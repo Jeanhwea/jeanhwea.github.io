@@ -1,0 +1,139 @@
+#+TITLE: 日志
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2018-10-30 Tue>
+#+TAGS: python programming logging logger
+
+
+* logging
+
+记录日志是程序员比较常见的需求， Python3.x 提供了 logging 模块来满足程序记录日志
+的基本功能。
+
+** 日志配置文件 logging.conf
+
+我比较偏爱使用配置文件来配置日志的属性，这样方便不修改程序来动态改日志记录级别。
+下面是我配置日志的一个配置文件。
+
+#+BEGIN_SRC conf
+[loggers]
+keys=root,sample
+
+[handlers]
+keys=console,debug,info,error
+
+[formatters]
+keys=simple,detail
+
+[logger_root]
+level=DEBUG
+handlers=debug,error
+
+[logger_sample]
+level=DEBUG
+handlers=console,info
+qualname=sample
+
+[handler_console]
+class=StreamHandler
+level=DEBUG
+formatter=simple
+args=(sys.stdout,)
+
+[handler_debug]
+class=logging.handlers.TimedRotatingFileHandler
+level=DEBUG
+formatter=simple
+backupCount=10
+encoding=utf8
+args=("log/debug.log",)
+
+[handler_info]
+class=logging.handlers.TimedRotatingFileHandler
+level=INFO
+formatter=simple
+backupCount=10
+encoding=utf8
+args=("log/info.log",)
+
+[handler_error]
+class=logging.handlers.TimedRotatingFileHandler
+level=WARNING
+formatter=detail
+backupCount=10
+encoding=utf8
+args=("log/error.log",)
+
+[formatter_simple]
+format=[%(asctime)s][%(levelname)-8s] <%(name)s>: %(message)s
+datefmt=
+
+[formatter_detail]
+format=[%(asctime)s][%(levelname)-8s][%(filename)s:%(lineno)d:%(funcName)s()] <%(name)s>: %(message)s
+datefmt=
+#+END_SRC
+
+这里的日志将分配记录到程序目录的 log 文件夹下。
+
+** 配置格式化属性名称
+
+配置的格式化属性参考下面的表格，请需要注意的是 args 不要自己编辑。
+
+| Attribute name  | Format                                       | Description                                                                                                                                                                                          |
+|-----------------+----------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| args            | You shouldn’t need to format this yourself.  | The tuple of arguments merged into msg to produce message, or a dict whose values are used for the merge (when there is only one argument, and it is a dictionary).                                  |
+| asctime         | %(asctime)s                                  | Human-readable time when the LogRecord was created. By default this is of the form ‘2003-07-08 16:49:45,896’ (the numbers after the comma are millisecond portion of the time).                      |
+| created         | %(created)f                                  | Time when the LogRecord was created (as returned by time.time()).                                                                                                                                    |
+| exc_info        | You shouldn’t need to format this yourself.  | Exception tuple (à la sys.exc_info) or, if no exception has occurred, None.                                                                                                                          |
+| filename        | %(filename)s                                 | Filename portion of pathname.                                                                                                                                                                        |
+| funcName        | %(funcName)s                                 | Name of function containing the logging call.                                                                                                                                                        |
+| levelname       | %(levelname)s                                | Text logging level for the message ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL').                                                                                                                |
+| levelno         | %(levelno)s                                  | Numeric logging level for the message (DEBUG, INFO, WARNING, ERROR, CRITICAL).                                                                                                                       |
+| lineno          | %(lineno)d                                   | Source line number where the logging call was issued (if available).                                                                                                                                 |
+| message         | %(message)s                                  | The logged message, computed as msg % args. This is set when Formatter.format() is invoked.                                                                                                          |
+| module          | %(module)s                                   | Module (name portion of filename).                                                                                                                                                                   |
+| msecs           | %(msecs)d                                    | Millisecond portion of the time when the LogRecord was created.                                                                                                                                      |
+| msg             | You shouldn’t need to format this yourself.  | The format string passed in the original logging call. Merged with args to produce message, or an arbitrary object (see Using arbitrary objects as messages).                                        |
+| name            | %(name)s                                     | Name of the logger used to log the call.                                                                                                                                                             |
+| pathname        | %(pathname)s                                 | Full pathname of the source file where the logging call was issued (if available).                                                                                                                   |
+| process         | %(process)d                                  | Process ID (if available).                                                                                                                                                                           |
+| processName     | %(processName)s                              | Process name (if available).                                                                                                                                                                         |
+| relativeCreated | %(relativeCreated)d                          | Time in milliseconds when the LogRecord was created, relative to the time the logging module was loaded.                                                                                             |
+| stack_info      | You shouldn’t need to format this yourself.  | Stack frame information (where available) from the bottom of the stack in the current thread, up to and including the stack frame of the logging call which resulted in the creation of this record. |
+| thread          | %(thread)d                                   | Thread ID (if available).                                                                                                                                                                            |
+| threadName      | %(threadName)s                               | Thread name (if available).                                                                                                                                                                          |
+
+** 使用指南
+
+使用的时候需要初始化日志类，参考代码如下：
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  import logging.config
+  logging.config.fileConfig('logging.conf')
+#+END_SRC
+
+初始化过后就可以记录日志了，这样记录日志方法可以是直接记录，也可以在类里面记录。
+下面是常用的记录方法：
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  import logging
+
+  # logging directly
+  logger = logging.getLogger(__name__)
+  logging.info("...")
+
+  # logging in Class
+  class Hello:
+
+    def __init__(self):
+      self.logger = logging.getLogger(__name__)
+
+    def hello(self):
+      self.info("...")
+#+END_SRC
+
+
+* 参考链接
+
+1. [[https://github.com/Jeanhwea/python-project-template][Python Project Template]]
+2. [[https://docs.python.org/3/library/logging.html#logrecord-attributes%0A][logging formatter]]

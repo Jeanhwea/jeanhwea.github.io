@@ -1,0 +1,47 @@
+#+TITLE: 使用 ffmpeg 制作 gif 动态图
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2018-10-27 Sat>
+#+TAGS: ffmpeg gif images cli
+
+
+* 前言
+
+ffmpeg 是个非常强大的命令行工具，之前写个一个使用 ffmpeg [[file:19.capture-screen-with-ffmpeg.org][录取屏幕动画]]的文章。
+这次继续分享一下使用它来做 gif 动态图片。
+
+
+* 剪切素材
+
+在制作 gif 图片时我们往往需要先将视频素材进行剪切，这里也是要用到 ffmpeg 工具的。
+使用如下的命令行将 ~input-file.mkv~ 视频素材剪切到 ~output-file.mkv~ 中。
+
+#+BEGIN_SRC sh
+  fmpeg -i input-file.mkv -ss 00:02 -to 02:25 -acodec copy -vcodec copy output-file.mkv
+#+END_SRC
+
+命令中的参数含义如下：
+
+- ~-i~: 指定输入流文件
+- ~-ss~, ~-to~: 分别指定裁剪视频的起始时间和结束时间，这里也可以使用 ~-ss~, ~-t~
+  分别指定裁剪视频的起始时间和裁剪的时间长度来完成。
+- ~-acodec copy -vcodec copy~: 让音频和视频的编解码直接复制，这样可以极大地缩减
+  裁剪的时间。
+- 最后是输出文件的名称
+
+
+* 生成动图
+
+有了素材就可以生成动图了，具体见下面的命令
+
+#+BEGIN_SRC sh
+  ffmpeg -i input.mkv -s 640x400 -f gif output.gif
+#+END_SRC
+
+命令中的参数含义如下：
+
+- ~-i~: 指定输入流文件
+- ~-s~: 指定图片的分辨率
+- ~-f~: 指定输出文件的格式
+- 最后是输出文件的名称
+

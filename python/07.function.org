@@ -1,0 +1,204 @@
+#+TITLE: 函数
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2018-10-23 Tue>
+#+TAGS: python programming function
+
+
+* 函数定义
+
+函数通过 def 关键字来定义，定义的例子如下：
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  def myfunc(arg):
+    print(arg)
+
+  def fib_lessthan(n):
+    ans = []
+    a, b = 0, 1
+    while a < n:
+      ans.append(a)
+      a, b = b, a+b
+    return ans
+
+  print(fib_lessthan(10))
+#+END_SRC
+
+#+RESULTS:
+: [0, 1, 1, 2, 3, 5, 8]
+
+
+* 函数传参
+
+** 默认参数
+
+在函数最后使用 ~=~ 可以给参数添加默认的值。
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  def increase(n, step=1):
+    return n + step
+
+  print(increase(2))
+  print(increase(1, 5))
+  print(increase(1, step=10))
+#+END_SRC
+
+#+RESULTS:
+: 3
+: 6
+: 11
+
+需要注意的是： *函数的默认参数只初始化一次* 。例如，下面例子中的 ~L~ 默认只在开
+始第一次初始化，后面每次调用都是添加到第一次初始化的列表中。
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  def f(a, L=[]):
+    L.append(a)
+    return L
+
+  print(f(1))
+  print(f(2))
+  print(f(3))
+#+END_SRC
+
+#+RESULTS:
+: [1]
+: [1, 2]
+: [1, 2, 3]
+
+** 变长参数
+
+Python 的边长参数传递可以通过列表或者字典实现。当在参数前面添加一个 ~*~ 表示在当
+前参数列表中的变长部分都会放入一个列表中传进函数里面， ~**~ 会放入一个字典中。
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  # parameter with single star
+  def print_param(*params):
+      print(params)
+
+  print_param('aa')
+  print_param('aa', 'bb')
+
+  # parameter with double star
+  def print_param2(**params):
+      print(params)
+  print_param2(x=1, y=2)
+
+  def print_param3(x, y, *args, **kargs):
+      print(x, y)
+      print(args)
+      print(kargs)
+  print_param3(1, 2, 3, 4, 5, p='3', k='d')
+#+END_SRC
+
+#+RESULTS:
+: ('aa',)
+: ('aa', 'bb')
+: {'x': 1, 'y': 2}
+: 1 2
+: (3, 4, 5)
+: {'p': '3', 'k': 'd'}
+
+~*~ 和 ~**~ 除了定义变长参数的作用以外，还可以用于将列表和字典参数解包，下面是一
+个使用的例子。
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  list(range(3, 6))            # normal call with separate arguments
+  args = [3, 6]
+  list(range(*args))            # call with arguments unpacked from a list
+
+  def parrot(voltage, state='a stiff', action='voom'):
+    print("-- This parrot wouldn't", action, end=' ')
+    print("if you put", voltage, "volts through it.", end=' ')
+    print("E's", state, "!")
+  d = {"voltage": "four million", "state": "bleedin' demised", "action": "VOOM"}
+  parrot(**d)
+#+END_SRC
+
+** lambda 表达式
+
+lambda 表达式其实是匿名函数，lambda 表达式可以帮助我们来实现闭包操作。如下定义了
+~make_incrementor~ 来动态生成 ~add5~ 和 ~add10~ 函数。
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  def make_incrementor(n):
+    return lambda x: x + n
+
+  add5 = make_incrementor(5)
+  add10 = make_incrementor(10)
+
+  print(add5(4))
+  print(add10(4))
+#+END_SRC
+
+#+RESULTS:
+: 9
+: 14
+
+** 装饰器
+
+装饰器是一个返回函数的高阶函数，通常是对一个函数进行一些属性设置后再将结果返回给
+原来的函数。装饰器使用 ~@~ 修饰到函数定义的前面，下面是一个样例。
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  def foo():
+      # do something
+
+  def decorator(func):
+      # manipulate func
+      return func
+
+  foo = decorator(foo)  # Manually decorate
+
+  @decorator
+  def bar():
+      # Do something
+  # bar() is decorated
+#+END_SRC
+
+
+* 匿名函数
+
+1. ~filter(func,iter)~ 只能处理一个参数 iter ，仅仅将满足 func 方法的数值过滤出来。
+2. ~map(func,iter1,iter2,..)~ 可以处理多个 iter，实现通过 func 方法对 iter1,
+   iter2,... 进行处理。
+3. ~reduce(func,iter,init)~ 仅能处理一个 iter, init 为初始化值，执行顺序为：先将
+   每个 iter 内部第一个值和 init 进行 func 处理，处理的结果再与 iter 第二个值进
+   行 func 处理，直到结束。
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  numseq = map(str, range(10))
+  print(list(numseq))
+  filnum = filter(lambda x: x > 5, range(10))
+  print(list(filnum))
+  from functools import reduce
+  ans = reduce(lambda x, y: x+y, range(100), 0)
+  print(ans)
+#+END_SRC
+
+#+RESULTS:
+: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+: [6, 7, 8, 9]
+: 4950
+
+
+* 全局变量
+
+Python 定义的变量默认都是局部变量，如果需要定义全局变量需要使用 ~global~ 关键字
+修饰。
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  g_x = 0
+  def change_x():
+      global g_x
+      g_x += 1
+
+  print(g_x)
+  change_x()
+  print(g_x)
+#+END_SRC
+
+
+* 参考链接
+
+1. [[https://docs.python.org/3/tutorial/controlflow.html#more-on-defining-functions][More on defining funciton]]

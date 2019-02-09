@@ -1,0 +1,139 @@
+#+TITLE: 时间和日期相关处理函数
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2018-10-24 Wed>
+#+TAGS: python programming time datetime
+
+
+* 基本操作
+
+~time~ 模块提供和时间相关的处理函数。 ~datetime~ 提供和日期相关的处理函数
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  import time
+  print(time.time()) # 获取当前时间
+  print(int(time.time()))
+
+  from datetime import datetime, timedelta
+  print(datetime.today())
+  year = timedelta(days=365)
+  print(year.total_seconds())
+  print(year)
+  print(datetime.today() + year)
+#+END_SRC
+
+#+RESULTS:
+: 1540362889.897552
+: 1540362889
+: 2018-10-24 14:34:49.897552
+: 31536000.0
+: 365 days, 0:00:00
+: 2019-10-24 14:34:49.897552
+
+
+* time 模块
+
+time 模块中的所有时间通过 ~time.struct_time~ 数据结构存储。
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  lt = time.localtime() # local time
+  gt = time.gmtime()    # UTC time
+  print(lt)
+  print(gt)
+#+END_SRC
+
+#+RESULTS:
+: time.struct_time(tm_year=2018, tm_mon=10, tm_mday=24, tm_hour=14, tm_min=47, tm_sec=1, tm_wday=2, tm_yday=297, tm_isdst=0)
+: time.struct_time(tm_year=2018, tm_mon=10, tm_mday=24, tm_hour=6, tm_min=47, tm_sec=1, tm_wday=2, tm_yday=297, tm_isdst=0)
+
+** 时间戳和 ~struct_time~ 转换
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  t = time.time()
+  print(time.localtime(t)) # timestamp -> struct_time
+  lt = time.localtime()
+  print(time.mktime(lt))   # the inverse function of localtime(), struct_time -> timestamp
+#+END_SRC
+
+#+RESULTS:
+: time.struct_time(tm_year=2018, tm_mon=10, tm_mday=24, tm_hour=14, tm_min=47, tm_sec=55, tm_wday=2, tm_yday=297, tm_isdst=0)
+: 1540363675.0
+
+** 格式化处理时间, 字符串和 ~struct_time~ 之间转换
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  fmt = '%Y-%m-%d %H:%M:%S'
+  print(time.strftime(fmt, time.localtime()))
+  print(time.strftime(fmt, time.gmtime()))
+  print(time.strptime('2018-10-24 14:51:03', fmt))
+#+END_SRC
+
+#+RESULTS:
+: 2018-10-24 14:52:05
+: 2018-10-24 06:52:05
+: time.struct_time(tm_year=2018, tm_mon=10, tm_mday=24, tm_hour=14, tm_min=51, tm_sec=3, tm_wday=2, tm_yday=297, tm_isdst=-1)
+
+** 时间戳和字符串之间转换
+
+需要借助 Python 的 time 模块中的 ~struct_time~ 作为中间数据结构来进行转换
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  fmt = '%Y-%m-%d %H:%M:%S'
+  ts = time.time()
+  print(time.strftime(fmt, time.localtime(ts)))
+  print(time.mktime(time.strptime('2018-10-24 15:03:46', fmt)))
+#+END_SRC
+
+#+RESULTS:
+: 2018-10-24 15:05:49
+: 1540364626.0
+
+** 线程休眠
+
+~sleep~ 可以是线程休眠相应的秒数。
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  fmt = '%Y-%m-%d %H:%M:%S'
+  sec = 3
+  print(time.strftime(fmt, time.localtime())) 
+  time.sleep(sec)
+  print(time.strftime(fmt, time.localtime()))
+#+END_SRC
+
+#+RESULTS:
+: 2018-10-24 14:56:01
+: 2018-10-24 14:56:04
+
+** 格式化时间表格
+
+| Directive | 	Meaning                                                                                                                                                                                                     |
+|-----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| %a        | 	Locale’s abbreviated weekday name.                                                                                                                                                                         |
+| %A        | 	Locale’s full weekday name.                                                                                                                                                                                |
+| %b        | 	Locale’s abbreviated month name.                                                                                                                                                                           |
+| %B        | 	Locale’s full month name.                                                                                                                                                                                  |
+| %c        | 	Locale’s appropriate date and time representation.                                                                                                                                                         |
+| %d        | 	Day of the month as a decimal number [01,31].                                                                                                                                                               |
+| %H        | 	Hour (24-hour clock) as a decimal number [00,23].                                                                                                                                                           |
+| %I        | 	Hour (12-hour clock) as a decimal number [01,12].                                                                                                                                                           |
+| %j        | 	Day of the year as a decimal number [001,366].                                                                                                                                                              |
+| %m        | 	Month as a decimal number [01,12].                                                                                                                                                                          |
+| %M        | 	Minute as a decimal number [00,59].                                                                                                                                                                         |
+| %p        | 	Locale’s equivalent of either AM or PM. 	                                                                                                                                                               |
+| %S        | 	Second as a decimal number [00,61]. 	                                                                                                                                                                    |
+| %U        | 	Week number of the year (Sunday as the first day of the week) as a decimal number [00,53]. All days in a new year preceding the first Sunday are considered to be in week 0.                                |
+| %w        | 	Weekday as a decimal number [0(Sunday),6].                                                                                                                                                                  |
+| %W        | 	Week number of the year (Monday as the first day of the week) as a decimal number [00,53]. All days in a new year preceding the first Monday are considered to be in week 0.                                |
+| %x        | 	Locale’s appropriate date representation.                                                                                                                                                                  |
+| %X        | 	Locale’s appropriate time representation.                                                                                                                                                                  |
+| %y        | 	Year without century as a decimal number [00,99].                                                                                                                                                           |
+| %Y        | 	Year with century as a decimal number.                                                                                                                                                                      |
+| %z        | 	Time zone offset indicating a positive or negative time difference from UTC/GMT of the form +HHMM or -HHMM, where H represents decimal hour digits and M represents decimal minute digits [-23:59, +23:59]. |
+| %Z        | 	Time zone name (no characters if no time zone exists).                                                                                                                                                      |
+| %%        | 	A literal '%' character.                                                                                                                                                                                    |
+
+
+* 参考链接
+
+1. [[https://docs.python.org/3/library/time.html#module-time][module-time]]
+2. [[https://docs.python.org/3/library/datetime.html#module-datetime][module-datetime]]

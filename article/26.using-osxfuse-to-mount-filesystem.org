@@ -1,0 +1,51 @@
+#+TITLE: 使用 osxfuse 挂载文件系统
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2018-11-13 Tue>
+#+TAGS: osxfuse ntfs filesystem
+
+
+* 安装工具
+
+osxfuse 是 macOS 下的一款可以提供访问非 mac 文件系统的软件，该软件开源免费，可以
+使用 homebrew 直接安装。
+
+#+BEGIN_SRC sh
+  brew cask install osxfuse
+#+END_SRC
+
+如果需要访问 NTF 文件系统，可以安装 ntf-3g 来挂载文件。
+
+#+BEGIN_SRC sh
+  brew install ntfs-3g
+#+END_SRC
+
+
+* ntfs-3g 挂载盘
+
+在挂载磁盘是先查询当前有哪些可以使用的盘，命令如下：
+
+#+BEGIN_SRC sh
+  diskutil list
+#+END_SRC
+
+[[file:../resource/image/2018/11/diskutil-list.png]]
+
+从图中可以看出我需要挂载的盘是 ~/dev/disk2s1~ ，所以可以使用下面的命令挂载
+
+#+BEGIN_SRC sh
+  sudo mkdir /Volumes/NTFS
+  sudo ntfs-3g /dev/disk2s1 /Volumes/NTFS -o local -o allow_other
+#+END_SRC
+
+如果挂载成功就可以在桌面上出现当前盘的图片
+
+[[file:../resource/image/2018/11/osxfuse-volume-ntfs-3g.png]]
+
+如需要弹出盘，直接右键盘点击弹出即可。
+
+
+* 参考链接
+
+1. [[https://osxfuse.github.io/][osxfuse]]
+2. [[https://github.com/osxfuse/osxfuse/wiki/NTFS-3G][ntfs-3g]]

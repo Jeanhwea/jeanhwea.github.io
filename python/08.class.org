@@ -1,0 +1,124 @@
+#+TITLE: 类
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2018-10-23 Tue>
+#+TAGS: python programming class
+
+
+* 定义类
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  class Vector:
+      # constructor
+      def __init__(self, a, b):
+          self.a = a
+          self.b = b
+
+      # destructor
+      def __del__(self):
+          pass
+
+      # displayer of this class
+      def __str__(self):
+          return 'Vector (%d, %d)' % (self.a, self.b)
+
+      # override operator '+'
+      def __add__(self,other):
+          return Vector(self.a + other.a, self.b + other.b)
+
+  v1 = Vector(2,10)
+  v2 = Vector(5,-2)
+  print(v1 + v2)
+#+END_SRC
+
+#+RESULTS:
+: Vector (7, 8)
+
+
+* 类继承
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  __metaclass__ = type
+  class Parent:
+      def __init__(self,):
+        self.name = 'parent'
+
+      def myMethod(self):
+          print(self.name)
+
+  class Child(Parent):
+      def __init__(self):
+        self.name = 'child'
+
+      def myMethod(self):
+          # call super method
+          super(Child, self).myMethod()
+
+  c = Child()
+  c.myMethod()
+#+END_SRC
+
+#+RESULTS:
+: child
+
+
+* 访问控制
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  class Visibility:
+      # private method start with __
+      def __inaccessible(self):
+          print 'you can not see me'
+
+      # public method
+      def accessible(self):
+          print 'this secret message is:',
+          self.__inaccessible()
+
+
+  secr = Visibility()
+  # secr.__inaccessible()
+  '''
+  Traceback (most recent call last):
+    File "***.py", line 13, in <module>
+      secr.__inaccessible()
+  AttributeError: Visibility instance has no attribute '__inaccessible'
+  '''
+  secr.accessible() #>>> this secret message is: you can not see me
+#+END_SRC
+
+#+RESULTS:
+: Traceback (most recent call last):
+:   File "<stdin>", line 1, in <module>
+:   File "***.py", line 4
+:     print 'you can not see me'
+:                              ^
+: SyntaxError: Missing parentheses in call to 'print'. Did you mean print('you can not see me')?
+
+
+* 定义类型类
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+  __metaclass__ = type
+  class Rect:
+      def __init__(self, width=0, height=0):
+          self.w = width
+          self.h = height
+
+      def getSize(self):
+          return self.w, self.h
+
+      def setSize(self, size):
+          self.w, self.h = size
+
+      size = property(getSize, setSize)
+
+  r = Rect(2, 5)
+  print(r.size)
+  r.size = 4, 4
+  print(r.size)
+#+END_SRC
+
+#+RESULTS:
+: (2, 5)
+: (4, 4)
