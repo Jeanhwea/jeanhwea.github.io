@@ -54,6 +54,8 @@ class IndexManager(object):
     content += self.infos2text(self.getinfos('article'))
     content += '\n** Python\n'
     content += self.infos2text(self.getinfos('python'))
+    content += '\n** Misc.\n'
+    content += self.infos2text(self.getinfos('misc'))
 
     with open(self._readme, 'w', encoding='utf-8') as f:
       f.write(content)
