@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2019-02-09 Sat 21:38 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>配置和使用 maven 工具</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">配置和使用 maven 工具</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgc18ca4a">1. 配置 Maven</a></li>
+<li><a href="#org411cf52">2. 使用 Maven</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orgc18ca4a" class="outline-2">
+<h2 id="orgc18ca4a"><span class="section-number-2">1</span> 配置 Maven</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+<a href="http://maven.apache.org/">Maven</a> 是一个非常优秀的 Java 项目中代码包管理工具。它默认将公共仓库放在
+<b>~/.m2/repository</b> 目录下面。有时候下载 Maven 是需要配置默认下载镜像到阿里云，这
+时候需要编辑 <b>~/.m2/settings.xml</b> 文件。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-xml"><span style="color: #2aa198;">&lt;?</span><span style="color: #859900;">xml</span><span style="color: #2aa198;"> </span><span style="color: #d33682;">version="1.0" encoding="UTF-8"</span><span style="color: #2aa198;">?&gt;</span>
+
+<span style="color: #586e75; font-style: italic;">&lt;!--</span>
+<span style="color: #586e75; font-style: italic;">Licensed to the Apache Software Foundation (ASF) under one</span>
+<span style="color: #586e75; font-style: italic;">or more contributor license agreements.  See the NOTICE file</span>
+<span style="color: #586e75; font-style: italic;">nndistributed with this work for additional information</span>
+<span style="color: #586e75; font-style: italic;">regarding copyright ownership.  The ASF licenses this file</span>
+<span style="color: #586e75; font-style: italic;">to you under the Apache License, Version 2.0 (the</span>
+<span style="color: #586e75; font-style: italic;">"License"); you may not use this file except in compliance</span>
+<span style="color: #586e75; font-style: italic;">with the License.  You may obtain a copy of the License at</span>
+
+<span style="color: #586e75; font-style: italic;">    http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span style="color: #586e75; font-style: italic;">Unless required by applicable law or agreed to in writing,</span>
+<span style="color: #586e75; font-style: italic;">software distributed under the License is distributed on an</span>
+<span style="color: #586e75; font-style: italic;">"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY</span>
+<span style="color: #586e75; font-style: italic;">KIND, either express or implied.  See the License for the</span>
+<span style="color: #586e75; font-style: italic;">specific language governing permissions and limitations</span>
+<span style="color: #586e75; font-style: italic;">under the License.</span>
+<span style="color: #586e75; font-style: italic;">--&gt;</span>
+
+<span style="color: #586e75; font-style: italic;">&lt;!--</span>
+<span style="color: #586e75; font-style: italic;"> </span><span style="color: #586e75; font-style: italic;">| This is the configuration file for Maven. It can be specified at two levels:</span>
+<span style="color: #586e75; font-style: italic;"> |</span>
+<span style="color: #586e75; font-style: italic;"> |  1. User Level. This settings.xml file provides configuration for a single user,</span>
+<span style="color: #586e75; font-style: italic;"> |                 and is normally provided in ${user.home}/.m2/settings.xml.</span>
+<span style="color: #586e75; font-style: italic;"> |</span>
+<span style="color: #586e75; font-style: italic;"> |                 NOTE: This location can be overridden with the CLI option:</span>
+<span style="color: #586e75; font-style: italic;"> |</span>
+<span style="color: #586e75; font-style: italic;"> |                 -s /path/to/user/settings.xml</span>
+<span style="color: #586e75; font-style: italic;"> |</span>
+<span style="color: #586e75; font-style: italic;"> |  2. Global Level. This settings.xml file provides configuration for all Maven</span>
+<span style="color: #586e75; font-style: italic;"> |                 users on a machine (assuming they're all using the same Maven</span>
+<span style="color: #586e75; font-style: italic;"> |                 installation). It's normally provided in</span>
+<span style="color: #586e75; font-style: italic;"> |                 ${maven.conf}/settings.xml.</span>
+<span style="color: #586e75; font-style: italic;"> |</span>
+<span style="color: #586e75; font-style: italic;"> |                 NOTE: This location can be overridden with the CLI option:</span>
+<span style="color: #586e75; font-style: italic;"> |</span>
+<span style="color: #586e75; font-style: italic;"> |                 -gs /path/to/global/settings.xml</span>
+<span style="color: #586e75; font-style: italic;"> |</span>
+<span style="color: #586e75; font-style: italic;"> | The sections in this sample file are intended to give you a running start at</span>
+<span style="color: #586e75; font-style: italic;"> | getting the most out of your Maven installation. Where appropriate, the default</span>
+<span style="color: #586e75; font-style: italic;"> | values (values used when the setting is not specified) are provided.</span>
+<span style="color: #586e75; font-style: italic;"> |</span>
+<span style="color: #586e75; font-style: italic;"> |</span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+&lt;<span style="color: #b58900;">settings</span> <span style="color: #6c71c4;">xmlns</span>=<span style="color: #2aa198;">"http://maven.apache.org/SETTINGS/1.0.0"</span>
+          <span style="color: #6c71c4;">xmlns</span>:<span style="color: #6c71c4;">xsi</span>=<span style="color: #2aa198;">"http://www.w3.org/2001/XMLSchema-instance"</span>
+          <span style="color: #6c71c4;">xsi</span>:<span style="color: #6c71c4;">schemaLocation</span>=<span style="color: #2aa198;">"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd"</span>&gt;
+  <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">localRepository</span>
+<span style="color: #586e75; font-style: italic;">   | The path to the local repository maven will use to store artifacts.</span>
+<span style="color: #586e75; font-style: italic;">   |</span>
+<span style="color: #586e75; font-style: italic;">   | Default: ${user.home}/.m2/repository</span>
+<span style="color: #586e75; font-style: italic;">  &lt;localRepository&gt;/path/to/local/repo&lt;/localRepository&gt;</span>
+<span style="color: #586e75; font-style: italic;">  </span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+
+  <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">interactiveMode</span>
+<span style="color: #586e75; font-style: italic;">   | This will determine whether maven prompts you when it needs input. If set to false,</span>
+<span style="color: #586e75; font-style: italic;">   | maven will use a sensible default value, perhaps based on some other setting, for</span>
+<span style="color: #586e75; font-style: italic;">   | the parameter in question.</span>
+<span style="color: #586e75; font-style: italic;">   |</span>
+<span style="color: #586e75; font-style: italic;">   | Default: true</span>
+<span style="color: #586e75; font-style: italic;">  &lt;interactiveMode&gt;true&lt;/interactiveMode&gt;</span>
+<span style="color: #586e75; font-style: italic;">  </span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+
+  <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">offline</span>
+<span style="color: #586e75; font-style: italic;">   | Determines whether maven should attempt to connect to the network when executing a build.</span>
+<span style="color: #586e75; font-style: italic;">   | This will have an effect on artifact downloads, artifact deployment, and others.</span>
+<span style="color: #586e75; font-style: italic;">   |</span>
+<span style="color: #586e75; font-style: italic;">   | Default: false</span>
+<span style="color: #586e75; font-style: italic;">  &lt;offline&gt;false&lt;/offline&gt;</span>
+<span style="color: #586e75; font-style: italic;">  </span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+
+  <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">pluginGroups</span>
+<span style="color: #586e75; font-style: italic;">   | This is a list of additional group identifiers that will be searched when resolving plugins by their prefix, i.e.</span>
+<span style="color: #586e75; font-style: italic;">   | when invoking a command line like "mvn prefix:goal". Maven will automatically add the group identifiers</span>
+<span style="color: #586e75; font-style: italic;">   | "org.apache.maven.plugins" and "org.codehaus.mojo" if these are not already contained in the list.</span>
+<span style="color: #586e75; font-style: italic;">   |</span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+  &lt;<span style="color: #b58900;">pluginGroups</span>&gt;
+    <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">pluginGroup</span>
+<span style="color: #586e75; font-style: italic;">     | Specifies a further group identifier to use for plugin lookup.</span>
+<span style="color: #586e75; font-style: italic;">    &lt;pluginGroup&gt;com.your.plugins&lt;/pluginGroup&gt;</span>
+<span style="color: #586e75; font-style: italic;">    </span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+  &lt;/<span style="color: #b58900;">pluginGroups</span>&gt;
+
+  <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">proxies</span>
+<span style="color: #586e75; font-style: italic;">   | This is a list of proxies which can be used on this machine to connect to the network.</span>
+<span style="color: #586e75; font-style: italic;">   | Unless otherwise specified (by system property or command-line switch), the first proxy</span>
+<span style="color: #586e75; font-style: italic;">   | specification in this list marked as active will be used.</span>
+<span style="color: #586e75; font-style: italic;">   |</span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+  &lt;<span style="color: #b58900;">proxies</span>&gt;
+    <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">proxy</span>
+<span style="color: #586e75; font-style: italic;">     | Specification for one proxy, to be used in connecting to the network.</span>
+<span style="color: #586e75; font-style: italic;">     |</span>
+<span style="color: #586e75; font-style: italic;">    &lt;proxy&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;id&gt;optional&lt;/id&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;active&gt;true&lt;/active&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;protocol&gt;http&lt;/protocol&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;username&gt;proxyuser&lt;/username&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;password&gt;proxypass&lt;/password&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;host&gt;proxy.host.net&lt;/host&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;port&gt;80&lt;/port&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;nonProxyHosts&gt;local.net|some.host.com&lt;/nonProxyHosts&gt;</span>
+<span style="color: #586e75; font-style: italic;">    &lt;/proxy&gt;</span>
+<span style="color: #586e75; font-style: italic;">    </span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+  &lt;/<span style="color: #b58900;">proxies</span>&gt;
+
+  <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">servers</span>
+<span style="color: #586e75; font-style: italic;">   | This is a list of authentication profiles, keyed by the server-id used within the system.</span>
+<span style="color: #586e75; font-style: italic;">   | Authentication profiles can be used whenever maven must make a connection to a remote server.</span>
+<span style="color: #586e75; font-style: italic;">   |</span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+  &lt;<span style="color: #b58900;">servers</span>&gt;
+    <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">server</span>
+<span style="color: #586e75; font-style: italic;">     | Specifies the authentication information to use when connecting to a particular server, identified by</span>
+<span style="color: #586e75; font-style: italic;">     | a unique name within the system (referred to by the 'id' attribute below).</span>
+<span style="color: #586e75; font-style: italic;">     |</span>
+<span style="color: #586e75; font-style: italic;">     | NOTE: You should either specify username/password OR privateKey/passphrase, since these pairings are</span>
+<span style="color: #586e75; font-style: italic;">     |       used together.</span>
+<span style="color: #586e75; font-style: italic;">     |</span>
+<span style="color: #586e75; font-style: italic;">    &lt;server&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;id&gt;deploymentRepo&lt;/id&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;username&gt;repouser&lt;/username&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;password&gt;repopwd&lt;/password&gt;</span>
+<span style="color: #586e75; font-style: italic;">    &lt;/server&gt;</span>
+<span style="color: #586e75; font-style: italic;">    </span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+
+    <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">Another sample, using keys to authenticate.</span>
+<span style="color: #586e75; font-style: italic;">    &lt;server&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;id&gt;siteServer&lt;/id&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;privateKey&gt;/path/to/private/key&lt;/privateKey&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;passphrase&gt;optional; leave empty if not used.&lt;/passphrase&gt;</span>
+<span style="color: #586e75; font-style: italic;">    &lt;/server&gt;</span>
+<span style="color: #586e75; font-style: italic;">    </span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+  &lt;/<span style="color: #b58900;">servers</span>&gt;
+
+  <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">mirrors</span>
+<span style="color: #586e75; font-style: italic;">   | This is a list of mirrors to be used in downloading artifacts from remote repositories.</span>
+<span style="color: #586e75; font-style: italic;">   |</span>
+<span style="color: #586e75; font-style: italic;">   | It works like this: a POM may declare a repository to use in resolving certain artifacts.</span>
+<span style="color: #586e75; font-style: italic;">   | However, this repository may have problems with heavy traffic at times, so people have mirrored</span>
+<span style="color: #586e75; font-style: italic;">   | it to several places.</span>
+<span style="color: #586e75; font-style: italic;">   |</span>
+<span style="color: #586e75; font-style: italic;">   | That repository definition will have a unique id, so we can create a mirror reference for that</span>
+<span style="color: #586e75; font-style: italic;">   | repository, to be used as an alternate download site. The mirror site will be the preferred</span>
+<span style="color: #586e75; font-style: italic;">   | server for that repository.</span>
+<span style="color: #586e75; font-style: italic;">   |</span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+  &lt;<span style="color: #b58900;">mirrors</span>&gt;
+    <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">mirror</span>
+<span style="color: #586e75; font-style: italic;">     | Specifies a repository mirror site to use instead of a given repository. The repository that</span>
+<span style="color: #586e75; font-style: italic;">     | this mirror serves has an ID that matches the mirrorOf element of this mirror. IDs are used</span>
+<span style="color: #586e75; font-style: italic;">     | for inheritance and direct lookup purposes, and must be unique across the set of mirrors.</span>
+<span style="color: #586e75; font-style: italic;">     |</span>
+<span style="color: #586e75; font-style: italic;">    &lt;mirror&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;id&gt;mirrorId&lt;/id&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;mirrorOf&gt;repositoryId&lt;/mirrorOf&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;name&gt;Human Readable Name for this Mirror.&lt;/name&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;url&gt;http://my.repository.com/repo/path&lt;/url&gt;</span>
+<span style="color: #586e75; font-style: italic;">    &lt;/mirror&gt;</span>
+<span style="color: #586e75; font-style: italic;">    </span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+    &lt;<span style="color: #b58900;">mirror</span>&gt;
+      &lt;<span style="color: #b58900;">id</span>&gt;nexus-aliyun&lt;/<span style="color: #b58900;">id</span>&gt;
+      &lt;<span style="color: #b58900;">mirrorOf</span>&gt;*&lt;/<span style="color: #b58900;">mirrorOf</span>&gt;
+      &lt;<span style="color: #b58900;">name</span>&gt;Nexus aliyun&lt;/<span style="color: #b58900;">name</span>&gt;
+      &lt;<span style="color: #b58900;">url</span>&gt;https://maven.aliyun.com/nexus/content/groups/public&lt;/<span style="color: #b58900;">url</span>&gt;
+    &lt;/<span style="color: #b58900;">mirror</span>&gt;
+  &lt;/<span style="color: #b58900;">mirrors</span>&gt;
+
+  <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">profiles</span>
+<span style="color: #586e75; font-style: italic;">   | This is a list of profiles which can be activated in a variety of ways, and which can modify</span>
+<span style="color: #586e75; font-style: italic;">   | the build process. Profiles provided in the settings.xml are intended to provide local machine-</span>
+<span style="color: #586e75; font-style: italic;">   | specific paths and repository locations which allow the build to work in the local environment.</span>
+<span style="color: #586e75; font-style: italic;">   |</span>
+<span style="color: #586e75; font-style: italic;">   | For example, if you have an integration testing plugin - like cactus - that needs to know where</span>
+<span style="color: #586e75; font-style: italic;">   | your Tomcat instance is installed, you can provide a variable here such that the variable is</span>
+<span style="color: #586e75; font-style: italic;">   | dereferenced during the build process to configure the cactus plugin.</span>
+<span style="color: #586e75; font-style: italic;">   |</span>
+<span style="color: #586e75; font-style: italic;">   | As noted above, profiles can be activated in a variety of ways. One way - the activeProfiles</span>
+<span style="color: #586e75; font-style: italic;">   | section of this document (settings.xml) - will be discussed later. Another way essentially</span>
+<span style="color: #586e75; font-style: italic;">   | relies on the detection of a system property, either matching a particular value for the property,</span>
+<span style="color: #586e75; font-style: italic;">   | or merely testing its existence. Profiles can also be activated by JDK version prefix, where a</span>
+<span style="color: #586e75; font-style: italic;">   | value of '1.4' might activate a profile when the build is executed on a JDK version of '1.4.2_07'.</span>
+<span style="color: #586e75; font-style: italic;">   | Finally, the list of active profiles can be specified directly from the command line.</span>
+<span style="color: #586e75; font-style: italic;">   |</span>
+<span style="color: #586e75; font-style: italic;">   | NOTE: For profiles defined in the settings.xml, you are restricted to specifying only artifact</span>
+<span style="color: #586e75; font-style: italic;">   |       repositories, plugin repositories, and free-form properties to be used as configuration</span>
+<span style="color: #586e75; font-style: italic;">   |       variables for plugins in the POM.</span>
+<span style="color: #586e75; font-style: italic;">   |</span>
+<span style="color: #586e75; font-style: italic;">   |</span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+  &lt;<span style="color: #b58900;">profiles</span>&gt;
+    <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">profile</span>
+<span style="color: #586e75; font-style: italic;">     | Specifies a set of introductions to the build process, to be activated using one or more of the</span>
+<span style="color: #586e75; font-style: italic;">     | mechanisms described above. For inheritance purposes, and to activate profiles via &lt;activatedProfiles/&gt;</span>
+<span style="color: #586e75; font-style: italic;">     | or the command line, profiles have to have an ID that is unique.</span>
+<span style="color: #586e75; font-style: italic;">     |</span>
+<span style="color: #586e75; font-style: italic;">     | An encouraged best practice for profile identification is to use a consistent naming convention</span>
+<span style="color: #586e75; font-style: italic;">     | for profiles, such as 'env-dev', 'env-test', 'env-production', 'user-jdcasey', 'user-brett', etc.</span>
+<span style="color: #586e75; font-style: italic;">     | This will make it more intuitive to understand what the set of introduced profiles is attempting</span>
+<span style="color: #586e75; font-style: italic;">     | to accomplish, particularly when you only have a list of profile id's for debug.</span>
+<span style="color: #586e75; font-style: italic;">     |</span>
+<span style="color: #586e75; font-style: italic;">     | This profile example uses the JDK version to trigger activation, and provides a JDK-specific repo.</span>
+<span style="color: #586e75; font-style: italic;">    &lt;profile&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;id&gt;jdk-1.4&lt;/id&gt;</span>
+
+<span style="color: #586e75; font-style: italic;">      &lt;activation&gt;</span>
+<span style="color: #586e75; font-style: italic;">        &lt;jdk&gt;1.4&lt;/jdk&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;/activation&gt;</span>
+
+<span style="color: #586e75; font-style: italic;">      &lt;repositories&gt;</span>
+<span style="color: #586e75; font-style: italic;">        &lt;repository&gt;</span>
+<span style="color: #586e75; font-style: italic;">          &lt;id&gt;jdk14&lt;/id&gt;</span>
+<span style="color: #586e75; font-style: italic;">          &lt;name&gt;Repository for JDK 1.4 builds&lt;/name&gt;</span>
+<span style="color: #586e75; font-style: italic;">          &lt;url&gt;http://www.myhost.com/maven/jdk14&lt;/url&gt;</span>
+<span style="color: #586e75; font-style: italic;">          &lt;layout&gt;default&lt;/layout&gt;</span>
+<span style="color: #586e75; font-style: italic;">          &lt;snapshotPolicy&gt;always&lt;/snapshotPolicy&gt;</span>
+<span style="color: #586e75; font-style: italic;">        &lt;/repository&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;/repositories&gt;</span>
+<span style="color: #586e75; font-style: italic;">    &lt;/profile&gt;</span>
+<span style="color: #586e75; font-style: italic;">    </span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+
+    <span style="color: #586e75; font-style: italic;">&lt;!--</span>
+<span style="color: #586e75; font-style: italic;">     </span><span style="color: #586e75; font-style: italic;">| Here is another profile, activated by the system property 'target-env' with a value of 'dev',</span>
+<span style="color: #586e75; font-style: italic;">     | which provides a specific path to the Tomcat instance. To use this, your plugin configuration</span>
+<span style="color: #586e75; font-style: italic;">     | might hypothetically look like:</span>
+<span style="color: #586e75; font-style: italic;">     |</span>
+<span style="color: #586e75; font-style: italic;">     | ...</span>
+<span style="color: #586e75; font-style: italic;">     | &lt;plugin&gt;</span>
+<span style="color: #586e75; font-style: italic;">     |   &lt;groupId&gt;org.myco.myplugins&lt;/groupId&gt;</span>
+<span style="color: #586e75; font-style: italic;">     |   &lt;artifactId&gt;myplugin&lt;/artifactId&gt;</span>
+<span style="color: #586e75; font-style: italic;">     |</span>
+<span style="color: #586e75; font-style: italic;">     |   &lt;configuration&gt;</span>
+<span style="color: #586e75; font-style: italic;">     |     &lt;tomcatLocation&gt;${tomcatPath}&lt;/tomcatLocation&gt;</span>
+<span style="color: #586e75; font-style: italic;">     |   &lt;/configuration&gt;</span>
+<span style="color: #586e75; font-style: italic;">     | &lt;/plugin&gt;</span>
+<span style="color: #586e75; font-style: italic;">     | ...</span>
+<span style="color: #586e75; font-style: italic;">     |</span>
+<span style="color: #586e75; font-style: italic;">     | NOTE: If you just wanted to inject this configuration whenever someone set 'target-env' to</span>
+<span style="color: #586e75; font-style: italic;">     |       anything, you could just leave off the &lt;value/&gt; inside the activation-property.</span>
+<span style="color: #586e75; font-style: italic;">     |</span>
+<span style="color: #586e75; font-style: italic;">    &lt;profile&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;id&gt;env-dev&lt;/id&gt;</span>
+
+<span style="color: #586e75; font-style: italic;">      &lt;activation&gt;</span>
+<span style="color: #586e75; font-style: italic;">        &lt;property&gt;</span>
+<span style="color: #586e75; font-style: italic;">          &lt;name&gt;target-env&lt;/name&gt;</span>
+<span style="color: #586e75; font-style: italic;">          &lt;value&gt;dev&lt;/value&gt;</span>
+<span style="color: #586e75; font-style: italic;">        &lt;/property&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;/activation&gt;</span>
+
+<span style="color: #586e75; font-style: italic;">      &lt;properties&gt;</span>
+<span style="color: #586e75; font-style: italic;">        &lt;tomcatPath&gt;/path/to/tomcat/instance&lt;/tomcatPath&gt;</span>
+<span style="color: #586e75; font-style: italic;">      &lt;/properties&gt;</span>
+<span style="color: #586e75; font-style: italic;">    &lt;/profile&gt;</span>
+<span style="color: #586e75; font-style: italic;">    </span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+  &lt;/<span style="color: #b58900;">profiles</span>&gt;
+
+  <span style="color: #586e75; font-style: italic;">&lt;!-- </span><span style="color: #586e75; font-style: italic;">activeProfiles</span>
+<span style="color: #586e75; font-style: italic;">   | List of profiles that are active for all builds.</span>
+<span style="color: #586e75; font-style: italic;">   |</span>
+<span style="color: #586e75; font-style: italic;">  &lt;activeProfiles&gt;</span>
+<span style="color: #586e75; font-style: italic;">    &lt;activeProfile&gt;alwaysActiveProfile&lt;/activeProfile&gt;</span>
+<span style="color: #586e75; font-style: italic;">    &lt;activeProfile&gt;anotherAlwaysActiveProfile&lt;/activeProfile&gt;</span>
+<span style="color: #586e75; font-style: italic;">  &lt;/activeProfiles&gt;</span>
+<span style="color: #586e75; font-style: italic;">  </span><span style="color: #586e75; font-style: italic;">--&gt;</span>
+&lt;/<span style="color: #b58900;">settings</span>&gt;
+</pre>
+</div>
+
+<p>
+其中下面这一段可以设置镜像站点
+</p>
+
+<div class="org-src-container">
+<pre class="src src-xml">&lt;<span style="color: #b58900;">mirror</span>&gt;
+  &lt;<span style="color: #b58900;">id</span>&gt;nexus-aliyun&lt;/<span style="color: #b58900;">id</span>&gt;
+  &lt;<span style="color: #b58900;">mirrorOf</span>&gt;*&lt;/<span style="color: #b58900;">mirrorOf</span>&gt;
+  &lt;<span style="color: #b58900;">name</span>&gt;Nexus aliyun&lt;/<span style="color: #b58900;">name</span>&gt;
+  &lt;<span style="color: #b58900;">url</span>&gt;https://maven.aliyun.com/nexus/content/groups/public&lt;/<span style="color: #b58900;">url</span>&gt;
+&lt;/<span style="color: #b58900;">mirror</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org411cf52" class="outline-2">
+<h2 id="org411cf52"><span class="section-number-2">2</span> 使用 Maven</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Maven 官方给出了一个<a href="http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html">五分钟教程</a>，里面有详细的介绍。其中我觉得一个比较重要的命令就
+是新建一个 maven 项目，这里先粘贴过来。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">mvn archetype:generate <span style="color: #2aa198;">\</span>
+  -DgroupId=cn.edu.buaa.app <span style="color: #2aa198;">\</span>
+  -DartifactId=mapp <span style="color: #2aa198;">\</span>
+  -DarchetypeArtifactId=maven-archetype-quickstart <span style="color: #2aa198;">\</span>
+  -DinteractiveMode=false
+</pre>
+</div>
+
+<p>
+使用 Maven 将本地的 jar 包安装到本地仓库中
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">mvn install:install-file <span style="color: #2aa198;">\</span>
+  -DgroupId=com.oracle <span style="color: #2aa198;">\</span>
+  -DartifactId=ojdbc6 <span style="color: #2aa198;">\</span>
+  -Dversion=11.2.0.4 <span style="color: #2aa198;">\</span>
+  -Dpackaging=jar <span style="color: #2aa198;">\</span>
+  -Dfile=&lt;path-to-jar&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2018-10-08 Mon 00:00</p>
+<p class="author">Author: Jinghui Hu</p>
+<p class="date">Created: 2019-02-09 Sat 21:38</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

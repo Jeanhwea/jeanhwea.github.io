@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2019-02-09 Sat 21:43 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CRUL 工具</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">CRUL 工具</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org5f7db3b">1. 常见用法</a>
+<ul>
+<li><a href="#org7635395">1.1. 获取网页</a></li>
+<li><a href="#orge0eb220">1.2. 保存文件</a></li>
+<li><a href="#org49d597b">1.3. 用户名/密码</a></li>
+<li><a href="#orgb8677fa">1.4. 返回 header 和 code</a></li>
+<li><a href="#org9f44c2e">1.5. 代理</a></li>
+<li><a href="#org5b6670b">1.6. 分片下载 (Range)</a></li>
+<li><a href="#org0b94764">1.7. 上传</a></li>
+</ul>
+</li>
+<li><a href="#orgc63fcf5">2. API 测试</a>
+<ul>
+<li><a href="#org56cd9e8">2.1. POST 数据</a></li>
+<li><a href="#orgb94225b">2.2. USER AGENT</a></li>
+<li><a href="#orga320cfb">2.3. 处理 cookie</a></li>
+</ul>
+</li>
+<li><a href="#org8c5e672">3. 参考链接</a></li>
+</ul>
+</div>
+</div>
+
+<div class="figure">
+<p><img src="../resource/image/2018/11/everything-curl.png" alt="everything-curl.png" />
+</p>
+</div>
+
+<div id="outline-container-org5f7db3b" class="outline-2">
+<h2 id="org5f7db3b"><span class="section-number-2">1</span> 常见用法</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org7635395" class="outline-3">
+<h3 id="org7635395"><span class="section-number-3">1.1</span> 获取网页</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+直接使用 curl 后面添加网站地址就可以将网站的内容抓取下来。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl http://www.example.com/
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orge0eb220" class="outline-3">
+<h3 id="orge0eb220"><span class="section-number-3">1.2</span> 保存文件</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+使用 <b>-o</b> 选项可以将下载的内容保存成相应的文件，并命名成给定的文件名。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -o example.html http://www.example.com/
+</pre>
+</div>
+
+<p>
+使用 <b>-O</b> 选项将下载的内容保存成 url 最后给定的文件名，如下例子中将会把文件命名
+成 index.html
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -O www.haxx.se/index.html
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org49d597b" class="outline-3">
+<h3 id="org49d597b"><span class="section-number-3">1.3</span> 用户名/密码</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+有时候下载 ftp 中的内容需要用户名和密码，可以使用 <b>-u</b> 选项添加用户名和密码。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -u name:passwd ftp://machine.domain:port/full/path/to/file
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb8677fa" class="outline-3">
+<h3 id="orgb8677fa"><span class="section-number-3">1.4</span> 返回 header 和 code</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+使用 <b>-i</b> 选项可以参考网页的给出的返回头相关信息。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -i www.example.com
+</pre>
+</div>
+
+<pre class="example">
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Cache-Control: max-age=604800
+Content-Type: text/html; charset=UTF-8
+Date: Sat, 03 Nov 2018 14:36:06 GMT
+Etag: "1541025663"
+Expires: Sat, 10 Nov 2018 14:36:06 GMT
+Last-Modified: Fri, 09 Aug 2013 23:54:35 GMT
+Server: ECS (lga/13A4)
+Vary: Accept-Encoding
+X-Cache: HIT
+Content-Length: 1270
+
+...
+</pre>
+
+<p>
+可以使用下面命令来将 header 下载起来保存成文件。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl --dump-header headers.txt www.example.com
+</pre>
+</div>
+
+<p>
+有时候我们在写脚本是仅仅需要参考网站的返回码，为了方便解析可以使用下面命令直接获
+取返回码。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -q -s -w %{http_code} www.example.com
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9f44c2e" class="outline-3">
+<h3 id="org9f44c2e"><span class="section-number-3">1.5</span> 代理</h3>
+<div class="outline-text-3" id="text-1-5">
+<p>
+curl 还支持 HTTP 和 SOCKS 协议的代理。可以使用 <b>-x</b> 选项了设置代理服务器的地址和
+端口号信息。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -x my-proxy:888 ftp://ftp.leachsite.com/README
+curl -u user:passwd -x my-proxy:888 http://www.get.this/
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5b6670b" class="outline-3">
+<h3 id="org5b6670b"><span class="section-number-3">1.6</span> 分片下载 (Range)</h3>
+<div class="outline-text-3" id="text-1-6">
+<p>
+可以使用 <b>-r</b> 选项来分片下载文件。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">Get the first 100 bytes of a document</span>
+curl -r 0-99 http://www.get.this/
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">Get the last 500 bytes of a document</span>
+curl -r -500 http://www.get.this/
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0b94764" class="outline-3">
+<h3 id="org0b94764"><span class="section-number-3">1.7</span> 上传</h3>
+<div class="outline-text-3" id="text-1-7">
+<p>
+使用 curl 的 <b>-T</b> 选项来指定上传文件。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">upload all data on stdin to a specified server</span>
+curl -T - ftp://ftp.upload.com/myfile
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">upload file with username and password</span>
+curl -T uploadfile -u user:passwd ftp://ftp.upload.com/
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">upload file to get append to the remote file</span>
+curl -T localfile -a ftp://ftp.upload.com/remotefile
+</pre>
+</div>
+
+<p>
+使用 smb 协议上传文件。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -T file.txt -u <span style="color: #2aa198;">"domain\username:passwd"</span> smb://server.example.com/share/
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgc63fcf5" class="outline-2">
+<h2 id="orgc63fcf5"><span class="section-number-2">2</span> API 测试</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org56cd9e8" class="outline-3">
+<h3 id="org56cd9e8"><span class="section-number-3">2.1</span> POST 数据</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+在测试 API 联通时常常需要 POST 一下数据，使用 <b>-d</b> 选项可以 POST 数据。这里的数
+据部分必须是事先编码好的。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -d <span style="color: #2aa198;">"name=Rafael%20Sagula&amp;phone=3320780"</span> http://www.where.com/guest.cgi
+</pre>
+</div>
+
+<p>
+使用 <b>-d</b> 选项的局限性是只能使用普通键值对方式的参数，如果需要 POST 文件内容参数
+则需要使用 <b>-F</b> 选项。 <b>-F</b> 选项使用 <code>@&lt;filename&gt;;type=&lt;mime-type&gt;</code> 这种方式来编
+码所要上传的文件。如果没有给定 mime-type 则 curl 根据文件后缀名来猜测。如下命令
+中上传了三个文件。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -F <span style="color: #2aa198;">"coolfiles=@fil1.gif;type=image/gif,fil2.txt,fil3.html"</span> http://www.post.com/postit.cgi
+</pre>
+</div>
+
+<p>
+上传文件并且添加其它字段的例子。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -F <span style="color: #2aa198;">"file=@cooltext.txt"</span> -F <span style="color: #2aa198;">"yourname=Daniel"</span> <span style="color: #2aa198;">\</span>
+  -F <span style="color: #2aa198;">"filedescription=Cool text file with cool text inside"</span> <span style="color: #2aa198;">\</span>
+  http://www.post.com/postit.cgi
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb94225b" class="outline-3">
+<h3 id="orgb94225b"><span class="section-number-3">2.2</span> USER AGENT</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+使用 <b>-A</b> 选项知道 USER-AGENT。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -A <span style="color: #2aa198;">'Mozilla/3.0 (Win95; I)'</span> www.baidu.com
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga320cfb" class="outline-3">
+<h3 id="orga320cfb"><span class="section-number-3">2.3</span> 处理 cookie</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+由于 HTTP 协议是无状态的，所以有些网站是使用 cookie 来记录会话信息。对于chrome
+这样的浏览器，可以轻易处理 cookie 信息，但在 curl 中只要增加相关参数也是可以很容
+易的处理 cookie 。如下， <b>-c</b> 选项可以将获取到的 cookie 保存成文件。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -c cookie.txt http://www.baidu.com
+</pre>
+</div>
+
+<p>
+使用 <b>-b</b> 可以指定 cookie 字段。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -b <span style="color: #2aa198;">"name=Daniel"</span> www.sillypage.com
+</pre>
+</div>
+
+<p>
+读写同一个 cookie 文件。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl -b cookies.txt -c cookies.txt www.example.com
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org8c5e672" class="outline-2">
+<h2 id="org8c5e672"><span class="section-number-2">3</span> 参考链接</h2>
+<div class="outline-text-2" id="text-3">
+<ol class="org-ol">
+<li><a href="https://curl.haxx.se/">curl</a></li>
+<li><a href="https://curl.haxx.se/docs/manual.html">curl manual</a></li>
+<li><a href="https://ec.haxx.se/">everything curl</a></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2018-11-03 Sat 00:00</p>
+<p class="author">Author: Jinghui Hu</p>
+<p class="date">Created: 2019-02-09 Sat 21:43</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

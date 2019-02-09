@@ -3,12 +3,12 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-02-09 Sat 21:35 -->
+<!-- 2019-02-09 Sat 21:41 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Jinghui Hu's Personal Webpages</title>
+<title>使用 JavaScript 导出 Excel 文件</title>
 <meta name="generator" content="Org mode" />
-<meta name="author" content="胡京徽" />
+<meta name="author" content="Jinghui Hu" />
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
   .title  { text-align: center;
@@ -229,96 +229,149 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">Jinghui Hu's Personal Webpages</h1>
+<h1 class="title">使用 JavaScript 导出 Excel 文件</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org1cd3a33">1. Study and Working</a>
+<li><a href="#org2842fde">1. SheetJS</a>
 <ul>
-<li><a href="#org14287cc">1.1. Education Experience</a></li>
-<li><a href="#org1fe3817">1.2. Internship and Working Experience</a></li>
+<li><a href="#org2d566d1">1.1. 安装</a></li>
+<li><a href="#org1b76d81">1.2. 使用</a>
+<ul>
+<li><a href="#org40b16d7">1.2.1. export-excel.ts</a></li>
+<li><a href="#org6be97f1">1.2.2. export-excel.html</a></li>
 </ul>
 </li>
-<li><a href="#orgcc3c662">2. Publications</a></li>
-<li><a href="#orgf3a0dc4">3. Links</a></li>
+</ul>
+</li>
+<li><a href="#org53c20f4">2. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org1cd3a33" class="outline-2">
-<h2 id="org1cd3a33"><span class="section-number-2">1</span> Study and Working</h2>
+<div id="outline-container-org2842fde" class="outline-2">
+<h2 id="org2842fde"><span class="section-number-2">1</span> SheetJS</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org14287cc" class="outline-3">
-<h3 id="org14287cc"><span class="section-number-3">1.1</span> Education Experience</h3>
+<div id="outline-container-org2d566d1" class="outline-3">
+<h3 id="org2d566d1"><span class="section-number-3">1.1</span> 安装</h3>
 <div class="outline-text-3" id="text-1-1">
-<ul class="org-ul">
-<li>2011/09 – 2015/07: <a href="https://www.buaa.edu.cn">Beihang University</a>, Bachelor Degree of Computer Science and
-Technology</li>
-<li>2012/09 – 2015/07: <a href="https://www.buaa.edu.cn">Beihang University</a>, Second Bachelor Degree of Mathematics
-and Applied Mathematics</li>
-<li>2015/09 - 2018/03: <a href="https://www.buaa.edu.cn">Beihang University</a>, Master Degree of Computer Technology</li>
-</ul>
+<p>
+SheetJS 可以读写 Excel 文件，它的社区版本是开源免费使用的，安装方法如下：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">yarn add xlsx
+</pre>
 </div>
 </div>
-<div id="outline-container-org1fe3817" class="outline-3">
-<h3 id="org1fe3817"><span class="section-number-3">1.2</span> Internship and Working Experience</h3>
+</div>
+
+<div id="outline-container-org1b76d81" class="outline-3">
+<h3 id="org1b76d81"><span class="section-number-3">1.2</span> 使用</h3>
 <div class="outline-text-3" id="text-1-2">
-<ul class="org-ul">
-<li>2013/07 – 2013/09: Intern Java Programmer at <a href="http://www.snsoft.com.cn/index.html">Beijing City North and South
-Software Technologies Company Ltd.</a></li>
-<li>2016/03 – 2016/09: Intern C# and Python Backend Programmer at <a href="https://www.tencent.com">Beijing City
-Tencent Computer System Company Ltd.</a></li>
-<li>2018/09 – now: Backend Programmer at <a href="http://www.avicmti.avic.com">AVIC Manufacturing Technology Institute</a></li>
-</ul>
+<p>
+官网上的使用方法见 <a href="https://github.com/SheetJS/js-xlsx/tree/078e5b7ebac1d8138b118292668a4dddaf0a9455/demos/angular2">sheetjs angular2</a> 。
+</p>
+</div>
+
+<div id="outline-container-org40b16d7" class="outline-4">
+<h4 id="org40b16d7"><span class="section-number-4">1.2.1</span> export-excel.ts</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<div class="org-src-container">
+<pre class="src src-typescript"><span style="color: #859900;">import</span> <span style="color: #8d5649;">{</span> Component, OnInit <span style="color: #8d5649;">}</span> <span style="color: #859900;">from</span> <span style="color: #2aa198;">'@angular/core'</span>;
+
+<span style="color: #859900;">import</span> * <span style="color: #859900;">as</span> XLSX <span style="color: #859900;">from</span> <span style="color: #2aa198;">'xlsx'</span>;
+
+<span style="color: #859900;">type</span> <span style="color: #268bd2;">MTI_TABLE_T</span> = <span style="color: #859900;">any</span><span style="color: #8d5649;">[][]</span>;
+
+@Component<span style="color: #8d5649;">(</span><span style="color: #d8241f;">{</span>
+  selector: <span style="color: #2aa198;">'app-export-excel'</span>,
+  templateUrl: <span style="color: #2aa198;">'./export-excel.component.html'</span>,
+  styleUrls: <span style="color: #9564bf;">[</span><span style="color: #2aa198;">'./export-excel.component.less'</span><span style="color: #9564bf;">]</span>
+<span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">export</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">ExportExcelComponent</span> <span style="color: #859900;">implements</span> <span style="color: #268bd2;">OnInit</span> <span style="color: #8d5649;">{</span>
+
+  data: MTI_TABLE_T;
+  option: XLSX.WritingOptions;
+  fileName: <span style="color: #859900;">string</span>;
+
+  <span style="color: #859900;">constructor</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> <span style="color: #d8241f;">}</span>
+
+  ngOnInit<span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">this</span>.data = <span style="color: #9564bf;">[</span>
+      <span style="color: #24a222;">[</span><span style="color: #2aa198;">'&#22995;&#21517;'</span>, <span style="color: #2aa198;">'&#24180;&#40836;'</span>, <span style="color: #2aa198;">'&#25104;&#32489;'</span><span style="color: #24a222;">]</span>,
+      <span style="color: #24a222;">[</span><span style="color: #2aa198;">'&#27931;&#38451;&#38130;'</span>, 22, 87<span style="color: #24a222;">]</span>,
+      <span style="color: #24a222;">[</span><span style="color: #2aa198;">'&#29579;&#22823;&#38180;'</span>, 21, 88<span style="color: #24a222;">]</span>,
+      <span style="color: #24a222;">[</span><span style="color: #2aa198;">'&#26446;&#25935;&#38224;'</span>, 22, 73<span style="color: #24a222;">]</span>
+    <span style="color: #9564bf;">]</span>;
+    <span style="color: #859900;">this</span>.option = <span style="color: #9564bf;">{</span> bookType: <span style="color: #2aa198;">'xlsx'</span>, <span style="color: #859900;">type</span>: <span style="color: #2aa198;">'array'</span> <span style="color: #9564bf;">}</span>;
+    <span style="color: #859900;">this</span>.fileName = <span style="color: #2aa198;">'worksheet.xlsx'</span>;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #859900;">export</span><span style="color: #d8241f;">()</span>: <span style="color: #859900;">void</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">generate worksheet</span>
+    <span style="color: #859900;">const</span> <span style="color: #6c71c4;">worksheet</span>: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet<span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.data<span style="color: #9564bf;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">generate workbook and add the worksheet</span>
+    <span style="color: #859900;">const</span> <span style="color: #6c71c4;">workbook</span>: XLSX.WorkBook = XLSX.utils.book_new<span style="color: #9564bf;">()</span>;
+    XLSX.utils.book_append_sheet<span style="color: #9564bf;">(</span>workbook, worksheet, <span style="color: #2aa198;">'Sheet1'</span><span style="color: #9564bf;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">save to file</span>
+    XLSX.writeFile<span style="color: #9564bf;">(</span>workbook, <span style="color: #859900;">this</span>.fileName<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+<span style="color: #8d5649;">}</span>
+</pre>
 </div>
 </div>
 </div>
-<div id="outline-container-orgcc3c662" class="outline-2">
-<h2 id="orgcc3c662"><span class="section-number-2">2</span> Publications</h2>
+
+<div id="outline-container-org6be97f1" class="outline-4">
+<h4 id="org6be97f1"><span class="section-number-4">1.2.2</span> export-excel.html</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<div class="org-src-container">
+<pre class="src src-html">&lt;<span style="color: #b58900;">div</span> <span style="color: #6c71c4;">class</span>=<span style="color: #2aa198;">"export-excel-div"</span>&gt;
+  &lt;<span style="color: #b58900;">h2</span>&gt;<span style="font-weight: bold; font-style: italic; text-decoration: underline;">&#23548;&#20986; Excel &#25991;&#20214;&#21040; {{ fileName }}</span>&lt;/<span style="color: #b58900;">h2</span>&gt;
+
+  &lt;<span style="color: #b58900;">table</span>&gt;
+    &lt;<span style="color: #b58900;">tr</span> *ngFor=<span style="color: #2aa198;">"let row of data"</span>&gt;
+      &lt;<span style="color: #b58900;">td</span> *ngFor=<span style="color: #2aa198;">"let cell of row"</span>&gt;
+        {{ cell }}
+      &lt;/<span style="color: #b58900;">td</span>&gt;
+    &lt;/<span style="color: #b58900;">tr</span>&gt;
+  &lt;/<span style="color: #b58900;">table</span>&gt;
+
+  &lt;<span style="color: #b58900;">span</span>&gt;
+    &lt;<span style="color: #b58900;">input</span> [(ngModel)]=<span style="color: #2aa198;">"fileName"</span>/&gt;
+    &lt;<span style="color: #b58900;">button</span> (click)=<span style="color: #2aa198;">"export()"</span>&gt;export&lt;/<span style="color: #b58900;">button</span>&gt;
+  &lt;/<span style="color: #b58900;">span</span>&gt;
+
+&lt;/<span style="color: #b58900;">div</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org53c20f4" class="outline-2">
+<h2 id="org53c20f4"><span class="section-number-2">2</span> 参考链接</h2>
 <div class="outline-text-2" id="text-2">
-<ul class="org-ul">
-<li>2018
-<ul class="org-ul">
-<li>Jinghui Hu, Ji Wu, Han Meng, Chao Liu, and Haiyan Yang, "Signal Model of
-Automatic Testing Technology for Airborne Equipment" Computer Science,
-vol. 45, pp. 94–98, 2018. (in Chinese) <a href="http://kns.cnki.net/KCMS/detail/detail.aspx?dbcode=CJFQ&amp;dbname=CJFDLAST2018&amp;filename=JSJA201809016&amp;v=MTA1MDBMejdCYjdHNEg5bk1wbzlFWW9SOGVYMUx1eFlTN0RoMVQzcVRyV00xRnJDVVJMT2ZaZVptRkNqa1VML0I=">cnki</a></li>
-<li>Han Meng, Ji Wu, Jinghui Hu, Chao Liu, Haiyan Yang, and Xinyin Sun,
-"Modeling in Multiple Views and Industrial Case Study of Automatic Test for
-Hardware System" Computer Science, vol. 45, pp. 75–80, 2018. (in Chinese)
-<a href="http://kns.cnki.net/KCMS/detail/detail.aspx?dbcode=CJFD&amp;dbname=CJFDLAST2018&amp;filename=JSJA201809013&amp;v=MjMzODBGckNVUkxPZlplWm1GQ2psVnJySkx6N0JiN0c0SDluTXBvOUVaNFI4ZVgxTHV4WVM3RGgxVDNxVHJXTTE=">cnki</a></li>
-<li>吴际, 胡京徽, 崔明宝. 一种机载设备测试需求生成方法. 中国专利: CN108388231A,
-2018-08-10. <a href="http://dbpub.cnki.net/grid2008/dbpub/detail.aspx?dbcode=SCPD&amp;dbname=SCPD2018&amp;filename=CN108388231A">cnki</a></li>
-</ul></li>
-<li>2017
-<ul class="org-ul">
-<li>Jinghui Hu, Xu Wang, Jian Ren, Chao Liu. "Parallel Evolutionary Algorithm in
-Solving Single Objective Software Project Management Problem", NASAC2017
-English Track. 2017, Harbin China, Nov 2017.</li>
-<li>刘超, 胡京徽, 杨海燕, 吴际. 一种基于本体的 RUCM 模型一致性检查方法. 中国专
-利: CN107168762A, 2017-09-15. <a href="http://dbpub.cnki.net/grid2008/dbpub/detail.aspx?dbcode=SCPD&amp;dbname=SCPD2017&amp;filename=CN107168762A">cnki</a></li>
-</ul></li>
-</ul>
-</div>
-</div>
-
-
-<div id="outline-container-orgf3a0dc4" class="outline-2">
-<h2 id="orgf3a0dc4"><span class="section-number-2">3</span> Links</h2>
-<div class="outline-text-2" id="text-3">
 <ol class="org-ol">
-<li><a href="https://www.linkedin.com/in/jeanhwea">LinkedIn</a></li>
-<li><a href="https://github.com/Jeanhwea">Github</a></li>
-<li><a href="https://jeanhwea.github.io/readme.html">Notes</a></li>
+<li><a href="https://github.com/SheetJS/js-xlsx">SheetJS</a>: SheetJS Community Edition &#x2013; Spreadsheet Parser and Writer</li>
+<li><a href="https://yarnpkg.com/en/package/xlsx">yarn package site: xlsx</a></li>
 </ol>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Author: 胡京徽</p>
-<p class="date">Created: 2019-02-09 Sat 21:35</p>
+<p class="date">Date: 2018-10-16 Tue 00:00</p>
+<p class="author">Author: Jinghui Hu</p>
+<p class="date">Created: 2019-02-09 Sat 21:41</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
