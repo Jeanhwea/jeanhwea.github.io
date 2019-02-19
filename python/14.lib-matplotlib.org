@@ -209,6 +209,42 @@ matplotlib 的基本术语可以参考官网中展示的图。
 #+RESULTS:
 [[file:../resource/image/2018/10/matplotlib6.png]]
 
+** 绘制数学函数图像
+
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :results file
+  import numpy as np
+  import matplotlib.pyplot as plt
+  import math
+  filename = '../resource/image/2019/02/image081008.png'
+
+  def math_plot(x, y, filename):
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    # Move left y-axis and bottim x-axis to centre, passing through (0,0)
+    ax.spines['left'].set_position('center')
+    ax.spines['bottom'].set_position('center')
+
+    # Eliminate upper and right axes
+    ax.spines['right'].set_color('none')
+    ax.spines['top'].set_color('none')
+
+    # Show ticks in the left and lower axes only
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+
+    plt.plot(x, y)
+    plt.savefig(filename)
+
+
+  x = np.linspace(-3, 3, 500)
+  y = [t if t > 0 else 0.1 * t for t in x]
+  math_plot(x, y, filename)
+
+  return filename
+#+END_SRC
+
+#+RESULTS:
+[[file:../resource/image/2019/02/image081008.png]]
 
 * 参考链接
 
