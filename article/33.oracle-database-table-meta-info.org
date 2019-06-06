@@ -1,0 +1,67 @@
+#+TITLE: Oracle 数据库中表名、列名、唯一性约束等元信息
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2019-06-06 Thu>
+#+TAGS: Oracle database
+
+
+* 元表
+
+Oracle 的数据库组织方式中所有数据库的表信息，类信息等元信息也是存放在一个对用户
+不可见的数据表中，这里称之为元表。
+
+表更加功能不同分成了不同的级别，不同级别对于的表名称开头不一样：
+- USER_*: 用户表信息
+- DBA_*: 数据库管理员表信息
+- ALL_*: 所有的表信息，包括：DBA 和 USER
+
+例如：USER_TAB_COMMENTS 表中存放着用户表的注释，DBA_TAB_COMMENTS 表中则存放在管
+理员的所有表注释。
+
+* 获取表信息
+
+** 表列属性
+#+BEGIN_SRC sql
+  SELECT USER_TAB_COLUMNS.TABLE_NAME ||
+           ',' || USER_TAB_COLUMNS.COLUMN_NAME ||
+           ',' || USER_TAB_COLUMNS.DATA_TYPE ||
+           ',' || USER_TAB_COLUMNS.DATA_LENGTH ||
+           ',' || USER_TAB_COLUMNS.NULLABLE
+    FROM USER_TAB_COLUMNS
+   WHERE ROWNUM < 100
+   ORDER BY USER_TAB_COLUMNS.TABLE_NAME;
+#+END_SRC
+
+** 唯一性约束
+#+BEGIN_SRC sql
+  SELECT USER_CONS_COLUMNS.OWNER ||
+           ',' || USER_CONS_COLUMNS.CONSTRAINT_NAME ||
+           ',' || USER_CONS_COLUMNS.TABLE_NAME ||
+           ',' || USER_CONS_COLUMNS.COLUMN_NAME ||
+           ',' || USER_CONS_COLUMNS.POSITION
+    FROM USER_CONS_COLUMNS
+   WHERE ROWNUM < 100
+   ORDER BY USER_CONS_COLUMNS.TABLE_NAME;
+#+END_SRC
+
+*  注释信息
+
+** 表注释
+#+BEGIN_SRC sql
+  SELECT USER_TAB_COMMENTS.TABLE_NAME ||
+           ',' || USER_TAB_COMMENTS.TABLE_TYPE ||
+           ',' || USER_TAB_COMMENTS.COMMENTS
+    FROM USER_TAB_COMMENTS
+   WHERE ROWNUM < 100
+   ORDER BY USER_TAB_COMMENTS.TABLE_NAME;
+#+END_SRC
+
+** 列注释
+#+BEGIN_SRC sql
+  SELECT USER_COL_COMMENTS.TABLE_NAME ||
+           ',' || USER_COL_COMMENTS.COLUMN_NAME ||
+           ',' || USER_COL_COMMENTS.COMMENTS
+    FROM USER_COL_COMMENTS
+   WHERE ROWNUM < 100
+   ORDER BY USER_COL_COMMENTS.TABLE_NAME;
+#+END_SRC
