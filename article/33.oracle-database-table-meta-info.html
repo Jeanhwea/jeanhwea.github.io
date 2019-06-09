@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-06-06 Thu 10:53 -->
+<!-- 2019-06-09 Sun 17:40 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Oracle 数据库中表名、列名、唯一性约束等元信息</title>
@@ -234,17 +234,17 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org86ac21f">1. 元表</a></li>
-<li><a href="#org45a1430">2. 获取表信息</a>
+<li><a href="#orgc14e242">1. 元表</a></li>
+<li><a href="#org45187b0">2. 获取表信息</a>
 <ul>
-<li><a href="#org986f045">2.1. 表列属性</a></li>
-<li><a href="#orgd040fe1">2.2. 唯一性约束</a></li>
+<li><a href="#org46adc6d">2.1. 表列属性</a></li>
+<li><a href="#org206fdb4">2.2. 唯一性约束</a></li>
 </ul>
 </li>
-<li><a href="#org4a32325">3. 注释信息</a>
+<li><a href="#org5254939">3. 注释信息</a>
 <ul>
-<li><a href="#org4631ecc">3.1. 表注释</a></li>
-<li><a href="#org2eda96a">3.2. 列注释</a></li>
+<li><a href="#org6cd48fa">3.1. 表注释</a></li>
+<li><a href="#orgf631fd8">3.2. 列注释</a></li>
 </ul>
 </li>
 </ul>
@@ -252,8 +252,8 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-org86ac21f" class="outline-2">
-<h2 id="org86ac21f"><span class="section-number-2">1</span> 元表</h2>
+<div id="outline-container-orgc14e242" class="outline-2">
+<h2 id="orgc14e242"><span class="section-number-2">1</span> 元表</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Oracle 的数据库组织方式中所有数据库的表信息，类信息等元信息也是存放在一个对用户
@@ -270,48 +270,48 @@ Oracle 的数据库组织方式中所有数据库的表信息，类信息等元�
 </ul>
 
 <p>
-例如：USER<sub>TAB</sub><sub>COMMENTS</sub> 表中存放着用户表的注释，DBA<sub>TAB</sub><sub>COMMENTS</sub> 表中则存放在管
-理员的所有表注释。
+例如： <code>USER_TAB_COMMENTS</code> 表中存放着用户表的注释， <code>DBA_TAB_COMMENTS</code> 表中则存
+放在管理员的所有表注释。
 </p>
 </div>
 </div>
 
-<div id="outline-container-org45a1430" class="outline-2">
-<h2 id="org45a1430"><span class="section-number-2">2</span> 获取表信息</h2>
+<div id="outline-container-org45187b0" class="outline-2">
+<h2 id="org45187b0"><span class="section-number-2">2</span> 获取表信息</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org986f045" class="outline-3">
-<h3 id="org986f045"><span class="section-number-3">2.1</span> 表列属性</h3>
+<div id="outline-container-org46adc6d" class="outline-3">
+<h3 id="org46adc6d"><span class="section-number-3">2.1</span> 表列属性</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_TAB_COLUMNS.<span style="color: #859900;">TABLE_NAME</span> ||
-         <span style="color: #2aa198;">','</span> || USER_TAB_COLUMNS.<span style="color: #859900;">COLUMN_NAME</span> ||
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_TAB_COLUMNS.<span style="color: #6c71c4;">TABLE_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_TAB_COLUMNS.<span style="color: #6c71c4;">COLUMN_NAME</span> ||
          <span style="color: #2aa198;">','</span> || USER_TAB_COLUMNS.DATA_TYPE ||
          <span style="color: #2aa198;">','</span> || USER_TAB_COLUMNS.DATA_LENGTH ||
-         <span style="color: #2aa198;">','</span> || USER_TAB_COLUMNS.<span style="color: #859900;">NULLABLE</span>
+         <span style="color: #2aa198;">','</span> || USER_TAB_COLUMNS.<span style="color: #6c71c4;">NULLABLE</span>
   <span style="color: #859900;">FROM</span> USER_TAB_COLUMNS
- <span style="color: #859900;">WHERE</span> <span style="color: #859900;">ROWNUM</span> &lt; 100
- <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> USER_TAB_COLUMNS.<span style="color: #859900;">TABLE_NAME</span>;
+ <span style="color: #859900;">WHERE</span> ROWNUM &lt; 100
+ <span style="color: #859900;">ORDER</span> <span style="color: #6c71c4;">BY</span> USER_TAB_COLUMNS.<span style="color: #6c71c4;">TABLE_NAME</span>;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgd040fe1" class="outline-3">
-<h3 id="orgd040fe1"><span class="section-number-3">2.2</span> 唯一性约束</h3>
+<div id="outline-container-org206fdb4" class="outline-3">
+<h3 id="org206fdb4"><span class="section-number-3">2.2</span> 唯一性约束</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 获取列的约束名称
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_CONS_COLUMNS.OWNER ||
-         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #859900;">CONSTRAINT_NAME</span> ||
-         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #859900;">TABLE_NAME</span> ||
-         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #859900;">COLUMN_NAME</span> ||
-         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #859900;">POSITION</span>
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_CONS_COLUMNS.<span style="color: #6c71c4;">OWNER</span> ||
+         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #6c71c4;">CONSTRAINT_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #6c71c4;">TABLE_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #6c71c4;">COLUMN_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #6c71c4;">POSITION</span>
   <span style="color: #859900;">FROM</span> USER_CONS_COLUMNS
- <span style="color: #859900;">WHERE</span> <span style="color: #859900;">ROWNUM</span> &lt; 100
- <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> USER_CONS_COLUMNS.<span style="color: #859900;">TABLE_NAME</span>;
+ <span style="color: #859900;">WHERE</span> ROWNUM &lt; 100
+ <span style="color: #859900;">ORDER</span> <span style="color: #6c71c4;">BY</span> USER_CONS_COLUMNS.<span style="color: #6c71c4;">TABLE_NAME</span>;
 </pre>
 </div>
 
@@ -319,48 +319,48 @@ Oracle 的数据库组织方式中所有数据库的表信息，类信息等元�
 获取列的约束类型
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_CONSTRAINTS.<span style="color: #859900;">CONSTRAINT_NAME</span> ||
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_CONSTRAINTS.<span style="color: #6c71c4;">CONSTRAINT_NAME</span> ||
          <span style="color: #2aa198;">','</span> || USER_CONSTRAINTS.CONSTRAINT_TYPE ||
          <span style="color: #2aa198;">','</span> || USER_CONSTRAINTS.STATUS
   <span style="color: #859900;">FROM</span> USER_CONSTRAINTS
  <span style="color: #859900;">WHERE</span> USER_CONSTRAINTS.CONSTRAINT_TYPE <span style="color: #859900;">in</span> (<span style="color: #2aa198;">'U'</span>,<span style="color: #2aa198;">'P'</span>)
-   <span style="color: #859900;">AND</span> <span style="color: #859900;">ROWNUM</span> &lt; 100
- <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> USER_CONSTRAINTS.<span style="color: #859900;">CONSTRAINT_NAME</span>;
+   <span style="color: #859900;">AND</span> ROWNUM &lt; 100
+ <span style="color: #859900;">ORDER</span> <span style="color: #6c71c4;">BY</span> USER_CONSTRAINTS.<span style="color: #6c71c4;">CONSTRAINT_NAME</span>;
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org4a32325" class="outline-2">
-<h2 id="org4a32325"><span class="section-number-2">3</span> 注释信息</h2>
+<div id="outline-container-org5254939" class="outline-2">
+<h2 id="org5254939"><span class="section-number-2">3</span> 注释信息</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org4631ecc" class="outline-3">
-<h3 id="org4631ecc"><span class="section-number-3">3.1</span> 表注释</h3>
+<div id="outline-container-org6cd48fa" class="outline-3">
+<h3 id="org6cd48fa"><span class="section-number-3">3.1</span> 表注释</h3>
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_TAB_COMMENTS.<span style="color: #859900;">TABLE_NAME</span> ||
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_TAB_COMMENTS.<span style="color: #6c71c4;">TABLE_NAME</span> ||
          <span style="color: #2aa198;">','</span> || USER_TAB_COMMENTS.TABLE_TYPE ||
-         <span style="color: #2aa198;">','</span> || USER_TAB_COMMENTS.COMMENTS
+         <span style="color: #2aa198;">','</span> || USER_TAB_COMMENTS.<span style="color: #6c71c4;">COMMENTS</span>
   <span style="color: #859900;">FROM</span> USER_TAB_COMMENTS
- <span style="color: #859900;">WHERE</span> <span style="color: #859900;">ROWNUM</span> &lt; 100
- <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> USER_TAB_COMMENTS.<span style="color: #859900;">TABLE_NAME</span>;
+ <span style="color: #859900;">WHERE</span> ROWNUM &lt; 100
+ <span style="color: #859900;">ORDER</span> <span style="color: #6c71c4;">BY</span> USER_TAB_COMMENTS.<span style="color: #6c71c4;">TABLE_NAME</span>;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org2eda96a" class="outline-3">
-<h3 id="org2eda96a"><span class="section-number-3">3.2</span> 列注释</h3>
+<div id="outline-container-orgf631fd8" class="outline-3">
+<h3 id="orgf631fd8"><span class="section-number-3">3.2</span> 列注释</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_COL_COMMENTS.<span style="color: #859900;">TABLE_NAME</span> ||
-         <span style="color: #2aa198;">','</span> || USER_COL_COMMENTS.<span style="color: #859900;">COLUMN_NAME</span> ||
-         <span style="color: #2aa198;">','</span> || USER_COL_COMMENTS.COMMENTS
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_COL_COMMENTS.<span style="color: #6c71c4;">TABLE_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_COL_COMMENTS.<span style="color: #6c71c4;">COLUMN_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_COL_COMMENTS.<span style="color: #6c71c4;">COMMENTS</span>
   <span style="color: #859900;">FROM</span> USER_COL_COMMENTS
- <span style="color: #859900;">WHERE</span> <span style="color: #859900;">ROWNUM</span> &lt; 100
- <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> USER_COL_COMMENTS.<span style="color: #859900;">TABLE_NAME</span>;
+ <span style="color: #859900;">WHERE</span> ROWNUM &lt; 100
+ <span style="color: #859900;">ORDER</span> <span style="color: #6c71c4;">BY</span> USER_COL_COMMENTS.<span style="color: #6c71c4;">TABLE_NAME</span>;
 </pre>
 </div>
 </div>
@@ -370,7 +370,7 @@ Oracle 的数据库组织方式中所有数据库的表信息，类信息等元�
 <div id="postamble" class="status">
 <p class="date">Date: 2019-06-06 Thu 00:00</p>
 <p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-06-06 Thu 10:53</p>
+<p class="date">Created: 2019-06-09 Sun 17:40</p>
 <p class="validation"></p>
 </div>
 </body>

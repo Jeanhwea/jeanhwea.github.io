@@ -5,7 +5,7 @@
 #+TAGS: postgresql install setup database
 
 
-* 下载并安装
+* windows 下载并安装
 
 首先去官网上下载所需的安装文件 [[https://www.enterprisedb.com/downloads/postgres-postgresql-downloads][download]]。
 
@@ -30,10 +30,11 @@
 #+BEGIN_SRC shell
   initdb /usr/local/var/postgresql@9.6
 #+END_SRC
-** 创建数据库和账户
+** 初始创建数据库和账户
 #+BEGIN_SRC shell
   createdb
 #+END_SRC
+
 ** 登录数据库
 #+BEGIN_SRC shell
   psql
@@ -46,3 +47,56 @@
 
   hujinghui=#
 #+END_SRC
+* 数据库创建及配置
+** 创建用户及数据库
+
+#+BEGIN_SRC sql
+  -- 用户名及密码
+  CREATE USER pguser WITH PASSWORD 'pg$PassWord';
+  CREATE DATABASE pgdb OWNER pguser;
+
+  -- 添加权限
+  GRANT ALL PRIVILEGES ON DATABASE pgdb TO pguser;
+  ALTER ROLE pguser CREATEDB;
+#+END_SRC
+
+** 登录数据库
+#+BEGIN_SRC shell
+  psql -U pguser -d pgdb
+#+END_SRC
+
+** 常见控制台命令
+#+BEGIN_SRC text
+  \password：设置当前登录用户的密码
+  \h：查看 SQL 命令的解释，比如\h select。
+  \?：查看 psql 命令列表。
+  \l：列出所有数据库。
+  \c [database_name]：连接其他数据库。
+  \d：列出当前数据库的所有表格。
+  \d [table_name]：列出某一张表格的结构。
+  \du：列出所有用户。
+  \e：打开文本编辑器。
+  \conninfo：列出当前数据库和连接的信息。
+  \password [user]: 修改用户密码
+  \q：退出
+#+END_SRC
+* 远程连接数据库配置
+
+postgres 默认只能通过 localhost 连接，如果需要建立远程连接则需要进行配置。找到
+postgres 配置文件所在目录，homebrew 安装后默认配置文件位于
+=/usr/local/var/postgres=
+
+** 修改 =postgresql.conf=
+ 编辑或添加下面一行，使 postgresql 可以接受来自任意 IP 的连接请求。
+#+BEGIN_SRC conf
+  listen_addresses = '*'
+#+END_SRC
+** 修改 =pg_hba.conf=
+配置服务端允许的认证方式
+
+#+BEGIN_SRC conf
+  # TYPE  DATABASE  USER  CIDR-ADDRESS  METHOD
+  host  all  all 0.0.0.0/0 md5
+#+END_SRC
+
+修改过后需要重启才能生效
