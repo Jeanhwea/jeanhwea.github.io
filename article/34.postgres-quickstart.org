@@ -1,0 +1,99 @@
+#+TITLE: Postgres 快速使用
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2019-06-16 Sun>
+#+TAGS: postgres sql
+
+
+* 常用命令速查
+
+** 查看数据库基本信息
+   #+BEGIN_SRC sql
+     -- 查看所有用户列表:
+     SELECT rolname FROM pg_roles;
+     -- 查看当前用户:
+     SELECT current_user;
+     -- 查看当前用户权限
+     \du
+     -- 查看所有数据库列表
+     \l
+     -- 查看当前数据库
+     SELECT current_database();
+     -- 查看当前数据库的所有表
+     \dt
+     -- 查看函数列表
+     \df <schema>
+    #+END_SRC
+** 数据库相关的操作命令
+    #+BEGIN_SRC sql
+      -- 连接数据库
+      \c <database_name>
+      -- 创建数据库
+      CREATE DATABASE <database_name> WITH OWNER <username>;
+      -- 删除数据库
+      DROP DATABASE IF EXISTS <database_name>;
+      -- 重命名数据库
+      ALTER DATABASE <old_name> RENAME TO <new_name>;
+    #+END_SRC
+** 用户信息相关的操作命令
+    #+BEGIN_SRC sql
+      -- 查看所有用户
+      SELECT rolname FROM pg_roles;
+      -- 创建用户
+      CREATE USER <user_name> WITH PASSWORD '<password>';
+      -- 删除用户
+      DROP USER IF EXISTS <user_name>;
+      -- 修改用户密码
+      ALTER ROLE <user_name> WITH PASSWORD '<password>';
+    #+END_SRC
+** 表相关的操作命令
+    #+BEGIN_SRC sql
+      -- 查看所有表
+      \dt
+      -- 查看全局的表
+      \dt *.*
+      -- 创建表
+      CREATE TABLE <table_name> (
+        <column_name> <column_type>,
+        <column_name> <column_type>,
+        <column_name> <column_type>
+      );
+
+      -- 创建用户表的例子
+      CREATE SEQUENCE global_id
+        INCREMENT BY 1
+        MINVALUE 1 NO MAXVALUE
+        START WITH 9999;
+
+      CREATE TABLE users (
+        id INT PRIMARY KEY NOT NULL DEFAULT NEXTVAL('global_id'),
+        code VARCHAR(32), -- data is invalid when code is NULL
+        created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        username VARCHAR(64) NOT NULL,
+        nickname VARCHAR(64),
+        password VARCHAR(128),
+        birthday DATE,
+        CONSTRAINT unique_username UNIQUE (username)
+      );
+      ALTER TABLE users OWNER TO <tabowner_name>;
+      COMMENT ON TABLE users IS '用户表';
+      COMMENT ON COLUMN users.username IS '用户登录的用户名';
+      COMMENT ON COLUMN users.nickname IS '用户昵称';
+
+      -- 删除表
+      DROP TABLE IF EXISTS <table_name> CASCADE;
+    #+END_SRC
+** 数据备份与还原
+    #+BEGIN_SRC shell
+      -- 备份数据库
+      pg_dump <database_name>
+      -- 还原数据库
+      pg_restore -d <database_name> -a <file_pathway>
+    #+END_SRC
+    #+BEGIN_SRC shell
+      -- 导出 csv 文件
+      \copy <table_name> TO '<file_path>' CSV;
+      -- 导入 csv 文件
+      \copy <table_name> FROM '<file_path>' CSV;
+    #+END_SRC
