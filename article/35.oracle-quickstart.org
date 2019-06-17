@@ -1,0 +1,39 @@
+#+TITLE: Oracle 快速使用
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2019-06-17 Mon>
+#+TAGS: oracle sql quickstart
+
+
+* 常用命令速查
+** 查看数据库基本信息
+   #+BEGIN_SRC sql
+     -- 查看当前用户
+     SHOW USER;
+     SELECT USER FROM DUAL;
+     -- 查看当前数据库
+
+     -- 查看当前数据库的所有表
+     SELECT tc.TABLE_NAME || ' ' || tc.COMMENTS
+       FROM USER_TAB_COMMENTS tc
+      WHERE tc.TABLE_TYPE in ('TABLE', 'VIEW')
+      ORDER BY tc.TABLE_NAME;
+   #+END_SRC
+
+** 用户信息相关的操作命令
+   #+BEGIN_SRC sql
+     -- 创建用户
+     CREATE USER <username> IDENTIFIED BY <password>;
+     -- 删除用户
+     DROP USER <username>;
+     -- 修改用户密码
+     ALTER USER <username> IDENTIFIED BY <password>;
+
+     -- 创建角色
+     CREATE ROLE <rolename> IDENTIFIED BY <password>;
+
+     -- 授权用户
+     GRANT ALL ON <database>.* TO <username>;
+     -- 解除授权
+     REVOKE ALL ON <database>.* FROM <username>;
+   #+END_SRC
