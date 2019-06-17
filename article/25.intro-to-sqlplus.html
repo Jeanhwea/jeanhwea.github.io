@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-02-09 Sat 21:43 -->
+<!-- 2019-06-17 Mon 12:09 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Oracle 数据库</title>
+<title>SQL*Plus 简介</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="Jinghui Hu" />
 <style type="text/css">
@@ -229,25 +229,26 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">Oracle 数据库</h1>
+<h1 class="title">SQL*Plus 简介</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org0155b23">1. sqlplus</a>
+<li><a href="#orge89417f">1. sqlplus</a>
 <ul>
-<li><a href="#org8f1ff7d">1.1. 登录命令</a></li>
-<li><a href="#org6679697">1.2. sqlplus 启动配置</a></li>
+<li><a href="#orgafb923c">1.1. 从命令行中连接 sqlplus</a></li>
+<li><a href="#orgd237a1b">1.2. sqlplus 启动配置 <code>$ORACLE_HOME/sqlplus/admin/glogin.sql</code></a></li>
+<li><a href="#org5084c2b">1.3. sqlplus 使用技巧</a></li>
 </ul>
 </li>
-<li><a href="#org2853443">2. 参考链接</a></li>
+<li><a href="#org730707d">2. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org0155b23" class="outline-2">
-<h2 id="org0155b23"><span class="section-number-2">1</span> sqlplus</h2>
+<div id="outline-container-orge89417f" class="outline-2">
+<h2 id="orge89417f"><span class="section-number-2">1</span> sqlplus</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Oracle 的 sqlplus 是与 oracle 数据库进行交互的客户端工具，借助 sqlplus 可以查看、
@@ -255,8 +256,8 @@ Oracle 的 sqlplus 是与 oracle 数据库进行交互的客户端工具，借�
 </p>
 </div>
 
-<div id="outline-container-org8f1ff7d" class="outline-3">
-<h3 id="org8f1ff7d"><span class="section-number-3">1.1</span> 登录命令</h3>
+<div id="outline-container-orgafb923c" class="outline-3">
+<h3 id="orgafb923c"><span class="section-number-3">1.1</span> 从命令行中连接 sqlplus</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 第一种登录方式的命令如下
@@ -278,8 +279,8 @@ Oracle 的 sqlplus 是与 oracle 数据库进行交互的客户端工具，借�
 </div>
 
 <p>
-第二种登录方式需要使用 tnsnames.ora 这种格式，下面是 Oracle Client 提供的默认样
-本。
+第二种登录方式需要使用 tnsnames.ora 这种格式，下面是 Oracle Client 提供的默认
+样本。
 </p>
 
 <div class="org-src-container">
@@ -315,33 +316,47 @@ hsagent  =
 </div>
 </div>
 
-<div id="outline-container-org6679697" class="outline-3">
-<h3 id="org6679697"><span class="section-number-3">1.2</span> sqlplus 启动配置</h3>
+<div id="outline-container-orgd237a1b" class="outline-3">
+<h3 id="orgd237a1b"><span class="section-number-3">1.2</span> sqlplus 启动配置 <code>$ORACLE_HOME/sqlplus/admin/glogin.sql</code></h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
-初始化 sqlplus 时，需要配置 <b>$ORACLE<sub>HOME</sub>/sqlplus/admin/glogin.sql</b> 文件来设置一
-些启动选项。
+在启动 sqlplus 时需要预先设置一些启动的基本配置，例如启动的每行显示的字符数量，
+显示是否折行，分页大小配置等。下面是我常用的配置。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- $ORACLE_HOME/sqlplus/admin/glogin.sql</span>
-<span style="color: #586e75; font-style: italic;">-- SET UNDERLINE OFF</span>
-<span style="color: #6c71c4;">SET</span> TAB <span style="color: #6c71c4;">OFF</span>
-<span style="color: #6c71c4;">SET</span> VERIFY <span style="color: #6c71c4;">OFF</span>
-<span style="color: #6c71c4;">SET</span> WRAP <span style="color: #6c71c4;">OFF</span>
-<span style="color: #6c71c4;">SET</span> LINESIZE 32767
-<span style="color: #6c71c4;">SET</span> PAGESIZE 0
-<span style="color: #6c71c4;">SET</span> TRIMOUT <span style="color: #859900;">ON</span>
-<span style="color: #6c71c4;">SET</span> TRIMSPOOL <span style="color: #859900;">ON</span>
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- $ORACLE_HOME/sqlplus/admin/glogin.sql</span>
+<span style="color: #93a1a1; font-style: italic;">-- SET UNDERLINE OFF</span>
+<span style="color: #d33682;">SET TAB OFF</span>
+<span style="color: #d33682;">SET VERIFY OFF</span>
+<span style="color: #d33682;">SET WRAP OFF</span>
+<span style="color: #d33682;">SET LINESIZE 32767</span>
+<span style="color: #d33682;">SET PAGESIZE 0</span>
+<span style="color: #d33682;">SET TRIMOUT ON</span>
+<span style="color: #d33682;">SET TRIMSPOOL ON</span>
 </pre>
 </div>
 </div>
 </div>
+
+<div id="outline-container-org5084c2b" class="outline-3">
+<h3 id="org5084c2b"><span class="section-number-3">1.3</span> sqlplus 使用技巧</h3>
+<div class="outline-text-3" id="text-1-3">
+<ul class="org-ul">
+<li>执行本地sql脚本: <b><b>START filename</b></b> 或者 <b><b>@ filename</b></b></li>
+<li>将SQL*Plus执行的命令存成本地文件: <b><b>SAVE filename</b></b></li>
+<li>装载本地sql脚本，但不立即执行: <b><b>GET filename</b></b></li>
+<li>执行最后一条 sql 语句: <b><b>/</b></b></li>
+<li>打印最后执行的sql语句: <b><b>L</b></b></li>
+<li>结果输出到文件: <b><b>SPOOL filename</b></b></li>
+<li>查看/修改SQL*Plus的环境变量: <b><b>SHOW/SET variablename</b></b></li>
+</ul>
+</div>
+</div>
 </div>
 
-
-<div id="outline-container-org2853443" class="outline-2">
-<h2 id="org2853443"><span class="section-number-2">2</span> 参考链接</h2>
+<div id="outline-container-org730707d" class="outline-2">
+<h2 id="org730707d"><span class="section-number-2">2</span> 参考链接</h2>
 <div class="outline-text-2" id="text-2">
 <ol class="org-ol">
 <li><a href="https://superuser.com/questions/272818/how-to-turn-off-word-wrap-in-less">How to turn off word-wrap in less</a></li>
@@ -352,7 +367,8 @@ hsagent  =
 <div id="postamble" class="status">
 <p class="date">Date: 2018-11-12 Mon 00:00</p>
 <p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-02-09 Sat 21:43</p>
+<p class="date">Created: 2019-06-17 Mon 12:09</p>
+<p class="validation"></p>
 </div>
 </body>
 </html>
