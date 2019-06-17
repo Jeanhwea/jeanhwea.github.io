@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-06-17 Mon 12:09 -->
+<!-- 2019-06-17 Mon 13:36 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SQL*Plus 简介</title>
@@ -234,30 +234,36 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orge89417f">1. sqlplus</a>
+<li><a href="#org2eb5bd6">1. SQL*Plus</a>
 <ul>
-<li><a href="#orgafb923c">1.1. 从命令行中连接 sqlplus</a></li>
-<li><a href="#orgd237a1b">1.2. sqlplus 启动配置 <code>$ORACLE_HOME/sqlplus/admin/glogin.sql</code></a></li>
-<li><a href="#org5084c2b">1.3. sqlplus 使用技巧</a></li>
+<li><a href="#orge9f2d03">1.1. 从命令行中连接 SQL*Plus</a></li>
+<li><a href="#orgcffc8bd">1.2. SQL*Plus 启动配置 <code>$ORACLE_HOME/sqlplus/admin/glogin.sql</code></a></li>
+<li><a href="#orgec6de06">1.3. SQL*Plus 使用技巧</a></li>
+<li><a href="#org2b023b4">1.4. SQL*Plus计时器</a>
+<ul>
+<li><a href="#org22e1975">1.4.1. 查看单个语句执行的时间</a></li>
+<li><a href="#org3174311">1.4.2. 使用计时器记录连续执行语句的时间</a></li>
 </ul>
 </li>
-<li><a href="#org730707d">2. 参考链接</a></li>
+</ul>
+</li>
+<li><a href="#org399f54e">2. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orge89417f" class="outline-2">
-<h2 id="orge89417f"><span class="section-number-2">1</span> sqlplus</h2>
+<div id="outline-container-org2eb5bd6" class="outline-2">
+<h2 id="org2eb5bd6"><span class="section-number-2">1</span> SQL*Plus</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-Oracle 的 sqlplus 是与 oracle 数据库进行交互的客户端工具，借助 sqlplus 可以查看、
-修改数据库记录。在 sqlplus 中，可以运行 sqlplus 命令与 sql 语句。
+Oracle 的 SQL*Plus 是与 oracle 数据库进行交互的客户端工具，借助 SQL*Plus 可以查看、
+修改数据库记录。在 SQL*Plus 中，可以运行 SQL*Plus 命令与 sql 语句。
 </p>
 </div>
 
-<div id="outline-container-orgafb923c" class="outline-3">
-<h3 id="orgafb923c"><span class="section-number-3">1.1</span> 从命令行中连接 sqlplus</h3>
+<div id="outline-container-orge9f2d03" class="outline-3">
+<h3 id="orge9f2d03"><span class="section-number-3">1.1</span> 从命令行中连接 SQL*Plus</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 第一种登录方式的命令如下
@@ -316,11 +322,11 @@ hsagent  =
 </div>
 </div>
 
-<div id="outline-container-orgd237a1b" class="outline-3">
-<h3 id="orgd237a1b"><span class="section-number-3">1.2</span> sqlplus 启动配置 <code>$ORACLE_HOME/sqlplus/admin/glogin.sql</code></h3>
+<div id="outline-container-orgcffc8bd" class="outline-3">
+<h3 id="orgcffc8bd"><span class="section-number-3">1.2</span> SQL*Plus 启动配置 <code>$ORACLE_HOME/sqlplus/admin/glogin.sql</code></h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
-在启动 sqlplus 时需要预先设置一些启动的基本配置，例如启动的每行显示的字符数量，
+在启动 SQL*Plus 时需要预先设置一些启动的基本配置，例如启动的每行显示的字符数量，
 显示是否折行，分页大小配置等。下面是我常用的配置。
 </p>
 
@@ -339,8 +345,8 @@ hsagent  =
 </div>
 </div>
 
-<div id="outline-container-org5084c2b" class="outline-3">
-<h3 id="org5084c2b"><span class="section-number-3">1.3</span> sqlplus 使用技巧</h3>
+<div id="outline-container-orgec6de06" class="outline-3">
+<h3 id="orgec6de06"><span class="section-number-3">1.3</span> SQL*Plus 使用技巧</h3>
 <div class="outline-text-3" id="text-1-3">
 <ul class="org-ul">
 <li>执行本地sql脚本: <b><b>START filename</b></b> 或者 <b><b>@ filename</b></b></li>
@@ -353,10 +359,42 @@ hsagent  =
 </ul>
 </div>
 </div>
+
+<div id="outline-container-org2b023b4" class="outline-3">
+<h3 id="org2b023b4"><span class="section-number-3">1.4</span> SQL*Plus计时器</h3>
+<div class="outline-text-3" id="text-1-4">
+</div>
+<div id="outline-container-org22e1975" class="outline-4">
+<h4 id="org22e1975"><span class="section-number-4">1.4.1</span> 查看单个语句执行的时间</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #d33682;">SET TIMING ON</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3174311" class="outline-4">
+<h4 id="org3174311"><span class="section-number-4">1.4.2</span> 使用计时器记录连续执行语句的时间</h4>
+<div class="outline-text-4" id="text-1-4-2">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #d33682;">TIMING START mytimer</span>
+  <span style="color: #93a1a1; font-style: italic;">-- your query1</span>
+  <span style="color: #93a1a1; font-style: italic;">-- your query2</span>
+
+<span style="color: #d33682;">TIMING SHOW mytimer</span>
+
+  <span style="color: #93a1a1; font-style: italic;">-- your query3 and more</span>
+
+<span style="color: #d33682;">TIMING STOP mytimer</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="outline-container-org730707d" class="outline-2">
-<h2 id="org730707d"><span class="section-number-2">2</span> 参考链接</h2>
+<div id="outline-container-org399f54e" class="outline-2">
+<h2 id="org399f54e"><span class="section-number-2">2</span> 参考链接</h2>
 <div class="outline-text-2" id="text-2">
 <ol class="org-ol">
 <li><a href="https://superuser.com/questions/272818/how-to-turn-off-word-wrap-in-less">How to turn off word-wrap in less</a></li>
@@ -367,7 +405,7 @@ hsagent  =
 <div id="postamble" class="status">
 <p class="date">Date: 2018-11-12 Mon 00:00</p>
 <p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-06-17 Mon 12:09</p>
+<p class="date">Created: 2019-06-17 Mon 13:36</p>
 <p class="validation"></p>
 </div>
 </body>
