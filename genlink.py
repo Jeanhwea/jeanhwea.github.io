@@ -32,7 +32,7 @@ class IndexManager(object):
     i = 1
     for e in infos:
       line = '{i:02d}. [[./{path}][{title}]] {date}'.format(
-          i=i, path=e['fullpath'], title=e['title'], date=e['date']
+          i=i, path=e['fullpath'].replace('\\', '/'), title=e['title'], date=e['date']
       )
       i += 1
       titles.append(line)
