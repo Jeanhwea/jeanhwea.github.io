@@ -37,3 +37,44 @@
      -- 解除授权
      REVOKE ALL ON <database>.* FROM <username>;
    #+END_SRC
+
+* 小技巧
+** 格式化日期时间字符串
+   Oracle 数据库中的时间字符串和目前主流的时间格式有点不一样，可以使用 ~to_char~
+   函数来格式化时间输出。
+   #+BEGIN_SRC sql
+     SQL> SELECT sysdate FROM DUAL;
+
+     SYSDATE
+     ------------------
+     26-JUN-19
+
+
+     SQL> SELECT to_char(sysdate, 'YYYY-MM-DD HH:MM:SS') FROM DUAL;
+
+     TO_CHAR(SYSDATE,'YYYY-MM-DDHH:MM:SS')
+     ---------------------------------------------------------
+     2019-06-26 08:06:41
+   #+END_SRC
+** 正则化表达式匹配
+   Oracle 可以使用 ~regexp_like~ 来做正则表达式匹配
+   #+BEGIN_SRC sql
+     SQL> SELECT TABLE_NAME FROM USER_TAB_COMMENTS WHERE regexp_like(TABLE_NAME, '^PRDT');
+
+     TABLE_NAME
+     ------------------------------------------------------------------------------------------
+     PRDT_DIC
+     PRDT_DIC_ALL_V
+     PRDT_DIC_BOM
+     PRDT_DIC_CODE_RULE
+     PRDT_DIC_EXT01
+     PRDT_DIC_EXT02
+     PRDT_DIC_PROCESS
+     PRDT_DIC_PROCESS_ALL
+     PRDT_DIC_PROCESS_DEVICE_WORK
+     PRDT_KIND_TYPE
+     PRDT_LIST_TYPE
+     PRDT_PROCESS_ACT_DIC
+     PRDT_PROCESS_DIC
+     PRDT_PROCESS_RES_DIC
+   #+END_SRC
