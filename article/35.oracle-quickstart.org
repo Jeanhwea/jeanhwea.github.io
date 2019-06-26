@@ -62,7 +62,7 @@
      SQL> SELECT TABLE_NAME FROM USER_TAB_COMMENTS WHERE regexp_like(TABLE_NAME, '^PRDT');
 
      TABLE_NAME
-     ------------------------------------------------------------------------------------------
+     -----------------------------
      PRDT_DIC
      PRDT_DIC_ALL_V
      PRDT_DIC_BOM
@@ -77,4 +77,23 @@
      PRDT_PROCESS_ACT_DIC
      PRDT_PROCESS_DIC
      PRDT_PROCESS_RES_DIC
+   #+END_SRC
+** 处理空值(NULL)
+   在数据库选取时候需要处理空值，即 ~NULL~ 值。Oracle 提供 ~nvl~ 函数来处理空值
+   #+BEGIN_SRC sql
+     SQL> SELECT nvl(length(PHOTO), 0) AS PHOTO_SIZE FROM T_EMPLOYEE_BASE WHERE rownum < 10;
+
+     PHOTO_SIZE
+     ----------
+         103357
+          12177
+          84866
+         102154
+          17527
+         169567
+          33577
+          0
+          52372
+
+     9 rows selected.
    #+END_SRC
