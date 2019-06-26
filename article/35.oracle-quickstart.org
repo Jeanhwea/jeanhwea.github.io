@@ -109,3 +109,29 @@
      null
      52372
    #+END_SRC
+** 处理字符串的回车换行符
+   Oracle 字符串好回车换行符处理需要借助 ~chr~ 函数，见如下例子
+   #+BEGIN_SRC sql
+     SQL> UPDATE T_EMPLOYEE_BASE SET E_NOTE = '第一行' || CHR(10) ||'第二行' WHERE E_CODE='test04';
+
+     1 row updated.
+
+     SQL> SELECT E_NOTE FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
+
+     E_NOTE
+     --------
+     第一行
+     第二行
+
+     SQL> SELECT replace(replace(E_NOTE, chr(13), ''), chr(10), '') FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
+
+     REPLACE(REPLACE(E_NOTE,CHR(13),''),CHR(10),'')
+     ----------------------------------------------
+     第一行第二行
+
+     SQL> SELECT replace(replace(E_NOTE, chr(13), ''), chr(10), ' _r_n ') FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
+
+     REPLACE(REPLACE(E_NOTE,CHR(13),''),CHR(10),' _R_N ')
+     ---------------------------------------------------
+     第一行 _r_n 第二行
+   #+END_SRC
