@@ -135,3 +135,96 @@
      ---------------------------------------------------
      第一行 _r_n 第二行
    #+END_SRC
+** 获取序列值
+   创建序列
+   #+BEGIN_SRC sql
+     CREATE SEQUENCE SEQ_GLOBAL_ID
+       START WITH 10000
+       INCREMENT BY 1;
+   #+END_SRC
+   ~NEXTVAL~ 获取下一个序列值，同时自增， ~CURRVAL~ 获取当前序列值，单不自增。
+   #+BEGIN_SRC sql
+
+     SQL> SELECT SEQ_GLOBAL_ID.NEXTVAL FROM DUAL;
+
+          10000
+
+     SQL> SELECT SEQ_GLOBAL_ID.NEXTVAL FROM DUAL;
+
+          10001
+
+     SQL> SELECT SEQ_GLOBAL_ID.CURRVAL FROM DUAL;
+
+          10001
+
+     SQL> SELECT SEQ_GLOBAL_ID.CURRVAL FROM DUAL;
+
+          10001
+
+     SQL>
+   #+END_SRC
+** 限制查询结果的行数
+   使用 ~ROWNUM~ 在条件语句中限制
+   #+BEGIN_SRC sql
+     SELECT ID FROM EMPLOYEE
+      WHERE ROWNUM < 100;
+   #+END_SRC
+** 删除表中重复的行数据
+   Oracle 里面每行都有一个 ~ROWID~ 的伪列，即使两行的数据是相同的， ~ROWID~ 也是
+   唯一的。
+   #+BEGIN_SRC sql
+     SELECT DISTINCT MYID FROM T_EMPLOYEE_BASE E1
+      WHERE ROWID != (
+        SELECT max(ROWID) FROM T_EMPLOYEE_BASE E2
+         WHERE E1.MYID = E2.MYID
+      );
+   #+END_SRC
+   将 SELECT 修改成 DELETE 即可删除重复行。
+** 条件转化查询的字段结果 ~if-then-else~
+   使用 ~DECODE~ 函数可以对模仿应用程序的 ~if-then-else~ 结构。
+   #+BEGIN_SRC sql
+     SQL> SELECT SEX || ':' || decode(SEX, '男', 1, '女', 2, 0) FROM T_EMPLOYEE_BASE WHERE ROWNUM < 5;
+
+     男:1
+     女:2
+     男:1
+     女:2
+   #+END_SRC
+** 字符串处理函数
+   #+BEGIN_SRC sql
+     SQL> SELECT substr('abcdef', 2, 3) FROM DUAL;
+
+     bcd
+
+     SQL> SELECT instr('abcdef', 'cd') FROM DUAL;
+
+                3
+
+     SQL> SELECT instr('abcdef', 'ce') FROM DUAL;
+
+                0
+
+     SQL> SELECT replace('abcdef', 'ce') FROM DUAL;
+
+     abcdef
+
+     SQL> SELECT replace('abcdef', 'cd', '$$') FROM DUAL;
+
+     ab$$ef
+
+     SQL> SELECT lower('abcdef') FROM DUAL;
+
+     abcdef
+
+     SQL> SELECT upper('abcdef') FROM DUAL;
+
+     ABCDEF
+   #+END_SRC
+** 查看数据库磁盘容量
+   通过 ~SYS.DBA_FREE_SPACE~ 视图可以查看磁盘可以空间，进行实时监控。
+   #+BEGIN_SRC sql
+     SELECT TABLESPACE_NAME, sum(BLOCKSE), sum(BYTES)
+       FROM SYS.DBA_FREE_SPACE
+      GROUP BY TABLESPACE_NAME
+      ORDER BY TABLESPACE_NAME;
+   #+END_SRC
