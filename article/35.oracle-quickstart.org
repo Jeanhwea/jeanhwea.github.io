@@ -228,3 +228,49 @@
       GROUP BY TABLESPACE_NAME
       ORDER BY TABLESPACE_NAME;
    #+END_SRC
+** 查看 query 的执行时间
+   查看单个 query 执行计时直接开启 ~TIMING~ 选项就可以看到
+   #+BEGIN_SRC sql
+     SQL> SELECT count(*) FROM T_LOG;
+
+       COUNT(*)
+     ----------
+          85718
+
+     SQL> SET TIMING ON
+     SQL> SELECT count(*) FROM T_LOG;
+
+       COUNT(*)
+     ----------
+          85718
+
+     Elapsed: 00:00:00.04
+     SQL> SET TIMING OFF
+   #+END_SRC
+   查询多条 query 语句的计时需要借助计时器
+   #+BEGIN_SRC sql
+     SQL> TIMING START mytimer;
+
+     SQL> SELECT count(*) FROM T_LOG;
+
+       COUNT(*)
+     ----------
+          85718
+
+     SQL> TIMING SHOW mytimer;
+
+     timing for: mytimer
+     Elapsed: 00:00:00.04
+     SQL> SELECT max(myid) FROM T_LOG;
+
+      MAX(MYID)
+     ----------
+         103234
+
+
+     SQL> TIMING STOP mytimer;
+
+     timing for: mytimer
+     Elapsed: 00:00:00.07
+     SQL>
+   #+END_SRC
