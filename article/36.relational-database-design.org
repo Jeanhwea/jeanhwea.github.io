@@ -32,22 +32,22 @@
   1NF 要求数据库每个表的每一列都是 **原子的** ，即表中的每一列不能拆分成更细的数
   据项。
 
-  ~client~ 表记录了顾客和兽医以及宠物的数据，例如：
-  | /=client_id=/ | =client_name= | =vet_id= | =vet_name= | =pet_id= | =pet_name=       | =pet_type=         |
-  |---------------+---------------+----------+------------+----------+------------------+--------------------|
-  |          2122 | Jack          |       21 | PetVet     | 1, 2, 3  | Sam, Hoober, Tom | Bird, Dog, Hamster |
-  |          2428 | James         |       21 | PetVet     | 1        | Tim              | Dog                |
-  |          2317 | Vernon        |       45 | PetCare    | 2        | Charlie          | Cat                |
-  |          8324 | Helen         |       95 | PetXY      | 1, 2     | Kirby, Beefer    | Dog, Cat           |
+  ~clients~ 表记录了顾客和兽医以及宠物的数据，例如：
+  | =client_id= | =client_name= | =vet_id= | =vet_name= | =pet_id= | =pet_name=       | =pet_type=         |
+  |-------------+---------------+----------+------------+----------+------------------+--------------------|
+  |        2122 | Jack          |       21 | PetVet     | 1, 2, 3  | Sam, Hoober, Tom | Bird, Dog, Hamster |
+  |        2428 | James         |       21 | PetVet     | 1        | Tim              | Dog                |
+  |        2317 | Vernon        |       45 | PetCare    | 2        | Charlie          | Cat                |
+  |        8324 | Helen         |       95 | PetXY      | 1, 2     | Kirby, Beefer    | Dog, Cat           |
 
   #+BEGIN_SRC text
-     +-- client --------------+
+     +-- clients -------------+
      |                        |
      | client_id: primary key |
      | client_name            |
      | vet_id                 |
      | vet_name               |
-     | +-- pet ---------+     |
+     | +-- pets --------+     |
      | |                |     |
      | | pet_id         |     |
      | | pet_name       |     |
@@ -60,7 +60,7 @@
   的问题，可以添加外键引用，结果如下：
 
   #+BEGIN_SRC text
-         +-- client --------------+
+         +-- clients -------------+
       1  |                        |
     +--->+ client_id: primary key |
     |    | client_name            |
@@ -68,7 +68,7 @@
     |    | vet_name               |
     |    +------------------------+
     |
-    |    +-- pet -----------------+
+    |    +-- pets ----------------+
     |    |                        |
     |    | pet_id                 |
     |    | pet_name               |
@@ -97,7 +97,7 @@
   传递依赖是当一个非码的属性 A 依赖于另一个非码属性 B，但 B 并不能用作表的主键。
 
   #+BEGIN_SRC text
-    +-- client --------------+
+    +-- clients -------------+
     |                        |
     | client_id: primary key |
     | client_name            |
@@ -106,18 +106,18 @@
     +------------------------+
   #+END_SRC
 
-  在上面的 ~client~ 表中 =vet_name= 依赖于 =vet_id= ， =vet_id= 又依赖于
+  在上面的 ~clients~ 表中 =vet_name= 依赖于 =vet_id= ， =vet_id= 又依赖于
   =client_id= ，所以 =vet_name= 传递依赖于 =client_id= 。
 
   #+BEGIN_SRC text
-         +-- client --------------+             +-- vet -----------------+
+         +-- clients -------------+             +-- vets ----------------+
       1  |                        |          1  |                        |
     +--->+ client_id: primary key |      +----->| vet_id: primary key    |
     |    | client_name            |      |      | vet_name               |
     |    | vet_id: foreign key    +------+      +------------------------+
     |    +------------------------+  *
     |
-    |    +-- pet -----------------+
+    |    +-- pets ----------------+
     |    |                        |
     |    | pet_id                 |
     |    | pet_name               |
@@ -126,7 +126,7 @@
       *  +------------------------+
   #+END_SRC
 
-  通过上述的表拆分，将 ~client~ 添加 =vet_id= 外键来消除传递依赖。
+  通过上述的表拆分，将 ~clients~ 添加 =vet_id= 外键来消除传递依赖。
 
 * BCNF, 4NF, 5NF
   通常创建数据库是满足 3NF 就可以了，BCNF, 4NF, 5NF 比较复杂，暂时先挂起吧！
