@@ -60,21 +60,21 @@
   的问题，可以添加外键引用，结果如下：
 
   #+BEGIN_SRC text
-        +-- client --------------+
-        |                        |
-    +-->+ client_id: primary key |
-    |   | client_name            |
-    |   | vet_id                 |
-    |   | vet_name               |
-    |   +------------------------+
+         +-- client --------------+
+      1  |                        |
+    +--->+ client_id: primary key |
+    |    | client_name            |
+    |    | vet_id                 |
+    |    | vet_name               |
+    |    +------------------------+
     |
-    |   +-- pet -----------------+
-    |   |                        |
-    |   | pet_id                 |
-    |   | pet_name               |
-    |   | pet_type               |
-    +---+ client_id: foreign key |
-        +------------------------+
+    |    +-- pet -----------------+
+    |    |                        |
+    |    | pet_id                 |
+    |    | pet_name               |
+    |    | pet_type               |
+    +----+ client_id: foreign key |
+      *  +------------------------+
   #+END_SRC
 
 * 2NF
@@ -99,7 +99,7 @@
   #+BEGIN_SRC text
     +-- client --------------+
     |                        |
-    + client_id: primary key |
+    | client_id: primary key |
     | client_name            |
     | vet_id                 |
     | vet_name               |
@@ -110,20 +110,20 @@
   =client_id= ，所以 =vet_name= 传递依赖于 =client_id= 。
 
   #+BEGIN_SRC text
-        +-- client --------------+             +-- vet -----------------+
-        |                        |             |                        |
-    +-->+ client_id: primary key |      +----->| vet_id: primary key    |
-    |   | client_name            |      |      | vet_name               |
-    |   | vet_id: foreign key    +------+      +------------------------+
-    |   +------------------------+
+         +-- client --------------+             +-- vet -----------------+
+      1  |                        |          1  |                        |
+    +--->+ client_id: primary key |      +----->| vet_id: primary key    |
+    |    | client_name            |      |      | vet_name               |
+    |    | vet_id: foreign key    +------+      +------------------------+
+    |    +------------------------+  *
     |
-    |   +-- pet -----------------+
-    |   |                        |
-    |   | pet_id                 |
-    |   | pet_name               |
-    |   | pet_type               |
-    +---+ client_id: foreign key |
-        +------------------------+
+    |    +-- pet -----------------+
+    |    |                        |
+    |    | pet_id                 |
+    |    | pet_name               |
+    |    | pet_type               |
+    +----+ client_id: foreign key |
+      *  +------------------------+
   #+END_SRC
 
   通过上述的表拆分，将 ~client~ 添加 =vet_id= 外键来消除传递依赖。
