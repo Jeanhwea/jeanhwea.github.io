@@ -6,315 +6,292 @@
 
 
 * numpy
-numpy 是 Python 科学计算的基础包，主要有以下一些功能：
-1. N 维数组
-2. 线性代数，傅里叶变换等
+  numpy 是 Python 科学计算的基础包，主要有以下一些功能：
+  1. N 维数组
+  2. 线性代数，傅里叶变换等
 ** 安装测试
-
-#+BEGIN_SRC sh
-  pip install numpy
-  python -c 'import numpy; numpy.test()'
-#+END_SRC
+   #+BEGIN_SRC sh
+     pip install numpy
+     python -c 'import numpy; numpy.test()'
+   #+END_SRC
 
 ** 基本用法
+   numpy 的数组类是 =ndarray= ，它的别名是 =array= 。主要 =numpy.array= 和
+   Python 自带的 =array.array= 是不同的。
 
-numpy 的数组类是 ~ndarray~ ，它的别名是 ~array~ 。主要 ~numpy.array~ 和 Python 自
-带的 ~array.array~ 是不同的。
-
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  import numpy as np
-  a = np.arange(15).reshape(3, 5)
-  print(a)
-  print(a.shape)
-  print(a.ndim)
-  print(a.size)
-  print(a.dtype)
-  print(a.itemsize)
-
-  print('-'*40)
-  b = np.array([6, 7, 8])
-  print(type(a))
-  print(type(b))
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-[[ 0  1  2  3  4]
- [ 5  6  7  8  9]
- [10 11 12 13 14]]
-(3, 5)
-2
-15
-int64
-8
-----------------------------------------
-<class 'numpy.ndarray'>
-<class 'numpy.ndarray'>
-#+end_example
+   #+BEGIN_SRC python :exports code
+     >>> import numpy as np
+     a = np.arange(15).reshape(3, 5)
+     >>> a = np.arange(15).reshape(3, 5)
+     >>> a
+     array([[ 0,  1,  2,  3,  4],
+            [ 5,  6,  7,  8,  9],
+            [10, 11, 12, 13, 14]])
+     >>> a.shape
+     (3, 5)
+     >>> a.ndim
+     2
+     >>> a.size
+     15
+     >>> a.dtype
+     dtype('int64')
+     >>> a.itemsize
+     8
+     >>>
+     >>> b = np.array([6, 7, 8])
+     >>> type(a)
+     <class 'numpy.ndarray'>
+     >>> type(b)
+     <class 'numpy.ndarray'>
+     >>>
+   #+END_SRC
 
 ** 创建数组
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  # a = np.array(1, 2, 3, 4)    # WRONG
-  a = np.array([1, 2, 3, 4])  # RIGHT
-  b = np.array([(1.5,2,3), (4,5,6)])
-  c = np.array( [ [1,2], [3,4] ], dtype=complex )
-  print(a)
-  print(b)
-  print(c)
-#+END_SRC
+   #+BEGIN_SRC python :exports code
+     >>> # a = np.array(1, 2, 3, 4)    # WRONG
+     ... np.array([1, 2, 3, 4])  # RIGHT
+     array([1, 2, 3, 4])
+     >>> np.array([(1.5,2,3), (4,5,6)])
+     array([[1.5, 2. , 3. ],
+            [4. , 5. , 6. ]])
+     >>> np.array([ [1,2], [3,4] ], dtype=complex)
+     array([[1.+0.j, 2.+0.j],
+            [3.+0.j, 4.+0.j]])
+   #+END_SRC
 
-#+RESULTS:
-: [1 2 3 4]
-: [[1.5 2.  3. ]
-:  [4.  5.  6. ]]
-: [[1.+0.j 2.+0.j]
-:  [3.+0.j 4.+0.j]]
+** 初始化数组
+   #+BEGIN_SRC python :exports code
+     >>> np.zeros((3,4))
+     array([[0., 0., 0., 0.],
+            [0., 0., 0., 0.],
+            [0., 0., 0., 0.]])
+     >>> np.ones((2,3,4), dtype=np.int16)
+     array([[[1, 1, 1, 1],
+             [1, 1, 1, 1],
+             [1, 1, 1, 1]],
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  print(np.zeros((3,4)))
-  print('-'*80)
-  print(np.ones((2,3,4), dtype=np.int16))
-  print('-'*80)
-  print(np.empty((2,3)))
-  print('-'*80)
-  print(np.arange(10, 30, 5)) # samillar to range()
-  print('-'*80)
-  print(np.arange(1, 2, 0.3)) # but accept float
-
-  print('-'*80)
-  from numpy import pi
-  np.linspace(0, 2, 9)
-  x = np.linspace(0, 2*pi, 10)
-  y = np.sin(x)
-  print(x)
-  print(y)
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-  [[0. 0. 0. 0.]
-   [0. 0. 0. 0.]
-   [0. 0. 0. 0.]]
-  --------------------------------------------------------------------------------
-  [[[1 1 1 1]
-    [1 1 1 1]
-    [1 1 1 1]]
-
-   [[1 1 1 1]
-    [1 1 1 1]
-    [1 1 1 1]]]
-  --------------------------------------------------------------------------------
-  [[1.39069238e-309 1.39069238e-309 1.39069238e-309]
-   [1.39069238e-309 1.39069238e-309 1.39069238e-309]]
-  --------------------------------------------------------------------------------
-  [10 15 20 25]
-  --------------------------------------------------------------------------------
-  [1.  1.3 1.6 1.9]
-  --------------------------------------------------------------------------------
-  [0.         0.6981317  1.3962634  2.0943951  2.7925268  3.4906585
-   4.1887902  4.88692191 5.58505361 6.28318531]
-  [ 0.00000000e+00  6.42787610e-01  9.84807753e-01  8.66025404e-01
-    3.42020143e-01 -3.42020143e-01 -8.66025404e-01 -9.84807753e-01
-   -6.42787610e-01 -2.44929360e-16]
-#+end_example
+            [[1, 1, 1, 1],
+             [1, 1, 1, 1],
+             [1, 1, 1, 1]]], dtype=int16)
+     >>> np.empty((2,3))
+     array([[1.5, 2. , 3. ],
+            [4. , 5. , 6. ]])
+     >>> np.arange(10, 30, 5) # samillar to range()
+     array([10, 15, 20, 25])
+     >>> np.arange(1, 2, 0.3) # but accept float
+     array([1. , 1.3, 1.6, 1.9])
+     >>>
+     >>> from numpy import pi
+     >>> np.linspace(0, 2, 9)
+     array([0.  , 0.25, 0.5 , 0.75, 1.  , 1.25, 1.5 , 1.75, 2.  ])
+     >>> x = np.linspace(0, 2*pi, 10)
+     >>> y = np.sin(x)
+     >>> x
+     array([0.        , 0.6981317 , 1.3962634 , 2.0943951 , 2.7925268 ,
+            3.4906585 , 4.1887902 , 4.88692191, 5.58505361, 6.28318531])
+     >>> y
+     array([ 0.00000000e+00,  6.42787610e-01,  9.84807753e-01,  8.66025404e-01,
+             3.42020143e-01, -3.42020143e-01, -8.66025404e-01, -9.84807753e-01,
+            -6.42787610e-01, -2.44929360e-16])
+   #+END_SRC
 
 ** 修改数组维度 reshape
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  a = np.arange(6)
-  b = np.arange(12).reshape(4,3)
-  c = np.arange(24).reshape(2,3,4)
-  print(c)
-#+END_SRC
+   #+BEGIN_SRC python :exports code
+     >>> np.arange(6)
+     array([0, 1, 2, 3, 4, 5])
+     >>> np.arange(12).reshape(4,3)
+     array([[ 0,  1,  2],
+            [ 3,  4,  5],
+            [ 6,  7,  8],
+            [ 9, 10, 11]])
+     >>> np.arange(24).reshape(2,3,4)
+     array([[[ 0,  1,  2,  3],
+             [ 4,  5,  6,  7],
+             [ 8,  9, 10, 11]],
 
-#+RESULTS:
-: [[[ 0  1  2  3]
-:   [ 4  5  6  7]
-:   [ 8  9 10 11]]
-:
-:  [[12 13 14 15]
-:   [16 17 18 19]
-:   [20 21 22 23]]]
+            [[12, 13, 14, 15],
+             [16, 17, 18, 19],
+             [20, 21, 22, 23]]])
+     >>>
+   #+END_SRC
 
 ** 数学操作
+   numpy 重载了 Python 的数学操作符，基本操作如下
 
-numpy 重载了 Python 的数学操作符，基本操作如下
+   #+BEGIN_SRC python :exports code
+     >>> a = np.array( [20,30,40,50] )
+     >>> b = np.arange(4)
+     >>> c = a-b
+     >>> b**2
+     array([0, 1, 4, 9])
+     >>> 10*np.sin(a)
+     array([ 9.12945251, -9.88031624,  7.4511316 , -2.62374854])
+     >>> a<35
+     array([ True,  True, False, False])
+   #+END_SRC
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  a = np.array( [20,30,40,50] )
-  b = np.arange( 4 )
-  print('-'*80, '\n', b)
+   矩阵的乘法和矩阵里面每个元素相乘
 
-  c = a-b
-  print('-'*80, '\n', c)
+   #+BEGIN_SRC python :exports code
+     >>> A = np.array([[1,1],
+     ...               [0,1]] )
+     >>> B = np.array([[2,0],
+     ...               [3,4]] )
+     >>> A * B                       # elementwise product
+     array([[2, 0],
+            [0, 4]])
+     >>> A @ B                       # matrix product
+     array([[5, 4],
+            [3, 4]])
+     >>> A.dot(B)                    # another matrix product
+     array([[5, 4],
+            [3, 4]])
+     >>>
+   #+END_SRC
 
-  b**2
-  10*np.sin(a)
-  print('-'*80, '\n', a<35)
-#+END_SRC
-
-#+RESULTS:
-: --------------------------------------------------------------------------------
-:  [0 1 2 3]
-: --------------------------------------------------------------------------------
-:  [20 29 38 47]
-: --------------------------------------------------------------------------------
-:  [ True  True False False]
-
-矩阵的乘法和矩阵里面每个元素相乘
-
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  A = np.array([[1,1],
-                [0,1]] )
-  B = np.array([[2,0],
-                [3,4]] )
-  print(A * B)                       # elementwise product
-  print(A @ B)                       # matrix product
-  print(A.dot(B))                    # another matrix product
-#+END_SRC
-
-#+RESULTS:
-: [[2 0]
-:  [0 4]]
-: [[5 4]
-:  [3 4]]
-: [[5 4]
-:  [3 4]]
-
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  a = np.random.random((2,3))
-  print(a)
-  print(a.sum())
-  print(a.min())
-  print(a.max())
-#+END_SRC
-
-#+RESULTS:
-: [[0.59214609 0.41282224 0.45479527]
-:  [0.57618158 0.228041   0.45807712]]
-: 2.72206329792099
-: 0.2280410015762373
-: 0.5921460900643057
-
+   #+BEGIN_SRC python :exports code
+     >>> a = np.random.random((2,3))
+     >>> a
+     array([[0.54468729, 0.03709586, 0.65467565],
+            [0.56025666, 0.39270547, 0.51565504]])
+     >>> a.sum()
+     2.705075965630731
+     >>> a.min()
+     0.037095859583547
+     >>> a.max()
+     0.6546756487343482
+     >>>
+   #+END_SRC
 ** 深度复制
-
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  d = a.copy()                          # a new array object with new data is created
-  print(d is a)
-  d.base is a                           # d doesn't share anything with a
-  d[0,0] = 9999
-  print(a)
-#+END_SRC
-
-#+RESULTS:
-: False
-: [[0.59214609 0.41282224 0.45479527]
-:  [0.57618158 0.228041   0.45807712]]
+   #+BEGIN_SRC python :exports code
+     >>> a
+     array([[0.54468729, 0.03709586, 0.65467565],
+            [0.56025666, 0.39270547, 0.51565504]])
+     >>> d = a.copy()                          # a new array object with new data is created
+     >>> d is a
+     False
+     >>> d.base is a                           # d doesn't share anything with a
+     False
+     >>> d[0,0] = 9999
+     >>> d
+     array([[9.99900000e+03, 3.70958596e-02, 6.54675649e-01],
+            [5.60256661e-01, 3.92705465e-01, 5.15655039e-01]])
+     >>> a
+     array([[0.54468729, 0.03709586, 0.65467565],
+            [0.56025666, 0.39270547, 0.51565504]])
+     >>>
+   #+END_SRC
 
 ** 索引
-
 *** 使用 Indices 索引
+    #+BEGIN_SRC python :exports code
+      >>> a = np.arange(12)**2                       # the first 12 square numbers
+      >>> a
+      array([  0,   1,   4,   9,  16,  25,  36,  49,  64,  81, 100, 121])
+      >>> i = np.array( [ 1,1,3,8,5 ] )              # an array of indices
+      >>> a[i]                                # the elements of a at the positions i
+      array([ 1,  1,  9, 64, 25])
+      >>> j = np.array( [ [ 3, 4], [ 9, 7 ] ] )      # a bidimensional array of indices
+      >>> a[j]                                # the same shape as j
+      array([[ 9, 16],
+             [81, 49]])
+      >>>
+    #+END_SRC
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  a = np.arange(12)**2                       # the first 12 square numbers
-  i = np.array( [ 1,1,3,8,5 ] )              # an array of indices
-  print(a[i])                                # the elements of a at the positions i
-  j = np.array( [ [ 3, 4], [ 9, 7 ] ] )      # a bidimensional array of indices
-  print(a[j])                                # the same shape as j
-#+END_SRC
+    使用下标来掩码
+    #+BEGIN_SRC python :exports code
+      >>> palette = np.array( [ [0,0,0],            # black
+      ...                       [255,0,0],          # red
+      ...                       [0,255,0],          # green
+      ...                       [0,0,255],          # blue
+      ...                       [255,255,255] ] )   # white
+      >>> image = np.array( [ [ 0, 1, 2, 0 ],       # each value corresponds to a color in the palette
+      ...                     [ 0, 3, 4, 0 ]  ] )
+      >>> palette[image]                            # the (2,4,3) color image
+      array([[[  0,   0,   0],
+              [255,   0,   0],
+              [  0, 255,   0],
+              [  0,   0,   0]],
 
-#+RESULTS:
-: [ 1  1  9 64 25]
-: [[ 9 16]
-:  [81 49]]
+             [[  0,   0,   0],
+              [  0,   0, 255],
+              [255, 255, 255],
+              [  0,   0,   0]]])
+      >>>
+    #+END_SRC
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  palette = np.array( [ [0,0,0],            # black
-                        [255,0,0],          # red
-                        [0,255,0],          # green
-                        [0,0,255],          # blue
-                        [255,255,255] ] )   # white
-  image = np.array( [ [ 0, 1, 2, 0 ],       # each value corresponds to a color in the palette
-                      [ 0, 3, 4, 0 ]  ] )
-  print(palette[image])                     # the (2,4,3) color image
-#+END_SRC
+    #+BEGIN_SRC python :exports code
+      >>> a = np.arange(12).reshape(3,4)
+      >>> i = np.array([ [0,1],                  # indices for the first dim of a
+      ...                [1,2] ] )
+      >>> j = np.array([ [2,1],                  # indices for the second dim
+      ...                [3,3] ] )
+      >>> a[i,j]                                 # i and j must have equal shape
+      array([[ 2,  5],
+             [ 7, 11]])
+      >>> a[i,2]
+      array([[ 2,  6],
+             [ 6, 10]])
+      >>> a[:,j]                                 # i.e., a[ : , j]
+      array([[[ 2,  1],
+              [ 3,  3]],
 
-#+RESULTS:
-: [[[  0   0   0]
-:   [255   0   0]
-:   [  0 255   0]
-:   [  0   0   0]]
-:
-:  [[  0   0   0]
-:   [  0   0 255]
-:   [255 255 255]
-:   [  0   0   0]]]
+             [[ 6,  5],
+              [ 7,  7]],
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  a = np.arange(12).reshape(3,4)
-  i = np.array([ [0,1],                  # indices for the first dim of a
-                 [1,2] ] )
-  j = np.array([ [2,1],                  # indices for the second dim
-                 [3,3] ] )
-
-  print('-'*80, '\n', a[i,j])            # i and j must have equal shape
-  print('-'*80, '\n', a[i,2])
-  print('-'*80, '\n', a[:,j])            # i.e., a[ : , j]
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
---------------------------------------------------------------------------------
- [[ 2  5]
- [ 7 11]]
---------------------------------------------------------------------------------
- [[ 2  6]
- [ 6 10]]
---------------------------------------------------------------------------------
- [[[ 2  1]
-  [ 3  3]]
-
- [[ 6  5]
-  [ 7  7]]
-
- [[10  9]
-  [11 11]]]
-#+end_example
+             [[10,  9],
+              [11, 11]]])
+      >>>
+    #+END_SRC
 
 *** 使用布尔值索引
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  a = np.arange(12).reshape(3,4)
-  b = a > 4
-  print(b)                        # b is a boolean with a's shape
-  print(a[b])                     # 1d array with the selected elements
-  a[b] = 0                        # All elements of 'a' higher than 4 become 0
-  print(a)
-#+END_SRC
+    #+BEGIN_SRC python :exports code
+      >>> a = np.arange(12).reshape(3,4)
+      >>> b = a > 4
+      >>> b                        # b is a boolean with a's shape
+      array([[False, False, False, False],
+             [False,  True,  True,  True],
+             [ True,  True,  True,  True]])
+      >>> a[b]                     # 1d array with the selected elements
+      array([ 5,  6,  7,  8,  9, 10, 11])
+      >>> a[b] = 0                 # All elements of 'a' higher than 4 become 0
+      >>> a
+      array([[0, 1, 2, 3],
+             [4, 0, 0, 0],
+             [0, 0, 0, 0]])
+      >>>
+    #+END_SRC
 
-#+RESULTS:
-: [[False False False False]
-:  [False  True  True  True]
-:  [ True  True  True  True]]
-: [ 5  6  7  8  9 10 11]
-: [[0 1 2 3]
-:  [4 0 0 0]
-:  [0 0 0 0]]
-
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  a = np.arange(12).reshape(3,4)
-  b1 = np.array([False,True,True])          # first dim selection
-  b2 = np.array([True,False,True,False])    # second dim selection
-  a[b1,:]                                   # selecting rows
-  a[b1]                                     # same thing
-  a[:,b2]                                   # selecting columns
-  a[b1,b2]                                  # a weird thing to do
-#+END_SRC
+    多个维度的索引
+    #+BEGIN_SRC python :exports code
+      >>> a = np.arange(12).reshape(3,4)
+      >>> a
+      array([[ 0,  1,  2,  3],
+             [ 4,  5,  6,  7],
+             [ 8,  9, 10, 11]])
+      >>> b1 = np.array([False,True,True])          # first dim selection
+      >>> b2 = np.array([True,False,True,False])    # second dim selection
+      >>> a[b1,:]                                   # selecting rows
+      array([[ 4,  5,  6,  7],
+             [ 8,  9, 10, 11]])
+      >>> a[b1]                                     # same thing
+      array([[ 4,  5,  6,  7],
+             [ 8,  9, 10, 11]])
+      >>> a[:,b2]                                   # selecting columns
+      array([[ 0,  2],
+             [ 4,  6],
+             [ 8, 10]])
+      >>> a[b1,b2]                                  # a weird thing to do
+      array([ 4, 10])
+      >>>
+    #+END_SRC
 
 ** 线性代数
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
+   #+BEGIN_SRC python :exports code
   a = np.array([[1.0, 2.0], [3.0, 4.0]])
   a.transpose()
   np.linalg.inv(a)
@@ -325,58 +302,73 @@ numpy 重载了 Python 的数学操作符，基本操作如下
   y = np.array([[5.], [7.]])
   np.linalg.solve(a, y)
   np.linalg.eig(j)
-#+END_SRC
+   #+END_SRC
 
 ** 直方图
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :results file
-  import numpy as np
-  import matplotlib.pyplot as plt
-  filename = '../resource/image/2018/10/numpy1.png'
+   #+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :results file
+     import numpy as np
+     import matplotlib.pyplot as plt
+     filename = '../resource/image/2018/10/numpy1.png'
 
-  # Build a vector of 10000 normal deviates with variance 0.5^2 and mean 2
-  mu, sigma = 2, 0.5
-  v = np.random.normal(mu,sigma,10000)
-  # Plot a normalized histogram with 50 bins
-  plt.hist(v, bins=50, density=1)       # matplotlib version (plot)
-  plt.savefig(filename)
-  return filename
-#+END_SRC
+     # Build a vector of 10000 normal deviates with variance 0.5^2 and mean 2
+     mu, sigma = 2, 0.5
+     v = np.random.normal(mu,sigma,10000)
+     # Plot a normalized histogram with 50 bins
+     plt.hist(v, bins=50, density=1)       # matplotlib version (plot)
+     plt.savefig(filename)
+     return filename
+   #+END_SRC
 
-#+RESULTS:
-[[file:../resource/image/2018/10/numpy1.png]]
+   #+RESULTS:
+   [[file:../resource/image/2018/10/numpy1.png]]
 
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :results file
-  import numpy as np
-  import matplotlib.pyplot as plt
-  filename = '../resource/image/2018/10/numpy2.png'
+   #+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :results file
+     import numpy as np
+     import matplotlib.pyplot as plt
+     filename = '../resource/image/2018/10/numpy2.png'
 
-  # Build a vector of 10000 normal deviates with variance 0.5^2 and mean 2
-  mu, sigma = 2, 0.5
-  v = np.random.normal(mu,sigma,10000)
-  # Compute the histogram with numpy and then plot it
-  (n, bins) = np.histogram(v, bins=50, density=True)  # NumPy version (no plot)
-  plt.plot(.5*(bins[1:]+bins[:-1]), n)
-  plt.savefig(filename)
-  return filename
-#+END_SRC
+     # Build a vector of 10000 normal deviates with variance 0.5^2 and mean 2
+     mu, sigma = 2, 0.5
+     v = np.random.normal(mu,sigma,10000)
+     # Compute the histogram with numpy and then plot it
+     (n, bins) = np.histogram(v, bins=50, density=True)  # NumPy version (no plot)
+     plt.plot(.5*(bins[1:]+bins[:-1]), n)
+     plt.savefig(filename)
+     return filename
+   #+END_SRC
 
-#+RESULTS:
-[[file:../resource/image/2018/10/numpy2.png]]
+   #+RESULTS:
+   [[file:../resource/image/2018/10/numpy2.png]]
 
 * 小技巧: 自动 reshape
+  当给出数组的维度为 -1 时，代表需要自推导维度大小
+  #+BEGIN_SRC python :exports code
+    >>> a = np.arange(30)
+    >>> a
+    array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
+           17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29])
+    >>> a.shape = 2,-1,3  # -1 means "whatever is needed"
+    >>> a.shape
+    (2, 5, 3)
+    >>> a
+    array([[[ 0,  1,  2],
+            [ 3,  4,  5],
+            [ 6,  7,  8],
+            [ 9, 10, 11],
+            [12, 13, 14]],
 
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :session default :results output pp
-  a = np.arange(30)
-  a.shape = 2,-1,3  # -1 means "whatever is needed"
-  print(a.shape)
-  print(a)
-#+END_SRC
+           [[15, 16, 17],
+            [18, 19, 20],
+            [21, 22, 23],
+            [24, 25, 26],
+            [27, 28, 29]]])
+    >>>
+  #+END_SRC
 
 * 参考链接
-
-1. [[http://www.numpy.org/][numpy]]
-2. [[https://github.com/numpy/numpy.git][numpy on github]]
-3. [[https://docs.scipy.org/doc/numpy-1.15.1/user/quickstart.html][quickstart]]
-4. [[https://docs.scipy.org/doc/numpy-1.15.1/reference/index.html#reference][reference]]
+  1. [[http://www.numpy.org/][numpy]]
+  2. [[https://github.com/numpy/numpy.git][numpy on github]]
+  3. [[https://docs.scipy.org/doc/numpy-1.15.1/user/quickstart.html][quickstart]]
+  4. [[https://docs.scipy.org/doc/numpy-1.15.1/reference/index.html#reference][reference]]
