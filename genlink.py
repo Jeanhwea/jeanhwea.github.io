@@ -44,8 +44,8 @@ if __name__ == '__main__':
   content = '* Index'
   content += '\n** Articles\n'
   content += infos2text(getinfos('article'))
-  content += '\n** Python\n'
-  content += infos2text(getinfos('python'))
+  content += '\n** Programming Language\n'
+  content += infos2text(getinfos('lang'))
   content += '\n** Misc.\n'
   content += infos2text(getinfos('misc'))
   content += '\n'
