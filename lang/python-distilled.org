@@ -774,65 +774,241 @@
     #+END_SRC
 
 *** 装饰器
-
     装饰器是一个返回函数的高阶函数，通常是对一个函数进行一些属性设置后再将结果返回给
     原来的函数。装饰器使用 =@= 修饰到函数定义的前面，下面是一个样例。
 
     #+BEGIN_SRC python :exports code
-      def foo():
-          # do something
-
-      def decorator(func):
-          # manipulate func
-          return func
-
-      foo = decorator(foo)  # Manually decorate
-
-      @decorator
-      def bar():
-          # Do something
-      # bar() is decorated
+      >>> def foo():
+      ...   print('foo called')
+      ...
+      >>> def decorator(func):
+      ...   return func
+      ...
+      >>> foo = decorator(foo)
+      >>>
+      >>> @decorator
+      ... def bar():
+      ...   print('bar called')
+      ...
+      >>> bar()
+      bar called
+      >>>
     #+END_SRC
 
-
 ** 匿名函数
-
-   1. ~filter(func,iter)~ 只能处理一个参数 iter ，仅仅将满足 func 方法的数值过滤出来。
-   2. ~map(func,iter1,iter2,..)~ 可以处理多个 iter，实现通过 func 方法对 iter1,
+   1. =filter(func,iter)= 只能处理一个参数 iter ，仅仅将满足 func 方法的数值过滤出来。
+   2. =map(func,iter1,iter2,..)= 可以处理多个 iter，实现通过 func 方法对 iter1,
       iter2,... 进行处理。
-   3. ~reduce(func,iter,init)~ 仅能处理一个 iter, init 为初始化值，执行顺序为：先将
+   3. =reduce(func,iter,init)= 仅能处理一个 iter, init 为初始化值，执行顺序为：先将
       每个 iter 内部第一个值和 init 进行 func 处理，处理的结果再与 iter 第二个值进
       行 func 处理，直到结束。
 
    #+BEGIN_SRC python :exports code
-     numseq = map(str, range(10))
-     print(list(numseq))
-     filnum = filter(lambda x: x > 5, range(10))
-     print(list(filnum))
-     from functools import reduce
-     ans = reduce(lambda x, y: x+y, range(100), 0)
-     print(ans)
+     >>> numseq = map(str, range(10))
+     >>> list(numseq)
+     ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+     >>> filnum = filter(lambda x: x > 5, range(10))
+     >>> list(filnum)
+     [6, 7, 8, 9]
+     >>> from functools import reduce
+     >>> reduce(lambda x, y: x+y, range(100), 0)
+     4950
+     >>>
    #+END_SRC
 
 ** 全局变量
 
-   Python 定义的变量默认都是局部变量，如果需要定义全局变量需要使用 ~global~ 关键字
-   修饰。
+   Python 定义的变量默认都是局部变量，如果需要定义全局变量需要使用 =global= 关键
+   字修饰。
 
    #+BEGIN_SRC python :exports code
-     g_x = 0
-     def change_x():
-       global g_x
-       g_x += 1
-
-     print(g_x)
-     change_x()
-     print(g_x)
+     >>> g_x = 0
+     >>> def change_x():
+     ...   global g_x
+     ...   g_x += 1
+     ...
+     >>> g_x
+     0
+     >>> change_x()
+     >>> g_x
+     1
+     >>>
    #+END_SRC
 
+* 类
+** 定义类
+   #+BEGIN_SRC python :exports code
+     class Vector:
+       # constructor
+       def __init__(self, a, b):
+         self.a = a
+         self.b = b
 
+       # destructor
+       def __del__(self):
+         pass
+
+       # displayer of this class
+       def __str__(self):
+         return 'Vector (%d, %d)' % (self.a, self.b)
+
+       # override operator '+'
+       def __add__(self,other):
+         return Vector(self.a + other.a, self.b + other.b)
+
+     v1 = Vector(2, 10)
+     v2 = Vector(5, -2)
+     v3 = v1 + v2
+   #+END_SRC
+
+** 类继承
+   Python 的类继承方式如下：
+
+   #+BEGIN_SRC python :exports code
+     __metaclass__ = type
+     class Parent:
+       def __init__(self,):
+         self.name = 'parent'
+
+       def myMethod(self):
+         print(self.name)
+
+     class Child(Parent):
+       def __init__(self):
+         self.name = 'child'
+
+       def myMethod(self):
+         # call super method
+         super(Child, self).myMethod()
+
+     c = Child()
+     c.myMethod()
+   #+END_SRC
+
+** 访问控制
+
+   Python 没有 private, protected, public 关键字，类的访问级别根据函数的命名来。
+
+   #+BEGIN_SRC python :exports code
+     class Visibility:
+       # private method start with __
+       def __inaccessible(self):
+         print 'you can not see me'
+
+       # public method
+       def accessible(self):
+         print 'this secret message is:',
+         self.__inaccessible()
+
+
+     secr = Visibility()
+     # secr.__inaccessible()
+     '''
+     Traceback (most recent call last):
+     File "***.py", line 13, in <module>
+       secr.__inaccessible()
+     AttributeError: Visibility instance has no attribute '__inaccessible'
+     '''
+     secr.accessible() #>>> this secret message is: you can not see me
+   #+END_SRC
+
+** 定义类型类
+
+   #+BEGIN_SRC python :exports code
+     __metaclass__ = type
+     class Rect:
+       def __init__(self, width=0, height=0):
+         self.w = width
+         self.h = height
+
+       def getSize(self):
+         return self.w, self.h
+
+       def setSize(self, size):
+         self.w, self.h = size
+
+     size = property(getSize, setSize)
+
+     r = Rect(2, 5)
+     r.size #=> (2, 5)
+     r.size = 4, 4
+     r.size #=> (4, 4)
+   #+END_SRC
+
+* 模块
+** 定义模块
+   定义模块就像正常编写普通 Python 的代码一样，在相应文件中定义一些函数。
+
+   #+BEGIN_SRC python :exports code
+     # fibo.py
+     # Fibonacci numbers module
+     def fib(n):    # write Fibonacci series up to n
+       a, b = 0, 1
+         while a < n:
+           print(a, end=' ')
+           a, b = b, a+b
+           print()
+
+     def fib2(n):   # return Fibonacci series up to n
+       result = []
+       a, b = 0, 1
+         while a < n:
+           result.append(a)
+           a, b = b, a+b
+         return result
+   #+END_SRC
+
+   然后通过 =import= 关键字导入模块
+
+   #+BEGIN_SRC python :exports code
+     import fibo
+     fibo.fib(1000)
+     fibo.fib2(100)
+
+     # or
+     from fibo import fib, fib2
+     import fibo as fib
+     from fibo import fib as fibonacci
+   #+END_SRC
+
+** 包的组织结构
+    包也是一种模块，在每一级的文件夹下需要新建 =__init__.py= 文件初始化当前的包。下
+    面是一个包的文件结构的例子。
+
+    #+BEGIN_SRC text
+      sound/                          Top-level package
+            __init__.py               Initialize the sound package
+            formats/                  Subpackage for file format conversions
+                    __init__.py
+                    wavread.py
+                    wavwrite.py
+                    aiffread.py
+                    aiffwrite.py
+                    auread.py
+                    auwrite.py
+                    ...
+            effects/                  Subpackage for sound effects
+                    __init__.py
+                    echo.py
+                    surround.py
+                    reverse.py
+                    ...
+            filters/                  Subpackage for filters
+                    __init__.py
+                    equalizer.py
+                    vocoder.py
+                    karaoke.py
+                    ...
+    #+END_SRC
+
+    当包创建并且添加到 =PYTHONPATH= 环境变量中后，可以通过如下方式导入包
+
+    #+BEGIN_SRC python :exports code
+      import sound.effects.echo
+      from sound.effects import echo
+      from sound.effects.echo import echofilter
+    #+END_SRC
 * 参考链接
-
   1. [[https://docs.python-guide.org][The Hitchhiker’s Guide to Python!]]
   2. [[https://www.fullstackpython.com/][Full Stack Python]]
   3. [[https://docs.python.org/3/][Python3 Documentatnion]]
