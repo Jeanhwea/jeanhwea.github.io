@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2019-07-03 Wed 22:52 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>使用 JavaScript 解析二维码</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">使用 JavaScript 解析二维码</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org0aa5edd">1. ngx-qrcode-all</a>
+<ul>
+<li><a href="#orgf19758e">1.1. 安装</a></li>
+<li><a href="#org148d5ec">1.2. 使用</a></li>
+</ul>
+</li>
+<li><a href="#org04f4775">2. qrcode-parser</a>
+<ul>
+<li><a href="#orga13ace7">2.1. 安装</a></li>
+<li><a href="#org0d773fe">2.2. 使用</a></li>
+</ul>
+</li>
+<li><a href="#orgb214e35">3. ngx-qrcode2</a>
+<ul>
+<li><a href="#org361f904">3.1. 安装</a></li>
+<li><a href="#orgb065865">3.2. 使用</a></li>
+</ul>
+</li>
+<li><a href="#org60e42b5">4. 参考链接</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org0aa5edd" class="outline-2">
+<h2 id="org0aa5edd"><span class="section-number-2">1</span> ngx-qrcode-all</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-orgf19758e" class="outline-3">
+<h3 id="orgf19758e"><span class="section-number-3">1.1</span> 安装</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+直接使用 yarn 安装
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">yarn add ngx-qrcode-all
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org148d5ec" class="outline-3">
+<h3 id="org148d5ec"><span class="section-number-3">1.2</span> 使用</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Appmodule 中导入模块
+</p>
+
+<div class="org-src-container">
+<pre class="src src-typescript"><span style="color: #859900;">import</span> <span style="color: #8d5649;">{</span> NgModule <span style="color: #8d5649;">}</span> <span style="color: #859900;">from</span> <span style="color: #2aa198;">'@angular/core'</span>;
+<span style="color: #859900;">import</span> <span style="color: #8d5649;">{</span> CommonModule <span style="color: #8d5649;">}</span> <span style="color: #859900;">from</span> <span style="color: #2aa198;">'@angular/common'</span>;
+<span style="color: #859900;">import</span> <span style="color: #8d5649;">{</span> QrCodeAllModule <span style="color: #8d5649;">}</span> <span style="color: #859900;">from</span> <span style="color: #2aa198;">'ngx-qrcode-all'</span>;
+<span style="color: #859900;">import</span> <span style="color: #8d5649;">{</span> AppComponent <span style="color: #8d5649;">}</span> <span style="color: #859900;">from</span> <span style="color: #2aa198;">'./app.component'</span>;
+
+@NgModule<span style="color: #8d5649;">(</span><span style="color: #d8241f;">{</span>
+    imports: <span style="color: #9564bf;">[</span>
+        CommonModule,
+        QrCodeAllModule
+    <span style="color: #9564bf;">]</span>,
+    declarations: <span style="color: #9564bf;">[</span>
+        AppComponent
+    <span style="color: #9564bf;">]</span>
+<span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">export</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">AppModule</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #859900;">constructor</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+情况一： 生成二维码的代码模板
+</p>
+
+<div class="org-src-container">
+<pre class="src src-html">&lt;<span style="color: #b58900;">div</span> <span style="color: #6c71c4;">id</span>=<span style="color: #2aa198;">"qrcodeid"</span>&gt;
+ &lt;<span style="color: #b58900;">qr-code-all</span> [qrCodeType]=<span style="color: #2aa198;">"url"</span>
+     [qrCodeValue]=<span style="color: #2aa198;">"'SK is the best in the world!'"</span>
+     [qrCodeVersion]=<span style="color: #2aa198;">"'1'"</span>
+     [qrCodeECLevel]=<span style="color: #2aa198;">"'M'"</span>
+     [qrCodeColorLight]=<span style="color: #2aa198;">"'#ffffff'"</span>
+     [qrCodeColorDark]=<span style="color: #2aa198;">"'#000000'"</span>
+     [width]=<span style="color: #2aa198;">"11"</span>
+     [margin]=<span style="color: #2aa198;">"4"</span>
+     [scale]=<span style="color: #2aa198;">"4"</span>
+     [scanQrCode]=<span style="color: #2aa198;">"false"</span>&gt;
+ &lt;/<span style="color: #b58900;">qr-code-all</span>&gt;
+&lt;/<span style="color: #b58900;">div</span>&gt;
+</pre>
+</div>
+
+<p>
+情况二： 读取二维码的代码模板
+</p>
+
+<div class="org-src-container">
+<pre class="src src-html">&lt;<span style="color: #b58900;">div</span> <span style="color: #6c71c4;">id</span>=<span style="color: #2aa198;">"qrcodeid"</span>&gt;
+ &lt;<span style="color: #b58900;">qr-code-all</span> [canvasWidth]=<span style="color: #2aa198;">"640"</span>
+     [canvasHeight]=<span style="color: #2aa198;">"480"</span>
+     [debug]=<span style="color: #2aa198;">"false"</span>
+     [stopAfterScan]=<span style="color: #2aa198;">"true"</span>
+     [updateTime]=<span style="color: #2aa198;">"500"</span>
+     (onCapture)=<span style="color: #2aa198;">"captureImage($event)"</span>
+     [scanQrCode]=<span style="color: #2aa198;">"true"</span>&gt;
+ &lt;/<span style="color: #b58900;">qr-code-all</span>&gt;
+&lt;/<span style="color: #b58900;">div</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org04f4775" class="outline-2">
+<h2 id="org04f4775"><span class="section-number-2">2</span> qrcode-parser</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+一个没有依赖的二维码前端解析工具。优点是比较轻量级，缺点是不会调用摄像头，需要编
+写调用摄像头的代码。
+</p>
+</div>
+
+<div id="outline-container-orga13ace7" class="outline-3">
+<h3 id="orga13ace7"><span class="section-number-3">2.1</span> 安装</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+使用 qrcode-parser 包来解析二维码。直接使用 yarn 安装
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">yarn add qrcode-parser
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0d773fe" class="outline-3">
+<h3 id="org0d773fe"><span class="section-number-3">2.2</span> 使用</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-js"><span style="color: #859900;">import</span> qrcodeParser from <span style="color: #2aa198;">'qrcode-parser'</span>;
+
+<span style="color: #859900;">var</span> <span style="color: #6c71c4;">imageUrl</span> = <span style="color: #2aa198;">''</span>;
+
+qrcodeParser(imageUrl).then(res =&gt; {
+  document.getElementById(<span style="color: #2aa198;">'content'</span>).innerText = res.data
+})
+
+<span style="color: #859900;">const</span> <span style="color: #6c71c4;">fileElement</span> = document.getElementById(<span style="color: #2aa198;">'file'</span>)
+fileElement.addEventListener(<span style="color: #2aa198;">'change'</span>, () =&gt; {
+  <span style="color: #859900;">const</span> <span style="color: #6c71c4;">file</span> = fileElement.files[0]
+  qrcodeParser(file).then(res =&gt; {
+    document.getElementById(<span style="color: #2aa198;">'content'</span>).innerText = res.data
+  })
+}, <span style="color: #268bd2;">false</span>)
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgb214e35" class="outline-2">
+<h2 id="orgb214e35"><span class="section-number-2">3</span> ngx-qrcode2</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+一个集成到 angular 的二维码生成工具。只能生成，不能读取。
+</p>
+</div>
+
+<div id="outline-container-org361f904" class="outline-3">
+<h3 id="org361f904"><span class="section-number-3">3.1</span> 安装</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+<pre class="src src-sh">yarn add ngx-qrcode2
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb065865" class="outline-3">
+<h3 id="orgb065865"><span class="section-number-3">3.2</span> 使用</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Appmodule 中导入模块
+</p>
+
+<div class="org-src-container">
+<pre class="src src-typescript"><span style="color: #859900;">import</span> <span style="color: #8d5649;">{</span> BrowserModule <span style="color: #8d5649;">}</span> <span style="color: #859900;">from</span> <span style="color: #2aa198;">'@angular/platform-browser'</span>;
+<span style="color: #859900;">import</span> <span style="color: #8d5649;">{</span> NgModule <span style="color: #8d5649;">}</span> <span style="color: #859900;">from</span> <span style="color: #2aa198;">'@angular/core'</span>;
+<span style="color: #859900;">import</span> <span style="color: #8d5649;">{</span> NgxQRCodeModule <span style="color: #8d5649;">}</span> <span style="color: #859900;">from</span> <span style="color: #2aa198;">'ngx-qrcode2'</span>;
+
+<span style="color: #859900;">import</span> <span style="color: #8d5649;">{</span> AppComponent <span style="color: #8d5649;">}</span> <span style="color: #859900;">from</span> <span style="color: #2aa198;">'./app.component'</span>;
+
+@NgModule<span style="color: #8d5649;">(</span><span style="color: #d8241f;">{</span>
+  declarations: <span style="color: #9564bf;">[</span>
+    AppComponent
+  <span style="color: #9564bf;">]</span>,
+  imports: <span style="color: #9564bf;">[</span>
+    BrowserModule,
+    NgxQRCodeModule
+  <span style="color: #9564bf;">]</span>,
+  providers: <span style="color: #9564bf;">[]</span>,
+  bootstrap: <span style="color: #9564bf;">[</span>AppComponent<span style="color: #9564bf;">]</span>
+<span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">export</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">AppModule</span> <span style="color: #8d5649;">{</span> <span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+app.component.html 插入的模板
+</p>
+
+<div class="org-src-container">
+<pre class="src src-html">&lt;<span style="color: #b58900;">div</span> <span style="color: #6c71c4;">style</span>=<span style="color: #2aa198;">"text-align:center"</span>&gt;
+  &lt;<span style="color: #b58900;">h1</span>&gt;<span style="font-weight: bold; text-decoration: underline;">ngx-qrcode2 demo</span>&lt;/<span style="color: #b58900;">h1</span>&gt;
+&lt;/<span style="color: #b58900;">div</span>&gt;
+
+&lt;<span style="color: #b58900;">ngx-qrcode</span>
+      [qrc-element-type]=<span style="color: #2aa198;">"elementType"</span>
+      [qrc-value] = <span style="color: #2aa198;">"value"</span>
+      qrc-class = <span style="color: #2aa198;">"aclass"</span>
+      qrc-errorCorrectionLevel = <span style="color: #2aa198;">"L"</span>&gt;
+&lt;/<span style="color: #b58900;">ngx-qrcode</span>&gt;
+</pre>
+</div>
+
+<p>
+app.component.ts 中添加代码
+</p>
+
+<div class="org-src-container">
+<pre class="src src-typescript"><span style="color: #859900;">import</span> <span style="color: #8d5649;">{</span> Component <span style="color: #8d5649;">}</span> <span style="color: #859900;">from</span> <span style="color: #2aa198;">'@angular/core'</span>;
+
+@Component<span style="color: #8d5649;">(</span><span style="color: #d8241f;">{</span>
+  selector: <span style="color: #2aa198;">'app-root'</span>,
+  templateUrl: <span style="color: #2aa198;">'./app.component.html'</span>,
+  styleUrls: <span style="color: #9564bf;">[</span><span style="color: #2aa198;">'./app.component.css'</span><span style="color: #9564bf;">]</span>
+<span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">export</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">AppComponent</span> <span style="color: #8d5649;">{</span>
+  title = <span style="color: #2aa198;">'app'</span>;
+  elementType = <span style="color: #2aa198;">'url'</span>;
+  value = <span style="color: #2aa198;">'Techiediaries'</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org60e42b5" class="outline-2">
+<h2 id="org60e42b5"><span class="section-number-2">4</span> 参考链接</h2>
+<div class="outline-text-2" id="text-4">
+<ol class="org-ol">
+<li><a href="https://github.com/sinchang/qrcode-parser">qrcode-parser</a>: A pure javascript QR code reading library, accept File object, image url, base64.</li>
+<li><a href="https://qrcode-parser.netlify.com/">qrcode parser live demo</a></li>
+<li><a href="https://github.com/nileskh16/ngx-qrcode-all">ngx-qrcode-all</a></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2018-10-11 Thu 00:00</p>
+<p class="author">Author: Jinghui Hu</p>
+<p class="date">Created: 2019-07-03 Wed 22:52</p>
+<p class="validation"></p>
+</div>
+</body>
+</html>

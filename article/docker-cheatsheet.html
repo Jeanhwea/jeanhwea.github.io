@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2019-07-03 Wed 22:54 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Docker 介绍</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Docker 介绍</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orga3c97a2">1. Docker</a></li>
+<li><a href="#org3142423">2. Docker 容器</a>
+<ul>
+<li><a href="#org4d62212">2.1. 生命周期</a></li>
+<li><a href="#orge0b81ff">2.2. 启动和停止</a></li>
+<li><a href="#org4ccdb24">2.3. 查看容器的状态</a></li>
+<li><a href="#orgdd7378f">2.4. 杂项</a></li>
+</ul>
+</li>
+<li><a href="#orgca2536c">3. Docker 图像</a>
+<ul>
+<li><a href="#org2886ce7">3.1. 生命周期</a></li>
+<li><a href="#orga9944f8">3.2. 显示状态</a></li>
+</ul>
+</li>
+<li><a href="#org5e9969a">4. 工作流</a>
+<ul>
+<li><a href="#org06760cd">4.1. load/save 图像</a></li>
+<li><a href="#orga557783">4.2. import/export 容器</a></li>
+</ul>
+</li>
+<li><a href="#org413b466">5. Registry 和 Repository</a></li>
+<li><a href="#org7ca19d7">6. Dockerfile</a>
+<ul>
+<li><a href="#org47f6525">6.1. Dockerfile 的指令</a></li>
+</ul>
+</li>
+<li><a href="#org919f087">7. 私有仓库</a></li>
+<li><a href="#org76c5804">8. 参考链接</a></li>
+</ul>
+</div>
+</div>
+
+<div class="figure">
+<p><img src="../resource/image/2018/11/docker-architecture.png" alt="docker-architecture.png" />
+</p>
+</div>
+
+
+<div id="outline-container-orga3c97a2" class="outline-2">
+<h2 id="orga3c97a2"><span class="section-number-2">1</span> Docker</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Docker 和虚拟机有着同样的虚拟化的功能，但是 Docker 在完成虚拟化是使用的是“容器”的
+技术而非实现虚拟主机的资源，这样带来的好处就是更加轻便。
+</p>
+
+
+<div class="figure">
+<p><img src="../resource/image/2018/11/container-vs-vm.png" alt="container-vs-vm.png" />
+</p>
+</div>
+
+<p>
+Docker 的最低依赖是 3.10.x 的 Linux 内核。并且 Docker 可以安装在 Linux，MacOS 和
+Windows 10 以上的机器上，安装的方式请参考官网的文档。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org3142423" class="outline-2">
+<h2 id="org3142423"><span class="section-number-2">2</span> Docker 容器</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org4d62212" class="outline-3">
+<h3 id="org4d62212"><span class="section-number-3">2.1</span> 生命周期</h3>
+<div class="outline-text-3" id="text-2-1">
+<ul class="org-ul">
+<li>docker create: 创建容器</li>
+<li>docker rename: 重命名容器</li>
+<li>docker run: 创建并启动容器</li>
+<li>docker rm: 删除容器</li>
+<li>docker update: 更新容器运行的资源约束</li>
+</ul>
+
+<p>
+<code>docker run</code> 是非常常用的一个命令其中比较有用的选项如下：
+</p>
+<ul class="org-ul">
+<li>-t: 添加一个 tty 终端</li>
+<li>-d: 当容器退出后自动进行 detach 操作</li>
+<li>&#x2013;volume $HOSTDIR:$DOCKERDIR : 挂载容器外的磁盘</li>
+<li>&#x2013;publish $HOSTPORT:$DOCKERPORT : 暴露端口</li>
+<li>&#x2013;name: 制定容器名</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orge0b81ff" class="outline-3">
+<h3 id="orge0b81ff"><span class="section-number-3">2.2</span> 启动和停止</h3>
+<div class="outline-text-3" id="text-2-2">
+<ul class="org-ul">
+<li>docker start: 启动容器</li>
+<li>docker stop: 停止容器</li>
+<li>docker restart: 重启容器</li>
+<li>docker pause: 暂停容器</li>
+<li>docker unpause: 重启暂停的容器</li>
+<li>docker wait: 阻断直到容器停止</li>
+<li>docker kill: 发送 SIGKILL 信号到容器</li>
+<li>docker attach: 连接一个运行的容器</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org4ccdb24" class="outline-3">
+<h3 id="org4ccdb24"><span class="section-number-3">2.3</span> 查看容器的状态</h3>
+<div class="outline-text-3" id="text-2-3">
+<ul class="org-ul">
+<li>docker ps: 显示当前运行的容器， <code>-a</code> 选项可以显示所有的容器</li>
+<li>docker logs: 显示容器的日志</li>
+<li>docker inspect: 查看所有容器的信息（包括 IP 地址）</li>
+<li>docker events: 获取容器的事件</li>
+<li>docker port: 获取发布的端口</li>
+<li>docker top: 显示容器中的进程</li>
+<li>docker stats: 显示容器资源的使用情况， <code>--all</code> 显示所有的容器</li>
+<li>docker diff: 显示容器的修改的文件</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgdd7378f" class="outline-3">
+<h3 id="orgdd7378f"><span class="section-number-3">2.4</span> 杂项</h3>
+<div class="outline-text-3" id="text-2-4">
+<ul class="org-ul">
+<li>docker cp: 在本地和容器之间复制文件</li>
+<li>docker export: 将文件系统导出成压缩文档，并输出到 STDOUT</li>
+<li>docker exec: 在容器里面执行一个指令</li>
+</ul>
+
+<p>
+常用的 exec 指令如下，可以启动一个 bash 交互环境。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">docker exec -it foo /bin/bash
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgca2536c" class="outline-2">
+<h2 id="orgca2536c"><span class="section-number-2">3</span> Docker 图像</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Docker 图像指的是容器在一个特点时间点的快照，它是一个只读的容器的存储，官网上说
+图像是容器的一个模板。
+</p>
+</div>
+
+<div id="outline-container-org2886ce7" class="outline-3">
+<h3 id="org2886ce7"><span class="section-number-3">3.1</span> 生命周期</h3>
+<div class="outline-text-3" id="text-3-1">
+<ul class="org-ul">
+<li>docker images: 显示所有图像</li>
+<li>docker import: 通过压缩文档导入图像</li>
+<li>docker build: 通过 Dockerfile 创建图像</li>
+<li>docker commit: 通过一个容器来提交一个图像</li>
+<li>docker rmi: 移除一个图像</li>
+<li>docker load: 通过压缩档案作为 STDIN 来导入图像，图像的标签也会一并导入</li>
+<li>docker save: 将图像压缩成压缩档案输出到 STDOUT，图像的 layer, tags, version 一并输出</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orga9944f8" class="outline-3">
+<h3 id="orga9944f8"><span class="section-number-3">3.2</span> 显示状态</h3>
+<div class="outline-text-3" id="text-3-2">
+<ul class="org-ul">
+<li>docker history: 显示所有历史图像</li>
+<li>docker tag: 重命名图像，打标签等操作</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org5e9969a" class="outline-2">
+<h2 id="org5e9969a"><span class="section-number-2">4</span> 工作流</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-org06760cd" class="outline-3">
+<h3 id="org06760cd"><span class="section-number-3">4.1</span> load/save 图像</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+加载文件中的图像
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">docker load &lt; filename.tar.gz
+</pre>
+</div>
+
+<p>
+保存图像到文件
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">docker save imagename:tagname | gzip &gt; filename.tar.gz
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga557783" class="outline-3">
+<h3 id="orga557783"><span class="section-number-3">4.2</span> import/export 容器</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+从一个容器文件中导入容器
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">cat filename.tar.gz | docker import - imagename:tagname
+</pre>
+</div>
+
+<p>
+导出一个容器
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">docker export containername | gzip &gt; filename.tar.gz
+</pre>
+</div>
+
+<p>
+值得一提的是： <code>load</code> 在新建图像时会带人相关的历史信息，tag 等，而 <code>import</code> 只会
+创建一个图像，所以 <code>import</code> 的图像的大小会小一点。
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org413b466" class="outline-2">
+<h2 id="org413b466"><span class="section-number-2">5</span> Registry 和 Repository</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+registry 是一个宿主机器，一个 registry 包含多个 repository。repository 是存储图
+像的仓库，一个 repository 包含多个 image，同时每个 image 又有许多 tag。常见的操
+作如下：
+</p>
+
+<ul class="org-ul">
+<li>docker login: 登入 registry</li>
+<li>docker logout: 注销 registry</li>
+<li>docker search: 搜索图像</li>
+<li>docker pull: 拉取 registry 的镜像</li>
+<li>docker push: 上传本地图像到 registry</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org7ca19d7" class="outline-2">
+<h2 id="org7ca19d7"><span class="section-number-2">6</span> Dockerfile</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+Dockerfile 是配置 Docker 容器的配置文件，通过 <code>docker build</code> 来使用它创建图像。
+</p>
+</div>
+
+<div id="outline-container-org47f6525" class="outline-3">
+<h3 id="org47f6525"><span class="section-number-3">6.1</span> Dockerfile 的指令</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+常见的指令如下表
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Instruction</th>
+<th scope="col" class="org-left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">FROM</td>
+<td class="org-left">设置基的图像</td>
+</tr>
+
+<tr>
+<td class="org-left">RUN</td>
+<td class="org-left">在新的层数执行一条命令，并且提交结果</td>
+</tr>
+
+<tr>
+<td class="org-left">CMD</td>
+<td class="org-left">提供默认执行的容器</td>
+</tr>
+
+<tr>
+<td class="org-left">EXPOSE</td>
+<td class="org-left">暴露容器的监听端口， <b>这条指令只是提供端口，并不会直接暴露</b></td>
+</tr>
+
+<tr>
+<td class="org-left">ENV</td>
+<td class="org-left">设置环境变量</td>
+</tr>
+
+<tr>
+<td class="org-left">ADD</td>
+<td class="org-left">从容器外复制文件和目录到容器里面，避免使用 ADD，尽量使用 COPY</td>
+</tr>
+
+<tr>
+<td class="org-left">COPY</td>
+<td class="org-left">使用 root 权限来复制文件</td>
+</tr>
+
+<tr>
+<td class="org-left">ENTRYPOINT</td>
+<td class="org-left">配置容器是入口可执行文件</td>
+</tr>
+
+<tr>
+<td class="org-left">VOLUME</td>
+<td class="org-left">配置一个可挂载的点</td>
+</tr>
+
+<tr>
+<td class="org-left">USER</td>
+<td class="org-left">设置 RUN/CMD/ENTRYPOINT 的执行用户</td>
+</tr>
+
+<tr>
+<td class="org-left">WORKDIR</td>
+<td class="org-left">设置工作目录</td>
+</tr>
+
+<tr>
+<td class="org-left">ARG</td>
+<td class="org-left">设置 build 的命令行参数</td>
+</tr>
+
+<tr>
+<td class="org-left">ONBUILD</td>
+<td class="org-left">添加一个当容器作为别的基容器是的触发命令</td>
+</tr>
+
+<tr>
+<td class="org-left">STOPSIGNAL</td>
+<td class="org-left">设置系统退出的信号</td>
+</tr>
+
+<tr>
+<td class="org-left">LABEL</td>
+<td class="org-left">添加 key/value 属性，如：images, container, daemon</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org919f087" class="outline-2">
+<h2 id="org919f087"><span class="section-number-2">7</span> 私有仓库</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+添加一些别名帮助查询远端的仓库内容
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">REGISTRY</span>=<span style="color: #2aa198;">'http://localhost:5000'</span>
+
+<span style="color: #6c71c4;">alias</span> <span style="color: #6c71c4;">ri</span>=<span style="color: #2aa198;">'_f(){ curl -XGET $REGISTRY/v2/_catalog; }; _f'</span>
+<span style="color: #6c71c4;">alias</span> <span style="color: #6c71c4;">rt</span>=<span style="color: #2aa198;">'_f(){ curl -XGET $REGISTRY/v2/$1/tags/list; }; _f'</span>
+</pre>
+</div>
+
+<p>
+输出结果
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">$ ri
+{"repositories":["gitlab/gitlab-ce","registry","ubuntu"]}
+
+$ rt ubuntu
+{"name":"ubuntu","tags":["18.04","latest"]}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org76c5804" class="outline-2">
+<h2 id="org76c5804"><span class="section-number-2">8</span> 参考链接</h2>
+<div class="outline-text-2" id="text-8">
+<ol class="org-ol">
+<li><a href="https://github.com/wsargent/docker-cheat-sheet">docker cheatsheet</a></li>
+<li><a href="https://docs.docker.com/">docker docs</a></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2018-11-27 Tue 00:00</p>
+<p class="author">Author: Jinghui Hu</p>
+<p class="date">Created: 2019-07-03 Wed 22:54</p>
+<p class="validation"></p>
+</div>
+</body>
+</html>

@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-03 Wed 22:55 -->
+<!-- 2019-07-03 Wed 22:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>殊蕤的工作笔记</title>
+<title>安装 postgresql 数据库</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="Jinghui Hu" />
 <style type="text/css">
@@ -229,104 +229,261 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">殊蕤的工作笔记</h1>
+<h1 class="title">安装 postgresql 数据库</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org7d9ec7e">1. Index</a>
+<li><a href="#orgeeed947">1. windows 下载并安装</a></li>
+<li><a href="#org2ef135e">2. mac 下配置 postgres</a>
 <ul>
-<li><a href="#org0941cfe">1.1. Articles</a></li>
-<li><a href="#orga9032e0">1.2. Programming Language</a></li>
-<li><a href="#org67eb470">1.3. Misc.</a></li>
+<li><a href="#org376c6c5">2.1. 使用 Homebrow 安装</a></li>
+<li><a href="#org1df8f98">2.2. 初始创建数据库和账户</a></li>
+<li><a href="#orgc244be9">2.3. 登录数据库</a></li>
 </ul>
 </li>
+<li><a href="#org7e5edc8">3. 数据库创建及配置</a>
+<ul>
+<li><a href="#orgf355b21">3.1. 创建用户及数据库</a></li>
+<li><a href="#org7391d13">3.2. 登录数据库</a></li>
+<li><a href="#org2b5288f">3.3. 常见控制台命令</a></li>
+</ul>
+</li>
+<li><a href="#org98f9bc3">4. 远程连接数据库配置</a>
+<ul>
+<li><a href="#org4e4c472">4.1. 修改 <code>postgresql.conf</code></a></li>
+<li><a href="#org825995e">4.2. 修改 <code>pg_hba.conf</code></a></li>
+</ul>
+</li>
+<li><a href="#org9c95f5a">5. ubuntu 下配置 postgres</a>
+<ul>
+<li><a href="#orgca696a7">5.1. 进入管理命令行</a></li>
+</ul>
+</li>
+<li><a href="#orgf8caf57">6. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
+
+<div id="outline-container-orgeeed947" class="outline-2">
+<h2 id="orgeeed947"><span class="section-number-2">1</span> windows 下载并安装</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+首先去官网上下载所需的安装文件 <a href="https://www.enterprisedb.com/downloads/postgres-postgresql-downloads">download</a>。
+</p>
+
+
 <div class="figure">
-<p><img src="resource/image/2018/11/header.png" alt="header.png" />
+<p><img src="../resource/image/2018/12/postgresql-download.png" alt="postgresql-download.png" />
 </p>
 </div>
-<div id="outline-container-org7d9ec7e" class="outline-2">
-<h2 id="org7d9ec7e"><span class="section-number-2">1</span> Index</h2>
-<div class="outline-text-2" id="text-1">
+
+<p>
+我下载的是 <code>postgresql-9.6.11-1-windows-x64.exe</code> ，双击点开是直接报错安装不了，出现如下提示：
+</p>
+
+
+<div class="figure">
+<p><img src="../resource/image/2018/12/postgresql-install-error.png" alt="postgresql-install-error.png" />
+</p>
 </div>
-<div id="outline-container-org0941cfe" class="outline-3">
-<h3 id="org0941cfe"><span class="section-number-3">1.1</span> Articles</h3>
-<div class="outline-text-3" id="text-1-1">
+
+<p>
+通过网络资料查找得知，可以通过跳过本地 C++ 运行库来解决这个错误。具体安装使用如下命令行。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">postgresql-9.6.11-1-windows-x64.exe --install_runtimes 0
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org2ef135e" class="outline-2">
+<h2 id="org2ef135e"><span class="section-number-2">2</span> mac 下配置 postgres</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org376c6c5" class="outline-3">
+<h3 id="org376c6c5"><span class="section-number-3">2.1</span> 使用 Homebrow 安装</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+这里安装 9.6 版本的 postgres
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">brew install postgresql@9.6
+</pre>
+</div>
+<p>
+初始化
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">initdb /usr/local/var/postgresql@9.6 -E UTF8
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org1df8f98" class="outline-3">
+<h3 id="org1df8f98"><span class="section-number-3">2.2</span> 初始创建数据库和账户</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-shell">createdb
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc244be9" class="outline-3">
+<h3 id="orgc244be9"><span class="section-number-3">2.3</span> 登录数据库</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+<pre class="src src-shell">psql
+</pre>
+</div>
+<p>
+登录成功提示
+</p>
+<div class="org-src-container">
+<pre class="src src-text">&gt; psql
+psql (9.6.13)
+Type "help" for help.
+
+hujinghui=#
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org7e5edc8" class="outline-2">
+<h2 id="org7e5edc8"><span class="section-number-2">3</span> 数据库创建及配置</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgf355b21" class="outline-3">
+<h3 id="orgf355b21"><span class="section-number-3">3.1</span> 创建用户及数据库</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#29992;&#25143;&#21517;&#21450;&#23494;&#30721;</span>
+<span style="color: #859900;">CREATE</span> <span style="color: #6c71c4;">USER</span> pguser <span style="color: #859900;">WITH</span> PASSWORD <span style="color: #2aa198;">'pg$PassWord'</span>;
+<span style="color: #859900;">CREATE</span> DATABASE pgdb OWNER pguser;
+
+<span style="color: #586e75; font-style: italic;">-- &#28155;&#21152;&#26435;&#38480;</span>
+<span style="color: #859900;">GRANT</span> <span style="color: #859900;">ALL</span> <span style="color: #859900;">PRIVILEGES</span> <span style="color: #859900;">ON</span> DATABASE pgdb <span style="color: #859900;">TO</span> pguser;
+<span style="color: #859900;">ALTER</span> <span style="color: #859900;">ROLE</span> pguser CREATEDB;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7391d13" class="outline-3">
+<h3 id="org7391d13"><span class="section-number-3">3.2</span> 登录数据库</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+<pre class="src src-shell">psql -U pguser -d pgdb
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2b5288f" class="outline-3">
+<h3 id="org2b5288f"><span class="section-number-3">3.3</span> 常见控制台命令</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+<pre class="src src-text">\password&#65306;&#35774;&#32622;&#24403;&#21069;&#30331;&#24405;&#29992;&#25143;&#30340;&#23494;&#30721;
+\h&#65306;&#26597;&#30475; SQL &#21629;&#20196;&#30340;&#35299;&#37322;&#65292;&#27604;&#22914;\h select&#12290;
+\?&#65306;&#26597;&#30475; psql &#21629;&#20196;&#21015;&#34920;&#12290;
+\l&#65306;&#21015;&#20986;&#25152;&#26377;&#25968;&#25454;&#24211;&#12290;
+\c [database_name]&#65306;&#36830;&#25509;&#20854;&#20182;&#25968;&#25454;&#24211;&#12290;
+\d&#65306;&#21015;&#20986;&#24403;&#21069;&#25968;&#25454;&#24211;&#30340;&#25152;&#26377;&#34920;&#26684;&#12290;
+\d [table_name]&#65306;&#21015;&#20986;&#26576;&#19968;&#24352;&#34920;&#26684;&#30340;&#32467;&#26500;&#12290;
+\du&#65306;&#21015;&#20986;&#25152;&#26377;&#29992;&#25143;&#12290;
+\e&#65306;&#25171;&#24320;&#25991;&#26412;&#32534;&#36753;&#22120;&#12290;
+\conninfo&#65306;&#21015;&#20986;&#24403;&#21069;&#25968;&#25454;&#24211;&#21644;&#36830;&#25509;&#30340;&#20449;&#24687;&#12290;
+\password [user]: &#20462;&#25913;&#29992;&#25143;&#23494;&#30721;
+\q&#65306;&#36864;&#20986;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org98f9bc3" class="outline-2">
+<h2 id="org98f9bc3"><span class="section-number-2">4</span> 远程连接数据库配置</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+postgres 默认只能通过 localhost 连接，如果需要建立远程连接则需要进行配置。找到
+postgres 配置文件所在目录，homebrew 安装后默认配置文件位于
+<code>/usr/local/var/postgresql@9.6</code>
+</p>
+</div>
+
+<div id="outline-container-org4e4c472" class="outline-3">
+<h3 id="org4e4c472"><span class="section-number-3">4.1</span> 修改 <code>postgresql.conf</code></h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+编辑或添加下面一行，使 postgresql 可以接受来自任意 IP 的连接请求。
+</p>
+<div class="org-src-container">
+<pre class="src src-conf"><span style="color: #6c71c4;">listen_addresses</span> = <span style="color: #2aa198;">'*'</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org825995e" class="outline-3">
+<h3 id="org825995e"><span class="section-number-3">4.2</span> 修改 <code>pg_hba.conf</code></h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+配置服务端允许的认证方式
+</p>
+
+<div class="org-src-container">
+<pre class="src src-conf"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">TYPE  DATABASE  USER  CIDR-ADDRESS  METHOD</span>
+host  all  all 0.0.0.0/0 md5
+</pre>
+</div>
+
+<p>
+修改过后需要重启才能生效
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org9c95f5a" class="outline-2">
+<h2 id="org9c95f5a"><span class="section-number-2">5</span> ubuntu 下配置 postgres</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-orgca696a7" class="outline-3">
+<h3 id="orgca696a7"><span class="section-number-3">5.1</span> 进入管理命令行</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+Ubuntu 默认安装的 postgres 可以通过下面命令进入数据库
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">sudo -u postgres psql
+</pre>
+</div>
+
+<p>
+直接使用 sql 了修改 postgres 默认用户的密码。
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">ALTER</span> <span style="color: #6c71c4;">USER</span> postgres <span style="color: #859900;">WITH</span> PASSWORD <span style="color: #2aa198;">'postgres'</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf8caf57" class="outline-2">
+<h2 id="orgf8caf57"><span class="section-number-2">6</span> 参考链接</h2>
+<div class="outline-text-2" id="text-6">
 <ol class="org-ol">
-<li><a href="./article/relational-database-design.html">关系型数据库设计</a> 2019-06-28</li>
-<li><a href="./article/oracle-quickstart.html">Oracle 快速使用</a> 2019-06-17</li>
-<li><a href="./article/postgres-quickstart.html">Postgres 快速使用</a> 2019-06-16</li>
-<li><a href="./article/oracle-database-table-meta-info.html">Oracle 数据库中表名、列名、唯一性约束等元信息</a> 2019-06-06</li>
-<li><a href="./article/project-names.html">项目名称</a> 2019-05-18</li>
-<li><a href="./article/metallographic-database.html">Metallographic database</a> 2019-02-19</li>
-<li><a href="./article/router-command.html">Linux 修改路由表</a> 2019-02-18</li>
-<li><a href="./article/convolution-operator.html">Convolution Operator</a> 2019-01-18</li>
-<li><a href="./article/install-postgresql.html">安装 postgresql 数据库</a> 2018-12-10</li>
-<li><a href="./article/docker-cheatsheet.html">Docker 介绍</a> 2018-11-27</li>
-<li><a href="./article/using-osxfuse-to-mount-filesystem.html">使用 osxfuse 挂载文件系统</a> 2018-11-13</li>
-<li><a href="./article/intro-to-sqlplus.html">SQL*Plus 简介</a> 2018-11-12</li>
-<li><a href="./article/angular-passing-value-between-component.html">Angular 组件之间传值</a> 2018-11-09</li>
-<li><a href="./article/curl-cheatsheet.html">CRUL 工具</a> 2018-11-03</li>
-<li><a href="./article/count-words-from-cli.html">使用命令行统计项目中词汇的频率</a> 2018-10-27</li>
-<li><a href="./article/make-gif-images-with-ffmpeg.html">使用 ffmpeg 制作 gif 动态图</a> 2018-10-27</li>
-<li><a href="./article/capture-screen-with-ffmpeg.html">使用 ffmpeg 录屏</a> 2018-10-16</li>
-<li><a href="./article/export-excel-by-javascript.html">使用 JavaScript 导出 Excel 文件</a> 2018-10-16</li>
-<li><a href="./article/tensorflow-startup-notes.html">TensorFlow 安装笔记</a> 2018-10-12</li>
-<li><a href="./article/emmet-mode-or-zen-coding.html">Emmet-mode 或者 Zen Coding</a> 2018-10-11</li>
-<li><a href="./article/qrcode-decoder-by-javascript.html">使用 JavaScript 解析二维码</a> 2018-10-11</li>
-<li><a href="./article/typescript-learning-notes.html">学习 Typescript 的笔记</a> 2018-10-11</li>
-<li><a href="./article/RESTful-API-in-Practice.html">RESTful API 设计实践</a> 2018-10-10</li>
-<li><a href="./article/spring-boot-note.html">Spring boot 学习笔记</a> 2018-10-10</li>
-<li><a href="./article/setup-ROR-enviroment.html">安装 ROR 开发环境</a> 2018-10-09</li>
-<li><a href="./article/chrome-options.html">chrome 浏览器相关设置</a> 2018-10-08</li>
-<li><a href="./article/download-all-site-via-wget.html">离线下载整个站点</a> 2018-10-08</li>
-<li><a href="./article/emacs-org-mode-note.html">Emacs org-mode 的相关笔记</a> 2018-10-08</li>
-<li><a href="./article/firefox-default-zoom-pixel.html">Firefox 的默认缩放大小</a> 2018-10-08</li>
-<li><a href="./article/generate-ssh-key.html">生成 RSA 加密的 SSH 公钥和私钥</a> 2018-10-08</li>
-<li><a href="./article/git-command-in-detail.html">Git 命令详解</a> 2018-10-08</li>
-<li><a href="./article/setup-and-use-maven.html">配置和使用 maven 工具</a> 2018-10-08</li>
-<li><a href="./article/setup-npm-and-yarn.html">配置 npm 和 yarn</a> 2018-10-08</li>
-<li><a href="./article/setup-pip-envs.html">配置 pip 的相关环境变量</a> 2018-10-08</li>
-<li><a href="./article/start-angular-project.html">编写 Angular 项目</a> 2018-10-08</li>
-<li><a href="./article/rename-many-files.html">批量规范化重命名大量的文件</a> 2018-10-05</li>
+<li><a href="https://www.postgresql.org/docs/current/index.html">postgres docs</a></li>
 </ol>
-</div>
-</div>
-<div id="outline-container-orga9032e0" class="outline-3">
-<h3 id="orga9032e0"><span class="section-number-3">1.2</span> Programming Language</h3>
-<div class="outline-text-3" id="text-1-2">
-<ol class="org-ol">
-<li><a href="./lang/java-distilled.html">Java 编程语言精粹</a> 2019-07-03</li>
-<li><a href="./lang/javascript-distilled.html">JavaScript 编程语言精粹</a> 2019-07-02</li>
-<li><a href="./lang/python-lib-opencv.html">OpenCV 的介绍</a> 2019-01-25</li>
-<li><a href="./lang/python-lib-matplotlib.html">matplotlib: 绘图包</a> 2018-10-26</li>
-<li><a href="./lang/python-lib-numpy.html">numpy: 数据处理包</a> 2018-10-26</li>
-<li><a href="./lang/python-distilled.html">Python 编程语言精粹</a> 2018-10-23</li>
-<li><a href="./lang/python-lib-pandas.html">pandas: 数据处理包</a> 2018-10-12</li>
-</ol>
-</div>
-</div>
-<div id="outline-container-org67eb470" class="outline-3">
-<h3 id="org67eb470"><span class="section-number-3">1.3</span> Misc.</h3>
-<div class="outline-text-3" id="text-1-3">
-<ol class="org-ol">
-<li><a href="./misc/journal-and-conference.html">部分期刊会议链接</a> 2019-02-20</li>
-<li><a href="./misc/the-health-way.html">健康本该如此</a> 2019-02-09</li>
-<li><a href="./misc/common-used-condiment.html">常用调味品</a> 2018-10-18</li>
-<li><a href="./misc/folder-structure.html">文件夹结构</a> 2018-10-15</li>
-</ol>
-</div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Date: 2018-10-05 Fri 00:00</p>
+<p class="date">Date: 2018-12-10 Mon 00:00</p>
 <p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-07-03 Wed 22:55</p>
+<p class="date">Created: 2019-07-03 Wed 22:53</p>
 <p class="validation"></p>
 </div>
 </body>
