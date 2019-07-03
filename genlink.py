@@ -47,9 +47,9 @@ def readdir(title, folder, by='name'):
 
 
 if __name__ == '__main__':
-  content = '* Index'
-  content += readdir('Articles', 'article', by='date')
-  content += readdir('Programming Language', 'lang')
-  content += readdir('Misc.', 'misc')
+  content = '* 目录'
+  content += readdir('技术文章', 'article', by='date')
+  content += readdir('编程语言', 'lang')
+  content += readdir('杂文随笔', 'misc')
   content += '\n'
   sys.stdout.buffer.write(content.encode("utf8"))
