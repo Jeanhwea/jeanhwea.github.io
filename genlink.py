@@ -27,8 +27,11 @@ def getinfos(dir):
     return infos
 
 
-def infos2text(infos):
-  infos.sort(key=lambda x: -time.mktime(x['date']))
+def infos2text(infos, by='name'):
+  if by == 'date':
+    infos.sort(key=lambda x: -time.mktime(x['date']))
+  elif by == 'name':
+    infos.sort(key=lambda x: x['url'])
   titles = []
   for index, info in enumerate(infos, start=1):
     titles.append('{index:02d}. [[./{path}][{title}]] {date}'.format(
@@ -43,7 +46,7 @@ def infos2text(infos):
 if __name__ == '__main__':
   content = '* Index'
   content += '\n** Articles\n'
-  content += infos2text(getinfos('article'))
+  content += infos2text(getinfos('article'), by='date')
   content += '\n** Programming Language\n'
   content += infos2text(getinfos('lang'))
   content += '\n** Misc.\n'
