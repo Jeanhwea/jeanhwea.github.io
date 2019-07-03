@@ -7,13 +7,29 @@
 
 
 * 类型
-  #+BEGIN_SRC java :classname App9 :exports both :results output
-    class App9 {
-      public static void main(String args[]) {
-        System.out.println("Hello world");
-      }
-    }
-  #+END_SRC
+** 格式输出字符串
+   - ~String.format(String fmt, Object... args)~ 的字符串格式和 C 语言的 printf
+     一样。
+   - ~MessageFormat.format(String fmt, Object... args)~ 使用单引号标记任意字面
+     量，使用花括号加数字来表示相应的位置的占位符，例如： ={0}= 表示第 1 个位置
+     的参数， ={1}= 表示第 2 个位置的参数，以此类推。
 
-  #+RESULTS:
-  : Hello world
+   #+BEGIN_SRC java :classname App9 :exports both :results output
+     import java.text.MessageFormat;
+
+     class App9 {
+       public static void main(String args[]) {
+         String str1 = String.format("Hi, %s", "Jack");
+         String str2 = MessageFormat.format("Hi, {0}, I''m {1} years old.", "Tom", 18);
+         String str3 = MessageFormat.format("'Hi, {0}, I''m {1} years old.'", "Tom", 18);
+         System.out.println(str1);
+         System.out.println(str2);
+         System.out.println(str3);
+       }
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   : Hi, Jack
+   : Hi, Tom, I'm 18 years old.
+   : Hi, {0}, I'm {1} years old.
