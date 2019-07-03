@@ -27,29 +27,29 @@ def getinfos(dir):
     return infos
 
 
-def infos2text(infos, by='name'):
+def readdir(title, folder, by='name'):
+  infos = getinfos(folder)
   if by == 'date':
     infos.sort(key=lambda x: -time.mktime(x['date']))
   elif by == 'name':
     infos.sort(key=lambda x: x['url'])
-  titles = []
+  items = []
   for index, info in enumerate(infos, start=1):
-    titles.append('{index:02d}. [[./{path}][{title}]] {date}'.format(
+    items.append('{index:02d}. [[./{path}][{title}]] {date}'.format(
         index=index,
         path=info['url'].replace('\\', '/'),
         title=info['title'],
         date=time.strftime('%Y-%m-%d', info['date'])
     ))
-  return '\n'.join(titles)
+  res = '\n** ' + title + '\n'
+  res += '\n'.join(items)
+  return res
 
 
 if __name__ == '__main__':
   content = '* Index'
-  content += '\n** Articles\n'
-  content += infos2text(getinfos('article'), by='date')
-  content += '\n** Programming Language\n'
-  content += infos2text(getinfos('lang'))
-  content += '\n** Misc.\n'
-  content += infos2text(getinfos('misc'))
+  content += readdir('Articles', 'article', by='date')
+  content += readdir('Programming Language', 'lang')
+  content += readdir('Misc.', 'misc')
   content += '\n'
   sys.stdout.buffer.write(content.encode("utf8"))
