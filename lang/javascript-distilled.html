@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-02 Tue 20:29 -->
+<!-- 2019-07-03 Wed 16:55 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JavaScript 编程语言精粹</title>
@@ -185,7 +185,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -234,15 +234,48 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9b70ccb">1. 常量和变量</a></li>
+<li><a href="#org5971ca1">1. 基础知识</a>
+<ul>
+<li><a href="#orgb99a902">1.1. 常量和变量</a></li>
+<li><a href="#org559d875">1.2. null 和 undefined</a></li>
+<li><a href="#orgd5f099a">1.3. 类型转换</a></li>
+</ul>
+</li>
+<li><a href="#org20c6597">2. 控制流</a>
+<ul>
+<li><a href="#org236cac5">2.1. if 条件, switch case 多层条件控制</a></li>
+<li><a href="#org9acfdba">2.2. while for 循环</a></li>
+</ul>
+</li>
+<li><a href="#orgbb4308b">3. 函数</a></li>
+<li><a href="#org25e7e9c">4. 字符串</a>
+<ul>
+<li><a href="#orga770ff5">4.1. 定义字符串</a></li>
+</ul>
+</li>
+<li><a href="#org2c8e183">5. 对象</a>
+<ul>
+<li><a href="#org9ef5a0a">5.1. 定义对象</a></li>
+<li><a href="#org836eb71">5.2. 对象操作方法</a>
+<ul>
+<li><a href="#orgd95ea70">5.2.1. 判断 key 是否存在</a></li>
+<li><a href="#orgac12424">5.2.2. 对象引用及复制</a></li>
+<li><a href="#org0daeef5">5.2.3. 更新对象值</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
-
-<div id="outline-container-org9b70ccb" class="outline-2">
-<h2 id="org9b70ccb"><span class="section-number-2">1</span> 常量和变量</h2>
+<div id="outline-container-org5971ca1" class="outline-2">
+<h2 id="org5971ca1"><span class="section-number-2">1</span> 基础知识</h2>
 <div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-orgb99a902" class="outline-3">
+<h3 id="orgb99a902"><span class="section-number-3">1.1</span> 常量和变量</h3>
+<div class="outline-text-3" id="text-1-1">
 <p>
 定义常量使用 <code>const</code> 关键字，变量有 <code>var</code> 和 <code>let</code> ，其中 <code>var</code> 是旧版本的定义
 变量方法，它没有 scope，但是 <code>let</code> 是有 scope 的，所以无论如何 <b>定义变量请使用
@@ -250,7 +283,7 @@ let 关键字</b>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript">&gt; <span style="color: #859900;">if</span> (<span style="color: #268bd2;">true</span>) {
+<pre class="src src-js">&gt; <span style="color: #859900;">if</span> (<span style="color: #268bd2;">true</span>) {
 ... <span style="color: #859900;">var</span> <span style="color: #6c71c4;">v1</span> = <span style="color: #268bd2;">true</span>;
 ... }
 &gt; v1
@@ -266,11 +299,312 @@ ReferenceError: v2 is not defined
 </div>
 </div>
 </div>
+
+<div id="outline-container-org559d875" class="outline-3">
+<h3 id="org559d875"><span class="section-number-3">1.2</span> null 和 undefined</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+<code>null</code> 在 JavaScript 中表示空值， <code>undefined</code> 通常是为没有赋值的变量。通常变
+量为空的时候要使用 <code>null</code> ，尽量避免 <code>undefined</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-js">&gt; <span style="color: #268bd2;">null</span> == <span style="color: #268bd2;">undefined</span>
+<span style="color: #268bd2;">true</span>
+&gt; <span style="color: #268bd2;">null</span> === <span style="color: #268bd2;">undefined</span>
+<span style="color: #268bd2;">false</span>
+&gt; <span style="color: #268bd2;">undefined</span> == <span style="color: #268bd2;">undefined</span>
+<span style="color: #268bd2;">true</span>
+&gt; <span style="color: #859900;">typeof</span> <span style="color: #268bd2;">undefined</span>
+<span style="color: #2aa198;">'undefined'</span>
+&gt; <span style="color: #859900;">typeof</span> <span style="color: #268bd2;">null</span>
+<span style="color: #2aa198;">'object'</span>
+&gt; <span style="color: #859900;">typeof</span> <span style="color: #268bd2;">true</span>
+<span style="color: #2aa198;">'boolean'</span>
+&gt; <span style="color: #859900;">typeof</span> 0
+<span style="color: #2aa198;">'number'</span>
+&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd5f099a" class="outline-3">
+<h3 id="orgd5f099a"><span class="section-number-3">1.3</span> 类型转换</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+转换成字符串
+</p>
+<div class="org-src-container">
+<pre class="src src-js">&gt; String(<span style="color: #268bd2;">true</span>)
+<span style="color: #2aa198;">'true'</span>
+&gt; String(<span style="color: #268bd2;">null</span>)
+<span style="color: #2aa198;">'null'</span>
+&gt; String(23)
+<span style="color: #2aa198;">'23'</span>
+&gt;String(<span style="color: #268bd2;">undefined</span>)
+<span style="color: #2aa198;">'undefined'</span>
+&gt; <span style="color: #2aa198;">''</span> + 21
+<span style="color: #2aa198;">'21'</span>
+&gt; 2 + 2 + <span style="color: #2aa198;">'1'</span>
+<span style="color: #2aa198;">'41'</span>
+</pre>
+</div>
+<p>
+转换成数值
+</p>
+<div class="org-src-container">
+<pre class="src src-js">&gt; <span style="color: #2aa198;">"6"</span> / <span style="color: #2aa198;">"3"</span>
+2
+&gt; Number(<span style="color: #2aa198;">"234"</span>)
+234
+&gt; Number(<span style="color: #2aa198;">"str"</span>)
+<span style="color: #268bd2;">NaN</span>
+&gt; Number(<span style="color: #268bd2;">null</span>)
+0
+&gt; Number(<span style="color: #268bd2;">undefined</span>)
+<span style="color: #268bd2;">NaN</span>
+&gt; Number(<span style="color: #268bd2;">true</span>)
+1
+&gt; Number(<span style="color: #268bd2;">false</span>)
+0
+&gt; +<span style="color: #2aa198;">'12.3'</span>
+12.3
+&gt; parseInt(<span style="color: #2aa198;">'23'</span>)
+23
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org20c6597" class="outline-2">
+<h2 id="org20c6597"><span class="section-number-2">2</span> 控制流</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org236cac5" class="outline-3">
+<h3 id="org236cac5"><span class="section-number-3">2.1</span> if 条件, switch case 多层条件控制</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-js"><span style="color: #859900;">if</span> (year &lt; 2015) {
+  alert( <span style="color: #2aa198;">'Too early...'</span> );
+} <span style="color: #859900;">else</span> <span style="color: #859900;">if</span> (year &gt; 2015) {
+  alert( <span style="color: #2aa198;">'Too late'</span> );
+} <span style="color: #859900;">else</span> {
+  alert( <span style="color: #2aa198;">'Exactly!'</span> );
+}
+
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">a</span> = 2 + 2;
+
+<span style="color: #859900;">switch</span> (a) {
+  <span style="color: #859900;">case</span> 3:
+    alert( <span style="color: #2aa198;">'Too small'</span> );
+    <span style="color: #859900;">break</span>;
+  <span style="color: #859900;">case</span> 4:
+    alert( <span style="color: #2aa198;">'Exactly!'</span> );
+    <span style="color: #859900;">break</span>;
+  <span style="color: #859900;">case</span> 5:
+    alert( <span style="color: #2aa198;">'Too large'</span> );
+    <span style="color: #859900;">break</span>;
+  <span style="color: #859900;">default</span>:
+    alert( <span style="color: #2aa198;">"I don't know such values"</span> );
+}
+
+
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9acfdba" class="outline-3">
+<h3 id="org9acfdba"><span class="section-number-3">2.2</span> while for 循环</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-js"><span style="color: #859900;">let</span> <span style="color: #6c71c4;">i</span> = 0;
+<span style="color: #859900;">while</span> (i &lt; 3) { <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">shows 0, then 1, then 2</span>
+  alert( i );
+  i++;
+}
+
+<span style="color: #859900;">do</span> {
+  alert( i );
+  i++;
+} <span style="color: #859900;">while</span> (i &lt; 3);
+
+<span style="color: #859900;">for</span> (<span style="color: #859900;">let</span> <span style="color: #6c71c4;">i</span> = 0; i &lt; 3; i++) { <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">shows 0, then 1, then 2</span>
+  alert(i);
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbb4308b" class="outline-2">
+<h2 id="orgbb4308b"><span class="section-number-2">3</span> 函数</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+<pre class="src src-js"><span style="color: #859900;">function</span> <span style="color: #b58900;">showMessage</span>(<span style="color: #6c71c4;">from</span>, <span style="color: #6c71c4;">text</span>) {
+  alert(from + <span style="color: #2aa198;">': '</span> + text);
+}
+<span style="color: #859900;">function</span> <span style="color: #b58900;">showMessage2</span>(<span style="color: #6c71c4;">from</span>, <span style="color: #6c71c4;">text</span>=<span style="color: #2aa198;">'hello'</span>) {
+  alert(from + <span style="color: #2aa198;">': '</span> + text);
+}
+
+<span style="color: #859900;">function</span> <span style="color: #b58900;">sum</span>(<span style="color: #6c71c4;">a</span>, <span style="color: #6c71c4;">b</span>) {
+  <span style="color: #859900;">let</span> <span style="color: #6c71c4;">result</span> = a + b;
+
+  <span style="color: #859900;">return</span> result;
+}
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">sum</span> = <span style="color: #859900;">function</span>(<span style="color: #6c71c4;">a</span>, <span style="color: #6c71c4;">b</span>) {
+  <span style="color: #859900;">let</span> <span style="color: #6c71c4;">result</span> = a + b;
+
+  <span style="color: #859900;">return</span> result;
+}
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">expression at the right side</span>
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">sum</span> = (a, b) =&gt; a + b;
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">or multi-line syntax with { ... }, need return here:</span>
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">sum</span> = (a, b) =&gt; {
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">...</span>
+  <span style="color: #859900;">return</span> a + b;
+}
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">without arguments</span>
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">sayHi</span> = () =&gt; alert(<span style="color: #2aa198;">"Hello"</span>);
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">with a single argument</span>
+<span style="color: #859900;">let</span> <span style="color: #268bd2;">double</span> = n =&gt; n * 2;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org25e7e9c" class="outline-2">
+<h2 id="org25e7e9c"><span class="section-number-2">4</span> 字符串</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-orga770ff5" class="outline-3">
+<h3 id="orga770ff5"><span class="section-number-3">4.1</span> 定义字符串</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+注意使用 <code>${...}</code> 表达式
+</p>
+<div class="org-src-container">
+<pre class="src src-js">&gt; <span style="color: #2aa198;">"Double quote"</span>
+<span style="color: #2aa198;">'Double quote'</span>
+&gt; <span style="color: #2aa198;">'Single quote'</span>
+<span style="color: #2aa198;">'Single quote'</span>
+&gt; <span style="color: #859900;">let</span> <span style="color: #6c71c4;">name</span> = <span style="color: #2aa198;">'Jack'</span>
+&gt; <span style="color: #2aa198;">`Hi, ${name}`</span>
+<span style="color: #2aa198;">'Hi, Jack'</span>
+&gt; <span style="color: #2aa198;">`1 + 2 = ${1 + 2}`</span>
+<span style="color: #2aa198;">'1 + 2 = 3'</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org2c8e183" class="outline-2">
+<h2 id="org2c8e183"><span class="section-number-2">5</span> 对象</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org9ef5a0a" class="outline-3">
+<h3 id="org9ef5a0a"><span class="section-number-3">5.1</span> 定义对象</h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+<pre class="src src-js">&gt; <span style="color: #859900;">let</span> <span style="color: #6c71c4;">user1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Object</span>()
+&gt; user1
+{}
+&gt; <span style="color: #859900;">let</span> <span style="color: #6c71c4;">user2</span> = {}
+&gt; user2
+{}
+&gt; <span style="color: #859900;">let</span> <span style="color: #6c71c4;">user3</span> = {name: <span style="color: #2aa198;">'Tom'</span>, age: 22}
+&gt; user3
+{ name: <span style="color: #2aa198;">'Tom'</span>, age: 22 }
+&gt; user3.name
+<span style="color: #2aa198;">'Tom'</span>
+&gt; user3[<span style="color: #2aa198;">'name'</span>]
+<span style="color: #2aa198;">'Tom'</span>
+&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org836eb71" class="outline-3">
+<h3 id="org836eb71"><span class="section-number-3">5.2</span> 对象操作方法</h3>
+<div class="outline-text-3" id="text-5-2">
+</div>
+<div id="outline-container-orgd95ea70" class="outline-4">
+<h4 id="orgd95ea70"><span class="section-number-4">5.2.1</span> 判断 key 是否存在</h4>
+<div class="outline-text-4" id="text-5-2-1">
+<div class="org-src-container">
+<pre class="src src-js"><span style="color: #859900;">let</span> <span style="color: #6c71c4;">usr</span> = {name: <span style="color: #2aa198;">'Tom'</span>, age: 22}
+&gt; <span style="color: #2aa198;">'name'</span> <span style="color: #859900;">in</span> usr
+<span style="color: #268bd2;">true</span>
+&gt; <span style="color: #2aa198;">'birthday'</span> <span style="color: #859900;">in</span> usr
+<span style="color: #268bd2;">false</span>
+&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgac12424" class="outline-4">
+<h4 id="orgac12424"><span class="section-number-4">5.2.2</span> 对象引用及复制</h4>
+<div class="outline-text-4" id="text-5-2-2">
+<p>
+引用
+</p>
+<div class="org-src-container">
+<pre class="src src-js">&gt; usr
+{ name: <span style="color: #2aa198;">'Tom'</span>, age: 22, foo: <span style="color: #268bd2;">undefined</span> }
+&gt; usr1 = usr
+{ name: <span style="color: #2aa198;">'Tom'</span>, age: 22, foo: <span style="color: #268bd2;">undefined</span> }
+&gt; usr1 == usr
+<span style="color: #268bd2;">true</span>
+&gt; usr1 === usr
+<span style="color: #268bd2;">true</span>
+&gt; <span style="color: #859900;">let</span> <span style="color: #6c71c4;">_usr</span> = {}
+&gt; <span style="color: #859900;">for</span> (k <span style="color: #859900;">in</span> usr) {_usr[k] = usr[k]; }
+&gt; _usr
+{ name: <span style="color: #2aa198;">'Tom'</span>, age: 22, foo: <span style="color: #268bd2;">undefined</span> }
+&gt; _usr == usr
+<span style="color: #268bd2;">false</span>
+&gt; _usr === usr
+<span style="color: #268bd2;">false</span>
+&gt;
+&gt; usr
+{ name: <span style="color: #2aa198;">'Jackson'</span>, age: 22, foo: <span style="color: #268bd2;">undefined</span> }
+&gt; &gt; <span style="color: #859900;">delete</span> usr.foo
+<span style="color: #268bd2;">true</span>
+&gt; usr
+{ name: <span style="color: #2aa198;">'Jackson'</span>, age: 22 }
+&gt; <span style="color: #2aa198;">'foo'</span> <span style="color: #859900;">in</span> usr
+<span style="color: #268bd2;">false</span>
+&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0daeef5" class="outline-4">
+<h4 id="org0daeef5"><span class="section-number-4">5.2.3</span> 更新对象值</h4>
+<div class="outline-text-4" id="text-5-2-3">
+<p>
+<code>Object.assign(dest[, src1, src2, src3...])</code> 可以批量更新对象中的数值。
+</p>
+<div class="org-src-container">
+<pre class="src src-js">&gt; usr
+{ name: <span style="color: #2aa198;">'Tom'</span>, age: 22, foo: <span style="color: #268bd2;">undefined</span> }
+&gt; Object.assign(usr, {name: <span style="color: #2aa198;">'Jackson'</span>})
+{ name: <span style="color: #2aa198;">'Jackson'</span>, age: 22, foo: <span style="color: #268bd2;">undefined</span> }
+&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="date">Date: 2019-07-02 Tue 00:00</p>
 <p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-07-02 Tue 20:29</p>
+<p class="date">Created: 2019-07-03 Wed 16:55</p>
 <p class="validation"></p>
 </div>
 </body>

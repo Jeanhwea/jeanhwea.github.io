@@ -4,13 +4,13 @@
 #+DATE: <2019-07-02 Tue>
 #+TAGS: javascript programming language distilled
 
-
-* 常量和变量
+* 基础知识
+** 常量和变量
   定义常量使用 =const= 关键字，变量有 =var= 和 =let= ，其中 =var= 是旧版本的定义
   变量方法，它没有 scope，但是 =let= 是有 scope 的，所以无论如何 *定义变量请使用
   let 关键字*
 
-  #+BEGIN_SRC javascript
+  #+BEGIN_SRC js
     > if (true) {
     ... var v1 = true;
     ... }
@@ -24,3 +24,222 @@
     ReferenceError: v2 is not defined
     >
   #+END_SRC
+
+** null 和 undefined
+   =null= 在 JavaScript 中表示空值， =undefined= 通常是为没有赋值的变量。通常变
+   量为空的时候要使用 =null= ，尽量避免 =undefined=
+   #+BEGIN_SRC js
+     > null == undefined
+     true
+     > null === undefined
+     false
+     > undefined == undefined
+     true
+     > typeof undefined
+     'undefined'
+     > typeof null
+     'object'
+     > typeof true
+     'boolean'
+     > typeof 0
+     'number'
+     >
+   #+END_SRC
+
+** 类型转换
+   转换成字符串
+   #+BEGIN_SRC js
+     > String(true)
+     'true'
+     > String(null)
+     'null'
+     > String(23)
+     '23'
+     >String(undefined)
+     'undefined'
+     > '' + 21
+     '21'
+     > 2 + 2 + '1'
+     '41'
+   #+END_SRC
+   转换成数值
+   #+BEGIN_SRC js
+     > "6" / "3"
+     2
+     > Number("234")
+     234
+     > Number("str")
+     NaN
+     > Number(null)
+     0
+     > Number(undefined)
+     NaN
+     > Number(true)
+     1
+     > Number(false)
+     0
+     > +'12.3'
+     12.3
+     > parseInt('23')
+     23
+   #+END_SRC
+* 控制流
+** if 条件, switch case 多层条件控制
+   #+BEGIN_SRC js
+     if (year < 2015) {
+       alert( 'Too early...' );
+     } else if (year > 2015) {
+       alert( 'Too late' );
+     } else {
+       alert( 'Exactly!' );
+     }
+
+     let a = 2 + 2;
+
+     switch (a) {
+       case 3:
+         alert( 'Too small' );
+         break;
+       case 4:
+         alert( 'Exactly!' );
+         break;
+       case 5:
+         alert( 'Too large' );
+         break;
+       default:
+         alert( "I don't know such values" );
+     }
+
+
+   #+END_SRC
+** while for 循环
+   #+BEGIN_SRC js
+     let i = 0;
+     while (i < 3) { // shows 0, then 1, then 2
+       alert( i );
+       i++;
+     }
+
+     do {
+       alert( i );
+       i++;
+     } while (i < 3);
+
+     for (let i = 0; i < 3; i++) { // shows 0, then 1, then 2
+       alert(i);
+     }
+   #+END_SRC
+* 函数
+  #+BEGIN_SRC js
+    function showMessage(from, text) {
+      alert(from + ': ' + text);
+    }
+    function showMessage2(from, text='hello') {
+      alert(from + ': ' + text);
+    }
+
+    function sum(a, b) {
+      let result = a + b;
+      return result;
+    }
+    let sum = function(a, b) {
+      let result = a + b;
+      return result;
+    }
+
+    // expression at the right side
+    let sum = (a, b) => a + b;
+
+    // or multi-line syntax with { ... }, need return here:
+    let sum = (a, b) => {
+      // ...
+      return a + b;
+    }
+
+    // without arguments
+    let sayHi = () => alert("Hello");
+
+    // with a single argument
+    let double = n => n * 2;
+  #+END_SRC
+* 字符串
+** 定义字符串
+   注意使用 =${...}= 表达式
+   #+BEGIN_SRC js
+     > "Double quote"
+     'Double quote'
+     > 'Single quote'
+     'Single quote'
+     > let name = 'Jack'
+     > `Hi, ${name}`
+     'Hi, Jack'
+     > `1 + 2 = ${1 + 2}`
+     '1 + 2 = 3'
+   #+END_SRC
+* 对象
+** 定义对象
+   #+BEGIN_SRC js
+     > let user1 = new Object()
+     > user1
+     {}
+     > let user2 = {}
+     > user2
+     {}
+     > let user3 = {name: 'Tom', age: 22}
+     > user3
+     { name: 'Tom', age: 22 }
+     > user3.name
+     'Tom'
+     > user3['name']
+     'Tom'
+     >
+   #+END_SRC
+** 对象操作方法
+*** 判断 key 是否存在
+   #+BEGIN_SRC js
+     let usr = {name: 'Tom', age: 22}
+     > 'name' in usr
+     true
+     > 'birthday' in usr
+     false
+     >
+   #+END_SRC
+*** 对象引用及复制
+    引用
+    #+BEGIN_SRC js
+      > usr
+      { name: 'Tom', age: 22, foo: undefined }
+      > usr1 = usr
+      { name: 'Tom', age: 22, foo: undefined }
+      > usr1 == usr
+      true
+      > usr1 === usr
+      true
+      > let _usr = {}
+      > for (k in usr) {_usr[k] = usr[k]; }
+      > _usr
+      { name: 'Tom', age: 22, foo: undefined }
+      > _usr == usr
+      false
+      > _usr === usr
+      false
+      >
+      > usr
+      { name: 'Jackson', age: 22, foo: undefined }
+      > > delete usr.foo
+      true
+      > usr
+      { name: 'Jackson', age: 22 }
+      > 'foo' in usr
+      false
+      >
+    #+END_SRC
+*** 更新对象值
+    ~Object.assign(dest[, src1, src2, src3...])~ 可以批量更新对象中的数值。
+    #+BEGIN_SRC js
+      > usr
+      { name: 'Tom', age: 22, foo: undefined }
+      > Object.assign(usr, {name: 'Jackson'})
+      { name: 'Jackson', age: 22, foo: undefined }
+      >
+    #+END_SRC
