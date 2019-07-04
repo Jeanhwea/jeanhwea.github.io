@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-03 Wed 22:52 -->
+<!-- 2019-07-04 Thu 23:25 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>配置pip的相关环境变量</title>
+<title>pip 包管理工具</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="Jinghui Hu" />
 <style type="text/css">
@@ -229,18 +229,17 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">配置pip的相关环境变量</h1>
+<h1 class="title">pip 包管理工具</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgfaa6917">1. 基本配置</a></li>
-<li><a href="#org1dacd51">2. 常用命令</a>
+<li><a href="#orgc53a3ca">1. Pip 介绍</a></li>
+<li><a href="#orgaa0a5b6">2. 常用命令</a>
 <ul>
-<li><a href="#orgb330129">2.1. 列出当前所有包</a></li>
-<li><a href="#orgbe0d317">2.2. 更新所有包到最新版本</a></li>
-<li><a href="#org272635b">2.3. 导出所有包的版本信息</a></li>
-<li><a href="#org8d873c6">2.4. 安装导出版本文件中的所有包</a></li>
+<li><a href="#org9d840e8">2.1. 列出当前所有包</a></li>
+<li><a href="#org502c081">2.2. 更新所有包到最新版本</a></li>
+<li><a href="#orgc7feae8">2.3. 批量导出/安装包 <code>requirements.txt</code></a></li>
 </ul>
 </li>
 </ul>
@@ -248,13 +247,22 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-orgfaa6917" class="outline-2">
-<h2 id="orgfaa6917"><span class="section-number-2">1</span> 基本配置</h2>
+<div id="outline-container-orgc53a3ca" class="outline-2">
+<h2 id="orgc53a3ca"><span class="section-number-2">1</span> Pip 介绍</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-pip 是 Python 的包管理工具，在国内可以替换下载源来加快下载速度。配置项的内容如下：
+<a href="https://pypi.org/project/pip/">pip</a> 是 python 的包管理工具，在国内可以替换 <a href="https://mirrors.tuna.tsinghua.edu.cn/help/pypi/">清华pypi镜像</a> 下载源来加快下载速度。
+pip 工具在 Windows 和 Unix 环境下的配置文件位置如下
 </p>
 
+<ul class="org-ul">
+<li>Windows: <code>~/pip/pip.ini</code></li>
+<li>Mac &amp; Linux: <code>~/.pip/pip.conf</code></li>
+</ul>
+
+<p>
+需要配置项的内容如下：
+</p>
 <div class="org-src-container">
 <pre class="src src-conf">[<span style="color: #268bd2;">global</span>]
 <span style="color: #6c71c4;">index-url</span> = https://pypi.tuna.tsinghua.edu.cn/simple
@@ -265,14 +273,8 @@ pip 是 Python 的包管理工具，在国内可以替换下载源来加快下�
 </div>
 
 <p>
-值得注意的是，pip 工具在 Windows 和 Unix 环境下的配置文件位置是不一样的。其中
-Windows 的配置文件是 <b>~/pip/pip.ini</b> ，Unix 的配置文件是 <b>~/.pip/pip.conf</b> 。
-</p>
-
-<p>
 也可以用如下的命令直接设置
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">pip install pip -U
 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
@@ -281,23 +283,48 @@ pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 </div>
 </div>
 
-
-<div id="outline-container-org1dacd51" class="outline-2">
-<h2 id="org1dacd51"><span class="section-number-2">2</span> 常用命令</h2>
+<div id="outline-container-orgaa0a5b6" class="outline-2">
+<h2 id="orgaa0a5b6"><span class="section-number-2">2</span> 常用命令</h2>
 <div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li><code>pip install -U &lt;package&gt;</code> : 升级包</li>
+<li><code>pip install &lt;package&gt;</code> : 安装包
+<ul class="org-ul">
+<li><code>name</code> : 最新版本</li>
+<li><code>name==1.0.3</code> : 制定版本</li>
+<li><code>name&gt;=1.0.3</code> : 最小版本</li>
+</ul></li>
+<li><code>pip uninstall &lt;package&gt;</code> : 卸载包</li>
+<li><code>pip search &lt;package&gt;</code> : 搜索包</li>
+<li><code>pip show &lt;package&gt;</code> : 显示安装包信息</li>
+</ul>
 </div>
-<div id="outline-container-orgb330129" class="outline-3">
-<h3 id="orgb330129"><span class="section-number-3">2.1</span> 列出当前所有包</h3>
+
+<div id="outline-container-org9d840e8" class="outline-3">
+<h3 id="org9d840e8"><span class="section-number-3">2.1</span> 列出当前所有包</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
-<pre class="src src-sh">pip list
+<pre class="src src-sh">~ $ pip list
+Package                Version
+---------------------- ----------
+appnope                0.1.0
+autopep8               1.4.3
+backcall               0.1.0
+certifi                2018.11.29
+chardet                3.0.4
+cycler                 0.10.0
+flake8                 3.6.0
+get                    2018.11.19
+idna                   2.8
+ipdb                   0.12
+ipython                7.6.0
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgbe0d317" class="outline-3">
-<h3 id="orgbe0d317"><span class="section-number-3">2.2</span> 更新所有包到最新版本</h3>
+<div id="outline-container-org502c081" class="outline-3">
+<h3 id="org502c081"><span class="section-number-3">2.2</span> 更新所有包到最新版本</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 <pre class="src src-sh">pip freeze --local | grep -v <span style="color: #2aa198;">'^\-e'</span> | cut -d = -f 1  | xargs -n1 pip install -U
@@ -306,21 +333,16 @@ pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 </div>
 </div>
 
-<div id="outline-container-org272635b" class="outline-3">
-<h3 id="org272635b"><span class="section-number-3">2.3</span> 导出所有包的版本信息</h3>
+<div id="outline-container-orgc7feae8" class="outline-3">
+<h3 id="orgc7feae8"><span class="section-number-3">2.3</span> 批量导出/安装包 <code>requirements.txt</code></h3>
 <div class="outline-text-3" id="text-2-3">
+<p>
+在 Python项目中通常有一个 <code>requirements.txt</code> 文件，该文件记录项目所需的包和相
+应的版本号。
+</p>
 <div class="org-src-container">
 <pre class="src src-sh">pip freeze &gt; requirements.txt
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org8d873c6" class="outline-3">
-<h3 id="org8d873c6"><span class="section-number-3">2.4</span> 安装导出版本文件中的所有包</h3>
-<div class="outline-text-3" id="text-2-4">
-<div class="org-src-container">
-<pre class="src src-sh">pip install -r requirements.txt
+pip install -r requirements.txt
 </pre>
 </div>
 </div>
@@ -330,7 +352,7 @@ pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 <div id="postamble" class="status">
 <p class="date">Date: 2018-10-08 Mon 00:00</p>
 <p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-07-03 Wed 22:52</p>
+<p class="date">Created: 2019-07-04 Thu 23:25</p>
 <p class="validation"></p>
 </div>
 </body>
