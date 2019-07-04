@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-04 Thu 13:05 -->
+<!-- 2019-07-04 Thu 22:26 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Docker 容器</title>
@@ -185,7 +185,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2019 Free Software Foundation, Inc.
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -234,35 +234,41 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgbcb081f">1. Docker</a></li>
-<li><a href="#org8e7f2af">2. Docker 容器</a>
+<li><a href="#org8b4b559">1. Docker</a></li>
+<li><a href="#org38a9e13">2. Docker 容器</a>
 <ul>
-<li><a href="#org63f3635">2.1. 生命周期</a></li>
-<li><a href="#orga41ee20">2.2. 启动和停止</a></li>
-<li><a href="#org944b097">2.3. 查看容器的状态</a></li>
-<li><a href="#orgb191a99">2.4. 杂项</a></li>
+<li><a href="#orgd569524">2.1. 生命周期</a></li>
+<li><a href="#org1e41e23">2.2. 启动和停止</a></li>
+<li><a href="#orgd1ddfa8">2.3. 查看容器的状态</a></li>
+<li><a href="#org3913a83">2.4. 杂项</a></li>
+<li><a href="#org4a2aab8">2.5. 使用容器中 Ubuntu 操作系统</a></li>
 </ul>
 </li>
-<li><a href="#org9c87f29">3. Docker 图像</a>
+<li><a href="#org8510f60">3. Docker 图像</a>
 <ul>
-<li><a href="#orgf7440bf">3.1. 生命周期</a></li>
-<li><a href="#orgdb1a785">3.2. 显示状态</a></li>
+<li><a href="#org5e49229">3.1. 生命周期</a></li>
+<li><a href="#orgd02aaac">3.2. 显示状态</a></li>
 </ul>
 </li>
-<li><a href="#orge364e06">4. 工作流</a>
+<li><a href="#org0f1ff7f">4. 工作流</a>
 <ul>
-<li><a href="#org288a101">4.1. load/save 图像</a></li>
-<li><a href="#org883eafb">4.2. import/export 容器</a></li>
+<li><a href="#org29f227d">4.1. load/save 图像</a></li>
+<li><a href="#org374a1bf">4.2. import/export 容器</a></li>
 </ul>
 </li>
-<li><a href="#orgc0433d1">5. Registry 和 Repository</a></li>
-<li><a href="#org1ecc07a">6. Dockerfile</a>
+<li><a href="#org5ce8b2b">5. Registry 和 Repository</a>
 <ul>
-<li><a href="#org8ef19e5">6.1. Dockerfile 的指令</a></li>
+<li><a href="#org14ea0ab">5.1. 上传图像到私有仓库</a></li>
+<li><a href="#org978faae">5.2. 查询私有仓库中的镜像和 tag</a></li>
 </ul>
 </li>
-<li><a href="#org81aeebc">7. 私有仓库</a></li>
-<li><a href="#org51c852f">8. 参考链接</a></li>
+<li><a href="#org5f1db59">6. 编写 Dockerfile</a>
+<ul>
+<li><a href="#orgd7c77dc">6.1. dockerfile 的指令</a></li>
+<li><a href="#org8d8ee18">6.2. 通过 docker build 创建图像</a></li>
+</ul>
+</li>
+<li><a href="#org65a41cd">7. 参考链接</a></li>
 </ul>
 </div>
 </div>
@@ -273,8 +279,8 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-orgbcb081f" class="outline-2">
-<h2 id="orgbcb081f"><span class="section-number-2">1</span> Docker</h2>
+<div id="outline-container-org8b4b559" class="outline-2">
+<h2 id="org8b4b559"><span class="section-number-2">1</span> Docker</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Docker 和传统虚拟机有着同样的虚拟化硬件资源的功能，但是 Docker 在完成虚拟化是
@@ -288,18 +294,22 @@ Docker 和传统虚拟机有着同样的虚拟化硬件资源的功能，但是 
 </div>
 
 <p>
-Docker 的最低依赖是 3.10.x 的 Linux 内核。并且 Docker 可以安装在 Linux，MacOS
-和 Windows 10 以上的机器上，安装的方式请参考官网的文档。
+Docker 的最低依赖是 3.10.x 的 Linux 内核。并且 Docker 可以安装在 <a href="https://docs.docker.com/engine/installation/linux/">Linux</a>，<a href="https://docs.docker.com/docker-for-mac/">Mac</a> 和
+<a href="https://docs.docker.com/docker-for-windows/">Windows</a> 操作系统上。如果你使用 Windows 作为开机机，需要另外配置<a href="https://docs.docker.com/docker-for-windows/#shared-drives">驱动共享</a> 。
 </p>
 </div>
 </div>
 
-<div id="outline-container-org8e7f2af" class="outline-2">
-<h2 id="org8e7f2af"><span class="section-number-2">2</span> Docker 容器</h2>
+<div id="outline-container-org38a9e13" class="outline-2">
+<h2 id="org38a9e13"><span class="section-number-2">2</span> Docker 容器</h2>
 <div class="outline-text-2" id="text-2">
+<p>
+容器是一个运行的实例，他是一个图像的运行实体。如果把图像比喻成数轴上点的话，容
+器就是一个区间。
+</p>
 </div>
-<div id="outline-container-org63f3635" class="outline-3">
-<h3 id="org63f3635"><span class="section-number-3">2.1</span> 生命周期</h3>
+<div id="outline-container-orgd569524" class="outline-3">
+<h3 id="orgd569524"><span class="section-number-3">2.1</span> 生命周期</h3>
 <div class="outline-text-3" id="text-2-1">
 <ul class="org-ul">
 <li><code>docker create</code> : 创建容器</li>
@@ -308,10 +318,10 @@ Docker 的最低依赖是 3.10.x 的 Linux 内核。并且 Docker 可以安装�
 用的选项如下：
 <ul class="org-ul">
 <li><code>-t</code> : 添加一个 tty 终端</li>
-<li><code>-d</code> : 当容器退出后自动进行 detach 操作</li>
+<li><code>-d</code> : 当容器退出后自动进行 detach 操作，该选项是常见的后台启动应用的方法</li>
 <li><code>--volume $HOSTDIR:$DOCKERDIR</code> : 挂载容器外的磁盘</li>
 <li><code>--publish $HOSTPORT:$DOCKERPORT</code> : 暴露端口</li>
-<li><code>--Name</code> : 制定容器名</li>
+<li><code>--name</code> : 制定容器名</li>
 </ul></li>
 <li><code>docker rm</code> : 删除容器</li>
 <li><code>docker update</code> : 更新容器运行的资源约束</li>
@@ -319,8 +329,8 @@ Docker 的最低依赖是 3.10.x 的 Linux 内核。并且 Docker 可以安装�
 </div>
 </div>
 
-<div id="outline-container-orga41ee20" class="outline-3">
-<h3 id="orga41ee20"><span class="section-number-3">2.2</span> 启动和停止</h3>
+<div id="outline-container-org1e41e23" class="outline-3">
+<h3 id="org1e41e23"><span class="section-number-3">2.2</span> 启动和停止</h3>
 <div class="outline-text-3" id="text-2-2">
 <ul class="org-ul">
 <li><code>docker start</code> : 启动容器</li>
@@ -335,8 +345,8 @@ Docker 的最低依赖是 3.10.x 的 Linux 内核。并且 Docker 可以安装�
 </div>
 </div>
 
-<div id="outline-container-org944b097" class="outline-3">
-<h3 id="org944b097"><span class="section-number-3">2.3</span> 查看容器的状态</h3>
+<div id="outline-container-orgd1ddfa8" class="outline-3">
+<h3 id="orgd1ddfa8"><span class="section-number-3">2.3</span> 查看容器的状态</h3>
 <div class="outline-text-3" id="text-2-3">
 <ul class="org-ul">
 <li><code>docker ps</code> : 显示当前运行的容器， <code>-a</code> 选项可以显示所有的容器</li>
@@ -351,8 +361,8 @@ Docker 的最低依赖是 3.10.x 的 Linux 内核。并且 Docker 可以安装�
 </div>
 </div>
 
-<div id="outline-container-orgb191a99" class="outline-3">
-<h3 id="orgb191a99"><span class="section-number-3">2.4</span> 杂项</h3>
+<div id="outline-container-org3913a83" class="outline-3">
+<h3 id="org3913a83"><span class="section-number-3">2.4</span> 杂项</h3>
 <div class="outline-text-3" id="text-2-4">
 <ul class="org-ul">
 <li><code>docker cp</code> : 在本地和容器之间复制文件</li>
@@ -366,10 +376,70 @@ bash 交互环境。</li>
 </div>
 </div>
 </div>
+
+<div id="outline-container-org4a2aab8" class="outline-3">
+<h3 id="org4a2aab8"><span class="section-number-3">2.5</span> 使用容器中 Ubuntu 操作系统</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+下面是使用一些常用命令启动 Ubuntu 图像，并且 attache / detach 终端，具体见如
+下：
+</p>
+<div class="org-src-container">
+<pre class="src src-text">&#10140;  ~ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+&#10140;  ~ docker run -it --name=test ubuntu
+root@fde0a8727913:/# pwd
+/
+root@fde0a8727913:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@fde0a8727913:/# exit
+&#10140;  ~ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+&#10140;  ~ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES
+fde0a8727913        ubuntu              "/bin/bash"         16 seconds ago      Exited (0) 8 seconds ago                       test
+&#10140;  ~ docker attach test
+You cannot attach to a stopped container, start it first
+&#10140;  ~ docker start test
+test
+&#10140;  ~ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+fde0a8727913        ubuntu              "/bin/bash"         54 seconds ago      Up 1 second                             test
+&#10140;  ~ docker attach test
+root@fde0a8727913:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@fde0a8727913:/# rm -rvf /var/
+removed directory '/var/opt'
+removed '/var/run'
+removed '/var/lock'
+removed '/var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/apt-daily-upgrade.timer'
+removed directory '/var/lib/systemd/deb-systemd-helper-enabled'
+removed directory '/var/lib/systemd'
+...
+removed directory '/var/cache'
+removed directory '/var/tmp'
+removed directory '/var/'
+root@fde0a8727913:/# exit
+&#10140;  ~ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS                     PORTS               NAMES
+fde0a8727913        ubuntu              "/bin/bash"         About a minute ago   Exited (0) 5 seconds ago                       test
+&#10140;  ~ docker diff test
+C /root
+A /root/.bash_history
+D /var
+&#10140;  ~ docker rm test
+test
+&#10140;  ~ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+&#10140;  ~
+</pre>
+</div>
+</div>
+</div>
 </div>
 
-<div id="outline-container-org9c87f29" class="outline-2">
-<h2 id="org9c87f29"><span class="section-number-2">3</span> Docker 图像</h2>
+<div id="outline-container-org8510f60" class="outline-2">
+<h2 id="org8510f60"><span class="section-number-2">3</span> Docker 图像</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Docker 图像指的是容器在一个特点时间点的快照，它是一个只读的容器的存储，官网上
@@ -377,8 +447,8 @@ Docker 图像指的是容器在一个特点时间点的快照，它是一个只�
 </p>
 </div>
 
-<div id="outline-container-orgf7440bf" class="outline-3">
-<h3 id="orgf7440bf"><span class="section-number-3">3.1</span> 生命周期</h3>
+<div id="outline-container-org5e49229" class="outline-3">
+<h3 id="org5e49229"><span class="section-number-3">3.1</span> 生命周期</h3>
 <div class="outline-text-3" id="text-3-1">
 <ul class="org-ul">
 <li><code>docker images</code> : 显示所有图像</li>
@@ -392,8 +462,8 @@ Docker 图像指的是容器在一个特点时间点的快照，它是一个只�
 </div>
 </div>
 
-<div id="outline-container-orgdb1a785" class="outline-3">
-<h3 id="orgdb1a785"><span class="section-number-3">3.2</span> 显示状态</h3>
+<div id="outline-container-orgd02aaac" class="outline-3">
+<h3 id="orgd02aaac"><span class="section-number-3">3.2</span> 显示状态</h3>
 <div class="outline-text-3" id="text-3-2">
 <ul class="org-ul">
 <li><code>docker history</code> : 显示所有历史图像</li>
@@ -403,12 +473,12 @@ Docker 图像指的是容器在一个特点时间点的快照，它是一个只�
 </div>
 </div>
 
-<div id="outline-container-orge364e06" class="outline-2">
-<h2 id="orge364e06"><span class="section-number-2">4</span> 工作流</h2>
+<div id="outline-container-org0f1ff7f" class="outline-2">
+<h2 id="org0f1ff7f"><span class="section-number-2">4</span> 工作流</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org288a101" class="outline-3">
-<h3 id="org288a101"><span class="section-number-3">4.1</span> load/save 图像</h3>
+<div id="outline-container-org29f227d" class="outline-3">
+<h3 id="org29f227d"><span class="section-number-3">4.1</span> load/save 图像</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 加载文件中的图像
@@ -428,8 +498,8 @@ Docker 图像指的是容器在一个特点时间点的快照，它是一个只�
 </div>
 </div>
 
-<div id="outline-container-org883eafb" class="outline-3">
-<h3 id="org883eafb"><span class="section-number-3">4.2</span> import/export 容器</h3>
+<div id="outline-container-org374a1bf" class="outline-3">
+<h3 id="org374a1bf"><span class="section-number-3">4.2</span> import/export 容器</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 从一个容器文件中导入容器
@@ -455,8 +525,8 @@ Docker 图像指的是容器在一个特点时间点的快照，它是一个只�
 </div>
 </div>
 
-<div id="outline-container-orgc0433d1" class="outline-2">
-<h2 id="orgc0433d1"><span class="section-number-2">5</span> Registry 和 Repository</h2>
+<div id="outline-container-org5ce8b2b" class="outline-2">
+<h2 id="org5ce8b2b"><span class="section-number-2">5</span> Registry 和 Repository</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 registry 是一个宿主机器，一个 registry 包含多个 repository。repository 是存储
@@ -471,129 +541,68 @@ registry 是一个宿主机器，一个 registry 包含多个 repository。repos
 <li><code>docker push</code> : 上传本地图像到 registry</li>
 </ul>
 </div>
+
+<div id="outline-container-org14ea0ab" class="outline-3">
+<h3 id="org14ea0ab"><span class="section-number-3">5.1</span> 上传图像到私有仓库</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+在上传或下载私有仓库的图像时，需要提前设置安全性。通常 docker 私有仓库默认采
+用 HTTPS，如果不设置安全性则会出现如下错误：
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">&#10140;  ~ docker tag ubuntu:18.04 192.168.1.2:5000/ubuntu:18.04
+&#10140;  ~ docker push 192.168.1.2:5000/ubuntu:18.04
+The push refers to repository [192.168.1.2:5000/ubuntu]
+Get https://192.168.1.2:5000/v2/: http: server gave HTTP response to HTTPS client
+</pre>
 </div>
 
-<div id="outline-container-org1ecc07a" class="outline-2">
-<h2 id="org1ecc07a"><span class="section-number-2">6</span> Dockerfile</h2>
-<div class="outline-text-2" id="text-6">
 <p>
-Dockerfile 是配置 Docker 容器的配置文件，通过 <code>docker build</code> 来使用它创建图像。
+配置文件一般是 <code>daemon.json</code> ，所存放的位置因操作系统而异，具体如下：
 </p>
+<ul class="org-ul">
+<li>Mac: <code>~/.docker/daemon.json</code></li>
+<li>Linux: <code>/etc/docker/daemon.json</code></li>
+</ul>
+
+<p>
+需要添加 <code>insecure-registries</code> 的值，然后重启 docker 生效。
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+  <span style="color: #859900;">"insecure-registries"</span> : [
+    <span style="color: #2aa198;">"192.168.1.2:5000"</span>
+  ],
+  <span style="color: #859900;">"registry-mirrors"</span> : [
+    <span style="color: #2aa198;">"https://registry.docker-cn.com"</span>
+  ]
+}
+</pre>
 </div>
 
-<div id="outline-container-org8ef19e5" class="outline-3">
-<h3 id="org8ef19e5"><span class="section-number-3">6.1</span> Dockerfile 的指令</h3>
-<div class="outline-text-3" id="text-6-1">
 <p>
-常见的指令如下表:
+Mac 操作系统也可以直接通过界面设置，如下图所示：
+<img src="../static/image/2019/07/docker-daemon-config.png" alt="docker-daemon-config.png" />
 </p>
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-left" />
-
-<col  class="org-left" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-left">Instruction</th>
-<th scope="col" class="org-left">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-left">FROM</td>
-<td class="org-left">设置基的图像</td>
-</tr>
-
-<tr>
-<td class="org-left">RUN</td>
-<td class="org-left">在新的层数执行一条命令，并且提交结果</td>
-</tr>
-
-<tr>
-<td class="org-left">CMD</td>
-<td class="org-left">提供默认执行的容器</td>
-</tr>
-
-<tr>
-<td class="org-left">EXPOSE</td>
-<td class="org-left">暴露容器的监听端口， <b>这条指令只是提供端口，并不会直接暴露</b></td>
-</tr>
-
-<tr>
-<td class="org-left">ENV</td>
-<td class="org-left">设置环境变量</td>
-</tr>
-
-<tr>
-<td class="org-left">ADD</td>
-<td class="org-left">从容器外复制文件和目录到容器里面，避免使用 ADD，尽量使用 COPY</td>
-</tr>
-
-<tr>
-<td class="org-left">COPY</td>
-<td class="org-left">使用 root 权限来复制文件</td>
-</tr>
-
-<tr>
-<td class="org-left">ENTRYPOINT</td>
-<td class="org-left">配置容器是入口可执行文件</td>
-</tr>
-
-<tr>
-<td class="org-left">VOLUME</td>
-<td class="org-left">配置一个可挂载的点</td>
-</tr>
-
-<tr>
-<td class="org-left">USER</td>
-<td class="org-left">设置 RUN/CMD/ENTRYPOINT 的执行用户</td>
-</tr>
-
-<tr>
-<td class="org-left">WORKDIR</td>
-<td class="org-left">设置工作目录</td>
-</tr>
-
-<tr>
-<td class="org-left">ARG</td>
-<td class="org-left">设置 build 的命令行参数</td>
-</tr>
-
-<tr>
-<td class="org-left">ONBUILD</td>
-<td class="org-left">添加一个当容器作为别的基容器是的触发命令</td>
-</tr>
-
-<tr>
-<td class="org-left">STOPSIGNAL</td>
-<td class="org-left">设置系统退出的信号</td>
-</tr>
-
-<tr>
-<td class="org-left">LABEL</td>
-<td class="org-left">添加 key/value 属性，如：images, container, daemon</td>
-</tr>
-</tbody>
-</table>
 
 <div class="org-src-container">
-<pre class="src src-dockerfile"><span style="color: #859900;">FROM</span> <span style="color: #268bd2; font-weight: bold;">openjdk:8</span>
-<span style="color: #859900;">MAINTAINER</span> Jinghui Hu
-<span style="color: #859900;">LABEL</span> <span style="color: #6c71c4;">app</span>=<span style="color: #2aa198;">"microservice"</span> <span style="color: #6c71c4;">version</span>=<span style="color: #2aa198;">"0.0.1"</span> <span style="color: #6c71c4;">by</span>=<span style="color: #2aa198;">"Jinghui Hu"</span>
-<span style="color: #859900;">COPY</span> target/microservice-0.0.1-SNAPSHOT.jar microservice.jar
-<span style="color: #859900;">CMD</span> java -jar microservice.jar
+<pre class="src src-sh">&gt; docker tag imagename 192.168.1.2:5000/imagename
+&gt; docker push 192.168.1.2:5000/imagename
+The push refers to repository [192.168.1.2:5000/redis]
+f37e5c653360: Pushed
+031c196d6ffa: Pushed
+215555938ee1: Pushed
+2ea66b75bc32: Pushed
+bf0b6dc2d2d7: Pushed
+cfce7a8ae632: Pushed
+lastest: digest: sha256:9b1b75fa6364b2ec538a5efdb00c3511adee5b6b2f80d5c64b06c4456ad573f6 size: 1571
 </pre>
 </div>
 </div>
 </div>
-</div>
-
-<div id="outline-container-org81aeebc" class="outline-2">
-<h2 id="org81aeebc"><span class="section-number-2">7</span> 私有仓库</h2>
-<div class="outline-text-2" id="text-7">
+<div id="outline-container-org978faae" class="outline-3">
+<h3 id="org978faae"><span class="section-number-3">5.2</span> 查询私有仓库中的镜像和 tag</h3>
+<div class="outline-text-3" id="text-5-2">
 <p>
 添加一些别名帮助查询远端的仓库内容
 </p>
@@ -601,8 +610,8 @@ Dockerfile 是配置 Docker 容器的配置文件，通过 <code>docker build</c
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">REGISTRY</span>=<span style="color: #2aa198;">'http://localhost:5000'</span>
 
-alias <span style="color: #6c71c4;">ri</span>=<span style="color: #2aa198;">'_f(){ curl -XGET $REGISTRY/v2/_catalog; }; _f'</span>
-alias <span style="color: #6c71c4;">rt</span>=<span style="color: #2aa198;">'_f(){ curl -XGET $REGISTRY/v2/$1/tags/list; }; _f'</span>
+<span style="color: #6c71c4;">alias</span> <span style="color: #6c71c4;">ri</span>=<span style="color: #2aa198;">'_f(){ curl -XGET $REGISTRY/v2/_catalog; }; _f'</span>
+<span style="color: #6c71c4;">alias</span> <span style="color: #6c71c4;">rt</span>=<span style="color: #2aa198;">'_f(){ curl -XGET $REGISTRY/v2/$1/tags/list; }; _f'</span>
 </pre>
 </div>
 
@@ -619,10 +628,159 @@ $ rt ubuntu
 </div>
 </div>
 </div>
+</div>
 
-<div id="outline-container-org51c852f" class="outline-2">
-<h2 id="org51c852f"><span class="section-number-2">8</span> 参考链接</h2>
-<div class="outline-text-2" id="text-8">
+<div id="outline-container-org5f1db59" class="outline-2">
+<h2 id="org5f1db59"><span class="section-number-2">6</span> 编写 Dockerfile</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+Dockerfile 是配置 Docker 容器的配置文件，最佳实践参考<a href="https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/">这里</a> 。
+</p>
+</div>
+
+<div id="outline-container-orgd7c77dc" class="outline-3">
+<h3 id="orgd7c77dc"><span class="section-number-3">6.1</span> dockerfile 的指令</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+常见的指令如下表:
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">instruction</th>
+<th scope="col" class="org-left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">from</td>
+<td class="org-left">设置基的图像</td>
+</tr>
+
+<tr>
+<td class="org-left">run</td>
+<td class="org-left">在新的层数执行一条命令，并且提交结果</td>
+</tr>
+
+<tr>
+<td class="org-left">cmd</td>
+<td class="org-left">提供默认执行的容器</td>
+</tr>
+
+<tr>
+<td class="org-left">expose</td>
+<td class="org-left">暴露容器的监听端口， <b>这条指令只是提供端口，并不会直接暴露</b></td>
+</tr>
+
+<tr>
+<td class="org-left">env</td>
+<td class="org-left">设置环境变量</td>
+</tr>
+
+<tr>
+<td class="org-left">add</td>
+<td class="org-left">从容器外复制文件和目录到容器里面，避免使用 add，尽量使用 copy</td>
+</tr>
+
+<tr>
+<td class="org-left">copy</td>
+<td class="org-left">使用 root 权限来复制文件</td>
+</tr>
+
+<tr>
+<td class="org-left">entrypoint</td>
+<td class="org-left">配置容器是入口可执行文件</td>
+</tr>
+
+<tr>
+<td class="org-left">volume</td>
+<td class="org-left">配置一个可挂载的点</td>
+</tr>
+
+<tr>
+<td class="org-left">user</td>
+<td class="org-left">设置 run/cmd/entrypoint 的执行用户</td>
+</tr>
+
+<tr>
+<td class="org-left">workdir</td>
+<td class="org-left">设置工作目录</td>
+</tr>
+
+<tr>
+<td class="org-left">arg</td>
+<td class="org-left">设置 build 的命令行参数</td>
+</tr>
+
+<tr>
+<td class="org-left">onbuild</td>
+<td class="org-left">添加一个当容器作为别的基容器是的触发命令</td>
+</tr>
+
+<tr>
+<td class="org-left">stopsignal</td>
+<td class="org-left">设置系统退出的信号</td>
+</tr>
+
+<tr>
+<td class="org-left">label</td>
+<td class="org-left">添加 key/value 属性，如：images, container, daemon</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-org8d8ee18" class="outline-3">
+<h3 id="org8d8ee18"><span class="section-number-3">6.2</span> 通过 docker build 创建图像</h3>
+<div class="outline-text-3" id="text-6-2">
+<div class="org-src-container">
+<pre class="src src-dockerfile"><span style="color: #859900;">from</span> <span style="color: #268bd2; font-weight: bold;">openjdk:8</span>
+<span style="color: #859900;">maintainer</span> jinghui hu
+<span style="color: #859900;">label</span> <span style="color: #6c71c4;">app</span>=<span style="color: #2aa198;">"microservice"</span> <span style="color: #6c71c4;">version</span>=<span style="color: #2aa198;">"0.0.1"</span> <span style="color: #6c71c4;">by</span>=<span style="color: #2aa198;">"jinghui hu"</span>
+<span style="color: #859900;">copy</span> target/microservice-0.0.1.jar microservice.jar
+<span style="color: #859900;">CMD</span> [<span style="color: #2aa198;">"java"</span> <span style="color: #2aa198;">"-jar"</span> <span style="color: #2aa198;">"microservice.jar"</span>]
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-text">#&gt; docker build -t skree .
+Sending build context to Docker daemon  50.45MB
+Step 1/5 : FROM openjdk:8
+ ---&gt; b84359d0cbce
+Step 2/5 : LABEL appname="skree" version="0.0.1" author="Jinghui Hu"
+ ---&gt; Running in a1f05953535b
+Removing intermediate container a1f05953535b
+ ---&gt; 43bd7d46936b
+Step 3/5 : COPY target/skree-0.0.1.jar skree.jar
+ ---&gt; dcd6b274bbb4
+Step 4/5 : EXPOSE 9001
+ ---&gt; Running in 2b0a688fa87b
+Removing intermediate container 2b0a688fa87b
+ ---&gt; e7b41e7dd672
+Step 5/5 : CMD java -jar skree.jar
+ ---&gt; Running in a006ea951dfa
+Removing intermediate container a006ea951dfa
+ ---&gt; bef45240e69c
+Successfully built bef45240e69c
+Successfully tagged skree:latest
+#&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org65a41cd" class="outline-2">
+<h2 id="org65a41cd"><span class="section-number-2">7</span> 参考链接</h2>
+<div class="outline-text-2" id="text-7">
 <ol class="org-ol">
 <li><a href="https://github.com/wsargent/docker-cheat-sheet">docker cheatsheet</a></li>
 <li><a href="https://docs.docker.com/">docker docs</a></li>
@@ -633,7 +791,7 @@ $ rt ubuntu
 <div id="postamble" class="status">
 <p class="date">Date: 2018-11-27 Tue 00:00</p>
 <p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-07-04 Thu 13:05</p>
+<p class="date">Created: 2019-07-04 Thu 22:26</p>
 <p class="validation"></p>
 </div>
 </body>

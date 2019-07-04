@@ -15,17 +15,19 @@
 
   [[file:../static/image/2018/11/container-vs-vm.png]]
 
-  Docker 的最低依赖是 3.10.x 的 Linux 内核。并且 Docker 可以安装在 Linux，MacOS
-  和 Windows 10 以上的机器上，安装的方式请参考官网的文档。
+  Docker 的最低依赖是 3.10.x 的 Linux 内核。并且 Docker 可以安装在 [[https://docs.docker.com/engine/installation/linux/][Linux]]，[[https://docs.docker.com/docker-for-mac/][Mac]] 和
+  [[https://docs.docker.com/docker-for-windows/][Windows]] 操作系统上。如果你使用 Windows 作为开机机，需要另外配置[[https://docs.docker.com/docker-for-windows/#shared-drives][驱动共享]] 。
 
 * Docker 容器
+  容器是一个运行的实例，他是一个图像的运行实体。如果把图像比喻成数轴上点的话，容
+  器就是一个区间。
 ** 生命周期
    - ~docker create~ : 创建容器
    - ~docker rename~ : 重命名容器
    - ~docker run~ : 创建并启动容器, ~docker run~ 是非常常用的一个命令其中比较有
      用的选项如下：
      + =-t= : 添加一个 tty 终端
-     + =-d= : 当容器退出后自动进行 detach 操作
+     + =-d= : 当容器退出后自动进行 detach 操作，该选项是常见的后台启动应用的方法
      + =--volume $HOSTDIR:$DOCKERDIR= : 挂载容器外的磁盘
      + =--publish $HOSTPORT:$DOCKERPORT= : 暴露端口
      + =--name= : 制定容器名
@@ -59,6 +61,59 @@
      bash 交互环境。
    #+BEGIN_SRC sh
      docker exec -it foo /bin/bash
+   #+END_SRC
+
+** 使用容器中 Ubuntu 操作系统
+   下面是使用一些常用命令启动 Ubuntu 图像，并且 attache / detach 终端，具体见如
+   下：
+   #+BEGIN_SRC text
+     ➜  ~ docker ps -a
+     CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+     ➜  ~ docker run -it --name=test ubuntu
+     root@fde0a8727913:/# pwd
+     /
+     root@fde0a8727913:/# ls
+     bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+     root@fde0a8727913:/# exit
+     ➜  ~ docker ps
+     CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+     ➜  ~ docker ps -a
+     CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES
+     fde0a8727913        ubuntu              "/bin/bash"         16 seconds ago      Exited (0) 8 seconds ago                       test
+     ➜  ~ docker attach test
+     You cannot attach to a stopped container, start it first
+     ➜  ~ docker start test
+     test
+     ➜  ~ docker ps
+     CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+     fde0a8727913        ubuntu              "/bin/bash"         54 seconds ago      Up 1 second                             test
+     ➜  ~ docker attach test
+     root@fde0a8727913:/# ls
+     bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+     root@fde0a8727913:/# rm -rvf /var/
+     removed directory '/var/opt'
+     removed '/var/run'
+     removed '/var/lock'
+     removed '/var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/apt-daily-upgrade.timer'
+     removed directory '/var/lib/systemd/deb-systemd-helper-enabled'
+     removed directory '/var/lib/systemd'
+     ...
+     removed directory '/var/cache'
+     removed directory '/var/tmp'
+     removed directory '/var/'
+     root@fde0a8727913:/# exit
+     ➜  ~ docker ps -a
+     CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS                     PORTS               NAMES
+     fde0a8727913        ubuntu              "/bin/bash"         About a minute ago   Exited (0) 5 seconds ago                       test
+     ➜  ~ docker diff test
+     C /root
+     A /root/.bash_history
+     D /var
+     ➜  ~ docker rm test
+     test
+     ➜  ~ docker ps -a
+     CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+     ➜  ~
    #+END_SRC
 
 * Docker 图像
@@ -114,39 +169,100 @@
   - ~docker pull~ : 拉取 registry 的镜像
   - ~docker push~ : 上传本地图像到 registry
 
-* Dockerfile
-  Dockerfile 是配置 Docker 容器的配置文件，通过 ~docker build~ 来使用它创建图像。
+** 上传图像到私有仓库
+   在上传或下载私有仓库的图像时，需要提前设置安全性。通常 docker 私有仓库默认采
+   用 HTTPS，如果不设置安全性则会出现如下错误：
+   #+BEGIN_SRC sh
+     ➜  ~ docker tag ubuntu:18.04 192.168.1.2:5000/ubuntu:18.04
+     ➜  ~ docker push 192.168.1.2:5000/ubuntu:18.04
+     The push refers to repository [192.168.1.2:5000/ubuntu]
+     Get https://192.168.1.2:5000/v2/: http: server gave HTTP response to HTTPS client
+   #+END_SRC
 
-** Dockerfile 的指令
+   配置文件一般是 =daemon.json= ，所存放的位置因操作系统而异，具体如下：
+   - Mac: =~/.docker/daemon.json=
+   - Linux: =/etc/docker/daemon.json=
+
+   需要添加 =insecure-registries= 的值，然后重启 docker 生效。
+   #+BEGIN_SRC json
+     {
+       "insecure-registries" : [
+         "192.168.1.2:5000"
+       ],
+       "registry-mirrors" : [
+         "https://registry.docker-cn.com"
+       ]
+     }
+   #+END_SRC
+
+   Mac 操作系统也可以直接通过界面设置，如下图所示：
+   [[file:../static/image/2019/07/docker-daemon-config.png]]
+
+   #+BEGIN_SRC sh
+     > docker tag imagename 192.168.1.2:5000/imagename
+     > docker push 192.168.1.2:5000/imagename
+     The push refers to repository [192.168.1.2:5000/redis]
+     f37e5c653360: Pushed
+     031c196d6ffa: Pushed
+     215555938ee1: Pushed
+     2ea66b75bc32: Pushed
+     bf0b6dc2d2d7: Pushed
+     cfce7a8ae632: Pushed
+     lastest: digest: sha256:9b1b75fa6364b2ec538a5efdb00c3511adee5b6b2f80d5c64b06c4456ad573f6 size: 1571
+   #+END_SRC
+** 查询私有仓库中的镜像和 tag
+   添加一些别名帮助查询远端的仓库内容
+
+   #+BEGIN_SRC sh
+     export REGISTRY='http://localhost:5000'
+
+     alias ri='_f(){ curl -XGET $REGISTRY/v2/_catalog; }; _f'
+     alias rt='_f(){ curl -XGET $REGISTRY/v2/$1/tags/list; }; _f'
+   #+END_SRC
+
+   输出结果
+   #+BEGIN_SRC text
+     $ ri
+     {"repositories":["gitlab/gitlab-ce","registry","ubuntu"]}
+
+     $ rt ubuntu
+     {"name":"ubuntu","tags":["18.04","latest"]}
+   #+END_SRC
+
+* 编写 Dockerfile
+  Dockerfile 是配置 Docker 容器的配置文件，最佳实践参考[[https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/][这里]] 。
+
+** dockerfile 的指令
    常见的指令如下表:
-   | Instruction | 描述                                                          |
+   | instruction | 描述                                                          |
    |-------------+---------------------------------------------------------------|
-   | FROM        | 设置基的图像                                                  |
-   | RUN         | 在新的层数执行一条命令，并且提交结果                          |
-   | CMD         | 提供默认执行的容器                                            |
-   | EXPOSE      | 暴露容器的监听端口， *这条指令只是提供端口，并不会直接暴露*   |
-   | ENV         | 设置环境变量                                                  |
-   | ADD         | 从容器外复制文件和目录到容器里面，避免使用 ADD，尽量使用 COPY |
-   | COPY        | 使用 root 权限来复制文件                                      |
-   | ENTRYPOINT  | 配置容器是入口可执行文件                                      |
-   | VOLUME      | 配置一个可挂载的点                                            |
-   | USER        | 设置 RUN/CMD/ENTRYPOINT 的执行用户                            |
-   | WORKDIR     | 设置工作目录                                                  |
-   | ARG         | 设置 build 的命令行参数                                       |
-   | ONBUILD     | 添加一个当容器作为别的基容器是的触发命令                      |
-   | STOPSIGNAL  | 设置系统退出的信号                                            |
-   | LABEL       | 添加 key/value 属性，如：images, container, daemon            |
+   | from        | 设置基的图像                                                  |
+   | run         | 在新的层数执行一条命令，并且提交结果                          |
+   | cmd         | 提供默认执行的容器                                            |
+   | expose      | 暴露容器的监听端口， *这条指令只是提供端口，并不会直接暴露*   |
+   | env         | 设置环境变量                                                  |
+   | add         | 从容器外复制文件和目录到容器里面，避免使用 add，尽量使用 copy |
+   | copy        | 使用 root 权限来复制文件                                      |
+   | entrypoint  | 配置容器是入口可执行文件                                      |
+   | volume      | 配置一个可挂载的点                                            |
+   | user        | 设置 run/cmd/entrypoint 的执行用户                            |
+   | workdir     | 设置工作目录                                                  |
+   | arg         | 设置 build 的命令行参数                                       |
+   | onbuild     | 添加一个当容器作为别的基容器是的触发命令                      |
+   | stopsignal  | 设置系统退出的信号                                            |
+   | label       | 添加 key/value 属性，如：images, container, daemon            |
 
-   #+BEGIN_SRC dockerfile
-     FROM openjdk:8
-     MAINTAINER Jinghui Hu
-     LABEL app="microservice" version="0.0.1" by="Jinghui Hu"
-     COPY target/microservice-0.0.1-SNAPSHOT.jar microservice.jar
-     CMD java -jar microservice.jar
+** 通过 docker build 创建图像
+   #+begin_src dockerfile
+     from openjdk:8
+     maintainer jinghui hu
+     label app="microservice" version="0.0.1" by="jinghui hu"
+     copy target/microservice-0.0.1.jar microservice.jar
+     CMD ["java" "-jar" "microservice.jar"]
    #+END_SRC
 
    #+BEGIN_SRC text
-     # docker build -t skree .
+     #> docker build -t skree .
      Sending build context to Docker daemon  50.45MB
      Step 1/5 : FROM openjdk:8
       ---> b84359d0cbce
@@ -167,27 +283,7 @@
      Successfully built bef45240e69c
      Successfully tagged skree:latest
      #>
-
    #+END_SRC
-
-* 私有仓库
-  添加一些别名帮助查询远端的仓库内容
-
-  #+BEGIN_SRC sh
-    export REGISTRY='http://localhost:5000'
-
-    alias ri='_f(){ curl -XGET $REGISTRY/v2/_catalog; }; _f'
-    alias rt='_f(){ curl -XGET $REGISTRY/v2/$1/tags/list; }; _f'
-  #+END_SRC
-
-  输出结果
-  #+BEGIN_SRC text
-    $ ri
-    {"repositories":["gitlab/gitlab-ce","registry","ubuntu"]}
-
-    $ rt ubuntu
-    {"name":"ubuntu","tags":["18.04","latest"]}
-  #+END_SRC
 
 * 参考链接
   1. [[https://github.com/wsargent/docker-cheat-sheet][docker cheatsheet]]
