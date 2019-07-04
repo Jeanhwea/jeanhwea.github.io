@@ -28,7 +28,7 @@
      + =-d= : 当容器退出后自动进行 detach 操作
      + =--volume $HOSTDIR:$DOCKERDIR= : 挂载容器外的磁盘
      + =--publish $HOSTPORT:$DOCKERPORT= : 暴露端口
-     + =--Name= : 制定容器名
+     + =--name= : 制定容器名
    - ~docker rm~ : 删除容器
    - ~docker update~ : 更新容器运行的资源约束
 
@@ -143,6 +143,31 @@
      LABEL app="microservice" version="0.0.1" by="Jinghui Hu"
      COPY target/microservice-0.0.1-SNAPSHOT.jar microservice.jar
      CMD java -jar microservice.jar
+   #+END_SRC
+
+   #+BEGIN_SRC text
+     # docker build -t skree .
+     Sending build context to Docker daemon  50.45MB
+     Step 1/5 : FROM openjdk:8
+      ---> b84359d0cbce
+     Step 2/5 : LABEL appname="skree" version="0.0.1" author="Jinghui Hu"
+      ---> Running in a1f05953535b
+     Removing intermediate container a1f05953535b
+      ---> 43bd7d46936b
+     Step 3/5 : COPY target/skree-0.0.1.jar skree.jar
+      ---> dcd6b274bbb4
+     Step 4/5 : EXPOSE 9001
+      ---> Running in 2b0a688fa87b
+     Removing intermediate container 2b0a688fa87b
+      ---> e7b41e7dd672
+     Step 5/5 : CMD java -jar skree.jar
+      ---> Running in a006ea951dfa
+     Removing intermediate container a006ea951dfa
+      ---> bef45240e69c
+     Successfully built bef45240e69c
+     Successfully tagged skree:latest
+     #>
+
    #+END_SRC
 
 * 私有仓库
