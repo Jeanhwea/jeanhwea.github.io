@@ -1,0 +1,54 @@
+#+TITLE: Maven 包管理工具
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2018-10-08 Mon>
+#+TAGS: maven java mvn config
+
+
+* Maven工具简介
+  [[http://maven.apache.org/][Maven]] 是一个非常优秀的 Java 项目中代码包管理工具。它默认将公共仓库放在
+  *~/.m2/repository* 目录下面。有时候下载 Maven 是需要配置默认下载镜像到阿里云，
+  这时候需要编辑 *~/.m2/settings.xml* 文件。
+
+** 配置镜像源
+  在国内访问 Maven 官方的镜像站比较慢，添加下面的代码可以快速添加阿里云作为镜像
+  源。
+  #+BEGIN_SRC xml
+    <mirror>
+      <id>nexus-aliyun</id>
+      <mirrorOf>*</mirrorOf>
+      <name>Nexus aliyun</name>
+      <url>https://maven.aliyun.com/nexus/content/groups/public</url>
+    </mirror>
+  #+END_SRC
+
+* 使用 Maven
+  Maven 官方给出了一个[[http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html][五分钟教程]]，里面有详细的介绍。其中我觉得一个比较重要的命令
+  就是新建一个 maven 项目，这里先粘贴过来。
+
+** 常用命令
+   - ~mvn compile~ : 编译项目
+   - ~mvn test~ : 运行测试
+   - ~mvn package~ : 打包项目
+   - ~mvn clean~ : 清除构建
+
+** 如何创建项目
+  #+BEGIN_SRC sh
+    mvn archetype:generate \
+      -DgroupId=io.github.jeanhwea \
+      -DartifactId=mapp \
+      -DarchetypeArtifactId=maven-archetype-quickstart \
+      -DinteractiveMode=false
+  #+END_SRC
+
+** 安装jar文件到本机仓库
+  使用 ~mvn install:install-file~ 可以快速安装 jar 包到本地仓库中
+
+  #+BEGIN_SRC sh
+    mvn install:install-file \
+      -DgroupId=com.oracle \
+      -DartifactId=ojdbc6 \
+      -Dversion=11.2.0.4 \
+      -Dpackaging=jar \
+      -Dfile=<path-to-jar>
+  #+END_SRC
