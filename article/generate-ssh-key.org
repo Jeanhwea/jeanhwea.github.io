@@ -5,43 +5,39 @@
 #+TAGS: ssh git rsa
 
 
-* ssh 公钥管理
+* ssh
 
-** 生成 ssh 公钥
+  ssh 公钥认证是 ssh 认证的方式之一。通过公钥认证可实现 ssh 免密码登陆，git 的
+  ssh 方式也是通过公钥进行认证的。在用户目录的 home 目录下，有一个.ssh 的目录，
+  和当前用户 ssh 配置认证相关的文件都在这个目录下。
 
-ssh 公钥认证是 ssh 认证的方式之一。通过公钥认证可实现 ssh 免密码登陆，git 的ssh 方式也
-是通过公钥进行认证的。在用户目录的 home 目录下，有一个.ssh 的目录，和当前用户 ssh 配
-置认证相关的文件，几乎都在这个目录下。
+** 生成公钥和私钥
+   ssh-keygen 可用来生成 ssh 公钥认证所需的公钥和私钥文件。
+   #+BEGIN_SRC sh
+     ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+   #+END_SRC
 
-ssh-keygen 可用来生成 ssh 公钥认证所需的公钥和私钥文件。
+   使用 ssh-kengen 会在 =~/.ssh/= 目录下生成两个文件，不指定文件名和密钥类型的时
+   候，默认生成的两个文件是：
+   - id_rsa
+   - id_rsa.pub
 
-#+BEGIN_SRC sh
-  ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-#+END_SRC
 
-使用 ssh-kengen 会在 *~/.ssh/* 目录下生成两个文件，不指定文件名和密钥类型的时候，
-默认生成的两个文件是：
+   第一个是私钥文件，第二个是公钥文件。
 
-- id_rsa
-- id_rsa.pub
-
-第一个是私钥文件，第二个是公钥文件。
-
-[[file:../static/image/2018/10/sshkey-gen.gif]]
+   [[file:../static/image/2018/10/sshkey-gen.gif]]
 
 ** 复制 ssh 公钥到 Github 上
+   使用 ~pbcopy~ 将公钥复制到剪切板中，然后点击后面连接 ([[https://github.com/settings/ssh/new][github-ssh-new]]) 就可以
+   将公钥添加到 GitHub 上。
 
-使用 ~pbcopy~ 将公钥复制到剪切板中，然后点击后面连接 ([[https://github.com/settings/ssh/new][github-ssh-new]]) 就可以将公
-钥添加到 GitHub 上。
-
-#+BEGIN_SRC sh
-  pbcopy < ~/.ssh/id_rsa.pub
-#+END_SRC
+   #+BEGIN_SRC sh
+     pbcopy < ~/.ssh/id_rsa.pub
+   #+END_SRC
 
 ** 复制 ssh 公钥到远程机器上
+   直接可以通过 ~ssh-copy-id~ 工具将公钥拷贝到远程服务器上，命令如下：
 
-直接可以通过 ~ssh-copy-id~ 工具将公钥拷贝到远程服务器上，命令如下：
-
-#+BEGIN_SRC sh
-  ssh-copy-id -i ~/.ssh/id_rsa.pub username@hostname
-#+END_SRC
+   #+BEGIN_SRC sh
+     ssh-copy-id -i ~/.ssh/id_rsa.pub username@hostname
+   #+END_SRC
