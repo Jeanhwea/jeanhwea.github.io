@@ -230,6 +230,21 @@
      {"name":"ubuntu","tags":["18.04","latest"]}
    #+END_SRC
 
+** 查询仓库中所有的镜像和 tag
+   #+BEGIN_SRC sh
+     _reg=http://localhost:5000; curl -XGET $_reg/v2/_catalog | jq '.repositories[]' | xargs -I repo curl -XGET $_reg/v2/repo/tags/list
+   #+END_SRC
+   #+BEGIN_SRC text
+     {"name":"cassandra","tags":["3.11.2"]}
+     {"name":"elasticsearch","tags":["6.4.3"]}
+     {"name":"gitlab/gitlab-ce","tags":["20181128"]}
+     {"name":"mysql","tags":["5.7","5.7.26","8.0","8.0.16"]}
+     {"name":"openjdk","tags":["8"]}
+     {"name":"rabbitmq","tags":["3.7"]}
+     {"name":"redis","tags":["4.0.6"]}
+     {"name":"ubuntu","tags":["18.04"]}
+   #+END_SRC
+
 * 编写 Dockerfile
   Dockerfile 是配置 Docker 容器的配置文件，最佳实践参考[[https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/][这里]] 。
 
