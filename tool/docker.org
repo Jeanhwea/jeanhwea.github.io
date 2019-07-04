@@ -156,7 +156,7 @@
      docker export containername | gzip > filename.tar.gz
    #+END_SRC
 
-   值得一提的是： ~load~ 在新建图像时会带人相关的历史信息，tag 等，而 ~import~
+   值得一提的是： ~load~ 在新建图像时会带着相关的历史信息，tag 等，而 ~import~
    只会创建一个图像，所以 ~import~ 的图像的大小会小一点。
 
 * Registry 和 Repository
@@ -196,6 +196,7 @@
    #+END_SRC
 
    Mac 操作系统也可以直接通过界面设置，如下图所示：
+
    [[file:../static/image/2019/07/docker-daemon-config.png]]
 
    #+BEGIN_SRC sh
@@ -232,33 +233,33 @@
 * 编写 Dockerfile
   Dockerfile 是配置 Docker 容器的配置文件，最佳实践参考[[https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/][这里]] 。
 
-** dockerfile 的指令
+** Dockerfile 的指令
    常见的指令如下表:
-   | instruction | 描述                                                          |
+   | Instruction | 描述                                                          |
    |-------------+---------------------------------------------------------------|
-   | from        | 设置基的图像                                                  |
-   | run         | 在新的层数执行一条命令，并且提交结果                          |
-   | cmd         | 提供默认执行的容器                                            |
-   | expose      | 暴露容器的监听端口， *这条指令只是提供端口，并不会直接暴露*   |
-   | env         | 设置环境变量                                                  |
-   | add         | 从容器外复制文件和目录到容器里面，避免使用 add，尽量使用 copy |
-   | copy        | 使用 root 权限来复制文件                                      |
-   | entrypoint  | 配置容器是入口可执行文件                                      |
-   | volume      | 配置一个可挂载的点                                            |
-   | user        | 设置 run/cmd/entrypoint 的执行用户                            |
-   | workdir     | 设置工作目录                                                  |
-   | arg         | 设置 build 的命令行参数                                       |
-   | onbuild     | 添加一个当容器作为别的基容器是的触发命令                      |
-   | stopsignal  | 设置系统退出的信号                                            |
-   | label       | 添加 key/value 属性，如：images, container, daemon            |
+   | FROM        | 设置基的图像                                                  |
+   | RUN         | 在新的层数执行一条命令，并且提交结果                          |
+   | CMD         | 提供默认执行的容器                                            |
+   | EXPOSE      | 暴露容器的监听端口， *这条指令只是提供端口，并不会直接暴露*   |
+   | ENV         | 设置环境变量                                                  |
+   | ADD         | 从容器外复制文件和目录到容器里面，避免使用 ADD，尽量使用 COPY |
+   | COPY        | 使用 root 权限来复制文件                                      |
+   | ENTRYPOINT  | 配置容器是入口可执行文件                                      |
+   | VOLUME      | 配置一个可挂载的点                                            |
+   | USER        | 设置 RUN/CMD/ENTRYPOINT 的执行用户                            |
+   | WORKDIR     | 设置工作目录                                                  |
+   | ARG         | 设置 build 的命令行参数                                       |
+   | ONBUILD     | 添加一个当容器作为别的基容器是的触发命令                      |
+   | STOPSIGNAL  | 设置系统退出的信号                                            |
+   | LABEL       | 添加 key/value 属性，如：images, container, daemon            |
 
 ** 通过 docker build 创建图像
-   #+begin_src dockerfile
-     from openjdk:8
-     maintainer jinghui hu
-     label app="microservice" version="0.0.1" by="jinghui hu"
-     copy target/microservice-0.0.1.jar microservice.jar
-     CMD ["java" "-jar" "microservice.jar"]
+   #+BEGIN_SRC dockerfile
+     FROM openjdk:8
+     LABEL appname="skree" version="0.0.1" author="Jinghui Hu"
+     COPY target/skree-0.0.1.jar skree.jar
+     EXPOSE 9001
+     CMD java -jar skree.jar
    #+END_SRC
 
    #+BEGIN_SRC text
