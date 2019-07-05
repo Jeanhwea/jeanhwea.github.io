@@ -144,6 +144,188 @@
      DROP DATABASE [IF EXISTS] <dbname>;
    #+END_SRC
 
+** 字符编码和校对集
+   数据编码与客户端编码不需一致
+   #+BEGIN_SRC sql
+     -- 查看所有字符集编码项
+     SHOW VARIABLES LIKE 'character_set_%';
+     -- character_set_client        客户端向服务器发送数据时使用的编码
+     -- character_set_results       服务器端将结果返回给客户端所使用的编码
+     -- character_set_connection    连接层编码
+
+     -- 设置变量值
+     SET variable_name = value;
+
+     SET character_set_client = utf8;
+     SET character_set_results = utf8;
+     SET character_set_connection = utf8;
+     SET NAMES utf8; -- 相当于上述三个设置
+
+     -- 校对集, 校对集用以排序
+     -- 查看所有字符集
+     SHOW CHARACTER SET [LIKE 'pattern']/SHOW CHARSET [LIKE 'pattern'];
+     -- 查看所有校对集
+     SHOW COLLATION [LIKE 'pattern'];
+     -- 设置字符集编码
+     CHARSET charset_name;
+     -- 设置校对集编码
+     COLLATE collate_name;
+   #+END_SRC
+
+   Mac 下 client 编码不一致导致插入数据出现问题的解决案例
+   #+BEGIN_SRC text
+     mysql> insert cust (name) values('函数');
+     ERROR 1366 (HY000): Incorrect string value: '\xE5\x87\xBD\xE6\x95\xB0' for column 'name' at row 1
+     mysql> status
+     --------------
+     mysql  Ver 14.14 Distrib 5.7.23, for osx10.12 (x86_64) using  EditLine wrapper
+
+     Connection id:		2
+     Current database:	sellsys
+     Current user:		root@172.17.0.1
+     SSL:			Cipher in use is DHE-RSA-AES256-SHA
+     Current pager:		less
+     Using outfile:		''
+     Using delimiter:	;
+     Server version:		5.7.26 MySQL Community Server (GPL)
+     Protocol version:	10
+     Connection:		127.0.0.1 via TCP/IP
+     Server characterset:	latin1
+     Db     characterset:	latin1
+     Client characterset:	utf8
+     Conn.  characterset:	utf8
+     TCP port:		3306
+     Uptime:			18 min 40 sec
+
+     Threads: 2  Questions: 82  Slow queries: 0  Opens: 139  Flush tables: 1  Open tables: 130  Queries per second avg: 0.073
+     --------------
+
+     mysql> SHOW VARIABLES LIKE 'character_set_%';
+     +--------------------------+----------------------------+
+     | Variable_name            | Value                      |
+     +--------------------------+----------------------------+
+     | character_set_client     | utf8                       |
+     | character_set_connection | utf8                       |
+     | character_set_database   | latin1                     |
+     | character_set_filesystem | binary                     |
+     | character_set_results    | utf8                       |
+     | character_set_server     | latin1                     |
+     | character_set_system     | utf8                       |
+     | character_sets_dir       | /usr/share/mysql/charsets/ |
+     +--------------------------+----------------------------+
+     8 rows in set (0.01 sec)
+
+     mysql> set character_set_database = utf8;
+     Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+     mysql> set character_set_server = utf8;
+     Query OK, 0 rows affected (0.00 sec)
+
+     mysql> SHOW VARIABLES LIKE 'character_set_%';
+     +--------------------------+----------------------------+
+     | Variable_name            | Value                      |
+     +--------------------------+----------------------------+
+     | character_set_client     | utf8                       |
+     | character_set_connection | utf8                       |
+     | character_set_database   | utf8                       |
+     | character_set_filesystem | binary                     |
+     | character_set_results    | utf8                       |
+     | character_set_server     | utf8                       |
+     | character_set_system     | utf8                       |
+     | character_sets_dir       | /usr/share/mysql/charsets/ |
+     +--------------------------+----------------------------+
+     8 rows in set (0.01 sec)
+
+     mysql> status
+     --------------
+     mysql  Ver 14.14 Distrib 5.7.23, for osx10.12 (x86_64) using  EditLine wrapper
+
+     Connection id:		2
+     Current database:	sellsys
+     Current user:		root@172.17.0.1
+     SSL:			Cipher in use is DHE-RSA-AES256-SHA
+     Current pager:		less
+     Using outfile:		''
+     Using delimiter:	;
+     Server version:		5.7.26 MySQL Community Server (GPL)
+     Protocol version:	10
+     Connection:		127.0.0.1 via TCP/IP
+     Server characterset:	utf8
+     Db     characterset:	utf8
+     Client characterset:	utf8
+     Conn.  characterset:	utf8
+     TCP port:		3306
+     Uptime:			20 min 50 sec
+
+     Threads: 2  Questions: 91  Slow queries: 0  Opens: 140  Flush tables: 1  Open tables: 131  Queries per second avg: 0.072
+     --------------
+
+     mysql> drop database sellsys;
+     Query OK, 1 row affected (0.02 sec)
+
+     mysql> create database aa;
+     Query OK, 1 row affected (0.00 sec)
+
+     mysql> show create database aa;
+     +----------+-------------------------------------------------------------+
+     | Database | Create Database                                             |
+     +----------+-------------------------------------------------------------+
+     | aa       | CREATE DATABASE `aa` /*!40100 DEFAULT CHARACTER SET utf8 */ |
+     +----------+-------------------------------------------------------------+
+     1 row in set (0.00 sec)
+
+     mysql> status
+     --------------
+     mysql  Ver 14.14 Distrib 5.7.23, for osx10.12 (x86_64) using  EditLine wrapper
+
+     Connection id:		2
+     Current database:
+     Current user:		root@172.17.0.1
+     SSL:			Cipher in use is DHE-RSA-AES256-SHA
+     Current pager:		less
+     Using outfile:		''
+     Using delimiter:	;
+     Server version:		5.7.26 MySQL Community Server (GPL)
+     Protocol version:	10
+     Connection:		127.0.0.1 via TCP/IP
+     Server characterset:	utf8
+     Db     characterset:	utf8
+     Client characterset:	utf8
+     Conn.  characterset:	utf8
+     TCP port:		3306
+     Uptime:			22 min 9 sec
+
+     Threads: 2  Questions: 99  Slow queries: 0  Opens: 140  Flush tables: 1  Open tables: 130  Queries per second avg: 0.074
+     --------------
+
+     mysql> use aa;
+     Database changed
+     mysql> create table cust(id int primary key auto_increment, name varchar(32));
+     Query OK, 0 rows affected (0.03 sec)
+
+     mysql> show create table cust\G
+     *************************** 1. row ***************************
+            Table: cust
+     Create Table: CREATE TABLE `cust` (
+       `id` int(11) NOT NULL AUTO_INCREMENT,
+       `name` varchar(32) DEFAULT NULL,
+       PRIMARY KEY (`id`)
+     ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8
+     1 row in set (0.00 sec)
+
+     mysql> insert cust (name) values('函数');
+     Query OK, 1 row affected (0.01 sec)
+
+     mysql> select * from cust;
+     +----+--------+
+     | id | name   |
+     +----+--------+
+     |  1 | 函数   |
+     +----+--------+
+     1 row in set (0.01 sec)
+
+     mysql>
+   #+END_SRC
 * 表操作
 ** 创建表
    - ~TEMPORARY~ : 临时表，会话结束时表自动消失
@@ -158,7 +340,7 @@
      + ~SHOW ENGINES~ :显示存储引擎的状态信息
      + ~SHOW ENGINE engine_name {LOGS|STATUS}~ :显示存储引擎的日志或状态信息
    - 数据文件目录 ~DATA DIRECTORY = 'folder'~
-   - 索引文件目录 ~INDEX DIRECTORY = 'folder'~ :
+   - 索引文件目录 ~INDEX DIRECTORY = 'folder'~
    - 表注释 ~COMMENT = 'string'~
    #+BEGIN_SRC sql
      CREATE [TEMPORARY] TABLE[ IF NOT EXISTS] [dbname.]tabname (
