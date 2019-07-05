@@ -1,0 +1,1353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2019-07-05 Fri 23:12 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MySQL 关系数据库</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">MySQL 关系数据库</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgaedae06">1. 简介</a>
+<ul>
+<li><a href="#org3cae0a1">1.1. 安装 MySQL</a>
+<ul>
+<li><a href="#org1305d2f">1.1.1. Mac</a></li>
+<li><a href="#org33869e8">1.1.2. Windows</a></li>
+<li><a href="#org585ea1b">1.1.3. Unix</a></li>
+</ul>
+</li>
+<li><a href="#org0d9ad80">1.2. 参考手册</a></li>
+</ul>
+</li>
+<li><a href="#org00b7d1d">2. 数据库操作</a>
+<ul>
+<li><a href="#org5d9ed9c">2.1. 查看数据库基本信息</a></li>
+<li><a href="#org6eeb803">2.2. 查看数据库中所有的表</a></li>
+<li><a href="#org51f0305">2.3. 创建/删除数据库</a></li>
+</ul>
+</li>
+<li><a href="#org1bc0a92">3. 表操作</a>
+<ul>
+<li><a href="#orgfc4687f">3.1. 创建表</a>
+<ul>
+<li><a href="#org5c4aeab">3.1.1. 数据类型</a></li>
+<li><a href="#org9d6078b">3.1.2. 列约束</a></li>
+</ul>
+</li>
+<li><a href="#orgc956552">3.2. 查看表结构</a></li>
+<li><a href="#org28abb1b">3.3. 修改表结构</a></li>
+<li><a href="#org1f5c698">3.4. 删除/清空表</a></li>
+<li><a href="#org4420379">3.5. 复制表</a></li>
+<li><a href="#orgf117e31">3.6. 优化表</a></li>
+</ul>
+</li>
+<li><a href="#org1c86e57">4. 数据操作：增删改查</a>
+<ul>
+<li><a href="#org0bd1a9b">4.1. 插入数据</a></li>
+<li><a href="#org00dc92c">4.2. 删除数据</a></li>
+<li><a href="#org2a471fb">4.3. 更新数据</a></li>
+<li><a href="#org227d1ac">4.4. 查询数据</a></li>
+</ul>
+</li>
+<li><a href="#orga6e8346">5. mysqldump 备份/还原库</a>
+<ul>
+<li><a href="#org2044772">5.1. 导出数据</a></li>
+<li><a href="#orgf1bdcb0">5.2. 导入数据</a></li>
+</ul>
+</li>
+<li><a href="#org234dc14">6. 内置函数</a>
+<ul>
+<li><a href="#orgdb58e92">6.1. 数值函数</a></li>
+<li><a href="#orgab7753e">6.2. 时间日期函数</a></li>
+<li><a href="#orgbe56f2b">6.3. 字符串函数</a></li>
+<li><a href="#org253499e">6.4. 流程函数</a></li>
+<li><a href="#org5c893ae">6.5. 聚合函数</a></li>
+<li><a href="#org85f2aef">6.6. 其他常用函数</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orgaedae06" class="outline-2">
+<h2 id="orgaedae06"><span class="section-number-2">1</span> 简介</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+<a href="http://www.mysql.com">MySQL</a> 是一个关系型数据库管理系统，由瑞典 MySQL AB 公司开发，目前属于 Oracle 旗
+下产品。MySQL 是最流行的关系型数据库管理系统之一，在 WEB 应用方面，MySQL 是最好
+的 RDBMS (Relational Database Management System，关系数据库管理系统) 应用软件
+之一。
+</p>
+</div>
+
+<div id="outline-container-org3cae0a1" class="outline-3">
+<h3 id="org3cae0a1"><span class="section-number-3">1.1</span> 安装 MySQL</h3>
+<div class="outline-text-3" id="text-1-1">
+</div>
+<div id="outline-container-org1305d2f" class="outline-4">
+<h4 id="org1305d2f"><span class="section-number-4">1.1.1</span> Mac</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+Mac 上当然是使用 Homebrew 安装最省心了，
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">brew install mysql@5.7
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21021;&#22987;&#21270;&#25968;&#25454;&#24211;</span>
+sudo mysql_secure_installation
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#28155;&#21152;&#21040; homebrew &#30340;&#26381;&#21153;</span>
+brew services start mysql@5.7
+</pre>
+</div>
+
+<p>
+使用命令行登录方法：
+</p>
+<div class="org-src-container">
+<pre class="src src-text">% mysql -uroot -p
+Enter password:
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 902
+Server version: 5.7.25 Homebrew
+
+Copyright (c) 2000, 2019, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql&gt;
+</pre>
+</div>
+<div class="org-src-container">
+<pre class="src src-sh">mysql -h &lt;host&gt; -u &lt;user&gt; -p &lt;password&gt; &lt;database&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org33869e8" class="outline-4">
+<h4 id="org33869e8"><span class="section-number-4">1.1.2</span> Windows</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<p>
+提前下载 MySQL 社区版（ <a href="https://dev.mysql.com/downloads/mysql/">最新版</a>，<a href="https://dev.mysql.com/downloads/mysql/5.7.html#downloads">5.7</a>）的安装文件，直接根据提示安装。
+</p>
+</div>
+</div>
+<div id="outline-container-org585ea1b" class="outline-4">
+<h4 id="org585ea1b"><span class="section-number-4">1.1.3</span> Unix</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<p>
+Mysql 依赖 libaio 库，在安装 mysql 的机器时需要提前安装 libaio 库。
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">apt-get install libaio1
+apt-get install mysql-client mysql-server
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0d9ad80" class="outline-3">
+<h3 id="org0d9ad80"><span class="section-number-3">1.2</span> 参考手册</h3>
+<div class="outline-text-3" id="text-1-2">
+<ol class="org-ol">
+<li><a href="https://dev.mysql.com/doc/">MySQL 文档</a></li>
+<li><a href="https://hub.docker.com/_/mysql">MySQL on Docker Hub</a></li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org00b7d1d" class="outline-2">
+<h2 id="org00b7d1d"><span class="section-number-2">2</span> 数据库操作</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org5d9ed9c" class="outline-3">
+<h3 id="org5d9ed9c"><span class="section-number-3">2.1</span> 查看数据库基本信息</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-sql">mysql&gt; <span style="color: #859900;">SELECT</span> <span style="color: #859900;">database</span>();
++<span style="color: #586e75; font-style: italic;">------------+</span>
+| <span style="color: #859900;">database</span>() |
++<span style="color: #586e75; font-style: italic;">------------+</span>
+| sellsys    |
++<span style="color: #586e75; font-style: italic;">------------+</span>
+1 <span style="color: #268bd2;">row</span> <span style="color: #859900;">in</span> <span style="color: #859900;">set</span> (0.01 sec)
+
+mysql&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">now</span>();
++<span style="color: #586e75; font-style: italic;">---------------------+</span>
+| <span style="color: #6c71c4;">now</span>()               |
++<span style="color: #586e75; font-style: italic;">---------------------+</span>
+| 2019-07-05 20:26:38 |
++<span style="color: #586e75; font-style: italic;">---------------------+</span>
+1 <span style="color: #268bd2;">row</span> <span style="color: #859900;">in</span> <span style="color: #859900;">set</span> (0.00 sec)
+
+mysql&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">user</span>();
++<span style="color: #586e75; font-style: italic;">-----------------------+</span>
+| <span style="color: #6c71c4;">user</span>()                |
++<span style="color: #586e75; font-style: italic;">-----------------------+</span>
+| selladmin@192.168.1.5 |
++<span style="color: #586e75; font-style: italic;">-----------------------+</span>
+1 <span style="color: #268bd2;">row</span> <span style="color: #859900;">in</span> <span style="color: #859900;">set</span> (0.01 sec)
+
+mysql&gt; <span style="color: #859900;">SELECT</span> version();
++<span style="color: #586e75; font-style: italic;">-----------+</span>
+| version() |
++<span style="color: #586e75; font-style: italic;">-----------+</span>
+| 5.7.25    |
++<span style="color: #586e75; font-style: italic;">-----------+</span>
+1 <span style="color: #268bd2;">row</span> <span style="color: #859900;">in</span> <span style="color: #859900;">set</span> (0.00 sec)
+
+mysql&gt; <span style="color: #859900;">SHOW</span> PROCESSLIST; <span style="color: #586e75; font-style: italic;">-- &#26597;&#30475;&#21738;&#20123;&#32447;&#31243;&#27491;&#22312;&#36816;&#34892;</span>
++<span style="color: #586e75; font-style: italic;">-----+-----------+-------------------+---------+---------+------+----------+------------------+</span>
+| Id  | <span style="color: #6c71c4;">User</span>      | <span style="color: #859900;">Host</span>              | db      | Command | <span style="color: #268bd2;">Time</span> | <span style="color: #859900;">State</span>    | Info             |
++<span style="color: #586e75; font-style: italic;">-----+-----------+-------------------+---------+---------+------+----------+------------------+</span>
+| 900 | selladmin | 192.168.1.5:52231 | sellsys | Query   |    0 | <span style="color: #859900;">starting</span> | <span style="color: #859900;">SHOW</span> PROCESSLIST |
++<span style="color: #586e75; font-style: italic;">-----+-----------+-------------------+---------+---------+------+----------+------------------+</span>
+1 <span style="color: #268bd2;">row</span> <span style="color: #859900;">in</span> <span style="color: #859900;">set</span> (0.00 sec)
+
+mysql&gt; <span style="color: #859900;">SHOW</span> DATABASES;
++<span style="color: #586e75; font-style: italic;">--------------------+</span>
+| <span style="color: #859900;">Database</span>           |
++<span style="color: #586e75; font-style: italic;">--------------------+</span>
+| information_schema |
+| sellsys            |
++<span style="color: #586e75; font-style: italic;">--------------------+</span>
+2 <span style="color: #859900;">rows</span> <span style="color: #859900;">in</span> <span style="color: #859900;">set</span> (0.01 sec)
+
+mysql&gt; <span style="color: #859900;">SHOW</span> <span style="color: #859900;">CREATE</span> <span style="color: #859900;">DATABASE</span> sellsys;
++<span style="color: #586e75; font-style: italic;">----------+---------------------------------------------------------------------+</span>
+| <span style="color: #859900;">Database</span> | <span style="color: #859900;">Create</span> <span style="color: #859900;">Database</span>                                                     |
++<span style="color: #586e75; font-style: italic;">----------+---------------------------------------------------------------------+</span>
+| sellsys  | <span style="color: #859900;">CREATE</span> <span style="color: #859900;">DATABASE</span> `sellsys` <span style="color: #586e75; font-style: italic;">/*</span><span style="color: #586e75; font-style: italic;">!40100 DEFAULT CHARACTER SET utf8mb4 */</span> |
++<span style="color: #586e75; font-style: italic;">----------+---------------------------------------------------------------------+</span>
+1 <span style="color: #268bd2;">row</span> <span style="color: #859900;">in</span> <span style="color: #859900;">set</span> (0.00 sec)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6eeb803" class="outline-3">
+<h3 id="org6eeb803"><span class="section-number-3">2.2</span> 查看数据库中所有的表</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-sql">mysql&gt; <span style="color: #859900;">SHOW</span> <span style="color: #859900;">TABLES</span>;
++<span style="color: #586e75; font-style: italic;">-------------------+</span>
+| Tables_in_sellsys |
++<span style="color: #586e75; font-style: italic;">-------------------+</span>
+| customers         |
+| order_items       |
+| orders            |
+| product_notes     |
+| products          |
+| vendors           |
++<span style="color: #586e75; font-style: italic;">-------------------+</span>
+6 <span style="color: #859900;">rows</span> <span style="color: #859900;">in</span> <span style="color: #859900;">set</span> (0.02 sec)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org51f0305" class="outline-3">
+<h3 id="org51f0305"><span class="section-number-3">2.3</span> 创建/删除数据库</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+为了节约存储空间，MySQL 的编码中 utf8 是三个字节的编码，utf8mb4 才是真正的四
+字节。如果设置数据库编码为 utf8 会导致 emoji 无法存入数据库，所以最好默认设置
+utf8mb4 编码。
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">CREATE</span> <span style="color: #859900;">DATABASE</span> [<span style="color: #859900;">IF</span> <span style="color: #859900;">NOT</span> <span style="color: #859900;">EXISTS</span>] dbname
+  <span style="color: #859900;">DEFAULT</span> <span style="color: #859900;">CHARACTER</span> <span style="color: #859900;">SET</span> utf8mb4;
+
+<span style="color: #859900;">DROP</span> <span style="color: #859900;">DATABASE</span> [<span style="color: #859900;">IF</span> <span style="color: #859900;">EXISTS</span>] &lt;dbname&gt;;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1bc0a92" class="outline-2">
+<h2 id="org1bc0a92"><span class="section-number-2">3</span> 表操作</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgfc4687f" class="outline-3">
+<h3 id="orgfc4687f"><span class="section-number-3">3.1</span> 创建表</h3>
+<div class="outline-text-3" id="text-3-1">
+<ul class="org-ul">
+<li><code>TEMPORARY</code> : 临时表，会话结束时表自动消失</li>
+<li>列定义：每个字段必须有数据类型，最后一个字段后不能有逗号</li>
+<li>字符集: <code>CHARSET=charset_name</code> 如果表没有设定，则使用数据库字符集</li>
+<li>存储引擎: <code>ENGINE=engine_name</code> 表在管理数据时采用的不同的数据结构，结构不同
+会导致处理方式、提供的特性操作等不同常见的引擎：InnoDB MyISAM Memory/Heap
+BDB Merge Example CSV MaxDB Archive 不同的引擎在保存表的结构和数据时采用不同
+的方式
+<ul class="org-ul">
+<li>MyISAM 表文件含义：.frm 表定义，.MYD 表数据，.MYI 表索引</li>
+<li>InnoDB 表文件含义：.frm 表定义，表空间数据和日志文件</li>
+<li><code>SHOW ENGINES</code> :显示存储引擎的状态信息</li>
+<li><code>SHOW ENGINE engine_name {LOGS|STATUS}</code> :显示存储引擎的日志或状态信息</li>
+</ul></li>
+<li>数据文件目录 <code>DATA DIRECTORY = 'folder'</code></li>
+<li>索引文件目录 <code>INDEX DIRECTORY = 'folder'</code> :</li>
+<li>表注释 <code>COMMENT = 'string'</code></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">CREATE</span> [<span style="color: #859900;">TEMPORARY</span>] <span style="color: #859900;">TABLE</span>[ <span style="color: #859900;">IF</span> <span style="color: #859900;">NOT</span> <span style="color: #859900;">EXISTS</span>] [dbname.]tabname (
+  <span style="color: #586e75; font-style: italic;">-- columns defines</span>
+  colname dbtype [<span style="color: #859900;">NOT</span> <span style="color: #859900;">NULL</span> | <span style="color: #859900;">NULL</span>] [<span style="color: #859900;">DEFAULT</span> DEFAULT_VALUE] [<span style="color: #859900;">AUTO_INCREMENT</span>] [<span style="color: #859900;">UNIQUE</span> [<span style="color: #859900;">KEY</span>] | [<span style="color: #859900;">PRIMARY</span>] <span style="color: #859900;">KEY</span>] [<span style="color: #859900;">COMMENT</span> <span style="color: #2aa198;">'STRING'</span>]
+) [others];
+
+<span style="color: #586e75; font-style: italic;">-- example</span>
+<span style="color: #859900;">CREATE</span> <span style="color: #859900;">TABLE</span> `customers` (
+  `cust_id` <span style="color: #268bd2;">int</span>(11) <span style="color: #859900;">NOT</span> <span style="color: #859900;">NULL</span> <span style="color: #859900;">AUTO_INCREMENT</span>,
+  `cust_name` <span style="color: #268bd2;">char</span>(50) <span style="color: #859900;">NOT</span> <span style="color: #859900;">NULL</span>,
+  `cust_address` <span style="color: #268bd2;">char</span>(50) <span style="color: #859900;">DEFAULT</span> <span style="color: #859900;">NULL</span>,
+  `cust_city` <span style="color: #268bd2;">char</span>(50) <span style="color: #859900;">DEFAULT</span> <span style="color: #859900;">NULL</span>,
+  `cust_state` <span style="color: #268bd2;">char</span>(5) <span style="color: #859900;">DEFAULT</span> <span style="color: #859900;">NULL</span>,
+  `cust_zip` <span style="color: #268bd2;">char</span>(10) <span style="color: #859900;">DEFAULT</span> <span style="color: #859900;">NULL</span>,
+  `cust_country` <span style="color: #268bd2;">char</span>(50) <span style="color: #859900;">DEFAULT</span> <span style="color: #859900;">NULL</span>,
+  `cust_contact` <span style="color: #268bd2;">char</span>(50) <span style="color: #859900;">DEFAULT</span> <span style="color: #859900;">NULL</span>,
+  `cust_email` <span style="color: #268bd2;">char</span>(255) <span style="color: #859900;">DEFAULT</span> <span style="color: #859900;">NULL</span>,
+  <span style="color: #859900;">PRIMARY</span> <span style="color: #859900;">KEY</span> (`cust_id`)
+) ENGINE=InnoDB <span style="color: #859900;">DEFAULT</span> CHARSET=utf8mb4;
+</pre>
+</div>
+</div>
+<div id="outline-container-org5c4aeab" class="outline-4">
+<h4 id="org5c4aeab"><span class="section-number-4">3.1.1</span> 数据类型</h4>
+<div class="outline-text-4" id="text-3-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="org434f49e"></a>整型<br />
+<div class="outline-text-5" id="text-3-1-1-1">
+<ul class="org-ul">
+<li><code>int(M)</code> : M 表示总位数</li>
+<li>默认存在符号位, 使用 <code>unsigned</code> 来显示指定成无符号存储</li>
+<li>显示宽度，如果某个数不够定义字段时设置的位数，则前面以 0 补填, <code>zerofill</code>
+属性修改 例：~int(5)~ 插入一个数 '123' , 补填后为 '00123'</li>
+<li>在满足要求的情况下，越小越好。</li>
+<li>1 表示真，0 表示假。MySQL 没有布尔类型，通过整型 0 和 1 表示。常用
+<code>tinyint(1)</code> 表示布尔型。</li>
+</ul>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">类型</th>
+<th scope="col" class="org-left">字节</th>
+<th scope="col" class="org-left">范围（有符号位）</th>
+<th scope="col" class="org-left">无符号位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">tinyint</td>
+<td class="org-left">1 字节</td>
+<td class="org-left">-128 ~ 127</td>
+<td class="org-left">0 ~ 255</td>
+</tr>
+
+<tr>
+<td class="org-left">smallint</td>
+<td class="org-left">2 字节</td>
+<td class="org-left">-32768 ~ 32767</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">mediumint</td>
+<td class="org-left">3 字节</td>
+<td class="org-left">-8388608 ~ 8388607</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">int</td>
+<td class="org-left">4 字节</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">bigint</td>
+<td class="org-left">8 字节</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+
+<li><a id="orgedb9cc3"></a>浮点型<br />
+<div class="outline-text-5" id="text-3-1-1-2">
+<ul class="org-ul">
+<li>浮点型既支持符号位 <code>unsigned</code> 属性，也支持显示宽度 <code>zerofill</code> 属性。不同
+于整型，前后均会补填 0. 定义浮点型时，需指定总位数和小数位数。</li>
+<li><code>float(M, D)</code> <code>double(M, D)</code> : M 表示总位数，D 表示小数位数。 M 和 D 的大
+小 会决定浮点数的范围。不同于整型的固定范围。M 既表示总位数（不包括小数点
+和正 负号），也表示显示宽度（所有显示符号均包括）。支持科学计数法表示。浮
+点数表 示近似值。</li>
+</ul>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">类型</th>
+<th scope="col" class="org-left">字节</th>
+<th scope="col" class="org-left">范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">float</td>
+<td class="org-left">4 字节</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">double</td>
+<td class="org-left">8 字节</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+
+<li><a id="org6b5108b"></a>定点型<br />
+<div class="outline-text-5" id="text-3-1-1-3">
+<ul class="org-ul">
+<li>decimal 可变长度。 <code>decimal(M, D)</code> M 也表示总位数，D表示小数位数。保存一
+个精确的数值，不会发生数据的改变，不同于浮点数的四舍五入。将浮点数转换为
+字符串来保存，每 9 位数字保存为 4 个字节。</li>
+</ul>
+</div>
+</li>
+
+<li><a id="orgb2653ca"></a>字符串<br />
+<div class="outline-text-5" id="text-3-1-1-4">
+<ul class="org-ul">
+<li>char 定长字符串，速度快，但浪费空间</li>
+<li>varchar 变长字符串，速度慢，但节省空间 M 表示能存储的最大长度，此长度是字
+符数，非字节数。 不同的编码，所占用的空间不同。char 最多 255 个字符，与编
+码无关。varchar 最多 65535 字符，与编码有关。 一条有效记录最大不能超过
+65535 个字节。utf8 最大 为 21844 个字符，gbk 最大为 32766 个字符，latin1
+最大为 65532 个字符 varchar 是变长的，需要利用存储空间保存 varchar 的长度，
+如果数据小于 255 个 字节，则采用一个字节来保存长度，反之需要两个字节来保
+存。varchar 的最大有效 长度由最大行大小和使用的字符集确定。最大有效长度是
+65532 字节，因为在 varchar 存字符串时，第一个字节是空的，不存在任何数据，
+然后还需两个字节来存 放字符串的长度，所以有效长度是 64432-1-2=65532 字节。
+例：若一个表定义为
+<code>CREATE TABLE tb(c1 int, c2 char(30), c3 varchar(N)) charset=utf8;</code>
+问 N 的最 大值是多少？ 答：(65535-1-2-4-30*3)/3</li>
+<li>blob 二进制字符串（字节字符串）tinyblob, blob, mediumblob, longblob</li>
+<li>text 非二进制字符串（字符字符串）tinytext, text, mediumtext, longtext
+text 在定义时，不需要定义长度，也不会计算总长度。text 类型在定义时，不可
+给 default 值</li>
+<li>binary, varbinary 类似于 char 和 varchar，用于保存二进制字符串，也就是保
+存字节字符串而非字符字符串。char, varchar, text 对应 binary, varbinary,
+blob.</li>
+</ul>
+</div>
+</li>
+
+<li><a id="org74d4661"></a>日期/时间型<br />
+<div class="outline-text-5" id="text-3-1-1-5">
+<p>
+时间或日期类型数据库中直接存储时间戳格式。
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">类型</th>
+<th scope="col" class="org-left">字节</th>
+<th scope="col" class="org-left">描述</th>
+<th scope="col" class="org-left">范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">datetime</td>
+<td class="org-left">8 字节</td>
+<td class="org-left">日期及时间</td>
+<td class="org-left">1000-01-01 00:00:00 到 9999-12-31 23:59:59</td>
+</tr>
+
+<tr>
+<td class="org-left">date</td>
+<td class="org-left">3 字节</td>
+<td class="org-left">日期</td>
+<td class="org-left">1000-01-01 到 9999-12-31</td>
+</tr>
+
+<tr>
+<td class="org-left">timestamp</td>
+<td class="org-left">4 字节</td>
+<td class="org-left">时间戳</td>
+<td class="org-left">19700101000000 到 2038-01-19 03:14:07</td>
+</tr>
+
+<tr>
+<td class="org-left">time</td>
+<td class="org-left">3 字节</td>
+<td class="org-left">时间</td>
+<td class="org-left">-838:59:59 到 838:59:59</td>
+</tr>
+
+<tr>
+<td class="org-left">year</td>
+<td class="org-left">1 字节</td>
+<td class="org-left">年份</td>
+<td class="org-left">1901 - 2155</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+设置时间格式可以使用下面举例：
+</p>
+<ul class="org-ul">
+<li>datetime 'YYYY-MM-DD hh:mm:ss'</li>
+<li>timestamp 'YY-MM-DD hh:mm:ss' 'YYYYMMDDhhmmss' 'YYMMDDhhmmss'
+YYYYMMDDhhmmss YYMMDDhhmmss</li>
+<li>date 'YYYY-MM-DD' 'YY-MM-DD' 'YYYYMMDD' 'YYMMDD' 'YYYYMMDD' 'YYMMDD'</li>
+<li>time 'hh:mm:ss' 'hhmmss' hhmmss</li>
+<li>year 'YYYY' 'YY' YYYY YY</li>
+</ul>
+</div>
+</li>
+
+<li><a id="orgd66903d"></a>枚举和集合<br />
+<div class="outline-text-5" id="text-3-1-1-6">
+<ul class="org-ul">
+<li>枚举 enum(val1, val2, val3&#x2026;)  在已知的值中进行单选。最大数量为 65535.
+枚举值在保存时，以 2 个字节的整型(smallint)保存。每个枚举值，按保存的位置
+顺序，从 1 开始逐一递增。表现为字符串类型，存储却是整型。 NULL 值的索引是
+NULL。  空字符串错误值的索引值是 0。</li>
+<li>集合 set(val1, val2, val3&#x2026;)
+<code>CREATE TABLE tab (gender SET('男', '女', '无'));</code>
+<code>INSERT INTO tab VALUES ('男, 女');</code>
+最多可以有 64 个不同的成员。以 bigint 存储，共 8 个字节。采取位运算的形式。当
+创建表时，SET 成员值的尾部空格将自动被删除。</li>
+</ul>
+
+<p>
+一般在数据库中不用， <b>使用整数代替</b> ，具体类型使用程序处理。
+</p>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-org9d6078b" class="outline-4">
+<h4 id="org9d6078b"><span class="section-number-4">3.1.2</span> 列约束</h4>
+<div class="outline-text-4" id="text-3-1-2">
+</div>
+<ol class="org-ol">
+<li><a id="org7d3e7cc"></a>主键<br />
+<div class="outline-text-5" id="text-3-1-2-1">
+<ul class="org-ul">
+<li>能唯一标识记录的字段，可以作为主键。</li>
+<li>一个表只能有一个主键。</li>
+<li>主键具有唯一性。</li>
+<li>声明字段时，用 PRIMARY KEY 标识。也可以在字段列表之后声明
+<code>CREATE TABLE USER (id INT, name varchar(10), PRIMARY KEY (id));</code></li>
+<li>主键字段的值不能为 NULL。</li>
+<li>主键可以由多个字段共同组成。此时需要在字段列表后声明的方法。
+<code>CREATE TABLE USER (id INT, name varchar(10), age INT, PRIMARY KEY (name, age));</code></li>
+</ul>
+</div>
+</li>
+<li><a id="org37f9e4f"></a>唯一性约束<br />
+<div class="outline-text-5" id="text-3-1-2-2">
+<ul class="org-ul">
+<li>UNIQUE 唯一索引（唯一约束）使得某字段的值也不能重复。</li>
+</ul>
+</div>
+</li>
+
+<li><a id="org4d5e7b8"></a>NULL 约束<br />
+<div class="outline-text-5" id="text-3-1-2-3">
+<p>
+NULL 默认允许为空。NOT NULL, 不允许为空。
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">INSERT</span> <span style="color: #859900;">INTO</span> TAB <span style="color: #859900;">VALUES</span> (<span style="color: #859900;">NULL</span>, <span style="color: #2aa198;">'VAL'</span>);
+</pre>
+</div>
+<p>
+此时表示将第一个字段的值设为 NULL, 取决于该字段是否允许为 NULL
+</p>
+</div>
+</li>
+
+<li><a id="org4678d94"></a>DEFAULT 默认值属性<br />
+<div class="outline-text-5" id="text-3-1-2-4">
+<p>
+当前字段的默认值。
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">INSERT</span> <span style="color: #859900;">INTO</span> tab <span style="color: #859900;">VALUES</span> (<span style="color: #859900;">DEFAULT</span>, <span style="color: #2aa198;">'VAL'</span>);    <span style="color: #586e75; font-style: italic;">-- &#27492;&#26102;&#34920;&#31034;&#24378;&#21046;&#20351;&#29992;&#40664;&#35748;&#20540;&#12290;</span>
+<span style="color: #859900;">CREATE</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">tab</span> (create_at <span style="color: #268bd2;">TIMESTAMP</span> <span style="color: #859900;">DEFAULT</span> <span style="color: #6c71c4;">CURRENT_TIMESTAMP</span>); <span style="color: #586e75; font-style: italic;">-- &#34920;&#31034;&#23558;&#24403;&#21069;&#26102;&#38388;&#30340;&#26102;&#38388;&#25139;&#35774;&#20026;&#40664;&#35748;&#20540;&#12290;</span>
+<span style="color: #6c71c4;">CURRENT_DATE</span>, <span style="color: #6c71c4;">CURRENT_TIME</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="orgae9571a"></a><code>AUTO_INCREMENT</code> 自动增长约束<br />
+<div class="outline-text-5" id="text-3-1-2-5">
+<p>
+自动增长必须为索引（主键或 UNIQUE）只能存在一个字段为自动增长。默认为 1 开
+始自动增长。可以通过表属性 <code>AUTO_INCREMENT = x</code> 进行设置，或
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">ALTER</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">tbl</span> <span style="color: #859900;">AUTO_INCREMENT</span> = X;
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="org6c4f218"></a>表注释和列注释<br />
+<div class="outline-text-5" id="text-3-1-2-6">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">CREATE</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">tab</span> (id <span style="color: #268bd2;">INT</span> ) <span style="color: #859900;">COMMENT</span> <span style="color: #2aa198;">'&#27880;&#37322;&#20869;&#23481;'</span>;
+</pre>
+</div>
+
+<p>
+一般 MySQL 的列注释不好修改，但是我们可以使用下面的方式来修改列来更新注释。
+</p>
+<div class="org-src-container">
+<pre class="src src-text">mysql&gt; CREATE TABLE `Example` (
+    -&gt;   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    -&gt;   `some_col` varchar(255) DEFAULT NULL,
+    -&gt;   PRIMARY KEY (`id`)
+    -&gt; );
+Query OK, 0 rows affected (0.18 sec)
+
+mysql&gt; ALTER TABLE Example
+    -&gt; MODIFY COLUMN `id`
+    -&gt; int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Look, I''m a comment!';
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="orgc6d82dd"></a>FOREIGN KEY 外键约束<br />
+<div class="outline-text-5" id="text-3-1-2-7">
+<p>
+用于限制主表与从表数据完整性。 存在外键的表，称之为从表（子表），外键指向
+的表，称之为主表（父表）。 作用：保持数据一致性，完整性，主要目的是控制存储
+在外键表（从表）中的数据。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">ALTER</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">t1</span> <span style="color: #859900;">ADD</span> <span style="color: #859900;">CONSTRAINT</span> `t1_t2_fk` <span style="color: #859900;">FOREIGN</span> <span style="color: #859900;">KEY</span> (t1_id) <span style="color: #859900;">REFERENCES</span> t2(id);
+<span style="color: #586e75; font-style: italic;">-- &#23558;&#34920; t1 &#30340; t1_id &#22806;&#38190;&#20851;&#32852;&#21040;&#34920; t2 &#30340; id &#23383;&#27573;&#12290;</span>
+<span style="color: #586e75; font-style: italic;">-- &#27599;&#20010;&#22806;&#38190;&#37117;&#26377;&#19968;&#20010;&#21517;&#23383;&#65292;&#21487;&#20197;&#36890;&#36807; constraint &#25351;&#23450;</span>
+</pre>
+</div>
+
+<p>
+MySQL 中，可以对 InnoDB 引擎使用外键约束：
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">FOREIGN</span> <span style="color: #859900;">KEY</span> (&#22806;&#38190;&#23383;&#27573;&#65289; <span style="color: #859900;">REFERENCES</span> &#20027;&#34920;&#21517; (&#20851;&#32852;&#23383;&#27573;) [&#20027;&#34920;&#35760;&#24405;&#21024;&#38500;&#26102;&#30340;&#21160;&#20316;] [&#20027;&#34920;&#35760;&#24405;&#26356;&#26032;&#26102;&#30340;&#21160;&#20316;]
+<span style="color: #586e75; font-style: italic;">-- &#27492;&#26102;&#38656;&#35201;&#26816;&#27979;&#19968;&#20010;&#20174;&#34920;&#30340;&#22806;&#38190;&#38656;&#35201;&#32422;&#26463;&#20026;&#20027;&#34920;&#30340;&#24050;&#23384;&#22312;&#30340;&#20540;&#12290;&#22806;&#38190;&#22312;&#27809;&#26377;&#20851;&#32852;&#30340;&#24773;&#20917;&#19979;&#65292;</span>
+<span style="color: #586e75; font-style: italic;">-- &#21487;&#20197;&#35774;&#32622;&#20026; null.&#21069;&#25552;&#26159;&#35813;&#22806;&#38190;&#21015;&#65292;&#27809;&#26377; not null&#12290;</span>
+</pre>
+</div>
+<p>
+可以不指定主表记录更改或更新时的动作，那么此时主表的操作被拒绝。如果指定了
+ON UPDATE 或 ON DELETE：在删除或更新时，有如下几个操作可以选择:
+</p>
+
+<ul class="org-ul">
+<li>CASCADE: 级联操作。主表数据被更新（主键值更新），从表也被更新（外键值更
+新）。主表记录被删除，从表相关记录也被删除。</li>
+<li>RESTRICT: 拒绝父表删除和更新。</li>
+<li><p>
+SET NULL: 设置为 NULL。 主表数据被更新（主键值更新）， 从表的外键被设置为
+NULL。 主表记录被删除，从表相关记录外键被设置成 NULL。但注意，要求该外键
+的列，没有 NOT NULL 属性约束。
+</p>
+
+<p>
+注意，外键只被 InnoDB 存储引擎所支持。其他引擎是不支持的。
+</p></li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgc956552" class="outline-3">
+<h3 id="orgc956552"><span class="section-number-3">3.2</span> 查看表结构</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SHOW</span> <span style="color: #859900;">CREATE</span> <span style="color: #859900;">TABLE</span> tabname;
+<span style="color: #859900;">DESC</span>/<span style="color: #859900;">DESCRIBE</span>/EXPLAIN tabname;
+<span style="color: #859900;">SHOW</span> <span style="color: #859900;">COLUMNS</span> <span style="color: #6c71c4;">FROM</span> tabname [<span style="color: #859900;">LIKE</span> <span style="color: #2aa198;">'PATTERN'</span>];
+<span style="color: #859900;">SHOW</span> <span style="color: #859900;">TABLE</span> STATUS [<span style="color: #6c71c4;">FROM</span> dbname] [<span style="color: #859900;">LIKE</span> <span style="color: #2aa198;">'pattern'</span>];
+</pre>
+</div>
+<p>
+下面是查看表结构的示例
+</p>
+<div class="org-src-container">
+<pre class="src src-text">mysql&gt; SHOW CREATE TABLE customers\G
+*************************** 1. row ***************************
+       Table: customers
+Create Table: CREATE TABLE `customers` (
+  `cust_id` int(11) NOT NULL AUTO_INCREMENT,
+  `cust_name` char(50) NOT NULL,
+  `cust_address` char(50) DEFAULT NULL,
+  `cust_city` char(50) DEFAULT NULL,
+  `cust_state` char(5) DEFAULT NULL,
+  `cust_zip` char(10) DEFAULT NULL,
+  `cust_country` char(50) DEFAULT NULL,
+  `cust_contact` char(50) DEFAULT NULL,
+  `cust_email` char(255) DEFAULT NULL,
+  PRIMARY KEY (`cust_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10006 DEFAULT CHARSET=utf8mb4
+1 row in set (0.00 sec)
+
+mysql&gt; DESC customers;
++--------------+-----------+------+-----+---------+----------------+
+| Field        | Type      | Null | Key | Default | Extra          |
++--------------+-----------+------+-----+---------+----------------+
+| cust_id      | int(11)   | NO   | PRI | NULL    | auto_increment |
+| cust_name    | char(50)  | NO   |     | NULL    |                |
+| cust_address | char(50)  | YES  |     | NULL    |                |
+| cust_city    | char(50)  | YES  |     | NULL    |                |
+| cust_state   | char(5)   | YES  |     | NULL    |                |
+| cust_zip     | char(10)  | YES  |     | NULL    |                |
+| cust_country | char(50)  | YES  |     | NULL    |                |
+| cust_contact | char(50)  | YES  |     | NULL    |                |
+| cust_email   | char(255) | YES  |     | NULL    |                |
++--------------+-----------+------+-----+---------+----------------+
+9 rows in set (0.01 sec)
+
+mysql&gt; EXPLAIN customers;
++--------------+-----------+------+-----+---------+----------------+
+| Field        | Type      | Null | Key | Default | Extra          |
++--------------+-----------+------+-----+---------+----------------+
+| cust_id      | int(11)   | NO   | PRI | NULL    | auto_increment |
+| cust_name    | char(50)  | NO   |     | NULL    |                |
+| cust_address | char(50)  | YES  |     | NULL    |                |
+| cust_city    | char(50)  | YES  |     | NULL    |                |
+| cust_state   | char(5)   | YES  |     | NULL    |                |
+| cust_zip     | char(10)  | YES  |     | NULL    |                |
+| cust_country | char(50)  | YES  |     | NULL    |                |
+| cust_contact | char(50)  | YES  |     | NULL    |                |
+| cust_email   | char(255) | YES  |     | NULL    |                |
++--------------+-----------+------+-----+---------+----------------+
+9 rows in set (0.01 sec)
+
+mysql&gt; SHOW COLUMNS FROM customers;
++--------------+-----------+------+-----+---------+----------------+
+| Field        | Type      | Null | Key | Default | Extra          |
++--------------+-----------+------+-----+---------+----------------+
+| cust_id      | int(11)   | NO   | PRI | NULL    | auto_increment |
+| cust_name    | char(50)  | NO   |     | NULL    |                |
+| cust_address | char(50)  | YES  |     | NULL    |                |
+| cust_city    | char(50)  | YES  |     | NULL    |                |
+| cust_state   | char(5)   | YES  |     | NULL    |                |
+| cust_zip     | char(10)  | YES  |     | NULL    |                |
+| cust_country | char(50)  | YES  |     | NULL    |                |
+| cust_contact | char(50)  | YES  |     | NULL    |                |
+| cust_email   | char(255) | YES  |     | NULL    |                |
++--------------+-----------+------+-----+---------+----------------+
+9 rows in set (0.00 sec)
+
+mysql&gt; SHOW TABLE STATUS FROM sellsys LIKE 'cust%'\G
+*************************** 1. row ***************************
+           Name: customers
+         Engine: InnoDB
+        Version: 10
+     Row_format: Dynamic
+           Rows: 5
+ Avg_row_length: 3276
+    Data_length: 16384
+Max_data_length: 0
+   Index_length: 0
+      Data_free: 0
+ Auto_increment: 10006
+    Create_time: 2019-06-30 00:27:31
+    Update_time: 2019-06-30 00:30:49
+     Check_time: NULL
+      Collation: utf8mb4_general_ci
+       Checksum: NULL
+ Create_options:
+        Comment:
+1 row in set (0.01 sec)
+
+mysql&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org28abb1b" class="outline-3">
+<h3 id="org28abb1b"><span class="section-number-3">3.3</span> 修改表结构</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">ALTER</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">tabname</span>
+  <span style="color: #859900;">ADD</span>[ <span style="color: #859900;">COLUMN</span>] colname                       <span style="color: #586e75; font-style: italic;">-- &#22686;&#21152;&#23383;&#27573;</span>
+      <span style="color: #859900;">AFTER</span> colname                          <span style="color: #586e75; font-style: italic;">-- &#34920;&#31034;&#22686;&#21152;&#22312;&#35813;&#23383;&#27573;&#21517;&#21518;&#38754;</span>
+      <span style="color: #859900;">FIRST</span>                                  <span style="color: #586e75; font-style: italic;">-- &#34920;&#31034;&#22686;&#21152;&#22312;&#31532;&#19968;&#20010;</span>
+  <span style="color: #859900;">ADD</span> <span style="color: #859900;">PRIMARY</span> <span style="color: #859900;">KEY</span>(colname)                   <span style="color: #586e75; font-style: italic;">-- &#21019;&#24314;&#20027;&#38190;</span>
+  <span style="color: #859900;">ADD</span> <span style="color: #859900;">UNIQUE</span> [idxname] (colnam)              <span style="color: #586e75; font-style: italic;">-- &#21019;&#24314;&#21807;&#19968;&#32034;&#24341;</span>
+  <span style="color: #859900;">ADD</span> <span style="color: #859900;">INDEX</span> [idxname] (colname)              <span style="color: #586e75; font-style: italic;">-- &#21019;&#24314;&#26222;&#36890;&#32034;&#24341;</span>
+  <span style="color: #859900;">ADD</span>/<span style="color: #859900;">DROP</span>[ <span style="color: #859900;">COLUMN</span>] colname                  <span style="color: #586e75; font-style: italic;">-- &#21024;&#38500;&#23383;&#27573;</span>
+  <span style="color: #859900;">MODIFY</span>[ <span style="color: #859900;">COLUMN</span>] colname dbtype             <span style="color: #586e75; font-style: italic;">-- &#25903;&#25345;&#23545;&#23383;&#27573;&#23646;&#24615;&#36827;&#34892;&#20462;&#25913;&#65292;&#19981;&#33021;&#20462;&#25913;&#23383;&#27573;&#21517;(&#25152;&#26377;&#21407;&#26377;&#23646;&#24615;&#20063;&#38656;&#20889;&#19978;)</span>
+  <span style="color: #859900;">CHANGE</span>[ <span style="color: #859900;">COLUMN</span>] colname new_colname dbtype <span style="color: #586e75; font-style: italic;">-- &#25903;&#25345;&#23545;&#23383;&#27573;&#21517;&#20462;&#25913;</span>
+  <span style="color: #859900;">DROP</span> <span style="color: #859900;">PRIMARY</span> <span style="color: #859900;">KEY</span>                           <span style="color: #586e75; font-style: italic;">-- &#21024;&#38500;&#20027;&#38190;(&#21024;&#38500;&#20027;&#38190;&#21069;&#38656;&#21024;&#38500;&#20854; AUTO_INCREMENT &#23646;&#24615;)</span>
+  <span style="color: #859900;">DROP</span> <span style="color: #859900;">INDEX</span> idxname                         <span style="color: #586e75; font-style: italic;">-- &#21024;&#38500;&#32034;&#24341;</span>
+  <span style="color: #859900;">DROP</span> <span style="color: #859900;">FOREIGN</span> <span style="color: #859900;">KEY</span> fkname                    <span style="color: #586e75; font-style: italic;">-- &#21024;&#38500;&#22806;&#38190;</span>
+</pre>
+</div>
+<div class="org-src-container">
+<pre class="src src-text">mysql&gt; show create table orders\G
+*************************** 1. row ***************************
+       Table: orders
+Create Table: CREATE TABLE `orders` (
+  `order_num` int(11) NOT NULL AUTO_INCREMENT,
+  `order_date` datetime NOT NULL,
+  `cust_id` int(11) NOT NULL,
+  PRIMARY KEY (`order_num`),
+  KEY `fk_orders_customers` (`cust_id`),
+  CONSTRAINT `fk_orders_customers` FOREIGN KEY (`cust_id`) REFERENCES `customers` (`cust_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=20010 DEFAULT CHARSET=utf8mb4
+1 row in set (0.00 sec)
+
+mysql&gt; alter table orders add column note varchar(256) comment 'Order Notes';
+Query OK, 0 rows affected (0.21 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql&gt; show create table orders\G
+*************************** 1. row ***************************
+       Table: orders
+Create Table: CREATE TABLE `orders` (
+  `order_num` int(11) NOT NULL AUTO_INCREMENT,
+  `order_date` datetime NOT NULL,
+  `cust_id` int(11) NOT NULL,
+  `note` varchar(256) DEFAULT NULL COMMENT 'Order Notes',
+  PRIMARY KEY (`order_num`),
+  KEY `fk_orders_customers` (`cust_id`),
+  CONSTRAINT `fk_orders_customers` FOREIGN KEY (`cust_id`) REFERENCES `customers` (`cust_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=20010 DEFAULT CHARSET=utf8mb4
+1 row in set (0.00 sec)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org1f5c698" class="outline-3">
+<h3 id="org1f5c698"><span class="section-number-3">3.4</span> 删除/清空表</h3>
+<div class="outline-text-3" id="text-3-4">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#21024;&#38500;&#34920;</span>
+<span style="color: #859900;">DROP</span> <span style="color: #859900;">TABLE</span> [<span style="color: #859900;">IF</span> <span style="color: #859900;">EXISTS</span>] tabname;
+<span style="color: #586e75; font-style: italic;">-- &#28165;&#31354;&#34920;&#25968;&#25454;</span>
+<span style="color: #859900;">TRUNCATE</span> [<span style="color: #859900;">TABLE</span>] tabname;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org4420379" class="outline-3">
+<h3 id="org4420379"><span class="section-number-3">3.5</span> 复制表</h3>
+<div class="outline-text-3" id="text-3-5">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#22797;&#21046;&#34920;&#32467;&#26500;</span>
+<span style="color: #859900;">CREATE</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">tabname</span> <span style="color: #859900;">LIKE</span> src_tabname;
+<span style="color: #586e75; font-style: italic;">-- &#22797;&#21046;&#34920;&#32467;&#26500;&#21644;&#25968;&#25454;</span>
+<span style="color: #859900;">CREATE</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">tabname</span> [<span style="color: #859900;">AS</span>] <span style="color: #859900;">SELECT</span> * <span style="color: #6c71c4;">FROM</span> src_tabname;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf117e31" class="outline-3">
+<h3 id="orgf117e31"><span class="section-number-3">3.6</span> 优化表</h3>
+<div class="outline-text-3" id="text-3-6">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#26816;&#26597;&#34920;&#26159;&#21542;&#26377;&#38169;&#35823;</span>
+<span style="color: #859900;">CHECK</span> <span style="color: #859900;">TABLE</span> tabname [, tabname] ... [<span style="color: #859900;">option</span>] ...
+<span style="color: #586e75; font-style: italic;">-- &#20248;&#21270;&#34920;</span>
+OPTIMIZE [<span style="color: #859900;">LOCAL</span> | NO_WRITE_TO_BINLOG] <span style="color: #859900;">TABLE</span> tabname [, tabname] ...
+<span style="color: #586e75; font-style: italic;">-- &#20462;&#22797;&#34920;</span>
+REPAIR [<span style="color: #859900;">LOCAL</span> | NO_WRITE_TO_BINLOG] <span style="color: #859900;">TABLE</span> tabname [, tabname] ... [<span style="color: #859900;">QUICK</span>] [EXTENDED] [USE_FRM]
+<span style="color: #586e75; font-style: italic;">-- &#20998;&#26512;&#34920;</span>
+ANALYZE [<span style="color: #859900;">LOCAL</span> | NO_WRITE_TO_BINLOG] <span style="color: #859900;">TABLE</span> tabname [, tabname] ...
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org1c86e57" class="outline-2">
+<h2 id="org1c86e57"><span class="section-number-2">4</span> 数据操作：增删改查</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-org0bd1a9b" class="outline-3">
+<h3 id="org0bd1a9b"><span class="section-number-3">4.1</span> 插入数据</h3>
+<div class="outline-text-3" id="text-4-1">
+<ul class="org-ul">
+<li>如果要插入的值列表包含所有字段并且顺序一致，则可以省略字段列表。</li>
+<li>可同时插入多条数据记录！</li>
+<li>REPLACE 与 INSERT 完全一样，可互换。</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">INSERT</span> [<span style="color: #859900;">INTO</span>] tabname colname1, colname2, ... <span style="color: #859900;">VALUES</span> (value1, value2, ...) [, (value1, value2, ...), ...];
+<span style="color: #859900;">INSERT</span> [<span style="color: #859900;">INTO</span>] tabname <span style="color: #859900;">SET</span> colname1=value1[, colname2=value2, ...];
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org00dc92c" class="outline-3">
+<h3 id="org00dc92c"><span class="section-number-3">4.2</span> 删除数据</h3>
+<div class="outline-text-3" id="text-4-2">
+<ul class="org-ul">
+<li>删除数据比较危险，一般先用 SELECT 查询来调试，等到条件无误后将 SELECT 改成
+DELETE 来删除数据。</li>
+<li>没有条件子句，则会删除全部</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">DELETE</span> <span style="color: #6c71c4;">FROM</span> tabname[ <span style="color: #859900;">WHERE</span> condition];
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org2a471fb" class="outline-3">
+<h3 id="org2a471fb"><span class="section-number-3">4.3</span> 更新数据</h3>
+<div class="outline-text-3" id="text-4-3">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">UPDATE</span> tabname <span style="color: #859900;">SET</span> colname1=value1[, colname2=value2] [<span style="color: #859900;">WHERE</span> condition];
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org227d1ac" class="outline-3">
+<h3 id="org227d1ac"><span class="section-number-3">4.4</span> 查询数据</h3>
+<div class="outline-text-3" id="text-4-4">
+<ul class="org-ul">
+<li>可来自多个表的多个字段</li>
+<li>可以不带条件限制查询</li>
+<li>字段列表可以用 <code>*</code> 代替，表示所有字段</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> colname1, colname2, ... <span style="color: #6c71c4;">FROM</span> tabname [<span style="color: #859900;">WHERE</span> condition];
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga6e8346" class="outline-2">
+<h2 id="orga6e8346"><span class="section-number-2">5</span> mysqldump 备份/还原库</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org2044772" class="outline-3">
+<h3 id="org2044772"><span class="section-number-3">5.1</span> 导出数据</h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+<pre class="src src-sh">mysqldump -u user -p pass dbname tabname &gt; /tmp/out.sql <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23548;&#20986;&#19968;&#24352;&#34920;</span>
+mysqldump -u user -p pass dbname tabname1 tabname1 &gt; /tmp/out.sql <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23548;&#20986;&#22810;&#24352;&#34920;</span>
+mysqldump -u user -p pass dbname &gt; /tmp/out.sql <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23548;&#20986;&#25968;&#25454;&#24211;&#25152;&#26377;&#34920;</span>
+mysqldump -u user -p pass -B dbname1 dbname2 &gt; /tmp/out.sql <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23548;&#20986;&#22810;&#25968;&#25454;&#24211;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf1bdcb0" class="outline-3">
+<h3 id="orgf1bdcb0"><span class="section-number-3">5.2</span> 导入数据</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+在 MySQL 命令行里面使用 source 导入数据
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">source</span> <span style="color: #859900;">out</span>.<span style="color: #859900;">sql</span>
+</pre>
+</div>
+<p>
+在 shell 可以使用非交互式命令导入
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">mysql -u user -p pass dbname &lt; out.sql
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org234dc14" class="outline-2">
+<h2 id="org234dc14"><span class="section-number-2">6</span> 内置函数</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-orgdb58e92" class="outline-3">
+<h3 id="orgdb58e92"><span class="section-number-3">6.1</span> 数值函数</h3>
+<div class="outline-text-3" id="text-6-1">
+<ul class="org-ul">
+<li><code>abs(x)</code> : 绝对值 abs(-10.9) = 10</li>
+<li><code>format(x, d)</code> : 格式化千分位数值 format(1234567.456, 2) = 1,234,567.46</li>
+<li><code>ceil(x)</code> : 向上取整 ceil(10.1) = 11</li>
+<li><code>floor(x)</code> : 向下取整 floor (10.1) = 10</li>
+<li><code>round(x)</code> : 四舍五入去整</li>
+<li><code>mod(m, n)</code> : m%n m mod n 求余 10%3=1</li>
+<li><code>pi()</code> : 获得圆周率</li>
+<li><code>pow(m, n)</code> : m<sup>n</sup></li>
+<li><code>sqrt(x)</code> : 算术平方根</li>
+<li><code>rand()</code> : 随机数</li>
+<li><code>truncate(x, d)</code> : 截取 d 位小数</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgab7753e" class="outline-3">
+<h3 id="orgab7753e"><span class="section-number-3">6.2</span> 时间日期函数</h3>
+<div class="outline-text-3" id="text-6-2">
+<ul class="org-ul">
+<li><code>now(), current_timestamp()</code> : 当前日期时间</li>
+<li><code>current_date()</code> : 当前日期</li>
+<li><code>current_time()</code> : 当前时间</li>
+<li><code>date('yyyy-mm-dd hh:ii:ss')</code> : 获取日期部分</li>
+<li><code>time('yyyy-mm-dd hh:ii:ss')</code> : 获取时间部分</li>
+<li><code>date_format('yyyy-mm-dd hh:ii:ss', '%d %y %a %d %m %b %j')</code> : 格式化时间</li>
+<li><code>unix_timestamp()</code> : 获得 unix 时间戳</li>
+<li><code>from_unixtime()</code> : 从时间戳获得时间</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgbe56f2b" class="outline-3">
+<h3 id="orgbe56f2b"><span class="section-number-3">6.3</span> 字符串函数</h3>
+<div class="outline-text-3" id="text-6-3">
+<ul class="org-ul">
+<li><code>length(string)</code> : string 长度，字节</li>
+<li><code>char_length(string)</code> : string 的字符个数</li>
+<li><code>substring(str, position [,length])</code> : 从 str 的 position 开始,取 length 个字符</li>
+<li><code>replace(str ,search_str ,replace_str)</code> : 在 str 中用 <code>replace_str</code> 替换 <code>search_str</code></li>
+<li><code>instr(string ,substring)</code> : 返回 substring 首次在 string 中出现的位置</li>
+<li><code>concat(string [,...])</code> : 连接字串</li>
+<li><code>charset(str)</code> : 返回字串字符集</li>
+<li><code>lcase(string)</code> : 转换成小写</li>
+<li><code>left(string, length)</code> : 从 string2 中的左边起取 length 个字符</li>
+<li><code>load_file(file_name)</code> : 从文件读取内容</li>
+<li><code>locate(substring, string [,start_position])</code> : 同 instr,但可指定开始位置</li>
+<li><code>lpad(string, length, pad)</code> : 重复用 pad 加在 string 开头,直到字串长度为 length</li>
+<li><code>ltrim(string)</code> : 去除前端空格</li>
+<li><code>repeat(string, count)</code> : 重复 count 次</li>
+<li><code>rpad(string, length, pad)</code> : 在 str 后用 pad 补充,直到长度为 length</li>
+<li><code>rtrim(string)</code> : 去除后端空格</li>
+<li><code>strcmp(string1 ,string2)</code> : 逐字符比较两字串大小</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org253499e" class="outline-3">
+<h3 id="org253499e"><span class="section-number-3">6.4</span> 流程函数</h3>
+<div class="outline-text-3" id="text-6-4">
+<ul class="org-ul">
+<li><code>case when [condition] then result [when [condition] then result ...] [else result] end</code> : 多分支</li>
+<li><code>if(expr1,expr2,expr3)</code> 双分支。</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org5c893ae" class="outline-3">
+<h3 id="org5c893ae"><span class="section-number-3">6.5</span> 聚合函数</h3>
+<div class="outline-text-3" id="text-6-5">
+<ul class="org-ul">
+<li><code>count()</code></li>
+<li><code>sum()</code></li>
+<li><code>max()</code></li>
+<li><code>min()</code></li>
+<li><code>avg()</code></li>
+<li><code>group_concat()</code></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org85f2aef" class="outline-3">
+<h3 id="org85f2aef"><span class="section-number-3">6.6</span> 其他常用函数</h3>
+<div class="outline-text-3" id="text-6-6">
+<ul class="org-ul">
+<li><code>md5()</code></li>
+<li><code>default()</code></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2019-07-05 Fri 00:00</p>
+<p class="author">Author: Jinghui Hu</p>
+<p class="date">Created: 2019-07-05 Fri 23:12</p>
+<p class="validation"></p>
+</div>
+</body>
+</html>
