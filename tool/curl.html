@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-04 Thu 23:41 -->
+<!-- 2019-07-05 Fri 16:08 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CRUL 工具</title>
@@ -185,7 +185,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -234,26 +234,25 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org4fcf0da">1. cURL</a></li>
-<li><a href="#orge3db5f2">2. 常见用法</a>
+<li><a href="#org40d136f">1. cURL</a></li>
+<li><a href="#org8a8224e">2. 常见用法</a>
 <ul>
-<li><a href="#orgb947ff7">2.1. 获取网页</a></li>
-<li><a href="#orgcc60677">2.2. 保存文件</a></li>
-<li><a href="#org901b1bf">2.3. 用户名/密码</a></li>
-<li><a href="#org9161cea">2.4. 返回 header 和 code</a></li>
-<li><a href="#org9e6d648">2.5. 代理</a></li>
-<li><a href="#orgd144e95">2.6. 分片下载 (Range)</a></li>
-<li><a href="#org970d207">2.7. 上传</a></li>
+<li><a href="#orgb5bdab0">2.1. 获取网页</a></li>
+<li><a href="#org4f840a0">2.2. 保存成本地文件</a></li>
+<li><a href="#orga2deea5">2.3. 添加用户名/密码</a></li>
+<li><a href="#org4b5661b">2.4. 处理返回头和 HTTP 状态码</a></li>
+<li><a href="#org7842506">2.5. 代理</a></li>
+<li><a href="#org56186a7">2.6. 分片下载 (Range)</a></li>
+<li><a href="#org1d894f8">2.7. 上传</a></li>
 </ul>
 </li>
-<li><a href="#orgf6a92e0">3. API 测试</a>
+<li><a href="#org5453151">3. API 测试</a>
 <ul>
-<li><a href="#org27483ab">3.1. POST 数据</a></li>
-<li><a href="#orgdcf209f">3.2. USER AGENT</a></li>
-<li><a href="#org2a9631a">3.3. 处理 cookie</a></li>
+<li><a href="#org687d34e">3.1. POST 数据</a></li>
+<li><a href="#org75dc4fb">3.2. USER AGENT</a></li>
+<li><a href="#org00b11de">3.3. 处理 cookie</a></li>
 </ul>
 </li>
-<li><a href="#orgb95e201">4. 参考链接</a></li>
 </ul>
 </div>
 </div>
@@ -263,42 +262,60 @@ for the JavaScript code in this tag.
 </p>
 </div>
 
-<div id="outline-container-org4fcf0da" class="outline-2">
-<h2 id="org4fcf0da"><span class="section-number-2">1</span> cURL</h2>
+<div id="outline-container-org40d136f" class="outline-2">
+<h2 id="org40d136f"><span class="section-number-2">1</span> cURL</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-cURL 是一个利用 URL 语法在命令行下工作的文件传输工具，1997 年首次发行。它支持
+<a href="https://curl.haxx.se/">cURL</a> 是一个利用 URL 语法在命令行下工作的文件传输工具，1997 年首次发行。它支持
 文件上传和下载，所以是综合传输工具，但按传统，习惯称 cURL 为下载工具。 Mac 和
-Linux 可以通过命令行直接安装，Windows 需要<a href="https://curl.haxx.se/windows/">下载</a>可执行文件安装。
+Linux 可以通过命令行直接安装，Windows 需要<a href="https://curl.haxx.se/windows/">下载</a>可执行文件安装。可以通过
+<a href="https://ec.haxx.se/">Everything curl</a> 来学习使用工具。
 </p>
 </div>
 </div>
 
-<div id="outline-container-orge3db5f2" class="outline-2">
-<h2 id="orge3db5f2"><span class="section-number-2">2</span> 常见用法</h2>
+<div id="outline-container-org8a8224e" class="outline-2">
+<h2 id="org8a8224e"><span class="section-number-2">2</span> 常见用法</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgb947ff7" class="outline-3">
-<h3 id="orgb947ff7"><span class="section-number-3">2.1</span> 获取网页</h3>
+<div id="outline-container-orgb5bdab0" class="outline-3">
+<h3 id="orgb5bdab0"><span class="section-number-3">2.1</span> 获取网页</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
-直接使用 curl 后面添加网站地址就可以将网站的内容抓取下来。
+直接使用 curl 后面添加网站地址就可以将网站的内容抓取下来，curl 默认将输出打印
+到标准输出。curl 会统计下载的速度，如果不需要的话可以使用 <code>-s</code> 来关闭统计。
 </p>
-
 <div class="org-src-container">
-<pre class="src src-sh">curl http://www.example.com/
+<pre class="src src-text">~ $ curl http://www.example.com/
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1270  100  1270    0     0   1695      0 --:--:-- --:--:-- --:--:--  1695&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Example Domain&lt;/title&gt;
+
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta http-equiv="Content-type" content="text/html; charset=utf-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;
+........
+~ $ curl -s http://www.example.com/
+&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Example Domain&lt;/title&gt;
+
+    &lt;meta charset="utf-8" /&gt;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgcc60677" class="outline-3">
-<h3 id="orgcc60677"><span class="section-number-3">2.2</span> 保存文件</h3>
+<div id="outline-container-org4f840a0" class="outline-3">
+<h3 id="org4f840a0"><span class="section-number-3">2.2</span> 保存成本地文件</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 使用 <b>-o</b> 选项可以将下载的内容保存成相应的文件，并命名成给定的文件名。
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">curl -o example.html http://www.example.com/
 </pre>
@@ -308,7 +325,6 @@ Linux 可以通过命令行直接安装，Windows 需要<a href="https://curl.ha
 使用 <b>-O</b> 选项将下载的内容保存成 url 最后给定的文件名，如下例子中将会把文件命名
 成 index.html
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">curl -O www.haxx.se/index.html
 </pre>
@@ -316,13 +332,12 @@ Linux 可以通过命令行直接安装，Windows 需要<a href="https://curl.ha
 </div>
 </div>
 
-<div id="outline-container-org901b1bf" class="outline-3">
-<h3 id="org901b1bf"><span class="section-number-3">2.3</span> 用户名/密码</h3>
+<div id="outline-container-orga2deea5" class="outline-3">
+<h3 id="orga2deea5"><span class="section-number-3">2.3</span> 添加用户名/密码</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 有时候下载 ftp 中的内容需要用户名和密码，可以使用 <b>-u</b> 选项添加用户名和密码。
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">curl -u name:passwd ftp://machine.domain:port/full/path/to/file
 </pre>
@@ -330,13 +345,12 @@ Linux 可以通过命令行直接安装，Windows 需要<a href="https://curl.ha
 </div>
 </div>
 
-<div id="outline-container-org9161cea" class="outline-3">
-<h3 id="org9161cea"><span class="section-number-3">2.4</span> 返回 header 和 code</h3>
+<div id="outline-container-org4b5661b" class="outline-3">
+<h3 id="org4b5661b"><span class="section-number-3">2.4</span> 处理返回头和 HTTP 状态码</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 使用 <b>-i</b> 选项可以参考网页的给出的返回头相关信息。
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">curl -i www.example.com
 </pre>
@@ -362,7 +376,6 @@ Content-Length: 1270
 <p>
 可以使用下面命令来将 header 下载起来保存成文件。
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">curl --dump-header headers.txt www.example.com
 </pre>
@@ -372,7 +385,6 @@ Content-Length: 1270
 有时候我们在写脚本是仅仅需要参考网站的返回码，为了方便解析可以使用下面命令直接获
 取返回码。
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">curl -q -s -w %{http_code} www.example.com
 </pre>
@@ -380,8 +392,8 @@ Content-Length: 1270
 </div>
 </div>
 
-<div id="outline-container-org9e6d648" class="outline-3">
-<h3 id="org9e6d648"><span class="section-number-3">2.5</span> 代理</h3>
+<div id="outline-container-org7842506" class="outline-3">
+<h3 id="org7842506"><span class="section-number-3">2.5</span> 代理</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 curl 还支持 HTTP 和 SOCKS 协议的代理。可以使用 <b>-x</b> 选项了设置代理服务器的地址和
@@ -396,36 +408,36 @@ curl -u user:passwd -x my-proxy:888 http://www.get.this/
 </div>
 </div>
 
-<div id="outline-container-orgd144e95" class="outline-3">
-<h3 id="orgd144e95"><span class="section-number-3">2.6</span> 分片下载 (Range)</h3>
+<div id="outline-container-org56186a7" class="outline-3">
+<h3 id="org56186a7"><span class="section-number-3">2.6</span> 分片下载 (Range)</h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 可以使用 <b>-r</b> 选项来分片下载文件。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">Get the first 100 bytes of a document</span>
+<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">Get the first 100 bytes of a document</span>
 curl -r 0-99 http://www.get.this/
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">Get the last 500 bytes of a document</span>
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">Get the last 500 bytes of a document</span>
 curl -r -500 http://www.get.this/
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org970d207" class="outline-3">
-<h3 id="org970d207"><span class="section-number-3">2.7</span> 上传</h3>
+<div id="outline-container-org1d894f8" class="outline-3">
+<h3 id="org1d894f8"><span class="section-number-3">2.7</span> 上传</h3>
 <div class="outline-text-3" id="text-2-7">
 <p>
 使用 curl 的 <b>-T</b> 选项来指定上传文件。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">upload all data on stdin to a specified server</span>
+<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">upload all data on stdin to a specified server</span>
 curl -T - ftp://ftp.upload.com/myfile
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">upload file with username and password</span>
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">upload file with username and password</span>
 curl -T uploadfile -u user:passwd ftp://ftp.upload.com/
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">upload file to get append to the remote file</span>
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">upload file to get append to the remote file</span>
 curl -T localfile -a ftp://ftp.upload.com/remotefile
 </pre>
 </div>
@@ -443,12 +455,12 @@ curl -T localfile -a ftp://ftp.upload.com/remotefile
 </div>
 
 
-<div id="outline-container-orgf6a92e0" class="outline-2">
-<h2 id="orgf6a92e0"><span class="section-number-2">3</span> API 测试</h2>
+<div id="outline-container-org5453151" class="outline-2">
+<h2 id="org5453151"><span class="section-number-2">3</span> API 测试</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org27483ab" class="outline-3">
-<h3 id="org27483ab"><span class="section-number-3">3.1</span> POST 数据</h3>
+<div id="outline-container-org687d34e" class="outline-3">
+<h3 id="org687d34e"><span class="section-number-3">3.1</span> POST 数据</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 在测试 API 联通时常常需要 POST 一下数据，使用 <b>-d</b> 选项可以 POST 数据。这里的数
@@ -485,8 +497,8 @@ curl -T localfile -a ftp://ftp.upload.com/remotefile
 </div>
 </div>
 
-<div id="outline-container-orgdcf209f" class="outline-3">
-<h3 id="orgdcf209f"><span class="section-number-3">3.2</span> USER AGENT</h3>
+<div id="outline-container-org75dc4fb" class="outline-3">
+<h3 id="org75dc4fb"><span class="section-number-3">3.2</span> USER AGENT</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 使用 <b>-A</b> 选项知道 USER-AGENT。
@@ -499,8 +511,8 @@ curl -T localfile -a ftp://ftp.upload.com/remotefile
 </div>
 </div>
 
-<div id="outline-container-org2a9631a" class="outline-3">
-<h3 id="org2a9631a"><span class="section-number-3">3.3</span> 处理 cookie</h3>
+<div id="outline-container-org00b11de" class="outline-3">
+<h3 id="org00b11de"><span class="section-number-3">3.3</span> 处理 cookie</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 由于 HTTP 协议是无状态的，所以有些网站是使用 cookie 来记录会话信息。对于 chrome
@@ -533,23 +545,11 @@ curl -T localfile -a ftp://ftp.upload.com/remotefile
 </div>
 </div>
 </div>
-
-
-<div id="outline-container-orgb95e201" class="outline-2">
-<h2 id="orgb95e201"><span class="section-number-2">4</span> 参考链接</h2>
-<div class="outline-text-2" id="text-4">
-<ol class="org-ol">
-<li><a href="https://curl.haxx.se/">curl</a></li>
-<li><a href="https://curl.haxx.se/docs/manual.html">curl manual</a></li>
-<li><a href="https://ec.haxx.se/">everything curl</a></li>
-</ol>
-</div>
-</div>
 </div>
 <div id="postamble" class="status">
 <p class="date">Date: 2018-11-03 Sat 00:00</p>
 <p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-07-04 Thu 23:41</p>
+<p class="date">Created: 2019-07-05 Fri 16:08</p>
 <p class="validation"></p>
 </div>
 </body>
