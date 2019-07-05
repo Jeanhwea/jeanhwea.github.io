@@ -232,7 +232,10 @@
 
 ** 查询仓库中所有的镜像和 tag
    #+BEGIN_SRC sh
-     _reg=http://localhost:5000; curl -XGET $_reg/v2/_catalog | jq '.repositories[]' | xargs -I repo curl -XGET $_reg/v2/repo/tags/list
+     _reg=http://localhost:5000 && \
+       curl -XGET $_reg/v2/_catalog | \
+         jq '.repositories[]' | \
+         xargs -I repo curl -XGET $_reg/v2/repo/tags/list
    #+END_SRC
    #+BEGIN_SRC text
      {"name":"cassandra","tags":["3.11.2"]}
@@ -243,6 +246,30 @@
      {"name":"rabbitmq","tags":["3.7"]}
      {"name":"redis","tags":["4.0.6"]}
      {"name":"ubuntu","tags":["18.04"]}
+   #+END_SRC
+
+   #+BEGIN_SRC sh
+     _reg=http://192.168.0.202:5000 && \
+       wget -q $_reg/v2/_catalog -O- | \
+         sed 's/^.*\[\(.*\)\].*$/\1/;s/,/\n/g' | \
+         xargs -I repo wget -q $_reg/v2/repo/tags/list -O- | \
+         sed 's/.*"name":"\(.*\)".*"tags":\[\(.*\)\].*/\1:\2/;s/"//g;s/,/:/g'
+   #+END_SRC
+   #+BEGIN_SRC text
+     alpine:latest
+     elasticsearch:6.4.3
+     gitlab/gitlab-ce:20181127:latest
+     mongo:latest
+     mysql:5.7.26:8.0.16
+     nginx:1.14:1.15:latest
+     node:latest
+     openjdk:8
+     postgres:9.6:latest
+     rabbitmq:3.7:latest
+     redis:4.0.6
+     registry:20181127:latest
+     skree:20190704
+     ubuntu:18.04:latest
    #+END_SRC
 
 * 编写 Dockerfile
