@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-05 Fri 16:08 -->
+<!-- 2019-07-05 Fri 16:25 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CRUL 工具</title>
@@ -234,23 +234,23 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org40d136f">1. cURL</a></li>
-<li><a href="#org8a8224e">2. 常见用法</a>
+<li><a href="#orgf8be2a0">1. cURL</a></li>
+<li><a href="#org6037aea">2. 常见用法</a>
 <ul>
-<li><a href="#orgb5bdab0">2.1. 获取网页</a></li>
-<li><a href="#org4f840a0">2.2. 保存成本地文件</a></li>
-<li><a href="#orga2deea5">2.3. 添加用户名/密码</a></li>
-<li><a href="#org4b5661b">2.4. 处理返回头和 HTTP 状态码</a></li>
-<li><a href="#org7842506">2.5. 代理</a></li>
-<li><a href="#org56186a7">2.6. 分片下载 (Range)</a></li>
-<li><a href="#org1d894f8">2.7. 上传</a></li>
+<li><a href="#org000e0d7">2.1. 获取网页内容</a></li>
+<li><a href="#org573dff2">2.2. 保存成本地文件</a></li>
+<li><a href="#orgfead783">2.3. 下载 ftp 文件时添加用户名和密码</a></li>
+<li><a href="#org8d3026a">2.4. HTTP 和 SOCKS 代理</a></li>
+<li><a href="#org4714008">2.5. 分片下载 (Range)</a></li>
+<li><a href="#org0aef056">2.6. FTP/SMB 协议上传文件</a></li>
 </ul>
 </li>
-<li><a href="#org5453151">3. API 测试</a>
+<li><a href="#org7be8516">3. API 测试</a>
 <ul>
-<li><a href="#org687d34e">3.1. POST 数据</a></li>
-<li><a href="#org75dc4fb">3.2. USER AGENT</a></li>
-<li><a href="#org00b11de">3.3. 处理 cookie</a></li>
+<li><a href="#org8939bd0">3.1. 处理 HTTP 方法</a></li>
+<li><a href="#org35fb0eb">3.2. 添加 USER AGENT</a></li>
+<li><a href="#org6cc952a">3.3. 处理返回头和 HTTP 状态码</a></li>
+<li><a href="#org3f5eafc">3.4. 添加 Cookie</a></li>
 </ul>
 </li>
 </ul>
@@ -262,8 +262,8 @@ for the JavaScript code in this tag.
 </p>
 </div>
 
-<div id="outline-container-org40d136f" class="outline-2">
-<h2 id="org40d136f"><span class="section-number-2">1</span> cURL</h2>
+<div id="outline-container-orgf8be2a0" class="outline-2">
+<h2 id="orgf8be2a0"><span class="section-number-2">1</span> cURL</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 <a href="https://curl.haxx.se/">cURL</a> 是一个利用 URL 语法在命令行下工作的文件传输工具，1997 年首次发行。它支持
@@ -274,12 +274,12 @@ Linux 可以通过命令行直接安装，Windows 需要<a href="https://curl.ha
 </div>
 </div>
 
-<div id="outline-container-org8a8224e" class="outline-2">
-<h2 id="org8a8224e"><span class="section-number-2">2</span> 常见用法</h2>
+<div id="outline-container-org6037aea" class="outline-2">
+<h2 id="org6037aea"><span class="section-number-2">2</span> 常见用法</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgb5bdab0" class="outline-3">
-<h3 id="orgb5bdab0"><span class="section-number-3">2.1</span> 获取网页</h3>
+<div id="outline-container-org000e0d7" class="outline-3">
+<h3 id="org000e0d7"><span class="section-number-3">2.1</span> 获取网页内容</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 直接使用 curl 后面添加网站地址就可以将网站的内容抓取下来，curl 默认将输出打印
@@ -310,11 +310,11 @@ Linux 可以通过命令行直接安装，Windows 需要<a href="https://curl.ha
 </div>
 </div>
 
-<div id="outline-container-org4f840a0" class="outline-3">
-<h3 id="org4f840a0"><span class="section-number-3">2.2</span> 保存成本地文件</h3>
+<div id="outline-container-org573dff2" class="outline-3">
+<h3 id="org573dff2"><span class="section-number-3">2.2</span> 保存成本地文件</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
-使用 <b>-o</b> 选项可以将下载的内容保存成相应的文件，并命名成给定的文件名。
+使用 <code>-o</code> 选项可以将下载的内容保存成相应的文件，并命名成给定的文件名。
 </p>
 <div class="org-src-container">
 <pre class="src src-sh">curl -o example.html http://www.example.com/
@@ -322,7 +322,7 @@ Linux 可以通过命令行直接安装，Windows 需要<a href="https://curl.ha
 </div>
 
 <p>
-使用 <b>-O</b> 选项将下载的内容保存成 url 最后给定的文件名，如下例子中将会把文件命名
+使用 <code>-O</code> 选项将下载的内容保存成 url 最后给定的文件名，如下例子中将会把文件命名
 成 index.html
 </p>
 <div class="org-src-container">
@@ -332,11 +332,11 @@ Linux 可以通过命令行直接安装，Windows 需要<a href="https://curl.ha
 </div>
 </div>
 
-<div id="outline-container-orga2deea5" class="outline-3">
-<h3 id="orga2deea5"><span class="section-number-3">2.3</span> 添加用户名/密码</h3>
+<div id="outline-container-orgfead783" class="outline-3">
+<h3 id="orgfead783"><span class="section-number-3">2.3</span> 下载 ftp 文件时添加用户名和密码</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
-有时候下载 ftp 中的内容需要用户名和密码，可以使用 <b>-u</b> 选项添加用户名和密码。
+有时候下载 ftp 中的内容需要用户名和密码，可以使用 <code>-u</code> 选项添加用户名和密码。
 </p>
 <div class="org-src-container">
 <pre class="src src-sh">curl -u name:passwd ftp://machine.domain:port/full/path/to/file
@@ -345,11 +345,175 @@ Linux 可以通过命令行直接安装，Windows 需要<a href="https://curl.ha
 </div>
 </div>
 
-<div id="outline-container-org4b5661b" class="outline-3">
-<h3 id="org4b5661b"><span class="section-number-3">2.4</span> 处理返回头和 HTTP 状态码</h3>
+<div id="outline-container-org8d3026a" class="outline-3">
+<h3 id="org8d3026a"><span class="section-number-3">2.4</span> HTTP 和 SOCKS 代理</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
-使用 <b>-i</b> 选项可以参考网页的给出的返回头相关信息。
+curl 还支持 HTTP 和 SOCKS 协议的代理。可以使用 <code>-x</code> 选项了设置代理服务器的地
+址和端口号信息。
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">curl -x my-proxy:888 ftp://ftp.leachsite.com/README
+curl -u user:passwd -x my-proxy:888 http://www.get.this/
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4714008" class="outline-3">
+<h3 id="org4714008"><span class="section-number-3">2.5</span> 分片下载 (Range)</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+可以使用 <code>-r</code> 选项来分片下载文件。
+</p>
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">Get the first 100 bytes of a document</span>
+curl -r 0-99 http://www.get.this/
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">Get the last 500 bytes of a document</span>
+curl -r -500 http://www.get.this/
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0aef056" class="outline-3">
+<h3 id="org0aef056"><span class="section-number-3">2.6</span> FTP/SMB 协议上传文件</h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+使用 curl 的 <code>-T</code> 选项来指定上传文件。
+</p>
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">upload all data on stdin to a specified server</span>
+curl -T - ftp://ftp.upload.com/myfile
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">upload file with username and password</span>
+curl -T uploadfile -u user:passwd ftp://ftp.upload.com/
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">upload file to get append to the remote file</span>
+curl -T localfile -a ftp://ftp.upload.com/remotefile
+</pre>
+</div>
+
+<p>
+使用 smb 协议上传文件。
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">curl -T file.txt -u <span style="color: #2aa198;">"domain\username:passwd"</span> smb://server.example.com/share/
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7be8516" class="outline-2">
+<h2 id="org7be8516"><span class="section-number-2">3</span> API 测试</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org8939bd0" class="outline-3">
+<h3 id="org8939bd0"><span class="section-number-3">3.1</span> 处理 HTTP 方法</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+在测试 API 时常常需要 POST 数据，使用 <code>-X</code> 可以指定 HTTP 方法， <code>-d</code> 选项可以指
+定 POST 数据。这里的数据部分必须是事先编码好的。
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">curl -X POST -d <span style="color: #2aa198;">"name=Rafael%20Sagula&amp;phone=3320780"</span> http://www.where.com/guest.cgi
+</pre>
+</div>
+
+<p>
+使用 <code>-d</code> 选项的局限性是只能使用普通键值对方式的参数，如果需要 POST 文件内容参数
+则需要使用 <code>-F</code> 选项。 <code>-F</code> 选项使用 <code>@&lt;filename&gt;;type=&lt;mime-type&gt;</code> 这种方式来编
+码所要上传的文件。如果没有给定 mime-type 则 curl 根据文件后缀名来猜测。如下命令
+中上传了三个文件。
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">curl -X POST -F <span style="color: #2aa198;">"coolfiles=@fil1.gif;type=image/gif,fil2.txt,fil3.html"</span> <span style="color: #2aa198;">\</span>
+     http://www.post.com/postit.cgi
+</pre>
+</div>
+
+<p>
+上传文件并且添加其它字段的例子。
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">curl -X POST -F <span style="color: #2aa198;">"file=@cooltext.txt"</span> -F <span style="color: #2aa198;">"yourname=Daniel"</span> <span style="color: #2aa198;">\</span>
+  -F <span style="color: #2aa198;">"filedescription=Cool text file with cool text inside"</span> <span style="color: #2aa198;">\</span>
+  http://www.post.com/postit.cgi
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org35fb0eb" class="outline-3">
+<h3 id="org35fb0eb"><span class="section-number-3">3.2</span> 添加 USER AGENT</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+使用 <code>-A</code> 选项知道 USER-AGENT。
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">curl -A <span style="color: #2aa198;">'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0'</span> https://example.com
+</pre>
+</div>
+
+<pre class="example">
+&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Example Domain&lt;/title&gt;
+
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta http-equiv="Content-type" content="text/html; charset=utf-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;
+    &lt;style type="text/css"&gt;
+    body {
+        background-color: #f0f0f2;
+        margin: 0;
+        padding: 0;
+        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    }
+    div {
+        width: 600px;
+        margin: 5em auto;
+        padding: 50px;
+        background-color: #fff;
+        border-radius: 1em;
+    }
+    a:link, a:visited {
+        color: #38488f;
+        text-decoration: none;
+    }
+    @media (max-width: 700px) {
+        body {
+            background-color: #fff;
+        }
+        div {
+            width: auto;
+            margin: 0 auto;
+            border-radius: 0;
+            padding: 1em;
+        }
+    }
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+&lt;div&gt;
+    &lt;h1&gt;Example Domain&lt;/h1&gt;
+    &lt;p&gt;This domain is established to be used for illustrative examples in documents. You may use this
+    domain in examples without prior coordination or asking for permission.&lt;/p&gt;
+    &lt;p&gt;&lt;a href="http://www.iana.org/domains/example"&gt;More information...&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org6cc952a" class="outline-3">
+<h3 id="org6cc952a"><span class="section-number-3">3.3</span> 处理返回头和 HTTP 状态码</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+使用 <code>-i</code> 选项可以参考网页的给出的返回头相关信息。
 </p>
 <div class="org-src-container">
 <pre class="src src-sh">curl -i www.example.com
@@ -392,143 +556,22 @@ Content-Length: 1270
 </div>
 </div>
 
-<div id="outline-container-org7842506" class="outline-3">
-<h3 id="org7842506"><span class="section-number-3">2.5</span> 代理</h3>
-<div class="outline-text-3" id="text-2-5">
+<div id="outline-container-org3f5eafc" class="outline-3">
+<h3 id="org3f5eafc"><span class="section-number-3">3.4</span> 添加 Cookie</h3>
+<div class="outline-text-3" id="text-3-4">
 <p>
-curl 还支持 HTTP 和 SOCKS 协议的代理。可以使用 <b>-x</b> 选项了设置代理服务器的地址和
-端口号信息。
+由于 HTTP 协议是无状态的，所以有些网站是使用 cookie 来记录会话信息。对于
+chrome 这样的浏览器，可以轻易处理 cookie 信息，但在 curl 中只要增加相关参数也
+是可以很容易的处理 cookie 。如下， <code>-c</code> 选项可以将获取到的 cookie 保存成文件。
 </p>
-
-<div class="org-src-container">
-<pre class="src src-sh">curl -x my-proxy:888 ftp://ftp.leachsite.com/README
-curl -u user:passwd -x my-proxy:888 http://www.get.this/
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org56186a7" class="outline-3">
-<h3 id="org56186a7"><span class="section-number-3">2.6</span> 分片下载 (Range)</h3>
-<div class="outline-text-3" id="text-2-6">
-<p>
-可以使用 <b>-r</b> 选项来分片下载文件。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">Get the first 100 bytes of a document</span>
-curl -r 0-99 http://www.get.this/
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">Get the last 500 bytes of a document</span>
-curl -r -500 http://www.get.this/
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org1d894f8" class="outline-3">
-<h3 id="org1d894f8"><span class="section-number-3">2.7</span> 上传</h3>
-<div class="outline-text-3" id="text-2-7">
-<p>
-使用 curl 的 <b>-T</b> 选项来指定上传文件。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">upload all data on stdin to a specified server</span>
-curl -T - ftp://ftp.upload.com/myfile
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">upload file with username and password</span>
-curl -T uploadfile -u user:passwd ftp://ftp.upload.com/
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">upload file to get append to the remote file</span>
-curl -T localfile -a ftp://ftp.upload.com/remotefile
-</pre>
-</div>
-
-<p>
-使用 smb 协议上传文件。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-sh">curl -T file.txt -u <span style="color: #2aa198;">"domain\username:passwd"</span> smb://server.example.com/share/
-</pre>
-</div>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-org5453151" class="outline-2">
-<h2 id="org5453151"><span class="section-number-2">3</span> API 测试</h2>
-<div class="outline-text-2" id="text-3">
-</div>
-<div id="outline-container-org687d34e" class="outline-3">
-<h3 id="org687d34e"><span class="section-number-3">3.1</span> POST 数据</h3>
-<div class="outline-text-3" id="text-3-1">
-<p>
-在测试 API 联通时常常需要 POST 一下数据，使用 <b>-d</b> 选项可以 POST 数据。这里的数
-据部分必须是事先编码好的。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-sh">curl -d <span style="color: #2aa198;">"name=Rafael%20Sagula&amp;phone=3320780"</span> http://www.where.com/guest.cgi
-</pre>
-</div>
-
-<p>
-使用 <b>-d</b> 选项的局限性是只能使用普通键值对方式的参数，如果需要 POST 文件内容参数
-则需要使用 <b>-F</b> 选项。 <b>-F</b> 选项使用 <code>@&lt;filename&gt;;type=&lt;mime-type&gt;</code> 这种方式来编
-码所要上传的文件。如果没有给定 mime-type 则 curl 根据文件后缀名来猜测。如下命令
-中上传了三个文件。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-sh">curl -F <span style="color: #2aa198;">"coolfiles=@fil1.gif;type=image/gif,fil2.txt,fil3.html"</span> http://www.post.com/postit.cgi
-</pre>
-</div>
-
-<p>
-上传文件并且添加其它字段的例子。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-sh">curl -F <span style="color: #2aa198;">"file=@cooltext.txt"</span> -F <span style="color: #2aa198;">"yourname=Daniel"</span> <span style="color: #2aa198;">\</span>
-  -F <span style="color: #2aa198;">"filedescription=Cool text file with cool text inside"</span> <span style="color: #2aa198;">\</span>
-  http://www.post.com/postit.cgi
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org75dc4fb" class="outline-3">
-<h3 id="org75dc4fb"><span class="section-number-3">3.2</span> USER AGENT</h3>
-<div class="outline-text-3" id="text-3-2">
-<p>
-使用 <b>-A</b> 选项知道 USER-AGENT。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-sh">curl -A <span style="color: #2aa198;">'Mozilla/3.0 (Win95; I)'</span> www.baidu.com
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org00b11de" class="outline-3">
-<h3 id="org00b11de"><span class="section-number-3">3.3</span> 处理 cookie</h3>
-<div class="outline-text-3" id="text-3-3">
-<p>
-由于 HTTP 协议是无状态的，所以有些网站是使用 cookie 来记录会话信息。对于 chrome
-这样的浏览器，可以轻易处理 cookie 信息，但在 curl 中只要增加相关参数也是可以很容
-易的处理 cookie 。如下， <b>-c</b> 选项可以将获取到的 cookie 保存成文件。
-</p>
-
 <div class="org-src-container">
 <pre class="src src-sh">curl -c cookie.txt http://www.baidu.com
 </pre>
 </div>
 
 <p>
-使用 <b>-b</b> 可以指定 cookie 字段。
+使用 <code>-b</code> 可以指定 cookie 字段。
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">curl -b <span style="color: #2aa198;">"name=Daniel"</span> www.sillypage.com
 </pre>
@@ -537,7 +580,6 @@ curl -T localfile -a ftp://ftp.upload.com/remotefile
 <p>
 读写同一个 cookie 文件。
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">curl -b cookies.txt -c cookies.txt www.example.com
 </pre>
@@ -549,7 +591,7 @@ curl -T localfile -a ftp://ftp.upload.com/remotefile
 <div id="postamble" class="status">
 <p class="date">Date: 2018-11-03 Sat 00:00</p>
 <p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-07-05 Fri 16:08</p>
+<p class="date">Created: 2019-07-05 Fri 16:25</p>
 <p class="validation"></p>
 </div>
 </body>
