@@ -56,6 +56,303 @@
 ** 参考手册
    1. [[https://dev.mysql.com/doc/][MySQL 文档]]
    2. [[https://hub.docker.com/_/mysql][MySQL on Docker Hub]]
+** 帮助系统 - =\h= 命令
+   #+BEGIN_SRC text
+     mysql> \h
+     For information about MySQL products and services, visit:
+        http://www.mysql.com/
+     For developer information, including the MySQL Reference Manual, visit:
+        http://dev.mysql.com/
+     To buy MySQL Enterprise support, training, or other products, visit:
+        https://shop.mysql.com/
+
+     List of all MySQL commands:
+     Note that all text commands must be first on line and end with ';'
+     ?         (\?) Synonym for `help'.
+     clear     (\c) Clear the current input statement.
+     connect   (\r) Reconnect to the server. Optional arguments are db and host.
+     delimiter (\d) Set statement delimiter.
+     edit      (\e) Edit command with $EDITOR.
+     ego       (\G) Send command to mysql server, display result vertically.
+     exit      (\q) Exit mysql. Same as quit.
+     go        (\g) Send command to mysql server.
+     help      (\h) Display this help.
+     nopager   (\n) Disable pager, print to stdout.
+     notee     (\t) Don't write into outfile.
+     pager     (\P) Set PAGER [to_pager]. Print the query results via PAGER.
+
+     print     (\p) Print current command.
+     prompt    (\R) Change your mysql prompt.
+     quit      (\q) Quit mysql.
+     rehash    (\#) Rebuild completion hash.
+     source    (\.) Execute an SQL script file. Takes a file name as an argument.
+     status    (\s) Get status information from the server.
+     system    (\!) Execute a system shell command.
+     tee       (\T) Set outfile [to_outfile]. Append everything into given outfile.
+     use       (\u) Use another database. Takes database name as argument.
+     charset   (\C) Switch to another charset. Might be needed for processing binlog with multi-byte charsets.
+     warnings  (\W) Show warnings after every statement.
+     nowarning (\w) Don't show warnings after every statement.
+     resetconnection(\x) Clean session context.
+
+     For server side help, type 'help contents'
+
+     mysql> \h show
+     Name: 'SHOW'
+     Description:
+     SHOW has many forms that provide information about databases, tables,
+     columns, or status information about the server. This section describes
+     those following:
+
+     SHOW {BINARY | MASTER} LOGS
+     SHOW BINLOG EVENTS [IN 'log_name'] [FROM pos] [LIMIT [offset,] row_count]
+     SHOW CHARACTER SET [like_or_where]
+     SHOW COLLATION [like_or_where]
+     SHOW [FULL] COLUMNS FROM tbl_name [FROM db_name] [like_or_where]
+     SHOW CREATE DATABASE db_name
+     SHOW CREATE EVENT event_name
+     SHOW CREATE FUNCTION func_name
+     SHOW CREATE PROCEDURE proc_name
+     SHOW CREATE TABLE tbl_name
+     SHOW CREATE TRIGGER trigger_name
+     SHOW CREATE VIEW view_name
+     SHOW DATABASES [like_or_where]
+     SHOW ENGINE engine_name {STATUS | MUTEX}
+     SHOW [STORAGE] ENGINES
+     SHOW ERRORS [LIMIT [offset,] row_count]
+     SHOW EVENTS
+     SHOW FUNCTION CODE func_name
+     SHOW FUNCTION STATUS [like_or_where]
+     SHOW GRANTS FOR user
+     SHOW INDEX FROM tbl_name [FROM db_name]
+     SHOW MASTER STATUS
+     SHOW OPEN TABLES [FROM db_name] [like_or_where]
+     SHOW PLUGINS
+
+     SHOW PROCEDURE CODE proc_name
+     SHOW PROCEDURE STATUS [like_or_where]
+     SHOW PRIVILEGES
+     SHOW [FULL] PROCESSLIST
+     SHOW PROFILE [types] [FOR QUERY n] [OFFSET n] [LIMIT n]
+     SHOW PROFILES
+     SHOW RELAYLOG EVENTS [IN 'log_name'] [FROM pos] [LIMIT [offset,] row_count]
+     SHOW SLAVE HOSTS
+     SHOW SLAVE STATUS [FOR CHANNEL channel]
+     SHOW [GLOBAL | SESSION] STATUS [like_or_where]
+     SHOW TABLE STATUS [FROM db_name] [like_or_where]
+     SHOW [FULL] TABLES [FROM db_name] [like_or_where]
+     SHOW TRIGGERS [FROM db_name] [like_or_where]
+     SHOW [GLOBAL | SESSION] VARIABLES [like_or_where]
+     SHOW WARNINGS [LIMIT [offset,] row_count]
+
+     like_or_where:
+         LIKE 'pattern'
+       | WHERE expr
+
+     If the syntax for a given SHOW statement includes a LIKE 'pattern'
+     part, 'pattern' is a string that can contain the SQL % and _ wildcard
+     characters. The pattern is useful for restricting statement output to
+     matching values.
+
+     Several SHOW statements also accept a WHERE clause that provides more
+     flexibility in specifying which rows to display. See
+
+     http://dev.mysql.com/doc/refman/5.7/en/extended-show.html.
+
+     URL: http://dev.mysql.com/doc/refman/5.7/en/show.html
+
+
+     mysql> \h show create table
+     Name: 'SHOW CREATE TABLE'
+     Description:
+     Syntax:
+     SHOW CREATE TABLE tbl_name
+
+     Shows the CREATE TABLE statement that creates the named table. To use
+     this statement, you must have some privilege for the table. This
+     statement also works with views.
+     SHOW CREATE TABLE quotes table and column names according to the value
+     of the sql_quote_show_create option. See
+     http://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html.
+
+     For information about how CREATE TABLE statements are stored by MySQL,
+     see
+     http://dev.mysql.com/doc/refman/5.7/en/create-table-statement-retention
+     .html.
+
+     URL: http://dev.mysql.com/doc/refman/5.7/en/show-create-table.html
+
+     Examples:
+     mysql> SHOW CREATE TABLE t\G
+     ,*************************** 1. row ***************************
+            Table: t
+     Create Table: CREATE TABLE `t` (
+       `id` int(11) NOT NULL AUTO_INCREMENT,
+       `s` char(60) DEFAULT NULL,
+       PRIMARY KEY (`id`)
+     ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+     mysql> \h alter table
+     Name: 'ALTER TABLE'
+     Description:
+     Syntax:
+     ALTER TABLE tbl_name
+         [alter_specification [, alter_specification] ...]
+         [partition_options]
+
+     alter_specification:
+         table_options
+       | ADD [COLUMN] col_name column_definition
+             [FIRST | AFTER col_name]
+       | ADD [COLUMN] (col_name column_definition,...)
+       | ADD {INDEX|KEY} [index_name]
+             [index_type] (key_part,...) [index_option] ...
+       | ADD [CONSTRAINT [symbol]] PRIMARY KEY
+             [index_type] (key_part,...) [index_option] ...
+       | ADD [CONSTRAINT [symbol]]
+             UNIQUE [INDEX|KEY] [index_name]
+             [index_type] (key_part,...) [index_option] ...
+       | ADD FULLTEXT [INDEX|KEY] [index_name]
+             (key_part,...) [index_option] ...
+       | ADD SPATIAL [INDEX|KEY] [index_name]
+             (key_part,...) [index_option] ...
+       | ADD [CONSTRAINT [symbol]]
+             FOREIGN KEY [index_name] (col_name,...)
+             reference_definition
+       | ALGORITHM [=] {DEFAULT|INPLACE|COPY}
+
+       | ALTER [COLUMN] col_name {SET DEFAULT literal | DROP DEFAULT}
+       | CHANGE [COLUMN] old_col_name new_col_name column_definition
+             [FIRST|AFTER col_name]
+       | [DEFAULT] CHARACTER SET [=] charset_name [COLLATE [=] collation_name]
+       | CONVERT TO CHARACTER SET charset_name [COLLATE collation_name]
+       | {DISABLE|ENABLE} KEYS
+       | {DISCARD|IMPORT} TABLESPACE
+       | DROP [COLUMN] col_name
+       | DROP {INDEX|KEY} index_name
+       | DROP PRIMARY KEY
+       | DROP FOREIGN KEY fk_symbol
+       | FORCE
+       | LOCK [=] {DEFAULT|NONE|SHARED|EXCLUSIVE}
+       | MODIFY [COLUMN] col_name column_definition
+             [FIRST | AFTER col_name]
+       | ORDER BY col_name [, col_name] ...
+       | RENAME {INDEX|KEY} old_index_name TO new_index_name
+       | RENAME [TO|AS] new_tbl_name
+       | {WITHOUT|WITH} VALIDATION
+       | ADD PARTITION (partition_definition)
+       | DROP PARTITION partition_names
+       | DISCARD PARTITION {partition_names | ALL} TABLESPACE
+       | IMPORT PARTITION {partition_names | ALL} TABLESPACE
+       | TRUNCATE PARTITION {partition_names | ALL}
+       | COALESCE PARTITION number
+
+       | REORGANIZE PARTITION partition_names INTO (partition_definitions)
+       | EXCHANGE PARTITION partition_name WITH TABLE tbl_name [{WITH|WITHOUT} VALIDATION]
+       | ANALYZE PARTITION {partition_names | ALL}
+       | CHECK PARTITION {partition_names | ALL}
+       | OPTIMIZE PARTITION {partition_names | ALL}
+       | REBUILD PARTITION {partition_names | ALL}
+       | REPAIR PARTITION {partition_names | ALL}
+       | REMOVE PARTITIONING
+       | UPGRADE PARTITIONING
+
+     key_part:
+         col_name [(length)] [ASC | DESC]
+
+     index_type:
+         USING {BTREE | HASH}
+
+     index_option:
+         KEY_BLOCK_SIZE [=] value
+       | index_type
+       | WITH PARSER parser_name
+       | COMMENT 'string'
+
+     table_options:
+         table_option [[,] table_option] ...
+
+     table_option:
+         AUTO_INCREMENT [=] value
+       | AVG_ROW_LENGTH [=] value
+       | [DEFAULT] CHARACTER SET [=] charset_name
+       | CHECKSUM [=] {0 | 1}
+       | [DEFAULT] COLLATE [=] collation_name
+       | COMMENT [=] 'string'
+       | COMPRESSION [=] {'ZLIB'|'LZ4'|'NONE'}
+       | CONNECTION [=] 'connect_string'
+
+       | {DATA|INDEX} DIRECTORY [=] 'absolute path to directory'
+       | DELAY_KEY_WRITE [=] {0 | 1}
+       | ENCRYPTION [=] {'Y' | 'N'}
+       | ENGINE [=] engine_name
+       | INSERT_METHOD [=] { NO | FIRST | LAST }
+       | KEY_BLOCK_SIZE [=] value
+       | MAX_ROWS [=] value
+       | MIN_ROWS [=] value
+       | PACK_KEYS [=] {0 | 1 | DEFAULT}
+       | PASSWORD [=] 'string'
+       | ROW_FORMAT [=] {DEFAULT|DYNAMIC|FIXED|COMPRESSED|REDUNDANT|COMPACT}
+       | STATS_AUTO_RECALC [=] {DEFAULT|0|1}
+       | STATS_PERSISTENT [=] {DEFAULT|0|1}
+       | STATS_SAMPLE_PAGES [=] value
+       | TABLESPACE tablespace_name [STORAGE {DISK|MEMORY|DEFAULT}]
+       | UNION [=] (tbl_name[,tbl_name]...)
+
+     partition_options:
+         (see CREATE TABLE options)
+
+     ALTER TABLE changes the structure of a table. For example, you can add
+     or delete columns, create or destroy indexes, change the type of
+     existing columns, or rename columns or the table itself. You can also
+     change characteristics such as the storage engine used for the table or
+     the table comment.
+
+     o To use ALTER TABLE, you need ALTER, CREATE, and INSERT privileges for
+
+       the table. Renaming a table requires ALTER and DROP on the old table,
+       ALTER, CREATE, and INSERT on the new table.
+
+     o Following the table name, specify the alterations to be made. If none
+       are given, ALTER TABLE does nothing.
+
+     o The syntax for many of the permissible alterations is similar to
+       clauses of the CREATE TABLE statement. column_definition clauses use
+       the same syntax for ADD and CHANGE as for CREATE TABLE. For more
+       information, see [HELP CREATE TABLE].
+
+     o The word COLUMN is optional and can be omitted.
+
+     o Multiple ADD, ALTER, DROP, and CHANGE clauses are permitted in a
+       single ALTER TABLE statement, separated by commas. This is a MySQL
+       extension to standard SQL, which permits only one of each clause per
+       ALTER TABLE statement. For example, to drop multiple columns in a
+       single statement, do this:
+
+     ALTER TABLE t2 DROP COLUMN c, DROP COLUMN d;
+
+     o If a storage engine does not support an attempted ALTER TABLE
+       operation, a warning may result. Such warnings can be displayed with
+
+       SHOW WARNINGS. See [HELP SHOW WARNINGS]. For information on
+       troubleshooting ALTER TABLE, see
+       http://dev.mysql.com/doc/refman/5.7/en/alter-table-problems.html.
+
+     o For information about generated columns, see
+       http://dev.mysql.com/doc/refman/5.7/en/alter-table-generated-columns.
+       html.
+
+     o For usage examples, see
+       http://dev.mysql.com/doc/refman/5.7/en/alter-table-examples.html.
+
+     o With the mysql_info() C API function, you can find out how many rows
+       were copied by ALTER TABLE. See
+       http://dev.mysql.com/doc/refman/5.7/en/mysql-info.html.
+
+     URL: http://dev.mysql.com/doc/refman/5.7/en/alter-table.html
+
+     mysql >
+   #+END_SRC
 
 * 数据库操作
 ** 查看数据库基本信息
