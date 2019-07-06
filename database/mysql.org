@@ -949,6 +949,7 @@
      mysql>
    #+END_SRC
 ** 修改表结构
+   常见的修改表结果操作如下，如需更多改表操作，见 ~\h ALTER TABLE~
    #+BEGIN_SRC sql
      ALTER TABLE tabname
        ADD[ COLUMN] colname                       -- 增加字段
@@ -1044,13 +1045,75 @@
      UPDATE tabname SET colname1=value1[, colname2=value2] [WHERE condition];
    #+END_SRC
 ** 查询数据
-   - 可来自多个表的多个字段
-   - 可以不带条件限制查询
-   - 字段列表可以用 =*= 代替，表示所有字段
    #+BEGIN_SRC sql
      SELECT colname1, colname2, ... FROM tabname [WHERE condition];
    #+END_SRC
 
+   查询数据的语法如下，注意 ~SELECT~ 语句中的各个域的顺序。  ~SELECT ->
+   [ALL|DISTINCT] -> select_expr -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER
+   BY -> LIMIT~
+   #+BEGIN_SRC sql
+     SELECT
+         [ALL | DISTINCT | DISTINCTROW ]
+           [HIGH_PRIORITY]
+           [STRAIGHT_JOIN]
+           [SQL_SMALL_RESULT] [SQL_BIG_RESULT] [SQL_BUFFER_RESULT]
+           [SQL_CACHE | SQL_NO_CACHE] [SQL_CALC_FOUND_ROWS]
+         select_expr [, select_expr ...]
+         [FROM table_references
+           [PARTITION partition_list]
+         [WHERE where_condition]
+         [GROUP BY {col_name | expr | position}
+           [ASC | DESC], ... [WITH ROLLUP]]
+         [HAVING where_condition]
+         [ORDER BY {col_name | expr | position}
+           [ASC | DESC], ...]
+         [LIMIT {[offset,] row_count | row_count OFFSET offset}]
+         [PROCEDURE procedure_name(argument_list)]
+         [INTO OUTFILE 'file_name'
+             [CHARACTER SET charset_name]
+             export_options
+           | INTO DUMPFILE 'file_name'
+           | INTO var_name [, var_name]]
+         [FOR UPDATE | LOCK IN SHARE MODE]]
+   #+END_SRC
+   - select_expr:
+     + =*= 表示所有字段，如： ~SELECT * FROM tab;~
+     + 可以是字段，函数调用，计算公式，如： ~SELECT name, now(), 2+3 FROM tab;~
+     + 为了简化列或避免多个列标识符崇明，可以对 =select_expr= 的列起别名。 使用
+       ~as~ 关键字，也可以省略 ~as~
+   - FROM 子句
+     + 为表可以起别名，使用 ~as~ 关键字： ~SELECT * FROM tab1 as a, tab2 as b;~
+     + FROM 后面跟逗号分隔的从多个表的话表示会形成笛卡尔积
+   - WHERE 子句
+     + 整型 1 表示真，0表示假。
+     + 运算符：=, <=>, <>, !=, <=, <, >=, >, !, &&, ||, IN (NOT) NULL, (NOT)
+       LIKE, (NOT) IN, (NOT) BETWEEN AND, IS (NOT), AND, OR, NOT, XOR IS/IS NOT
+       加上 TURE/FALSE/UNKNOWN，检验某个值的真假<=>与<>功能相同，<=>可用于 NULL
+       比较
+     + 模式通配符： =_= 任意单个字符; =%= 任意多个字符，甚至包括零字符，配合 LIKE 使用
+    单引号需要进行转义 \'
+   - GROUP BY 子句
+     + 字段/别名 [排序方式]: 组后会进行排序。升序：ASC，降序：DESC
+     + 使用聚合函数: count 返回不同的非 NULL 值数目 count(*)、count(字段); sum
+       求和; max 求最大值; min 求最小值; avg 求平均值; group_concat 返回带有来自
+       一个组的连接的非 NULL 值的字符串结果。组内字符串连接。
+   - HAVING 子句: 与 WHERE 功能、用法相同，执行时机不同。WHERE 在开始时执行检测
+     数据，对原数据进行过滤。HAVING 对筛选出的结果再次进行过滤。HAVING 字段必须
+     是查询出来的，WHERE 字段必须是数据表存在的。WHERE 不可以使用字段的别名，
+     HAVING 可以。因为执行 WHERE 代码时，可能尚未确定列值。WHERE 不可以使用合计
+     函数。一般需用合计函数才会用 HAVING SQL 标准要求 HAVING 必须引用 GROUP BY
+     子句中的列或用于合计函数中的列。
+   - ORDER BY 子句，升序：ASC，降序：DESC 支持多个字段的排序。
+   - LIMIT 子句，限制结果数量子句仅对处理好的结果进行数量限制。将处理好的结果的
+     看作是一个集合，按照记录出现的顺序，索引从 0 开始。LIMIT 起始位置, 获取条数
+     省略第一个参数，表示从索引 0 开始。LIMIT 获取条数
+   - DISTINCT/ALL 选项 : DISTINCT 去除重复记录， 默认为 ALL, 全部记录
+
+* 高级查询
+** 查询结果进行集合操作
+** 子查询
+** 联表查询
 * mysqldump 备份/还原库
 ** 导出数据
    #+BEGIN_SRC sh
