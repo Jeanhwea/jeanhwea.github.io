@@ -1124,7 +1124,63 @@
       SELECT 语句为准。
 
 ** 子查询
+   子查询需用括号包裹。
+*** FROM 型子查询
+    FROM 后要求是一个表，必须给子查询结果取个别名。
+    - 简化每个查询内的条件。
+    - FROM 型需将结果生成一个临时表格，可用以原表的锁定的释放。
+    - 子查询返回一个表，表型子查询。
+
+    #+BEGIN_SRC sql
+      SELECT *
+        FROM
+            (SELECT * FROM tab WHERE id > 0) AS subtab
+       WHERE id > 1;
+    #+END_SRC
+
+*** WHERE 型子查询
+    - 子查询返回一个值，标量子查询。
+    - 不需要给子查询取别名。
+    - WHERE 子查询内的表，不能直接用以更新。
+
+    #+BEGIN_SRC sql
+      SELECT * FROM tab
+       WHERE money = (SELECT max(money) FROM tab);
+    #+END_SRC
+
+    - 列子查询
+      + 如果子查询结果返回的是一列， 使用 IN 或 NOT IN 完成查询
+      + 如果子查询返回数据， 使用 EXISTS 和 NOT EXISTS 完成查询。
+        ~SELECT column1 FROM t1 WHERE EXISTS (SELECT * FROM t2);~
+    - 行子查询，即查询条件是一个行。
+      ~SELECT * FROM t1 WHERE (id, gender) IN (SELECT id, gender FROM t2);~
+      行构造符： ~(col1, col2, ...)~ 或 ~ROW(col1,f col2, ...)~
+      行构造符通常用于与对能返回两个或两个以上列的子查询进行比较。
+    - 特殊运算符
+     + != ALL() 相当于 NOT IN
+     + = SOME() 相当于 IN, *ANY 是 SOME 的别名*
+     + != SOME() 不等同于 NOT IN，不等于其中某一个
+     + ALL, SOME 可以配合其他运算符一起使用。
+
 ** 联表查询
+   将多个表的字段进行连接，可以指定连接条件。联表查询包括多种类型，常见的有内连接，外连接等
+
+   [[file:../static/image/2019/07/sql-joins.jpg]]
+
+*** 内连接 INNER JOIN
+    - 默认就是内连接，可省略 INNER
+    - 只有数据存在时才能发送连接。即连接结果不能出现空行。 ON 表示连接条件。其条
+      件表达式与 WHERE 类似。也可以省略条件（表示条件永远为真） 也可用 WHERE 表
+      示连接条件。 还有 USING, 但需字段名相同。 USING (字段名)
+    - 交叉连接 CROSS JOIN, 即没有条件的内连接。 ~SELECT * FROM A CROSS JOIN B;~
+*** 外连接 OUTER JOIN
+    - 如果数据不存在，也会出现在连接结果中。
+    - 左外连接 LEFT JOIN: 如果数据不存在，左表记录会出现，而右表为 NULL 填充
+    - 右外连接 RIGHT JOIN: 如果数据不存在，右表记录会出现，而左表为 NULL 填充
+*** 自然连接 NATURAL JOIN
+    自动判断连接条件完成连接。相当于省略了 USING，会自动查找相同字段名。 ~NATURAL JOIN~ ,
+    ~NATURAL LEFT JOIN~, ~NATURAL RIGHT JOIN~
+
 * mysqldump 备份/还原库
 ** 导出数据
    #+BEGIN_SRC sh
