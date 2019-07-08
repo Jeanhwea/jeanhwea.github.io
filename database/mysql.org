@@ -1004,6 +1004,13 @@
      -- 清空表数据
      TRUNCATE [TABLE] tabname;
    #+END_SRC
+   - TRUNCATE 清空数据, 删除重建表
+   - TRUNCATE 和 DELETE 的区别
+     + TRUNCATE 是删除表再创建，DELETE 是逐条删除
+     + TRUNCATE 重置 AUTO_INCREMENT 的值。而 DELETE 不会
+     + TRUNCATE 不知道删除了几条，而 DELETE 知道。
+     + 当被用于带分区的表时，TRUNCATE 会保留分区
+
 ** 复制表
    #+BEGIN_SRC sql
      -- 复制表结构
@@ -1037,9 +1044,15 @@
    - 删除数据比较危险，一般先用 SELECT 查询来调试，等到条件无误后将 SELECT 改成
      DELETE 来删除数据。
    - 没有条件子句，则会删除全部
+   - 指定删除的最多记录数。LIMIT
+   - 可以通过排序条件删除。ORDER BY + LIMIT
+   - 支持多表删除，使用类似连接语法。
+   - DELETE FROM 需要删除数据多表 1，表 2 USING 表连接操作 条件。
+
    #+BEGIN_SRC sql
-     DELETE FROM tabname[ WHERE condition];
+     DELETE FROM tabname[ WHERE condition] [ORDER BY ...] [LIMIT row_count];
    #+END_SRC
+
 ** 更新数据
    #+BEGIN_SRC sql
      UPDATE tabname SET colname1=value1[, colname2=value2] [WHERE condition];
@@ -1181,23 +1194,54 @@
     自动判断连接条件完成连接。相当于省略了 USING，会自动查找相同字段名。 ~NATURAL JOIN~ ,
     ~NATURAL LEFT JOIN~, ~NATURAL RIGHT JOIN~
 
-* mysqldump 备份/还原库
-** 导出数据
-   #+BEGIN_SRC sh
-     mysqldump -u user -p pass dbname tabname > /tmp/out.sql # 导出一张表
-     mysqldump -u user -p pass dbname tabname1 tabname1 > /tmp/out.sql # 导出多张表
-     mysqldump -u user -p pass dbname > /tmp/out.sql # 导出数据库所有表
-     mysqldump -u user -p pass -B dbname1 dbname2 > /tmp/out.sql # 导出多数据库
-   #+END_SRC
-** 导入数据
-   在 MySQL 命令行里面使用 source 导入数据
+* 导入/导出数据
+** SELECT 方法导入/导出
    #+BEGIN_SRC sql
-     source out.sql
+     -- 导出表数据
+     SELECT * INTO OUTFILE filename [export_option] FROM tabname;
+
+     -- 导入数据
+     LOAD DATA [LOCAL] INFILE filename [REPLACE|IGNORE] INTO TABLE tabname [import_option];
    #+END_SRC
-   在 shell 可以使用非交互式命令导入
-   #+BEGIN_SRC sh
-     mysql -u user -p pass dbname < out.sql
-   #+END_SRC
+   - 生成的数据默认的分隔符是制表符
+   - LOCAL 未指定，则数据文件必须在服务器上
+   - REPLACE 和 IGNORE 关键词控制对现有的唯一键记录的重复的处理
+   - 选项 =export_option= / =import_option=
+     + FIELDS 控制字段格式, 默认为： ~FIELDS TERMINATED BY '\T' ENCLOSED BY '' ESCAPED BY '\\'~
+       - 终止: TERMINATED BY 'string'
+       - 包裹: ENCLOSED BY 'char'
+       - 转义: ESCAPED BY 'char'
+     + LINES 控制行格式，默认为： ~LINES TERMINATED BY '\N'~
+       - 起始: STARTING BY 'string'
+       - 终止: TERMINATED BY 'string'
+
+     #+BEGIN_SRC sql
+       SELECT A, B, A+B
+         INTO OUTFILE '/tmp/result.text'
+              FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+              LINES TERMINATED BY '\n'
+         FROM TEST_TABLE;
+     #+END_SRC
+
+** 使用 mysqldump 工具
+*** 备份数据
+    - 如果远程导入的本地需要指定使用 =-h= 选项指定主机名
+    - 导出后生成一个 sql 脚本
+    #+BEGIN_SRC sh
+      mysqldump -u user -p pass dbname tabname > /tmp/out.sql # 导出一张表
+      mysqldump -u user -p pass dbname tabname1 tabname1 > /tmp/out.sql # 导出多张表
+      mysqldump -u user -p pass dbname > /tmp/out.sql # 导出数据库所有表
+      mysqldump -u user -p pass -B dbname1 dbname2 > /tmp/out.sql # 导出多数据库
+    #+END_SRC
+*** 导入数据
+    在 MySQL 命令行里面使用 source 导入数据
+    #+BEGIN_SRC sql
+      source out.sql
+    #+END_SRC
+    在 shell 可以使用非交互式命令导入
+    #+BEGIN_SRC sh
+      mysql -u user -p pass dbname < out.sql
+    #+END_SRC
 * 内置函数
 ** 数值函数
    - ~abs(x)~ : 绝对值 abs(-10.9) = 10

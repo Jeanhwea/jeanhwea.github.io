@@ -1,24 +1,3 @@
-/* 导入导出 */ ------------------
-select * into outfile 文件地址 [控制格式] from 表名;    -- 导出表数据
-load data [local] infile 文件地址 [replace|ignore] into table 表名 [控制格式];    -- 导入数据
-    生成的数据默认的分隔符是制表符
-    local 未指定，则数据文件必须在服务器上
-    replace 和 ignore 关键词控制对现有的唯一键记录的重复的处理
--- 控制格式
-fields    控制字段格式
-默认：fields terminated by '\t' enclosed by '' escaped by '\\'
-    terminated by 'string'    -- 终止
-    enclosed by 'char'        -- 包裹
-    escaped by 'char'        -- 转义
-    -- 示例：
-        SELECT a,b,a+b INTO OUTFILE '/tmp/result.text'
-        FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
-        LINES TERMINATED BY '\n'
-        FROM test_table;
-lines    控制行格式
-默认：lines terminated by '\n'
-    terminated by 'string'    -- 终止
-
 /* insert */ ------------------
 select 语句获得的数据可以用 insert 插入。
 
@@ -40,28 +19,6 @@ select 语句获得的数据可以用 insert 插入。
 可以指定在插入的值出现主键（或唯一索引）冲突时，更新其他非主键列的信息。
     insert into tbl_name values/set/select on duplicate key update 字段=值, …;
 
-/* delete */ ------------------
-DELETE FROM tbl_name [WHERE where_definition] [ORDER BY ...] [LIMIT row_count]
-
-按照条件删除
-
-指定删除的最多记录数。Limit
-
-可以通过排序条件删除。order by + limit
-
-支持多表删除，使用类似连接语法。
-delete from 需要删除数据多表 1，表 2 using 表连接操作 条件。
-
-/* truncate */ ------------------
-TRUNCATE [TABLE] tbl_name
-清空数据
-删除重建表
-
-区别：
-1，truncate 是删除表再创建，delete 是逐条删除
-2，truncate 重置 auto_increment 的值。而 delete 不会
-3，truncate 不知道删除了几条，而 delete 知道。
-4，当被用于带分区的表时，truncate 会保留分区
 
 
 /* 视图 */ ------------------
