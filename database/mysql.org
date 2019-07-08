@@ -1285,7 +1285,7 @@
       消或更改表或存储的子程序的语句。
     - *事务不能被嵌套*
 
-** 开启事务
+** 事务开始：开启
    开启事务后，所有被执行的 SQL 语句均被认作当前事务内的 SQL 语句。
    #+BEGIN_SRC sql
      START TRANSACTION;
@@ -1303,6 +1303,26 @@
    #+BEGIN_SRC sql
      ROLLBACK;
     #+END_SRC
+
+** 事务保存：保存点
+   #+BEGIN_SRC sql
+     SAVEPOINT 保存点名称 -- 设置一个事务保存点
+     ROLLBACK TO SAVEPOINT 保存点名称 -- 回滚到保存点
+     RELEASE SAVEPOINT 保存点名称 -- 删除保存点
+   #+END_SRC
+
+** InnoDB 自动提交特性设置
+   #+BEGIN_SRC sql
+     -- 0 表示关闭自动提交，1表示开启自动提交。
+     SET autocommit = 0|1;
+   #+END_SRC
+   - 如果关闭了，那普通操作的结果对其他客户端也不可见，需要 COMMIT 提交后才能持
+     久化数据操作。
+   - 也可以关闭自动提交来开启事务。但与 START TRANSACTION 不同的是，
+     + SET autocommit 是永久改变服务器的设置，直到下次再次修改该设置。(针对当前
+       连接)
+     + START TRANSACTION 记录开启前的状态，而一旦事务提交或回滚后就需要再次开启
+       事务。(针对当前事务)
 
 * 导入/导出数据
 ** SELECT 方法导入/导出
