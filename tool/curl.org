@@ -5,13 +5,14 @@
 #+DATE: <2018-11-03 Sat>
 #+TAGS: curl api download
 
-[[file:../static/image/2018/11/everything-curl.png]]
 
 * cURL
   [[https://curl.haxx.se/][cURL]] 是一个利用 URL 语法在命令行下工作的文件传输工具，1997 年首次发行。它支持
   文件上传和下载，所以是综合传输工具，但按传统，习惯称 cURL 为下载工具。 Mac 和
   Linux 可以通过命令行直接安装，Windows 需要[[https://curl.haxx.se/windows/][下载]]可执行文件安装。可以通过
   [[https://ec.haxx.se/][Everything curl]] 来学习使用工具。
+
+  [[file:../static/image/2018/11/everything-curl.png]]
 
 * 常见用法
 ** 获取网页内容
@@ -45,8 +46,8 @@
      curl -o example.html http://www.example.com/
    #+END_SRC
 
-   使用 =-O= 选项将下载的内容保存成 url 最后给定的文件名，如下例子中将会把文件命名
-   成 index.html
+   使用 =-O= 选项将下载的内容保存成 url 最后给定的文件名，如下例子中将会把文件命
+   名成 index.html
    #+BEGIN_SRC sh
      curl -O www.haxx.se/index.html
    #+END_SRC
@@ -92,148 +93,210 @@
 
 * API 测试
 ** 处理 HTTP 方法
-   在测试 API 时常常需要 POST 数据，使用 =-X= 可以指定 HTTP 方法， =-d= 选项可以
-   指定 POST 数据。这里的数据部分必须是事先编码好的。
-   #+BEGIN_SRC sh
-     curl -X POST -d "name=Rafael%20Sagula&phone=3320780" http://www.where.com/guest.cgi
-   #+END_SRC
+*** 提交表单数据
+    #+BEGIN_SRC sh :exports both :results output
+      curl -X POST -d "user=foobar&pass=12345&id=blablabla&ding=submit" \
+           http://httpbin.org/post
+    #+END_SRC
 
-   使用 =-d= 选项的局限性是只能使用普通键值对方式的参数，如果需要 POST 文件内容
-   参数则需要使用 =-F= 选项。 =-F= 选项使用 ~@<filename>;type=<mime-type>~ 这种
-   方式来编码所要上传的文件。如果没有给定 mime-type 则 curl 根据文件后缀名来猜测。
-   如下命令中上传了三个文件。
-   #+BEGIN_SRC sh
-     curl -X POST -F "coolfiles=@fil1.gif;type=image/gif,fil2.txt,fil3.html" \
-          http://www.post.com/postit.cgi
-   #+END_SRC
+    #+RESULTS:
+    #+begin_example
+    {
+      "args": {},
+      "data": "",
+      "files": {},
+      "form": {
+        "ding": "submit",
+        "id": "blablabla",
+        "pass": "12345",
+        "user": "foobar"
+      },
+      "headers": {
+        "Accept": "application/json, application/xml, text/plain, */*",
+        "Content-Length": "47",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Host": "httpbin.org",
+        "User-Agent": "curl/7.54.0"
+      },
+      "json": null,
+      "origin": "223.72.66.144, 223.72.66.144",
+      "url": "https://httpbin.org/post"
+    }
+    #+end_example
 
-   上传文件并且添加其它字段的例子。
-   #+BEGIN_SRC sh
-     curl -X POST -F "file=@cooltext.txt" -F "yourname=Daniel" \
-       -F "filedescription=Cool text file with cool text inside" \
-       http://www.post.com/postit.cgi
-   #+END_SRC
+*** 命令行中指定 JSON 字符串
+    在测试 API 时常常需要 POST 数据，使用 =-X= 可以指定 HTTP 方法， =-d= 选项可以
+    指定 POST 数据。
+    #+BEGIN_SRC sh :exports both :results output
+      curl -X POST -d '{"name":"Rafael, Sagula", "phone":3320780}' \
+           -H "Content-Type: application/json" http://httpbin.org/post
+    #+END_SRC
+
+    #+RESULTS:
+    #+begin_example
+    {
+      "args": {},
+      "data": "{\"name\":\"Rafael, Sagula\", \"phone\":3320780}",
+      "files": {},
+      "form": {},
+      "headers": {
+        "Accept": "application/json, application/xml, text/plain, */*",
+        "Content-Length": "42",
+        "Content-Type": "application/json",
+        "Host": "httpbin.org",
+        "User-Agent": "curl/7.54.0"
+      },
+      "json": {
+        "name": "Rafael, Sagula",
+        "phone": 3320780
+      },
+      "origin": "223.72.66.144, 223.72.66.144",
+      "url": "https://httpbin.org/post"
+    }
+    #+end_example
+
+*** 命令行中指定 JSON 文件
+    使用 =-d= 选项的局限性是只能使用普通键值对方式的参数，如果需要 POST 文件内容，
+    可以使用 =@<filename>= 来指定
+    #+BEGIN_SRC sh :exports both :results output
+      cat /tmp/input.json
+    #+END_SRC
+
+    #+RESULTS:
+    : {
+    :   "apple": 1,
+    :   "banana": 2
+    : }
+
+    #+BEGIN_SRC sh :exports both :results output
+      curl -X POST -d@/tmp/input.json \
+           -H "Content-Type: application/json" http://httpbin.org/post
+    #+END_SRC
+
+    #+RESULTS:
+    #+begin_example
+    {
+      "args": {},
+      "data": "{  \"apple\": 1,  \"banana\": 2}",
+      "files": {},
+      "form": {},
+      "headers": {
+        "Accept": "application/json, application/xml, text/plain, */*",
+        "Content-Length": "28",
+        "Content-Type": "application/json",
+        "Host": "httpbin.org",
+        "User-Agent": "curl/7.54.0"
+      },
+      "json": {
+        "apple": 1,
+        "banana": 2
+      },
+      "origin": "223.72.66.144, 223.72.66.144",
+      "url": "https://httpbin.org/post"
+    }
+    #+end_example
+
+    参数则需要使用 =-F= 选项。 =-F= 选项使用 ~@<filename>;type=<mime-type>~ 这种
+    方式来编码所要上传的文件。如果没有给定 mime-type 则 curl 根据文件后缀名来猜
+    测。如下命令中上传了三个文件。
+    #+BEGIN_SRC sh
+      curl -X POST -F "coolfiles=@fil1.gif;type=image/gif,fil2.txt,fil3.html" \
+           http://www.post.com/postit.cgi
+    #+END_SRC
+
+    上传文件并且添加其它字段的例子。
+    #+BEGIN_SRC sh
+      curl -X POST -F "file=@cooltext.txt" -F "yourname=Daniel" \
+           -F "filedescription=Cool text file with cool text inside" \
+           http://www.post.com/postit.cgi
+    #+END_SRC
 
 ** 添加 USER AGENT
    使用 =-A= 选项知道 USER-AGENT。
    #+BEGIN_SRC sh :exports both :results output
-     curl -A 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0' https://example.com
+     curl -A 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0' \
+          https://httpbin.org/headers
+   #+END_SRC
+
+   #+RESULTS:
+   : {
+   :   "headers": {
+   :     "Accept": "application/json, application/xml, text/plain, */*",
+   :     "Host": "httpbin.org",
+   :     "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0"
+   :   }
+   : }
+
+** 处理返回头和 HTTP 状态码
+   使用 =-i= 选项可以参考网页的给出的返回头相关信息。
+   #+BEGIN_SRC sh :exports both :results output
+     curl -i http://httpbin.org/get
    #+END_SRC
 
    #+RESULTS:
    #+begin_example
-   <!doctype html>
-   <html>
-   <head>
-       <title>Example Domain</title>
-
-       <meta charset="utf-8" />
-       <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-       <meta name="viewport" content="width=device-width, initial-scale=1" />
-       <style type="text/css">
-       body {
-           background-color: #f0f0f2;
-           margin: 0;
-           padding: 0;
-           font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-
-       }
-       div {
-           width: 600px;
-           margin: 5em auto;
-           padding: 50px;
-           background-color: #fff;
-           border-radius: 1em;
-       }
-       a:link, a:visited {
-           color: #38488f;
-           text-decoration: none;
-       }
-       @media (max-width: 700px) {
-           body {
-               background-color: #fff;
-           }
-           div {
-               width: auto;
-               margin: 0 auto;
-               border-radius: 0;
-               padding: 1em;
-           }
-       }
-       </style>
-   </head>
-
-   <body>
-   <div>
-       <h1>Example Domain</h1>
-       <p>This domain is established to be used for illustrative examples in documents. You may use this
-       domain in examples without prior coordination or asking for permission.</p>
-       <p><a href="http://www.iana.org/domains/example">More information...</a></p>
-   </div>
-   </body>
-   </html>
-   #+end_example
-
-** 处理返回头和 HTTP 状态码
-   使用 =-i= 选项可以参考网页的给出的返回头相关信息。
-   #+BEGIN_SRC sh :exports both
-     curl -i www.example.com
-   #+END_SRC
-
-   #+RESULTS:
-
-   #+BEGIN_EXAMPLE
    HTTP/1.1 200 OK
-   Accept-Ranges: bytes
-   Cache-Control: max-age=604800
-   Content-Type: text/html; charset=UTF-8
-   Date: Sat, 03 Nov 2018 14:36:06 GMT
-   Etag: "1541025663"
-   Expires: Sat, 10 Nov 2018 14:36:06 GMT
-   Last-Modified: Fri, 09 Aug 2013 23:54:35 GMT
-   Server: ECS (lga/13A4)
-   Vary: Accept-Encoding
-   X-Cache: HIT
-   Content-Length: 1270
-
-   ...
-   #+END_EXAMPLE
+   Access-Control-Allow-Credentials: true
+   Access-Control-Allow-Origin: *
+   Content-Type: application/json
+   Date: Mon, 08 Jul 2019 15:33:45 GMT
+   Referrer-Policy: no-referrer-when-downgrade
+   Server: nginx
+   X-Content-Type-Options: nosniff
+   X-Frame-Options: DENY
+   X-XSS-Protection: 1; mode=block
+   Content-Length: 249
+   Connection: keep-alive
+   
+   {
+     "args": {},
+     "headers": {
+       "Accept": "application/json, application/xml, text/plain, */*",
+       "Host": "httpbin.org",
+       "User-Agent": "curl/7.54.0"
+     },
+     "origin": "223.72.66.144, 223.72.66.144",
+     "url": "https://httpbin.org/get"
+   }
+   #+end_example
 
    使用 =-v= 选项会详细输出请求过程中的信息。
    #+BEGIN_SRC text
-     >>> curl -v http://example.com
-     <!doctype html>
-     <html>
-       ......
-     </html>
-     ,*   Trying 2606:2800:220:1:248:1893:25c8:1946...
+     ~ $ curl -v http://httpbin.org/get
+     ,* Couldn't find host httpbin.org in the .netrc file; using defaults
+     ,*   Trying 34.230.136.58...
      ,* TCP_NODELAY set
-     ,*   Trying 93.184.216.34...
-     ,* TCP_NODELAY set
-     ,* Connected to example.com (93.184.216.34) port 80 (#0)
-     > GET / HTTP/1.1
-     > Host: example.com
-     > User-Agent: curl/7.62.0
-     > Accept: */*
+     ,* Connected to httpbin.org (34.230.136.58) port 80 (#0)
+     > GET /get HTTP/1.1
+     > Host: httpbin.org
+     > User-Agent: curl/7.54.0
+     > Accept: application/json, application/xml, text/plain, */*
      >
      < HTTP/1.1 200 OK
-     < Accept-Ranges: bytes
-     < Cache-Control: max-age=604800
-     < Content-Type: text/html; charset=UTF-8
-     < Date: Fri, 05 Jul 2019 08:29:54 GMT
-     < Etag: "1541025663"
-     < Expires: Fri, 12 Jul 2019 08:29:54 GMT
-     < Last-Modified: Fri, 09 Aug 2013 23:54:35 GMT
-     < Server: ECS (sjc/4E67)
-     < Vary: Accept-Encoding
-     < X-Cache: HIT
-     < Content-Length: 1270
+     < Access-Control-Allow-Credentials: true
+     < Access-Control-Allow-Origin: *
+     < Content-Type: application/json
+     < Date: Mon, 08 Jul 2019 15:37:21 GMT
+     < Referrer-Policy: no-referrer-when-downgrade
+     < Server: nginx
+     < X-Content-Type-Options: nosniff
+     < X-Frame-Options: DENY
+     < X-XSS-Protection: 1; mode=block
+     < Content-Length: 249
+     < Connection: keep-alive
      <
-     { [1270 bytes data]
-     ,* Connection #0 to host example.com left intact
+     {
+       "args": {},
+       "headers": {
+         "Accept": "application/json, application/xml, text/plain, */*",
+         "Host": "httpbin.org",
+         "User-Agent": "curl/7.54.0"
+       },
+       "origin": "223.72.66.144, 223.72.66.144",
+       "url": "https://httpbin.org/get"
+     }
+     ,* Connection #0 to host httpbin.org left intact
    #+END_SRC
-
-   #+RESULTS:
 
    可以使用下面命令来将 header 下载起来保存成文件。
    #+BEGIN_SRC sh
@@ -242,24 +305,49 @@
 
    有时候我们在写脚本是仅仅需要参考网站的返回码，为了方便解析可以使用下面命令直
    接获取返回码。
-   #+BEGIN_SRC sh
-     curl -q -s -w %{http_code} www.example.com
+   #+BEGIN_SRC sh :exports both :results output
+     curl -q -s -w %{http_code} http://httpbin.org/get
    #+END_SRC
 
    #+RESULTS:
+   #+begin_example
+   {
+     "args": {},
+     "headers": {
+       "Accept": "*/*",
+       "Host": "httpbin.org",
+       "User-Agent": "curl/7.54.0"
+     },
+     "origin": "223.72.66.144, 223.72.66.144",
+     "url": "https://httpbin.org/get"
+   }
+   200
+   #+end_example
 
 ** 添加 Cookie
    由于 HTTP 协议是无状态的，所以有些网站是使用 cookie 来记录会话信息。对于
    chrome 这样的浏览器，可以轻易处理 cookie 信息，但在 curl 中只要增加相关参数也
    是可以很容易的处理 cookie 。如下， =-c= 选项可以将获取到的 cookie 保存成文件。
-   #+BEGIN_SRC sh
-     curl -c cookie.txt http://www.baidu.com
+   #+BEGIN_SRC sh :exports both :results output
+     curl -c cookie.txt http://httpbin.org/cookies
    #+END_SRC
 
+   #+RESULTS:
+   : {
+   :   "cookies": {}
+   : }
+
    使用 =-b= 可以指定 cookie 字段。
-   #+BEGIN_SRC sh
-     curl -b "name=Daniel" www.sillypage.com
+   #+BEGIN_SRC sh :exports both :results output
+     curl -b "name=Daniel" http://httpbin.org/cookies
    #+END_SRC
+
+   #+RESULTS:
+   : {
+   :   "cookies": {
+   :     "name": "Daniel"
+   :   }
+   : }
 
    读写同一个 cookie 文件。
    #+BEGIN_SRC sh
