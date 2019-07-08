@@ -1106,9 +1106,9 @@
      + =*= 表示所有字段，如： ~SELECT * FROM tab;~
      + 可以是字段，函数调用，计算公式，如： ~SELECT name, now(), 2+3 FROM tab;~
      + 为了简化列或避免多个列标识符崇明，可以对 =select_expr= 的列起别名。 使用
-       ~as~ 关键字，也可以省略 ~as~
+       ~AS~ 关键字，也可以省略 ~AS~
    - FROM 子句
-     + 为表可以起别名，使用 ~as~ 关键字： ~SELECT * FROM tab1 as a, tab2 as b;~
+     + 为表可以起别名，使用 ~AS~ 关键字： ~SELECT * FROM tab1 AS a, tab2 AS b;~
      + FROM 后面跟逗号分隔的从多个表的话表示会形成笛卡尔积
    - WHERE 子句
      + 整型 1 表示真，0表示假。
@@ -1117,7 +1117,7 @@
        加上 TURE/FALSE/UNKNOWN，检验某个值的真假<=>与<>功能相同，<=>可用于 NULL
        比较
      + 模式通配符： =_= 任意单个字符; =%= 任意多个字符，甚至包括零字符，配合 LIKE 使用
-    单引号需要进行转义 \'
+     + 单引号需要进行转义 \'
    - GROUP BY 子句
      + 字段/别名 [排序方式]: 组后会进行排序。升序：ASC，降序：DESC
      + 使用聚合函数: count 返回不同的非 NULL 值数目 count(*)、count(字段); sum
@@ -1306,9 +1306,9 @@
 
 ** 事务保存：保存点
    #+BEGIN_SRC sql
-     SAVEPOINT 保存点名称 -- 设置一个事务保存点
-     ROLLBACK TO SAVEPOINT 保存点名称 -- 回滚到保存点
-     RELEASE SAVEPOINT 保存点名称 -- 删除保存点
+     SAVEPOINT spname             -- 设置一个事务保存点
+     ROLLBACK TO SAVEPOINT spname -- 回滚到保存点
+     RELEASE SAVEPOINT spname     -- 删除保存点
    #+END_SRC
 
 ** InnoDB 自动提交特性设置
@@ -1323,6 +1323,222 @@
        连接)
      + START TRANSACTION 记录开启前的状态，而一旦事务提交或回滚后就需要再次开启
        事务。(针对当前事务)
+
+* 锁表
+  表锁定只用于防止其它客户端进行不正当地读取和写入
+  MyISAM 支持表锁，InnoDB 支持行锁
+  #+BEGIN_SRC sql
+    -- 锁定
+    LOCK TABLES tbl_name [AS alias];
+    -- 解锁
+    UNLOCK TABLES;
+  #+END_SRC
+
+* 触发器
+  触发程序是与表有关的命名数据库对象，当该表出现特定事件时，将激活该对象监听：记
+  录的增加、修改、删除。
+
+**  创建触发器
+   #+BEGIN_SRC sql
+     CREATE TRIGGER tgname tgtime tgevent ON tbname FOR EACH ROW tgstmt;
+   #+END_SRC
+   参数：
+   - tgtime 是触发程序的动作时间。它可以是 BEFORE 或 AFTER，以指明触发程序是在激
+     活它的语句之前或之后触发。
+   - tgevent 指明了激活触发程序的语句的类型
+     + INSERT：将新行插入表时激活触发程序
+     + UPDATE：更改某一行时激活触发程序
+     + DELETE：从表中删除某一行时激活触发程序
+   - tabname：监听的表，必须是永久性的表，不能将触发程序与 TEMPORARY 表或视图关
+     联起来。
+   - tgstmt：当触发程序激活时执行的语句。执行多个语句，可使用 ~BEGIN...END~ 复合
+     语句结构
+
+** 删除触发器
+   #+BEGIN_SRC sql
+     DROP TRIGGER [scname.]tgname;
+   #+END_SRC
+   可以使用 old 和 new 代替旧的和新的数据
+   - 更新操作，更新前是 old，更新后是 new.
+   - 删除操作，只有 old.
+   - 增加操作，只有 new.
+   - 注意: *对于具有相同触发程序动作时间和事件的给定表，不能有两个触发程序*
+
+** 特殊的执行注意项
+   - 只要添加记录，就会触发程序。
+   - ~INSERT INTO ON DUPLICATE KEY UPDATE~ 语法会触发：
+     + 如果没有重复记录，会触发 BEFORE INSERT, AFTER INSERT;
+     + 如果有重复记录并更新，会触发 BEFORE INSERT, BEFORE UPDATE, AFTER UPDATE;
+     + 如果有重复记录但是没有发生更新，则触发 BEFORE INSERT, BEFORE UPDATE
+   - ~REPLACE~ 语法 如果有记录，则执行 BEFORE INSERT, BEFORE DELETE, AFTER DELETE,
+     AFTER INSERT
+
+* SQL 编程
+** 变量
+*** 变量声明
+    #+BEGIN_SRC sql
+      DECLARE var_name[,...] TYPE [DEFAULT value]
+    #+END_SRC
+    这个语句被用来声明局部变量。要给变量提供一个默认值，请包含一个 DEFAULT 子句。
+    值可以被指定为一个表达式，不需要为一个常数。如果没有 DEFAULT 子句，初始值为
+    NULL。
+
+*** 全局变量
+    使用 SET 和 SELECT INTO 语句为变量赋值。注意， *在函数内是可以使用全局变量
+    （用户自定义的变量）*
+
+    SET 语句可以定义并为变量赋值。
+    #+BEGIN_SRC sql
+      SET @var = val;
+    #+END_SRC
+    也可以使用 SELECT INTO 语句为变量初始化并赋值。这样要求 SELECT 语句只能返回
+    一行，但是可以是多个字段，就意味着同时为多个变量进行赋值，变量的数量需要与查
+    询的列数一致。还可以把赋值语句看作一个表达式，通过 SELECT 执行完成。此时为了
+    避免=被当作关系运算符看待，使用:=代替。（SET 语句可以使用= 和 :=）。
+    #+BEGIN_SRC sql
+      SELECT @var:=20;
+      SELECT @v1:=id, @v2=name FROM t1 LIMIT 1;
+      SELECT * FROM tbl_name WHERE @var:=30;
+      -- select into 可以将表中查询获得的数据赋给变量。
+      SELECT max(height) INTO @max_height FROM tb;
+    #+END_SRC
+
+*** 自定义变量名
+   为了避免 SELECT 语句中，用户自定义的变量与系统标识符（通常是字段名）冲突，用
+   户自定义变量在变量名前使用 =@= 作为开始符号。 ~@var=10;~ *变量被定义后，在整
+   个会话周期都有效（登录到退出）*
+
+** 控制流
+*** 分支语句
+    #+BEGIN_SRC sql
+      -- if
+      IF condition THEN
+          -- stmt1
+      ELSEIF 条件 THEN
+          -- stmt2
+      ELSE
+          -- stmt3
+      END IF;
+
+      -- case
+      CASE value
+        WHEN [compare_value] THEN result
+        [WHEN [compare_value] THEN result ...]
+        [ELSE result]
+      END
+    #+END_SRC
+
+*** 循环语句
+    #+BEGIN_SRC sql
+      -- loop
+      [begin_label:] LOOP
+        -- statement_list
+      END LOOP [end_label]
+
+      -- while
+      [begin_label:] WHILE search_condition DO
+        -- statement_list
+      END WHILE [end_label];
+    #+END_SRC
+    - 如果需要在循环内提前终止 WHILE 循环，则需要使用标签；标签需要成对出现。
+    - 退出循环
+      + 退出整个循环 ~LEAVE label~
+      + 退出当前循环 ~ITERATE label~
+      + 通过退出的标签决定退出哪个循环
+
+    编程举例
+    #+BEGIN_SRC sql
+      CREATE PROCEDURE doiterate(p1 INT)
+      BEGIN
+        label1: LOOP
+          SET p1 = p1 + 1;
+          IF p1 < 10 THEN
+            ITERATE label1;
+          END IF;
+          LEAVE label1;
+        END LOOP label1;
+        SET @x = p1;
+      END;
+
+      CREATE PROCEDURE dowhile()
+      BEGIN
+        DECLARE v1 INT DEFAULT 5;
+        WHILE v1 > 0 DO
+          ...
+          SET v1 = v1 - 1;
+        END WHILE;
+      END
+    #+END_SRC
+
+*** 语句块包裹
+    #+BEGIN_SRC sql
+      BEGIN
+          语句块
+      END
+    #+END_SRC
+
+** 存储函数和存储过程
+*** 存储函数
+**** 创建存储函数
+     #+BEGIN_SRC sql
+       CREATE FUNCTION funcname (arglist)
+         RETURNS (rettype)
+           body
+     #+END_SRC
+     - 函数名，应该合法的标识符，并且不应该与已有的关键字冲突
+     - 一个函数应该属于某个数据库，可以使用 db_name.funciton_name 的形式执行当前
+       函数所属数据库，否则为当前数据库
+     - 参数部分，由"参数名"和"参数类型"组成。多个参数用逗号隔开
+     - 函数体由多条可用的 MySQL 语句，流程控制，变量声明等语句构成
+     - 多条语句应该使用 ~BEGIN...END~ 语句块包含
+     - 一定要有 RETURN 返回值语句
+
+**** 删除存储过程
+     #+BEGIN_SRC sql
+       DROP FUNCTION [IF EXISTS] funcname;
+     #+END_SRC
+
+**** 查看存储过程
+     #+BEGIN_SRC sql
+       SHOW FUNCTION STATUS LIKE 'partten'
+       SHOW CREATE FUNCTION funcname;
+     #+END_SRC
+
+**** 修改存储过程
+     #+BEGIN_SRC sql
+       ALTER FUNCTION funcname ...;
+     #+END_SRC
+
+*** 存储过程
+    存储存储过程 是一段代码（过程），存储在数据库中的 SQL 组成。一个存储过程通常
+    用于完成一段业务逻辑，例如报名，交班费，订单入库等。而一个函数通常专注与某个
+    功能，视为其他程序服务的，需要在其他语句中调用函数才可以，而存储过程不能被其
+    他调用，是自己执行通过 ~CALL~ 执行。
+
+**** 创建存储过程
+     存储过程是一段可执行性代码的集合。相比函数，更偏向于业务逻辑。
+     - 调用方法， ~CALL procname;~
+     - 没有返回值
+     - 只能单独调用，不可夹杂在其他语句中
+     - 参数， 存储过程必须指定参数类型， ~IN|OUT|INOUT~ 参数名 数据类型
+       + IN 输入：在调用过程中，将数据输入到过程体内部的参数
+       + OUT 输出：在调用过程中，将过程体处理完的结果返回到客户端
+       + INOUT 输入输出：既可输入，也可输出
+
+     #+BEGIN_SRC sql
+       CREATE PROCEDURE procname (arglist)
+         body
+     #+END_SRC
+
+** 修改语句的分隔符
+   修改最外层语句结束符
+   #+BEGIN_SRC sql
+     DELIMITER newsep
+       --- <SQL 语句>
+     自定义结束符号
+
+     DELIMITER ;        -- 修改回原来的分号
+   #+END_SRC
 
 * 导入/导出数据
 ** SELECT 方法导入/导出
