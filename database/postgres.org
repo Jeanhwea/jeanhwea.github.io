@@ -206,9 +206,45 @@
    #+BEGIN_SRC sql
      -- 查看当前数据库的所有表
      \dt
-     -- 查看函数列表
-     \df <schema>
+     -- 查看全局的表
+     \dt *.*
     #+END_SRC
+
+** 创建表
+    #+BEGIN_SRC sql
+      CREATE TABLE <table_name> (
+        <column_name> <column_type>,
+        <column_name> <column_type>,
+        <column_name> <column_type>
+      );
+      -- 删除表
+      DROP TABLE IF EXISTS <table_name> CASCADE;
+    #+END_SRC
+
+    #+BEGIN_SRC sql
+      -- 创建用户表的例子
+      CREATE SEQUENCE global_id
+        INCREMENT BY 1
+        MINVALUE 1 NO MAXVALUE
+        START WITH 9999;
+
+      CREATE TABLE users (
+        id INT PRIMARY KEY NOT NULL DEFAULT NEXTVAL('global_id'),
+        code VARCHAR(32), -- data is invalid when code is NULL
+        created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        username VARCHAR(64) NOT NULL,
+        nickname VARCHAR(64),
+        password VARCHAR(128),
+        birthday DATE,
+        CONSTRAINT unique_username UNIQUE (username)
+      );
+      ALTER TABLE users OWNER TO <tabowner_name>;
+      COMMENT ON TABLE users IS '用户表';
+      COMMENT ON COLUMN users.username IS '用户登录的用户名';
+      COMMENT ON COLUMN users.nickname IS '用户昵称';
+    #+END_SRC
+
 * 用户/权限
 ** 查看用户基本信息
    #+BEGIN_SRC sql
@@ -219,10 +255,12 @@
      -- 查看当前用户权限
      \du
    #+END_SRC
+
 ** 创建用户
    #+BEGIN_SRC sql
      CREATE USER username WITH PASSWORD password_string;
    #+END_SRC
+
 ** 修改用户密码
    #+BEGIN_SRC sql
      ALTER USER postgres WITH PASSWORD 'postgres';
@@ -253,44 +291,6 @@
       ALTER ROLE <user_name> WITH PASSWORD '<password>';
     #+END_SRC
 
-** 表相关的操作命令
-    #+BEGIN_SRC sql
-      -- 查看所有表
-      \dt
-      -- 查看全局的表
-      \dt *.*
-      -- 创建表
-      CREATE TABLE <table_name> (
-        <column_name> <column_type>,
-        <column_name> <column_type>,
-        <column_name> <column_type>
-      );
-
-      -- 创建用户表的例子
-      CREATE SEQUENCE global_id
-        INCREMENT BY 1
-        MINVALUE 1 NO MAXVALUE
-        START WITH 9999;
-
-      CREATE TABLE users (
-        id INT PRIMARY KEY NOT NULL DEFAULT NEXTVAL('global_id'),
-        code VARCHAR(32), -- data is invalid when code is NULL
-        created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        username VARCHAR(64) NOT NULL,
-        nickname VARCHAR(64),
-        password VARCHAR(128),
-        birthday DATE,
-        CONSTRAINT unique_username UNIQUE (username)
-      );
-      ALTER TABLE users OWNER TO <tabowner_name>;
-      COMMENT ON TABLE users IS '用户表';
-      COMMENT ON COLUMN users.username IS '用户登录的用户名';
-      COMMENT ON COLUMN users.nickname IS '用户昵称';
-
-      -- 删除表
-      DROP TABLE IF EXISTS <table_name> CASCADE;
-    #+END_SRC
 ** 数据备份与还原
     #+BEGIN_SRC sh
       # 备份数据库
