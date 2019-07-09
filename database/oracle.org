@@ -78,3 +78,342 @@
    - 打印最后执行的 SQL 语句: ~L~
    - 结果输出到文件: ~SPOOL filename~
    - 查看/修改 SQL*Plus 的环境变量: ~SHOW/SET variablename~
+* 获取数据库中元信息
+  Oracle 的数据库组织方式中所有数据库的表信息，类信息等元信息也是存放在一个对用
+  户不可见的数据表中，这里称之为元表。
+
+  表更加功能不同分成了不同的级别，不同级别对于的表名称开头不一样：
+  - =USER_*=: 用户表信息
+  - =DBA_*=: 数据库管理员表信息
+  - =ALL_*=: 所有的表信息，包括：DBA 和 USER
+
+  例如： =USER_TAB_COMMENTS= 表中存放着用户表的注释， =DBA_TAB_COMMENTS= 表中则
+  存放在管理员的所有表注释。
+
+** 获取表信息
+*** 表列属性
+    #+BEGIN_SRC sql
+      SELECT USER_TAB_COLUMNS.TABLE_NAME ||
+               ',' || USER_TAB_COLUMNS.COLUMN_NAME ||
+               ',' || USER_TAB_COLUMNS.DATA_TYPE ||
+               ',' || USER_TAB_COLUMNS.DATA_LENGTH ||
+               ',' || USER_TAB_COLUMNS.NULLABLE
+        FROM USER_TAB_COLUMNS
+       WHERE ROWNUM < 100
+       ORDER BY USER_TAB_COLUMNS.TABLE_NAME;
+    #+END_SRC
+
+*** 唯一性约束
+    获取列的约束名称
+    #+BEGIN_SRC sql
+      SELECT USER_CONS_COLUMNS.OWNER ||
+               ',' || USER_CONS_COLUMNS.CONSTRAINT_NAME ||
+               ',' || USER_CONS_COLUMNS.TABLE_NAME ||
+               ',' || USER_CONS_COLUMNS.COLUMN_NAME ||
+               ',' || USER_CONS_COLUMNS.POSITION
+        FROM USER_CONS_COLUMNS
+       WHERE ROWNUM < 100
+       ORDER BY USER_CONS_COLUMNS.TABLE_NAME;
+    #+END_SRC
+
+    获取列的约束类型
+    #+BEGIN_SRC sql
+      SELECT USER_CONSTRAINTS.CONSTRAINT_NAME ||
+               ',' || USER_CONSTRAINTS.CONSTRAINT_TYPE ||
+               ',' || USER_CONSTRAINTS.STATUS
+        FROM USER_CONSTRAINTS
+       WHERE USER_CONSTRAINTS.CONSTRAINT_TYPE in ('U','P')
+         AND ROWNUM < 100
+       ORDER BY USER_CONSTRAINTS.CONSTRAINT_NAME;
+   #+END_SRC
+
+** 注释信息
+*** 表注释
+    #+BEGIN_SRC sql
+      SELECT USER_TAB_COMMENTS.TABLE_NAME ||
+               ',' || USER_TAB_COMMENTS.TABLE_TYPE ||
+               ',' || USER_TAB_COMMENTS.COMMENTS
+        FROM USER_TAB_COMMENTS
+       WHERE ROWNUM < 100
+       ORDER BY USER_TAB_COMMENTS.TABLE_NAME;
+    #+END_SRC
+
+*** 列注释
+    #+BEGIN_SRC sql
+      SELECT USER_COL_COMMENTS.TABLE_NAME ||
+               ',' || USER_COL_COMMENTS.COLUMN_NAME ||
+               ',' || USER_COL_COMMENTS.COMMENTS
+        FROM USER_COL_COMMENTS
+       WHERE ROWNUM < 100
+       ORDER BY USER_COL_COMMENTS.TABLE_NAME;
+    #+END_SRC
+
+* 常用命令速查
+** 查看数据库基本信息
+   #+BEGIN_SRC sql
+     -- 查看当前用户
+     SHOW USER;
+     SELECT USER FROM DUAL;
+     -- 查看当前数据库
+
+     -- 查看当前数据库的所有表
+     SELECT tc.TABLE_NAME || ' ' || tc.COMMENTS
+       FROM USER_TAB_COMMENTS tc
+      WHERE tc.TABLE_TYPE in ('TABLE', 'VIEW')
+      ORDER BY tc.TABLE_NAME;
+   #+END_SRC
+
+** 用户信息相关的操作命令
+   #+BEGIN_SRC sql
+     -- 创建用户
+     CREATE USER <username> IDENTIFIED BY <password>;
+     -- 删除用户
+     DROP USER <username>;
+     -- 修改用户密码
+     ALTER USER <username> IDENTIFIED BY <password>;
+
+     -- 创建角色
+     CREATE ROLE <rolename> IDENTIFIED BY <password>;
+
+     -- 授权用户
+     GRANT ALL ON <database>.* TO <username>;
+     -- 解除授权
+     REVOKE ALL ON <database>.* FROM <username>;
+   #+END_SRC
+
+* 小技巧
+** 格式化日期时间字符串
+   Oracle 数据库中的时间字符串和目前主流的时间格式有点不一样，可以使用 ~to_char~
+   函数来格式化时间输出。
+   #+BEGIN_SRC sql
+     SQL> SELECT sysdate FROM DUAL;
+
+     SYSDATE
+     ------------------
+     26-JUN-19
+
+
+     SQL> SELECT to_char(sysdate, 'YYYY-MM-DD HH:MM:SS') FROM DUAL;
+
+     TO_CHAR(SYSDATE,'YYYY-MM-DDHH:MM:SS')
+     ---------------------------------------------------------
+     2019-06-26 08:06:41
+   #+END_SRC
+** 正则化表达式匹配
+   Oracle 可以使用 ~regexp_like~ 来做正则表达式匹配
+   #+BEGIN_SRC sql
+     SQL> SELECT TABLE_NAME FROM USER_TAB_COMMENTS WHERE regexp_like(TABLE_NAME, '^PRDT');
+
+     TABLE_NAME
+     -----------------------------
+     PRDT_DIC
+     PRDT_DIC_ALL_V
+     PRDT_DIC_BOM
+     PRDT_DIC_CODE_RULE
+     PRDT_DIC_EXT01
+     PRDT_DIC_EXT02
+     PRDT_DIC_PROCESS
+     PRDT_DIC_PROCESS_ALL
+     PRDT_DIC_PROCESS_DEVICE_WORK
+     PRDT_KIND_TYPE
+     PRDT_LIST_TYPE
+     PRDT_PROCESS_ACT_DIC
+     PRDT_PROCESS_DIC
+     PRDT_PROCESS_RES_DIC
+   #+END_SRC
+** 处理空值(NULL)
+   在数据库选取时候需要处理空值，即 ~NULL~ 值。Oracle 提供 ~nvl~ 函数来处理空值
+   #+BEGIN_SRC sql
+     SQL> SELECT nvl(length(PHOTO), 0) AS PHOTO_SIZE FROM T_EMPLOYEE_BASE WHERE rownum < 10;
+
+     PHOTO_SIZE
+     ----------
+         103357
+          12177
+          84866
+         102154
+          17527
+         169567
+          33577
+          0
+          52372
+
+     SQL> SELECT nvl(to_char(length(PHOTO)), 'null') AS PHOTO_SIZE FROM T_EMPLOYEE_BASE WHERE rownum < 10;
+
+     PHOTO_SIZE
+     ----------
+     103357
+     12177
+     84866
+     102154
+     17527
+     169567
+     33577
+     null
+     52372
+   #+END_SRC
+** 处理字符串的回车换行符
+   Oracle 字符串好回车换行符处理需要借助 ~chr~ 函数，见如下例子
+   #+BEGIN_SRC sql
+     SQL> UPDATE T_EMPLOYEE_BASE SET E_NOTE = '第一行' || CHR(10) ||'第二行' WHERE E_CODE='test04';
+
+     1 row updated.
+
+     SQL> SELECT E_NOTE FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
+
+     E_NOTE
+     --------
+     第一行
+     第二行
+
+     SQL> SELECT replace(replace(E_NOTE, chr(13), ''), chr(10), '') FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
+
+     REPLACE(REPLACE(E_NOTE,CHR(13),''),CHR(10),'')
+     ----------------------------------------------
+     第一行第二行
+
+     SQL> SELECT replace(replace(E_NOTE, chr(13), ''), chr(10), ' _r_n ') FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
+
+     REPLACE(REPLACE(E_NOTE,CHR(13),''),CHR(10),' _R_N ')
+     ---------------------------------------------------
+     第一行 _r_n 第二行
+   #+END_SRC
+** 获取序列值
+   创建序列
+   #+BEGIN_SRC sql
+     CREATE SEQUENCE SEQ_GLOBAL_ID
+       START WITH 10000
+       INCREMENT BY 1;
+   #+END_SRC
+   ~NEXTVAL~ 获取下一个序列值，同时自增， ~CURRVAL~ 获取当前序列值，单不自增。
+   #+BEGIN_SRC sql
+
+     SQL> SELECT SEQ_GLOBAL_ID.NEXTVAL FROM DUAL;
+
+          10000
+
+     SQL> SELECT SEQ_GLOBAL_ID.NEXTVAL FROM DUAL;
+
+          10001
+
+     SQL> SELECT SEQ_GLOBAL_ID.CURRVAL FROM DUAL;
+
+          10001
+
+     SQL> SELECT SEQ_GLOBAL_ID.CURRVAL FROM DUAL;
+
+          10001
+
+     SQL>
+   #+END_SRC
+** 限制查询结果的行数
+   使用 ~ROWNUM~ 在条件语句中限制
+   #+BEGIN_SRC sql
+     SELECT ID FROM EMPLOYEE
+      WHERE ROWNUM < 100;
+   #+END_SRC
+** 删除表中重复的行数据
+   Oracle 里面每行都有一个 ~ROWID~ 的伪列，即使两行的数据是相同的， ~ROWID~ 也是
+   唯一的。
+   #+BEGIN_SRC sql
+     SELECT DISTINCT MYID FROM T_EMPLOYEE_BASE E1
+      WHERE ROWID != (
+        SELECT max(ROWID) FROM T_EMPLOYEE_BASE E2
+         WHERE E1.MYID = E2.MYID
+      );
+   #+END_SRC
+   将 SELECT 修改成 DELETE 即可删除重复行。
+** 条件转化查询的字段结果 ~if-then-else~
+   使用 ~DECODE~ 函数可以对模仿应用程序的 ~if-then-else~ 结构。
+   #+BEGIN_SRC sql
+     SQL> SELECT SEX || ':' || decode(SEX, '男', 1, '女', 2, 0) FROM T_EMPLOYEE_BASE WHERE ROWNUM < 5;
+
+     男:1
+     女:2
+     男:1
+     女:2
+   #+END_SRC
+** 字符串处理函数
+   #+BEGIN_SRC sql
+     SQL> SELECT substr('abcdef', 2, 3) FROM DUAL;
+
+     bcd
+
+     SQL> SELECT instr('abcdef', 'cd') FROM DUAL;
+
+                3
+
+     SQL> SELECT instr('abcdef', 'ce') FROM DUAL;
+
+                0
+
+     SQL> SELECT replace('abcdef', 'ce') FROM DUAL;
+
+     abcdef
+
+     SQL> SELECT replace('abcdef', 'cd', '$$') FROM DUAL;
+
+     ab$$ef
+
+     SQL> SELECT lower('abcdef') FROM DUAL;
+
+     abcdef
+
+     SQL> SELECT upper('abcdef') FROM DUAL;
+
+     ABCDEF
+   #+END_SRC
+** 查看数据库磁盘容量
+   通过 ~SYS.DBA_FREE_SPACE~ 视图可以查看磁盘可以空间，进行实时监控。
+   #+BEGIN_SRC sql
+     SELECT TABLESPACE_NAME, sum(BLOCKS), sum(BYTES)
+       FROM SYS.DBA_FREE_SPACE
+      GROUP BY TABLESPACE_NAME
+      ORDER BY TABLESPACE_NAME;
+   #+END_SRC
+** 查看 query 的执行时间
+   查看单个 query 执行计时直接开启 ~TIMING~ 选项就可以看到
+   #+BEGIN_SRC sql
+     SQL> SELECT count(*) FROM T_LOG;
+
+       COUNT(*)
+     ----------
+          85718
+
+     SQL> SET TIMING ON
+     SQL> SELECT count(*) FROM T_LOG;
+
+       COUNT(*)
+     ----------
+          85718
+
+     Elapsed: 00:00:00.04
+     SQL> SET TIMING OFF
+   #+END_SRC
+   查询多条 query 语句的计时需要借助计时器
+   #+BEGIN_SRC sql
+     SQL> TIMING START mytimer;
+
+     SQL> SELECT count(*) FROM T_LOG;
+
+       COUNT(*)
+     ----------
+          85718
+
+     SQL> TIMING SHOW mytimer;
+
+     timing for: mytimer
+     Elapsed: 00:00:00.04
+     SQL> SELECT max(myid) FROM T_LOG;
+
+      MAX(MYID)
+     ----------
+         103234
+
+
+     SQL> TIMING STOP mytimer;
+
+     timing for: mytimer
+     Elapsed: 00:00:00.07
+     SQL>
+   #+END_SRC
