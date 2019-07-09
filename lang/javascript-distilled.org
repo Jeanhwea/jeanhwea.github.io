@@ -246,11 +246,41 @@
 * 数组
  数组是具有固定长度 (~arr.length~) 的同一类元素的集合，具体参考 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array][MDN]] 中的定义。
 
-** 添加/删除
+** 创建
+   #+BEGIN_SRC js
+     > let fruits = ['Apple', 'Banana', 'Orange']
+     undefined
+     > fruits.length
+     3
+   #+END_SRC
+
+** 修改元素：添加/删除
    - ~push(...items)~ : 添加元素到数组结尾
    - ~pop()~ : 移除结尾的元素
    - ~shift()~ : 删除起始的元素
    - ~unshift(...items)~ : 添加元素到数组起始
+   #+BEGIN_SRC js
+     > fruits
+     [ 'Apple', 'Banana', 'Orange' ]
+     > fruits.push('Grape')
+     4
+     > fruits
+     [ 'Apple', 'Banana', 'Orange', 'Grape' ]
+     > fruits.pop()
+     'Grape'
+     > fruits
+     [ 'Apple', 'Banana', 'Orange' ]
+     > fruits.shift()
+     'Apple'
+     > fruits
+     [ 'Banana', 'Orange' ]
+     > fruits.unshift('Apple')
+     3
+     > fruits
+     [ 'Apple', 'Banana', 'Orange' ]
+     >
+   #+END_SRC
+
    - ~splice(pos, deleteCount, ...items)~ : 在 ~pos~ 位置删除 ~deleteCount~ 个元
      素然后插入 ~items~
    - ~slice(start, end)~ : 创建一个新的数组, 复制 ~start~ 到 ~end~ (不包含) 到新
@@ -258,6 +288,28 @@
    - ~concat(...items)~ : 返回一个新的数组: 拷贝当前数组的所有元素然后添加
      ~items~ 到新的数组中. 如果任何 ~items~ 是一个数组, 数组里面的元素都会添加的
      新的数组中
+   #+BEGIN_SRC js
+     > fruits
+     [ 'Apple', 'Banana', 'Orange' ]
+     > let new_fruits = fruits.slice(0, 2)
+     > new_fruits
+     [ 'Apple', 'Banana' ]
+     > fruits.splice(1, 1)
+     [ 'Banana' ]
+     > fruits
+     [ 'Apple', 'Orange' ]
+     > fruits
+     [ 'Apple', 'Orange' ]
+     > fruits.splice(1, 0, 'Pear')
+     []
+     > fruits
+     [ 'Apple', 'Pear', 'Orange' ]
+     > fruits.concat('Banana')
+     [ 'Apple', 'Pear', 'Orange', 'Banana' ]
+     > fruits
+     [ 'Apple', 'Pear', 'Orange' ]
+     >
+   #+END_SRC
 
 ** 查找
    - ~indexOf/lastIndexOf(item, pos)~ : 查找 ~item~ , 起始位置是~pos~ , 如果没有
@@ -266,9 +318,34 @@
    - ~find/filter(func)~ : 使用谓词函数过滤数组, 返回第一个/所有的使得谓词函数成
      立的元素
    - ~findIndex(func)~ : 和 ~find~ 相似, 但是返回下标索引而不是数组元素
+   #+BEGIN_SRC js
+     > fruits
+     [ 'Apple', 'Pear', 'Orange' ]
+     > fruits.indexOf('Pear')
+     1
+     > fruits.indexOf('Banana')
+     -1
+     > fruits.find(function (e) { return e.length >= 5;})
+     'Apple'
+     > fruits.filter(function (e) { return e.length >= 5;})
+     [ 'Apple', 'Orange' ]
+     > fruits.includes('Banana')
+     false
+     > fruits.includes('Pear')
+     true
+     > 'Banana' in fruits
+     false
+     > 'Pear' in fruits
+     false
+   #+END_SRC
 
 ** 迭代
    - ~forEach(func)~ : 调用 ~func~ 处理所有的数组里的元素, 但是不返回
+   #+BEGIN_SRC js
+     ['Apple', 'Banana', 'Orange'].forEach(function(e, i, arr) {
+       console.log(i + " : " + e)
+     })
+   #+END_SRC
 
 ** 数组变换
    - ~map(func)~ : 调用 ~func~ 处理所有数组里的元素，返回处理结果集构成的新数组
@@ -277,6 +354,27 @@
    - ~split/join~ : 在字符串和数组之间转换
    - ~reduce(func, initial)~ : 计算得出一个值， 通过调用 ~func~ 函数处理起始值和
      中间值
+   #+BEGIN_SRC js
+     > fruits
+     [ 'Apple', 'Pear', 'Orange' ]
+     > fruits.map(function(e) { return e.toUpperCase();})
+     [ 'APPLE', 'PEAR', 'ORANGE' ]
+     > fruits.reduce(function(a, e) { return a+':'+e;}, '')
+     ':Apple:Pear:Orange'
+     > fruits.join(':')
+     'Apple:Pear:Orange'
+     > 'Apple:Pear:Orange'.split(':')
+     [ 'Apple', 'Pear', 'Orange' ]
+     > fruits.sort()
+     [ 'Apple', 'Orange', 'Pear' ]
+     > fruits
+     [ 'Apple', 'Orange', 'Pear' ]
+     > fruits.sort(function(a,b) {return a.length>b.length?1:-1;})
+     [ 'Pear', 'Apple', 'Orange' ]
+     > fruits.reverse()
+     [ 'Orange', 'Apple', 'Pear' ]
+     >
+   #+END_SRC
 
 ** 其它
    - ~Array.isArray(arr)~ : 检查 ~arr~ 是否是数组对象
