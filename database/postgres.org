@@ -189,42 +189,46 @@
 * 数据库
 ** 查看数据库基本信息
    #+BEGIN_SRC sql
+     -- 查看所有数据库列表
+     \l
+     -- 查看当前数据库
+     SELECT current_database();
+    #+END_SRC
+
+** 创建用户及数据库
+   #+BEGIN_SRC sql
+     CREATE DATABASE dbname OWNER username;
+     GRANT ALL PRIVILEGES ON DATABASE dbname TO username;
+   #+END_SRC
+
+* 表
+** 查看表基本信息
+   #+BEGIN_SRC sql
+     -- 查看当前数据库的所有表
+     \dt
+     -- 查看函数列表
+     \df <schema>
+    #+END_SRC
+* 用户/权限
+** 查看用户基本信息
+   #+BEGIN_SRC sql
      -- 查看所有用户列表:
      SELECT rolname FROM pg_roles;
      -- 查看当前用户:
      SELECT current_user;
      -- 查看当前用户权限
      \du
-     -- 查看所有数据库列表
-     \l
-     -- 查看当前数据库
-     SELECT current_database();
-     -- 查看当前数据库的所有表
-     \dt
-     -- 查看函数列表
-     \df <schema>
-    #+END_SRC
-
-** 创建用户及数据库
-   #+BEGIN_SRC sql
-     -- 用户名及密码
-     CREATE USER pguser WITH PASSWORD 'pg$PassWord';
-     CREATE DATABASE pgdb OWNER pguser;
-
-     -- 添加权限
-     GRANT ALL PRIVILEGES ON DATABASE pgdb TO pguser;
-     ALTER ROLE pguser CREATEDB;
    #+END_SRC
-
-* 用户/权限
+** 创建用户
+   #+BEGIN_SRC sql
+     CREATE USER username WITH PASSWORD password_string;
+   #+END_SRC
 ** 修改用户密码
-   直接使用 sql 了修改 postgres 默认用户的密码。
    #+BEGIN_SRC sql
      ALTER USER postgres WITH PASSWORD 'postgres';
    #+END_SRC
 
 * 常用命令速查
-
 ** 数据库相关的操作命令
     #+BEGIN_SRC sql
       -- 连接数据库
@@ -236,6 +240,7 @@
       -- 重命名数据库
       ALTER DATABASE <old_name> RENAME TO <new_name>;
     #+END_SRC
+
 ** 用户信息相关的操作命令
     #+BEGIN_SRC sql
       -- 查看所有用户
@@ -247,6 +252,7 @@
       -- 修改用户密码
       ALTER ROLE <user_name> WITH PASSWORD '<password>';
     #+END_SRC
+
 ** 表相关的操作命令
     #+BEGIN_SRC sql
       -- 查看所有表
