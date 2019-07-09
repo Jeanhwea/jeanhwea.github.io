@@ -185,6 +185,21 @@
    - dbtype 是数据类型，常见的有 number, varchar2, date，布尔型一般使用
      ~char(1)~ 或 ~number(1)~ 来模拟
 
+   #+BEGIN_SRC sql
+     CREATE TABLE users (
+       id number(16) PRIMARY KEY NOT NULL,
+       created_by varchar2(64) DEFAULT 'SYSMAN' NOT NULL,
+       updated_at date DEFAULT SYSDATE NOT NULL,
+       valid char(1) DEFAULT 'y' NOT NULL,
+       -- code rule and type
+       code varchar2(32) UNIQUE NOT NULL,
+       name varchar2(32)
+     );
+
+     COMMENT ON COLUMN users.code IS '用户编号, 用于登录';
+     COMMENT ON COLUMN users.name IS '用户名字, 用于显示';
+   #+END_SRC
+
 *** 数据类型
 **** 数值型
      - ~number(precision[,scale])~ : 数值型，用于表示整数和实数。 precision 表示
