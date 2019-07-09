@@ -265,25 +265,36 @@
      REVOKE ALL ON <database>.* FROM <username>;
    #+END_SRC
 
+* 内置函数
+** 数值函数
+   - ~abs(x)~ : 绝对值
+   - ~cos(x)~ : cos 函数
+   - ~sin(x)~ : sin 函数
+   - ~exp(x)~ : =e^x=
+   - ~log(x)~ : 对数函数
+   - ~power(m, n)~ : =m^n=
+   - ~mod(m, n)~ : =m - n * FLOOR(m/n)=
+   - ~sqrt(x)~ : 求平方根
+
+** 字符串函数
+   - ~chr(n)~ : 数字转字符
+   - ~concat(str1, str2)~ : 字符串拼接，也可以使用 =||=
+   - ~lower(str)~
+   - ~upper(str)~
+   - ~replace(str, search_str, repl_str)~ : 在字符串 =str= 中查找 =search_str=
+     并替换成 =repl_str=
+   - ~substr(str, m, n)~ : 子串
+   - ~length(str)~ : 字符串长度
+   - ~to_date(str)~ : 转成数据库中 date 类型
+
+** 日期函数
+   - ~add_month~
+   - ~month_between~
+   - ~next_day~
+   - ~to_char~ : 格式化日期。 ~to_char(sysdate, 'YYYY-MM-DD HH:MM:SS')~
+
+
 * 使用笔记
-** 格式化日期时间字符串
-   Oracle 数据库中的时间字符串和目前主流的时间格式有点不一样，可以使用 ~to_char~
-   函数来格式化时间输出。
-   #+BEGIN_SRC sql
-     SQL> SELECT sysdate FROM DUAL;
-
-     SYSDATE
-     ------------------
-     26-JUN-19
-
-
-     SQL> SELECT to_char(sysdate, 'YYYY-MM-DD HH:MM:SS') FROM DUAL;
-
-     TO_CHAR(SYSDATE,'YYYY-MM-DDHH:MM:SS')
-     ---------------------------------------------------------
-     2019-06-26 08:06:41
-   #+END_SRC
-
 ** 正则化表达式匹配
    Oracle 可以使用 ~regexp_like~ 来做正则表达式匹配
    #+BEGIN_SRC sql
