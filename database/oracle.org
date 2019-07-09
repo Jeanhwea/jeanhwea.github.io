@@ -154,42 +154,91 @@
        ORDER BY USER_COL_COMMENTS.TABLE_NAME;
     #+END_SRC
 
-* 常用命令速查
-** 查看数据库基本信息
-*** 查看当前用户
-    #+BEGIN_SRC sql
-      -- 查看当前用户
-      SHOW USER;
-      SELECT USER FROM DUAL;
-    #+END_SRC
-    #+BEGIN_SRC text
-      SQL> SHOW USER;
-      USER is "Apple"
-      SQL> SELECT USER FROM DUAL;
-
-      Apple
-    #+END_SRC
-
-*** 查看当前数据库的所有表
-    #+BEGIN_SRC sql
-      SELECT tc.TABLE_NAME || ' ' || tc.COMMENTS
-        FROM USER_TAB_COMMENTS tc
-       WHERE tc.TABLE_TYPE in ('TABLE', 'VIEW')
-       ORDER BY tc.TABLE_NAME;
-    #+END_SRC
-
-** 用户/权限
+* 数据库
+** 查看当前数据库
    #+BEGIN_SRC sql
-     -- 创建用户
-     CREATE USER <username> IDENTIFIED BY <password>;
-     -- 删除用户
-     DROP USER <username>;
-     -- 修改用户密码
-     ALTER USER <username> IDENTIFIED BY <password>;
+     SELECT NAME FROM V$DATABASE;
+   #+END_SRC
 
+* 表
+** 查看所有表
+   #+BEGIN_SRC sql
+     -- 查看所有表
+     SELECT TABLE_NAME FROM USER_TABLES ORDER BY TABLE_NAME;
+
+     -- 查看所有表和视图，以及注释
+     SELECT tc.TABLE_NAME || ' ' || tc.COMMENTS
+       FROM USER_TAB_COMMENTS tc
+      WHERE tc.TABLE_TYPE in ('TABLE', 'VIEW')
+      ORDER BY tc.TABLE_NAME;
+   #+END_SRC
+
+** 创建表
+   #+BEGIN_SRC sql
+     CREATE TABLE [scmname.]tabname (
+       colname dbtype [NOT NULL | NULL] [DEFAULT DEFAULT_VALUE] [PRIMARY KEY]
+     );
+   #+END_SRC
+   - Oracle 数据库中 =scmname=, =tabname=, 和 =colname= 不加引号默认大写，即使使
+     用小写的名称也会自动转成大写。如果非要使用小写需要使用单引号将名称包起来
+   - Oracle 一张表最多只能有 254 列
+   - dbtype 是数据类型，常见的有 number, varchar2, date，布尔型一般使用
+     ~char(1)~ 或 ~number(1)~ 来模拟
+
+*** 数据类型
+**** 数值型
+     - ~number(precision[,scale])~ : 数值型，用于表示整数和实数。 precision 表示
+       精度，scale 表示数值范围。precision 的取值范围为 1 到 38，scale 的取值范
+       围为 -84 到 127
+
+**** 字符串
+     - ~varchar2(size[BYTE|CHAR])~ : 变长字符串类型，size 表示字符串最大长度，单
+       位可以是 BYTE 或 CHAR。 size 的取值范围为 1 到 4000。单位 BYTE 表示所用的
+       字节数，单位 CHAR 表示所用的字符（character）数
+     - ~nvarchar2(size)~ : 边长 Unicode 编码字符串类型， =AL16UTF16= 字符编码的
+       byte 数是 =UTF8= 字符编码的三倍，所以 nvarchar2 的 size 取决于具体的编码集。
+       size 的取值范围为 1 到 4000
+     - ~char(size[BYTE|CHAR])~ : 定长字符串类型，size 的取值范围是 1 到 2000 。
+       单位 BYTE 和单位 CHAR 语义一样都是表示字符（character）数
+     - ~long~ : 2GB 的超长字符串。 _每张表只允许一列是 long 类型_
+
+**** 时间/日期类型
+     - ~date~ : 时间和日期类型。 Oracle 的时间和日期都用 date 类型表示， 默认的
+       时间格式字符由 ~NLS_DATE_FORMAT~ 参数决定，它是 =DD-MMM-YY= 格式，例如：
+       '13-OCT-92', '07-JAN-98' 。
+
+* 用户、角色和权限
+** 查看当前用户
+   #+BEGIN_SRC sql
+     SHOW USER;
+     SELECT USER FROM DUAL;
+   #+END_SRC
+   #+BEGIN_SRC text
+     SQL> SHOW USER;
+     USER is "Apple"
+     SQL> SELECT USER FROM DUAL;
+     Apple
+   #+END_SRC
+
+**  创建用户
+   #+BEGIN_SRC sql
+     CREATE USER <username> IDENTIFIED BY <password>;
+   #+END_SRC
+
+** 删除用户
+   #+BEGIN_SRC sql
+     DROP USER <username>;
+   #+END_SRC
+
+** 修改用户密码
+   #+BEGIN_SRC sql
+     ALTER USER <username> IDENTIFIED BY <password>;
+   #+END_SRC
+
+** 角色和授权
+   #+BEGIN_SRC sql
      -- 创建角色
      CREATE ROLE <rolename> IDENTIFIED BY <password>;
-
      -- 授权用户
      GRANT ALL ON <database>.* TO <username>;
      -- 解除授权
