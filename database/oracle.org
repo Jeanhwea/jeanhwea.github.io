@@ -78,7 +78,7 @@
    - 打印最后执行的 SQL 语句: ~L~
    - 结果输出到文件: ~SPOOL filename~
    - 查看/修改 SQL*Plus 的环境变量: ~SHOW/SET variablename~
-* 获取数据库中元信息
+* 元信息
   Oracle 的数据库组织方式中所有数据库的表信息，类信息等元信息也是存放在一个对用
   户不可见的数据表中，这里称之为元表。
 
@@ -90,7 +90,7 @@
   例如： =USER_TAB_COMMENTS= 表中存放着用户表的注释， =DBA_TAB_COMMENTS= 表中则
   存放在管理员的所有表注释。
 
-** 获取表信息
+** 获取表的元信息：列的属性，唯一性约束
 *** 表列属性
     #+BEGIN_SRC sql
       SELECT USER_TAB_COLUMNS.TABLE_NAME ||
@@ -127,7 +127,7 @@
        ORDER BY USER_CONSTRAINTS.CONSTRAINT_NAME;
    #+END_SRC
 
-** 注释信息
+** 获取注释信息
 *** 表注释
     #+BEGIN_SRC sql
       SELECT USER_TAB_COMMENTS.TABLE_NAME ||
@@ -150,20 +150,29 @@
 
 * 常用命令速查
 ** 查看数据库基本信息
-   #+BEGIN_SRC sql
-     -- 查看当前用户
-     SHOW USER;
-     SELECT USER FROM DUAL;
-     -- 查看当前数据库
+*** 查看当前用户
+    #+BEGIN_SRC sql
+      -- 查看当前用户
+      SHOW USER;
+      SELECT USER FROM DUAL;
+    #+END_SRC
+    #+BEGIN_SRC text
+      SQL> SHOW USER;
+      USER is "Apple"
+      SQL> SELECT USER FROM DUAL;
 
-     -- 查看当前数据库的所有表
-     SELECT tc.TABLE_NAME || ' ' || tc.COMMENTS
-       FROM USER_TAB_COMMENTS tc
-      WHERE tc.TABLE_TYPE in ('TABLE', 'VIEW')
-      ORDER BY tc.TABLE_NAME;
-   #+END_SRC
+      Apple
+    #+END_SRC
 
-** 用户信息相关的操作命令
+*** 查看当前数据库的所有表
+    #+BEGIN_SRC sql
+      SELECT tc.TABLE_NAME || ' ' || tc.COMMENTS
+        FROM USER_TAB_COMMENTS tc
+       WHERE tc.TABLE_TYPE in ('TABLE', 'VIEW')
+       ORDER BY tc.TABLE_NAME;
+    #+END_SRC
+
+** 用户/权限
    #+BEGIN_SRC sql
      -- 创建用户
      CREATE USER <username> IDENTIFIED BY <password>;
@@ -181,7 +190,7 @@
      REVOKE ALL ON <database>.* FROM <username>;
    #+END_SRC
 
-* 小技巧
+* 使用笔记
 ** 格式化日期时间字符串
    Oracle 数据库中的时间字符串和目前主流的时间格式有点不一样，可以使用 ~to_char~
    函数来格式化时间输出。
@@ -199,6 +208,7 @@
      ---------------------------------------------------------
      2019-06-26 08:06:41
    #+END_SRC
+
 ** 正则化表达式匹配
    Oracle 可以使用 ~regexp_like~ 来做正则表达式匹配
    #+BEGIN_SRC sql
@@ -221,6 +231,7 @@
      PRDT_PROCESS_DIC
      PRDT_PROCESS_RES_DIC
    #+END_SRC
+
 ** 处理空值(NULL)
    在数据库选取时候需要处理空值，即 ~NULL~ 值。Oracle 提供 ~nvl~ 函数来处理空值
    #+BEGIN_SRC sql
@@ -252,6 +263,7 @@
      null
      52372
    #+END_SRC
+
 ** 处理字符串的回车换行符
    Oracle 字符串好回车换行符处理需要借助 ~chr~ 函数，见如下例子
    #+BEGIN_SRC sql
@@ -278,6 +290,7 @@
      ---------------------------------------------------
      第一行 _r_n 第二行
    #+END_SRC
+
 ** 获取序列值
    创建序列
    #+BEGIN_SRC sql
@@ -306,12 +319,14 @@
 
      SQL>
    #+END_SRC
+
 ** 限制查询结果的行数
    使用 ~ROWNUM~ 在条件语句中限制
    #+BEGIN_SRC sql
      SELECT ID FROM EMPLOYEE
       WHERE ROWNUM < 100;
    #+END_SRC
+
 ** 删除表中重复的行数据
    Oracle 里面每行都有一个 ~ROWID~ 的伪列，即使两行的数据是相同的， ~ROWID~ 也是
    唯一的。
@@ -323,6 +338,7 @@
       );
    #+END_SRC
    将 SELECT 修改成 DELETE 即可删除重复行。
+
 ** 条件转化查询的字段结果 ~if-then-else~
    使用 ~DECODE~ 函数可以对模仿应用程序的 ~if-then-else~ 结构。
    #+BEGIN_SRC sql
@@ -333,6 +349,7 @@
      男:1
      女:2
    #+END_SRC
+
 ** 字符串处理函数
    #+BEGIN_SRC sql
      SQL> SELECT substr('abcdef', 2, 3) FROM DUAL;
@@ -363,6 +380,7 @@
 
      ABCDEF
    #+END_SRC
+
 ** 查看数据库磁盘容量
    通过 ~SYS.DBA_FREE_SPACE~ 视图可以查看磁盘可以空间，进行实时监控。
    #+BEGIN_SRC sql
@@ -371,6 +389,7 @@
       GROUP BY TABLESPACE_NAME
       ORDER BY TABLESPACE_NAME;
    #+END_SRC
+
 ** 查看 query 的执行时间
    查看单个 query 执行计时直接开启 ~TIMING~ 选项就可以看到
    #+BEGIN_SRC sql

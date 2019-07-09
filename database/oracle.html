@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-08 Mon 20:10 -->
+<!-- 2019-07-09 Tue 09:34 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Oracle 关系数据库</title>
@@ -185,7 +185,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -234,12 +234,54 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgd237b96">1. Oracle 数据库</a></li>
-<li><a href="#orgf5959f6">2. SQL*Plus</a>
+<li><a href="#org0c29f78">1. Oracle 数据库</a></li>
+<li><a href="#orgd1d0e9b">2. SQL*Plus</a>
 <ul>
-<li><a href="#orgd8c92c4">2.1. 从命令行中连接 SQL*Plus</a></li>
-<li><a href="#org1e5a748">2.2. SQL*Plus 启动配置</a></li>
-<li><a href="#org84f0a7a">2.3. SQL*Plus 使用技巧</a></li>
+<li><a href="#orge41dbe1">2.1. 从命令行中连接 SQL*Plus</a></li>
+<li><a href="#org33ea5e6">2.2. SQL*Plus 启动配置</a></li>
+<li><a href="#org3eda4ad">2.3. SQL*Plus 使用技巧</a></li>
+</ul>
+</li>
+<li><a href="#org01f5ab3">3. 元信息</a>
+<ul>
+<li><a href="#orgf2d311f">3.1. 获取表的元信息：列的属性，唯一性约束</a>
+<ul>
+<li><a href="#org354262a">3.1.1. 表列属性</a></li>
+<li><a href="#orgfe6e9df">3.1.2. 唯一性约束</a></li>
+</ul>
+</li>
+<li><a href="#org7e3f9a3">3.2. 获取注释信息</a>
+<ul>
+<li><a href="#org4796660">3.2.1. 表注释</a></li>
+<li><a href="#org61be888">3.2.2. 列注释</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgee05216">4. 常用命令速查</a>
+<ul>
+<li><a href="#orgd542d7f">4.1. 查看数据库基本信息</a>
+<ul>
+<li><a href="#orgc159f40">4.1.1. 查看当前用户</a></li>
+<li><a href="#org3a1415f">4.1.2. 查看当前数据库的所有表</a></li>
+</ul>
+</li>
+<li><a href="#orgcb0817f">4.2. 用户/权限</a></li>
+</ul>
+</li>
+<li><a href="#org833248c">5. 使用笔记</a>
+<ul>
+<li><a href="#org04303bc">5.1. 格式化日期时间字符串</a></li>
+<li><a href="#orgda92a0e">5.2. 正则化表达式匹配</a></li>
+<li><a href="#org5d372a6">5.3. 处理空值(NULL)</a></li>
+<li><a href="#org1ce4dc5">5.4. 处理字符串的回车换行符</a></li>
+<li><a href="#orge28bbf1">5.5. 获取序列值</a></li>
+<li><a href="#org2ef77c8">5.6. 限制查询结果的行数</a></li>
+<li><a href="#orgc4e49d1">5.7. 删除表中重复的行数据</a></li>
+<li><a href="#org7b031f0">5.8. 条件转化查询的字段结果 <code>if-then-else</code></a></li>
+<li><a href="#orgb4b20b6">5.9. 字符串处理函数</a></li>
+<li><a href="#org26ef673">5.10. 查看数据库磁盘容量</a></li>
+<li><a href="#org77e4cf1">5.11. 查看 query 的执行时间</a></li>
 </ul>
 </li>
 </ul>
@@ -247,8 +289,8 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-orgd237b96" class="outline-2">
-<h2 id="orgd237b96"><span class="section-number-2">1</span> Oracle 数据库</h2>
+<div id="outline-container-org0c29f78" class="outline-2">
+<h2 id="org0c29f78"><span class="section-number-2">1</span> Oracle 数据库</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Oracle Database，又名 Oracle RDBMS，或简称 Oracle。是甲骨文公司的一款关系数据库
@@ -259,8 +301,8 @@ Oracle Database，又名 Oracle RDBMS，或简称 Oracle。是甲骨文公司的
 </div>
 </div>
 
-<div id="outline-container-orgf5959f6" class="outline-2">
-<h2 id="orgf5959f6"><span class="section-number-2">2</span> SQL*Plus</h2>
+<div id="outline-container-orgd1d0e9b" class="outline-2">
+<h2 id="orgd1d0e9b"><span class="section-number-2">2</span> SQL*Plus</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Oracle 的 SQL*Plus 是与 oracle 数据库进行交互的客户端工具，借助 SQL*Plus 可以
@@ -268,8 +310,8 @@ Oracle 的 SQL*Plus 是与 oracle 数据库进行交互的客户端工具，借�
 </p>
 </div>
 
-<div id="outline-container-orgd8c92c4" class="outline-3">
-<h3 id="orgd8c92c4"><span class="section-number-3">2.1</span> 从命令行中连接 SQL*Plus</h3>
+<div id="outline-container-orge41dbe1" class="outline-3">
+<h3 id="orge41dbe1"><span class="section-number-3">2.1</span> 从命令行中连接 SQL*Plus</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 第一种登录方式的命令如下
@@ -328,8 +370,8 @@ hsagent  =
 </div>
 </div>
 
-<div id="outline-container-org1e5a748" class="outline-3">
-<h3 id="org1e5a748"><span class="section-number-3">2.2</span> SQL*Plus 启动配置</h3>
+<div id="outline-container-org33ea5e6" class="outline-3">
+<h3 id="org33ea5e6"><span class="section-number-3">2.2</span> SQL*Plus 启动配置</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 SQL*Plus 启动配置文件为 <code>$ORACLE_HOME/sqlplus/admin/glogin.sql</code> 。在启动
@@ -338,22 +380,22 @@ SQL*Plus 时需要预先设置一些启动的基本配置，例如启动的每�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- $ORACLE_HOME/sqlplus/admin/glogin.sql</span>
-<span style="color: #586e75; font-style: italic;">-- SET UNDERLINE OFF</span>
-<span style="color: #859900;">SET</span> TAB <span style="color: #859900;">OFF</span>
-<span style="color: #859900;">SET</span> VERIFY <span style="color: #859900;">OFF</span>
-<span style="color: #859900;">SET</span> WRAP <span style="color: #859900;">OFF</span>
-<span style="color: #859900;">SET</span> LINESIZE 32767
-<span style="color: #859900;">SET</span> PAGESIZE 0
-<span style="color: #859900;">SET</span> TRIMOUT <span style="color: #859900;">ON</span>
-<span style="color: #859900;">SET</span> TRIMSPOOL <span style="color: #859900;">ON</span>
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- $ORACLE_HOME/sqlplus/admin/glogin.sql</span>
+<span style="color: #93a1a1; font-style: italic;">-- SET UNDERLINE OFF</span>
+<span style="color: #d33682;">SET TAB OFF</span>
+<span style="color: #d33682;">SET VERIFY OFF</span>
+<span style="color: #d33682;">SET WRAP OFF</span>
+<span style="color: #d33682;">SET LINESIZE 32767</span>
+<span style="color: #d33682;">SET PAGESIZE 0</span>
+<span style="color: #d33682;">SET TRIMOUT ON</span>
+<span style="color: #d33682;">SET TRIMSPOOL ON</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org84f0a7a" class="outline-3">
-<h3 id="org84f0a7a"><span class="section-number-3">2.3</span> SQL*Plus 使用技巧</h3>
+<div id="outline-container-org3eda4ad" class="outline-3">
+<h3 id="org3eda4ad"><span class="section-number-3">2.3</span> SQL*Plus 使用技巧</h3>
 <div class="outline-text-3" id="text-2-3">
 <ul class="org-ul">
 <li>执行本地 SQL 脚本: <code>START filename</code> 或者 <code>@ filename</code></li>
@@ -367,11 +409,525 @@ SQL*Plus 时需要预先设置一些启动的基本配置，例如启动的每�
 </div>
 </div>
 </div>
+<div id="outline-container-org01f5ab3" class="outline-2">
+<h2 id="org01f5ab3"><span class="section-number-2">3</span> 元信息</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Oracle 的数据库组织方式中所有数据库的表信息，类信息等元信息也是存放在一个对用
+户不可见的数据表中，这里称之为元表。
+</p>
+
+<p>
+表更加功能不同分成了不同的级别，不同级别对于的表名称开头不一样：
+</p>
+<ul class="org-ul">
+<li><code>USER_*</code>: 用户表信息</li>
+<li><code>DBA_*</code>: 数据库管理员表信息</li>
+<li><code>ALL_*</code>: 所有的表信息，包括：DBA 和 USER</li>
+</ul>
+
+<p>
+例如： <code>USER_TAB_COMMENTS</code> 表中存放着用户表的注释， <code>DBA_TAB_COMMENTS</code> 表中则
+存放在管理员的所有表注释。
+</p>
+</div>
+
+<div id="outline-container-orgf2d311f" class="outline-3">
+<h3 id="orgf2d311f"><span class="section-number-3">3.1</span> 获取表的元信息：列的属性，唯一性约束</h3>
+<div class="outline-text-3" id="text-3-1">
+</div>
+<div id="outline-container-org354262a" class="outline-4">
+<h4 id="org354262a"><span class="section-number-4">3.1.1</span> 表列属性</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_TAB_COLUMNS.<span style="color: #859900;">TABLE_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_TAB_COLUMNS.<span style="color: #859900;">COLUMN_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_TAB_COLUMNS.DATA_TYPE ||
+         <span style="color: #2aa198;">','</span> || USER_TAB_COLUMNS.DATA_LENGTH ||
+         <span style="color: #2aa198;">','</span> || USER_TAB_COLUMNS.<span style="color: #859900;">NULLABLE</span>
+  <span style="color: #859900;">FROM</span> USER_TAB_COLUMNS
+ <span style="color: #859900;">WHERE</span> <span style="color: #859900;">ROWNUM</span> &lt; 100
+ <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> USER_TAB_COLUMNS.<span style="color: #859900;">TABLE_NAME</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfe6e9df" class="outline-4">
+<h4 id="orgfe6e9df"><span class="section-number-4">3.1.2</span> 唯一性约束</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<p>
+获取列的约束名称
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_CONS_COLUMNS.OWNER ||
+         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #859900;">CONSTRAINT_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #859900;">TABLE_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #859900;">COLUMN_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_CONS_COLUMNS.<span style="color: #859900;">POSITION</span>
+  <span style="color: #859900;">FROM</span> USER_CONS_COLUMNS
+ <span style="color: #859900;">WHERE</span> <span style="color: #859900;">ROWNUM</span> &lt; 100
+ <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> USER_CONS_COLUMNS.<span style="color: #859900;">TABLE_NAME</span>;
+</pre>
+</div>
+
+<p>
+获取列的约束类型
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_CONSTRAINTS.<span style="color: #859900;">CONSTRAINT_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_CONSTRAINTS.CONSTRAINT_TYPE ||
+         <span style="color: #2aa198;">','</span> || USER_CONSTRAINTS.STATUS
+  <span style="color: #859900;">FROM</span> USER_CONSTRAINTS
+ <span style="color: #859900;">WHERE</span> USER_CONSTRAINTS.CONSTRAINT_TYPE <span style="color: #859900;">in</span> (<span style="color: #2aa198;">'U'</span>,<span style="color: #2aa198;">'P'</span>)
+   <span style="color: #859900;">AND</span> <span style="color: #859900;">ROWNUM</span> &lt; 100
+ <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> USER_CONSTRAINTS.<span style="color: #859900;">CONSTRAINT_NAME</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7e3f9a3" class="outline-3">
+<h3 id="org7e3f9a3"><span class="section-number-3">3.2</span> 获取注释信息</h3>
+<div class="outline-text-3" id="text-3-2">
+</div>
+<div id="outline-container-org4796660" class="outline-4">
+<h4 id="org4796660"><span class="section-number-4">3.2.1</span> 表注释</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_TAB_COMMENTS.<span style="color: #859900;">TABLE_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_TAB_COMMENTS.TABLE_TYPE ||
+         <span style="color: #2aa198;">','</span> || USER_TAB_COMMENTS.COMMENTS
+  <span style="color: #859900;">FROM</span> USER_TAB_COMMENTS
+ <span style="color: #859900;">WHERE</span> <span style="color: #859900;">ROWNUM</span> &lt; 100
+ <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> USER_TAB_COMMENTS.<span style="color: #859900;">TABLE_NAME</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org61be888" class="outline-4">
+<h4 id="org61be888"><span class="section-number-4">3.2.2</span> 列注释</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_COL_COMMENTS.<span style="color: #859900;">TABLE_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_COL_COMMENTS.<span style="color: #859900;">COLUMN_NAME</span> ||
+         <span style="color: #2aa198;">','</span> || USER_COL_COMMENTS.COMMENTS
+  <span style="color: #859900;">FROM</span> USER_COL_COMMENTS
+ <span style="color: #859900;">WHERE</span> <span style="color: #859900;">ROWNUM</span> &lt; 100
+ <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> USER_COL_COMMENTS.<span style="color: #859900;">TABLE_NAME</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgee05216" class="outline-2">
+<h2 id="orgee05216"><span class="section-number-2">4</span> 常用命令速查</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-orgd542d7f" class="outline-3">
+<h3 id="orgd542d7f"><span class="section-number-3">4.1</span> 查看数据库基本信息</h3>
+<div class="outline-text-3" id="text-4-1">
+</div>
+<div id="outline-container-orgc159f40" class="outline-4">
+<h4 id="orgc159f40"><span class="section-number-4">4.1.1</span> 查看当前用户</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- &#26597;&#30475;&#24403;&#21069;&#29992;&#25143;</span>
+<span style="color: #d33682;">SHOW USER;</span>
+<span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">USER</span> <span style="color: #859900;">FROM</span> DUAL;
+</pre>
+</div>
+<div class="org-src-container">
+<pre class="src src-text">SQL&gt; SHOW USER;
+USER is "Apple"
+SQL&gt; SELECT USER FROM DUAL;
+
+Apple
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3a1415f" class="outline-4">
+<h4 id="org3a1415f"><span class="section-number-4">4.1.2</span> 查看当前数据库的所有表</h4>
+<div class="outline-text-4" id="text-4-1-2">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> tc.<span style="color: #859900;">TABLE_NAME</span> || <span style="color: #2aa198;">' '</span> || tc.COMMENTS
+  <span style="color: #859900;">FROM</span> USER_TAB_COMMENTS tc
+ <span style="color: #859900;">WHERE</span> tc.TABLE_TYPE <span style="color: #859900;">in</span> (<span style="color: #2aa198;">'TABLE'</span>, <span style="color: #2aa198;">'VIEW'</span>)
+ <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> tc.<span style="color: #859900;">TABLE_NAME</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcb0817f" class="outline-3">
+<h3 id="orgcb0817f"><span class="section-number-3">4.2</span> 用户/权限</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- &#21019;&#24314;&#29992;&#25143;</span>
+<span style="color: #859900;">CREATE</span> <span style="color: #6c71c4;">USER</span> &lt;username&gt; <span style="color: #859900;">IDENTIFIED</span> <span style="color: #859900;">BY</span> &lt;<span style="color: #859900;">password</span>&gt;;
+<span style="color: #93a1a1; font-style: italic;">-- &#21024;&#38500;&#29992;&#25143;</span>
+<span style="color: #859900;">DROP</span> <span style="color: #6c71c4;">USER</span> &lt;username&gt;;
+<span style="color: #93a1a1; font-style: italic;">-- &#20462;&#25913;&#29992;&#25143;&#23494;&#30721;</span>
+<span style="color: #859900;">ALTER</span> <span style="color: #6c71c4;">USER</span> &lt;username&gt; <span style="color: #859900;">IDENTIFIED</span> <span style="color: #859900;">BY</span> &lt;<span style="color: #859900;">password</span>&gt;;
+
+<span style="color: #93a1a1; font-style: italic;">-- &#21019;&#24314;&#35282;&#33394;</span>
+<span style="color: #859900;">CREATE</span> <span style="color: #859900;">ROLE</span> &lt;rolename&gt; <span style="color: #859900;">IDENTIFIED</span> <span style="color: #859900;">BY</span> &lt;<span style="color: #859900;">password</span>&gt;;
+
+<span style="color: #93a1a1; font-style: italic;">-- &#25480;&#26435;&#29992;&#25143;</span>
+<span style="color: #859900;">GRANT</span> <span style="color: #859900;">ALL</span> <span style="color: #859900;">ON</span> &lt;<span style="color: #859900;">database</span>&gt;.* <span style="color: #859900;">TO</span> &lt;username&gt;;
+<span style="color: #93a1a1; font-style: italic;">-- &#35299;&#38500;&#25480;&#26435;</span>
+<span style="color: #859900;">REVOKE</span> <span style="color: #859900;">ALL</span> <span style="color: #859900;">ON</span> &lt;<span style="color: #859900;">database</span>&gt;.* <span style="color: #859900;">FROM</span> &lt;username&gt;;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org833248c" class="outline-2">
+<h2 id="org833248c"><span class="section-number-2">5</span> 使用笔记</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org04303bc" class="outline-3">
+<h3 id="org04303bc"><span class="section-number-3">5.1</span> 格式化日期时间字符串</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+Oracle 数据库中的时间字符串和目前主流的时间格式有点不一样，可以使用 <code>to_char</code>
+函数来格式化时间输出。
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">sysdate</span> <span style="color: #859900;">FROM</span> DUAL;
+
+<span style="color: #6c71c4;">SYSDATE</span>
+<span style="color: #93a1a1; font-style: italic;">------------------</span>
+26-JUN-19
+
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">to_char</span>(<span style="color: #6c71c4;">sysdate</span>, <span style="color: #2aa198;">'YYYY-MM-DD HH:MM:SS'</span>) <span style="color: #859900;">FROM</span> DUAL;
+
+<span style="color: #6c71c4;">TO_CHAR</span>(<span style="color: #6c71c4;">SYSDATE</span>,<span style="color: #2aa198;">'YYYY-MM-DDHH:MM:SS'</span>)
+<span style="color: #93a1a1; font-style: italic;">---------------------------------------------------------</span>
+2019-06-26 08:06:41
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgda92a0e" class="outline-3">
+<h3 id="orgda92a0e"><span class="section-number-3">5.2</span> 正则化表达式匹配</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+Oracle 可以使用 <code>regexp_like</code> 来做正则表达式匹配
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #859900;">TABLE_NAME</span> <span style="color: #859900;">FROM</span> USER_TAB_COMMENTS <span style="color: #859900;">WHERE</span> <span style="color: #6c71c4;">regexp_like</span>(<span style="color: #859900;">TABLE_NAME</span>, <span style="color: #2aa198;">'^PRDT'</span>);
+
+<span style="color: #859900;">TABLE_NAME</span>
+<span style="color: #93a1a1; font-style: italic;">-----------------------------</span>
+PRDT_DIC
+PRDT_DIC_ALL_V
+PRDT_DIC_BOM
+PRDT_DIC_CODE_RULE
+PRDT_DIC_EXT01
+PRDT_DIC_EXT02
+PRDT_DIC_PROCESS
+PRDT_DIC_PROCESS_ALL
+PRDT_DIC_PROCESS_DEVICE_WORK
+PRDT_KIND_TYPE
+PRDT_LIST_TYPE
+PRDT_PROCESS_ACT_DIC
+PRDT_PROCESS_DIC
+PRDT_PROCESS_RES_DIC
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5d372a6" class="outline-3">
+<h3 id="org5d372a6"><span class="section-number-3">5.3</span> 处理空值(NULL)</h3>
+<div class="outline-text-3" id="text-5-3">
+<p>
+在数据库选取时候需要处理空值，即 <code>NULL</code> 值。Oracle 提供 <code>nvl</code> 函数来处理空值
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">nvl</span>(<span style="color: #6c71c4;">length</span>(PHOTO), 0) <span style="color: #859900;">AS</span> PHOTO_SIZE <span style="color: #859900;">FROM</span> T_EMPLOYEE_BASE <span style="color: #859900;">WHERE</span> <span style="color: #859900;">rownum</span> &lt; 10;
+
+PHOTO_SIZE
+<span style="color: #93a1a1; font-style: italic;">----------</span>
+    103357
+     12177
+     84866
+    102154
+     17527
+    169567
+     33577
+     0
+     52372
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">nvl</span>(<span style="color: #6c71c4;">to_char</span>(<span style="color: #6c71c4;">length</span>(PHOTO)), <span style="color: #2aa198;">'null'</span>) <span style="color: #859900;">AS</span> PHOTO_SIZE <span style="color: #859900;">FROM</span> T_EMPLOYEE_BASE <span style="color: #859900;">WHERE</span> <span style="color: #859900;">rownum</span> &lt; 10;
+
+PHOTO_SIZE
+<span style="color: #93a1a1; font-style: italic;">----------</span>
+103357
+12177
+84866
+102154
+17527
+169567
+33577
+<span style="color: #859900;">null</span>
+52372
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1ce4dc5" class="outline-3">
+<h3 id="org1ce4dc5"><span class="section-number-3">5.4</span> 处理字符串的回车换行符</h3>
+<div class="outline-text-3" id="text-5-4">
+<p>
+Oracle 字符串好回车换行符处理需要借助 <code>chr</code> 函数，见如下例子
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">UPDATE</span> T_EMPLOYEE_BASE <span style="color: #6c71c4;">SET</span> E_NOTE = <span style="color: #2aa198;">'&#31532;&#19968;&#34892;'</span> || <span style="color: #6c71c4;">CHR</span>(10) ||<span style="color: #2aa198;">'&#31532;&#20108;&#34892;'</span> <span style="color: #859900;">WHERE</span> E_CODE=<span style="color: #2aa198;">'test04'</span>;
+
+1 <span style="color: #859900;">row</span> updated.
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> E_NOTE <span style="color: #859900;">FROM</span> T_EMPLOYEE_BASE <span style="color: #859900;">WHERE</span> E_CODE=<span style="color: #2aa198;">'test04'</span>;
+
+E_NOTE
+<span style="color: #93a1a1; font-style: italic;">--------</span>
+&#31532;&#19968;&#34892;
+&#31532;&#20108;&#34892;
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">replace</span>(<span style="color: #6c71c4;">replace</span>(E_NOTE, <span style="color: #6c71c4;">chr</span>(13), <span style="color: #2aa198;">''</span>), <span style="color: #6c71c4;">chr</span>(10), <span style="color: #2aa198;">''</span>) <span style="color: #859900;">FROM</span> T_EMPLOYEE_BASE <span style="color: #859900;">WHERE</span> E_CODE=<span style="color: #2aa198;">'test04'</span>;
+
+<span style="color: #6c71c4;">REPLACE</span>(<span style="color: #6c71c4;">REPLACE</span>(E_NOTE,<span style="color: #6c71c4;">CHR</span>(13),<span style="color: #2aa198;">''</span>),<span style="color: #6c71c4;">CHR</span>(10),<span style="color: #2aa198;">''</span>)
+<span style="color: #93a1a1; font-style: italic;">----------------------------------------------</span>
+&#31532;&#19968;&#34892;&#31532;&#20108;&#34892;
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">replace</span>(<span style="color: #6c71c4;">replace</span>(E_NOTE, <span style="color: #6c71c4;">chr</span>(13), <span style="color: #2aa198;">''</span>), <span style="color: #6c71c4;">chr</span>(10), <span style="color: #2aa198;">' _r_n '</span>) <span style="color: #859900;">FROM</span> T_EMPLOYEE_BASE <span style="color: #859900;">WHERE</span> E_CODE=<span style="color: #2aa198;">'test04'</span>;
+
+<span style="color: #6c71c4;">REPLACE</span>(<span style="color: #6c71c4;">REPLACE</span>(E_NOTE,<span style="color: #6c71c4;">CHR</span>(13),<span style="color: #2aa198;">''</span>),<span style="color: #6c71c4;">CHR</span>(10),<span style="color: #2aa198;">' _R_N '</span>)
+<span style="color: #93a1a1; font-style: italic;">---------------------------------------------------</span>
+&#31532;&#19968;&#34892; _r_n &#31532;&#20108;&#34892;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orge28bbf1" class="outline-3">
+<h3 id="orge28bbf1"><span class="section-number-3">5.5</span> 获取序列值</h3>
+<div class="outline-text-3" id="text-5-5">
+<p>
+创建序列
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">CREATE</span> <span style="color: #859900;">SEQUENCE</span> <span style="color: #b58900;">SEQ_GLOBAL_ID</span>
+  <span style="color: #859900;">START</span> <span style="color: #859900;">WITH</span> 10000
+  <span style="color: #859900;">INCREMENT</span> <span style="color: #859900;">BY</span> 1;
+</pre>
+</div>
+<p>
+<code>NEXTVAL</code> 获取下一个序列值，同时自增， <code>CURRVAL</code> 获取当前序列值，单不自增。
+</p>
+<div class="org-src-container">
+<pre class="src src-sql">
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> SEQ_GLOBAL_ID.<span style="color: #859900;">NEXTVAL</span> <span style="color: #859900;">FROM</span> DUAL;
+
+     10000
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> SEQ_GLOBAL_ID.<span style="color: #859900;">NEXTVAL</span> <span style="color: #859900;">FROM</span> DUAL;
+
+     10001
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> SEQ_GLOBAL_ID.<span style="color: #859900;">CURRVAL</span> <span style="color: #859900;">FROM</span> DUAL;
+
+     10001
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> SEQ_GLOBAL_ID.<span style="color: #859900;">CURRVAL</span> <span style="color: #859900;">FROM</span> DUAL;
+
+     10001
+
+<span style="color: #859900;">SQL</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2ef77c8" class="outline-3">
+<h3 id="org2ef77c8"><span class="section-number-3">5.6</span> 限制查询结果的行数</h3>
+<div class="outline-text-3" id="text-5-6">
+<p>
+使用 <code>ROWNUM</code> 在条件语句中限制
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> <span style="color: #859900;">ID</span> <span style="color: #859900;">FROM</span> EMPLOYEE
+ <span style="color: #859900;">WHERE</span> <span style="color: #859900;">ROWNUM</span> &lt; 100;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc4e49d1" class="outline-3">
+<h3 id="orgc4e49d1"><span class="section-number-3">5.7</span> 删除表中重复的行数据</h3>
+<div class="outline-text-3" id="text-5-7">
+<p>
+Oracle 里面每行都有一个 <code>ROWID</code> 的伪列，即使两行的数据是相同的， <code>ROWID</code> 也是
+唯一的。
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> <span style="color: #859900;">DISTINCT</span> MYID <span style="color: #859900;">FROM</span> T_EMPLOYEE_BASE E1
+ <span style="color: #859900;">WHERE</span> <span style="color: #268bd2;">ROWID</span> != (
+   <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">max</span>(<span style="color: #268bd2;">ROWID</span>) <span style="color: #859900;">FROM</span> T_EMPLOYEE_BASE E2
+    <span style="color: #859900;">WHERE</span> E1.MYID = E2.MYID
+ );
+</pre>
+</div>
+<p>
+将 SELECT 修改成 DELETE 即可删除重复行。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7b031f0" class="outline-3">
+<h3 id="org7b031f0"><span class="section-number-3">5.8</span> 条件转化查询的字段结果 <code>if-then-else</code></h3>
+<div class="outline-text-3" id="text-5-8">
+<p>
+使用 <code>DECODE</code> 函数可以对模仿应用程序的 <code>if-then-else</code> 结构。
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> SEX || <span style="color: #2aa198;">':'</span> || <span style="color: #6c71c4;">decode</span>(SEX, <span style="color: #2aa198;">'&#30007;'</span>, 1, <span style="color: #2aa198;">'&#22899;'</span>, 2, 0) <span style="color: #859900;">FROM</span> T_EMPLOYEE_BASE <span style="color: #859900;">WHERE</span> <span style="color: #859900;">ROWNUM</span> &lt; 5;
+
+&#30007;:1
+&#22899;:2
+&#30007;:1
+&#22899;:2
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb4b20b6" class="outline-3">
+<h3 id="orgb4b20b6"><span class="section-number-3">5.9</span> 字符串处理函数</h3>
+<div class="outline-text-3" id="text-5-9">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">substr</span>(<span style="color: #2aa198;">'abcdef'</span>, 2, 3) <span style="color: #859900;">FROM</span> DUAL;
+
+bcd
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">instr</span>(<span style="color: #2aa198;">'abcdef'</span>, <span style="color: #2aa198;">'cd'</span>) <span style="color: #859900;">FROM</span> DUAL;
+
+           3
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">instr</span>(<span style="color: #2aa198;">'abcdef'</span>, <span style="color: #2aa198;">'ce'</span>) <span style="color: #859900;">FROM</span> DUAL;
+
+           0
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">replace</span>(<span style="color: #2aa198;">'abcdef'</span>, <span style="color: #2aa198;">'ce'</span>) <span style="color: #859900;">FROM</span> DUAL;
+
+abcdef
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">replace</span>(<span style="color: #2aa198;">'abcdef'</span>, <span style="color: #2aa198;">'cd'</span>, <span style="color: #2aa198;">'$$'</span>) <span style="color: #859900;">FROM</span> DUAL;
+
+ab$$ef
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">lower</span>(<span style="color: #2aa198;">'abcdef'</span>) <span style="color: #859900;">FROM</span> DUAL;
+
+abcdef
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">upper</span>(<span style="color: #2aa198;">'abcdef'</span>) <span style="color: #859900;">FROM</span> DUAL;
+
+ABCDEF
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org26ef673" class="outline-3">
+<h3 id="org26ef673"><span class="section-number-3">5.10</span> 查看数据库磁盘容量</h3>
+<div class="outline-text-3" id="text-5-10">
+<p>
+通过 <code>SYS.DBA_FREE_SPACE</code> 视图可以查看磁盘可以空间，进行实时监控。
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SELECT</span> TABLESPACE_NAME, <span style="color: #6c71c4;">sum</span>(BLOCKS), <span style="color: #6c71c4;">sum</span>(BYTES)
+  <span style="color: #859900;">FROM</span> <span style="color: #859900;">SYS</span>.DBA_FREE_SPACE
+ <span style="color: #859900;">GROUP</span> <span style="color: #859900;">BY</span> TABLESPACE_NAME
+ <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> TABLESPACE_NAME;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org77e4cf1" class="outline-3">
+<h3 id="org77e4cf1"><span class="section-number-3">5.11</span> 查看 query 的执行时间</h3>
+<div class="outline-text-3" id="text-5-11">
+<p>
+查看单个 query 执行计时直接开启 <code>TIMING</code> 选项就可以看到
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">count</span>(*) <span style="color: #859900;">FROM</span> T_LOG;
+
+  <span style="color: #6c71c4;">COUNT</span>(*)
+<span style="color: #93a1a1; font-style: italic;">----------</span>
+     85718
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #6c71c4;">SET</span> TIMING <span style="color: #859900;">ON</span>
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">count</span>(*) <span style="color: #859900;">FROM</span> T_LOG;
+
+  <span style="color: #6c71c4;">COUNT</span>(*)
+<span style="color: #93a1a1; font-style: italic;">----------</span>
+     85718
+
+Elapsed: 00:00:00.04
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #6c71c4;">SET</span> TIMING <span style="color: #859900;">OFF</span>
+</pre>
+</div>
+<p>
+查询多条 query 语句的计时需要借助计时器
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">SQL</span>&gt; TIMING <span style="color: #859900;">START</span> mytimer;
+
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">count</span>(*) <span style="color: #859900;">FROM</span> T_LOG;
+
+  <span style="color: #6c71c4;">COUNT</span>(*)
+<span style="color: #93a1a1; font-style: italic;">----------</span>
+     85718
+
+<span style="color: #859900;">SQL</span>&gt; TIMING SHOW mytimer;
+
+<span style="color: #d33682;">timing for: mytimer</span>
+Elapsed: 00:00:00.04
+<span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">max</span>(myid) <span style="color: #859900;">FROM</span> T_LOG;
+
+ <span style="color: #6c71c4;">MAX</span>(MYID)
+<span style="color: #93a1a1; font-style: italic;">----------</span>
+    103234
+
+
+<span style="color: #859900;">SQL</span>&gt; TIMING <span style="color: #859900;">STOP</span> mytimer;
+
+<span style="color: #d33682;">timing for: mytimer</span>
+Elapsed: 00:00:00.07
+<span style="color: #859900;">SQL</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="date">Date: 2019-07-08 Mon 00:00</p>
 <p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-07-08 Mon 20:10</p>
+<p class="date">Created: 2019-07-09 Tue 09:34</p>
 <p class="validation"></p>
 </div>
 </body>
