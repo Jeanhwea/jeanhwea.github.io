@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-03 Wed 22:54 -->
+<!-- 2019-07-10 Wed 14:54 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>使用命令行统计项目中词汇的频率</title>
@@ -185,7 +185,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -228,30 +228,34 @@ for the JavaScript code in this tag.
 </script>
 </head>
 <body>
-<div id="content">
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="../readme.html"> UP </a>
+ |
+ <a accesskey="H" href="../index.html"> HOME </a>
+</div><div id="content">
 <h1 class="title">使用命令行统计项目中词汇的频率</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orge27f620">1. 统计代码词频</a></li>
-<li><a href="#org4e34e0f">2. 参考链接</a></li>
+<li><a href="#orgcb7907d">1. 统计代码词频</a></li>
+<li><a href="#org42e1b83">2. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orge27f620" class="outline-2">
-<h2 id="orge27f620"><span class="section-number-2">1</span> 统计代码词频</h2>
+<div id="outline-container-orgcb7907d" class="outline-2">
+<h2 id="orgcb7907d"><span class="section-number-2">1</span> 统计代码词频</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-最近在设置 emacs 的 <code>prettify-symbols-alist</code> 时需要统计一下出现频率比较高的关键
-字。折腾了一下发现下面的命令比较好用，特此记个笔记。
+最近在设置 emacs 的 <code>prettify-symbols-alist</code> 时需要统计一下出现频率比较高的关
+键字。折腾了一下发现下面的命令比较好用，特此记个笔记。
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">find . -type f -name <span style="color: #2aa198;">"*.ts"</span> -exec cat {} + <span style="color: #2aa198;">\</span>
-  | tr -c <span style="color: #2aa198;">'[:alnum:]'</span> <span style="color: #2aa198;">'[\n*]'</span> | sed <span style="color: #2aa198;">'/^$/d'</span> |sort | uniq -c | sort -nr | head -10
+  | tr -c <span style="color: #2aa198;">'[:alnum:]'</span> <span style="color: #2aa198;">'[\n*]'</span> | sed <span style="color: #2aa198;">'/^$/d'</span> | <span style="color: #2aa198;">\</span>
+  sort | uniq -c | sort -nr | head -10
 </pre>
 </div>
 
@@ -268,35 +272,33 @@ for the JavaScript code in this tag.
 <p>
 另外附上我最终设置的 <code>prettify-symbols-alist</code>
 </p>
-
 <div class="org-src-container">
 <pre class="src src-elisp"><span style="color: #8d5649;">(</span><span style="color: #859900;">setq</span> prettify-symbols-alist
   <span style="color: #d8241f;">(</span>append prettify-symbols-alist
     '<span style="color: #9564bf;">(</span>
-       <span style="color: #586e75; font-style: italic;">;; </span><span style="color: #586e75; font-style: italic;">-----------------------------------------------------------------</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"function"</span> . 402<span style="color: #24a222;">)</span>             <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#402;</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"this"</span> . 945<span style="color: #24a222;">)</span>                 <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#945;</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"return"</span> . 949<span style="color: #24a222;">)</span>               <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#949;</span>
-       <span style="color: #586e75; font-style: italic;">;; </span><span style="color: #586e75; font-style: italic;">-----------------------------------------------------------------</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"!"</span> . 172<span style="color: #24a222;">)</span>                    <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#172;</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"&amp;&amp;"</span> . 8743<span style="color: #24a222;">)</span>                  <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#8743;</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"||"</span> . 8744<span style="color: #24a222;">)</span>                  <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#8744;</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"=&gt;"</span> . 8658<span style="color: #24a222;">)</span>                  <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#8658;</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"&lt;="</span> . 8804<span style="color: #24a222;">)</span>                  <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#8804;</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"&gt;="</span> . 8805<span style="color: #24a222;">)</span>                  <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#8805;</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"!="</span> . 8800<span style="color: #24a222;">)</span>                  <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#8800;</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"==="</span> . 8801<span style="color: #24a222;">)</span>                 <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#8801;</span>
-       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"!=="</span> . 8802<span style="color: #24a222;">)</span>                 <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">&#8802;</span>
-       <span style="color: #586e75; font-style: italic;">;; </span><span style="color: #586e75; font-style: italic;">-----------------------------------------------------------------</span>
+       <span style="color: #93a1a1; font-style: italic;">;; </span><span style="color: #93a1a1; font-style: italic;">-----------------------------------------------------------------</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"function"</span> . 402<span style="color: #24a222;">)</span>             <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#402;</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"this"</span> . 945<span style="color: #24a222;">)</span>                 <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#945;</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"return"</span> . 949<span style="color: #24a222;">)</span>               <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#949;</span>
+       <span style="color: #93a1a1; font-style: italic;">;; </span><span style="color: #93a1a1; font-style: italic;">-----------------------------------------------------------------</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"!"</span> . 172<span style="color: #24a222;">)</span>                    <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#172;</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"&amp;&amp;"</span> . 8743<span style="color: #24a222;">)</span>                  <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#8743;</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"||"</span> . 8744<span style="color: #24a222;">)</span>                  <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#8744;</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"=&gt;"</span> . 8658<span style="color: #24a222;">)</span>                  <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#8658;</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"&lt;="</span> . 8804<span style="color: #24a222;">)</span>                  <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#8804;</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"&gt;="</span> . 8805<span style="color: #24a222;">)</span>                  <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#8805;</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"!="</span> . 8800<span style="color: #24a222;">)</span>                  <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#8800;</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"==="</span> . 8801<span style="color: #24a222;">)</span>                 <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#8801;</span>
+       <span style="color: #24a222;">(</span><span style="color: #2aa198;">"!=="</span> . 8802<span style="color: #24a222;">)</span>                 <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">&#8802;</span>
+       <span style="color: #93a1a1; font-style: italic;">;; </span><span style="color: #93a1a1; font-style: italic;">-----------------------------------------------------------------</span>
        <span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
 </pre>
 </div>
 </div>
 </div>
 
-
-<div id="outline-container-org4e34e0f" class="outline-2">
-<h2 id="org4e34e0f"><span class="section-number-2">2</span> 参考链接</h2>
+<div id="outline-container-org42e1b83" class="outline-2">
+<h2 id="org42e1b83"><span class="section-number-2">2</span> 参考链接</h2>
 <div class="outline-text-2" id="text-2">
 <ol class="org-ol">
 <li><a href="https://unix.stackexchange.com/questions/41479/find-n-most-frequent-words-in-a-file">find n most frequent words in a file</a></li>
@@ -306,10 +308,7 @@ for the JavaScript code in this tag.
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Date: 2018-10-27 Sat 00:00</p>
-<p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-07-03 Wed 22:54</p>
-<p class="validation"></p>
+<p class="author">Last Updated 2019-07-10 Wed 14:54. Created by Jinghui Hu at 2018-10-27 Sat 11:04.</p>
 </div>
 </body>
 </html>

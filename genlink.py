@@ -13,7 +13,7 @@ def parsemeta(url):
         info['title'] = line.replace('#+TITLE:', '').strip()
       if line.startswith('#+DATE:'):
         str = line.replace('#+DATE:', '').strip()
-        info['date'] = time.strptime(str, '<%Y-%m-%d %a>')
+        info['date'] = time.strptime(str, '<%Y-%m-%d %a %H:%M:%S>')
     return info
 
 

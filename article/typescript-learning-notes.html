@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-03 Wed 22:51 -->
+<!-- 2019-07-10 Wed 15:16 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>学习 Typescript 的笔记</title>
@@ -185,7 +185,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -228,71 +228,73 @@ for the JavaScript code in this tag.
 </script>
 </head>
 <body>
-<div id="content">
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="../readme.html"> UP </a>
+ |
+ <a accesskey="H" href="../index.html"> HOME </a>
+</div><div id="content">
 <h1 class="title">学习 Typescript 的笔记</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9a04687">1. 笔记</a>
+<li><a href="#org6363c6f">1. 笔记</a>
 <ul>
-<li><a href="#org88cbba3">1.1. let 和 var 的区别</a>
+<li><a href="#org30729e2">1.1. let 和 var 的区别</a>
 <ul>
-<li><a href="#org1837118">1.1.1. 不同作用域</a></li>
-<li><a href="#org2318dbd">1.1.2. 重定义及屏蔽</a></li>
+<li><a href="#org96c11ce">1.1.1. 不同作用域</a></li>
+<li><a href="#org7bd35bb">1.1.2. 重定义及屏蔽</a></li>
 </ul>
 </li>
-<li><a href="#org8c68325">1.2. 函数传参</a>
+<li><a href="#orgd8d2dec">1.2. 函数传参</a>
 <ul>
-<li><a href="#org14476f6">1.2.1. 可选参数和默认参数</a></li>
-<li><a href="#org4618f50">1.2.2. 边长参数</a></li>
+<li><a href="#org201bc45">1.2.1. 可选参数和默认参数</a></li>
+<li><a href="#org68a4c4a">1.2.2. 变长参数</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org6cb51c6">2. 参考链接</a></li>
+<li><a href="#org98cf426">2. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org9a04687" class="outline-2">
-<h2 id="org9a04687"><span class="section-number-2">1</span> 笔记</h2>
+<div id="outline-container-org6363c6f" class="outline-2">
+<h2 id="org6363c6f"><span class="section-number-2">1</span> 笔记</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org88cbba3" class="outline-3">
-<h3 id="org88cbba3"><span class="section-number-3">1.1</span> let 和 var 的区别</h3>
+<div id="outline-container-org30729e2" class="outline-3">
+<h3 id="org30729e2"><span class="section-number-3">1.1</span> let 和 var 的区别</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
-let 和 var 两个关键字都可以定义变量，两者的主要区别是他们的作用域不一样的。 var
-是函数作用域， let 是块作用域。
+let 和 var 两个关键字都可以定义变量，两者的主要区别是他们的作用域不一样的。
+var 是函数作用域， let 是块作用域。
 </p>
-
 <div class="org-src-container">
 <pre class="src src-javascript"><span style="color: #859900;">function</span> <span style="color: #b58900;">f</span>(<span style="color: #6c71c4;">shouldInitialize</span>: <span style="color: #268bd2;">boolean</span>) {
   <span style="color: #859900;">if</span> (shouldInitialize) {
-    <span style="color: #859900;">var</span> <span style="color: #6c71c4;">x</span> = 10; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#36825;&#37324;&#22914;&#26524;&#29992; let &#23450;&#20041;&#21017; return &#23601;&#19981;&#33021;&#36820;&#22238; x</span>
+    <span style="color: #859900;">var</span> <span style="color: #6c71c4;">x</span> = 10; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#36825;&#37324;&#22914;&#26524;&#29992; let &#23450;&#20041;&#21017; return &#23601;&#19981;&#33021;&#36820;&#22238; x</span>
   }
 
   <span style="color: #859900;">return</span> x;
 }
 
-f(<span style="color: #268bd2;">true</span>);  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">returns '10'</span>
-f(<span style="color: #268bd2;">false</span>); <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">returns 'undefined'</span>
+f(<span style="color: #268bd2;">true</span>);  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">returns '10'</span>
+f(<span style="color: #268bd2;">false</span>); <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">returns 'undefined'</span>
 </pre>
 </div>
 </div>
 
-<div id="outline-container-org1837118" class="outline-4">
-<h4 id="org1837118"><span class="section-number-4">1.1.1</span> 不同作用域</h4>
+<div id="outline-container-org96c11ce" class="outline-4">
+<h4 id="org96c11ce"><span class="section-number-4">1.1.1</span> 不同作用域</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <p>
-var 声明可以在包含它的函数，模块，命名空间或全局作用域内部任何位置被访问。这里会
-引起一些不易察觉的错误，
+var 声明可以在包含它的函数，模块，命名空间或全局作用域内部任何位置被访问。这
+里会引起一些不易察觉的错误，
 </p>
-
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">i &#34987;&#37325;&#22797;&#23450;&#20041;</span>
+<pre class="src src-javascript"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">i &#34987;&#37325;&#22797;&#23450;&#20041;</span>
 <span style="color: #859900;">function</span> <span style="color: #b58900;">sumMatrix</span>(<span style="color: #6c71c4;">matrix</span>: <span style="color: #6c71c4;">number</span>[][]) {
   <span style="color: #859900;">var</span> <span style="color: #6c71c4;">sum</span> = 0;
   <span style="color: #859900;">for</span> (<span style="color: #859900;">var</span> <span style="color: #6c71c4;">i</span> = 0; i &lt; matrix.length; i++) {
@@ -308,75 +310,76 @@ var 声明可以在包含它的函数，模块，命名空间或全局作用域�
 </div>
 
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#27599;&#27425;&#23450;&#20041;&#30340; i &#21482;&#20250;&#24341;&#29992;&#26368;&#21518;&#30340;&#21464;&#37327;</span>
+<pre class="src src-javascript"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#27599;&#27425;&#23450;&#20041;&#30340; i &#21482;&#20250;&#24341;&#29992;&#26368;&#21518;&#30340;&#21464;&#37327;</span>
 <span style="color: #859900;">for</span> (<span style="color: #859900;">var</span> <span style="color: #6c71c4;">i</span> = 0; i &lt; 5; i++) {
   setTimeout(<span style="color: #859900;">function</span>() { console.log(i); }, 100 * i);
 }
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">output:</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">5</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">5</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">5</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">5</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">5</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">output:</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">5</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">5</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">5</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">5</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">5</span>
 
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#35299;&#20915;&#26041;&#26696;&#26159;&#20351;&#29992; lambda &#20989;&#25968;&#26469;&#25193;&#20805;&#23450;&#20041;&#22495;</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#35299;&#20915;&#26041;&#26696;&#26159;&#20351;&#29992; lambda &#20989;&#25968;&#26469;&#25193;&#20805;&#23450;&#20041;&#22495;</span>
 <span style="color: #859900;">for</span> (<span style="color: #859900;">var</span> <span style="color: #6c71c4;">i</span> = 0; i &lt; 5; i++) {
   (<span style="color: #859900;">function</span>(<span style="color: #6c71c4;">i</span>) {
     setTimeout(<span style="color: #859900;">function</span>() { console.log(i); }, 100 * i);
   })(i);
 }
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">output:</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">1</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">2</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">3</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">4</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">5</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">output:</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">1</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">2</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">3</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">4</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">5</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org2318dbd" class="outline-4">
-<h4 id="org2318dbd"><span class="section-number-4">1.1.2</span> 重定义及屏蔽</h4>
+<div id="outline-container-org7bd35bb" class="outline-4">
+<h4 id="org7bd35bb"><span class="section-number-4">1.1.2</span> 重定义及屏蔽</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <div class="org-src-container">
 <pre class="src src-javascript"><span style="color: #859900;">function</span> <span style="color: #b58900;">f</span>(<span style="color: #6c71c4;">x</span>) {
     <span style="color: #859900;">var</span> <span style="color: #6c71c4;">x</span>;
-    <span style="color: #859900;">var</span> <span style="color: #6c71c4;">x</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#21487;&#20197;&#23450;&#20041;</span>
+    <span style="color: #859900;">var</span> <span style="color: #6c71c4;">x</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21487;&#20197;&#23450;&#20041;</span>
     <span style="color: #859900;">if</span> (<span style="color: #268bd2;">true</span>) {
         <span style="color: #859900;">var</span> <span style="color: #6c71c4;">x</span>;
     }
 }
 
 <span style="color: #859900;">let</span> <span style="color: #6c71c4;">x</span> = 10;
-<span style="color: #859900;">let</span> <span style="color: #6c71c4;">x</span> = 20; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#38169;&#35823;&#65292;&#19981;&#33021;&#22312;1&#20010;&#20316;&#29992;&#22495;&#37324;&#22810;&#27425;&#22768;&#26126;`x`</span>
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">x</span> = 20; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#38169;&#35823;&#65292;&#19981;&#33021;&#22312; 1 &#20010;&#20316;&#29992;&#22495;&#37324;&#22810;&#27425;&#22768;&#26126;`x`</span>
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org8c68325" class="outline-3">
-<h3 id="org8c68325"><span class="section-number-3">1.2</span> 函数传参</h3>
+<div id="outline-container-orgd8d2dec" class="outline-3">
+<h3 id="orgd8d2dec"><span class="section-number-3">1.2</span> 函数传参</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
-TypeScript 里的每个函数参数都是必须的。 这不是指不能传递 null 或 undefined 作为
-参数，而是说编译器检查用户是否为每个参数都传入了值。 编译器还会假设只有这些参数
-会被传递进函数。简短地说，传递给一个函数的参数个数必须与函数期望的参数个数一致。
+TypeScript 里的每个函数参数都是必须的。 这不是指不能传递 null 或 undefined 作
+为参数，而是说编译器检查用户是否为每个参数都传入了值。 编译器还会假设只有这些
+参数会被传递进函数。简短地说，传递给一个函数的参数个数必须与函数期望的参数个
+数一致。
 </p>
 </div>
 
-<div id="outline-container-org14476f6" class="outline-4">
-<h4 id="org14476f6"><span class="section-number-4">1.2.1</span> 可选参数和默认参数</h4>
+<div id="outline-container-org201bc45" class="outline-4">
+<h4 id="org201bc45"><span class="section-number-4">1.2.1</span> 可选参数和默认参数</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <p>
 JavaScript 里，每个参数都是可选的，可传可不传。 没传参的时候，它的值就是
-undefined 。在 TypeScript 里我们可以在参数名旁使用 ? 实现可选参数的功能。 比如，
-我们想让 lastName 是可选的：
+undefined 。在 TypeScript 里我们可以在参数名旁使用 ? 实现可选参数的功能。 比
+如，我们想让 lastName 是可选的：
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#21487;&#36873;&#21442;&#25968;</span>
+<pre class="src src-javascript"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21487;&#36873;&#21442;&#25968;</span>
 <span style="color: #859900;">function</span> <span style="color: #b58900;">buildName</span>(<span style="color: #6c71c4;">firstName</span>: <span style="color: #6c71c4;">string</span>, <span style="color: #6c71c4;">lastName</span>?: <span style="color: #6c71c4;">string</span>) {
   <span style="color: #859900;">if</span> (lastName)
     <span style="color: #859900;">return</span> firstName + <span style="color: #2aa198;">" "</span> + lastName;
@@ -384,31 +387,31 @@ undefined 。在 TypeScript 里我们可以在参数名旁使用 ? 实现可选�
     <span style="color: #859900;">return</span> firstName;
 }
 
-<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result1</span> = buildName(<span style="color: #2aa198;">"Bob"</span>);  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">works correctly now</span>
-<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result2</span> = buildName(<span style="color: #2aa198;">"Bob"</span>, <span style="color: #2aa198;">"Adams"</span>, <span style="color: #2aa198;">"Sr."</span>);  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">error, too many parameters</span>
-<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result3</span> = buildName(<span style="color: #2aa198;">"Bob"</span>, <span style="color: #2aa198;">"Adams"</span>);  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">ah, just right</span>
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result1</span> = buildName(<span style="color: #2aa198;">"Bob"</span>);  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">works correctly now</span>
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result2</span> = buildName(<span style="color: #2aa198;">"Bob"</span>, <span style="color: #2aa198;">"Adams"</span>, <span style="color: #2aa198;">"Sr."</span>);  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">error, too many parameters</span>
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result3</span> = buildName(<span style="color: #2aa198;">"Bob"</span>, <span style="color: #2aa198;">"Adams"</span>);  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">ah, just right</span>
 
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#40664;&#35748;&#21442;&#25968;</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#40664;&#35748;&#21442;&#25968;</span>
 <span style="color: #859900;">function</span> <span style="color: #b58900;">buildName</span>(<span style="color: #6c71c4;">firstName</span>: <span style="color: #6c71c4;">string</span>, <span style="color: #6c71c4;">lastName</span> = <span style="color: #2aa198;">"Smith"</span>) {
   <span style="color: #859900;">return</span> firstName + <span style="color: #2aa198;">" "</span> + lastName;
 }
 
-<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result1</span> = buildName(<span style="color: #2aa198;">"Bob"</span>);                  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">works correctly now, returns "Bob Smith"</span>
-<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result2</span> = buildName(<span style="color: #2aa198;">"Bob"</span>, <span style="color: #268bd2;">undefined</span>);       <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">still works, also returns "Bob Smith"</span>
-<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result3</span> = buildName(<span style="color: #2aa198;">"Bob"</span>, <span style="color: #2aa198;">"Adams"</span>, <span style="color: #2aa198;">"Sr."</span>);  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">error, too many parameters</span>
-<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result4</span> = buildName(<span style="color: #2aa198;">"Bob"</span>, <span style="color: #2aa198;">"Adams"</span>);         <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">ah, just right</span>
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result1</span> = buildName(<span style="color: #2aa198;">"Bob"</span>);                  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">works correctly now, returns "Bob Smith"</span>
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result2</span> = buildName(<span style="color: #2aa198;">"Bob"</span>, <span style="color: #268bd2;">undefined</span>);       <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">still works, also returns "Bob Smith"</span>
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result3</span> = buildName(<span style="color: #2aa198;">"Bob"</span>, <span style="color: #2aa198;">"Adams"</span>, <span style="color: #2aa198;">"Sr."</span>);  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">error, too many parameters</span>
+<span style="color: #859900;">let</span> <span style="color: #6c71c4;">result4</span> = buildName(<span style="color: #2aa198;">"Bob"</span>, <span style="color: #2aa198;">"Adams"</span>);         <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">ah, just right</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org4618f50" class="outline-4">
-<h4 id="org4618f50"><span class="section-number-4">1.2.2</span> 边长参数</h4>
+<div id="outline-container-org68a4c4a" class="outline-4">
+<h4 id="org68a4c4a"><span class="section-number-4">1.2.2</span> 变长参数</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <p>
-在 TypeScript 里，你可以把所有参数收集到一个变量里， 剩余参数会被当做个数不限的
-可选参数。 可以一个都没有，同样也可以有任意个。 编译器创建参数数组，名字是你在省
-略号 <b>&#x2026;</b> 后面给定的名字，你可以在函数体内使用这个数组。
+在 TypeScript 里，你可以把所有参数收集到一个变量里， 剩余参数会被当做个数不
+限的可选参数。 可以一个都没有，同样也可以有任意个。 编译器创建参数数组，名字
+是你在省略号 <b>&#x2026;</b> 后面给定的名字，你可以在函数体内使用这个数组。
 </p>
 
 <div class="org-src-container">
@@ -424,12 +427,11 @@ undefined 。在 TypeScript 里我们可以在参数名旁使用 ? 实现可选�
 </div>
 </div>
 
-
-<div id="outline-container-org6cb51c6" class="outline-2">
-<h2 id="org6cb51c6"><span class="section-number-2">2</span> 参考链接</h2>
+<div id="outline-container-org98cf426" class="outline-2">
+<h2 id="org98cf426"><span class="section-number-2">2</span> 参考链接</h2>
 <div class="outline-text-2" id="text-2">
 <ol class="org-ol">
-<li><a href="https://www.tslang.cn/docs/handbook/typescript-in-5-minutes.html">5分钟上手TypeScript</a>，typescript中文官网</li>
+<li><a href="https://www.tslang.cn/docs/handbook/typescript-in-5-minutes.html">5 分钟上手 TypeScript</a>，typescript 中文官网</li>
 <li><a href="http://www.typescriptlang.org/docs/home.html">Typescript Documentation</a></li>
 <li><a href="https://www.tslang.cn/index.html#download-links">TypeScript 实战视频</a></li>
 <li><a href="https://www.tslang.cn/docs/handbook/basic-types.html">TypeScript 文档</a></li>
@@ -438,10 +440,7 @@ undefined 。在 TypeScript 里我们可以在参数名旁使用 ? 实现可选�
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Date: 2018-10-11 Thu 00:00</p>
-<p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-07-03 Wed 22:51</p>
-<p class="validation"></p>
+<p class="author">Last Updated 2019-07-10 Wed 15:16. Created by Jinghui Hu at 2018-10-11 Thu 11:04.</p>
 </div>
 </body>
 </html>

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-03 Wed 22:52 -->
+<!-- 2019-07-10 Wed 15:08 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>批量规范化重命名大量的文件</title>
@@ -185,7 +185,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -228,41 +228,44 @@ for the JavaScript code in this tag.
 </script>
 </head>
 <body>
-<div id="content">
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="../readme.html"> UP </a>
+ |
+ <a accesskey="H" href="../index.html"> HOME </a>
+</div><div id="content">
 <h1 class="title">批量规范化重命名大量的文件</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9499ab2">1. 使用vim和find进行命名</a>
+<li><a href="#org68c043e">1. 使用 vim 和 find 进行命名</a>
 <ul>
-<li><a href="#org7fef0c0">1.1. 第一步</a></li>
-<li><a href="#org9d3e63d">1.2. 第二步</a></li>
+<li><a href="#org68ede56">1.1. 第一步</a></li>
+<li><a href="#orga54b590">1.2. 第二步</a></li>
 </ul>
 </li>
-<li><a href="#org0d72d2a">2. 使用emacs的dired进行重命名</a></li>
+<li><a href="#orgcb761c8">2. 使用 emacs 的 dired 进行重命名</a></li>
 </ul>
 </div>
 </div>
 <p>
-大量修改文件名非常麻烦，本人曾经不厌其烦地用Windows文件管理器点开一个个文件夹后
-修改文件名，非常苦逼。自从用了EMACS的dired模式过后就回不去了，但是一些服务器上往
-往没有安装EMACS，所以可以总结下面的发放来批量修改文件名。
+大量修改文件名非常麻烦，本人曾经不厌其烦地用 Windows 文件管理器点开一个个文件夹
+后修改文件名，非常苦逼。自从用了 EMACS 的 dired 模式过后就回不去了，但是一些服务
+器上往往没有安装 EMACS，所以可以总结下面的发放来批量修改文件名。
 </p>
 
-<div id="outline-container-org9499ab2" class="outline-2">
-<h2 id="org9499ab2"><span class="section-number-2">1</span> 使用vim和find进行命名</h2>
+<div id="outline-container-org68c043e" class="outline-2">
+<h2 id="org68c043e"><span class="section-number-2">1</span> 使用 vim 和 find 进行命名</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org7fef0c0" class="outline-3">
-<h3 id="org7fef0c0"><span class="section-number-3">1.1</span> 第一步</h3>
+<div id="outline-container-org68ede56" class="outline-3">
+<h3 id="org68ede56"><span class="section-number-3">1.1</span> 第一步</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
-将需要修改的文件名全面找到放到 /tmp 目录下的两个文件里面，文件a 里面存放原来的文
-件名，文件b 通过 vim 编辑成修改后的文件。注意文件a 里面的文件名或者目录名的空格
+将需要修改的文件名全面找到放到 /tmp 目录下的两个文件里面，文件 a 里面存放原来的文
+件名，文件 b 通过 vim 编辑成修改后的文件。注意文件 a 里面的文件名或者目录名的空格
 需要转义。
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">find . -type f -iname <span style="color: #2aa198;">'*.txt'</span> | tee /tmp/b | sed <span style="color: #2aa198;">'s/ /\\ /'</span> &gt; /tmp/a
 vim /tmp/b
@@ -270,9 +273,8 @@ vim /tmp/b
 </div>
 
 <p>
-或者使用下面的命令，在find找到的文件前后添加单引号
+或者使用下面的命令，在 find 找到的文件前后添加单引号
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">find . -type f -iname <span style="color: #2aa198;">'*.txt'</span> | tee /tmp/b | sed <span style="color: #2aa198;">"s/$/'/"</span> | sed <span style="color: #2aa198;">"s/^/'/"</span> &gt; /tmp/a
 </pre>
@@ -280,13 +282,12 @@ vim /tmp/b
 </div>
 </div>
 
-<div id="outline-container-org9d3e63d" class="outline-3">
-<h3 id="org9d3e63d"><span class="section-number-3">1.2</span> 第二步</h3>
+<div id="outline-container-orga54b590" class="outline-3">
+<h3 id="orga54b590"><span class="section-number-3">1.2</span> 第二步</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
-编辑好文件/tmp/b保存后用下面命令批量重命名。
+编辑好文件/tmp/b 保存后用下面命令批量重命名。
 </p>
-
 <div class="org-src-container">
 <pre class="src src-sh">paste /tmp/a /tmp/b | xargs -n 2 mv
 </pre>
@@ -295,29 +296,25 @@ vim /tmp/b
 </div>
 </div>
 
-
-<div id="outline-container-org0d72d2a" class="outline-2">
-<h2 id="org0d72d2a"><span class="section-number-2">2</span> 使用emacs的dired进行重命名</h2>
+<div id="outline-container-orgcb761c8" class="outline-2">
+<h2 id="orgcb761c8"><span class="section-number-2">2</span> 使用 emacs 的 dired 进行重命名</h2>
 <div class="outline-text-2" id="text-2">
 <p>
-emacs 的 dired-mode 可以直接浏览文件，使用 wired-dired-mode 可以绑定当前目录的文
-件到当前的 dired 的 buffer 上，然后使用 query-replace 替换文件名后，使用 <code>"C-c
-C-c"</code> 应用修改。
+emacs 的 dired-mode 可以直接浏览文件，使用 wired-dired-mode 可以绑定当前目录的
+文件到当前的 dired 的 buffer 上，然后使用 query-replace 替换文件名后，使用
+<code>"C-c C-c"</code> 应用修改。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-elisp"><span style="color: #8d5649;">(</span>wdired-change-to-wdired-mode<span style="color: #8d5649;">)</span> <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">C-c C-q</span>
-<span style="color: #8d5649;">(</span>wdired-finish-edit<span style="color: #8d5649;">)</span> <span style="color: #586e75; font-style: italic;">; </span><span style="color: #586e75; font-style: italic;">C-c C-c</span>
+<pre class="src src-elisp"><span style="color: #8d5649;">(</span>wdired-change-to-wdired-mode<span style="color: #8d5649;">)</span> <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">C-c C-q</span>
+<span style="color: #8d5649;">(</span>wdired-finish-edit<span style="color: #8d5649;">)</span> <span style="color: #93a1a1; font-style: italic;">; </span><span style="color: #93a1a1; font-style: italic;">C-c C-c</span>
 </pre>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Date: 2018-10-05 Fri 00:00</p>
-<p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-07-03 Wed 22:52</p>
-<p class="validation"></p>
+<p class="author">Last Updated 2019-07-10 Wed 15:08. Created by Jinghui Hu at 2018-10-05 Fri 11:04.</p>
 </div>
 </body>
 </html>

@@ -1,98 +1,90 @@
 #+TITLE: 使用 JavaScript 导出 Excel 文件
 #+AUTHOR: Jinghui Hu
 #+EMAIL: hujinghui@buaa.edu.cn
-#+DATE: <2018-10-16 Tue>
+#+DATE: <2018-10-16 Tue 11:04:00>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
 #+TAGS: frontend javascript excel
 
 
 * SheetJS
-
 ** 安装
-
-SheetJS 可以读写 Excel 文件，它的社区版本是开源免费使用的，安装方法如下：
-
-#+BEGIN_SRC sh
-  yarn add xlsx
-#+END_SRC
+   SheetJS 可以读写 Excel 文件，它的社区版本是开源免费使用的，安装方法如下：
+   #+BEGIN_SRC sh
+     yarn add xlsx
+   #+END_SRC
 
 ** 使用
-
-官网上的使用方法见 [[https://github.com/SheetJS/js-xlsx/tree/078e5b7ebac1d8138b118292668a4dddaf0a9455/demos/angular2][sheetjs angular2]] 。
+   官网上的使用方法见 [[https://github.com/SheetJS/js-xlsx/tree/078e5b7ebac1d8138b118292668a4dddaf0a9455/demos/angular2][sheetjs angular2]] 。
 
 *** export-excel.ts
+    #+BEGIN_SRC typescript
+      import { Component, OnInit } from '@angular/core';
 
-#+BEGIN_SRC typescript
-  import { Component, OnInit } from '@angular/core';
+      import * as XLSX from 'xlsx';
 
-  import * as XLSX from 'xlsx';
+      type MTI_TABLE_T = any[][];
 
-  type MTI_TABLE_T = any[][];
+      @Component({
+        selector: 'app-export-excel',
+        templateUrl: './export-excel.component.html',
+        styleUrls: ['./export-excel.component.less']
+      })
+      export class ExportExcelComponent implements OnInit {
 
-  @Component({
-    selector: 'app-export-excel',
-    templateUrl: './export-excel.component.html',
-    styleUrls: ['./export-excel.component.less']
-  })
-  export class ExportExcelComponent implements OnInit {
+        data: MTI_TABLE_T;
+        option: XLSX.WritingOptions;
+        fileName: string;
 
-    data: MTI_TABLE_T;
-    option: XLSX.WritingOptions;
-    fileName: string;
+        constructor() { }
 
-    constructor() { }
+        ngOnInit() {
+          this.data = [
+            ['姓名', '年龄', '成绩'],
+            ['洛阳铲', 22, 87],
+            ['王大锤', 21, 88],
+            ['李敏镐', 22, 73]
+          ];
+          this.option = { bookType: 'xlsx', type: 'array' };
+          this.fileName = 'worksheet.xlsx';
+        }
 
-    ngOnInit() {
-      this.data = [
-        ['姓名', '年龄', '成绩'],
-        ['洛阳铲', 22, 87],
-        ['王大锤', 21, 88],
-        ['李敏镐', 22, 73]
-      ];
-      this.option = { bookType: 'xlsx', type: 'array' };
-      this.fileName = 'worksheet.xlsx';
-    }
+        export(): void {
+          // generate worksheet
+          const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(this.data);
 
-    export(): void {
-      // generate worksheet
-      const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(this.data);
+          // generate workbook and add the worksheet
+          const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
-      // generate workbook and add the worksheet
-      const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+          // save to file
+          XLSX.writeFile(workbook, this.fileName);
+        }
 
-      // save to file
-      XLSX.writeFile(workbook, this.fileName);
-    }
-
-  }
-#+END_SRC
+      }
+    #+END_SRC
 
 *** export-excel.html
+    #+BEGIN_SRC html
+      <div class="export-excel-div">
+        <h2>导出 Excel 文件到 {{ fileName }}</h2>
 
-#+BEGIN_SRC html
-  <div class="export-excel-div">
-    <h2>导出 Excel 文件到 {{ fileName }}</h2>
+        <table>
+          <tr *ngFor="let row of data">
+            <td *ngFor="let cell of row">
+              {{ cell }}
+            </td>
+          </tr>
+        </table>
 
-    <table>
-      <tr *ngFor="let row of data">
-        <td *ngFor="let cell of row">
-          {{ cell }}
-        </td>
-      </tr>
-    </table>
+        <span>
+          <input [(ngModel)]="fileName"/>
+          <button (click)="export()">export</button>
+        </span>
 
-    <span>
-      <input [(ngModel)]="fileName"/>
-      <button (click)="export()">export</button>
-    </span>
-
-  </div>
-#+END_SRC
-
+      </div>
+    #+END_SRC
 
 * 参考链接
-
-1. [[https://github.com/SheetJS/js-xlsx][SheetJS]]: SheetJS Community Edition -- Spreadsheet Parser and Writer
-2. [[https://yarnpkg.com/en/package/xlsx][yarn package site: xlsx]]
-
-
+  1. [[https://github.com/SheetJS/js-xlsx][SheetJS]]: SheetJS Community Edition -- Spreadsheet Parser and Writer
+  2. [[https://yarnpkg.com/en/package/xlsx][yarn package site: xlsx]]

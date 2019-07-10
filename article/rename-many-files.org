@@ -1,49 +1,43 @@
 #+TITLE: 批量规范化重命名大量的文件
 #+AUTHOR: Jinghui Hu
 #+EMAIL: hujinghui@buaa.edu.cn
-#+DATE: <2018-10-05 Fri>
+#+DATE: <2018-10-05 Fri 11:04:00>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
 #+TAGS: workflows rename vim emacs dired
 
 
-大量修改文件名非常麻烦，本人曾经不厌其烦地用Windows文件管理器点开一个个文件夹后
-修改文件名，非常苦逼。自从用了EMACS的dired模式过后就回不去了，但是一些服务器上往
-往没有安装EMACS，所以可以总结下面的发放来批量修改文件名。
+大量修改文件名非常麻烦，本人曾经不厌其烦地用 Windows 文件管理器点开一个个文件夹
+后修改文件名，非常苦逼。自从用了 EMACS 的 dired 模式过后就回不去了，但是一些服务
+器上往往没有安装 EMACS，所以可以总结下面的发放来批量修改文件名。
 
-* 使用vim和find进行命名
-
+* 使用 vim 和 find 进行命名
 ** 第一步
+   将需要修改的文件名全面找到放到 /tmp 目录下的两个文件里面，文件 a 里面存放原来的文
+   件名，文件 b 通过 vim 编辑成修改后的文件。注意文件 a 里面的文件名或者目录名的空格
+   需要转义。
+   #+BEGIN_SRC sh
+     find . -type f -iname '*.txt' | tee /tmp/b | sed 's/ /\\ /' > /tmp/a
+     vim /tmp/b
+   #+END_SRC
 
-将需要修改的文件名全面找到放到 /tmp 目录下的两个文件里面，文件a 里面存放原来的文
-件名，文件b 通过 vim 编辑成修改后的文件。注意文件a 里面的文件名或者目录名的空格
-需要转义。
-
-#+BEGIN_SRC sh
-  find . -type f -iname '*.txt' | tee /tmp/b | sed 's/ /\\ /' > /tmp/a
-  vim /tmp/b
-#+END_SRC
-
-或者使用下面的命令，在find找到的文件前后添加单引号
-
-#+BEGIN_SRC sh
-  find . -type f -iname '*.txt' | tee /tmp/b | sed "s/$/'/" | sed "s/^/'/" > /tmp/a
-#+END_SRC
+   或者使用下面的命令，在 find 找到的文件前后添加单引号
+   #+BEGIN_SRC sh
+     find . -type f -iname '*.txt' | tee /tmp/b | sed "s/$/'/" | sed "s/^/'/" > /tmp/a
+   #+END_SRC
 
 ** 第二步
+   编辑好文件/tmp/b 保存后用下面命令批量重命名。
+   #+BEGIN_SRC sh
+     paste /tmp/a /tmp/b | xargs -n 2 mv
+   #+END_SRC
 
-编辑好文件/tmp/b保存后用下面命令批量重命名。
+* 使用 emacs 的 dired 进行重命名
+  emacs 的 dired-mode 可以直接浏览文件，使用 wired-dired-mode 可以绑定当前目录的
+  文件到当前的 dired 的 buffer 上，然后使用 query-replace 替换文件名后，使用
+  ~"C-c C-c"~ 应用修改。
 
-#+BEGIN_SRC sh
-  paste /tmp/a /tmp/b | xargs -n 2 mv
-#+END_SRC
-
-
-* 使用emacs的dired进行重命名
-
-emacs 的 dired-mode 可以直接浏览文件，使用 wired-dired-mode 可以绑定当前目录的文
-件到当前的 dired 的 buffer 上，然后使用 query-replace 替换文件名后，使用 ~"C-c
-C-c"~ 应用修改。
-
-#+BEGIN_SRC elisp
-  (wdired-change-to-wdired-mode) ; C-c C-q
-  (wdired-finish-edit) ; C-c C-c
-#+END_SRC
+  #+BEGIN_SRC elisp
+    (wdired-change-to-wdired-mode) ; C-c C-q
+    (wdired-finish-edit) ; C-c C-c
+  #+END_SRC

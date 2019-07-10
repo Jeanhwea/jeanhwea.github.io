@@ -1,182 +1,167 @@
 #+TITLE: 使用 JavaScript 解析二维码
 #+AUTHOR: Jinghui Hu
 #+EMAIL: hujinghui@buaa.edu.cn
-#+DATE: <2018-10-11 Thu>
+#+DATE: <2018-10-11 Thu 11:04:00>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
 #+TAGS: frontend javascipt npm qrcode
 
 
 * ngx-qrcode-all
-
 ** 安装
-
-直接使用 yarn 安装
-
-#+BEGIN_SRC sh
-  yarn add ngx-qrcode-all
-#+END_SRC
+   直接使用 yarn 安装
+   #+BEGIN_SRC sh
+     yarn add ngx-qrcode-all
+   #+END_SRC
 
 ** 使用
+   Appmodule 中导入模块
+   #+BEGIN_SRC typescript
+     import { NgModule } from '@angular/core';
+     import { CommonModule } from '@angular/common';
+     import { QrCodeAllModule } from 'ngx-qrcode-all';
+     import { AppComponent } from './app.component';
 
-Appmodule 中导入模块
+     @NgModule({
+         imports: [
+             CommonModule,
+             QrCodeAllModule
+         ],
+         declarations: [
+             AppComponent
+         ]
+     })
+     export class AppModule {
+         constructor() {}
+     }
+   #+END_SRC
 
-#+BEGIN_SRC typescript
-  import { NgModule } from '@angular/core';
-  import { CommonModule } from '@angular/common';
-  import { QrCodeAllModule } from 'ngx-qrcode-all';
-  import { AppComponent } from './app.component';
+   情况一： 生成二维码的代码模板
+   #+BEGIN_SRC html
+     <div id="qrcodeid">
+      <qr-code-all [qrCodeType]="url"
+          [qrCodeValue]="'SK is the best in the world!'"
+          [qrCodeVersion]="'1'"
+          [qrCodeECLevel]="'M'"
+          [qrCodeColorLight]="'#ffffff'"
+          [qrCodeColorDark]="'#000000'"
+          [width]="11"
+          [margin]="4"
+          [scale]="4"
+          [scanQrCode]="false">
+      </qr-code-all>
+     </div>
+   #+END_SRC
 
-  @NgModule({
-      imports: [
-          CommonModule,
-          QrCodeAllModule
-      ],
-      declarations: [
-          AppComponent
-      ]
-  })
-  export class AppModule {
-      constructor() {}
-  }
-#+END_SRC
-
-情况一： 生成二维码的代码模板
-
-#+BEGIN_SRC html
-  <div id="qrcodeid">
-   <qr-code-all [qrCodeType]="url"
-       [qrCodeValue]="'SK is the best in the world!'"
-       [qrCodeVersion]="'1'"
-       [qrCodeECLevel]="'M'"
-       [qrCodeColorLight]="'#ffffff'"
-       [qrCodeColorDark]="'#000000'"
-       [width]="11"
-       [margin]="4"
-       [scale]="4"
-       [scanQrCode]="false">
-   </qr-code-all>
-  </div>
-#+END_SRC
-
-情况二： 读取二维码的代码模板
-
-#+BEGIN_SRC html
-  <div id="qrcodeid">
-   <qr-code-all [canvasWidth]="640"
-       [canvasHeight]="480"
-       [debug]="false"
-       [stopAfterScan]="true"
-       [updateTime]="500"
-       (onCapture)="captureImage($event)"
-       [scanQrCode]="true">
-   </qr-code-all>
-  </div>
-#+END_SRC
+   情况二： 读取二维码的代码模板
+   #+BEGIN_SRC html
+     <div id="qrcodeid">
+      <qr-code-all [canvasWidth]="640"
+          [canvasHeight]="480"
+          [debug]="false"
+          [stopAfterScan]="true"
+          [updateTime]="500"
+          (onCapture)="captureImage($event)"
+          [scanQrCode]="true">
+      </qr-code-all>
+     </div>
+   #+END_SRC
 
 
 * qrcode-parser
-
-一个没有依赖的二维码前端解析工具。优点是比较轻量级，缺点是不会调用摄像头，需要编
-写调用摄像头的代码。
+  一个没有依赖的二维码前端解析工具。优点是比较轻量级，缺点是不会调用摄像头，需要
+  编写调用摄像头的代码。
 
 ** 安装
-
-使用 qrcode-parser 包来解析二维码。直接使用 yarn 安装
-
-#+BEGIN_SRC sh
-  yarn add qrcode-parser
-#+END_SRC
+   使用 qrcode-parser 包来解析二维码。直接使用 yarn 安装
+   #+BEGIN_SRC sh
+     yarn add qrcode-parser
+   #+END_SRC
 
 ** 使用
+   #+BEGIN_SRC js
+     import qrcodeParser from 'qrcode-parser';
 
-#+BEGIN_SRC js
-  import qrcodeParser from 'qrcode-parser';
+     var imageUrl = '';
 
-  var imageUrl = '';
+     qrcodeParser(imageUrl).then(res => {
+       document.getElementById('content').innerText = res.data
+     })
 
-  qrcodeParser(imageUrl).then(res => {
-    document.getElementById('content').innerText = res.data
-  })
-
-  const fileElement = document.getElementById('file')
-  fileElement.addEventListener('change', () => {
-    const file = fileElement.files[0]
-    qrcodeParser(file).then(res => {
-      document.getElementById('content').innerText = res.data
-    })
-  }, false)
-#+END_SRC
-
+     const fileElement = document.getElementById('file')
+     fileElement.addEventListener('change', () => {
+       const file = fileElement.files[0]
+       qrcodeParser(file).then(res => {
+         document.getElementById('content').innerText = res.data
+       })
+     }, false)
+   #+END_SRC
 
 * ngx-qrcode2
-
-一个集成到 angular 的二维码生成工具。只能生成，不能读取。
+  一个集成到 angular 的二维码生成工具。只能生成，不能读取。
 
 ** 安装
-
-#+BEGIN_SRC sh
-  yarn add ngx-qrcode2
-#+END_SRC
+   #+BEGIN_SRC sh
+     yarn add ngx-qrcode2
+   #+END_SRC
 
 ** 使用
+   Appmodule 中导入模块
 
-Appmodule 中导入模块
+   #+BEGIN_SRC typescript
+     import { BrowserModule } from '@angular/platform-browser';
+     import { NgModule } from '@angular/core';
+     import { NgxQRCodeModule } from 'ngx-qrcode2';
 
-#+BEGIN_SRC typescript
-  import { BrowserModule } from '@angular/platform-browser';
-  import { NgModule } from '@angular/core';
-  import { NgxQRCodeModule } from 'ngx-qrcode2';
+     import { AppComponent } from './app.component';
 
-  import { AppComponent } from './app.component';
+     @NgModule({
+       declarations: [
+         AppComponent
+       ],
+       imports: [
+         BrowserModule,
+         NgxQRCodeModule
+       ],
+       providers: [],
+       bootstrap: [AppComponent]
+     })
+     export class AppModule { }
+   #+END_SRC
 
-  @NgModule({
-    declarations: [
-      AppComponent
-    ],
-    imports: [
-      BrowserModule,
-      NgxQRCodeModule
-    ],
-    providers: [],
-    bootstrap: [AppComponent]
-  })
-  export class AppModule { }
-#+END_SRC
+   app.component.html 插入的模板
 
-app.component.html 插入的模板
+   #+BEGIN_SRC html
+     <div style="text-align:center">
+       <h1>ngx-qrcode2 demo</h1>
+     </div>
 
-#+BEGIN_SRC html
-  <div style="text-align:center">
-    <h1>ngx-qrcode2 demo</h1>
-  </div>
+     <ngx-qrcode
+           [qrc-element-type]="elementType"
+           [qrc-value] = "value"
+           qrc-class = "aclass"
+           qrc-errorCorrectionLevel = "L">
+     </ngx-qrcode>
+   #+END_SRC
 
-  <ngx-qrcode
-        [qrc-element-type]="elementType"
-        [qrc-value] = "value"
-        qrc-class = "aclass"
-        qrc-errorCorrectionLevel = "L">
-  </ngx-qrcode>
-#+END_SRC
+   app.component.ts 中添加代码
 
-app.component.ts 中添加代码
+   #+BEGIN_SRC typescript
+     import { Component } from '@angular/core';
 
-#+BEGIN_SRC typescript
-  import { Component } from '@angular/core';
-
-  @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
-  })
-  export class AppComponent {
-    title = 'app';
-    elementType = 'url';
-    value = 'Techiediaries';
-  }
-#+END_SRC
-
+     @Component({
+       selector: 'app-root',
+       templateUrl: './app.component.html',
+       styleUrls: ['./app.component.css']
+     })
+     export class AppComponent {
+       title = 'app';
+       elementType = 'url';
+       value = 'Techiediaries';
+     }
+   #+END_SRC
 
 * 参考链接
-
-1. [[https://github.com/sinchang/qrcode-parser][qrcode-parser]]: A pure javascript QR code reading library, accept File object, image url, base64.
-2. [[https://qrcode-parser.netlify.com/][qrcode parser live demo]]
-3. [[https://github.com/nileskh16/ngx-qrcode-all][ngx-qrcode-all]]
+  1. [[https://github.com/sinchang/qrcode-parser][qrcode-parser]]: A pure javascript QR code reading library, accept File object, image url, base64.
+  2. [[https://qrcode-parser.netlify.com/][qrcode parser live demo]]
+  3. [[https://github.com/nileskh16/ngx-qrcode-all][ngx-qrcode-all]]

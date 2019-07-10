@@ -1,50 +1,48 @@
 #+TITLE: 使用命令行统计项目中词汇的频率
 #+AUTHOR: Jinghui Hu
 #+EMAIL: hujinghui@buaa.edu.cn
-#+DATE: <2018-10-27 Sat>
+#+DATE: <2018-10-27 Sat 11:04:00>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
 #+TAGS: word count cli
 
 
 * 统计代码词频
+  最近在设置 emacs 的 ~prettify-symbols-alist~ 时需要统计一下出现频率比较高的关
+  键字。折腾了一下发现下面的命令比较好用，特此记个笔记。
+  #+BEGIN_SRC sh
+    find . -type f -name "*.ts" -exec cat {} + \
+      | tr -c '[:alnum:]' '[\n*]' | sed '/^$/d' | \
+      sort | uniq -c | sort -nr | head -10
+  #+END_SRC
 
-最近在设置 emacs 的 ~prettify-symbols-alist~ 时需要统计一下出现频率比较高的关键
-字。折腾了一下发现下面的命令比较好用，特此记个笔记。
+  该命令行的典型使用场景是统计 Angular 代码中词汇的频率，见下图：
 
-#+BEGIN_SRC sh
-  find . -type f -name "*.ts" -exec cat {} + \
-    | tr -c '[:alnum:]' '[\n*]' | sed '/^$/d' |sort | uniq -c | sort -nr | head -10
-#+END_SRC
+  [[file:../static/image/2018/10/count-words.gif]]
 
-该命令行的典型使用场景是统计 Angular 代码中词汇的频率，见下图：
-
-[[file:../static/image/2018/10/count-words.gif]]
-
-另外附上我最终设置的 ~prettify-symbols-alist~
-
-#+BEGIN_SRC elisp
-  (setq prettify-symbols-alist
-    (append prettify-symbols-alist
-      '(
-         ;; -----------------------------------------------------------------
-         ("function" . 402)             ; ƒ
-         ("this" . 945)                 ; α
-         ("return" . 949)               ; ε
-         ;; -----------------------------------------------------------------
-         ("!" . 172)                    ; ¬
-         ("&&" . 8743)                  ; ∧
-         ("||" . 8744)                  ; ∨
-         ("=>" . 8658)                  ; ⇒
-         ("<=" . 8804)                  ; ≤
-         (">=" . 8805)                  ; ≥
-         ("!=" . 8800)                  ; ≠
-         ("===" . 8801)                 ; ≡
-         ("!==" . 8802)                 ; ≢
-         ;; -----------------------------------------------------------------
-         )))
-#+END_SRC
-
+  另外附上我最终设置的 ~prettify-symbols-alist~
+  #+BEGIN_SRC elisp
+    (setq prettify-symbols-alist
+      (append prettify-symbols-alist
+        '(
+           ;; -----------------------------------------------------------------
+           ("function" . 402)             ; ƒ
+           ("this" . 945)                 ; α
+           ("return" . 949)               ; ε
+           ;; -----------------------------------------------------------------
+           ("!" . 172)                    ; ¬
+           ("&&" . 8743)                  ; ∧
+           ("||" . 8744)                  ; ∨
+           ("=>" . 8658)                  ; ⇒
+           ("<=" . 8804)                  ; ≤
+           (">=" . 8805)                  ; ≥
+           ("!=" . 8800)                  ; ≠
+           ("===" . 8801)                 ; ≡
+           ("!==" . 8802)                 ; ≢
+           ;; -----------------------------------------------------------------
+           )))
+  #+END_SRC
 
 * 参考链接
-
-1. [[https://unix.stackexchange.com/questions/41479/find-n-most-frequent-words-in-a-file][find n most frequent words in a file]]
-2. [[https://github.com/jeanhwea/scripts/blob/master/bin/countwords][countwords]]
+  1. [[https://unix.stackexchange.com/questions/41479/find-n-most-frequent-words-in-a-file][find n most frequent words in a file]]
+  2. [[https://github.com/jeanhwea/scripts/blob/master/bin/countwords][countwords]]

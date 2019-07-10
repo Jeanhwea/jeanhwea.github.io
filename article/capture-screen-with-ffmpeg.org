@@ -1,99 +1,91 @@
 #+TITLE: 使用 ffmpeg 录屏
 #+AUTHOR: Jinghui Hu
 #+EMAIL: hujinghui@buaa.edu.cn
-#+DATE: <2018-10-16 Tue>
+#+DATE: <2018-10-16 Tue 11:04:00>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
 #+TAGS: ffmpeg screen-capture screenshot video
 
 
 * Windows
-
-使用 Windows 自带的 GDI screengrabber 录屏非常方便。
+  使用 Windows 自带的 GDI screengrabber 录屏非常方便。
 
 ** 列出使用的设备信息
+   #+BEGIN_SRC sh
+     ffmpeg -list_devices true -f dshow -i dummy
+   #+END_SRC
 
-#+BEGIN_SRC sh
-  ffmpeg -list_devices true -f dshow -i dummy
-#+END_SRC
-
-在我的 Windows 7 下面信息如下：
-
-#+BEGIN_SRC text
-  ffmpeg version 3.4 Copyright (c) 2000-2017 the FFmpeg developers
-    built with gcc 7.2.0 (GCC)
-    configuration: --enable-gpl --enable-version3 --enable-sdl2 --enable-bzlib --enable-fontconfig --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libfreetype --enable-libmp3lame --enable-libopenjpeg --enable-libopus --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libtheora --enable-libtwolame --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libzimg --enable-lzma --enable-zlib --enable-gmp --enable-libvidstab --enable-libvorbis --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-dxva2 --enable-avisynth --enable-libmfx
-    libavutil      55. 78.100 / 55. 78.100
-    libavcodec     57.107.100 / 57.107.100
-    libavformat    57. 83.100 / 57. 83.100
-    libavdevice    57. 10.100 / 57. 10.100
-    libavfilter     6.107.100 /  6.107.100
-    libswscale      4.  8.100 /  4.  8.100
-    libswresample   2.  9.100 /  2.  9.100
-    libpostproc    54.  7.100 / 54.  7.100
-  [dshow @ 0000000000567740] DirectShow video devices (some may be both video and audio devices)
-  [dshow @ 0000000000567740] Could not enumerate video devices (or none found).
-  [dshow @ 0000000000567740] DirectShow audio devices
-  [dshow @ 0000000000567740] Could not enumerate audio only devices (or none found).
-  dummy: Immediate exit requested
-#+END_SRC
+   在我的 Windows 7 下面信息如下：
+   #+BEGIN_SRC text
+     ffmpeg version 3.4 Copyright (c) 2000-2017 the FFmpeg developers
+       built with gcc 7.2.0 (GCC)
+       configuration: --enable-gpl --enable-version3 --enable-sdl2 --enable-bzlib --enable-fontconfig --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libfreetype --enable-libmp3lame --enable-libopenjpeg --enable-libopus --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libtheora --enable-libtwolame --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libzimg --enable-lzma --enable-zlib --enable-gmp --enable-libvidstab --enable-libvorbis --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-dxva2 --enable-avisynth --enable-libmfx
+       libavutil      55. 78.100 / 55. 78.100
+       libavcodec     57.107.100 / 57.107.100
+       libavformat    57. 83.100 / 57. 83.100
+       libavdevice    57. 10.100 / 57. 10.100
+       libavfilter     6.107.100 /  6.107.100
+       libswscale      4.  8.100 /  4.  8.100
+       libswresample   2.  9.100 /  2.  9.100
+       libpostproc    54.  7.100 / 54.  7.100
+     [dshow @ 0000000000567740] DirectShow video devices (some may be both video and audio devices)
+     [dshow @ 0000000000567740] Could not enumerate video devices (or none found).
+     [dshow @ 0000000000567740] DirectShow audio devices
+     [dshow @ 0000000000567740] Could not enumerate audio only devices (or none found).
+     dummy: Immediate exit requested
+   #+END_SRC
 
 ** 录取整个屏幕
-
-#+BEGIN_SRC sh
-  ffmpeg -f gdigrab -framerate 30 -i desktop output.mkv
-#+END_SRC
+   #+BEGIN_SRC sh
+     ffmpeg -f gdigrab -framerate 30 -i desktop output.mkv
+   #+END_SRC
 
 ** 录取部分屏幕
-
-#+BEGIN_SRC sh
-  ffmpeg -f gdigrab -framerate 30 -offset_x 10 -offset_y 20 -video_size 1280x720 -show_region 1 -i desktop output.mkv
-#+END_SRC
-
+   #+BEGIN_SRC sh
+     ffmpeg -f gdigrab -framerate 30 \
+            -offset_x 10 -offset_y 20 \
+            -video_size 1280x720 -show_region 1 \
+            -i desktop output.mkv
+   #+END_SRC
 
 * macOS
-
-mac 下使用 avfoundation 设备可以快速地录屏
+  mac 下使用 avfoundation 设备可以快速地录屏
 
 ** 列出所有设备
+   #+BEGIN_SRC sh
+     ffmpeg -f avfoundation -list_devices true -i ""
+   #+END_SRC
 
-#+BEGIN_SRC sh
-  ffmpeg -f avfoundation -list_devices true -i ""
-#+END_SRC
-
-在我的 macbook 上的输出设备如下：
-
-#+BEGIN_SRC text
-  ffmpeg version 4.0.2 Copyright (c) 2000-2018 the FFmpeg developers
-    built with Apple LLVM version 9.1.0 (clang-902.0.39.2)
-    configuration: --prefix=/usr/local/Cellar/ffmpeg/4.0.2 --enable-shared --enable-pthreads --enable-version3 --enable-hardcoded-tables --enable-avresample --cc=clang --host-cflags= --host-ldflags= --enable-gpl --enable-libmp3lame --enable-libx264 --enable-libxvid --enable-opencl --enable-videotoolbox --disable-lzma
-    libavutil      56. 14.100 / 56. 14.100
-    libavcodec     58. 18.100 / 58. 18.100
-    libavformat    58. 12.100 / 58. 12.100
-    libavdevice    58.  3.100 / 58.  3.100
-    libavfilter     7. 16.100 /  7. 16.100
-    libavresample   4.  0.  0 /  4.  0.  0
-    libswscale      5.  1.100 /  5.  1.100
-    libswresample   3.  1.100 /  3.  1.100
-    libpostproc    55.  1.100 / 55.  1.100
-  [AVFoundation input device @ 0x7f84f7c004c0] AVFoundation video devices:
-  [AVFoundation input device @ 0x7f84f7c004c0] [0] FaceTime HD Camera
-  [AVFoundation input device @ 0x7f84f7c004c0] [1] Capture screen 0
-  [AVFoundation input device @ 0x7f84f7c004c0] AVFoundation audio devices:
-  [AVFoundation input device @ 0x7f84f7c004c0] [0] MI Portable Bluetooth Speaker
-  [AVFoundation input device @ 0x7f84f7c004c0] [1] Built-in Microphone
-  : Input/output error
-#+END_SRC
+   在我的 macbook 上的输出设备如下：
+   #+BEGIN_SRC text
+     ffmpeg version 4.0.2 Copyright (c) 2000-2018 the FFmpeg developers
+       built with Apple LLVM version 9.1.0 (clang-902.0.39.2)
+       configuration: --prefix=/usr/local/Cellar/ffmpeg/4.0.2 --enable-shared --enable-pthreads --enable-version3 --enable-hardcoded-tables --enable-avresample --cc=clang --host-cflags= --host-ldflags= --enable-gpl --enable-libmp3lame --enable-libx264 --enable-libxvid --enable-opencl --enable-videotoolbox --disable-lzma
+       libavutil      56. 14.100 / 56. 14.100
+       libavcodec     58. 18.100 / 58. 18.100
+       libavformat    58. 12.100 / 58. 12.100
+       libavdevice    58.  3.100 / 58.  3.100
+       libavfilter     7. 16.100 /  7. 16.100
+       libavresample   4.  0.  0 /  4.  0.  0
+       libswscale      5.  1.100 /  5.  1.100
+       libswresample   3.  1.100 /  3.  1.100
+       libpostproc    55.  1.100 / 55.  1.100
+     [AVFoundation input device @ 0x7f84f7c004c0] AVFoundation video devices:
+     [AVFoundation input device @ 0x7f84f7c004c0] [0] FaceTime HD Camera
+     [AVFoundation input device @ 0x7f84f7c004c0] [1] Capture screen 0
+     [AVFoundation input device @ 0x7f84f7c004c0] AVFoundation audio devices:
+     [AVFoundation input device @ 0x7f84f7c004c0] [0] MI Portable Bluetooth Speaker
+     [AVFoundation input device @ 0x7f84f7c004c0] [1] Built-in Microphone
+     : Input/output error
+   #+END_SRC
 
 ** 录制整个屏幕
-
-~<screen device index>~ 和 ~<audio device index>~ 参考设备的编号
-
-#+BEGIN_SRC sh
-  ffmpeg -f avfoundation -i "<screen device index>:<audio device index>" output.mkv
-#+END_SRC
-
+   ~<screen device index>~ 和 ~<audio device index>~ 参考设备的编号
+   #+BEGIN_SRC sh
+     ffmpeg -f avfoundation -i "<screen device index>:<audio device index>" output.mkv
+   #+END_SRC
 
 * 参考链接
-
-1. [[https://trac.ffmpeg.org/wiki/Capture/Desktop][Capture Desktop]]
-2. [[https://www.ffmpeg.org/][ffmpeg homepage]]
-3. [[https://github.com/jeanhwea/emacs.d/blob/master/lisp/init-ffmpeg.el][init-ffmpeg.el]]
+  1. [[https://trac.ffmpeg.org/wiki/Capture/Desktop][Capture Desktop]]
+  2. [[https://www.ffmpeg.org/][ffmpeg homepage]]
+  3. [[https://github.com/jeanhwea/emacs.d/blob/master/lisp/init-ffmpeg.el][init-ffmpeg.el]]
