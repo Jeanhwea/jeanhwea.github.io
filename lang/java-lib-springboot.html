@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-10 Wed 08:54 -->
+<!-- 2019-07-10 Wed 10:09 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SpringBoot</title>
@@ -234,21 +234,30 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org1ac475d">1. SpringBoot</a></li>
-<li><a href="#org0077206">2. 开始使用</a>
+<li><a href="#org105a0e4">1. SpringBoot</a></li>
+<li><a href="#org2b93e7c">2. 命令行工具</a></li>
+<li><a href="#orga76e03b">3. 编译系统</a>
 <ul>
-<li><a href="#org537f2d9">2.1. 安装 SpringBoot 命令行工具</a></li>
-<li><a href="#orgc001908">2.2. Starters</a></li>
+<li><a href="#orgb799c3c">3.1. 继承父 starter</a></li>
+<li><a href="#org9921880">3.2. Starters</a></li>
 </ul>
 </li>
-<li><a href="#orga17cfc4">3. Controller</a></li>
+<li><a href="#org702f4e7">4. Spring Beans 和依赖注入</a></li>
+<li><a href="#orgecfe5af">5. <code>@SpringBootApplication</code> 标注</a></li>
+<li><a href="#org6e6aa55">6. 外部配置</a>
+<ul>
+<li><a href="#org806a9ac">6.1. <code>@Value</code> 方式配置</a></li>
+<li><a href="#org891fc15">6.2. <code>@ConfigurationProperties</code> 方式配置</a></li>
+</ul>
+</li>
+<li><a href="#org926e0c0">7. 开发工具</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org1ac475d" class="outline-2">
-<h2 id="org1ac475d"><span class="section-number-2">1</span> SpringBoot</h2>
+<div id="outline-container-org105a0e4" class="outline-2">
+<h2 id="org105a0e4"><span class="section-number-2">1</span> SpringBoot</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 <a href="https://spring.io/projects/spring-boot/#overview">SpringBoot</a> 是由 Pivotal 团队提供的全新框架，其设计目的是用来简化新 Spring 应用
@@ -260,129 +269,388 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org0077206" class="outline-2">
-<h2 id="org0077206"><span class="section-number-2">2</span> 开始使用</h2>
+<div id="outline-container-org2b93e7c" class="outline-2">
+<h2 id="org2b93e7c"><span class="section-number-2">2</span> 命令行工具</h2>
 <div class="outline-text-2" id="text-2">
-</div>
-<div id="outline-container-org537f2d9" class="outline-3">
-<h3 id="org537f2d9"><span class="section-number-3">2.1</span> 安装 SpringBoot 命令行工具</h3>
-<div class="outline-text-3" id="text-2-1">
 <p>
-SpringBoot 命令行工具参考 <a href="../tool/springboot-cli.html">../tool/springboot-cli.html</a>
+SpringBoot 命令行工具参考 <a href="../tool/springboot-cli.html">cli</a>
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgc001908" class="outline-3">
-<h3 id="orgc001908"><span class="section-number-3">2.2</span> Starters</h3>
-<div class="outline-text-3" id="text-2-2">
+<div id="outline-container-orga76e03b" class="outline-2">
+<h2 id="orga76e03b"><span class="section-number-2">3</span> 编译系统</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgb799c3c" class="outline-3">
+<h3 id="orgb799c3c"><span class="section-number-3">3.1</span> 继承父 starter</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+SpringBoot 项目需要继承的父级 Starter，配置如下：
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">Inherit defaults from Spring Boot </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+&lt;<span style="color: #b58900;">parent</span>&gt;
+ &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.boot&lt;/<span style="color: #b58900;">groupId</span>&gt;
+ &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-boot-starter-parent&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+ &lt;<span style="color: #b58900;">version</span>&gt;2.1.0.RELEASE&lt;/<span style="color: #b58900;">version</span>&gt;
+&lt;/<span style="color: #b58900;">parent</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9921880" class="outline-3">
+<h3 id="org9921880"><span class="section-number-3">3.2</span> Starters</h3>
+<div class="outline-text-3" id="text-3-2">
 <p>
 Starters 是 SpringBoot 对其依赖的再打包，官方的 Starter 都是以
 <code>spring-boot-starter</code> 开头，并且存放在 <a href="https://github.com/spring-projects/spring-boot/tree/master/spring-boot-project/spring-boot-starters">spring-boot-starters</a> 中
 </p>
-
 <ul class="org-ul">
-<li>spring-boot-starter : Core starter, including auto-configuration support,
+<li><code>spring-boot-starter</code> : Core starter, including auto-configuration support,
 logging and YAML</li>
-<li>spring-boot-starter-activemq : Starter for JMS messaging using Apache
+<li><code>spring-boot-starter-activemq</code> : Starter for JMS messaging using Apache
 ActiveMQ</li>
-<li>spring-boot-starter-amqp : Starter for using Spring AMQP and Rabbit MQ</li>
-<li>spring-boot-starter-aop : Starter for aspect-oriented programming with
+<li><code>spring-boot-starter-amqp</code> : Starter for using Spring AMQP and Rabbit MQ</li>
+<li><code>spring-boot-starter-aop</code> : Starter for aspect-oriented programming with
 Spring AOP and AspectJ</li>
-<li>spring-boot-starter-artemis : Starter for JMS messaging using Apache
+<li><code>spring-boot-starter-artemis</code> : Starter for JMS messaging using Apache
 Artemis</li>
-<li>spring-boot-starter-batch : Starter for using Spring Batch</li>
-<li>spring-boot-starter-cache : Starter for using Spring Framework's caching
+<li><code>spring-boot-starter-batch</code> : Starter for using Spring Batch</li>
+<li><code>spring-boot-starter-cache</code> : Starter for using Spring Framework's caching
 support</li>
-<li>spring-boot-starter-cloud-connectors : Starter for using Spring Cloud
+<li><code>spring-boot-starter-cloud-connectors</code> : Starter for using Spring Cloud
 Connectors which simplifies connecting to services in cloud platforms like
 Cloud Foundry and Heroku</li>
-<li>spring-boot-starter-data-cassandra : Starter for using Cassandra
+<li><code>spring-boot-starter-data-cassandra</code> : Starter for using Cassandra
 distributed database and Spring Data Cassandra</li>
-<li>spring-boot-starter-data-cassandra-reactive : Starter for using Cassandra
+<li><code>spring-boot-starter-data-cassandra-reactive</code> : Starter for using Cassandra
 distributed database and Spring Data Cassandra Reactive</li>
-<li>spring-boot-starter-data-couchbase : Starter for using Couchbase
+<li><code>spring-boot-starter-data-couchbase</code> : Starter for using Couchbase
 document-oriented database and Spring Data Couchbase</li>
-<li>spring-boot-starter-data-couchbase-reactive : Starter for using Couchbase
+<li><code>spring-boot-starter-data-couchbase-reactive</code> : Starter for using Couchbase
 document-oriented database and Spring Data Couchbase Reactive</li>
-<li>spring-boot-starter-data-elasticsearch : Starter for using Elasticsearch
+<li><code>spring-boot-starter-data-elasticsearch</code> : Starter for using Elasticsearch
 search and analytics engine and Spring Data Elasticsearch</li>
-<li>spring-boot-starter-data-jdbc : Starter for using Spring Data JDBC</li>
-<li>spring-boot-starter-data-jpa : Starter for using Spring Data JPA with
+<li><code>spring-boot-starter-data-jdbc</code> : Starter for using Spring Data JDBC</li>
+<li><code>spring-boot-starter-data-jpa</code> : Starter for using Spring Data JPA with
 Hibernate</li>
-<li>spring-boot-starter-data-ldap : Starter for using Spring Data LDAP</li>
-<li>spring-boot-starter-data-mongodb : Starter for using MongoDB
+<li><code>spring-boot-starter-data-ldap</code> : Starter for using Spring Data LDAP</li>
+<li><code>spring-boot-starter-data-mongodb</code> : Starter for using MongoDB
 document-oriented database and Spring Data MongoDB</li>
-<li>spring-boot-starter-data-mongodb-reactive : Starter for using MongoDB
+<li><code>spring-boot-starter-data-mongodb-reactive</code> : Starter for using MongoDB
 document-oriented database and Spring Data MongoDB Reactive</li>
-<li>spring-boot-starter-data-neo4j : Starter for using Neo4j graph database and
-Spring Data Neo4j</li>
-<li>spring-boot-starter-data-redis : Starter for using Redis key-value data
+<li><code>spring-boot-starter-data-neo4j</code> : Starter for using Neo4j graph database
+and Spring Data Neo4j</li>
+<li><code>spring-boot-starter-data-redis</code> : Starter for using Redis key-value data
 store with Spring Data Redis and the Lettuce client</li>
-<li>spring-boot-starter-data-redis-reactive : Starter for using Redis key-value
-data store with Spring Data Redis reactive and the Lettuce client</li>
-<li>spring-boot-starter-data-rest : Starter for exposing Spring Data
+<li><code>spring-boot-starter-data-redis-reactive</code> : Starter for using Redis
+key-value data store with Spring Data Redis reactive and the Lettuce client</li>
+<li><code>spring-boot-starter-data-rest</code> : Starter for exposing Spring Data
 repositories over REST using Spring Data REST</li>
-<li>spring-boot-starter-data-solr : Starter for using the Apache Solr search
+<li><code>spring-boot-starter-data-solr</code> : Starter for using the Apache Solr search
 platform with Spring Data Solr</li>
-<li>spring-boot-starter-freemarker : Starter for building MVC web applications
-using FreeMarker views</li>
-<li>spring-boot-starter-groovy-templates : Starter for building MVC web
+<li><code>spring-boot-starter-freemarker</code> : Starter for building MVC web
+applications using FreeMarker views</li>
+<li><code>spring-boot-starter-groovy-templates</code> : Starter for building MVC web
 applications using Groovy Templates views</li>
-<li>spring-boot-starter-hateoas : Starter for building hypermedia-based RESTful
-web application with Spring MVC and Spring HATEOAS</li>
-<li>spring-boot-starter-integration : Starter for using Spring Integration</li>
-<li>spring-boot-starter-jdbc : Starter for using JDBC with the HikariCP
+<li><code>spring-boot-starter-hateoas</code> : Starter for building hypermedia-based
+RESTful web application with Spring MVC and Spring HATEOAS</li>
+<li><code>spring-boot-starter-integration</code> : Starter for using Spring Integration</li>
+<li><code>spring-boot-starter-jdbc</code> : Starter for using JDBC with the HikariCP
 connection pool</li>
-<li>spring-boot-starter-jersey : Starter for building RESTful web applications
-using JAX-RS and Jersey. An alternative to spring-boot-starter-web</li>
-<li>spring-boot-starter-jooq : Starter for using jOOQ to access SQL
+<li><code>spring-boot-starter-jersey</code> : Starter for building RESTful web
+applications using JAX-RS and Jersey. An alternative to
+spring-boot-starter-web</li>
+<li><code>spring-boot-starter-jooq</code> : Starter for using jOOQ to access SQL
 databases. An alternative to spring-boot-starter-data-jpa or
 spring-boot-starter-jdbc</li>
-<li>spring-boot-starter-json : Starter for reading and writing json</li>
-<li>spring-boot-starter-jta-atomikos : Starter for JTA transactions using
+<li><code>spring-boot-starter-json</code> : Starter for reading and writing json</li>
+<li><code>spring-boot-starter-jta-atomikos</code> : Starter for JTA transactions using
 Atomikos</li>
-<li>spring-boot-starter-jta-bitronix : Starter for JTA transactions using
+<li><code>spring-boot-starter-jta-bitronix</code> : Starter for JTA transactions using
 Bitronix</li>
-<li>spring-boot-starter-mail : Starter for using Java Mail and Spring
+<li><code>spring-boot-starter-mail</code> : Starter for using Java Mail and Spring
 Framework's email sending support</li>
-<li>spring-boot-starter-mustache : Starter for building web applications using
-Mustache views</li>
-<li>spring-boot-starter-oauth2-client : Starter for using Spring Security's
+<li><code>spring-boot-starter-mustache</code> : Starter for building web applications
+using Mustache views</li>
+<li><code>spring-boot-starter-oauth2-client</code> : Starter for using Spring Security's
 OAuth2/OpenID Connect client features</li>
-<li>spring-boot-starter-oauth2-resource-server : Starter for using Spring
+<li><code>spring-boot-starter-oauth2-resource-server</code> : Starter for using Spring
 Security's OAuth2 resource server features</li>
-<li>spring-boot-starter-quartz : Starter for using the Quartz scheduler</li>
-<li>spring-boot-starter-security : Starter for using Spring Security</li>
-<li>spring-boot-starter-test : Starter for testing Spring Boot applications
+<li><code>spring-boot-starter-quartz</code> : Starter for using the Quartz scheduler</li>
+<li><code>spring-boot-starter-security</code> : Starter for using Spring Security</li>
+<li><code>spring-boot-starter-test</code> : Starter for testing Spring Boot applications
 with libraries including JUnit, Hamcrest and Mockito</li>
-<li>spring-boot-starter-thymeleaf : Starter for building MVC web applications
+<li><code>spring-boot-starter-thymeleaf</code> : Starter for building MVC web applications
 using Thymeleaf views</li>
-<li>spring-boot-starter-validation : Starter for using Java Bean Validation
+<li><code>spring-boot-starter-validation</code> : Starter for using Java Bean Validation
 with Hibernate Validator</li>
-<li>spring-boot-starter-web : Starter for building web, including RESTful,
+<li><code>spring-boot-starter-web</code> : Starter for building web, including RESTful,
 applications using Spring MVC. Uses Tomcat as the default embedded
 container</li>
-<li>spring-boot-starter-web-services : Starter for using Spring Web Services</li>
-<li>spring-boot-starter-webflux : Starter for building WebFlux applications
+<li><code>spring-boot-starter-web-services</code> : Starter for using Spring Web Services</li>
+<li><code>spring-boot-starter-webflux</code> : Starter for building WebFlux applications
 using Spring Framework's Reactive Web support</li>
-<li>spring-boot-starter-websocket : Starter for building WebSocket applications
-using Spring Framework's WebSocket support</li>
+<li><code>spring-boot-starter-websocket</code> : Starter for building WebSocket
+applications using Spring Framework's WebSocket support</li>
 </ul>
 </div>
 </div>
 </div>
 
+<div id="outline-container-org702f4e7" class="outline-2">
+<h2 id="org702f4e7"><span class="section-number-2">4</span> Spring Beans 和依赖注入</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Spring Framework 的相关技术在 SpringBoot 工程中都是支持的，常见的标注如下：
+</p>
+<ul class="org-ul">
+<li><code>@ComponentScan</code> : 查找 Beans</li>
+<li><code>@Autowired</code> : 注入的构造器</li>
+<li><code>@Component</code> : 组件</li>
+<li><code>@Repository</code> : 仓库</li>
+<li><code>@Service</code> : 服务</li>
+<li><code>@Controller</code> : 控制器</li>
+</ul>
+
+<p>
+下面是依赖注入的示例
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">package</span> com.example.<span style="color: #268bd2;">service</span>;
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">org</span>.<span style="color: #268bd2;">springframework</span>.<span style="color: #268bd2;">beans</span>.<span style="color: #268bd2;">factory</span>.<span style="color: #268bd2;">annotation</span>.<span style="color: #268bd2;">Autowired</span>;
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">org</span>.<span style="color: #268bd2;">springframework</span>.<span style="color: #268bd2;">stereotype</span>.<span style="color: #268bd2;">Service</span>;
+
+<span style="color: #268bd2;">@Service</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">DatabaseAccountService</span> <span style="color: #859900;">implements</span> <span style="color: #268bd2;">AccountService</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">RiskAssessor</span> <span style="color: #6c71c4;">riskAssessor</span>;
+
+  <span style="color: #268bd2;">@Autowired</span>
+  <span style="color: #859900;">public</span> <span style="color: #b58900;">DatabaseAccountService</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">RiskAssessor</span> <span style="color: #6c71c4;">riskAssessor</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">this</span>.riskAssessor = riskAssessor;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">...</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@Service</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">DatabaseAccountService</span> <span style="color: #859900;">implements</span> <span style="color: #268bd2;">AccountService</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">RiskAssessor</span> <span style="color: #6c71c4;">riskAssessor</span>;
+
+  <span style="color: #859900;">public</span> <span style="color: #b58900;">DatabaseAccountService</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">RiskAssessor</span> <span style="color: #6c71c4;">riskAssessor</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">this</span>.riskAssessor = riskAssessor;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">...</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgecfe5af" class="outline-2">
+<h2 id="orgecfe5af"><span class="section-number-2">5</span> <code>@SpringBootApplication</code> 标注</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Spring Framework 提供了下面的基本标注
+</p>
+<ul class="org-ul">
+<li><code>@EnableAutoConfiguration</code> : 开启自动配置</li>
+<li><code>@ComponentScan</code> : 开启自动扫描组件</li>
+<li><code>@Configuration</code> : 允许在上下文中注册其它的 Bean 或导入其它的配置类</li>
+</ul>
+
+<p>
+<code>@SpringBootApplication</code> 相当于同时开启了上面三项配置
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">package</span> com.example.<span style="color: #268bd2;">myapplication</span>;
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">org</span>.<span style="color: #268bd2;">springframework</span>.<span style="color: #268bd2;">boot</span>.<span style="color: #268bd2;">SpringApplication</span>;
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">org</span>.<span style="color: #268bd2;">springframework</span>.<span style="color: #268bd2;">boot</span>.<span style="color: #268bd2;">autoconfigure</span>.<span style="color: #268bd2;">SpringBootApplication</span>;
 
 
-<div id="outline-container-orga17cfc4" class="outline-2">
-<h2 id="orga17cfc4"><span class="section-number-2">3</span> Controller</h2>
+<span style="color: #268bd2;">@SpringBootApplication</span> <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">same as @Configuration @EnableAutoConfiguration @ComponentScan</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Application</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    SpringApplication.run<span style="color: #9564bf;">(</span>Application.<span style="color: #859900;">class</span>, args<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6e6aa55" class="outline-2">
+<h2 id="org6e6aa55"><span class="section-number-2">6</span> 外部配置</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+SpringBoot 允许使用外部配置方便应用在不同的环境下运行。
+</p>
+</div>
+<div id="outline-container-org806a9ac" class="outline-3">
+<h3 id="org806a9ac"><span class="section-number-3">6.1</span> <code>@Value</code> 方式配置</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@Component</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">MyBean</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #268bd2;">@Value</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"${name}"</span><span style="color: #d8241f;">)</span>
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span>;
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">...</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org891fc15" class="outline-3">
+<h3 id="org891fc15"><span class="section-number-3">6.2</span> <code>@ConfigurationProperties</code> 方式配置</h3>
+<div class="outline-text-3" id="text-6-2">
+<p>
+该种配置方法比 <code>@Value</code> 更加安全
+</p>
+
+<p>
+先定义配置项的 Java Bean
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">package</span> com.<span style="color: #268bd2;">example</span>;
+
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">net</span>.<span style="color: #268bd2;">InetAddress</span>;
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">util</span>.<span style="color: #268bd2;">ArrayList</span>;
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">util</span>.<span style="color: #268bd2;">Collections</span>;
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">util</span>.<span style="color: #268bd2;">List</span>;
+
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">org</span>.<span style="color: #268bd2;">springframework</span>.<span style="color: #268bd2;">boot</span>.<span style="color: #268bd2;">context</span>.<span style="color: #268bd2;">properties</span>.<span style="color: #268bd2;">ConfigurationProperties</span>;
+
+<span style="color: #268bd2;">@ConfigurationProperties</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"acme"</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">AcmeProperties</span> <span style="color: #8d5649;">{</span>
+
+    <span style="color: #859900;">private</span> <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">enabled</span>;
+    <span style="color: #859900;">private</span> <span style="color: #268bd2;">InetAddress</span> <span style="color: #6c71c4;">remoteAddress</span>;
+    <span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Security</span> <span style="color: #6c71c4;">security</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Security</span><span style="color: #d8241f;">()</span>;
+
+    <span style="color: #859900;">public</span> <span style="color: #268bd2;">boolean</span> <span style="color: #b58900;">isEnabled</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> ... <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setEnabled</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">enabled</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> ... <span style="color: #d8241f;">}</span>
+
+    <span style="color: #859900;">public</span> <span style="color: #268bd2;">InetAddress</span> <span style="color: #b58900;">getRemoteAddress</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> ... <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setRemoteAddress</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">InetAddress</span> <span style="color: #6c71c4;">remoteAddress</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> ... <span style="color: #d8241f;">}</span>
+
+    <span style="color: #859900;">public</span> <span style="color: #268bd2;">Security</span> <span style="color: #b58900;">getSecurity</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> ... <span style="color: #d8241f;">}</span>
+
+    <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Security</span> <span style="color: #d8241f;">{</span>
+
+     <span style="color: #859900;">private</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">username</span>;
+     <span style="color: #859900;">private</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">password</span>;
+    <span style="color: #859900;">private</span> <span style="color: #268bd2;">List</span><span style="color: #9564bf;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">&gt;</span> <span style="color: #6c71c4;">roles</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #9564bf;">&lt;&gt;(</span>Collections.singleton<span style="color: #24a222;">(</span><span style="color: #2aa198;">"USER"</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+
+    <span style="color: #859900;">public</span> <span style="color: #268bd2;">String</span> <span style="color: #b58900;">getUsername</span><span style="color: #9564bf;">()</span> <span style="color: #9564bf;">{</span> ... <span style="color: #9564bf;">}</span>
+    <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setUsername</span><span style="color: #9564bf;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">username</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span> ... <span style="color: #9564bf;">}</span>
+
+    <span style="color: #859900;">public</span> <span style="color: #268bd2;">String</span> <span style="color: #b58900;">getPassword</span><span style="color: #9564bf;">()</span> <span style="color: #9564bf;">{</span> ... <span style="color: #9564bf;">}</span>
+    <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setPassword</span><span style="color: #9564bf;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">password</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span> ... <span style="color: #9564bf;">}</span>
+
+    <span style="color: #859900;">public</span> <span style="color: #268bd2;">List</span><span style="color: #9564bf;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">&gt;</span> <span style="color: #b58900;">getRoles</span><span style="color: #9564bf;">()</span> <span style="color: #9564bf;">{</span> ... <span style="color: #9564bf;">}</span>
+    <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setRoles</span><span style="color: #9564bf;">(</span><span style="color: #268bd2;">List</span><span style="color: #24a222;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #24a222;">&gt;</span> <span style="color: #6c71c4;">roles</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span> ... <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+上述的配置类对应于配置文件中的这些配置项
+</p>
+<ul class="org-ul">
+<li><code>acme.enabled</code> 定义一个值，默认为空</li>
+<li><code>acme.remote-address</code> 能通过字符串强制转换的类型</li>
+<li><code>acme.security.username</code> 自带 Security 对象，用户名</li>
+<li><code>acme.security.password</code></li>
+<li><code>acme.security.roles</code> 字符串集合</li>
+</ul>
+
+<p>
+添加配置项，通过 <code>@EnableConfigurationProperties</code> 标注来扫描配置的 Java Bean
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@Configuration</span>
+<span style="color: #268bd2;">@EnableConfigurationProperties</span><span style="color: #8d5649;">(</span>AcmeProperties.<span style="color: #859900;">class</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">MyConfiguration</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">...</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+并且需要添加 <code>@Configuration</code> 到 Java Bean 中
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@Component</span>
+<span style="color: #268bd2;">@ConfigurationProperties</span><span style="color: #8d5649;">(</span>prefix=<span style="color: #2aa198;">"acme"</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">AcmeProperties</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">... see the preceding example</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+最后就可以将定义的 Java Bean 配置项注入到其它组件中
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@Service</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">MyService</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">AcmeProperties</span> <span style="color: #6c71c4;">properties</span>;
+
+  <span style="color: #268bd2;">@Autowired</span>
+  <span style="color: #859900;">public</span> <span style="color: #b58900;">MyService</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">AcmeProperties</span> <span style="color: #6c71c4;">properties</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">this</span>.properties = properties;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #93a1a1; font-style: italic;">//</span><span style="color: #93a1a1; font-style: italic;">...</span>
+
+  <span style="color: #268bd2;">@PostConstruct</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">openConnection</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #268bd2;">Server</span> <span style="color: #6c71c4;">server</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Server</span><span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.properties.getRemoteAddress<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">...</span>
+  <span style="color: #d8241f;">}</span>
+
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org926e0c0" class="outline-2">
+<h2 id="org926e0c0"><span class="section-number-2">7</span> 开发工具</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+SpringBoot 的提供了开发工具套件，可以实现自动加载，仅仅需要在 <code>pom.xml</code> 文件中
+加入下面依赖即可自动添加
+</p>
+<div class="org-src-container">
+<pre class="src src-xml">&lt;<span style="color: #b58900;">dependencies</span>&gt;
+ &lt;<span style="color: #b58900;">dependency</span>&gt;
+  &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.boot&lt;/<span style="color: #b58900;">groupId</span>&gt;
+  &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-boot-devtools&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+  &lt;<span style="color: #b58900;">optional</span>&gt;true&lt;/<span style="color: #b58900;">optional</span>&gt;
+ &lt;/<span style="color: #b58900;">dependency</span>&gt;
+&lt;/<span style="color: #b58900;">dependencies</span>&gt;
+</pre>
+</div>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="date">Date: 2019-07-10 Wed 00:00</p>
 <p class="author">Author: Jinghui Hu</p>
-<p class="date">Created: 2019-07-10 Wed 08:54</p>
+<p class="date">Created: 2019-07-10 Wed 10:09</p>
 <p class="validation"></p>
 </div>
 </body>
