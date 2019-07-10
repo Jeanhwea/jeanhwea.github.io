@@ -290,6 +290,75 @@
      }
    #+END_SRC
 
+* 日志
+  SpringBoot 提供了一个统一的日志配置，可以兼容 Java Util Logging、Log4J2 和
+  Logback 等日志系统作为后端。
+
+** 日志样式
+   默认的输出样式如下：
+   #+BEGIN_SRC text
+     2014-03-05 10:57:51.112  INFO 45469 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet Engine: Apache Tomcat/7.0.52
+     2014-03-05 10:57:51.253  INFO 45469 --- [ost-startStop-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+     2014-03-05 10:57:51.253  INFO 45469 --- [ost-startStop-1] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 1358 ms
+     2014-03-05 10:57:51.698  INFO 45469 --- [ost-startStop-1] o.s.b.c.e.ServletRegistrationBean        : Mapping servlet: 'dispatcherServlet' to [/]
+     2014-03-05 10:57:51.702  INFO 45469 --- [ost-startStop-1] o.s.b.c.embedded.FilterRegistrationBean  : Mapping filter: 'hiddenHttpMethodFilter' to: [/*]
+   #+END_SRC
+   包括以下几个部分：
+   - Date and Time: Millisecond precision and easily sortable.
+   - Log Level: ERROR, WARN, INFO, DEBUG, or TRACE.
+   - Process ID.
+   - A --- separator to distinguish the start of actual log messages.
+   - Thread name: Enclosed in square brackets (may be truncated for console output).
+   - Logger name: This is usually the source class name (often abbreviated).
+   - The log message
+
+** 控制台输出
+   控制台输出默认记录 ERROR, WARN 和 INFO 基本的日志，可以使用 =--debug= 开启调
+   试级别的输出。
+   #+BEGIN_SRC sh
+     java -jar myapp.jar --debug
+   #+END_SRC
+
+   也可以在配置文件 =application.yml= 中设置 ~debug=true~
+
+   如果控制台支持彩色输出，那么还可以配置彩色输出日志
+   - 开启配置文件中的 =spring.output.ansi.enabled= 选项
+   - 使用 =%clr(%5p)= 可以根据日志基本来变换颜色。各级别对应的颜色： 红色
+     (FATAL, ERROR)，黄色（INFO），绿色（INFO, DEBUG）
+   - 设置日期的颜色 =%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){yellow}= ，默认支持以下几
+     种色彩： blue cyan faint green magenta red yellow
+
+** 文件输出
+   文件输出通过 =logging.file= 和 =logging.path= 来控制
+
+   | logging.file  | logging.path       | Example  | Description                                  |
+   |---------------+--------------------+----------+----------------------------------------------|
+   | (none)        | (none)             |          | 仅开启控制台输出                             |
+   | Specific file | (none)             | my.log   | 输出到文件，文件路径是当前文件夹的相对路径   |
+   | (none)        | Specific directory | /var/log | 输出到文件，文件路径可以是相对路径或绝对路径 |
+
+   - =logging.file.max-size= 设置文件的最大存储大小
+   - =logging.file.max-history= 设置最大的历史文件数量
+
+** 日志级别
+   日志级别可以通过 =logging.level.<logger-name>=<level>= 来设置，其中
+   =logging.level.root= 是设置默认级别
+   #+BEGIN_SRC conf
+     logging.level.root=WARN
+     logging.level.org.springframework.web=DEBUG
+     logging.level.org.hibernate=ERROR
+   #+END_SRC
+
+** 日志分组
+   日志基本可以通过分组来设置，例如
+   #+BEGIN_SRC conf
+     logging.group.tomcat=org.apache.catalina, org.apache.coyote, org.apache.tomcat
+   #+END_SRC
+
+   SpringBoot 的默认分组有下面几个：
+   - web : =org.springframework.core.codec, org.springframework.http, org.springframework.web=
+   - sql : =org.springframework.jdbc.core, org.hibernate.SQL=
+
 * 开发工具
   SpringBoot 的提供了开发工具套件，可以实现自动加载，仅仅需要在 =pom.xml= 文件中
   加入下面依赖即可自动添加
