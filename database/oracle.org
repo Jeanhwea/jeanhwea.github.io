@@ -274,7 +274,8 @@
     - ~ASIN(n)~
     - ~ATAN(n)~
     - ~ATAN2(n)~
-    - ~BITAND(n)~
+    - ~BITAND(expr1, expr2)~ : 计算 expr1 和 expr2 的按位与操作，通常和 DECODE
+      一起搭配使用
     - ~CEIL(n)~
     - ~COS(n)~
     - ~COSH(n)~
@@ -285,7 +286,7 @@
     - ~MOD(n, m)~ : =MOD(11,4) -> 3=
     - ~NANVL(n)~
     - ~POWER(n)~
-    - ~REMAINDER(n, m)~
+    - ~REMAINDER(n, m)~ : 求余数
     - ~ROUND(n, precision)~ : precision 表示小数点后的精度，例如：
       =TRUNC(15.193,1) -> 15.2=, =TRUNC(15.193, -1) -> 20=
     - ~SIGN(n)~
@@ -304,6 +305,68 @@
       个正整数。如果 n 是 NULL，则返回 NULL。
       + min_value, max_value 取值范围的最小值和最大值
       + num_buckets 所分为的节
+
+    #+BEGIN_SRC sql
+      SELECT order_id, customer_id,
+             DECODE(BITAND(order_status, 1), 1, 'Warehouse', 'PostOffice')
+               Location,
+             DECODE(BITAND(order_status, 2), 2, 'Ground', 'Air') Method,
+             DECODE(BITAND(order_status, 4), 4, 'Insured', 'Certified') Receipt
+        FROM orders
+       WHERE order_status < 8;
+
+         ORDER_ID CUSTOMER_ID LOCATION   METHOD RECEIPT
+      ---------- ----------- ---------- ------ ---------
+            2458         101 PostOffice Air    Certified
+            2397         102 Warehouse  Air    Certified
+            2454         103 Warehouse  Air    Certified
+            2354         104 PostOffice Air    Certified
+            2358         105 PostOffice Ground Certified
+            2381         106 Warehouse  Ground Certified
+            2440         107 Warehouse  Ground Certified
+            2357         108 Warehouse  Air    Insured
+            2394         109 Warehouse  Air    Insured
+            2435         144 PostOffice Ground Insured
+
+
+      SELECT customer_id, cust_last_name, credit_limit,
+         WIDTH_BUCKET(credit_limit, 100, 5000, 10) "Credit Group"
+         FROM customers WHERE nls_territory = 'SWITZERLAND'
+           ORDER BY "Credit Group";
+
+      CUSTOMER_ID CUST_LAST_NAME       CREDIT_LIMIT Credit Group
+      ----------- -------------------- ------------ ------------
+              825 Dreyfuss                      500            1
+              826 Barkin                        500            1
+              853 Palin                         400            1
+              827 Siegel                        500            1
+              843 Oates                         700            2
+              844 Julius                        700            2
+              835 Eastwood                     1200            3
+              840 Elliott                      1400            3
+              842 Stern                        1400            3
+              841 Boyer                        1400            3
+              837 Stanton                      1200            3
+              836 Berenger                     1200            3
+              848 Olmos                        1800            4
+              849 Kaurusmdki                   1800            4
+              828 Minnelli                     2300            5
+              829 Hunter                       2300            5
+              852 Tanner                       2300            5
+              851 Brown                        2300            5
+              850 Finney                       2300            5
+              830 Dutt                         3500            7
+              831 Bel Geddes                   3500            7
+              832 Spacek                       3500            7
+              838 Nicholson                    3500            7
+              839 Johnson                      3500            7
+              833 Moranis                      3500            7
+              834 Idle                         3500            7
+              845 Fawcett                      5000           11
+              846 Brando                       5000           11
+              847 Streep                       5000           11
+    #+END_SRC
+
 *** 返回字符值的字符函数
     - ~CHR(n)~
     - ~CONCAT(str1, str2)~ : 字符串可以是 CHAR, VARCHAR2, NCHAR, NVARCHAR2, CLOB,
