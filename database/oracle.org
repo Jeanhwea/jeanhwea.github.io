@@ -315,72 +315,73 @@
         FROM orders
        WHERE order_status < 8;
 
-         ORDER_ID CUSTOMER_ID LOCATION   METHOD RECEIPT
-      ---------- ----------- ---------- ------ ---------
-            2458         101 PostOffice Air    Certified
-            2397         102 Warehouse  Air    Certified
-            2454         103 Warehouse  Air    Certified
-            2354         104 PostOffice Air    Certified
-            2358         105 PostOffice Ground Certified
-            2381         106 Warehouse  Ground Certified
-            2440         107 Warehouse  Ground Certified
-            2357         108 Warehouse  Air    Insured
-            2394         109 Warehouse  Air    Insured
-            2435         144 PostOffice Ground Insured
+      --    ORDER_ID CUSTOMER_ID LOCATION   METHOD RECEIPT
+      -- ---------- ----------- ---------- ------ ---------
+      --       2458         101 PostOffice Air    Certified
+      --       2397         102 Warehouse  Air    Certified
+      --       2454         103 Warehouse  Air    Certified
+      --       2354         104 PostOffice Air    Certified
+      --       2358         105 PostOffice Ground Certified
+      --       2381         106 Warehouse  Ground Certified
+      --       2440         107 Warehouse  Ground Certified
+      --       2357         108 Warehouse  Air    Insured
+      --       2394         109 Warehouse  Air    Insured
+      --       2435         144 PostOffice Ground Insured
 
 
       SELECT customer_id, cust_last_name, credit_limit,
-         WIDTH_BUCKET(credit_limit, 100, 5000, 10) "Credit Group"
-         FROM customers WHERE nls_territory = 'SWITZERLAND'
-           ORDER BY "Credit Group";
+             WIDTH_BUCKET(credit_limit, 100, 5000, 10) "Credit Group"
+        FROM customers WHERE nls_territory = 'SWITZERLAND'
+       ORDER BY "Credit Group";
 
-      CUSTOMER_ID CUST_LAST_NAME       CREDIT_LIMIT Credit Group
-      ----------- -------------------- ------------ ------------
-              825 Dreyfuss                      500            1
-              826 Barkin                        500            1
-              853 Palin                         400            1
-              827 Siegel                        500            1
-              843 Oates                         700            2
-              844 Julius                        700            2
-              835 Eastwood                     1200            3
-              840 Elliott                      1400            3
-              842 Stern                        1400            3
-              841 Boyer                        1400            3
-              837 Stanton                      1200            3
-              836 Berenger                     1200            3
-              848 Olmos                        1800            4
-              849 Kaurusmdki                   1800            4
-              828 Minnelli                     2300            5
-              829 Hunter                       2300            5
-              852 Tanner                       2300            5
-              851 Brown                        2300            5
-              850 Finney                       2300            5
-              830 Dutt                         3500            7
-              831 Bel Geddes                   3500            7
-              832 Spacek                       3500            7
-              838 Nicholson                    3500            7
-              839 Johnson                      3500            7
-              833 Moranis                      3500            7
-              834 Idle                         3500            7
-              845 Fawcett                      5000           11
-              846 Brando                       5000           11
-              847 Streep                       5000           11
+      -- CUSTOMER_ID CUST_LAST_NAME       CREDIT_LIMIT Credit Group
+      -- ----------- -------------------- ------------ ------------
+      --         825 Dreyfuss                      500            1
+      --         826 Barkin                        500            1
+      --         853 Palin                         400            1
+      --         827 Siegel                        500            1
+      --         843 Oates                         700            2
+      --         844 Julius                        700            2
+      --         835 Eastwood                     1200            3
+      --         840 Elliott                      1400            3
+      --         842 Stern                        1400            3
+      --         841 Boyer                        1400            3
+      --         837 Stanton                      1200            3
+      --         836 Berenger                     1200            3
+      --         848 Olmos                        1800            4
+      --         849 Kaurusmdki                   1800            4
+      --         828 Minnelli                     2300            5
+      --         829 Hunter                       2300            5
+      --         852 Tanner                       2300            5
+      --         851 Brown                        2300            5
+      --         850 Finney                       2300            5
+      --         830 Dutt                         3500            7
+      --         831 Bel Geddes                   3500            7
+      --         832 Spacek                       3500            7
+      --         838 Nicholson                    3500            7
+      --         839 Johnson                      3500            7
+      --         833 Moranis                      3500            7
+      --         834 Idle                         3500            7
+      --         845 Fawcett                      5000           11
+      --         846 Brando                       5000           11
+      --         847 Streep                       5000           11
     #+END_SRC
 
 *** 返回字符值的字符函数
     - ~CHR(n)~
-    - ~CONCAT(str1, str2)~ : 字符串可以是 CHAR, VARCHAR2, NCHAR, NVARCHAR2, CLOB,
-      NCLOB 这些类型
+    - ~CONCAT(str1, str2)~ : 字符串可以是 CHAR, VARCHAR2, NCHAR, NVARCHAR2,
+      CLOB, NCLOB 这些类型
     - ~INITCAP(s)~
     - ~LOWER(s)~
-    - ~LPAD(s, n, pad)~ : 左填充字符串，填充 n 个 pad 字符到 s 的左侧，返回新字符串
-      =LPAD('Page 1',15,'*.') -> '*.*.*.*.*Page 1'=
+    - ~LPAD(s, n, pad)~ : 左填充字符串，填充 n 个 pad 字符到 s 的左侧，返回新字
+      符串
     - ~LTRIM(s[, set])~ : 移除左侧包含的 set 字符
     - ~NLS_INITCAP(s)~
     - ~NLS_LOWER(s)~
     - ~NLSSORT(s)~
     - ~NLS_UPPER(s)~
-    - ~REGEXP_REPLACE(str, pat, repl_str, pos, occur, match_param)~ : 正则表达式替换
+    - ~REGEXP_REPLACE(str, pat, repl_str, pos, occur, match_param)~ : 正则表达式
+      替换
       + str 源字符串
       + pat 匹配的正则表达式
       + repl_str 待替换的字符串
@@ -405,44 +406,55 @@
     - ~TRIM([LEADING|TRAILING|BOTH] trim_char FROM trim_src)~ : 删除空白符号
       =TO_CHAR(TRIM(LEADING 0 FROM hire_date))=
     - ~UPPER(s)~
+
     #+BEGIN_SRC sql
       SQL> SELECT substr('abcdef', 2, 3) FROM DUAL;
-
       bcd
 
       SQL> SELECT instr('abcdef', 'cd') FROM DUAL;
-
                  3
 
       SQL> SELECT instr('abcdef', 'ce') FROM DUAL;
-
                  0
 
       SQL> SELECT replace('abcdef', 'ce') FROM DUAL;
-
       abcdef
 
       SQL> SELECT replace('abcdef', 'cd', '$$') FROM DUAL;
-
       ab$$ef
 
       SQL> select regexp_substr('500 Oracle Parkway, Redwood Shores, CA', ',[^,]+,') from dual;
-
       , Redwood Shores,
 
       SQL> SELECT lower('abcdef') FROM DUAL;
-
       abcdef
 
       SQL> SELECT upper('abcdef') FROM DUAL;
-
       ABCDEF
+
+      SQL> select lpad('Page 1',15,'*.') from dual;
+      ,*.*.*.*.*Page 1
+    #+END_SRC
+
+    处理字符串的回车换行符 Oracle 字符串好回车换行符处理需要借助 ~chr~ 函数，见
+    如下例子
+    #+BEGIN_SRC sql
+      SQL> SELECT E_NOTE FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
+      第一行
+      第二行
+
+      SQL> SELECT replace(replace(E_NOTE, chr(13), ''), chr(10), '') FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
+      第一行第二行
+
+      SQL> SELECT replace(replace(E_NOTE, chr(13), ''), chr(10), ' _r_n ') FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
+      第一行 _r_n 第二行
     #+END_SRC
 
 *** NLS 字符串函数
     - ~NLS_CHARSET_DECL_LEN()~ : =NLS_CHARSET_DECL_LEN (200, nls_charset_id('ja16eucfixed'))=
     - ~NLS_CHARSET_ID()~
     - ~NLS_CHARSET_NAME()~
+
 *** 返回数值的字符函数
     - ~ASCII(c)~
     - ~INSTR(s, search_str, pos, occur)~ : 如果 search_str 在字符串 s 中，返回真；
@@ -450,6 +462,7 @@
     - ~LENGTH(s)~
     - ~REGEXP_INSTR(str, pat, pos, occur, ret_option, match_param)~
       + ret_option 表示 occur 的相对位置，0 表示第一次出现，1 表示第二次出现
+
 *** 时间/日期函数
     - ~ADD_MONTHS(date, n)~
     - ~CURRENT_DATE~
@@ -481,36 +494,31 @@
     - ~TO_YMINTERVAL()~
     - ~TRUNC (date)()~
     - ~TZ_OFFSET()~
+
     #+BEGIN_SRC sql
       SQL> select DBTIMEZONE from dual;
-
       +00:00
 
       SQL> select NEXT_DAY('02-FEB-2001','TUESDAY') from dual;
-
       06-FEB-01
 
       SQL> select TO_CHAR(current_timestamp, 'YYYY-MM-DD') from dual;
-
       2019-07-11
 
       SQL> select SYSTIMESTAMP from dual;
-
       11-JUL-19 12.38.17.185000 PM +08:00
 
       SQL> select SYSDATE from dual;
-
       11-JUL-19
 
       SQL> select SYSTIMESTAMP from dual;
-
       11-JUL-19 12.42.11.732000 PM +08:00
-
-      SQL>
     #+END_SRC
+
 *** 通用比较函数
     - ~GREATEST(a1, a2, ...)~
     - ~LEAST(a1, a2, ...)~
+
 *** 类型转化函数
     - ~ASCIISTR()~
     - ~BIN_TO_NUM()~
@@ -545,17 +553,25 @@
     - ~TO_TIMESTAMP_TZ()~
     - ~TO_YMINTERVAL()~
     - ~UNISTR()~
+
 *** 大对象处理函数
     - ~BFILENAME()~
     - ~EMPTY_BLOB, EMPTY_CLOB()~
+
 *** 集合函数
     - ~CARDINALITY()~
     - ~COLLECT()~
     - ~POWERMULTISET()~
     - ~POWERMULTISET_BY_CARDINALITY()~
     - ~SET()~
+
 *** 继承函数
-    - ~SYS_CONNECT_BY_PATH()~
+    - ~SYS_CONNECT_BY_PATH()~ : 主要用于树查询(层次查询) 以及 多列转行。其语法一般为：
+    #+BEGIN_SRC sql
+      SELECT ... SYS_CONNECT_BY_PATH(colname, 'CONNECT_SYMBOL')  FROM tabname
+      START WITH ... CONNECT BY ... PRIOR
+    #+END_SRC
+
 *** 数据挖掘函数
     - ~CLUSTER_ID()~
     - ~CLUSTER_PROBABILITY()~
@@ -568,6 +584,7 @@
     - ~PREDICTION_DETAILS()~
     - ~PREDICTION_PROBABILITY()~
     - ~PREDICTION_SET()~
+
 *** XML 函数
     - ~APPENDCHILDXML()~
     - ~DELETEXML()~
@@ -596,6 +613,7 @@
     - ~XMLSERIALIZE()~
     - ~XMLTABLE()~
     - ~XMLTRANSFORM()~
+
 *** 编码/解码函数
     - ~DECODE()~
     - ~DUMP()~
@@ -685,29 +703,30 @@
       ERROR at line 1:
       ORA-00923: FROM keyword not found where expected
     #+END_SRC
+
 ** 聚合函数
-   - ~AVG()~
+   - ~AVG(expr)~ : 平均值
    - ~COLLECT()~
    - ~CORR()~
-   - ~CORR_*()~
-   - ~COUNT()~
+   - ~COUNT(expr)~ : 计数
    - ~COVAR_POP()~
    - ~COVAR_SAMP()~
    - ~CUME_DIST()~
    - ~DENSE_RANK()~
-   - ~FIRST()~
+   - ~FIRST~ : 取首个值, 具体参考下面的例子 =aggr_func KEEP (DENSE_RANK FIRST
+     ORDER BY expr [ASC/DESC] [NULLS FIRST/LAST])=
    - ~GROUP_ID()~
    - ~GROUPING()~
    - ~GROUPING_ID()~
-   - ~LAST()~
-   - ~MAX()~
+   - ~LAST~ : 取最后一个值， 语法和 FIRST 相似。 =aggr_func KEEP (DENSE_RANK
+     LAST ORDER BY expr [ASC/DESC] [NULLS FIRST/LAST])=
+   - ~MAX(expr)~ : 最大值
    - ~MEDIAN()~
-   - ~MIN()~
+   - ~MIN(expr)~ : 最小值
    - ~PERCENTILE_CONT()~
    - ~PERCENTILE_DISC()~
    - ~PERCENT_RANK()~
    - ~RANK()~
-   - ~REGR_ (Linear Regression) Functions()~
    - ~STATS_BINOMIAL_TEST()~
    - ~STATS_CROSSTAB()~
    - ~STATS_F_TEST()~
@@ -715,15 +734,38 @@
    - ~STATS_MODE()~
    - ~STATS_MW_TEST()~
    - ~STATS_ONE_WAY_ANOVA()~
-   - ~STATS_T_TEST_*()~
    - ~STATS_WSR_TEST()~
    - ~STDDEV()~
    - ~STDDEV_POP()~
    - ~STDDEV_SAMP()~
-   - ~SUM()~
+   - ~SUM(expr)~ : 求和
    - ~VAR_POP()~
    - ~VAR_SAMP()~
-   - ~VARIANCE()~
+   - ~VARIANCE(expr)~ : 方差
+
+   #+BEGIN_SRC sql
+     SELECT department_id,
+            MIN(salary) KEEP (DENSE_RANK FIRST ORDER BY commission_pct) "Worst",
+            MAX(salary) KEEP (DENSE_RANK LAST ORDER BY commission_pct) "Best"
+       FROM employees
+      GROUP BY department_id;
+
+     -- DEPARTMENT_ID      Worst       Best
+     -- ------------- ---------- ----------
+     --            10       4400       4400
+     --            20       6000      13000
+     --            30       2500      11000
+     --            40       6500       6500
+     --            50       2100       8200
+     --            60       4200       9000
+     --            70      10000      10000
+     --            80       6100      14000
+     --            90      17000      24000
+     --           100       6900      12000
+     --           110       8300      12000
+     --                     7000       7000
+   #+END_SRC
+
 ** 分析函数
    - ~NUMTOYMINTERVAL()~
    - ~AVG()~
@@ -756,12 +798,14 @@
    - ~VAR_POP()~
    - ~VAR_SAMP()~
    - ~VARIANCE()~
+
 ** 对象引用函数
    - ~DEREF()~
    - ~MAKE_REF()~
    - ~REF()~
    - ~REFTOHEX()~
    - ~VALUE()~
+
 ** 模型函数
    - ~CV()~
    - ~ITERATION_NUMBER()~
@@ -791,35 +835,6 @@
      PRDT_PROCESS_ACT_DIC
      PRDT_PROCESS_DIC
      PRDT_PROCESS_RES_DIC
-   #+END_SRC
-
-
-
-** 处理字符串的回车换行符
-   Oracle 字符串好回车换行符处理需要借助 ~chr~ 函数，见如下例子
-   #+BEGIN_SRC sql
-     SQL> UPDATE T_EMPLOYEE_BASE SET E_NOTE = '第一行' || CHR(10) ||'第二行' WHERE E_CODE='test04';
-
-     1 row updated.
-
-     SQL> SELECT E_NOTE FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
-
-     E_NOTE
-     --------
-     第一行
-     第二行
-
-     SQL> SELECT replace(replace(E_NOTE, chr(13), ''), chr(10), '') FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
-
-     REPLACE(REPLACE(E_NOTE,CHR(13),''),CHR(10),'')
-     ----------------------------------------------
-     第一行第二行
-
-     SQL> SELECT replace(replace(E_NOTE, chr(13), ''), chr(10), ' _r_n ') FROM T_EMPLOYEE_BASE WHERE E_CODE='test04';
-
-     REPLACE(REPLACE(E_NOTE,CHR(13),''),CHR(10),' _R_N ')
-     ---------------------------------------------------
-     第一行 _r_n 第二行
    #+END_SRC
 
 ** 获取序列值
