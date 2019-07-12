@@ -96,9 +96,9 @@
    #+BEGIN_SRC dot
      digraph structs {
        node [shape=record];
-       struct1 [label="<f0> left|<f1> mid&#92; dle|<f2> right"];
+       struct1 [label="<f0> left|<f1> mid\ dle|<f2> right"];
        struct2 [label="<f0> one|<f1> two"];
-       struct3 [label="hello&#92;nworld |{ b |{c|<here> d|e}| f}| g | h"];
+       struct3 [label="hello\nworld |{ b |{c|<here> d|e}| f}| g | h"];
        struct1:f1 -> struct2:f0;
        struct1:f2 -> struct3:here;
      }
@@ -106,5 +106,52 @@
 
    - =|= 用来分隔域
    - =<>= 里面是 field_id
+   - label 里面的空格和换行符需要转义
 
    [[file:../static/image/2019/07/fig4.png]]
+
+** 标签文字
+   标签文字默认是
+   - 换行需要转义，其中 =\n=, =\l=, =\r= 分别表示换行居中，靠左和靠右。
+   - graph 和 cluster subgraph 也有 label，默认在图片正下方， ~labelloc=t~ 将
+     label 移到图的上方， ~labelloc=b~ 将图片移到下面。 ~labeljust=r~ 文字靠右。
+   - 字体默认是 "Times-Roman 14", 可以设置 ~fontname~, ~fontsize~ 和 ~fontcolor~
+     这些属性。例如： ~fontname=Helvetica~
+   - 边可以设置两端的 label， ~headlabel~ 和 ~taillabel~ ，以及 label 的字体
+     ~labelfontname~, ~labelfontsize~ 和 ~labelfontcolor~ ，另外如果有需求也可以
+     设置 ~labelangle~ 和 ~labeldistance~
+
+** HTML 类型标签
+   #+BEGIN_SRC dot
+     digraph structs {
+       node [shape=plaintext]
+       struct1 [label=<
+                <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+                <TR><TD>left</TD><TD PORT="f1">mid dle</TD><TD PORT="f2">right</TD></TR>
+                </TABLE>>];
+       struct2 [label=<
+                <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+                <TR><TD PORT="f0">one</TD><TD>two</TD></TR>
+                </TABLE>>];
+       struct3 [label=<
+                <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+                <TR>
+                <TD ROWSPAN="3">hello<BR/>world</TD>
+                <TD COLSPAN="3">b</TD>
+                <TD ROWSPAN="3">g</TD>
+                <TD ROWSPAN="3">h</TD>
+                </TR>
+                <TR>
+                <TD>c</TD><TD PORT="here">d</TD><TD>e</TD>
+                </TR>
+                <TR>
+                <TD COLSPAN="3">f</TD>
+                </TR>
+                </TABLE>>];
+       struct1:f1 -> struct2:f0;
+       struct1:f2 -> struct3:here;
+     }
+   #+END_SRC
+   - =<TD>= 的 PORT 表示单元格的名称
+
+   [[file:../static/image/2019/07/fig5.png]]
