@@ -1,0 +1,40 @@
+digraph G {
+  rankdir="LR"
+
+  node [shape=folder, style=filled, color="#24a222", fontcolor="white", fontname="Helvetia"];
+  module;
+
+  node [shape=ellipse, style=filled, color="#1776b6"];
+  service;
+  controller;
+  repository[lable="repo"];
+  entity;
+
+  node [shape=box, style="filled,rounded", color="#d8241f"];
+  domain;
+  helper;
+  service_impl[label="impl"];
+
+
+  edge [style=solid, color="#e574c3"];
+  module -> {domain, service, controller, helper};
+  domain -> {entity, repository};
+  service -> service_impl;
+
+  node [shape=component, style=filled, color="#777777", width=2];
+  {
+    rank="same";
+    Employee;
+    EmployeeRepository;
+    EmployeeService;
+    EmployeeServiceImpl;
+    EmployeeController;
+  }
+
+  edge [shape=dot, style=dotted, color="#beaed4"];
+  entity -> Employee;
+  repository -> EmployeeRepository;
+  service -> EmployeeService;
+  service_impl -> EmployeeServiceImpl;
+  controller -> EmployeeController;
+}
