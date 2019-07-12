@@ -20,29 +20,91 @@
   - ~digraph~ 有向图
   - ~graph~ 无向图
 
-  每种图中包含以下常见要素：
-  - ~node~ 节点
-  - ~edge~ 边
-  - ~subgraph~ 子图
+** 图的基本元素
+   每种图中包含以下常见要素：
+   - ~node~ 节点
+   - ~edge~ 边
+   - ~subgraph~ 子图
+   - ~attr~ 属性
 
-  #+BEGIN_SRC dot
-    digraph G {
-      main -> parse -> execute;
-      main -> init;
-      main -> cleanup;
-      execute -> make_string;
-      execute -> printf
-      init -> make_string;
-      main -> printf;
-      execute -> compare;
-    }
-  #+END_SRC
+   #+BEGIN_SRC dot
+     digraph G {
+       main -> parse -> execute;
+       main -> init;
+       main -> cleanup;
+       execute -> make_string;
+       execute -> printf
+       init -> make_string;
+       main -> printf;
+       execute -> compare;
+     }
+   #+END_SRC
 
-  - dot 语言中每个变量表示一个节点
-  - =->= 表示连接边
-  - 使用 dot 命令编译生成 PNG 图片，示例如下：
-  #+BEGIN_SRC sh
-    dot -Tpng fig1.dot -o fig1.png
-  #+END_SRC
+   - dot 语言中每个变量表示一个节点
+   - =->= 表示连接边
+   - 使用 dot 命令编译生成 PNG 图片，示例如下：
+   #+BEGIN_SRC sh
+     dot -Tpng fig1.dot -o fig1.png
+   #+END_SRC
 
-  [[file:../static/image/2019/07/fig1.png]]
+   [[file:../static/image/2019/07/fig1.png]]
+
+** 图的属性
+   在绘制图的时候一般需要根据需求来设置节点和边的属性，如下例子中
+   #+BEGIN_SRC dot
+     digraph G {
+       size ="4,4";
+       main [shape=box];   /* this is a comment */
+       main -> parse [weight=8];
+       parse -> execute;
+       main -> init [style=dotted];
+       main -> cleanup;
+       execute -> { make_string; printf}
+       init -> make_string;
+       edge [color=red];   // so is this
+       main -> printf [style=bold,label="100 times"];
+       make_string [label="make a\nstring"];
+       node [shape=box,style=filled,color=".7 .3 1.0"];
+       execute -> compare;
+     }
+   #+END_SRC
+
+   - ~size~ 设置图片大小为 4,4（英尺）
+   - 节点和边的属性写在方括号里
+   - ~shape=box~ 设置节点形状为方框
+   - 花括号表示一个节点连接多个节点 ~execute -> { make_string; printf}~ 等同于
+     ~execute -> make_string; execute -> printf;~
+   - 节点和边的文字可以使用 ~label~ 属性来设置
+
+   [[file:../static/image/2019/07/fig2.png]]
+
+* 属性介绍
+  主要的属性可以参考[[http://www.graphviz.org/doc/info/attrs.html][attrs]]。
+
+** 节点形状
+   节点属性默认设置为 ~shape=ellipse, width=.75, height=.5~ 并且使用节点的名字作
+   为其 label 。节点的形状见 [[http://www.graphviz.org/doc/info/shapes.html][shapes]] 。
+
+   [[file:../static/image/2019/07/fig3.png]]
+
+   - 节点的形状分为两类 =polygon-based= 和 =record-based=
+   - 除了 ~record~ 和 ~Mrecord~ 属于 =record-based= 以外，其它都是
+     =polygon-based=
+   - =polygon-based= 一般直接作为形状
+   - =record-based= 可以用于递归定义
+
+   #+BEGIN_SRC dot
+     digraph structs {
+       node [shape=record];
+       struct1 [label="<f0> left|<f1> mid&#92; dle|<f2> right"];
+       struct2 [label="<f0> one|<f1> two"];
+       struct3 [label="hello&#92;nworld |{ b |{c|<here> d|e}| f}| g | h"];
+       struct1:f1 -> struct2:f0;
+       struct1:f2 -> struct3:here;
+     }
+   #+END_SRC
+
+   - =|= 用来分隔域
+   - =<>= 里面是 field_id
+
+   [[file:../static/image/2019/07/fig4.png]]

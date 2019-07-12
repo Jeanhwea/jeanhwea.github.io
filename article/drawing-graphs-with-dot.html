@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-13 Sat 00:18 -->
+<!-- 2019-07-13 Sat 01:23 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>使用 dot 画图工具</title>
@@ -238,15 +238,25 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgef71a7a">1. Graphviz 画图工具和 dot 语言</a></li>
-<li><a href="#org54dc17f">2. 基本画图</a></li>
+<li><a href="#org15fc79f">1. Graphviz 画图工具和 dot 语言</a></li>
+<li><a href="#org8377b57">2. 基本画图</a>
+<ul>
+<li><a href="#orgab89f38">2.1. 图的基本元素</a></li>
+<li><a href="#org80ba6ea">2.2. 图的属性</a></li>
+</ul>
+</li>
+<li><a href="#org8693d26">3. 属性介绍</a>
+<ul>
+<li><a href="#orge3d50b3">3.1. 节点形状</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgef71a7a" class="outline-2">
-<h2 id="orgef71a7a"><span class="section-number-2">1</span> Graphviz 画图工具和 dot 语言</h2>
+<div id="outline-container-org15fc79f" class="outline-2">
+<h2 id="org15fc79f"><span class="section-number-2">1</span> Graphviz 画图工具和 dot 语言</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Graphviz 是一个由 AT&amp;T 实验室启动的开源工具包，用于绘制 dot 语言脚本描述的图形。
@@ -258,8 +268,8 @@ Graphviz 是一个由 AT&amp;T 实验室启动的开源工具包，用于绘制 
 </div>
 </div>
 
-<div id="outline-container-org54dc17f" class="outline-2">
-<h2 id="org54dc17f"><span class="section-number-2">2</span> 基本画图</h2>
+<div id="outline-container-org8377b57" class="outline-2">
+<h2 id="org8377b57"><span class="section-number-2">2</span> 基本画图</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 dot 可以生成 GIF, PNG, SVG, PDF 和 PostScript 格式的图片。dot 语言画图的类别可
@@ -269,7 +279,11 @@ dot 可以生成 GIF, PNG, SVG, PDF 和 PostScript 格式的图片。dot 语言�
 <li><code>digraph</code> 有向图</li>
 <li><code>graph</code> 无向图</li>
 </ul>
+</div>
 
+<div id="outline-container-orgab89f38" class="outline-3">
+<h3 id="orgab89f38"><span class="section-number-3">2.1</span> 图的基本元素</h3>
+<div class="outline-text-3" id="text-2-1">
 <p>
 每种图中包含以下常见要素：
 </p>
@@ -277,6 +291,7 @@ dot 可以生成 GIF, PNG, SVG, PDF 和 PostScript 格式的图片。dot 语言�
 <li><code>node</code> 节点</li>
 <li><code>edge</code> 边</li>
 <li><code>subgraph</code> 子图</li>
+<li><code>attr</code> 属性</li>
 </ul>
 
 <div class="org-src-container">
@@ -310,9 +325,108 @@ dot 可以生成 GIF, PNG, SVG, PDF 和 PostScript 格式的图片。dot 语言�
 </div>
 </div>
 </div>
+
+<div id="outline-container-org80ba6ea" class="outline-3">
+<h3 id="org80ba6ea"><span class="section-number-3">2.2</span> 图的属性</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+在绘制图的时候一般需要根据需求来设置节点和边的属性，如下例子中
+</p>
+<div class="org-src-container">
+<pre class="src src-dot">digraph G {
+  size =<span style="color: #2aa198;">"4,4"</span>;
+  main [shape=box];   /* this is a comment */
+  main -&gt; parse [weight=8];
+  parse -&gt; execute;
+  main -&gt; init [style=dotted];
+  main -&gt; cleanup;
+  execute -&gt; { make_string; printf}
+  init -&gt; make_string;
+  edge [color=red];   // so is this
+  main -&gt; printf [style=bold,label=<span style="color: #2aa198;">"100 times"</span>];
+  make_string [label=<span style="color: #2aa198;">"make a\nstring"</span>];
+  node [shape=box,style=filled,color=<span style="color: #2aa198;">".7 .3 1.0"</span>];
+  execute -&gt; compare;
+}
+</pre>
+</div>
+
+<ul class="org-ul">
+<li><code>size</code> 设置图片大小为 4,4（英尺）</li>
+<li>节点和边的属性写在方括号里</li>
+<li><code>shape=box</code> 设置节点形状为方框</li>
+<li>花括号表示一个节点连接多个节点 <code>execute -&gt; { make_string; printf}</code> 等同于
+<code>execute -&gt; make_string; execute -&gt; printf;</code></li>
+<li>节点和边的文字可以使用 <code>label</code> 属性来设置</li>
+</ul>
+
+
+<div class="figure">
+<p><img src="../static/image/2019/07/fig2.png" alt="fig2.png" />
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8693d26" class="outline-2">
+<h2 id="org8693d26"><span class="section-number-2">3</span> 属性介绍</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+主要的属性可以参考<a href="http://www.graphviz.org/doc/info/attrs.html">attrs</a>。
+</p>
+</div>
+
+<div id="outline-container-orge3d50b3" class="outline-3">
+<h3 id="orge3d50b3"><span class="section-number-3">3.1</span> 节点形状</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+节点属性默认设置为 <code>shape=ellipse, width=.75, height=.5</code> 并且使用节点的名字作
+为其 label 。节点的形状见 <a href="http://www.graphviz.org/doc/info/shapes.html">shapes</a> 。
+</p>
+
+
+<div class="figure">
+<p><img src="../static/image/2019/07/fig3.png" alt="fig3.png" />
+</p>
+</div>
+
+<ul class="org-ul">
+<li>节点的形状分为两类 <code>polygon-based</code> 和 <code>record-based</code></li>
+<li>除了 <code>record</code> 和 <code>Mrecord</code> 属于 <code>record-based</code> 以外，其它都是
+<code>polygon-based</code></li>
+<li><code>polygon-based</code> 一般直接作为形状</li>
+<li><code>record-based</code> 可以用于递归定义</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-dot">digraph structs {
+  node [shape=record];
+  struct1 [label=<span style="color: #2aa198;">"&lt;f0&gt; left|&lt;f1&gt; mid&amp;#92; dle|&lt;f2&gt; right"</span>];
+  struct2 [label=<span style="color: #2aa198;">"&lt;f0&gt; one|&lt;f1&gt; two"</span>];
+  struct3 [label=<span style="color: #2aa198;">"hello&amp;#92;nworld |{ b |{c|&lt;here&gt; d|e}| f}| g | h"</span>];
+  struct1:f1 -&gt; struct2:f0;
+  struct1:f2 -&gt; struct3:here;
+}
+</pre>
+</div>
+
+<ul class="org-ul">
+<li><code>|</code> 用来分隔域</li>
+<li><code>&lt;&gt;</code> 里面是 field<sub>id</sub></li>
+</ul>
+
+
+<div class="figure">
+<p><img src="../static/image/2019/07/fig4.png" alt="fig4.png" />
+</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-07-13 Sat 00:18. Created by Jinghui Hu at 2019-07-12 Fri 23:58.</p>
+<p class="author">Last Updated 2019-07-13 Sat 01:23. Created by Jinghui Hu at 2019-07-12 Fri 23:58.</p>
 </div>
 </body>
 </html>
