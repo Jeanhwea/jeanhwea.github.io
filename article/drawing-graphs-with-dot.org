@@ -1,0 +1,46 @@
+#+TITLE: 使用 dot 画图工具
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2019-07-12 Fri 23:58:24>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+TAGS: dot graphviz graph cli
+
+
+* Graphviz 画图工具和 dot 语言
+  Graphviz 是一个由 AT&T 实验室启动的开源工具包，用于绘制 dot 语言脚本描述的图形。
+  类似微软的 visio，但是他和 visio 也有很大的不同，他是用代码绘图的，使用一种名
+  为 dot 的语言绘图，对于绘制复杂的流程图，类图等非常好用。 这种设计使得用户更关
+  注于逻辑关系，实现 "所思即所得"。Graphviz 的自动布局功能，无需人为干预就可以做
+  到 "最小化连线交叉"。
+
+* 基本画图
+  dot 可以生成 GIF, PNG, SVG, PDF 和 PostScript 格式的图片。dot 语言画图的类别可
+  以分成以下两类：
+  - ~digraph~ 有向图
+  - ~graph~ 无向图
+
+  每种图中包含以下常见要素：
+  - ~node~ 节点
+  - ~edge~ 边
+  - ~subgraph~ 子图
+
+  #+BEGIN_SRC dot
+    digraph G {
+     main -> parse -> execute;
+     main -> init;
+     main -> cleanup;
+     execute -> make_string;
+     execute -> printf
+     init -> make_string;
+     main -> printf;
+     execute -> compare;
+    }
+  #+END_SRC
+
+  使用如下命令编译生成 PNG 图片
+  #+BEGIN_SRC sh
+    dot -Tpng fig1.dot -o fig1.png
+  #+END_SRC
+
+  [[file:../static/image/2019/07/fig1.png]]
