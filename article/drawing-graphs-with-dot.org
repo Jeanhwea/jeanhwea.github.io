@@ -12,7 +12,7 @@
   类似微软的 visio，但是他和 visio 也有很大的不同，他是用代码绘图的，使用一种名
   为 dot 的语言绘图，对于绘制复杂的流程图，类图等非常好用。 这种设计使得用户更关
   注于逻辑关系，实现 "所思即所得"。Graphviz 的自动布局功能，无需人为干预就可以做
-  到 "最小化连线交叉"。
+  到 "最小化连线交叉"。 关于 dot 画图的一个非常好的文章见 [[https://www.graphviz.org/pdf/dotguide.pdf][Drawing graphs with dot]]
 
 * 基本画图
   dot 可以生成 GIF, PNG, SVG, PDF 和 PostScript 格式的图片。dot 语言画图的类别可
@@ -121,6 +121,18 @@
      ~labelfontname~, ~labelfontsize~ 和 ~labelfontcolor~ ，另外如果有需求也可以
      设置 ~labelangle~ 和 ~labeldistance~
 
+   #+BEGIN_SRC dot
+     digraph graphTextAlign {
+       node [shape=record fontname=Arial];
+       a [label="one\ltwo three\lfour five six seven\l"]
+       b [label="one\ntwo three\nfour five six seven"]
+       c [label="one\rtwo three\rfour five six seven\r"]
+       a -> b -> c
+     }
+   #+END_SRC
+
+   [[file:../static/image/2019/07/graph-text-align.png]]
+
 ** HTML 类型标签
    #+BEGIN_SRC dot
      digraph graphHtmlLabel {
@@ -155,6 +167,52 @@
    - =<TD>= 的 PORT 表示单元格的名称
 
    [[file:../static/image/2019/07/graph-html-labels.png]]
+
+   使用 Port
+   #+BEGIN_SRC dot
+     digraph graphPorts {
+
+       parent [
+        shape=plaintext
+        label=<
+          <table border='1' cellborder='1'>
+            <tr><td colspan="3">The foo, the bar and the baz</td></tr>
+            <tr><td port='port_one'>First port</td><td port='port_two'>Second port</td><td port='port_three'>Third port</td></tr>
+          </table>
+       >];
+
+       child_one [
+        shape=plaintext
+        label=<
+          <table border='1' cellborder='0'>
+            <tr><td>1</td></tr>
+          </table>
+       >];
+
+       child_two [
+        shape=plaintext
+        label=<
+          <table border='1' cellborder='0'>
+            <tr><td>2</td></tr>
+          </table>
+       >];
+
+       child_three [
+        shape=plaintext
+        label=<
+          <table border='1' cellborder='0'>
+            <tr><td>3</td></tr>
+          </table>
+       >];
+
+       parent:port_one   -> child_one;
+       parent:port_two   -> child_two;
+       parent:port_three -> child_three;
+
+     }
+   #+END_SRC
+
+   [[file:../static/image/2019/07/graph-ports.png]]
 
 ** 节点和边的样式
    节点和边的颜色使用 ~color~ 属性来设置， ~color~ 接收以下几种类型的值：
@@ -229,3 +287,34 @@
      + =L= left-to-right
      + =T= top-to-bottom
      + =R= right-to-left
+   - ~center=true~ 居中作图
+
+* 节点和边的位置
+  节点和边的分别通过 ~rankdir~ 属性控制
+  - =LR= left-to-right
+  - =TB= top-to-bottom
+  - =BT= bottom-to-top
+  - =RL= right-to-left
+
+  对于有时间线的图，子图的 ~rank~ 可以设置为：
+  - same 子图中的所有节点属于同一个级别
+  - min 最小级别
+  - source 使得子图中的级别相同，并且严格小于其他节点
+  - max 最大级别
+  - sink
+
+  #+BEGIN_SRC dot
+    digraph graphRank {
+      node [shape=record];
+      { rank=same rA sA tA }
+      { rank=same uB vB wB }
+      rA -> sA;
+      sA -> vB;
+      t  -> rA;
+      uB -> vB;
+      wB -> u;
+      wB -> tA;
+    }
+  #+END_SRC
+
+  [[file:../static/image/2019/07/graph-rank.png]]
