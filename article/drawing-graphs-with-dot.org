@@ -28,7 +28,7 @@
    - ~attr~ 属性
 
    #+BEGIN_SRC dot
-     digraph G {
+     digraph basicGraph {
        main -> parse -> execute;
        main -> init;
        main -> cleanup;
@@ -44,15 +44,15 @@
    - =->= 表示连接边
    - 使用 dot 命令编译生成 PNG 图片，示例如下：
    #+BEGIN_SRC sh
-     dot -Tpng fig1.dot -o fig1.png
+     dot -Tpng fig.dot -o fig.png
    #+END_SRC
 
-   [[file:../static/image/2019/07/fig1.png]]
+   [[file:../static/image/2019/07/basic-graph.png]]
 
 ** 图的属性
    在绘制图的时候一般需要根据需求来设置节点和边的属性，如下例子中
    #+BEGIN_SRC dot
-     digraph G {
+     digraph graphAttrs {
        size ="4,4";
        main [shape=box];   /* this is a comment */
        main -> parse [weight=8];
@@ -76,7 +76,7 @@
      ~execute -> make_string; execute -> printf;~
    - 节点和边的文字可以使用 ~label~ 属性来设置
 
-   [[file:../static/image/2019/07/fig2.png]]
+   [[file:../static/image/2019/07/graph-attrs.png]]
 
 * 图的属性介绍
   主要的属性可以参考[[http://www.graphviz.org/doc/info/attrs.html][attrs]]。
@@ -85,7 +85,7 @@
    节点属性默认设置为 ~shape=ellipse, width=.75, height=.5~ 并且使用节点的名字作
    为其 label 。节点的形状见 [[http://www.graphviz.org/doc/info/shapes.html][shapes]] 。
 
-   [[file:../static/image/2019/07/fig3.png]]
+   [[file:../static/image/2019/07/graph-shapes.png]]
 
    - 节点的形状分为两类 =polygon-based= 和 =record-based=
    - 除了 ~record~ 和 ~Mrecord~ 属于 =record-based= 以外，其它都是
@@ -94,7 +94,7 @@
    - =record-based= 可以用于递归定义
 
    #+BEGIN_SRC dot
-     digraph structs {
+     digraph graphLabel {
        node [shape=record];
        struct1 [label="<f0> left|<f1> mid\ dle|<f2> right"];
        struct2 [label="<f0> one|<f1> two"];
@@ -108,7 +108,7 @@
    - =<>= 里面是 field_id
    - label 里面的空格和换行符需要转义
 
-   [[file:../static/image/2019/07/fig4.png]]
+   [[file:../static/image/2019/07/graph-label.png]]
 
 ** 标签文字
    标签文字默认是
@@ -123,7 +123,7 @@
 
 ** HTML 类型标签
    #+BEGIN_SRC dot
-     digraph structs {
+     digraph graphHtmlLabel {
        node [shape=plaintext]
        struct1 [label=<
                 <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
@@ -154,7 +154,7 @@
    #+END_SRC
    - =<TD>= 的 PORT 表示单元格的名称
 
-   [[file:../static/image/2019/07/fig5.png]]
+   [[file:../static/image/2019/07/graph-html-label.png]]
 
 ** 节点和边的样式
    节点和边的颜色使用 ~color~ 属性来设置， ~color~ 接收以下几种类型的值：
@@ -167,7 +167,7 @@
    dashed, dotted, bold 和 invis；节点属性包括：filled, diagonals 和 rounded。
 
    #+BEGIN_SRC dot
-     digraph fig6 {
+     digraph graphStyle {
        solid -> dashed[style=solid; label=solid];
        dashed -> dotted[style=dashed; label=dashed];
        dotted -> bold[style=dotted; label=dotted];
@@ -189,7 +189,7 @@
      }
    #+END_SRC
 
-   [[file:../static/image/2019/07/fig6.png]]
+   [[file:../static/image/2019/07/graph-style.png]]
 
    边有 ~dir~ 属性来设置箭头方向，包括：forward, back, both 和 none。还有一些可
    以控制箭头的头和尾样式的属性 ~arrowhead~ 和 ~arrowtail~ 。箭头样式包括：
@@ -197,7 +197,7 @@
    置箭头的长度，例如 ~arrowsize=2.0~ 可以将箭头长度扩大两倍。
 
    #+BEGIN_SRC dot
-     digraph fig6 {
+     digraph graphArrows {
        mynode [color=red; style=diagonals];
        b[style="bold,filled"];
        c[shape=box,style="bold,filled",color="#24a222",fillcolor="#ff7f00"fontcolor=white];
@@ -208,7 +208,7 @@
      }
    #+END_SRC
 
-   [[file:../static/image/2019/07/fig7.png]]
+   [[file:../static/image/2019/07/graph-arrows.png]]
 
 ** 图的方向，大小和空隙
    - ~nodesep~ 控制同样 rank 节点之间的最小的间距，单位是英尺
