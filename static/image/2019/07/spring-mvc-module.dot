@@ -1,5 +1,6 @@
 digraph G {
-  rankdir="LR"; compound=true;
+  // rankdir="LR";
+  compound=true;
 
   node [shape=folder, style=filled, color="#24a222", fontcolor="white", fontname="Helvetia"];
   module;
@@ -17,7 +18,7 @@ digraph G {
 
   {
     rank = "same";
-    service; controller; domain; helper;
+    domain; helper;
   }
 
   edge [style=solid, color="#e574c3"];
@@ -25,22 +26,28 @@ digraph G {
   domain -> {entity, repository};
   service -> service_impl;
 
-  node [shape=Mrecord, style=filled, color="#777777", width=2];
+  node [shape=Mrecord, style=filled, color="#777777"];
   {
     rank="same";
-    Name;
-    NameRepository;
-    NameService;
-    NameServiceImpl;
-    NameController;
-    NameHelper;
+    Name[label="Name.java"];
+    NameRepository[label="NameRepository.java"];
+    NameService[label="NameService.java"];
+    NameServiceImpl[label="NameServiceImpl.java"];
+    NameController[label="NameController.java"];
+    NameHelper[label="NameHelper.java"];
   }
 
-  edge [shape=dot, style=solid, color="#00bed1", arrowhead="empty"];
+  edge [shape=dot, style=solid];
   entity -> Name;
   repository -> NameRepository;
   service -> NameService;
   service_impl -> NameServiceImpl;
   controller -> NameController;
   helper -> NameHelper;
+
+  edge[style=dashed, arrowhead="vee", color="#00bed1"];
+  {
+    rank="same";
+    entity -> repository -> service -> controller;
+  }
 }
