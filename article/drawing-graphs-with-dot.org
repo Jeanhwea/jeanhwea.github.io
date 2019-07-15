@@ -289,32 +289,90 @@
      + =R= right-to-left
    - ~center=true~ 居中作图
 
-* 节点和边的位置
-  节点和边的分别通过 ~rankdir~ 属性控制
-  - =LR= left-to-right
-  - =TB= top-to-bottom
-  - =BT= bottom-to-top
-  - =RL= right-to-left
+** 节点和边的位置
+   节点和边的分别通过 ~rankdir~ 属性控制
+   - =LR= left-to-right
+   - =TB= top-to-bottom
+   - =BT= bottom-to-top
+   - =RL= right-to-left
 
-  对于有时间线的图，子图的 ~rank~ 可以设置为：
-  - same 子图中的所有节点属于同一个级别
-  - min 最小级别
-  - source 使得子图中的级别相同，并且严格小于其他节点
-  - max 最大级别
-  - sink
+   对于有时间线的图，子图的 ~rank~ 可以设置为：
+   - same 子图中的所有节点属于同一个级别
+   - min 最小级别
+   - source 使得子图中的级别相同，并且严格小于其他节点
+   - max 最大级别
+   - sink
 
-  #+BEGIN_SRC dot
-    digraph graphRank {
-      node [shape=record];
-      { rank=same rA sA tA }
-      { rank=same uB vB wB }
-      rA -> sA;
-      sA -> vB;
-      t  -> rA;
-      uB -> vB;
-      wB -> u;
-      wB -> tA;
-    }
-  #+END_SRC
+   #+BEGIN_SRC dot
+     digraph graphRank {
+       node [shape=record];
+       { rank=same rA sA tA }
+       { rank=same uB vB wB }
+       rA -> sA;
+       sA -> vB;
+       t  -> rA;
+       uB -> vB;
+       wB -> u;
+       wB -> tA;
+     }
+   #+END_SRC
 
-  [[file:../static/image/2019/07/graph-rank.png]]
+   [[file:../static/image/2019/07/graph-rank.png]]
+
+* 高级特性
+
+** 节点端口
+   每个节点有 8 个端口可以用于连接： "n", "ne", "e", "se", "s", "sw", "w" 和
+   "nw"，其中 HTML 标签可以是 =<TD>= 中的 PORT 属性来指明端口。语法是使用
+   ~node_name:port_name~
+   #+BEGIN_SRC dot
+     digraph graphNodePorts {
+       a -> b [tailport=w];
+       c:sw -> b:e;
+     }
+   #+END_SRC
+
+   [[file:../static/image/2019/07/graph-node-ports.png]]
+
+** Cluster
+   Cluster 使用一个在特定矩形区域中的子图
+   - Cluster 的子图名称要以 =cluster= 开头
+   - 如果 ~compound=true~, dot 就会允许边将 cluster 和节点相连
+
+   #+BEGIN_SRC dot
+     digraph graphCluster {
+       subgraph cluster_0 {
+         style=filled;
+         color=lightgrey;
+         node [style=filled,color=white];
+         a0 -> a1 -> a2 -> a3;
+         label = "process #1";
+       }
+
+       subgraph cluster_1 {
+         node [style=filled];
+         b0 -> b1 -> b2 -> b3;
+         label = "process #2";
+         color=blue
+       }
+       start -> a0;
+       start -> b0;
+       a1 -> b3;
+       b2 -> a3;
+       a3 -> a0;
+       a3 -> end;
+       b3 -> end;
+
+       start [shape=Mdiamond];
+       end [shape=Msquare];
+     }
+   #+END_SRC
+
+   [[file:../static/image/2019/07/graph-cluster.png]]
+
+** 合并边
+   如果 ~concentrate=true~ 则 dot 会自动帮忙合并相同的边
+
+* 杂项
+  ~strict graph~ 和 ~strict digraph~ 不允许建立重复的边，即每两个节点之间最多只
+  有一个边。
