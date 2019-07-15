@@ -2,25 +2,25 @@ digraph G {
   // rankdir="LR";
   compound=true;
 
-  node [shape=folder, style=filled, color="#24a222", fontcolor="white", fontname="Helvetia"];
+  node[shape=folder, style=filled, color="#24a222", fontcolor="white", fontname="Helvetia"];
   module;
 
-  node [shape=ellipse, style=filled, color="#1776b6"];
+  node[shape=ellipse, style=filled, color="#1776b6"];
   service;
   controller;
   repository[label="repo"];
   entity;
 
-  node [shape=ellipse, style=filled, color="#ff7f00"];
+  node[shape=ellipse, style=filled, color="#ff7f00"];
   domain;
   service_impl[label="impl"];
 
-  edge [style=solid, color="#e574c3"];
+  edge[style=solid, color="#e574c3"];
   module -> {domain, service, controller};
   domain -> {entity, repository};
   service -> service_impl;
 
-  node [shape=Mrecord, style=filled, color="#777777"];
+  node[shape=Mrecord, style=filled, color="#777777"];
   {
     rank="same";
     Name[label="Name.java"];
@@ -30,14 +30,16 @@ digraph G {
     NameController[label="NameController.java"];
   }
 
-  edge [shape=dot, style=solid];
-  entity -> Name;
-  repository -> NameRepository;
-  service -> NameService;
-  service_impl -> NameServiceImpl;
-  controller -> NameController;
+  edge[shape=dot, style=solid, label="source"];
+  {
+    entity -> Name;
+    repository -> NameRepository;
+    service -> NameService;
+    service_impl -> NameServiceImpl;
+    controller -> NameController;
+  }
 
-  edge[style=dashed, arrowhead="vee", color="#00bed1", minlen=3];
+  edge[style=dashed, arrowhead="vee", color="#00bed1", label="support"];
   {
     rank="same";
     entity -> repository -> service -> controller;
