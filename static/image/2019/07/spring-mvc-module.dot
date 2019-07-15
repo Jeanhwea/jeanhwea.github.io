@@ -13,20 +13,14 @@ digraph G {
 
   node [shape=record, style=filled, color="#ff7f00"];
   domain;
-  helper;
   service_impl[label="impl"];
 
-  {
-    rank = "same";
-    domain; helper;
-  }
-
   edge [style=solid, color="#e574c3"];
-  module -> {domain, service, controller, helper};
+  module -> {domain, service, controller};
   domain -> {entity, repository};
   service -> service_impl;
 
-  node [shape=Mrecord, style=filled, color="#777777"];
+  node [shape=plaintext, style=filled, color="#777777"];
   {
     rank="same";
     Name[label="Name.java"];
@@ -34,7 +28,6 @@ digraph G {
     NameService[label="NameService.java"];
     NameServiceImpl[label="NameServiceImpl.java"];
     NameController[label="NameController.java"];
-    NameHelper[label="NameHelper.java"];
   }
 
   edge [shape=dot, style=solid];
@@ -43,9 +36,8 @@ digraph G {
   service -> NameService;
   service_impl -> NameServiceImpl;
   controller -> NameController;
-  helper -> NameHelper;
 
-  edge[style=dashed, arrowhead="vee", color="#00bed1"];
+  edge[style=dashed, arrowhead="vee", color="#00bed1", minlen=3];
   {
     rank="same";
     entity -> repository -> service -> controller;
