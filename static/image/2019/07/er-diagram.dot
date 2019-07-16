@@ -1,0 +1,28 @@
+graph ER_Diagram {
+  rankdir="LR";
+  bgcolor="#e8e8e8";
+  compound=true;
+  splines=false;
+
+  node [fontname="Helvetia"; fontcolor="#ffffff"]
+
+  node [shape=ellipse, style=filled, color="#5588a3"];
+  student_number; student_name; joined_on;
+  course_name; started_on; finished_on;
+  value; passed;
+
+  node [shape=box, style=filled, color="#145374", width=2];
+  courses; students;
+
+  node [shape=diamond, color="#00334e"];
+  scores;
+
+  edge[color="#000000", penwidth=1.2];
+  {course_name; started_on; finished_on} -- courses:w ;
+  scores:e -- {value; passed};
+  students:e -- {student_number; student_name; joined_on};
+  {
+    rank=same
+    courses -- scores -- students;
+  }
+}

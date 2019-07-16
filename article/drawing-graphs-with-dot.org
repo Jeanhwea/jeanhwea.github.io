@@ -376,3 +376,38 @@
 * 杂项
   ~strict graph~ 和 ~strict digraph~ 不允许建立重复的边，即每两个节点之间最多只
   有一个边。
+
+* 举例
+** ER 图
+   #+BEGIN_SRC dot
+     graph ER_Diagram {
+       rankdir="LR";
+       bgcolor="#e8e8e8";
+       compound=true;
+       splines=false;
+
+       node [fontname="Helvetia"; fontcolor="#ffffff"]
+
+       node [shape=ellipse, style=filled, color="#5588a3"];
+       student_number; student_name; joined_on;
+       course_name; started_on; finished_on;
+       value; passed;
+
+       node [shape=box, style=filled, color="#145374", width=2];
+       courses; students;
+
+       node [shape=diamond, color="#00334e"];
+       scores;
+
+       edge[color="#000000", penwidth=1.2];
+       {course_name; started_on; finished_on} -- courses:w ;
+       scores:e -- {value; passed};
+       students:e -- {student_number; student_name; joined_on};
+       {
+         rank=same
+         courses -- scores -- students;
+       }
+     }
+   #+END_SRC
+
+   [[file:../static/image/2019/07/er-diagram.png]]
