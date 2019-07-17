@@ -3,22 +3,35 @@ digraph javaCollection {
   // size="8,4"
   // splines=ortho;
   bgcolor="#f6f6f6"
-  node[style=filled; shape="box"; fontname="Source Code Pro"; fontsize=16 fontcolor="#ffffff"];
+  node [
+    shape=box;
+    style="filled";
+    fontname="Source Code Pro";
+    fontsize=16;
+    color="#ffffff";
+    fontcolor="#ffffff";
+    height=0.8;
+    // width=4;
+  ];
 
-  node[color="#00b7a8"];
-  object[label="Object"];
+  edge [
+    color="#484c7f"
+  ];
+
+  node [fillcolor="#e4007c"];
+  object [label="java.lang.Object"];
 
   // interfaces
-  node[color="#e4007c"];
-  collection[label="\<\<Interface\>\>\nCollection\<E\>"];
+  node [fillcolor="#00b7a8"];
+  collection [label="\<\<Interface\>\>\nCollection\<E\>"];
   set [label="\<\<Interface\>\>\nSet\<E\>"];
   list [label="\<\<Interface\>\>\nList\<E\>"];
   map [label="\<\<Interface\>\>\nMap\<K,V\>"];
   serializable [label="\<\<Interface\>\>\nSerializable\<K,V\>"];
 
   // classes
-  node[color="#096386"];
-  abstract_collection[label="AbstractCollection\<E\>"];
+  node [fillcolor="#096386"];
+  abstract_collection [label="AbstractCollection\<E\>"];
   {
     rank=same;
     abstract_set; abstract_list; abstract_map;
@@ -42,7 +55,7 @@ digraph javaCollection {
   // concurrent_hash_map [label="ConcurrentHashMap\<K,V\>"];
   linked_hash_map [label="LinkedHashMap\<K,V\>"];
 
-  edge[dir=back; arrowtail=empty; color="#000000"];
+  edge [dir=back; arrowtail=empty;];
   object -> {abstract_collection, abstract_map};
   abstract_collection -> {abstract_list, abstract_set};
   abstract_set -> {enum_set, hash_set, tree_set};
@@ -52,12 +65,7 @@ digraph javaCollection {
   abstract_map -> {enum_map, hash_map, tree_map};
   hash_map -> linked_hash_map;
 
-  edge[
-    style=dashed;
-    dir=forward;
-    arrowhead=empty;
-    color="#777777"
-  ];
+  edge [style=dashed; dir=forward; arrowhead=empty;];
   abstract_collection -> collection;
   abstract_set -> set;
   abstract_list -> list;
@@ -72,5 +80,15 @@ digraph javaCollection {
     enum_map,
     hash_map,
     tree_map
-  } -> serializable;
-};
+ } -> serializable;
+
+ edge [style=invis];
+ {
+   abstract_list -> abstract_set -> abstract_map;
+   list -> set -> map;
+ }
+ {
+   rank=same;
+   list; set; map;
+ }
+}
