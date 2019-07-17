@@ -2,7 +2,7 @@ digraph javaCollection {
   // rankdir=LR;
   // size="8,4"
   // splines=ortho;
-  bgcolor="#f6f6f6"
+  // bgcolor="#f6f6f6"
   node [
     shape=box;
     style="filled";
@@ -10,7 +10,7 @@ digraph javaCollection {
     fontsize=16;
     color="#ffffff";
     fontcolor="#ffffff";
-    height=0.8;
+    height=1;
     // width=4;
   ];
 
@@ -32,22 +32,21 @@ digraph javaCollection {
   // classes
   node [fillcolor="#096386"];
   abstract_collection [label="AbstractCollection\<E\>"];
-  {
-    rank=same;
-    abstract_set; abstract_list; abstract_map;
-  }
 
+  node [fillcolor="#930077"];
   abstract_set [label="AbstractSet\<E\>"];
   enum_set [label="EnumSet\<E\>"];
   hash_set [label="HashSet\<E\>"];
   linked_hash_set [label="LinkedHashSet\<E\>"];
   tree_set [label="TreeSet\<E\>"];
 
+  node [fillcolor="#6e9086"];
   abstract_list [label="AbstractList\<E\>"];
   abstract_sequential_list [label="AbstractSequentialList\<E\>"];
   array_list [label="ArrayList\<E\>"];
   linked_list [label="LinkedList\<E\>"];
 
+  node [fillcolor="#fab95b"];
   abstract_map [label="AbstractMap\<K,V\>"];
   enum_map [label="EnumMap\<K,V\>"];
   hash_map [label="HashMap\<K,V\>"];
@@ -80,15 +79,19 @@ digraph javaCollection {
     enum_map,
     hash_map,
     tree_map
- } -> serializable;
+  } -> serializable;
 
- edge [style=invis];
- {
-   abstract_list -> abstract_set -> abstract_map;
-   list -> set -> map;
- }
- {
-   rank=same;
-   list; set; map;
- }
+  {
+    rank=same;
+    abstract_set; abstract_list; abstract_map;
+  }
+  edge [style=invis];
+  {
+    abstract_list -> abstract_set -> abstract_map;
+    list -> set -> map;
+  }
+  {
+    rank=same;
+    list; set; map;
+  }
 }
