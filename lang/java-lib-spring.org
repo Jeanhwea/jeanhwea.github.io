@@ -619,7 +619,7 @@
 ** Spring Cloud Config
    将配置信息中央化保存, 配置 Spring Cloud Bus 可以实现动态修改配置文件
 
-*** 新建配置文件
+*** 配置文件命名格式
     - 配置文件命名方式为: *{appname}-{profile}.yml*
       - appname 是微服务的名称
       - profile 是不同的环境，建议用: ~dev~ 表示开发环境， ~prod~ 表示线
@@ -632,145 +632,147 @@
       - ~/{label}/{application}-{profile}.properties~
 
 *** 中心配置服务器
-    #+BEGIN_SRC xml
-      <project>
-        <dependencies>
-          <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-config-server</artifactId>
-          </dependency>
-          <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-          </dependency>
-        </dependencies>
+**** 项目依赖
+     在 =pom.xml= 文件中添加如下的依赖项
+     #+BEGIN_SRC xml
+       <project>
+         <dependencies>
+           <dependency>
+             <groupId>org.springframework.cloud</groupId>
+             <artifactId>spring-cloud-config-server</artifactId>
+           </dependency>
+           <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-test</artifactId>
+             <scope>test</scope>
+           </dependency>
+         </dependencies>
 
-        <dependencyManagement>
-          <dependencies>
-            <dependency>
-              <groupId>org.springframework.cloud</groupId>
-              <artifactId>spring-cloud-dependencies</artifactId>
-              <version>Greenwich.SR2</version>
-              <type>pom</type>
-              <scope>import</scope>
-            </dependency>
-          </dependencies>
-        </dependencyManagement>
-      </project>
-    #+END_SRC
+         <dependencyManagement>
+           <dependencies>
+             <dependency>
+               <groupId>org.springframework.cloud</groupId>
+               <artifactId>spring-cloud-dependencies</artifactId>
+               <version>Greenwich.SR2</version>
+               <type>pom</type>
+               <scope>import</scope>
+             </dependency>
+           </dependencies>
+         </dependencyManagement>
+       </project>
+     #+END_SRC
 
-    中心服务器需要添加 ~@EnableConfigServer~ 来启用配置服务器
-    #+BEGIN_SRC java
-      import org.springframework.boot.SpringApplication;
-      import org.springframework.boot.autoconfigure.SpringBootApplication;
-      import org.springframework.cloud.config.server.EnableConfigServer;
+**** 引导类
+     中心服务器的引导累着需要添加 ~@EnableConfigServer~ 来启用配置服务器
+     #+BEGIN_SRC java
+       import org.springframework.boot.SpringApplication;
+       import org.springframework.boot.autoconfigure.SpringBootApplication;
+       import org.springframework.cloud.config.server.EnableConfigServer;
 
-      @SpringBootApplication
-      @EnableConfigServer
-      public class Application {
+       @SpringBootApplication
+       @EnableConfigServer
+       public class Application {
 
-        public static void main(String[] args) {
-          SpringApplication.run(Application.class, args);
-        }
+         public static void main(String[] args) {
+           SpringApplication.run(Application.class, args);
+         }
 
-      }
-    #+END_SRC
+       }
+     #+END_SRC
 
-    在中心配置服务器中的 =application.yml= 中添加相应的配置
-
-    #+BEGIN_SRC yaml
-      spring:
-        profiles:
-          active: default
-        cloud:
-          config:
-            server:
-              git:
-                uri: http://github.com/avic/configfiles.git
-                searchPaths:
-                  - path1
-                  - path2
-                username: user
-                password: pass
-    #+END_SRC
+**** Git 远端配置项
+     在中心配置服务器中的 =application.yml= 中添加相应的配置
+     #+BEGIN_SRC yaml
+       spring:
+         profiles:
+           active: default
+         cloud:
+           config:
+             server:
+               git:
+                 uri: http://github.com/avic/configfiles.git
+                 searchPaths:
+                   - path1
+                   - path2
+                 username: user
+                 password: pass
+     #+END_SRC
 
 *** 客户端使用自动配置项
-    首先修改 *pom.xml*, *application.yml* 和 *bootstrap.yml* 这三项配置文件
+**** 配置相关文件
+     首先修改 *pom.xml*, *application.yml* 和 *bootstrap.yml* 这三项配置文件
+     #+BEGIN_SRC xml
+       <!-- pom.xml -->
+       <project>
+         <!-- 1. 添加下面四个依赖项 -->
+         <dependencies>
+           <dependency>
+             <groupId>org.springframework.cloud</groupId>
+             <artifactId>spring-cloud-starter-config</artifactId>
+           </dependency>
+           <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-actuator</artifactId>
+           </dependency>
+           <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-web</artifactId>
+           </dependency>
+           <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-test</artifactId>
+             <scope>test</scope>
+           </dependency>
+         </dependencies>
 
-    #+BEGIN_SRC xml
-      <!-- pom.xml -->
-      <project>
-        <!-- 1. 添加下面四个依赖项 -->
-        <dependencies>
-          <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
-          </dependency>
-          <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-          </dependency>
-          <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-          </dependency>
-          <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-          </dependency>
-        </dependencies>
+         <!-- 2. 设置依赖管理 -->
+         <dependencyManagement>
+           <dependencies>
+             <dependency>
+               <groupId>org.springframework.cloud</groupId>
+               <artifactId>spring-cloud-dependencies</artifactId>
+               <!-- 这个 version 需要和你使用的 spring boot 版本适配，否则应用起不来 -->
+               <version>Greenwich.SR2</version>
+               <!-- 我的项目中 spring boot 版本是 2.1.0.RELEASE, 所以 cloud 的版本使用 Greenwich -->
+               <type>pom</type>
+               <scope>import</scope>
+             </dependency>
+           </dependencies>
+         </dependencyManagement>
 
-        <!-- 2. 设置依赖管理 -->
-        <dependencyManagement>
-          <dependencies>
-            <dependency>
-              <groupId>org.springframework.cloud</groupId>
-              <artifactId>spring-cloud-dependencies</artifactId>
-              <!-- 这个 version 需要和你使用的 spring boot 版本适配，否则应用起不来 -->
-              <version>Greenwich.SR2</version>
-              <!-- 我的项目中 spring boot 版本是 2.1.0.RELEASE, 所以 cloud 的版本使用 Greenwich -->
-              <type>pom</type>
-              <scope>import</scope>
-            </dependency>
-          </dependencies>
-        </dependencyManagement>
+       </project>
+     #+END_SRC
+     #+BEGIN_SRC yaml
+       # src/main/resources/application.yml
+       management:
+         endpoints:
+           web:
+             exposure:
+               include: '*'
+     #+END_SRC
+     #+BEGIN_SRC yaml
+       # src/main/resources/bootstrap.yml
+       spring:
+         application:
+           name: appname # 这里写你项目的名称
+         profiles:
+           active: dev   # 这里配置你需要的 profile
+         cloud:
+           config:
+             uri: http://192.168.0.231/peizhi
+     #+END_SRC
 
-      </project>
-    #+END_SRC
+**** 引导类
+     在系统启动的引导类中添加 ~@RefreshScope~ 注解
+     #+BEGIN_SRC java
+       import org.springframework.boot.autoconfigure.SpringBootApplication;
+       import org.springframework.cloud.context.config.annotation.RefreshScope;
 
-    #+BEGIN_SRC yaml
-      # src/main/resources/application.yml
-      management:
-        endpoints:
-          web:
-            exposure:
-              include: '*'
-    #+END_SRC
-
-    #+BEGIN_SRC yaml
-      # src/main/resources/bootstrap.yml
-      spring:
-        application:
-          name: appname # 这里写你项目的名称
-        profiles:
-          active: dev   # 这里配置你需要的 profile
-        cloud:
-          config:
-            uri: http://192.168.0.231/peizhi
-    #+END_SRC
-
-    在系统启动的主类中添加 ~@RefreshScope~ 注解
-    #+BEGIN_SRC java
-      import org.springframework.boot.autoconfigure.SpringBootApplication;
-      import org.springframework.cloud.context.config.annotation.RefreshScope;
-
-      @SpringBootApplication
-      @RefreshScope
-      public class Application {
-        public static void main(String[] args) {
-          SpringApplication.run(Application.class, args);
-        }
-      }
-    #+END_SRC
+       @SpringBootApplication
+       @RefreshScope
+       public class Application {
+         public static void main(String[] args) {
+           SpringApplication.run(Application.class, args);
+         }
+       }
+     #+END_SRC
