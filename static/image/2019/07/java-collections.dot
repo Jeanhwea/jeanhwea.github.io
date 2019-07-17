@@ -1,0 +1,76 @@
+digraph javaCollection {
+  // rankdir=LR;
+  // size="8,4"
+  // splines=ortho;
+  // bgcolor="#fcf9ec"
+  fontname="Helvetia";
+  node[shape="box"; fontname="Helvetia"; fontcolor="#000000"];
+
+  node[color="#222222"];
+  object[label="Object"];
+
+  node[color="#e4007c"];
+  collection[label="\<\<Interface\>\>\nCollection\<E\>"];
+  set [label="\<\<Interface\>\>\nSet\<E\>"];
+  list [label="\<\<Interface\>\>\nList\<E\>"];
+  map [label="\<\<Interface\>\>\nMap\<K,V\>"];
+  serializable [label="\<\<Interface\>\>\nSerializable\<K,V\>"];
+  // iterator[label="Iterator\<E\>"];
+
+  node[color="#000000"];
+  abstract_collection[label="AbstractCollection\<E\>"];
+
+  node[color="#000000"];
+  abstract_set [label="AbstractSet\<E\>"];
+  enum_set [label="EnumSet\<E\>"];
+  hash_set [label="HashSet\<E\>"];
+  linked_hash_set [label="LinkedHashSet\<E\>"];
+  tree_set [label="TreeSet\<E\>"];
+
+  node[color="#000000"];
+  abstract_list [label="AbstractList\<E\>"];
+  abstract_sequential_list [label="AbstractSequentialList\<E\>"];
+  array_list [label="ArrayList\<E\>"];
+  linked_list [label="LinkedList\<E\>"];
+
+  node[color="#000000"];
+  abstract_map [label="AbstractMap\<K,V\>"];
+  enum_map [label="EnumMap\<K,V\>"];
+  hash_map [label="HashMap\<K,V\>"];
+  tree_map [label="TreeMap\<K,V\>"];
+  // concurrent_hash_map [label="ConcurrentHashMap\<K,V\>"];
+  linked_hash_map [label="LinkedHashMap\<K,V\>"];
+
+  edge[fontname="Helvetia", dir=back; arrowtail=empty; color="#000000"];
+  object -> {abstract_collection, abstract_map};
+  abstract_collection -> {abstract_list, abstract_set};
+  abstract_set -> {enum_set, hash_set, tree_set};
+  hash_set -> linked_hash_set;
+  abstract_list -> {array_list, abstract_sequential_list};
+  abstract_sequential_list -> linked_list;
+  abstract_map -> {enum_map, hash_map, tree_map};
+  hash_map -> linked_hash_map;
+
+  edge[
+    fontname="Helvetia",
+    style=dashed;
+    dir=forward;
+    arrowhead=empty;
+    color="#777777"
+  ];
+  abstract_collection -> collection;
+  abstract_set -> set;
+  abstract_list -> list;
+  abstract_map -> map;
+  {
+    linked_list,
+    array_list,
+    enum_set,
+    hash_set,
+    linked_hash_set,
+    tree_set,
+    enum_map,
+    hash_map,
+    tree_map
+  } -> serializable;
+};
