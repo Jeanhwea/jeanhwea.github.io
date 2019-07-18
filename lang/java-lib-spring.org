@@ -638,7 +638,7 @@
       - ~/{application}-{profile}.properties~
       - ~/{label}/{application}-{profile}.properties~
 
-*** 中心配置服务器
+*** Config Server
 **** 项目依赖
      在 =pom.xml= 文件中添加如下的依赖项
      #+BEGIN_SRC xml
@@ -698,14 +698,14 @@
              server:
                git:
                  uri: http://github.com/avic/configfiles.git
-                 searchPaths:
+                 search-paths:
                    - path1
                    - path2
                  username: user
                  password: pass
      #+END_SRC
 
-*** 客户端使用自动配置项
+*** Config Client
 **** 配置相关文件
      首先修改 *pom.xml*, *application.yml* 和 *bootstrap.yml* 这三项配置文件
      #+BEGIN_SRC xml
@@ -797,6 +797,80 @@
     务，主要用于定位运行在 AWS 域中的中间层服务，以达到负载均衡和中间层服务故障
     转移的目的。Spring Cloud 将它集成在其子项目 spring-cloud-netflix 中，以实现
     Spring Cloud 的服务发现功能。
+
+**** Eureka Server
+***** 配置相关文件
+      =pom.xml= 添加 ~spring-cloud-starter-netflix-eureka-server~ 的依赖项
+      #+BEGIN_SRC xml
+        <!-- pom.xml -->
+        <project>
+          <dependencies>
+            <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+            </dependency>
+          </dependencies>
+        </project>
+      #+END_SRC
+
+      =application.yml= 添加配置项
+      #+BEGIN_SRC yaml
+        eureka:
+          fetch-registry: false                # 不要在本地缓存注册表信息
+          client:
+            register-with-eureka: false
+          server:
+            wait-time-in-ms-when-sync-empty: 5      # 在服务器接收请求之前的等待时间
+      #+END_SRC
+
+**** Eureka Client
+***** 配置相关文件
+      =pom.xml= 添加 ~spring-cloud-starter-netflix-eureka-client~ 的依赖项
+      #+BEGIN_SRC xml
+        <!-- pom.xml -->
+        <project>
+          <dependencies>
+            <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            </dependency>
+          </dependencies>
+        </project>
+      #+END_SRC
+
+      =application.yml= 添加配置项
+      #+BEGIN_SRC yaml
+        eureka:
+          instance:
+            prefer-ip-address: true       # 使用 IP 地址注册，而不是使用主机名注册
+          client:
+            register-with-eureka: true
+            fetch-registry: true
+            service-url:
+              default-zone: http://localhost:8761/eureka/
+      #+END_SRC
+
+***** 配置引导类
+      如果是 Spring Boot 项目的话，添加了
+      ~spring-cloud-starter-netflix-eureka-client~ 的依赖项后会自动注册到 Eureka
+      Server 上
+      #+BEGIN_SRC java
+        @SpringBootApplication
+        @RestController
+        public class Application {
+
+          @RequestMapping("/")
+          public String home() {
+            return "Hello world";
+          }
+
+          public static void main(String[] args) {
+            new SpringApplicationBuilder(Application.class).web(true).run(args);
+          }
+        }
+      #+END_SRC
+
+      也可以使用 ~@EnableDiscoveryClient~ 的注解来显示激活
 
 ** Spring Cloud Gateway
    [[https://spring.io/projects/spring-cloud-gateway][Spring Cloud Gateway]] 是 Spring 官方基于 Spring 5.0，Spring Boot 2.0 和 Project
