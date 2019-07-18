@@ -207,7 +207,31 @@
      >
    #+END_SRC
 *** 对象引用及复制
-    引用
+    ~=~ 赋值是引用
+    #+BEGIN_SRC js
+      > obj1 = {a:'Apple', b:1}
+      { a: 'Apple', b: 1 }
+      > obj2 = obj1
+      { a: 'Apple', b: 1 }
+      > obj2.b = 7
+      7
+      > obj1
+      { a: 'Apple', b: 7 }
+      >
+    #+END_SRC
+
+    ~Object.assign(...)~ 可以实现复制传值
+    #+BEGIN_SRC js
+      > obj3 = Object.assign({}, obj1)
+      { a: 'Apple', b: 7 }
+      > obj3.b = 9
+      9
+      > obj1
+      { a: 'Apple', b: 7 }
+      >
+    #+END_SRC
+
+    下面是更多的传值的示例
     #+BEGIN_SRC js
       > usr
       { name: 'Tom', age: 22, foo: undefined }
@@ -225,10 +249,9 @@
       false
       > _usr === usr
       false
-      >
       > usr
       { name: 'Jackson', age: 22, foo: undefined }
-      > > delete usr.foo
+      > delete usr.foo
       true
       > usr
       { name: 'Jackson', age: 22 }
@@ -236,6 +259,7 @@
       false
       >
     #+END_SRC
+
 *** 更新对象值
     ~Object.assign(dest[, src1, src2, src3...])~ 可以批量更新对象中的数值。
     #+BEGIN_SRC js
