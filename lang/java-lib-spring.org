@@ -791,13 +791,11 @@
    - Hystrix : 客户端弹性模式
    - Zuul : 智能路由
    - Ribbon : 客户端的负载均衡
-
 *** Eureka
     Eureka 是 [[https://spring.io/projects/spring-cloud-netflix][Spring Cloud Netflix]] 开发的服务发现框架，本身是一个基于 REST 的服
     务，主要用于定位运行在 AWS 域中的中间层服务，以达到负载均衡和中间层服务故障
     转移的目的。Spring Cloud 将它集成在其子项目 spring-cloud-netflix 中，以实现
     Spring Cloud 的服务发现功能。
-
 **** Eureka Server
 ***** 配置相关文件
       =pom.xml= 添加 ~spring-cloud-starter-netflix-eureka-server~ 的依赖项
@@ -813,14 +811,55 @@
         </project>
       #+END_SRC
 
-      =application.yml= 添加配置项
+      =application.yml= 添加配置项，下面是 Standalone 模式的配置方法
       #+BEGIN_SRC yaml
         eureka:
-          fetch-registry: false                # 不要在本地缓存注册表信息
+          instance:
+            hostname: localhost
           client:
+            fetch-registry: false                # 不要在本地缓存注册表信息
             register-with-eureka: false
+            server-url:
+              default-zone: http://localhost:8761/eureka/
           server:
             wait-time-in-ms-when-sync-empty: 5      # 在服务器接收请求之前的等待时间
+      #+END_SRC
+
+      Peer Awareness 模模式配置方法如下：
+      #+BEGIN_SRC yaml
+        ---
+        spring:
+          profiles: peer1
+        eureka:
+          instance:
+            hostname: peer1
+          client:
+            serviceUrl:
+              defaultZone: https://peer2/eureka/
+
+        ---
+        spring:
+          profiles: peer2
+        eureka:
+          instance:
+            hostname: peer2
+          client:
+            serviceUrl:
+              defaultZone: https://peer1/eureka/
+      #+END_SRC
+
+***** 配置引导类
+      使用 ~@EnableEurekaServer~ 来开启 Eureka Server
+      #+BEGIN_SRC java
+        @SpringBootApplication
+        @EnableEurekaServer
+        public class Application {
+
+          public static void main(String[] args) {
+            new SpringApplicationBuilder(Application.class).web(true).run(args);
+          }
+
+        }
       #+END_SRC
 
 **** Eureka Client
@@ -844,8 +883,8 @@
           instance:
             prefer-ip-address: true       # 使用 IP 地址注册，而不是使用主机名注册
           client:
-            register-with-eureka: true
             fetch-registry: true
+            register-with-eureka: true
             service-url:
               default-zone: http://localhost:8761/eureka/
       #+END_SRC
