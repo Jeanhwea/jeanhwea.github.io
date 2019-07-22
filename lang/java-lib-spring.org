@@ -789,9 +789,58 @@
 
 *** Eureka
     Eureka 是 [[https://spring.io/projects/spring-cloud-netflix][Spring Cloud Netflix]] 开发的服务发现框架，本身是一个基于 REST 的服
-    务，主要用于定位运行在 AWS 域中的中间层服务，以达到负载均衡和中间层服务故障
-    转移的目的。Spring Cloud 将它集成在其子项目 spring-cloud-netflix 中，以实现
-    Spring Cloud 的服务发现功能。
+    务。Spring Cloud 将它集成在其子项目 spring-cloud-netflix 中，以实现 Spring
+    Cloud 的服务发现功能。 Eureka 项目本身包括客户端和服务器两个子项目，具体配置
+    如下：
+
+**** Eureka Client
+***** 配置相关文件
+      =pom.xml= 添加 ~spring-cloud-starter-netflix-eureka-client~ 的依赖项
+      #+BEGIN_SRC xml
+        <!-- pom.xml -->
+        <project>
+          <dependencies>
+            <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            </dependency>
+          </dependencies>
+        </project>
+      #+END_SRC
+
+      =application.yml= 添加配置项
+      #+BEGIN_SRC yaml
+        eureka:
+          instance:
+            preferIpAddress: true       # 使用 IP 地址注册，而不是使用主机名注册
+          client:
+            fetchRegistry: true
+            registerWithEureka: true
+            serviceUrl:
+              defaultZone: http://localhost:8761/eureka/
+      #+END_SRC
+
+***** 配置引导类
+      如果是 Spring Boot 项目的话，添加了
+      ~spring-cloud-starter-netflix-eureka-client~ 的依赖项后会自动注册到 Eureka
+      Server 上
+      #+BEGIN_SRC java
+        @SpringBootApplication
+        @RestController
+        public class Application {
+
+          @RequestMapping("/")
+          public String home() {
+            return "Hello world";
+          }
+
+          public static void main(String[] args) {
+            new SpringApplicationBuilder(Application.class).web(true).run(args);
+          }
+        }
+      #+END_SRC
+
+      也可以使用 ~@EnableDiscoveryClient~ 的注解来显示激活
 
 **** Eureka Server
 ***** 配置相关文件
@@ -858,55 +907,6 @@
 
         }
       #+END_SRC
-
-**** Eureka Client
-***** 配置相关文件
-      =pom.xml= 添加 ~spring-cloud-starter-netflix-eureka-client~ 的依赖项
-      #+BEGIN_SRC xml
-        <!-- pom.xml -->
-        <project>
-          <dependencies>
-            <dependency>
-              <groupId>org.springframework.cloud</groupId>
-              <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-            </dependency>
-          </dependencies>
-        </project>
-      #+END_SRC
-
-      =application.yml= 添加配置项
-      #+BEGIN_SRC yaml
-        eureka:
-          instance:
-            preferIpAddress: true       # 使用 IP 地址注册，而不是使用主机名注册
-          client:
-            fetchRegistry: true
-            registerWithEureka: true
-            serviceUrl:
-              defaultZone: http://localhost:8761/eureka/
-      #+END_SRC
-
-***** 配置引导类
-      如果是 Spring Boot 项目的话，添加了
-      ~spring-cloud-starter-netflix-eureka-client~ 的依赖项后会自动注册到 Eureka
-      Server 上
-      #+BEGIN_SRC java
-        @SpringBootApplication
-        @RestController
-        public class Application {
-
-          @RequestMapping("/")
-          public String home() {
-            return "Hello world";
-          }
-
-          public static void main(String[] args) {
-            new SpringApplicationBuilder(Application.class).web(true).run(args);
-          }
-        }
-      #+END_SRC
-
-      也可以使用 ~@EnableDiscoveryClient~ 的注解来显示激活
 
 *** Hystrix
     Hystrix 是 SOA 微服务架构中提供服务隔离、熔断、降级机制的工具/框架。Hystrix
