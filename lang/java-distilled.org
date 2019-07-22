@@ -145,6 +145,50 @@
      的异常，是一种设计或实现问题；也就是说，它表示如果程序运行正常，从不会发生
      的情况。并且鼓励用户程序去 ~catch~ 它。
 
+   处理异常的一种方式是在类方法的定义中 ~throws~ 相应的异常
+   #+BEGIN_SRC java :classname App148 :exports both :results output
+     class App148 {
+       public static void main(String args[]) throws MyException {
+         MyException myecpt = new MyException("Ops!");
+         throw myexcpt;
+         // System.out.println("Dead code");
+       }
+     }
+
+     class MyException extends IOException {
+       MyException(String message) {
+         super(message);
+       }
+     }
+   #+END_SRC
+
+   或者使用 ~try...catch~ 块来捕获异常进行处理
+   #+BEGIN_SRC java :classname App166 :exports both :results output
+     class App166 {
+
+       public static void main(String args[]) {
+         int num1, num2;
+         try {
+           num1 = 0;
+           num2 = 62 / num1;
+           System.out.println(num2);
+           System.out.println("Hey I'm at the end of try block");
+         }
+         catch (ArithmeticException e) {
+           System.out.println("You should not divide a number by zero");
+         }
+         catch (Exception e) {
+           System.out.println("Exception occurred");
+         }
+         System.out.println("I'm out of try-catch block in Java.");
+       }
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   : You should not divide a number by zero
+   : I'm out of try-catch block in Java.
+
    *Error 和 RuntimeException 及其子类都是未检查的异常* （unchecked exceptions），
    而所有其他的 Exception 类都是检查了的异常（checked exceptions）
 
