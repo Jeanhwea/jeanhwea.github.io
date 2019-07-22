@@ -1,17 +1,21 @@
 digraph OverloadOverride {
+  // rankdir=LR;
   fontname="Helvetia";
   node[shape="record"; fontname="Helvetia"];
-  edge[fontname="Helvetia", dir=back; arrowtail=empty;];
 
-  subgraph cluster_overload {
-    animal [label="{Animal|+ name : string\l+ age : int\l|+ die() : void\l}"];
-    style=dashed;
-  }
+  node [color=red];
+  note_overload [shape=note; label="重载(Overload)发生\l在同一个类中相同方法名中"];
+  note_override [shape=note; label="重写(Override)发生\l在不同类中相同方法名中"];
 
-  subgraph cluster_override {
-    animal1 [label="{Animal|+ name: string}"];
-    dog;
-    animal1 -> dog;
-    style=dashed;
-  }
+  node [color=blue;];
+  stuff [label="{Stuff|- firstname : String\l- lastname : String\l|+ setName(String firstname) : void\l+ setName(String firstname, String lastname) : void\l}"];
+  teacher [label="{Teacher|- firstname : String\l- lastname : String\l|+ setName(String firstname, String lastname) : void\l}"; ];
+  edge[fontname="Helvetia"; dir=back; arrowtail=empty; color=blue];
+  stuff -> teacher;
+
+  edge[style=dashed; dir=forward; arrowhead=dot; color=black];
+  note_override -> teacher:se;
+  note_override -> stuff:se;
+  note_overload -> stuff:sw;
+
 }
