@@ -1,21 +1,25 @@
 digraph OverloadOverride {
   // rankdir=LR;
   fontname="Helvetia";
-  node[shape="record"; fontname="Helvetia"];
 
-  node [color=red];
+  subgraph cluster_class {
+    node[shape="record"; fontname="Arial";];
+    node [color="#090088"];
+    employee [label="{Employee|- firstname : String\l- lastname : String\l|+ setName(String firstname) : void\l+ setName(String firstname, String lastname) : void\l}"];
+    node [color="#e4007c"];
+    teacher [label="{Teacher|- firstname : String\l- lastname : String\l|+ setName(String firstname, String lastname) : void\l}"; ];
+    edge[fontname="Helvetia"; dir=back; arrowtail=empty; color=blue];
+    employee -> teacher;
+    style=invis;
+  }
+
+  node [color="#7b88ff"; fontname="Microsoft YaHei"; fontsize=12;];
   note_overload [shape=note; label="重载(Overload)发生\l在同一个类中相同方法名中"];
   note_override [shape=note; label="重写(Override)发生\l在不同类中相同方法名中"];
 
-  node [color=blue;];
-  stuff [label="{Stuff|- firstname : String\l- lastname : String\l|+ setName(String firstname) : void\l+ setName(String firstname, String lastname) : void\l}"];
-  teacher [label="{Teacher|- firstname : String\l- lastname : String\l|+ setName(String firstname, String lastname) : void\l}"; ];
-  edge[fontname="Helvetia"; dir=back; arrowtail=empty; color=blue];
-  stuff -> teacher;
-
-  edge[style=dashed; dir=forward; arrowhead=dot; color=black];
+  edge[style=dashed; dir=forward; arrowhead=dot; color="#1b7fbd";];
   note_override -> teacher:se;
-  note_override -> stuff:se;
-  note_overload -> stuff:sw;
+  note_override -> employee:se;
+  note_overload -> employee:sw;
 
 }
