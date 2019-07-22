@@ -820,6 +820,9 @@
               defaultZone: http://localhost:8761/eureka/
       #+END_SRC
 
+      通常建议开启 ~preferIpAddress~ ，因为有的时候微服务被部署到 docker 容器中，
+      主机名可能是随机分配的，不好管理。
+
 ***** 配置引导类
       如果是 Spring Boot 项目的话，添加了
       ~spring-cloud-starter-netflix-eureka-client~ 的依赖项后会自动注册到 Eureka
@@ -910,7 +913,10 @@
 
 *** Hystrix
     Hystrix 是 SOA 微服务架构中提供服务隔离、熔断、降级机制的工具/框架。Hystrix
-    是断路器的一种实现，用于高微服务架构的可用性，是防止服务出现雪崩的利器
+    是断路器的一种实现，用于高微服务架构的可用性，是防止服务出现雪崩的利器。
+    Hystrix 实现了 Martin Fowler 的 [[https://martinfowler.com/bliki/CircuitBreaker.html][Circuit Breaker]] 模式，熔断器的机制的思想很简
+    单直白，即在 client 和 supplier 之间实现一个 circuit breaker 层，当 supplier
+    出现错误或超时，就对 client 的请求进行截断
 
 *** Zuul
     Zuul 是在云平台上提供动态路由,监控,弹性,安全等边缘服务的框架。Zuul 相当于是
