@@ -1,65 +1,107 @@
 digraph SpringBootStarters {
-  size=10;
-  node [fontcolor=white; style="filled,rounded"; shape=box; fontname="Arial"; color="#ffffff"];
+  // size=10;
 
-  node [fillcolor="#58b368"];
-  "spring-boot-starter";
-  node [fillcolor="#009975"];
-  "activemq";
-  "data-elasticsearch";
-  "data-jpa";
-  "data-redis";
-  "data-mongodb";
-  "json";
-  "web";
-  "test";
-  node [fillcolor="#454d66"];
-  "amqp";
-  "aop";
-  "artemis";
-  "batch";
-  "cache";
-  "cloud-connectors";
-  "data-cassandra";
-  "data-cassandra-reactive";
-  "data-couchbase";
-  "data-couchbase-reactive";
-  "data-jdbc";
-  "data-ldap";
-  "data-mongodb-reactive";
-  "data-neo4j";
-  "data-redis-reactive";
-  "data-rest";
-  "data-solr";
-  "freemarker";
-  "groovy-templates";
-  "hateoas";
-  "integration";
-  "jdbc";
-  "jersey";
-  "jooq";
-  "jta-atomikos";
-  "jta-bitronix";
-  "mail";
-  "mustache";
-  "oauth2-client";
-  "oauth2-resource-server";
-  "quartz";
-  "security";
-  "thymeleaf";
-  "validation";
-  "web-services";
-  "webflux";
-  "websocket";
-
-  "_note"
+  node
   [
-   shape=note;
-   color=black;
-   fontcolor=black;
-   fontname="Arial Bold";
-   style=normal;
-   label="All prefix with\lspring-boot-starter"
-  ];
+   fontcolor=white;
+   style="filled,rounded";
+   shape=box;
+   fontname="Arial";
+   color="#ffffff"
+   ];
+
+  subgraph cluster_0 {
+    fontname="Arial Bold";
+    label="core starter";
+    style=dashed;
+
+    node [fillcolor="#58b368"];
+    "spring-boot-starter";
+  }
+
+  // cluster_0 -- cluster_1;
+
+  subgraph cluster_1 {
+    fontname="Arial Bold";
+    label="Other starters, prefixed with spring-boot-starter-*";
+    style=dashed;
+
+    node [fillcolor="#009975"];
+    {
+      rank=same;
+      "activemq";
+      "data-elasticsearch";
+      "data-jpa";
+      "data-redis";
+      "data-mongodb";
+      "json";
+      "web";
+      "test";
+    }
+
+    node [fillcolor="#454d66"];
+    {
+      rank=same;
+      "amqp";
+      "aop";
+      "artemis";
+      "batch";
+      "cache";
+      "cloud-connectors";
+    }
+
+    {
+      rank=same;
+      "data-cassandra";
+      "data-couchbase";
+      "data-jdbc";
+      "data-ldap";
+      "data-neo4j";
+      "data-rest";
+      "data-solr";
+    }
+    {
+      rank=same;
+      "data-cassandra-reactive";
+      "data-couchbase-reactive";
+      "data-mongodb-reactive";
+      "data-redis-reactive";
+    }
+    {
+      rank=same;
+      "freemarker";
+      "hateoas";
+      "integration";
+      "jdbc";
+      "jersey";
+      "jooq";
+      "jta-atomikos";
+      "jta-bitronix";
+    }
+    {
+      rank=same;
+      "mail";
+      "mustache";
+      "groovy-templates";
+      "oauth2-client";
+      "oauth2-resource-server";
+      "security";
+    }
+
+    {
+      rank=same;
+      "thymeleaf";
+      "quartz";
+      "validation";
+      "web-services";
+      "webflux";
+      "websocket";
+    }
+
+    edge [style=invis];
+    "activemq" -> "amqp" -> "data-cassandra" ->
+    "data-cassandra-reactive" -> "freemarker"
+    -> "mail" -> "thymeleaf";
+  }
 
 }
