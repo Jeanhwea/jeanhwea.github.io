@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-10 Wed 15:23 -->
+<!-- 2019-07-23 Tue 10:08 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>pip 包管理工具</title>
@@ -238,12 +238,13 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org5e71171">1. Pip 介绍</a></li>
-<li><a href="#orgf4be1d7">2. 常用命令</a>
+<li><a href="#org5a4ebda">1. Pip 介绍</a></li>
+<li><a href="#org787fec1">2. 常用命令</a>
 <ul>
-<li><a href="#org74c35ea">2.1. 列出当前所有包</a></li>
-<li><a href="#orgd69d1ed">2.2. 更新所有包到最新版本</a></li>
-<li><a href="#org85241fa">2.3. 批量导出/安装包 <code>requirements.txt</code></a></li>
+<li><a href="#org04bc3a5">2.1. 列出当前所有包</a></li>
+<li><a href="#org95aac2a">2.2. 更新所有包到最新版本</a></li>
+<li><a href="#org386a629">2.3. 批量导出/安装包 <code>requirements.txt</code></a></li>
+<li><a href="#orgde24a0e">2.4. 离线下载 wheel 包</a></li>
 </ul>
 </li>
 </ul>
@@ -251,8 +252,8 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-org5e71171" class="outline-2">
-<h2 id="org5e71171"><span class="section-number-2">1</span> Pip 介绍</h2>
+<div id="outline-container-org5a4ebda" class="outline-2">
+<h2 id="org5a4ebda"><span class="section-number-2">1</span> Pip 介绍</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 <a href="https://pypi.org/project/pip/">pip</a> 是 python 的包管理工具，在国内可以替换 <a href="https://mirrors.tuna.tsinghua.edu.cn/help/pypi/">清华 pypi 镜像</a> 下载源来加快下载速度。
@@ -287,8 +288,8 @@ pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 </div>
 </div>
 
-<div id="outline-container-orgf4be1d7" class="outline-2">
-<h2 id="orgf4be1d7"><span class="section-number-2">2</span> 常用命令</h2>
+<div id="outline-container-org787fec1" class="outline-2">
+<h2 id="org787fec1"><span class="section-number-2">2</span> 常用命令</h2>
 <div class="outline-text-2" id="text-2">
 <ul class="org-ul">
 <li><code>pip install -U &lt;package&gt;</code> : 升级包</li>
@@ -304,8 +305,8 @@ pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 </ul>
 </div>
 
-<div id="outline-container-org74c35ea" class="outline-3">
-<h3 id="org74c35ea"><span class="section-number-3">2.1</span> 列出当前所有包</h3>
+<div id="outline-container-org04bc3a5" class="outline-3">
+<h3 id="org04bc3a5"><span class="section-number-3">2.1</span> 列出当前所有包</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-sh">~ $ pip list
@@ -327,8 +328,8 @@ ipython                7.6.0
 </div>
 </div>
 
-<div id="outline-container-orgd69d1ed" class="outline-3">
-<h3 id="orgd69d1ed"><span class="section-number-3">2.2</span> 更新所有包到最新版本</h3>
+<div id="outline-container-org95aac2a" class="outline-3">
+<h3 id="org95aac2a"><span class="section-number-3">2.2</span> 更新所有包到最新版本</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 <pre class="src src-sh">pip freeze --local | grep -v <span style="color: #2aa198;">'^\-e'</span> | cut -d = -f 1  | xargs -n1 pip install -U
@@ -337,8 +338,8 @@ ipython                7.6.0
 </div>
 </div>
 
-<div id="outline-container-org85241fa" class="outline-3">
-<h3 id="org85241fa"><span class="section-number-3">2.3</span> 批量导出/安装包 <code>requirements.txt</code></h3>
+<div id="outline-container-org386a629" class="outline-3">
+<h3 id="org386a629"><span class="section-number-3">2.3</span> 批量导出/安装包 <code>requirements.txt</code></h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 在 Python 项目中通常有一个 <code>requirements.txt</code> 文件，该文件记录项目所需的包和相
@@ -351,10 +352,23 @@ pip install -r requirements.txt
 </div>
 </div>
 </div>
+
+<div id="outline-container-orgde24a0e" class="outline-3">
+<h3 id="orgde24a0e"><span class="section-number-3">2.4</span> 离线下载 wheel 包</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+将 <code>requirements.txt</code> 中的所有依赖的 wheel 包下载到 wheels 文件夹中
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">pip download -r requirements.txt -d wheels
+</pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-07-10 Wed 15:23. Created by Jinghui Hu at 2018-10-08 Mon 11:04.</p>
+<p class="author">Last Updated 2019-07-23 Tue 10:08. Created by Jinghui Hu at 2018-10-08 Mon 11:04.</p>
 </div>
 </body>
 </html>
