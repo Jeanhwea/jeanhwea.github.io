@@ -938,13 +938,198 @@
      少成功，多少失败等。Netflix 通过 hystrix-metrics-event-stream 项目实现了对以上
      指标的监控。
 
-*** TODO Zuul
+*** Zuul
     Zuul 是在云平台上提供动态路由,监控,弹性,安全等边缘服务的框架。Zuul 相当于是
     设备和 Netflix 流应用的 Web 网站后端所有请求的前门。
 
-*** TODO Ribbon
+***** 配置相关文件
+      =pom.xml= 添加 ~spring-cloud-starter-netflix-zuul~ 的依赖项将 Zuul 引入项目
+      #+BEGIN_SRC xml
+        <!-- pom.xml -->
+        <project>
+          <dependencies>
+            <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+            </dependency>
+          </dependencies>
+        </project>
+      #+END_SRC
 
-** TODO Spring Cloud Gateway
+***** 配置引导类
+      #+BEGIN_SRC java
+        @SpringBootApplication
+        @EnableZuulProxy
+        public class Application {
+
+          public static void main(String[] args) {
+            new SpringApplicationBuilder(Application.class).web(true).run(args);
+          }
+
+        }
+      #+END_SRC
+      ~@EnableZuulProxy~ 来开启 Zuul 服务
+
+***** 配置反向代理
+      Zuul 的反向代理使用的是以下几种方式进行设置
+      - 通过服务发现自动映射路由
+      - 通过服务发现手动映射路由
+      - 通过静态 URL 手动映射路由
+
+      使用 ~@EnableZuulProxy~ 开启 Zuul 服务后，如果正确地配置了 Eureka Client
+      服务的话，不需要进行其它的配置就可以自动映射路由。根据惯例，Zuul 会自动给
+      反向代理的微服务添加前缀，例如： 如果微服务的名字是 =users= ，则 Zuul 会将
+      =/users/**= 的请求全部映射到 =users= 微服务中
+
+
+      手动配置反向代理需要修改 =application.yml= 配置文件，例如下面的配置将
+      =/myusers/**= 请求传递到 =users= 微服务中
+      #+BEGIN_SRC yaml
+        zuul:
+         routes:
+           users:
+             path: /myusers/**
+             serviceId: users_service
+      #+END_SRC
+
+      使用静态 URL 手动映射路由
+      #+BEGIN_SRC yaml
+        zuul:
+         routes:
+           users:
+             path: /myusers/**
+             url: https://example.com/users_service
+      #+END_SRC
+
+***** 忽略某些微服务
+      Zuul 允许配置对一些微服务的忽略项
+      #+BEGIN_SRC yaml
+        # 忽略所有微服务
+        zuul:
+          ignoredServices: '*'
+          routes:
+            users: /myusers/**
+
+        # 忽略某个微服务，微服务的名字为 appname
+        zuul:
+          ignoredServices: 'appname'
+          routes:
+            users: /myusers/**
+
+        # 添加统一的前缀 /api
+        zuul:
+          ignoredServices: '*'
+          prefix: /api
+          routes:
+            users: /myusers/**
+
+        # 忽略所有带有 /admin/ 路由的调用接口
+        zuul:
+          ignoredPatterns: /**/admin/**
+          routes:
+            users: /myusers/**
+      #+END_SRC
+
+***** 头部的设置选项
+      将 =Cookies=, =Set-Cookie=, =Authorization= 设置成敏感的头部，忽略一些头部
+      #+BEGIN_SRC yaml
+        zuul:
+          routes:
+            users:
+              path: /myusers/**
+              # Cookies 和敏感的头部
+              sensitiveHeaders: Cookie,Set-Cookie,Authorization
+              # 忽略的头部
+              ignoredHeaders: Header1
+              # 是否忽略安全头部
+              ignoreSecurityHeaders: true
+              url: https://downstream
+      #+END_SRC
+
+*** Ribbon
+    Ribbon 是 Netflix 发布的开源项目，主要功能是提供客户端的软件负载均衡算法，将
+    Netflix 的中间层服务连接在一起。Ribbon 客户端组件提供一系列完善的配置项如连
+    接超时，重试等。简单的说，就是在配置文件中列出 Load Balancer（简称 LB）后面
+    所有的机器，Ribbon 会自动的帮助你基于某种规则（如简单轮询，随即连接等）去连
+    接这些机器。我们也很容易使用 Ribbon 实现自定义的负载均衡算法。
+
+**** Ribbon Client
+***** 配置相关文件
+      =pom.xml= 添加 ~spring-cloud-starter-netflix-ribbon~ 的依赖项
+      #+BEGIN_SRC xml
+        <!-- pom.xml -->
+        <project>
+          <dependencies>
+            <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+            </dependency>
+          </dependencies>
+        </project>
+      #+END_SRC
+
+
+      #+BEGIN_SRC yaml
+        users:
+          ribbon:
+            NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
+            NFLoadBalancerRuleClassName: com.netflix.loadbalancer.WeightedResponseTimeRule
+      #+END_SRC
+
+***** 使用配置类来进行配置
+      Ribbon 支持使用配置类来配置，使用 ~@RibbonClient~ 注解进行相关配置
+      #+BEGIN_SRC java
+        // 设置默认调用的配置类
+        @RibbonClients(defaultConfiguration = DefaultRibbonConfig.class)
+        public class RibbonClientDefaultConfigurationTestsConfig {
+          public static class BazServiceList extends ConfigurationBasedServerList {
+            public BazServiceList(IClientConfig config) {
+              super.initWithNiwsConfig(config);
+            }
+          }
+        }
+
+        // 客户端配置实现类
+        @Configuration
+        class DefaultRibbonConfig {
+
+          @Bean
+          public IRule ribbonRule() { return new BestAvailableRule(); }
+
+          @Bean
+          public IPing ribbonPing() { return new PingUrl(); }
+
+          @Bean
+          public ServerList<Server> ribbonServerList(IClientConfig config) {
+            return new RibbonClientDefaultConfigurationTestsConfig.BazServiceList(config);
+          }
+
+          @Bean
+          public ServerListSubsetFilter serverListFilter() {
+            ServerListSubsetFilter filter = new ServerListSubsetFilter();
+            return filter;
+          }
+        }
+      #+END_SRC
+
+      Ribbon 客户端的配置, 如果不指定会使用默认的实现:
+      - ~IClientConfig~ 客户端相关配置
+      - ~IRule~ 定义负载均衡策略
+      - ~IPing~ 定义如何 ping 目标服务实例来判断是否存活, ribbon 使用单独的线程
+        每隔一段时间(默认 10s)对本地缓存的 =ServerList= 做一次检查
+      - ~ServerList~ 定义如何获取服务实例列表. 两种实现基于配置的
+        =ConfigurationBasedServerList= 和基于 Eureka 服务发现的
+        =DiscoveryEnabledNIWSServerList=
+      - ~ServerListFilter~ 用来使用期望的特征过滤静态配置动态获得的候选服务实例
+        列表. 若未提供, 默认使用 =ZoneAffinityServerListFilter=
+      - ~ILoadBalancer~ 定义了软负载均衡器的操作的接口. 一个典型的负载均衡器至少需
+        要一组用来做负载均衡的服务实例, 一个标记某个服务实例不在旋转中的方法, 和
+        对应的方法调用从实例列表中选出某一个服务实例.
+      - ~ServerListUpdater~ =DynamicServerListLoadBalancer= 用来更新实例列表的策
+        略 (推 -> =EurekaNotificationServerListUpdater=; 拉 ->
+        =PollingServerListUpdater=, 默认是拉)
+
+** Spring Cloud Gateway
    [[https://spring.io/projects/spring-cloud-gateway][Spring Cloud Gateway]] 是 Spring 官方基于 Spring 5.0，Spring Boot 2.0 和 Project
    Reactor 等技术开发的网关，Spring Cloud Gateway 旨在为微服务架构提供一种简单而有
    效的统一的 API 路由管理方式。
