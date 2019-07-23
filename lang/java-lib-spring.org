@@ -940,7 +940,9 @@
 
 *** Zuul
     Zuul 是在云平台上提供动态路由,监控,弹性,安全等边缘服务的框架。Zuul 相当于是
-    设备和 Netflix 流应用的 Web 网站后端所有请求的前门。
+    设备和 Netflix 流应用的 Web 网站后端所有请求的前门
+
+    [[file:../static/image/2019/07/netflix-zuul.png]]
 
 ***** 配置相关文件
       =pom.xml= 添加 ~spring-cloud-starter-netflix-zuul~ 的依赖项将 Zuul 引入项目
@@ -1045,6 +1047,69 @@
               ignoreSecurityHeaders: true
               url: https://downstream
       #+END_SRC
+
+***** 管理端点 Endpoint
+      Zuul 提供了一些管理路由的 RESTful 接口
+      - =GET /routes= 获取所有解析的路由
+      - =GET /routes/detail= 获取详细路由信息
+      - =POST /routes= 强制刷新路由
+      - =GET /filter= 获取所有的过滤器
+
+      下面是一些示例
+      #+BEGIN_SRC sh
+        curl http://localhost/routes
+      #+END_SRC
+      #+BEGIN_SRC json
+        {
+          /stores/**: "http://localhost:8081"
+        }
+      #+END_SRC
+
+      #+BEGIN_SRC sh
+        curl http://localhost/routes/detail
+      #+END_SRC
+      #+BEGIN_SRC json
+        {
+          "/stores/**": {
+            "id": "stores",
+            "fullPath": "/stores/**",
+            "location": "http://localhost:8081",
+            "path": "/**",
+            "prefix": "/stores",
+            "retryable": false,
+            "customSensitiveHeaders": false,
+            "prefixStripped": true
+          }
+        }
+      #+END_SRC
+
+***** 基本使用场景
+      如下所示将相关路由反向代理的对应的 URL
+      | origin    | proxy                         |
+      |-----------+-------------------------------|
+      | /fisrt/1  | https://first.exmple.com/1    |
+      | /second/2 | /second/2                     |
+      | /third/3  | /3rd/3                        |
+      | /no       | https://legacy.example.com/no |
+
+      #+BEGIN_SRC yaml
+        zuul:
+         routes:
+           first:
+             path: /first/**
+             url: https://first.example.com
+           second:
+             path: /second/**
+             url: forward:/second
+           third:
+             path: /third/**
+             url: forward:/3rd
+           legacy:
+             path: /**
+             url: https://legacy.example.com
+      #+END_SRC
+
+      Zuul 的详细配置见 [[https://github.com/Netflix/zuul/wiki/How-it-Works][Zuul wiki]]
 
 *** Ribbon
     Ribbon 是 Netflix 发布的开源项目，主要功能是提供客户端的软件负载均衡算法，将
