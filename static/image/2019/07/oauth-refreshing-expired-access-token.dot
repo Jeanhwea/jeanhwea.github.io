@@ -1,37 +1,58 @@
 digraph refreshingExpiredAccessToken {
-  rankdir=LR;
   // bgcolor="#eaeaea";
   node
   [
    shape=box;
-   style="filled,rounded";
+   style=filled;
    fontcolor="#ffffff";
    fontname="Arial"
-  ];
+   ];
+  ranksep=0.75;
 
-  subgraph cluster_0 {
-    client [color="#00bdaa", width=2, height=3, label="Client"];
-    style=invis;
-  }
+  // client group
+  client [color="#00bdaa", width=2, label="Client", group=g_client];
+  p00, p01, p02, p03, p04, p05, p06, p07 [shape=point, width=0, label="", group=g_client];
+  p09 [style=invis, label="", group=g_client];
+  client -> p00 [style=dashed, arrowhead=none];
+  p07 -> p09 [style=dashed, arrowhead=none];
+  p00 -> p01 -> p02 -> p03 -> p04 -> p05 -> p06 -> p07 [style=none, color="#00bdaa", penwidth=5, arrowhead=none];
 
-  subgraph cluster_1 {
-    authsrv [color="#8559a5", width=2, height=3, label="Authorization Server"];
-    ressrv [color="#f8b739", width=2, height=2, label="Resource Server"];
-    // ressrv -> authsrv [style=invis];
-    style=dashed;
-    label="Servers";
-    labeljust="r";
-  }
+  // auth group
+  auth [color="#8559a5", width=2, label="Authorization Server", group=g_auth];
+  p20, p21, p26, p27 [shape=point, width=0, label="", group=g_auth];
+  p29 [style=invis, label="", group=g_auth];
+  auth -> p20 [style=dashed, arrowhead=none];
+  p27 -> p29 [style=dashed, arrowhead=none];
+  p20 -> p21 -> p26 -> p27 [style=none, color="#8559a5", penwidth=5, arrowhead=none];
 
-  client -> authsrv [color="#00bdaa", label="1. Authentication Grant"];
-  authsrv -> client [color="#8559a5", label="2. Access Token\n&\nRefresh Token"];
+  // res group
+  res [color="#f8b739", width=2, label="Resource Server", group=g_res];
+  p32, p33, p34, p35 [shape=point, width=0, label="", group=g_res];
+  p39 [style=invis, label="", group=g_res];
+  res -> p32 [style=dashed, arrowhead=none];
+  p35 -> p39 [style=dashed, arrowhead=none];
+  p32 -> p33 -> p34 -> p35 [style=none, color="#f8b739", penwidth=5, arrowhead=none];
 
-  client -> ressrv [color="#00bdaa", label="3. Access Token"];
-  ressrv -> client [color="#f8b739", label="4. Protected Resource"];
+  { rank=same; client; res; auth; }
+  { rank=same; p00; p20; }
+  { rank=same; p01; p21; }
+  { rank=same; p02; p32; }
+  { rank=same; p03; p33; }
+  { rank=same; p04; p34; }
+  { rank=same; p05; p35; }
+  { rank=same; p06; p26; }
+  { rank=same; p07; p27; }
+  { rank=same; p09; p29; p39; }
+  client -> res -> auth [style=invis];
 
-  client -> ressrv [color="#00bdaa", label="5. Access Token"];
-  ressrv -> client [color="#f8b739", label="6. Invalid Token Error"];
 
-  client -> authsrv [color="#00bdaa", label="7. Refresh Token"];
-  authsrv -> client [color="#8559a5", label="8. Access Token\n&\nOptional Refresh Token"];
+  edge [fontname="Arial"];
+  p00 -> p20 [color="#00bdaa", penwidth=1.2, label="1: Authentication Grant"];
+  p01 -> p21 [color="#8559a5", penwidth=1.2, style=dashed, dir=back, label="2: Access Token & Refresh Token"];
+  p02 -> p32 [color="#00bdaa", penwidth=1.2, label="3: Access Token"];
+  p03 -> p33 [color="#f8b739", penwidth=1.2, style=dashed, dir=back, label="4: Protected Resource"];
+  p04 -> p34 [color="#00bdaa", penwidth=1.2, label="5: Access Token"];
+  p05 -> p35 [color="#f8b739", penwidth=1.2, style=dashed, dir=back, label="6: Invalid Token Error"];
+  p06 -> p26 [color="#00bdaa", penwidth=1.2, label="7: Refresh Token"];
+  p07 -> p27 [color="#8559a5", penwidth=1.2, style=dashed, dir=back, label="8: Access Token & Optional Refresh Token"];
 }
