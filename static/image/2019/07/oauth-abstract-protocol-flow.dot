@@ -1,0 +1,35 @@
+digraph ProtocolFlow {
+  rankdir=LR;
+  // bgcolor="#eaeaea";
+  node
+  [
+   shape=box;
+   style="filled,rounded";
+   fontcolor="#ffffff";
+   fontname="Arial"
+  ];
+
+  subgraph cluster_0 {
+    client [color="#00bdaa", height=4, label="Client"];
+    style=invis;
+  }
+
+  subgraph cluster_1 {
+    owner [color="#f30067", width=2.4, label="Resource Owner"];
+    authsrv [color="#8559a5", width=2.4, label="Authorization Server"];
+    ressrv [color="#f8b739", width=2.4, label="Resource Server"];
+    style=dashed;
+    label="Owner & Servers";
+    labeljust="r";
+  }
+
+  edge [minlen=6, arrowhead=vee, arrowtail=vee];
+  client -> owner [color="#00bdaa", label="1. Authentication Request"];
+  owner -> client [color="#f30067", label="2. Authentication Grant"];
+
+  authsrv -> client [color="#00bdaa", dir=back, label="3. Authentication Grant"];
+  client -> authsrv [color="#8559a5", dir=back, label="4. Access Token"];
+
+  client -> ressrv [color="#00bdaa", label="5. Access Token"];
+  ressrv -> client [color="#f8b739", label="6. Protected Resource"];
+}

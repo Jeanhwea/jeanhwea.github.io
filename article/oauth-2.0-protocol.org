@@ -1,0 +1,57 @@
+#+TITLE: OAuth 2.0 协议
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2019-07-24 Wed 13:25:19>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+TAGS: OAuth 2.0 authentication
+
+
+* OAuth 2.0 协议
+  [[https://www.rfc-editor.org/rfc/rfc5849.txt][RFC 5849]] 文档中定义了 OAuth 1.0 认证协议，OAuth 2.0 是 OAuth 协议的延续版本，
+  但不向前兼容 OAuth 2.0(即完全废止了 OAuth1.0)。 OAuth 2.0 关注客户端开发者的简
+  易性。要么通过组织在资源拥有者和 HTTP 服务商之间的被批准的交互动作代表用户，要
+  么允许第三方应用代表用户获得访问的权限。同时为 Web 应用，桌面应用和手机，和起
+  居室设备提供专门的认证流程。2012 年 10 月，OAuth 2.0 协议正式发布为 [[https://www.rfc-editor.org/rfc/rfc6749.txt][RFC 6749]]
+
+* 介绍
+** 角色
+   OAuth 定义了如下四个角色：
+   - Resource Owner: 资源所有者
+   - Resource Server: 资源服务器，即服务提供商存放用户生成的资源的服务器。它与认
+     证服务器，可以是同一台服务器，也可以是不同的服务器。
+   - Client: 客户端，通常是三方应用
+   - Authorization Server: 授权服务器
+
+** 协议流程及授权方式
+   协议的流程如下图所示
+
+   [[file:../static/image/2019/07/oauth-abstract-protocol-flow.png]]
+
+   - 用户打开客户端以后，客户端要求用户给予授权。
+   - 用户同意给予客户端授权。
+   - 客户端使用上一步获得的授权，向认证服务器申请令牌。
+   - 认证服务器对客户端进行认证以后，确认无误，同意发放令牌。
+   - 客户端使用令牌，向资源服务器申请获取资源。
+   - 资源服务器确认令牌无误，同意向客户端开放资源。
+
+   客户端必须得到用户的授权（authorization grant），才能获得令牌（access token）。
+   OAuth 2.0 定义了四种授权方式
+
+   - 授权码模式（authorization code）
+   - 简化模式（implicit）
+   - 密码模式（resource owner password credentials）
+   - 客户端模式（client credentials）
+
+** Access Token
+   Access Token 即访问令牌，Access Token 是用来包含资源的，客户端在访问资源是必须
+   携带 Access Token 才能正确获取到相应的资源
+
+** Refresh Token
+   如果用户访问的时候，客户端的 Access Token 已经过期，则需要使用 Reresh Token 申请一个
+   新的访问令牌。刷新 Access Token 的流程如下图
+
+   [[file:../static/image/2019/07/oauth-refreshing-expired-access-token.png]]
+
+* 授权模式
+** 授权码模式

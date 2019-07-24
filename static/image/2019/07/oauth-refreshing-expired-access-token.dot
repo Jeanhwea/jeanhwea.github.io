@@ -1,0 +1,37 @@
+digraph refreshingExpiredAccessToken {
+  rankdir=LR;
+  // bgcolor="#eaeaea";
+  node
+  [
+   shape=box;
+   style="filled,rounded";
+   fontcolor="#ffffff";
+   fontname="Arial"
+  ];
+
+  subgraph cluster_0 {
+    client [color="#00bdaa", width=2, height=3, label="Client"];
+    style=invis;
+  }
+
+  subgraph cluster_1 {
+    authsrv [color="#8559a5", width=2, height=3, label="Authorization Server"];
+    ressrv [color="#f8b739", width=2, height=2, label="Resource Server"];
+    // ressrv -> authsrv [style=invis];
+    style=dashed;
+    label="Servers";
+    labeljust="r";
+  }
+
+  client -> authsrv [color="#00bdaa", label="1. Authentication Grant"];
+  authsrv -> client [color="#8559a5", label="2. Access Token\n&\nRefresh Token"];
+
+  client -> ressrv [color="#00bdaa", label="3. Access Token"];
+  ressrv -> client [color="#f8b739", label="4. Protected Resource"];
+
+  client -> ressrv [color="#00bdaa", label="5. Access Token"];
+  ressrv -> client [color="#f8b739", label="6. Invalid Token Error"];
+
+  client -> authsrv [color="#00bdaa", label="7. Refresh Token"];
+  authsrv -> client [color="#8559a5", label="8. Access Token\n&\nOptional Refresh Token"];
+}
