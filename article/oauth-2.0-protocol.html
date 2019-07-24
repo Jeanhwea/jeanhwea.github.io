@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-24 Wed 15:21 -->
+<!-- 2019-07-25 Thu 00:33 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>OAuth 2.0 协议</title>
@@ -185,7 +185,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2019 Free Software Foundation, Inc.
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -238,17 +238,18 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgd517ca1">1. OAuth 2.0 协议</a></li>
-<li><a href="#org8cf4a1b">2. 介绍</a>
+<li><a href="#orgeada673">1. OAuth 2.0 协议</a></li>
+<li><a href="#org1b8d135">2. 介绍</a>
 <ul>
-<li><a href="#org08fcf97">2.1. 角色</a></li>
-<li><a href="#orgac681f2">2.2. 协议流程及授权方式</a></li>
-<li><a href="#orgd4b19ad">2.3. Refresh Token</a></li>
+<li><a href="#org67e9b85">2.1. 角色</a></li>
+<li><a href="#org339c8ee">2.2. 协议流程及授权方式</a></li>
+<li><a href="#orgecd1870">2.3. Access Token</a></li>
+<li><a href="#org24a3c3c">2.4. Refresh Token</a></li>
 </ul>
 </li>
-<li><a href="#orgafbc123">3. 授权模式</a>
+<li><a href="#orgb84922a">3. 授权模式</a>
 <ul>
-<li><a href="#org854c540">3.1. 授权码模式</a></li>
+<li><a href="#org3fa2c1b">3.1. 授权码模式</a></li>
 </ul>
 </li>
 </ul>
@@ -256,8 +257,8 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-orgd517ca1" class="outline-2">
-<h2 id="orgd517ca1"><span class="section-number-2">1</span> OAuth 2.0 协议</h2>
+<div id="outline-container-orgeada673" class="outline-2">
+<h2 id="orgeada673"><span class="section-number-2">1</span> OAuth 2.0 协议</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 <a href="https://www.rfc-editor.org/rfc/rfc5849.txt">RFC 5849</a> 文档中定义了 OAuth 1.0 认证协议，OAuth 2.0 是 OAuth 协议的延续版本，
@@ -269,12 +270,12 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org8cf4a1b" class="outline-2">
-<h2 id="org8cf4a1b"><span class="section-number-2">2</span> 介绍</h2>
+<div id="outline-container-org1b8d135" class="outline-2">
+<h2 id="org1b8d135"><span class="section-number-2">2</span> 介绍</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org08fcf97" class="outline-3">
-<h3 id="org08fcf97"><span class="section-number-3">2.1</span> 角色</h3>
+<div id="outline-container-org67e9b85" class="outline-3">
+<h3 id="org67e9b85"><span class="section-number-3">2.1</span> 角色</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 OAuth 定义了如下四个角色：
@@ -289,8 +290,8 @@ OAuth 定义了如下四个角色：
 </div>
 </div>
 
-<div id="outline-container-orgac681f2" class="outline-3">
-<h3 id="orgac681f2"><span class="section-number-3">2.2</span> 协议流程及授权方式</h3>
+<div id="outline-container-org339c8ee" class="outline-3">
+<h3 id="org339c8ee"><span class="section-number-3">2.2</span> 协议流程及授权方式</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 协议的流程如下图所示
@@ -325,28 +326,44 @@ OAuth 2.0 定义了四种授权方式
 </div>
 </div>
 
-<div id="outline-container-orgd4b19ad" class="outline-3">
-<h3 id="orgd4b19ad"><span class="section-number-3">2.3</span> Refresh Token</h3>
+<div id="outline-container-orgecd1870" class="outline-3">
+<h3 id="orgecd1870"><span class="section-number-3">2.3</span> Access Token</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
+Access Token 即访问令牌，Access Token 是用来包含资源的，客户端在访问资源是必须
+携带 Access Token 才能正确获取到相应的资源
+</p>
+</div>
+</div>
+
+<div id="outline-container-org24a3c3c" class="outline-3">
+<h3 id="org24a3c3c"><span class="section-number-3">2.4</span> Refresh Token</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
 如果用户访问的时候，客户端的 Access Token 已经过期，则需要使用 Reresh Token 申请一个
-新的访问令牌。
+新的访问令牌。刷新 Access Token 的流程如下图
+</p>
+
+
+<div class="figure">
+<p><img src="../static/image/2019/07/oauth-refreshing-expired-access-token.png" alt="oauth-refreshing-expired-access-token.png" />
 </p>
 </div>
 </div>
 </div>
+</div>
 
-<div id="outline-container-orgafbc123" class="outline-2">
-<h2 id="orgafbc123"><span class="section-number-2">3</span> 授权模式</h2>
+<div id="outline-container-orgb84922a" class="outline-2">
+<h2 id="orgb84922a"><span class="section-number-2">3</span> 授权模式</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org854c540" class="outline-3">
-<h3 id="org854c540"><span class="section-number-3">3.1</span> 授权码模式</h3>
+<div id="outline-container-org3fa2c1b" class="outline-3">
+<h3 id="org3fa2c1b"><span class="section-number-3">3.1</span> 授权码模式</h3>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-07-24 Wed 15:21. Created by Jinghui Hu at 2019-07-24 Wed 13:25.</p>
+<p class="author">Last Updated 2019-07-25 Thu 00:33. Created by Jinghui Hu at 2019-07-24 Wed 13:25.</p>
 </div>
 </body>
 </html>
