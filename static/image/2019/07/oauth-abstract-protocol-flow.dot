@@ -1,35 +1,66 @@
 digraph ProtocolFlow {
-  rankdir=LR;
-  // bgcolor="#eaeaea";
+  // rankdir=LR;
+  bgcolor="#eaeaea";
+  ranksep=0.75;
   node
   [
    shape=box;
-   style="filled,rounded";
+   style="filled";
    fontcolor="#ffffff";
    fontname="Arial"
-  ];
+   ];
+  // edge [minlen=5];
 
-  subgraph cluster_0 {
-    client [color="#00bdaa", height=4, label="Client"];
-    style=invis;
-  }
+  // client group
+  client [color="#00bdaa", width=2, label="Client", group=g_client];
+  p00, p01, p02, p03, p04, p05 [shape=point, width=0, label="", group=g_client];
+  p09 [style=invis, label="", group=g_client];
+  client -> p00 [style=dashed, arrowhead=none];
+  p05 -> p09 [style=dashed, arrowhead=none];
+  p00 -> p01 -> p02 -> p03 -> p04 -> p05 [style=none, color="#00bdaa", penwidth=5, arrowhead=none];
 
-  subgraph cluster_1 {
-    owner [color="#f30067", width=2.4, label="Resource Owner"];
-    authsrv [color="#8559a5", width=2.4, label="Authorization Server"];
-    ressrv [color="#f8b739", width=2.4, label="Resource Server"];
-    style=dashed;
-    label="Owner & Servers";
-    labeljust="r";
-  }
+  // owner group
+  owner [color="#f30067", width=2, label="Resource Owner", group=g_owner];
+  p10, p11 [shape=point, width=0, label="", group=g_owner];
+  p19 [style=invis, label="", group=g_owner];
+  owner -> p10 [style=dashed, arrowhead=none];
+  p11 -> p19 [style=dashed, arrowhead=none];
+  p10 -> p11 [style=none, color="#f30067", penwidth=5, arrowhead=none];
 
-  edge [minlen=6, arrowhead=vee, arrowtail=vee];
-  client -> owner [color="#00bdaa", label="1. Authentication Request"];
-  owner -> client [color="#f30067", label="2. Authentication Grant"];
+  // auth group
+  auth [color="#8559a5", width=2, label="Authorization Server", group=g_auth];
+  p22, p23 [shape=point, width=0, label="", group=g_auth];
+  p29 [style=invis, label="", group=g_auth];
+  auth -> p22 [style=dashed, arrowhead=none];
+  p23 -> p29 [style=dashed, arrowhead=none];
+  p22 -> p23 [style=none, color="#8559a5", penwidth=5, arrowhead=none];
 
-  authsrv -> client [color="#00bdaa", dir=back, label="3. Authentication Grant"];
-  client -> authsrv [color="#8559a5", dir=back, label="4. Access Token"];
+  // res group
+  res [color="#f8b739", width=2, label="Resource Server", group=g_res];
+  p34, p35[shape=point, width=0, label="", group=g_res];
+  p39 [style=invis, label="", group=g_res];
+  res -> p34 [style=dashed, arrowhead=none];
+  p35 -> p39 [style=dashed, arrowhead=none];
+  p34 -> p35 [style=none, color="#f8b739", penwidth=5, arrowhead=none];
 
-  client -> ressrv [color="#00bdaa", label="5. Access Token"];
-  ressrv -> client [color="#f8b739", label="6. Protected Resource"];
+  // setup ranks and invis
+  { rank=same; client; owner; auth; res; }
+  { rank=same; p00; p10; }
+  { rank=same; p01; p11; }
+  { rank=same; p02; p22; }
+  { rank=same; p03; p23; }
+  { rank=same; p04; p34; }
+  { rank=same; p05; p35; }
+  { rank=same; p09; p19; p29; p39 }
+  client -> owner -> auth -> res [style=invis];
+  p09 -> p19 -> p29 -> p39 [style=invis];
+
+  // request and response lines
+  edge [fontname="Arial"];
+  p00 -> p10 [color="#00bdaa", penwidth=1.2, arrowhead=normal, label="1: Authentication Request"];
+  p01 -> p11 [color="#f30067", penwidth=1.2, arrowtail=normal, style=dashed, dir=back, label="2: Authentication Grant"];
+  p02 -> p22 [color="#00bdaa", penwidth=1.2, arrowhead=normal, label="3: Authentication Grant"];
+  p03 -> p23 [color="#8559a5", penwidth=1.2, arrowtail=normal, style=dashed, dir=back, label="4: Access Token"];
+  p04 -> p34 [color="#00bdaa", penwidth=1.2, arrowhead=normal, label="5: Access Token"];
+  p05 -> p35 [color="#f8b739", penwidth=1.2, arrowtail=normal, style=dashed, dir=back, label="6: Protected Resource"];
 }
