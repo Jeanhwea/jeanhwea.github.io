@@ -1,0 +1,71 @@
+digraph AuthorizationCodeFlow {
+  ua_note [shape=note; label="通常是浏览器", fontname="Microsoft YaHei", fontsize=12];
+
+  ranksep=0.75;
+  node
+  [
+   shape=box;
+   style="filled";
+   fontcolor="#ffffff";
+   fontname="Arial"
+   ];
+  // edge [minlen=5];
+
+  // client group
+  client [color="#00bdaa", width=2, label="Client", group=g_client];
+  p00, p05, p06, p07 [shape=point, width=0, label="", group=g_client];
+  p09 [style=invis, label="", group=g_client];
+  client -> p00 [style=dashed, arrowhead=none];
+  p07 -> p09 [style=dashed, arrowhead=none];
+  p00 -> p05 -> p06 -> p07 [style=none, color="#00bdaa", penwidth=5, arrowhead=none];
+
+  // owner group
+  owner [color="#f30067", width=2, label="Resource Owner", group=g_owner];
+  p12 [shape=point, width=0, label="", group=g_owner];
+  p19 [style=invis, label="", group=g_owner];
+  owner -> p12 [style=dashed, arrowhead=none];
+  p12 -> p19 [style=dashed, arrowhead=none];
+  // p11 -> p12 [style=none, color="#f30067", penwidth=5, arrowhead=none];
+
+  // auth group
+  auth [color="#8559a5", width=2, label="Authorization Server", group=g_auth];
+  p21, p23, p24, p26, p27 [shape=point, width=0, label="", group=g_auth];
+  p29 [style=invis, label="", group=g_auth];
+  auth -> p21 [style=dashed, arrowhead=none];
+  p27 -> p29 [style=dashed, arrowhead=none];
+  p21 -> p23 -> p24 -> p26 -> p27 [style=none, color="#8559a5", penwidth=5, arrowhead=none];
+
+  // user-agent group
+  ua [color="#36d22b", width=2, label="User-Agent", group=g_ua];
+  p40, p41, p42, p43, p44, p45 [shape=point, width=0, label="", group=g_ua];
+  p49 [style=invis, label="", group=g_ua];
+  ua -> p40 [style=dashed, arrowhead=none];
+  p45 -> p49 [style=dashed, arrowhead=none];
+  p40 -> p41 -> p42 -> p43 -> p44 -> p45 [style=none, color="#36d22b", penwidth=5, arrowhead=none];
+
+  { rank=same; client; owner; auth; ua}
+  { rank=same; p09; p19; p29; p49; }
+  { rank=same; p00; p40; ua_note; }
+  { rank=same; p41; p21; }
+  { rank=same; p42; p12; }
+  { rank=same; p43; p23;  }
+  { rank=same; p44; p24; }
+  { rank=same; p45; p05; }
+  { rank=same; p06; p26; }
+  { rank=same; p07; p27; }
+  client -> ua -> owner -> auth [style=invis];
+
+  // request and response lines
+  edge [fontname="Arial"];
+  p00 -> p40 [color="#00bdaa", penwidth=1.2, arrowhead=normal, label="1: "];
+  p41 -> p21 [color="#36d22b", penwidth=1.2, arrowhead=normal, label="1: Client Identifier & Redirection URI"];
+  p42 -> p12 [color="#36d22b", penwidth=1.2, arrowhead=normal, label="2: "];
+  p43 -> p23 [color="#36d22b", penwidth=1.2, arrowhead=normal, label="2: User authenticates"];
+  p44 -> p24 [color="#8559a5", penwidth=1.2, arrowhead=normal, dir=back, style=dashed, label="3: Authorizaiton Code"]
+  p05 -> p45 [color="#36d22b", penwidth=1.2, arrowhead=normal, dir=back, style=dashed, label="3: "]
+  p06 -> p26 [color="#00bdaa", penwidth=1.2, arrowhead=normal, label="4: Authorization Code & Redirection URI"];
+  p07 -> p27 [color="#00bdaa", penwidth=1.2, arrowhead=normal, dir=back, style=dashed, label="5: Access Token (w/ Optional Refresh Token)"];
+
+  // note
+  ua:e -> ua_note [style=dashed, dir=back, arrowtail=dot, arrowsize=0.5];
+}
