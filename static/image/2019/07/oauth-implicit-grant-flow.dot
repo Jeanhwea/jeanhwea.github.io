@@ -1,0 +1,74 @@
+digraph implicitGrantFlow {
+  ranksep=0.75;
+  node
+  [
+   shape=box;
+   style="filled";
+   fontcolor="#ffffff";
+   fontname="Arial"
+   ];
+  // edge [minlen=5];
+
+  // client group
+  client [color="#00bdaa", width=2, label="Client", group=g_client];
+  p00, p08 [shape=point, width=0, label="", group=g_client];
+  p09 [style=invis, label="", group=g_client];
+  client -> p00 [style=dashed, arrowhead=none];
+  p08 -> p09 [style=dashed, arrowhead=none];
+  p00 -> p08 [style=none, color="#00bdaa", penwidth=5, arrowhead=none];
+
+  // owner group
+  owner [color="#f30067", width=2, label="Resource Owner", group=g_owner];
+  p12 [shape=point, width=0, label="", group=g_owner];
+  p19 [style=invis, label="", group=g_owner];
+  owner -> p12 [style=dashed, arrowhead=none];
+  p12 -> p19 [style=dashed, arrowhead=none];
+  // p11 -> p12 [style=none, color="#f30067", penwidth=5, arrowhead=none];
+
+  // auth group
+  auth [color="#8559a5", width=2, label="Authorization Server", group=g_auth];
+  p21, p23, p24 [shape=point, width=0, label="", group=g_auth];
+  p29 [style=invis, label="", group=g_auth];
+  auth -> p21 [style=dashed, arrowhead=none];
+  p24 -> p29 [style=dashed, arrowhead=none];
+  p21 -> p23 -> p24 [style=none, color="#8559a5", penwidth=5, arrowhead=none];
+
+  // user-agent group
+  ua [color="#36d22b", width=2, label="User-Agent", group=g_ua];
+  p40, p41, p42, p43, p44, p45, p46, p47, p48 [shape=point, width=0, label="", group=g_ua];
+  p49 [style=invis, label="", group=g_ua];
+  ua -> p40 [style=dashed, arrowhead=none];
+  p48 -> p49 [style=dashed, arrowhead=none];
+  p40 -> p41 -> p42 -> p43 -> p44 -> p45 -> p46 -> p47 -> p48 [style=none, color="#36d22b", penwidth=5, arrowhead=none];
+
+  // web
+  web [color="#090088", width=2, label="Web-Hosted Client\nResource", group=g_web];
+  p55, p56 [shape=point, width=0, label="", group=g_web];
+  p59 [style=invis, label="", group=g_web];
+  web -> p55 [style=dashed, arrowhead=none];
+  p56 -> p59 [style=dashed, arrowhead=none];
+  p55 -> p56 [style=none, color="#090088", penwidth=5, arrowhead=none];
+
+  { rank=same; client; owner; auth; ua; web}
+  { rank=same; p09; p19; p29; p49; p59}
+  { rank=same; p00; p40; }
+  { rank=same; p41; p21; }
+  { rank=same; p42; p12; }
+  { rank=same; p43; p23; }
+  { rank=same; p44; p24; }
+  { rank=same; p45; p55; }
+  { rank=same; p46; p56; }
+  { rank=same; p48; p08; }
+  client -> ua -> owner -> auth -> web [style=invis];
+
+  edge [fontname="Arial"];
+  p00 -> p40 [color="#00bdaa", penwidth=1.2, arrowhead=normal, label="1: "];
+  p41 -> p21 [color="#36d22b", penwidth=1.2, arrowhead=normal, label="1: Client Identifier & Redirection URI"];
+  p42 -> p12 [color="#36d22b", penwidth=1.2, arrowhead=normal, label="2: "];
+  p43 -> p23 [color="#36d22b", penwidth=1.2, arrowhead=normal, label="2: User authenticates"];
+  p44 -> p24 [color="#8559a5", penwidth=1.2, arrowhead=normal, dir=back, style=dashed, label="3: Redirection URI with Access Token in Fragment"]
+  p45 -> p55 [color="#36d22b", penwidth=1.2, arrowhead=normal, label="4: Redirection URI without Fragment"];
+  p46 -> p56 [color="#090088", penwidth=1.2, arrowhead=normal, dir=back, style=dashed, label="5: Script"];
+  p47 -> p47 [color="#36d22b", penwidth=1.2, arrowhead=normal, label="6: "];
+  p08 -> p48 [color="#36d22b", penwidth=1.2, arrowhead=normal, dir=back, style=dashed, label="7: Access Token"];
+}
