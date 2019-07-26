@@ -1,0 +1,34 @@
+#+TITLE: Ngnix 场景应用场景配置
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2019-07-26 Fri 10:38:22>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+TAGS: ngnix server
+
+
+* 反向代理配置
+  #+BEGIN_SRC conf
+    location /api/ {
+      proxy_pass   http://192.168.0.240:8000/;
+      # ...
+    }
+  #+END_SRC
+  通过 =proxy_pass= 来反向代理请求
+
+* CORS 跨越配置
+  #+BEGIN_SRC conf
+    location /api/ {
+      # add_header Access-Control-Allow-Origin '*';
+      add_header Access-Control-Allow-Origin 'http://localhost:8000;
+      add_header Access-Control-Allow-Methods 'GET,POST,OPTIONS';
+      add_header Access-Control-Allow-Credentials 'true';
+      add_header Access-Control-Allow-Headers 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization';
+      # ...
+    }
+  #+END_SRC
+  主要是添加了三个用于控制 CORS 的头信息：
+  - =Access-Control-Allow-Origin= 允许的来源
+  - =Access-Control-Allow-Credentials= 设置为 true，允许 ajax 异步请求带 cookie 信息
+  - =Access-Control-Allow-Headers= 设置为 x-requested-with,content-type，允许 ajax
+    余部请求。
