@@ -71,12 +71,27 @@
    #+END_SRC
 
 ** 离线下载/安装 wheel 包
+*** 下载 wheel 包
    将 =requirements.txt= 中的所有依赖的 wheel 包下载到 wheels 文件夹中
    #+BEGIN_SRC sh
      pip download -r requirements.txt -d wheels
    #+END_SRC
 
+*** 安装 wheel 包
    将 wheels 文件夹中的包安装到环境中
    #+BEGIN_SRC sh
      pip install -r requirements.txt --no-index --find-link=wheels
+   #+END_SRC
+
+*** 最佳实践
+   一般可以将下载的 wheel 包放在摆渡机的 =~/Downloads/wheels= 文件夹中
+   #+BEGIN_SRC sh
+     # download and save packages to ~/Downloads/wheels
+     pip download -d ~/Downloads/wheels <name>
+
+     # upload packages to remote machine
+     rsync -av ~/Downloads/wheels/ user@host:~/Downloads/wheels
+
+     # install on remote machine
+     pip install --no-index --find-link=~/Downloads/wheels <name>
    #+END_SRC
