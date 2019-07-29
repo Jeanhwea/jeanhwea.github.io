@@ -42,7 +42,6 @@
    5. 客户端从资源服务器请求受保护资源并出示 Access Token 进行身份验证。
    6. 资源服务器验证 Access Token ，若有效则处理该请求。
 
-
    客户端必须得到用户的授权（authorization grant），才能获得令牌（access token）。
    OAuth 2.0 定义了四种授权方式
 
@@ -118,7 +117,7 @@
     请求参数的客户端使用 =application/x-www-form-urlencoded= 格式向授权端点 URI
     的查询部分添加下列参数构造请求 URI：
 
-    - =response_type= 必需的。值必须被设置为 =code=
+    - =response_type= 必需的。值必须被设置为 ="code"=
     - =client_id= 必需的。客户端标识
     - =redirect_uri= 可选的
     - =scope= 可选的。访问请求的范围
@@ -150,14 +149,14 @@
     - =state= 必需的，若 =state= 参数在客户端授权请求中提交。从客户端接收的精确值
 
 *** Access Token 请求
-    - =grant_type= 必需的。值必须被设置为 =authorization_code=
+    - =grant_type= 必需的。值必须被设置为 ="authorization_code"=
     - =code= 从授权服务器收到的授权码
     - =redirect_uri= 必需的，若 =redirect_uri= 参数包含在授权请求中，且他们的值
       必须相同。
     - =client_id= 必需的，如果客户端没有与授权服务器进行身份认证。
 
-a*** Access Token 响应
-    如果访问令牌请求是有效的且被授权，授权服务器颁发访问令牌以及可选的刷新令牌。
+*** Access Token 响应
+    如果访问令牌请求是有效的且被授权，授权服务器颁发访问令牌以及可选的 Refresh Token。
     如果请求客户端身份验证失败或无效，授权服务器返回错误响应。下面是一个样例成功
     响应：
 
@@ -177,18 +176,18 @@ a*** Access Token 响应
 
 ** 隐私许可
 *** 隐式许可流程
-    隐式授权类型被用于获取访问令牌（它不支持发行刷新令牌），并对知道操作具体重定
+    隐式授权类型被用于获取 Access Token（它不支持发行 Refresh Token），并对知道操作具体重定
     向 URI 的公共客户端进行优化。这些客户端通常在浏览器中使用诸如 JavaScript
     的脚本语言实现。
 
     由于这是一个基于重定向的流程，客户端必须能够与资源所有者的用户代理（通常是 Web
     浏览器）进行交互并能够接收来自授权服务器的传入请求（通过重定向）。
 
-    不同于客户端分别请求授权和访问令牌的授权码许可类型，客户端收到访问令牌作为授
+    不同于客户端分别请求授权和 Access Token 的授权码许可类型，客户端收到 Access Token 作为授
     权请求的结果。
 
     隐式许可类型不包含客户端身份验证而依赖于资源所有者在场和重定向 URI 的注册。因为
-    访问令牌被编码到重定向 URI 中，它可能会暴露给资源所有者和其他驻留在相同设备上的
+    Access Token 被编码到重定向 URI 中，它可能会暴露给资源所有者和其他驻留在相同设备上的
     应用。
 
     [[file:../static/image/2019/07/oauth-implicit-grant-flow.png]]
@@ -199,14 +198,14 @@ a*** Access Token 响应
     2. 授权服务器验证资源拥有者的身份（通过用户代理），并确定资源所有者是否授予或
        拒绝客户端的访问请求。
     3. 假设资源所有者许可访问，授权服务器使用之前（在请求时或客户端注册时）提供的
-       重定向 URI 重定向用户代理回到客户端。重定向 URI 在 URI 片段中包含访问令牌。
+       重定向 URI 重定向用户代理回到客户端。重定向 URI 在 URI 片段中包含 Access Token。
     4. 用户代理顺着重定向指示向 Web 托管的客户端资源发起请求（按 RFC2616 该请求不包含
        片段）。用户代理在本地保留片段信息。
     5. Web 托管的客户端资源返回一个网页（通常是带有嵌入式脚本的 HTML 文档），该网页能
-       够访问包含用户代理保留的片段的完整重定向 URI 并提取包含在片段中的访问令牌（和
+       够访问包含用户代理保留的片段的完整重定向 URI 并提取包含在片段中的 Access Token（和
        其他参数）。
-    6. 用户代理在本地执行 Web 托管的客户端资源提供的提取访问令牌的脚本。
-    7. 用户代理传送访问令牌给客户端。
+    6. 用户代理在本地执行 Web 托管的客户端资源提供的提取 Access Token 的脚本。
+    7. 用户代理传送 Access Token 给客户端。
 
 *** Access Token 请求
     请求参数的客户端使用 =application/x-www-form-urlencoded= 格式向授权端点 URI
@@ -230,7 +229,7 @@ a*** Access Token 响应
     #+END_SRC
 
     授权服务器验证该请求，确保所有需要的参数已提交且有效。授权服务器必须验证它将
-    重定向访问令牌的重定向 URI 与客户端注册的重定向 URI 匹配。
+    重定向 Access Token 的重定向 URI 与客户端注册的重定向 URI 匹配。
 
     如果请求是有效的，授权服务器对资源所有者进行身份验证并获得授权决定（通过询问
     资源所有者或通过经由其他方式确定批准）。
@@ -240,15 +239,122 @@ a*** Access Token 响应
 
 *** Access Token 响应
 
-    - =access_token= 必需的。授权服务器颁发的访问令牌。
+    - =access_token= 必需的。授权服务器颁发的 Access Token。
     - =token_type= 必需的。颁发的令牌的类型。值是大小写不敏感的。
-    - =expires_in= 推荐的。以秒为单位的访问令牌生命周期。例如，值“3600”表示访问
+    - =expires_in= 推荐的。以秒为单位的 Access Token 生命周期。例如，值“3600”表示访问
       令牌将在从生成响应时的 1 小时后到期。如果省略，则授权服务器应该通过其他方式
       提供过期时间，或者记录默认值。
     - =scope= 可选的，若与客户端请求的范围相同；否则，是必需的。如 3.3 节所述的访
       问令牌的范围。
     - =state= 必需的，若“state”参数在客户端授权请求中提交。从客户端接收的精确值。
-      授权服务器不能颁发刷新令牌。
+      授权服务器不能颁发 Refresh Token。
+
+** (资源所有者)密码许可
+   资源所有者密码凭据许可类型适合于资源所有者与客户端具有信任关系的情况，如设备
+   操作系统或高级特权应用。当启用这种许可类型时授权服务器应该特别关照且只有当其
+   他流程都不可用时才可以。
+
+   这种许可类型适合于能够获得资源所有者凭据（用户名和密码，通常使用交互的形式）
+   的客户端。通过转换已存储的凭据至 Access Token，它也用于迁移现存的使用如 http
+   基本或摘要身份验证的直接身份验证方案的客户端至 oauth
+
+   [[file:../static/image/2019/07/oauth-password-flow.png]]
+
+   - 资源所有者提供给客户端它的用户名和密码
+   - 通过包含从资源所有者处接收到的凭据，客户端从授权服务器的令牌端点请求访问令
+     牌。当发起请求时，客户端与授权服务器进行身份验证
+   - 授权服务器对客户端进行身份验证，验证资源所有者的凭证，如果有效，颁发 Access
+     Token
+
+*** Access Token 请求
+    请求参数的客户端使用 =application/x-www-form-urlencoded= 格式向授权端点 URI
+    的查询部分添加下列参数构造请求 URI：
+
+    - =grant_type= 必需的。值必须设置为 ="password"=
+    - =username= 必需的。资源所有者的用户名。
+    - =password= 必需的。资源所有者的密码。
+    - =scope= 可选的。访问请求的范围。如果客户端类型是机密的或客户端被颁发了客户
+      端凭据（或选定的其他身份验证要求），客户端必须与 授权服务器进行身份验证。
+
+    下面是一个示例
+    #+BEGIN_SRC text
+      POST /token HTTP/1.1
+      Host: server.example.com
+      Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+      Content-Type: application/x-www-form-urlencoded
+      grant_type=password&username=johndoe&password=A3ddj3w
+    #+END_SRC
+
+    授权服务器必须：
+
+    要求机密客户端或任何被颁发了客户端凭据（或有其他身份验证要求）的客户端进行客
+    户端身份验证若包括了客户端身份验证，验证客户端身份，并使用它现有的密码验证算
+    法验证资源所有者的密码凭据。
+
+*** Access Token 响应
+    如果访问令牌请求是有效的且被授权，授权服务器发访问令牌以及可选的刷新令牌。如
+    果请求客户端身份验证失败或无效，授权服务器返回错误响应。 一个样例成功响应：
+
+    #+BEGIN_SRC text
+      HTTP/1.1 200 OK
+      Content-Type: application/json;charset=UTF-8
+      Cache-Control: no-store
+      Pragma: no-cache
+      {
+        "access_token":"2YotnFZFEjr1zCsicMWpAA",
+        "token_type":"example",
+        "expires_in":3600,
+        "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA",
+        "example_parameter":"example_value"
+      }
+    #+END_SRC
+
+** (客户端)凭据许可
+   当客户端请求访问它所控制的，或者事先与授权服务器协商的其他资源所有者的受保护
+   资源，客户端可以只使用它的客户端凭据请求访问令牌
+
+   客户端凭据许可类型必须只能由机密客户端使用
+
+   [[file:../static/image/2019/07/oauth-client-credentials.png]]
+
+   - 客户端与授权服务器进行身份验证并向令牌端点请求访问令牌
+   - 授权服务器对客户端进行身份验证，如果有效，颁发访问令牌
+
+*** Access Token 请求
+    请求参数的客户端使用 =application/x-www-form-urlencoded= 格式向授权端点 URI
+    的查询部分添加下列参数构造请求 URI：
+
+    - =grant_type= 必需的。值必须设置为 ="client_credentials"=
+    - =scope= 可选的。访问请求的范围
+
+    下面是一个示例
+    #+BEGIN_SRC text
+      POST /token HTTP/1.1
+      Host: server.example.com
+      Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+      Content-Type: application/x-www-form-urlencoded
+      grant_type=client_credentials
+    #+END_SRC
+
+    授权服务器必须对客户端进行身份验证。
+
+*** Access Token 响应
+    如果访问令牌请求是有效的且被授权，授权服务器访问令牌以及可选的刷新令牌。刷新
+    令牌不应该包含在内。 如果请求因客户端身份验证失败或无效，授权服务器返回错误
+    响应。
+
+    一个样例成功响应：
+    #+BEGIN_SRC text
+      HTTP/1.1 200 OK
+      Content-Type: application/json;charset=UTF-8
+      Cache-Control: no-store
+      Pragma: no-cache
+      {
+        "access_token":"2YotnFZFEjr1zCsicMWpAA",
+        "token_type":"example",
+        "expires_in":3600， "example_parameter":"example_value"
+      }
+    #+END_SRC
 
 * 参考文档
   1. [[https://github.com/jeansfish/RFC6749.zh-cn][rfc6749 中文翻译]]
