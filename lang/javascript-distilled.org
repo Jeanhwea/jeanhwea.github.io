@@ -201,7 +201,31 @@
     - ~Math.max(a, b, c, ..)~ 和 ~Math.min(a, b, c, ..)~ 取最值
     - ~Math.pow(n, power)~
 
+*** 特殊数字测试
+    - ~isFinite~ 如果不是无穷大，返回真；否则返回假。 ~Infinity~ 和 ~-Infinity~
+      表示无穷大和无穷小
+    - ~isNaN~ 测试是否是一个数字
+
+    #+BEGIN_SRC js
+      > isFinite(NaN)
+      false
+      > isFinite(-Infinity)
+      false
+      > isFinite(Infinity)
+      false
+      > isFinite(12)
+      true
+      > isNaN(NaN)
+      true
+      > isNaN(2)
+      false
+      > isNaN("ss")
+      true
+      >
+    #+END_SRC
+
 ** String 字符串
+   String 对象在 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String][MSDN]] 中有详细的介绍
 *** 定义字符串
     注意使用 =${...}= 表达式
     #+BEGIN_SRC js
@@ -215,6 +239,101 @@
       > `1 + 2 = ${1 + 2}`
       '1 + 2 = 3'
     #+END_SRC
+
+*** 字符串长度
+    ~str.length~ ，字符串长度是一个对象中的属性
+    #+BEGIN_SRC js
+      > 'hello'.length
+      5
+    #+END_SRC
+
+*** 获取子字符串
+    - ~[]~ 和 ~str.charAt(idx)~: 通过下标索引获取字符
+    - ~str.slice(beginIndex[,endIndex])~ 获取子字符串，如果 beginIndex 或
+      endIndex 是负表示反向索引
+    - ~str.substring(indexStart[,indexEnd])~ 和 slice 和类似，但是 substring 支
+      持 indexEnd 小于 indexStart
+    #+BEGIN_SRC js
+      > 'abcd'.substring(1,3)
+      'bc'
+      > 'abcd'.substring(3,1)
+      'bc'
+      > 'abcd'.slice(1,3)
+      'bc'
+      > 'abcd'.slice(3,1)
+      ''
+      >
+    #+END_SRC
+
+*** 字符串查找
+    - ~str.indexOf(searchValue,fromIndex)~ : 查找字符串中是否包含 searchValue，
+      并返回下标
+    - ~str.lastIndexOf(searchValue,fromIndex)~ : 反向查找字符串中是否包含
+      searchValue，并返回下标
+    - ~str.includes(searchString,[position])~ : 查找字符串，返回布尔值
+    - ~str.startsWith(searchString[,position])~ 和
+      ~str.endsWith(searchString[,length])~
+    #+BEGIN_SRC js
+      > 'abaa'.indexOf('a')
+      0
+      > 'abaa'.indexOf('b')
+      1
+      > 'abaa'.lastIndexOf('a')
+      3
+      > 'abaa'.includes('b')
+      true
+      > 'hello'.startsWith('h')
+      true
+      > 'hello'.startsWith('a')
+      false
+      > 'hello'.endsWith('a')
+      false
+      >
+    #+END_SRC
+
+*** 字符串替换/正则表达式
+    - ~str.replace(regexp|substr,newSubstr|function)~
+    - ~str.match(regexp)~ : 匹配 regexp 返回数组，如果 regexp 是 null 则返回空
+    - ~str.search(regexp)~
+    #+BEGIN_SRC js
+      > 'abaa'.replace('a', '$')
+      '$baa'
+      > 'abaa'.replace(/a/g, '$')
+      '$b$$'
+      >
+    #+END_SRC
+
+    #+BEGIN_SRC js
+      > 'abaa'.match(/a/g)
+      [ 'a', 'a', 'a' ]
+      > 'abaa'.match(/a/)
+      [ 'a', index: 0, input: 'abaa', groups: undefined ]
+      > 'abaa'.match(/^a/)
+      [ 'a', index: 0, input: 'abaa', groups: undefined ]
+      > 'For more information, see Chapter 3.4.5.1'.match(/see (chapter \d+(\.\d)*)/i)
+      [ 'see Chapter 3.4.5.1',
+        'Chapter 3.4.5.1',
+        '.1',
+        index: 22,
+        input: 'For more information, see Chapter 3.4.5.1',
+        groups: undefined ]
+      > 'abaa'.match(null)
+      null
+    #+END_SRC
+
+*** 其它字符串函数
+    - ~str.padStart()~, ~str.padEnd()~
+    - ~str.repeat()~
+    - ~str.trim()~, ~str.trimStart()~, ~str.trimEnd()~
+    - ~str.toUpperCase()~, ~str.toLowerCase()~
+    - ~str.split()~
+    #+BEGIN_SRC js
+      > 'abaa'.split()
+      [ 'abaa' ]
+      > 'abaa'.split('')
+      [ 'a', 'b', 'a', 'a' ]
+    #+END_SRC
+
 
 ** Object 对象
 *** 定义对象
