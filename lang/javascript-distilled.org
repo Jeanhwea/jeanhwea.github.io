@@ -156,6 +156,7 @@
        alert( 'finally' );
      }
    #+END_SRC
+
 * 函数
 ** 函数定义
    函数是 JavaScript 的重要工具，定义函数有以下几种方法
@@ -182,6 +183,12 @@
      // with a single argument
      let double = n => n * 2;
    #+END_SRC
+
+   箭头函数绑定了上下文，所以箭头函数有以下特点：
+   - 没有 ~this~
+   - 没有 ~arguments~
+   - 不能使用 ~new~ 来创建对象
+   - 没有 ~super~
 
 ** 带默认值的函数
    #+BEGIN_SRC js
@@ -213,9 +220,9 @@
     理函数的对象。使用 ~arguments~ 主要是兼容以前 JavaScript 不支持 Rest 参数
     #+BEGIN_SRC js
       function showName() {
-        alert( arguments.length );
-        alert( arguments[0] );
-        alert( arguments[1] );
+        console.log(arguments.length);
+        console.log(arguments[0]);
+        console.log(arguments[1]);
 
         // it's iterable
         // for(let arg of arguments) alert(arg);
@@ -290,6 +297,103 @@
       // But this won't work:
       func(); // Error, func is not defined (not visible outside of the function)
     #+END_SRC
+
+** 调度 setTimeout/setInterval
+   - ~setTimeout~ 设置一定计时后运行
+   - ~setInterval~ 设置一定周期运行函数
+   - ~clearTimeout/clearInterval~ 取消计时器
+
+*** setTimeout
+    #+BEGIN_SRC js
+      let timerId = setTimeout(func|code, delay[, arg1, arg2...])
+    #+END_SRC
+    - ~func~ 回调函数
+    - ~delay~ 延迟毫秒数
+    - ~arg1, arg2, ...~ 回调函数的参数
+    #+BEGIN_SRC js
+      function sayHi() {
+        console.log('Hello');
+      }
+
+      setTimeout(sayHi, 1000);
+    #+END_SRC
+
+    ~setTimeout(func,0)~ 是在定义后里面运行函数，这个可以实现异步调用，例如下面
+    的例子中会在显示 Hello 过后立马显示 World
+    #+BEGIN_SRC js
+      setTimeout(() => alert("World"), 0);
+
+      alert("Hello");
+    #+END_SRC
+    另外使用 ~setTimeout(func,0)~ 可以将高消耗 CPU 的工作放在初始化过后进行
+
+*** clearTimeout
+    #+BEGIN_SRC js
+      let timerId = setTimeout(...);
+      clearTimeout(timerId);
+    #+END_SRC
+
+*** setInterval
+    #+BEGIN_SRC js
+      let timerId = setInterval(func|code, delay[, arg1, arg2...])
+    #+END_SRC
+    参数和 ~setTimeout~ 类似
+
+    #+BEGIN_SRC js
+      // repeat with the interval of 2 seconds
+      let timerId = setInterval(() => alert('tick'), 2000);
+
+      // after 5 seconds stop
+      setTimeout(() => { clearInterval(timerId); alert('stop'); }, 5000);
+    #+END_SRC
+
+** 函数 ~this~ 绑定
+   - ~func.bind(context, ...args)~ 绑定 func 的 ~this~ 到 context，详见 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind][bind]]
+   - ~func.call(context, ...args)~ 绑定 func 的 ~this~ 到 context, 然后调用函数
+     func，将 =...args= 作为参数传入，详见 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call][call]]
+   - ~func.apply(context, args)~ 绑定 func 的 ~this~ 到 context, 然后调用函数
+     func，将 Array-like 的 =args= 作为参数传入，详见 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply][apply]]
+
+** Currying
+   Currying 将 ~f(a,b,c)~ 转化成 ~f(a)(b)(c)~ 这样的调用。一个简单的 curry 实现如
+   下：
+   #+BEGIN_SRC js
+     function curry(func) {
+
+       return function curried(...args) {
+         if (args.length >= func.length) {
+           return func.apply(this, args);
+         } else {
+           return function(...args2) {
+             return curried.apply(this, args.concat(args2));
+           }
+         }
+       };
+
+     }
+   #+END_SRC
+
+   lodash 库提供 [[https://lodash.com/docs/4.17.15#curry][_.curry]] 实现的工具函数
+   #+BEGIN_SRC js
+     var abc = function(a, b, c) {
+       return [a, b, c];
+     };
+
+     var curried = _.curry(abc);
+
+     curried(1)(2)(3);
+     // => [1, 2, 3]
+
+     curried(1, 2)(3);
+     // => [1, 2, 3]
+
+     curried(1, 2, 3);
+     // => [1, 2, 3]
+
+     // Curried with placeholders.
+     curried(1)(_, 3)(2);
+     // => [1, 2, 3]
+   #+END_SRC
 
 * 标准内置对象
 ** Number 数字
