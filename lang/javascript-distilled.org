@@ -47,44 +47,56 @@
      'number'
      >
    #+END_SRC
+** 类型
+*** 基本类型
+    JavaScript 的基本类型包括： ~string~, ~number~, ~boolean~, ~symbol~, ~null~
+    和 ~undefined~
+    - 普通对象都有相应的方法
+    - ~null~ 和 ~undefined~ 没有方法
 
-** 类型转换
-   转换成字符串
-   #+BEGIN_SRC js
-     > String(true)
-     'true'
-     > String(null)
-     'null'
-     > String(23)
-     '23'
-     >String(undefined)
-     'undefined'
-     > '' + 21
-     '21'
-     > 2 + 2 + '1'
-     '41'
-   #+END_SRC
-   转换成数值
-   #+BEGIN_SRC js
-     > "6" / "3"
-     2
-     > Number("234")
-     234
-     > Number("str")
-     NaN
-     > Number(null)
-     0
-     > Number(undefined)
-     NaN
-     > Number(true)
-     1
-     > Number(false)
-     0
-     > +'12.3'
-     12.3
-     > parseInt('23')
-     23
-   #+END_SRC
+    JavaScript 的基本类型有以下 =包装类= ，例如： ~String~, ~Number~, ~Boolean~
+    和 ~Symbol~
+
+*** 类型转换
+    转换成字符串
+    #+BEGIN_SRC js
+      > String(true)
+      'true'
+      > String(null)
+      'null'
+      > String(23)
+      '23'
+      >String(undefined)
+      'undefined'
+      > '' + 21
+      '21'
+      > 2 + 2 + '1'
+      '41'
+    #+END_SRC
+    转换成数值
+    #+BEGIN_SRC js
+      > "6" / "3"
+      2
+      > Number("234")
+      234
+      > Number("str")
+      NaN
+      > Number(null)
+      0
+      > Number(undefined)
+      NaN
+      > Number(true)
+      1
+      > Number(false)
+      0
+      > +'12.3'
+      12.3
+      > parseInt('23')
+      23
+      > parseFloat('3.14')
+      3.14
+    #+END_SRC
+
 * 控制流
 ** if 条件, switch case 多层条件控制
    #+BEGIN_SRC js
@@ -111,9 +123,8 @@
        default:
          alert( "I don't know such values" );
      }
-
-
    #+END_SRC
+
 ** while for 循环
    #+BEGIN_SRC js
      let i = 0;
@@ -131,7 +142,9 @@
        alert(i);
      }
    #+END_SRC
+
 * 函数
+  函数是 JavaScript 的重要工具，定义函数有以下几种方法
   #+BEGIN_SRC js
     function showMessage(from, text) {
       alert(from + ': ' + text);
@@ -164,49 +177,75 @@
     // with a single argument
     let double = n => n * 2;
   #+END_SRC
-* 字符串
-** 定义字符串
-   注意使用 =${...}= 表达式
-   #+BEGIN_SRC js
-     > "Double quote"
-     'Double quote'
-     > 'Single quote'
-     'Single quote'
-     > let name = 'Jack'
-     > `Hi, ${name}`
-     'Hi, Jack'
-     > `1 + 2 = ${1 + 2}`
-     '1 + 2 = 3'
-   #+END_SRC
-* 对象
-** 定义对象
-   #+BEGIN_SRC js
-     > let user1 = new Object()
-     > user1
-     {}
-     > let user2 = {}
-     > user2
-     {}
-     > let user3 = {name: 'Tom', age: 22}
-     > user3
-     { name: 'Tom', age: 22 }
-     > user3.name
-     'Tom'
-     > user3['name']
-     'Tom'
-     >
-   #+END_SRC
-** 对象操作方法
-*** 判断 key 是否存在
-   #+BEGIN_SRC js
-     let usr = {name: 'Tom', age: 22}
-     > 'name' in usr
-     true
-     > 'birthday' in usr
-     false
-     >
-   #+END_SRC
-*** 对象引用及复制
+
+* 数据类型及数据结构
+** Number 数字
+*** 转化成数字
+   - ~parseInt(str, base)~ 转化成整数
+   - ~parseFloat(str)~ 转化成浮点数
+
+*** 数字截断
+   主要有： ~Math.floor~ , ~Math.ceil~, ~Math.round~, ~Math.trunc~ 这些方法，例
+   子见下表
+
+   |      | Math.floor | Math.ceil | Math.round | Math.trunc |
+   |------+------------+-----------+------------+------------|
+   |  3.1 |          3 |         4 |          3 |          3 |
+   |  3.6 |          3 |         4 |          4 |          3 |
+   | -1.1 |         -2 |        -1 |         -1 |         -1 |
+   | -1.6 |         -2 |        -1 |         -2 |         -1 |
+
+
+** String 字符串
+*** 定义字符串
+    注意使用 =${...}= 表达式
+    #+BEGIN_SRC js
+      > "Double quote"
+      'Double quote'
+      > 'Single quote'
+      'Single quote'
+      > let name = 'Jack'
+      > `Hi, ${name}`
+      'Hi, Jack'
+      > `1 + 2 = ${1 + 2}`
+      '1 + 2 = 3'
+    #+END_SRC
+
+** Object 对象
+*** 定义对象
+    #+BEGIN_SRC js
+      > let user1 = new Object()
+      > user1
+      {}
+      > let user2 = {}
+      > user2
+      {}
+      > let user3 = {name: 'Tom', age: 22}
+      > user3
+      { name: 'Tom', age: 22 }
+      > user3.name
+      'Tom'
+      > user3['name']
+      'Tom'
+      >
+    #+END_SRC
+
+*** 对象基本操作
+    - 引用对象中的值
+      + 点方式： ~obj.key~
+      + 方括号方式： ~obj['key']~
+    - 删除对象中的值 ~delete obj.key~
+    - 判断对象中是否存在键 ~'key' in obj~
+    #+BEGIN_SRC js
+      let usr = {name: 'Tom', age: 22}
+      > 'name' in usr
+      true
+      > 'birthday' in usr
+      false
+      >
+    #+END_SRC
+
+*** 对象引用/复制
     ~=~ 赋值是引用
     #+BEGIN_SRC js
       > obj1 = {a:'Apple', b:1}
@@ -220,7 +259,8 @@
       >
     #+END_SRC
 
-    ~Object.assign(...)~ 可以实现复制传值
+    ~Object.assign(...)~ 可以实现复制传值，或者使用 lodash 库中的
+    [[https://lodash.com/docs#cloneDeep][_.cloneDeep(obj)]]
     #+BEGIN_SRC js
       > obj3 = Object.assign({}, obj1)
       { a: 'Apple', b: 7 }
@@ -260,7 +300,7 @@
       >
     #+END_SRC
 
-*** 更新对象值
+*** 更新对象
     ~Object.assign(dest[, src1, src2, src3...])~ 可以批量更新对象中的数值。
     #+BEGIN_SRC js
       > usr
@@ -269,144 +309,183 @@
       { name: 'Jackson', age: 22, foo: undefined }
       >
     #+END_SRC
-* 数组
- 数组是具有固定长度 (~arr.length~) 的同一类元素的集合，具体参考 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array][MDN]] 中的定义。
 
-** 创建
-   #+BEGIN_SRC js
-     > let fruits = ['Apple', 'Banana', 'Orange']
-     undefined
-     > fruits.length
-     3
-   #+END_SRC
+** Array 数组
+  数组是具有固定长度 (~arr.length~) 的同一类元素的集合，具体参考 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array][MDN]] 中的定义。
 
-** 修改元素：添加/删除
-   - ~push(...items)~ : 添加元素到数组结尾
-   - ~pop()~ : 移除结尾的元素
-   - ~shift()~ : 删除起始的元素
-   - ~unshift(...items)~ : 添加元素到数组起始
-   #+BEGIN_SRC js
-     > fruits
-     [ 'Apple', 'Banana', 'Orange' ]
-     > fruits.push('Grape')
-     4
-     > fruits
-     [ 'Apple', 'Banana', 'Orange', 'Grape' ]
-     > fruits.pop()
-     'Grape'
-     > fruits
-     [ 'Apple', 'Banana', 'Orange' ]
-     > fruits.shift()
-     'Apple'
-     > fruits
-     [ 'Banana', 'Orange' ]
-     > fruits.unshift('Apple')
-     3
-     > fruits
-     [ 'Apple', 'Banana', 'Orange' ]
-     >
-   #+END_SRC
+*** 创建
+    #+BEGIN_SRC js
+      > let fruits = ['Apple', 'Banana', 'Orange']
+      undefined
+      > fruits.length
+      3
+    #+END_SRC
 
-   - ~splice(pos, deleteCount, ...items)~ : 在 ~pos~ 位置删除 ~deleteCount~ 个元
-     素然后插入 ~items~
-   - ~slice(start, end)~ : 创建一个新的数组, 复制 ~start~ 到 ~end~ (不包含) 到新
-     的数组中
-   - ~concat(...items)~ : 返回一个新的数组: 拷贝当前数组的所有元素然后添加
-     ~items~ 到新的数组中. 如果任何 ~items~ 是一个数组, 数组里面的元素都会添加的
-     新的数组中
-   #+BEGIN_SRC js
-     > fruits
-     [ 'Apple', 'Banana', 'Orange' ]
-     > let new_fruits = fruits.slice(0, 2)
-     > new_fruits
-     [ 'Apple', 'Banana' ]
-     > fruits.splice(1, 1)
-     [ 'Banana' ]
-     > fruits
-     [ 'Apple', 'Orange' ]
-     > fruits
-     [ 'Apple', 'Orange' ]
-     > fruits.splice(1, 0, 'Pear')
-     []
-     > fruits
-     [ 'Apple', 'Pear', 'Orange' ]
-     > fruits.concat('Banana')
-     [ 'Apple', 'Pear', 'Orange', 'Banana' ]
-     > fruits
-     [ 'Apple', 'Pear', 'Orange' ]
-     >
-   #+END_SRC
+*** 修改元素：添加/删除
+    - ~push(...items)~ : 添加元素到数组结尾
+    - ~pop()~ : 移除结尾的元素
+    - ~shift()~ : 删除起始的元素
+    - ~unshift(...items)~ : 添加元素到数组起始
+    #+BEGIN_SRC js
+      > fruits
+      [ 'Apple', 'Banana', 'Orange' ]
+      > fruits.push('Grape')
+      4
+      > fruits
+      [ 'Apple', 'Banana', 'Orange', 'Grape' ]
+      > fruits.pop()
+      'Grape'
+      > fruits
+      [ 'Apple', 'Banana', 'Orange' ]
+      > fruits.shift()
+      'Apple'
+      > fruits
+      [ 'Banana', 'Orange' ]
+      > fruits.unshift('Apple')
+      3
+      > fruits
+      [ 'Apple', 'Banana', 'Orange' ]
+      >
+    #+END_SRC
 
-** 查找
-   - ~indexOf/lastIndexOf(item, pos)~ : 查找 ~item~ , 起始位置是~pos~ , 如果没有
-     找到则返回 ~-1~
-   - ~includes(value)~ : 返回 ~true~ 如果数组包含 ~value~ , 否则 ~false~
-   - ~find/filter(func)~ : 使用谓词函数过滤数组, 返回第一个/所有的使得谓词函数成
-     立的元素
-   - ~findIndex(func)~ : 和 ~find~ 相似, 但是返回下标索引而不是数组元素
-   #+BEGIN_SRC js
-     > fruits
-     [ 'Apple', 'Pear', 'Orange' ]
-     > fruits.indexOf('Pear')
-     1
-     > fruits.indexOf('Banana')
-     -1
-     > fruits.find(function (e) { return e.length >= 5;})
-     'Apple'
-     > fruits.filter(function (e) { return e.length >= 5;})
-     [ 'Apple', 'Orange' ]
-     > fruits.includes('Banana')
-     false
-     > fruits.includes('Pear')
-     true
-     > 'Banana' in fruits
-     false
-     > 'Pear' in fruits
-     false
-   #+END_SRC
+    - ~splice(pos, deleteCount, ...items)~ : 在 ~pos~ 位置删除 ~deleteCount~ 个元
+      素然后插入 ~items~
+    - ~slice(start, end)~ : 创建一个新的数组, 复制 ~start~ 到 ~end~ (不包含) 到新
+      的数组中
+    - ~concat(...items)~ : 返回一个新的数组: 拷贝当前数组的所有元素然后添加
+      ~items~ 到新的数组中. 如果任何 ~items~ 是一个数组, 数组里面的元素都会添加的
+      新的数组中
+    #+BEGIN_SRC js
+      > fruits
+      [ 'Apple', 'Banana', 'Orange' ]
+      > let new_fruits = fruits.slice(0, 2)
+      > new_fruits
+      [ 'Apple', 'Banana' ]
+      > fruits.splice(1, 1)
+      [ 'Banana' ]
+      > fruits
+      [ 'Apple', 'Orange' ]
+      > fruits
+      [ 'Apple', 'Orange' ]
+      > fruits.splice(1, 0, 'Pear')
+      []
+      > fruits
+      [ 'Apple', 'Pear', 'Orange' ]
+      > fruits.concat('Banana')
+      [ 'Apple', 'Pear', 'Orange', 'Banana' ]
+      > fruits
+      [ 'Apple', 'Pear', 'Orange' ]
+      >
+    #+END_SRC
 
-** 迭代
-   - ~forEach(func)~ : 调用 ~func~ 处理所有的数组里的元素, 但是不返回
-   #+BEGIN_SRC js
-     ['Apple', 'Banana', 'Orange'].forEach(function(e, i, arr) {
-       console.log(i + " : " + e)
-     })
-   #+END_SRC
+*** 查找
+    - ~indexOf/lastIndexOf(item, pos)~ : 查找 ~item~ , 起始位置是~pos~ , 如果没有
+      找到则返回 ~-1~
+    - ~includes(value)~ : 返回 ~true~ 如果数组包含 ~value~ , 否则 ~false~
+    - ~find/filter(func)~ : 使用谓词函数过滤数组, 返回第一个/所有的使得谓词函数成
+      立的元素
+    - ~findIndex(func)~ : 和 ~find~ 相似, 但是返回下标索引而不是数组元素
+    #+BEGIN_SRC js
+      > fruits
+      [ 'Apple', 'Pear', 'Orange' ]
+      > fruits.indexOf('Pear')
+      1
+      > fruits.indexOf('Banana')
+      -1
+      > fruits.find(function (e) { return e.length >= 5;})
+      'Apple'
+      > fruits.filter(function (e) { return e.length >= 5;})
+      [ 'Apple', 'Orange' ]
+      > fruits.includes('Banana')
+      false
+      > fruits.includes('Pear')
+      true
+      > 'Banana' in fruits
+      false
+      > 'Pear' in fruits
+      false
+    #+END_SRC
 
-** 数组变换
-   - ~map(func)~ : 调用 ~func~ 处理所有数组里的元素，返回处理结果集构成的新数组
-   - ~sort(func)~ : 使用 ~func~ 排序数组，然后返回
-   - ~reverse()~ : 返回逆序的数组
-   - ~split/join~ : 在字符串和数组之间转换
-   - ~reduce(func, initial)~ : 计算得出一个值， 通过调用 ~func~ 函数处理起始值和
-     中间值
-   #+BEGIN_SRC js
-     > fruits
-     [ 'Apple', 'Pear', 'Orange' ]
-     > fruits.map(function(e) { return e.toUpperCase();})
-     [ 'APPLE', 'PEAR', 'ORANGE' ]
-     > fruits.reduce(function(a, e) { return a+':'+e;}, '')
-     ':Apple:Pear:Orange'
-     > fruits.join(':')
-     'Apple:Pear:Orange'
-     > 'Apple:Pear:Orange'.split(':')
-     [ 'Apple', 'Pear', 'Orange' ]
-     > fruits.sort()
-     [ 'Apple', 'Orange', 'Pear' ]
-     > fruits
-     [ 'Apple', 'Orange', 'Pear' ]
-     > fruits.sort(function(a,b) {return a.length>b.length?1:-1;})
-     [ 'Pear', 'Apple', 'Orange' ]
-     > fruits.reverse()
-     [ 'Orange', 'Apple', 'Pear' ]
-     >
-   #+END_SRC
+*** 迭代
+    - ~forEach(func)~ : 调用 ~func~ 处理所有的数组里的元素, 但是不返回
+    #+BEGIN_SRC js
+      ['Apple', 'Banana', 'Orange'].forEach(function(e, i, arr) {
+        console.log(i + " : " + e)
+      })
+    #+END_SRC
 
-** 其它
-   - ~Array.isArray(arr)~ : 检查 ~arr~ 是否是数组对象
-   - ~arr.some(fn)~ / ~arr.every(fn)~ : 调用 ~fn~ 作用于数组所有元素，如果任何/
-     所有的都返回 ~true~, 则返回 ~true~, 否则返回 ~false~
-   - ~arr.fill(value, start, end)~ : 使用 ~value~ 填充数组 ~start~ 到 ~end~ 位置
-     的元素
-   - ~arr.copyWithin(target, start, end)~ : 复制数组 ~start~ 到 ~end~ 位置中的元
-     素到自身 ~target~ 位置中, 注意会覆盖已存在的元素
+*** 数组变换
+    - ~map(func)~ : 调用 ~func~ 处理所有数组里的元素，返回处理结果集构成的新数组
+    - ~sort(func)~ : 使用 ~func~ 排序数组，然后返回
+    - ~reverse()~ : 返回逆序的数组
+    - ~split/join~ : 在字符串和数组之间转换
+    - ~reduce(func, initial)~ : 计算得出一个值， 通过调用 ~func~ 函数处理起始值和
+      中间值
+    #+BEGIN_SRC js
+      > fruits
+      [ 'Apple', 'Pear', 'Orange' ]
+      > fruits.map(function(e) { return e.toUpperCase();})
+      [ 'APPLE', 'PEAR', 'ORANGE' ]
+      > fruits.reduce(function(a, e) { return a+':'+e;}, '')
+      ':Apple:Pear:Orange'
+      > fruits.join(':')
+      'Apple:Pear:Orange'
+      > 'Apple:Pear:Orange'.split(':')
+      [ 'Apple', 'Pear', 'Orange' ]
+      > fruits.sort()
+      [ 'Apple', 'Orange', 'Pear' ]
+      > fruits
+      [ 'Apple', 'Orange', 'Pear' ]
+      > fruits.sort(function(a,b) {return a.length>b.length?1:-1;})
+      [ 'Pear', 'Apple', 'Orange' ]
+      > fruits.reverse()
+      [ 'Orange', 'Apple', 'Pear' ]
+      >
+    #+END_SRC
+
+*** 其它
+    - ~Array.isArray(arr)~ : 检查 ~arr~ 是否是数组对象
+    - ~arr.some(fn)~ / ~arr.every(fn)~ : 调用 ~fn~ 作用于数组所有元素，如果任何/
+      所有的都返回 ~true~, 则返回 ~true~, 否则返回 ~false~
+    - ~arr.fill(value, start, end)~ : 使用 ~value~ 填充数组 ~start~ 到 ~end~ 位置
+      的元素
+    - ~arr.copyWithin(target, start, end)~ : 复制数组 ~start~ 到 ~end~ 位置中的元
+      素到自身 ~target~ 位置中, 注意会覆盖已存在的元素
+
+* 面向对象知识
+** ~new~ 关键字和构造器
+*** 构造器
+    JavaScript 中没有所谓的构造器，它的构造器实际上是一个函数，该函数满足以下两
+    点：
+    1. 函数名称使用 Pascal case 命名
+    2. 函数只能使用 ~new~ 操作符来执行
+
+    例如：
+    #+BEGIN_SRC js
+      function User(name) {
+        this.name = name;
+        this.isAdmin = false;
+      }
+
+      let user = new User("Jack");
+
+      alert(user.name); // Jack
+      alert(user.isAdmin); // false
+    #+END_SRC
+
+*** ~new~ 操作符
+    ~new~ 操作符做了以下的事情:
+    1. 新建了函数作用域的 ~this~ 对象
+    2. 并且将新创建的 ~this~ 对象返回
+    该过程大致如下面代码所示：
+    #+BEGIN_SRC js
+      function User(name) {
+        // this = {};  (implicitly)
+
+        // add properties to this
+        this.name = name;
+        this.isAdmin = false;
+
+        // return this;  (implicitly)
+      }
+    #+END_SRC
