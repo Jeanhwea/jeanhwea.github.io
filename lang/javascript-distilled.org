@@ -524,7 +524,7 @@
       [ 'f', 'o', 'o' ]
     #+END_SRC
 
-** Map/Set
+** Map/Set 等标准内置对象
    [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map][Map]] , WeakMap, [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set][Set]], WeakSet 等都是常用的 Javascript 对象，具体参考 MDN 中的定
    义 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects][ Standard built-in objects]]
 
@@ -598,6 +598,8 @@
    #+END_SRC
 
 ** Object 对象
+   [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object][Object]] 是 JavaScript 中的对象
+
 *** 定义对象
     #+BEGIN_SRC js
       > let user1 = new Object()
@@ -693,6 +695,108 @@
       { name: 'Tom', age: 22, foo: undefined }
       > Object.assign(usr, {name: 'Jackson'})
       { name: 'Jackson', age: 22, foo: undefined }
+      >
+    #+END_SRC
+
+*** 对象的键和值
+    - ~Object.keys(obj)~ 返回 obj 的键
+    - ~Object.values(obj)~ 返回 obj 的值
+    - ~Object.entries(obj)~ 返回 obj 的 [key, value] 对
+
+    #+BEGIN_SRC js
+      > let o1 = {apple:1, banana:2, orange:3}
+      > o1
+      { apple: 1, banana: 2, orange: 3 }
+      > Object.keys(o1)
+      [ 'apple', 'banana', 'orange' ]
+      > o1.keys()
+      TypeError: o1.keys is not a function
+      > Object.values(o1)
+      [ 1, 2, 3 ]
+      > Object.entries(o1)
+      [ [ 'apple', 1 ], [ 'banana', 2 ], [ 'orange', 3 ] ]
+      >
+    #+END_SRC
+
+** Date 时间和日期
+   [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date][Date]] 是表示时间和日期的内置对象
+
+*** 创建日期对象
+    ~new Date()~, ~new Date(milliseconds)~ 和 ~new Date(date_str)~ 可以创建日期
+    对象
+    #+BEGIN_SRC js
+      > new Date()
+      2019-07-30T06:58:04.792Z
+      > new Date(123124123)
+      1970-01-02T10:12:04.123Z
+      > new Date("2017-01-26")
+      2017-01-26T00:00:00.000Z
+    #+END_SRC
+
+*** 时间函数
+    具体见下面的样例
+    #+BEGIN_SRC js
+      > let now = new Date()
+      > now.getFullYear()
+      2019
+      > now.getYear()
+      119
+      > now.getMonth()
+      6
+      > now.getDate()
+      30
+      > now.getHours()
+      15
+      > now.getMinutes()
+      5
+      > now.getSeconds()
+      21
+      > now.getMilliseconds()
+      725
+      > now.getDay()
+      2
+      >
+    #+END_SRC
+
+*** 时间戳
+    时间戳有以下函数
+    #+BEGIN_SRC js
+      // get timestamp
+      > now
+      2019-07-30T07:05:21.725Z
+      > now.getTime()
+      1564470321725
+      > +now
+      1564470321725
+      > Date.now()
+      1564470538021
+
+      // time diff
+      > new Date() - now
+      260547
+    #+END_SRC
+
+*** 字符串和 Date 互转
+    ~Date.parse(str)~, str 应满足 =YYYY-MM-DDTHH:mm:ss.sssZ= 格式
+    #+BEGIN_SRC js
+      > Date.parse('2012-01-26T13:51:50.417-07:00');
+      1327611110417
+    #+END_SRC
+
+    Date 转字符串有以下方法
+    #+BEGIN_SRC js
+      > now.toJSON()
+      '2019-07-30T07:05:21.725Z'
+      > now.toDateString()
+      'Tue Jul 30 2019'
+      > now.toISOString()
+      '2019-07-30T07:05:21.725Z'
+      > now.toString()
+      'Tue Jul 30 2019 15:05:21 GMT+0800 (GMT+08:00)'
+      > now.toTimeString()
+      '15:05:21 GMT+0800 (GMT+08:00)'
+      > now.toUTCString()
+      'Tue, 30 Jul 2019 07:05:21 GMT'
       >
     #+END_SRC
 
