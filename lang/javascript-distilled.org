@@ -144,42 +144,154 @@
      }
    #+END_SRC
 
+** try catch 处理异常
+   异常一般用到的比较少，这里先记上
+   #+BEGIN_SRC js
+     try {
+       alert( 'try' );
+       if (confirm('Make an error?')) BAD_CODE();
+     } catch (e) {
+       alert( 'catch' );
+     } finally {
+       alert( 'finally' );
+     }
+   #+END_SRC
 * 函数
-  函数是 JavaScript 的重要工具，定义函数有以下几种方法
-  #+BEGIN_SRC js
-    function showMessage(from, text) {
-      alert(from + ': ' + text);
-    }
-    function showMessage2(from, text='hello') {
-      alert(from + ': ' + text);
-    }
+** 函数定义
+   函数是 JavaScript 的重要工具，定义函数有以下几种方法
+   #+BEGIN_SRC js
+     function sum(a, b) {
+       let result = a + b;
+       return result;
+     }
+     let sum = function(a, b) {
+       let result = a + b;
+       return result;
+     }
 
-    function sum(a, b) {
-      let result = a + b;
-      return result;
-    }
-    let sum = function(a, b) {
-      let result = a + b;
-      return result;
-    }
+     // expression at the right side
+     let sum = (a, b) => a + b;
+     // or multi-line syntax with { ... }, need return here:
+     let sum = (a, b) => {
+       // ...
+       return a + b;
+     }
 
-    // expression at the right side
-    let sum = (a, b) => a + b;
+     // without arguments
+     let sayHi = () => alert("Hello");
+     // with a single argument
+     let double = n => n * 2;
+   #+END_SRC
 
-    // or multi-line syntax with { ... }, need return here:
-    let sum = (a, b) => {
-      // ...
-      return a + b;
-    }
+** 带默认值的函数
+   #+BEGIN_SRC js
+     function showMessage(from, text) {
+       alert(from + ': ' + text);
+     }
+     function showMessage2(from, text='hello') {
+       alert(from + ': ' + text);
+     }
+   #+END_SRC
 
-    // without arguments
-    let sayHi = () => alert("Hello");
+** Rest 参数和 =...= 操作符
+*** Rest 参数
+    JavaScript 中的三点操作符 =...= 可以定义变长的参数
+    #+BEGIN_SRC js
+      function sumAll(...args) { // args is the name for the array
+        let sum = 0;
+        for (let arg of args) sum += arg;
+        return sum;
+      }
 
-    // with a single argument
-    let double = n => n * 2;
-  #+END_SRC
+      sumAll(1); // 1
+      sumAll(1, 2); // 3
+      sumAll(1, 2, 3); // 6
+    #+END_SRC
 
-* 数据类型及数据结构
+*** ~arguments~ 变量
+    JavaScript 的每个函数中都默认传入一个 Array-like 的 ~arguments~ 变量，用于处
+    理函数的对象。使用 ~arguments~ 主要是兼容以前 JavaScript 不支持 Rest 参数
+    #+BEGIN_SRC js
+      function showName() {
+        alert( arguments.length );
+        alert( arguments[0] );
+        alert( arguments[1] );
+
+        // it's iterable
+        // for(let arg of arguments) alert(arg);
+      }
+
+      // shows: 2, Julius, Caesar
+      showName("Julius", "Caesar");
+      // shows: 1, Ilya, undefined (no second argument)
+      showName("Ilya");
+    #+END_SRC
+
+*** =...= 操作符
+    =...= 可以将数组中作为变长参数传入函数中
+    #+BEGIN_SRC js
+      > arr = [1, 2, 5]
+      [ 1, 2, 5 ]
+      > Math.max(1,2,5)
+      5
+      > Math.max(arr)
+      NaN
+      > Math.max(...arr)
+      5
+    #+END_SRC
+
+    =...= 可以合并数组
+    #+BEGIN_SRC js
+      > let a = [1, 3, 5];
+      > let b = [2, 4, 6];
+      > [...a, ...b]
+      [ 1, 3, 5, 2, 4, 6 ]
+      > Math.max(9, ...a, ...b)
+      9
+      >
+    #+END_SRC
+
+** 函数对象和 NFE
+   JavaScript 中函数也是一种对象，所以函数都是 ~Function~ 的实例。NFE 是命名函数
+   表达式（Named Function Expression）。
+
+*** 函数对象
+    - 函数对象都包含 =name= 属性，表示函数的名称
+    - 函数对象包含 =length= 属性，表示函数的参数的长度
+    #+BEGIN_SRC js
+      > function sayHi() { console.log('hello'); }
+      > sayHi.name
+      'sayHi'
+      > sayHi.length
+      0
+      >
+    #+END_SRC
+
+*** NFE
+    NFE 在函数定义赋值前重新添加一个函数名称，具体如下：
+    #+BEGIN_SRC js
+      let sayHi = function func(who) { // additional func as name
+        alert(`Hello, ${who}`);
+      };
+    #+END_SRC
+    这样定义的好处是：
+    - func 函数名对函数内部可见
+    - func 函数名对函数外部不可见
+    #+BEGIN_SRC js
+      let sayHi = function func(who) {
+        if (who) {
+          alert(`Hello, ${who}`);
+        } else {
+          func("Guest"); // use func to re-call itself
+        }
+      };
+
+      sayHi(); // Hello, Guest
+      // But this won't work:
+      func(); // Error, func is not defined (not visible outside of the function)
+    #+END_SRC
+
+* 标准内置对象
 ** Number 数字
 *** 转化成数字
     - ~parseInt(str, base)~ 转化成整数
