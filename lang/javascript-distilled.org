@@ -225,7 +225,7 @@
     #+END_SRC
 
 ** String 字符串
-   String 对象在 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String][MSDN]] 中有详细的介绍
+   String 对象在 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String][MDN]] 中有详细的介绍
 *** 定义字符串
     注意使用 =${...}= 表达式
     #+BEGIN_SRC js
@@ -332,106 +332,6 @@
       [ 'abaa' ]
       > 'abaa'.split('')
       [ 'a', 'b', 'a', 'a' ]
-    #+END_SRC
-
-
-** Object 对象
-*** 定义对象
-    #+BEGIN_SRC js
-      > let user1 = new Object()
-      > user1
-      {}
-      > let user2 = {}
-      > user2
-      {}
-      > let user3 = {name: 'Tom', age: 22}
-      > user3
-      { name: 'Tom', age: 22 }
-      > user3.name
-      'Tom'
-      > user3['name']
-      'Tom'
-      >
-    #+END_SRC
-
-*** 对象基本操作
-    - 引用对象中的值
-      + 点方式： ~obj.key~
-      + 方括号方式： ~obj['key']~
-    - 删除对象中的值 ~delete obj.key~
-    - 判断对象中是否存在键 ~'key' in obj~
-    #+BEGIN_SRC js
-      let usr = {name: 'Tom', age: 22}
-      > 'name' in usr
-      true
-      > 'birthday' in usr
-      false
-      >
-    #+END_SRC
-
-*** 对象引用/复制
-    ~=~ 赋值是引用
-    #+BEGIN_SRC js
-      > obj1 = {a:'Apple', b:1}
-      { a: 'Apple', b: 1 }
-      > obj2 = obj1
-      { a: 'Apple', b: 1 }
-      > obj2.b = 7
-      7
-      > obj1
-      { a: 'Apple', b: 7 }
-      >
-    #+END_SRC
-
-    ~Object.assign(...)~ 可以实现复制传值，或者使用 lodash 库中的
-    [[https://lodash.com/docs#cloneDeep][_.cloneDeep(obj)]]
-    #+BEGIN_SRC js
-      > obj3 = Object.assign({}, obj1)
-      { a: 'Apple', b: 7 }
-      > obj3.b = 9
-      9
-      > obj1
-      { a: 'Apple', b: 7 }
-      >
-    #+END_SRC
-
-    下面是更多的传值的示例
-    #+BEGIN_SRC js
-      > usr
-      { name: 'Tom', age: 22, foo: undefined }
-      > usr1 = usr
-      { name: 'Tom', age: 22, foo: undefined }
-      > usr1 == usr
-      true
-      > usr1 === usr
-      true
-      > let _usr = {}
-      > for (k in usr) { _usr[k] = usr[k]; }
-      > _usr
-      { name: 'Tom', age: 22, foo: undefined }
-      > _usr == usr
-      false
-      > _usr === usr
-      false
-      > usr
-      { name: 'Jackson', age: 22, foo: undefined }
-      > delete usr.foo
-      true
-      > usr
-      { name: 'Jackson', age: 22 }
-      > 'foo' in usr
-      false
-      >
-    #+END_SRC
-
-*** 更新对象
-    ~Object.assign(dest[, src1, src2, src3...])~ 可以批量更新对象中的数值。
-    #+BEGIN_SRC js
-      > usr
-      { name: 'Tom', age: 22, foo: undefined }
-      > Object.assign(usr, {name: 'Jackson'})
-      { name: 'Jackson', age: 22, foo: undefined }
-      >
     #+END_SRC
 
 ** Array 数组
@@ -575,6 +475,226 @@
       的元素
     - ~arr.copyWithin(target, start, end)~ : 复制数组 ~start~ 到 ~end~ 位置中的元
       素到自身 ~target~ 位置中, 注意会覆盖已存在的元素
+
+** 迭代器/数组类似物
+*** Array-like 和 Iterable
+    - =Iterable= 是实现了 =Symbol.iterator= 方法的对象
+      + =Symbol.iterator= 必须包含 =next()= 方法
+      + =next()= 方法必须返回像 ~{done: Boolean, value: any}~ 这样的对象，done 为
+        ~true~ 表示迭代器结束
+      + =Iterable= 主要是使用 =for..of= 迭代器进行迭代
+    - =Array-like= 是含义 =length= 属性和可索引的对象
+
+    #+BEGIN_SRC js
+      let arrayLike = { // has indexes and length => array-like
+        0: "Hello",
+        1: "World",
+        length: 2
+      };
+
+      let iterable = {
+        from: 1,
+        to: 5,
+        // 1. call to for..of initially calls this
+        [Symbol.iterator]() {
+          this.current = this.from;
+          // 2. ...it returns the iterator:
+          return this;
+        },
+        // 3. next() is called on each iteration by the for..of loop
+        next() {
+          // 4. it should return the value as an object {done:.., value :...}
+          if (this.current <= this.to) {
+            return { done: false, value: this.current++ };
+          } else {
+            return { done: true };
+          }
+        }
+        }
+      }
+
+      for (let num of iterable) { console.log(num); } // => prints 1, 2, 3, 4, 5
+    #+END_SRC
+
+*** ~Array.from~
+    ~Array.from(arrayLike[,mapFn[,thisArg]])~ 通过 Array-like 的对象来新建一个真
+    的 Array，例如字符串 ~'foo'~ 是 Array-like 对象，因此可以建立一个新的数组
+    #+BEGIN_SRC js
+      > Array.from('foo');
+      [ 'f', 'o', 'o' ]
+    #+END_SRC
+
+** Map/Set
+   [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map][Map]] , WeakMap, [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set][Set]], WeakSet 等都是常用的 Javascript 对象，具体参考 MDN 中的定
+   义 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects][ Standard built-in objects]]
+
+   Map 对象操作
+   #+BEGIN_SRC js
+     let map = new Map();
+
+     map.set('1', 'str1');   // a string key
+     map.set(1, 'num1');     // a numeric key
+     map.set(true, 'bool1'); // a boolean key
+
+     // remember the regular Object? it would convert keys to string
+     // Map keeps the type, so these two are different:
+     alert( map.get(1)   ); // 'num1'
+     alert( map.get('1') ); // 'str1'
+
+     alert( map.size ); // 3
+
+     let recipeMap = new Map([
+       ['cucumber', 500],
+       ['tomatoes', 350],
+       ['onion',    50]
+     ]);
+
+     // iterate over keys (vegetables)
+     for (let vegetable of recipeMap.keys()) {
+       alert(vegetable); // cucumber, tomatoes, onion
+     }
+
+     // iterate over values (amounts)
+     for (let amount of recipeMap.values()) {
+       alert(amount); // 500, 350, 50
+     }
+
+     // iterate over [key, value] entries
+     for (let entry of recipeMap) { // the same as of recipeMap.entries()
+       alert(entry); // cucumber,500 (and so on)
+     }
+   #+END_SRC
+
+   Set 集合函数
+   #+BEGIN_SRC js
+     let set = new Set();
+
+     let john = { name: "John" };
+     let pete = { name: "Pete" };
+     let mary = { name: "Mary" };
+
+     // visits, some users come multiple times
+     set.add(john);
+     set.add(pete);
+     set.add(mary);
+     set.add(john);
+     set.add(mary);
+
+     // set keeps only unique values
+     alert( set.size ); // 3
+
+     for (let user of set) {
+       alert(user.name); // John (then Pete and Mary)
+     }
+
+     let set = new Set(["oranges", "apples", "bananas"]);
+
+     for (let value of set) alert(value);
+
+     // the same with forEach:
+     set.forEach((value, valueAgain, set) => {
+       alert(value);
+     });
+   #+END_SRC
+
+** Object 对象
+*** 定义对象
+    #+BEGIN_SRC js
+      > let user1 = new Object()
+      > user1
+      {}
+      > let user2 = {}
+      > user2
+      {}
+      > let user3 = {name: 'Tom', age: 22}
+      > user3
+      { name: 'Tom', age: 22 }
+      > user3.name
+      'Tom'
+      > user3['name']
+      'Tom'
+      >
+    #+END_SRC
+
+*** 对象基本操作
+    - 引用对象中的值
+      + 点方式： ~obj.key~
+      + 方括号方式： ~obj['key']~
+    - 删除对象中的值 ~delete obj.key~
+    - 判断对象中是否存在键 ~'key' in obj~
+    #+BEGIN_SRC js
+      let usr = {name: 'Tom', age: 22}
+      > 'name' in usr
+      true
+      > 'birthday' in usr
+      false
+      >
+    #+END_SRC
+
+*** 对象引用/复制
+    ~=~ 赋值是引用
+    #+BEGIN_SRC js
+      > obj1 = {a:'Apple', b:1}
+      { a: 'Apple', b: 1 }
+      > obj2 = obj1
+      { a: 'Apple', b: 1 }
+      > obj2.b = 7
+      7
+      > obj1
+      { a: 'Apple', b: 7 }
+      >
+    #+END_SRC
+
+    ~Object.assign(...)~ 可以实现复制传值，或者使用 lodash 库中的
+    [[https://lodash.com/docs#cloneDeep][_.cloneDeep(obj)]]
+    #+BEGIN_SRC js
+      > obj3 = Object.assign({}, obj1)
+      { a: 'Apple', b: 7 }
+      > obj3.b = 9
+      9
+      > obj1
+      { a: 'Apple', b: 7 }
+      >
+    #+END_SRC
+
+    下面是更多的传值的示例
+    #+BEGIN_SRC js
+      > usr
+      { name: 'Tom', age: 22, foo: undefined }
+      > usr1 = usr
+      { name: 'Tom', age: 22, foo: undefined }
+      > usr1 == usr
+      true
+      > usr1 === usr
+      true
+      > let _usr = {}
+      > for (k in usr) { _usr[k] = usr[k]; }
+      > _usr
+      { name: 'Tom', age: 22, foo: undefined }
+      > _usr == usr
+      false
+      > _usr === usr
+      false
+      > usr
+      { name: 'Jackson', age: 22, foo: undefined }
+      > delete usr.foo
+      true
+      > usr
+      { name: 'Jackson', age: 22 }
+      > 'foo' in usr
+      false
+      >
+    #+END_SRC
+
+*** 更新对象
+    ~Object.assign(dest[, src1, src2, src3...])~ 可以批量更新对象中的数值。
+    #+BEGIN_SRC js
+      > usr
+      { name: 'Tom', age: 22, foo: undefined }
+      > Object.assign(usr, {name: 'Jackson'})
+      { name: 'Jackson', age: 22, foo: undefined }
+      >
+    #+END_SRC
 
 * 面向对象知识
 ** ~new~ 关键字和构造器
