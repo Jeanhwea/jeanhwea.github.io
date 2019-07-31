@@ -37,7 +37,7 @@
       >>>
     #+END_SRC
 
-** 内置类型
+** 内置基本类型
    Python 是弱类型的语言，但也会涉及到 6 个基本类型
 
    - ~int/long~ : 过大的 int 类型会被自动转化为 long 类型
@@ -68,8 +68,32 @@
        diff = dt1 - dt2
      #+END_SRC
 
+   需要注意的是：
    1. str、bool、int 和 float 同时也是显式类型转换函数
    2. 除字符串和元组外，Python 中的绝大多数对象都是可变的
+
+** 推导表达式
+   推导表达式是 Python 的语法糖，可以使用简洁的方式来处理生成新的列表、集合或字典
+
+*** 列表推导
+    #+BEGIN_SRC python
+      [expr for val in collection if condition]
+    #+END_SRC
+
+*** 字典推导
+    #+BEGIN_SRC python
+      {key-expr : value-expr for value in collection if condition}
+    #+END_SRC
+
+*** 集合推导
+    #+BEGIN_SRC python
+      (expr for val in collection if condition)
+    #+END_SRC
+
+*** 嵌套列表
+    #+BEGIN_SRC python
+      [expr for val in collection for innerVal in val if condition]
+    #+END_SRC
 
 * 控制流
 ** if 条件语句
@@ -101,6 +125,10 @@
      ages = [12, 33, 81]
      zip(names, ages) #>>> [('anne', 12), ('beth', 33), ('google', 81)]
      for name, age in zip(names, ages):
+       pass
+
+     # 添加下标
+     for i, v in enumerate(names, start=1):
        pass
    #+END_SRC
 
@@ -1175,6 +1203,113 @@
    #+END_SRC
 
 * 常用工具
+** 单元测试
+   Python 自带单元测试模块， =unittest=
+   #+BEGIN_SRC python
+     import unittest
+   #+END_SRC
+
+   我们可以编写继承于 ~unittest.TestCase~ 测试类的子类，并在子类中编写具体的测试
+   函数。测试函数命必须以 =test_= 开头，否则不会被识别为测试函数，进而不会在运行
+   单元测试时被运行。
+   #+BEGIN_SRC python
+     class TestSubclass(unittest.TestCase):
+
+       def test_func(self):
+         self.assertEqual(0, 0)
+         # 可以通过 msg 关键字参数提供测试失败时的提示消息
+         self.assertEqual(0, 0, msg='modified message')
+         self.assertGreater(1, 0)
+         self.assertIn(0, [0])
+         self.assertTrue(True)
+         # 测试是否会抛出异常
+         with self.assertRaises(KeyError):
+           _ = dict()[1]
+
+       # 被@unittest.skip 装饰器装饰的测试类或测试函数会被跳过
+       @unittest.skip(reason='just skip')
+       def test_skip(self):
+         raise Exception('I shall never be tested')
+   #+END_SRC
+
+   ~unittest.TestCase~ 中还有两个特殊的成员函数，他们分别会在调用每一个测试函数
+   的前后运行。在测试前连接数据库并在测试完成后断开连接是一种常见的使用场景
+   #+BEGIN_SRC python
+     def setUp(self):
+       # To do: connect to the database
+       pass
+
+     def tearDown(self):
+       # To do: release the connection
+       pass
+
+     def test_database(self):
+       # To do: test the database
+       pass
+   #+END_SRC
+
+   测试类编写完毕后，可以通过添加以下代码来将当前文件当成正常的 Python 脚本使用
+   #+BEGIN_SRC python
+     if __name__ == '__main__':
+       unittest.main()
+   #+END_SRC
+
+** 日志
+   在进行比较大的工程中往往需要配置日志。
+
+*** 配置案例
+    我在 GitHub 的 Python 模板工程 [[https://github.com/Jeanhwea/python-project-template][Python Project Template]] 建了日志初始化样例。
+    在项目模块的 init 文件中初始化空的 handler
+    #+BEGIN_SRC python
+      # sample/__init__.py
+      # -*- coding: utf-8 -*-
+      __all__ = ()
+      # https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
+      import logging
+      logging.getLogger(__name__).addHandler(logging.NullHandler())
+    #+END_SRC
+
+    在测试的模块 init 文件中读取根目录的[[https://github.com/Jeanhwea/python-project-template/blob/master/custom.yml][配置文件]]，这样的好处是运行单元测试的时候
+    可以看到日志的输出，当项目打包后就屏蔽了日志输出。
+    #+BEGIN_SRC python
+      # test/__init__.py
+      # -*- coding: utf-8 -*-
+      import os
+      import sys
+      sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+      import logging.config
+      from sample.tool.config import load_logging_config
+
+      logging.config.dictConfig(load_logging_config())
+    #+END_SRC
+
+*** 使用指南
+    #+BEGIN_SRC python :exports code
+      import logging.config
+      logging.config.fileConfig('logging.conf')
+    #+END_SRC
+
+    初始化过后就可以记录日志了，这样记录日志方法可以是直接记录，也可以在类里面记
+    录。下面是常用的记录方法：
+
+    #+BEGIN_SRC python :exports code
+      import logging
+
+      # logging directly
+      logger = logging.getLogger(__name__)
+      logging.info("...")
+
+      # logging in Class
+      class Hello:
+
+        def __init__(self):
+          self.logger = logging.getLogger(__name__)
+
+        def hello(self):
+      self.info("...")
+    #+END_SRC
+
 ** excel
    Python 不是自带操作 excel 的包，需要安装第三方包来完成相应的操作。常见的可以
    操作 excel 文件的包有：pandas, openpyxl, xlrd, xlutils 和 pyexcel。
@@ -1401,62 +1536,6 @@
       # 写入 yaml 文件
       with open(filename, 'w') as yamlfile:
         yaml.dump(nested_dict, yamlfile)
-    #+END_SRC
-
-** 日志
-   在进行比较大的工程中往往需要配置日志。
-
-*** 配置案例
-    我在 GitHub 的 Python 模板工程 [[https://github.com/Jeanhwea/python-project-template][Python Project Template]] 建了日志初始化样例。
-    在项目模块的 init 文件中初始化空的 handler
-    #+BEGIN_SRC python
-      # sample/__init__.py
-      # -*- coding: utf-8 -*-
-      __all__ = ()
-      # https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
-      import logging
-      logging.getLogger(__name__).addHandler(logging.NullHandler())
-    #+END_SRC
-
-    在测试的模块 init 文件中读取根目录的[[https://github.com/Jeanhwea/python-project-template/blob/master/custom.yml][配置文件]]，这样的好处是运行单元测试的时候
-    可以看到日志的输出，当项目打包后就屏蔽了日志输出。
-    #+BEGIN_SRC python
-      # test/__init__.py
-      # -*- coding: utf-8 -*-
-      import os
-      import sys
-      sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-      import logging.config
-      from sample.tool.config import load_logging_config
-
-      logging.config.dictConfig(load_logging_config())
-    #+END_SRC
-
-*** 使用指南
-    #+BEGIN_SRC python :exports code
-      import logging.config
-      logging.config.fileConfig('logging.conf')
-    #+END_SRC
-
-    初始化过后就可以记录日志了，这样记录日志方法可以是直接记录，也可以在类里面记
-    录。下面是常用的记录方法：
-
-    #+BEGIN_SRC python :exports code
-      import logging
-
-      # logging directly
-      logger = logging.getLogger(__name__)
-      logging.info("...")
-
-      # logging in Class
-      class Hello:
-
-        def __init__(self):
-          self.logger = logging.getLogger(__name__)
-
-        def hello(self):
-      self.info("...")
     #+END_SRC
 
 * 参考链接
