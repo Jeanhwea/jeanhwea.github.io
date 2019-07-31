@@ -37,6 +37,40 @@
       >>>
     #+END_SRC
 
+** 内置类型
+   Python 是弱类型的语言，但也会涉及到 6 个基本类型
+
+   - ~int/long~ : 过大的 int 类型会被自动转化为 long 类型
+   - ~float~ : 64 位，Python 中没有 double 类型
+   - ~bool~
+   - ~str~ : 在 Python 2 中默认以 ASCII 编码，而在 Python 3 中默认以 Unicode 编码
+     - 字符串可置于单/双/三引号中
+     - 字符串是字符的序列，因此可以像处理其他序列一样处理字符串
+     - 特殊字符可通过 \ 或者前缀 r 实现, ~str1= r'this\f?ff'~
+   - ~NoneType(None)~ : Python 中的 "null" 值（None 对象只存在一个实例）
+     - ~None~ 不是一个保留关键字，而是 NoneType 的一个唯一实例
+     - ~None~ 通常是可选函数参数的默认值, ~def func1(a, b, c=None)~
+     - ~None~ 可以放在 if 条件的判断, ~if variable is None :~
+   - ~datetime~ : Python 内置的 datetime 模块提供了 datetime、data 以及 time 类型
+
+     #+BEGIN_SRC python
+       # 从字符串中创建 datetime
+       dt1 = datetime.strptime('20091031', '%Y%m%d')
+       # 获取 date 对象
+       dt1.date()
+       # 获取 time 对象
+       dt1.time()
+       # 将 datetime 格式化为字符串
+       dt1.strftime('%m/%d/%Y%H:%M')
+       # 更改字段值
+       dt2 = dt1.replace(minute=0, second=30)
+       # 做差, diff 是一个 datetime.timedelta 对象
+       diff = dt1 - dt2
+     #+END_SRC
+
+   1. str、bool、int 和 float 同时也是显式类型转换函数
+   2. 除字符串和元组外，Python 中的绝大多数对象都是可变的
+
 * 控制流
 ** if 条件语句
    #+BEGIN_SRC python :exports code
@@ -48,14 +82,15 @@
      else:
        assert num == 0, 'num is zero'
    #+END_SRC
+
 ** while 循环语句
    #+BEGIN_SRC python :exports code
      x = 1
      while x <= 100:
        x += 1
    #+END_SRC
-** for 循环语句
 
+** for 循环语句
    #+BEGIN_SRC python :exports code
      # for loop
      words = ['this', 'is', 'an', 'ex', 'parrot']
@@ -68,6 +103,7 @@
      for name, age in zip(names, ages):
        pass
    #+END_SRC
+
 ** try catch 异常相关
    基本形式
    #+BEGIN_SRC python
@@ -273,7 +309,6 @@
    #+END_SRC
 
 ** 全局变量
-
    Python 定义的变量默认都是局部变量，如果需要定义全局变量需要使用 =global= 关键
    字修饰。
 
@@ -342,9 +377,7 @@
    #+END_SRC
 
 ** 访问控制
-
    Python 没有 private, protected, public 关键字，类的访问级别根据函数的命名来。
-
    #+BEGIN_SRC python :exports code
      class Visibility:
        # private method start with __
@@ -369,7 +402,6 @@
    #+END_SRC
 
 ** 定义类型类
-
    #+BEGIN_SRC python :exports code
      __metaclass__ = type
      class Rect:
@@ -428,10 +460,10 @@
    #+END_SRC
 
 ** 包的组织结构
-    包也是一种模块，在每一级的文件夹下需要新建 =__init__.py= 文件初始化当前的包。下
-    面是一个包的文件结构的例子。
+   包也是一种模块，在每一级的文件夹下需要新建 =__init__.py= 文件初始化当前的包。下
+   面是一个包的文件结构的例子。
 
-    #+BEGIN_SRC text
+   #+BEGIN_SRC text
       sound/                          Top-level package
             __init__.py               Initialize the sound package
             formats/                  Subpackage for file format conversions
@@ -455,15 +487,16 @@
                     vocoder.py
                     karaoke.py
                     ...
-    #+END_SRC
+   #+END_SRC
 
-    当包创建并且添加到 =PYTHONPATH= 环境变量中后，可以通过如下方式导入包
+   当包创建并且添加到 =PYTHONPATH= 环境变量中后，可以通过如下方式导入包
 
-    #+BEGIN_SRC python :exports code
+   #+BEGIN_SRC python :exports code
       import sound.effects.echo
       from sound.effects import echo
       from sound.effects.echo import echofilter
-    #+END_SRC
+   #+END_SRC
+
 * 内置对象
 ** 列表
 *** 索引列表元素以及获取子列表
@@ -623,9 +656,8 @@
 
 ** 字符串
 *** 基本操作，格式化输出，模板字符串
-
-    字符串有类似于列表的索引操作，也可以使用 =%= 和元组的组合方式来输出格式化字符
-    串。
+    字符串有类似于列表的索引操作，也可以使用 =%= 和元组的组合方式来输出格式化字
+    符串。
 
     #+BEGIN_SRC python :exports code
       >>> url = 'http://jeanhwea.github.io'
@@ -652,7 +684,8 @@
     #+END_SRC
 
 
-    另外一直比较常用的模板字符串形式如下，操作清晰易懂，建议使用这种方式来操作字符串。
+    另外一直比较常用的模板字符串形式如下，操作清晰易懂，建议使用这种方式来操作字
+    符串
 
     #+BEGIN_SRC python :exports code
       >>> foo = 'foo'
@@ -669,21 +702,20 @@
     #+END_SRC
 
 *** 字符串索引方式
-
     #+BEGIN_SRC python :exports code
-     #  +---+---+---+---+---+---+
-     #  | P | y | t | h | o | n |
-     #  +---+---+---+---+---+---+
-     #  0   1   2   3   4   5   6
-     # -6  -5  -4  -3  -2  -1
-     >>> python = 'Python'
-     >>> python[0]
-     'P'
-     >>> python[-1]
-     'n'
-     >>> python[-3]
-     'h'
-     >>>
+      #  +---+---+---+---+---+---+
+      #  | P | y | t | h | o | n |
+      #  +---+---+---+---+---+---+
+      #  0   1   2   3   4   5   6
+      # -6  -5  -4  -3  -2  -1
+      >>> python = 'Python'
+      >>> python[0]
+      'P'
+      >>> python[-1]
+      'n'
+      >>> python[-3]
+      'h'
+      >>>
     #+END_SRC
 
 *** 字符串查找
@@ -765,8 +797,8 @@
     正则表达式是处理文档的必备工具，常用的有 =search= ， =match= ， =findall= ，
     =finditer= 这几个函数。
 
-    =search= 若 string 中包含 pattern 子串，则返回 Match 对象，否则返回 None，注意，如果
-    string 中存在多个 pattern 子串，只返回第一个。
+    =search= 若 string 中包含 pattern 子串，则返回 Match 对象，否则返回 None，注
+    意，如果 string 中存在多个 pattern 子串，只返回第一个。
 
     =match= 从首字母开始开始匹配，string 如果包含 pattern 子串，则匹配成功，返回
     Match 对象，失败则返回 None，若要完全匹配，pattern 要以$结尾。
@@ -792,6 +824,7 @@
       ['hello', 'abc']
       >>>
     #+END_SRC
+
 ** 字典
 *** 基本操作： 字典的添加、删除、修改
     #+BEGIN_SRC python :exports code
@@ -843,7 +876,6 @@
     #+END_SRC
 
 *** 浅拷贝和深拷贝
-
     字典也有浅拷贝和深拷贝的区别，具体见下面代码。
 
     #+BEGIN_SRC python :exports code
@@ -879,8 +911,8 @@
     #+END_SRC
 
 *** 构造字典
-    =fromkeys= 通过列表生成字典。查字典时， =get= 方法不会引起异常，直接索引会引起异
-    常。
+    =fromkeys= 通过列表生成字典。查字典时， =get= 方法不会引起异常，直接索引会引
+    起异常。
 
     #+BEGIN_SRC python :exports code
       >>> keys = ['a', 'b', 'c']
@@ -961,9 +993,8 @@
     #+END_SRC
 
 *** 获取字典的值
-
-    =setdefault= 用于设置字典的默认值，如果元素存在则返回元素的值，并将值写入字典。
-    =get= 方法有同样的取值效果，但是不会将字典中不存在的值写入字典中。
+    =setdefault= 用于设置字典的默认值，如果元素存在则返回元素的值，并将值写入字
+    典。=get= 方法有同样的取值效果，但是不会将字典中不存在的值写入字典中。
 
     #+BEGIN_SRC python :exports code
       >>> person = dict(name='Jinghui', age=18)
@@ -1024,8 +1055,7 @@
     #+END_SRC
 
 *** 时间戳和 =struct_time= 转换
-
-     #+BEGIN_SRC python :exports code
+    #+BEGIN_SRC python :exports code
        >>> now = time.time()
        >>> time.localtime(now) # timestamp -> struct_time
        time.struct_time(tm_year=2019, tm_mon=7, tm_mday=2, tm_hour=19, tm_min=18, tm_sec=38, tm_wday=1, tm_yday=183, tm_isdst=0)
@@ -1033,11 +1063,10 @@
        >>> time.mktime(local_time) # the inverse function of localtime(), struct_time -> timestamp
        1562066319.0
        >>>
-     #+END_SRC
+    #+END_SRC
 
 *** 格式化处理时间, 字符串和 =struct_time= 之间转换
-
-     #+BEGIN_SRC python :exports code
+    #+BEGIN_SRC python :exports code
        >>> fmt = '%Y-%m-%d %H:%M:%S'
        >>> time.strftime(fmt, time.localtime())
        '2019-07-02 19:19:38'
@@ -1046,12 +1075,12 @@
        >>> time.strptime('2018-10-24 14:51:03', fmt)
        time.struct_time(tm_year=2018, tm_mon=10, tm_mday=24, tm_hour=14, tm_min=51, tm_sec=3, tm_wday=2, tm_yday=297, tm_isdst=-1)
        >>>
-     #+END_SRC
+    #+END_SRC
 
 *** 时间戳和字符串之间转换
-     需要借助 Python 的 time 模块中的 =struct_time= 作为中间数据结构来进行转换
+    需要借助 Python 的 time 模块中的 =struct_time= 作为中间数据结构来进行转换
 
-     #+BEGIN_SRC python :exports code
+    #+BEGIN_SRC python :exports code
        >>> fmt = '%Y-%m-%d %H:%M:%S'
        >>> now = time.time()
        >>> time.strftime(fmt, time.localtime(now))
@@ -1059,7 +1088,7 @@
        >>> time.mktime(time.strptime('2018-10-24 15:03:46', fmt))
        1540364626.0
        >>>
-     #+END_SRC
+    #+END_SRC
 
 *** 时间日期格式化字符串含义表
     具体定义见下表：
@@ -1090,12 +1119,12 @@
     | %%        | A literal '%' character.                                                                                                                                                                                    |
 
 *** 线程休眠
-     =sleep= 可以是线程休眠相应的秒数。
-
-     #+BEGIN_SRC python :exports code
+    =sleep= 可以是线程休眠相应的秒数。
+    #+BEGIN_SRC python :exports code
        import time
        time.sleep(5) # 线程休眠 5 秒
-     #+END_SRC
+    #+END_SRC
+
 ** 用户输入
 *** =raw_input= 和 =input=
     Python3.x 里面已经把 =raw_input()= 给去掉了。事实上是这样的：在 Python3.x 内，
@@ -1149,6 +1178,7 @@
 ** excel
    Python 不是自带操作 excel 的包，需要安装第三方包来完成相应的操作。常见的可以
    操作 excel 文件的包有：pandas, openpyxl, xlrd, xlutils 和 pyexcel。
+
 *** pandas
     读取 excel 中的数据
 
@@ -1192,6 +1222,7 @@
       sheet.col_values(0) #=> ['', 0.0, 1.0, 2.0, 3.0, 4.0]
       sheet.row_values(4) #=> [3.0, 6.0]
     #+END_SRC
+
 *** xlwt
     [[https://xlwt.readthedocs.io/en/latest/][xlwt]] 可以写入 excel 文件，具体使用方式见代码
 
@@ -1217,6 +1248,7 @@
 
 ** csv
    Python 自带读写 csv 文件的模块，可以直接导入 csv 模块。
+
 *** 读取 csv 文件
     使用函数方式读取 csv 文件
     #+BEGIN_SRC python :exports code
@@ -1237,7 +1269,6 @@
     #+END_SRC
 
 *** 写入 csv 文件
-
     使用函数方式写入 csv 文件
 
     #+BEGIN_SRC python :exports code
@@ -1249,7 +1280,6 @@
     #+END_SRC
 
     使用类方式写入 csv 文件
-
     #+BEGIN_SRC python :exports code
       import csv
       with open('names.csv', 'w') as csvfile:
@@ -1262,7 +1292,6 @@
     #+END_SRC
 
 *** 使用 csv 读写文件的例子
-
     #+BEGIN_SRC python :exports code
       import csv, codecs, cStringIO
 
@@ -1325,6 +1354,7 @@
           for row in rows:
             self.writerow(row)
     #+END_SRC
+
 ** json
 *** 处理 JSON 字符串和字典转化
     #+BEGIN_SRC python :exports code
@@ -1377,8 +1407,8 @@
    在进行比较大的工程中往往需要配置日志。
 
 *** 配置案例
-    我在 GitHub 的 Python 模板工程 [[https://github.com/Jeanhwea/python-project-template][Python Project Template]] 建了日志初始化样例。在
-    项目模块的 init 文件中初始化空的 handler
+    我在 GitHub 的 Python 模板工程 [[https://github.com/Jeanhwea/python-project-template][Python Project Template]] 建了日志初始化样例。
+    在项目模块的 init 文件中初始化空的 handler
     #+BEGIN_SRC python
       # sample/__init__.py
       # -*- coding: utf-8 -*-
@@ -1409,8 +1439,8 @@
       logging.config.fileConfig('logging.conf')
     #+END_SRC
 
-    初始化过后就可以记录日志了，这样记录日志方法可以是直接记录，也可以在类里面记录。
-    下面是常用的记录方法：
+    初始化过后就可以记录日志了，这样记录日志方法可以是直接记录，也可以在类里面记
+    录。下面是常用的记录方法：
 
     #+BEGIN_SRC python :exports code
       import logging
