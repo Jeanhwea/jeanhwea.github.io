@@ -1487,6 +1487,47 @@
     - ~elem.insertAdjacentHTML(where, html)~
       - where: 可以是这些字符串值 beforebegin, afterbegin, beforeend, afterend
 
+*** 样式和 css 类
+    - 在 DOM properties 管理样式有两种方法
+      - =elem.className= 字符串，方便管理全部的属性
+      - =elem.classList= 对象，方便使用 ~add/remove/toggle~ 方法
+    - css 样式的命名到 DOM 中的 properties 的命名有一点点区别例如：
+      - =background-color= 对应 =elem.style.backgroundColor=
+      - =z-index= 对应 =elem.style.zIndex=
+      - =border-left-width=  对应 =elem.style.borderLeftWidth=
+      - =-webkit-border-radius= 对应 =button.style.WebkitBorderRadius=
+    - ~style.cssText~ 全部样式的字符串
+    - 计算后的样式值通过调用 ~getComputedStyle(element[,pseudo])~ 函数获取，例如：
+      ~getComputedStyle(document.body)~
+      - =element= 读取的元素名
+      - =pseudo= 伪元素名称，例如： =::before=
+
+*** 元素/窗口的几何属性和滚动
+    DOM 元素位置的几何属性主要有以下：
+    - ~offsetParent~
+    - ~offsetLeft/offsetTop~
+    - ~offsetWidth/offsetHeight~
+    - ~clientLeft/clientTop~
+    - ~clientWidth/clientHeight~
+    - ~scrollWidth/scrollHeight~
+    - ~scrollLeft/scrollTop~
+
+    窗口的几何属性如下：
+    - ~document.documentElement.clientHeight/Width~
+    - 滚动的高度 =scrollHeight=
+      #+BEGIN_SRC js
+        let scrollHeight = Math.max(
+          document.body.scrollHeight, document.documentElement.scrollHeight,
+          document.body.offsetHeight, document.documentElement.offsetHeight,
+          document.body.clientHeight, document.documentElement.clientHeight
+        );
+      #+END_SRC
+    - 读取当前滚动: ~window.pageYOffset/pageXOffset~
+    - 改变当前滚动
+      - ~window.scrollTo(pageX, pageY)~
+      - ~window.scrollBy(x,y)~
+      - ~elem.scrollIntoView(top/bottom)~
+
 ** 事件
 
 ** 表单和控制
