@@ -6,551 +6,36 @@
 #+HTML_LINK_HOME: ../index.html
 #+TAGS: python programming distilled
 
-
-* Python 解释器的环境变量
-** PYTHONDONTWRITEBYTECODE 是否写字节码文件
-   阻止 Python 解释器生成二进制字节码文件，如 =__pycache__=, =*.pyc=, =*.pyo= 等
-
-   #+BEGIN_SRC sh
-     export PYTHONDONTWRITEBYTECODE=1
-   #+END_SRC
-
-   附将字节码一次性删除的命令
-
-   #+BEGIN_SRC sh
-     find . -type f -name "*.py[co]" -delete -or -type d -name "__pycache__" -delete
-   #+END_SRC
-
-** PYTHONPATH 系统的搜索路径
-
-   Python 模块的搜索路径，可以通过 =sys.path= 变量查看
-   #+BEGIN_SRC python :exports code
-     >>> import sys
-     >>> sys.path
-     ['d:\\Python36\\DLLs', 'd:\\Python36\\lib', 'd:\\Python36', ...]
-     >>>
-   #+END_SRC
-
-* 列表
-** 索引列表元素以及获取子列表
-   常见的有直接下标索引，范围索引，倒序索引。
-
-   #+BEGIN_SRC python :exports code
-     >>> nums = [1, 2, 3, 4, 5, 6, 7]
-     >>> nums[1:3]
-     [2, 3]
-     >>> nums[-3:]
-     [5, 6, 7]
-     >>> nums[-2]
-     6
-     >>>
-   #+END_SRC
-
-   使用具有一定步长的索引
-
-   #+BEGIN_SRC python :exports code
-     >>> start = 1; end = 7; step  = 2
-     >>> nums[start:end:step]
-     [2, 4, 6]
-     >>>
-   #+END_SRC
-
-** 修改列表内容：添加，扩展，翻转，排序
-   =append= 方法向列表最后添加元素，注意这样添加的方式是 *引用* ， 如果需要复制
-   的方式则需要 *深度复制* 。
-
-   #+BEGIN_SRC python :exports code
-     >>> x = [1, 2, 3]
-     >>> y = x
-     >>> x.append(4)
-     >>> x
-     [1, 2, 3, 4]
-     >>> y
-     [1, 2, 3, 4]
-     >>>
-     >>> from copy import copy
-     >>> y = copy(x)
-     >>> x.append(5)
-     >>> x
-     [1, 2, 3, 4, 5]
-     >>> y
-     [1, 2, 3, 4]
-     >>>
-   #+END_SRC
-
-   =insert= 插入元素， =pop= 出栈元素， =remove=查找并删除特定元素， =clear= 清
-   除所有列表。
-
-   #+BEGIN_SRC python :exports code
-     >>> friuts = ['apple', 'banana', 'orange']
-     >>> friuts.insert(1, 'pear')
-     >>> friuts
-     ['apple', 'pear', 'banana', 'orange']
-     >>> friuts.pop()
-     'orange'
-     >>> friuts
-     ['apple', 'pear', 'banana']
-     >>> friuts.remove('apple')
-     >>> friuts
-     ['pear', 'banana']
-     >>> friuts.clear()
-     >>> friuts
-     []
-     >>>
-   #+END_SRC
-
-   =extend= 使用一个列表来扩展列表，相当于合并两个列表
-
-   #+BEGIN_SRC python :exports code
-     >>> x = [1, 2, 3]; y = [5, 7]
-     >>> x.extend(y)
-     >>> x
-     [1, 2, 3, 5, 7]
-     >>>
-   #+END_SRC
-
-   =reverse= 翻转列表。 =sort= 成员方法在修改当前列表的元素，对其进行排序。
-   =sorted= 返回排序后的副本。
-   #+BEGIN_SRC python :exports code
-     >>> x = [4, 6, 2, 1, 0, 6]
-     >>> x.reverse()
-     >>> x
-     [6, 0, 1, 2, 6, 4]
-     >>> y = sorted(x)
-     >>> x
-     [6, 0, 1, 2, 6, 4]
-     >>> y
-     [0, 1, 2, 4, 6, 6]
-     >>> x.sort()
-     >>> x
-     [0, 1, 2, 4, 6, 6]
-     >>> friuts = ['apple', 'pear', 'banana', 'orange']
-     >>> friuts.sort(key=len) # 按单词长度排序
-     >>> friuts
-     ['pear', 'apple', 'banana', 'orange']
-     >>> friuts.sort() # 按字典序排序
-     >>> friuts
-     ['apple', 'banana', 'orange', 'pear']
-     >>>
-   #+END_SRC
-
-   一个非常重要的技巧， *通过赋值的方式来增加和删除列表中的元素* 。
-
-   #+BEGIN_SRC python :exports code
-     >>> numbers = [1, 5]
-     >>> numbers[1:1] = [2, 3, 4] # add elements by assign
-     >>> numbers
-     [1, 2, 3, 4, 5]
-     >>> numbers[-3:] = [] # delete elements by assign empty list
-     >>> numbers
-     [1, 2]
-     >>>
-   #+END_SRC
-
-** 统计列表信息: 元素存在性判断，长度，最大最小值
-   使用 =in= 可以判断当前元素是否在一个列表里。 =len= 是求列表的长度， =min= 求列表
-   中的最小值。
-
-   #+BEGIN_SRC python :exports code
-     >>> greeting = 'Hello'
-     >>> 'x' in greeting
-     False
-     >>> 'l' in greeting
-     True
-     >>> len(greeting)
-     5
-     >>> min(greeting)
-     'H'
-     >>>
-   #+END_SRC
-
-** 列表查找
-   =count= 对列表中的元素计数
-
-   #+BEGIN_SRC python :exports code
-     >>> numbers = [1, 2, 1, 3, 4, 2, 1]
-     >>> numbers.count(1)
-     3
-     >>>
-   #+END_SRC
-
-   =index= 查找元素，返回元素下标。如果元素不存在则抛出 ValueError 异常
-
-   #+BEGIN_SRC python :exports code
-     >>> friuts = ['apple', 'banana', 'orange']
-     >>> friuts.index("apple")
-     0
-     >>> friuts.index("foo")
-     Traceback (most recent call last):
-       File "<stdin>", line 1, in <module>
-     ValueError: 'foo' is not in list
-     >>>
-   #+END_SRC
-
-* 字符串
-** 基本操作，格式化输出，模板字符串
-
-   字符串有类似于列表的索引操作，也可以使用 =%= 和元组的组合方式来输出格式化字符
-   串。
-
-   #+BEGIN_SRC python :exports code
-     >>> url = 'http://jeanhwea.github.io'
-     >>> url[-2:]
-     'io'
-     >>> fmt = 'first: %s, second: %s'
-     >>> val = ('hello', 'Jeanhwea')
-     >>> fmt % val
-     'first: hello, second: Jeanhwea'
-     >>>
-   #+END_SRC
-
-   Python 支持字符串模板的操作，但是并没有 Ruby 那么好用，一般的操作方式如下：
-
-   #+BEGIN_SRC python :exports code
-     >>> from string import Template
-     >>> s = Template('$friut is $color') # using $$ to diplay $
-     >>> data = {'friut': 'apple', 'color': 'red'}
-     >>> s.substitute(friut='banana', color='yellow')
-     'banana is yellow'
-     >>> s.substitute(data)
-     'apple is red'
-     >>>
-   #+END_SRC
-
-
-   另外一直比较常用的模板字符串形式如下，操作清晰易懂，建议使用这种方式来操作字符串。
-
-   #+BEGIN_SRC python :exports code
-     >>> foo = 'foo'
-     >>> bar = 'bar'
-     >>> '%s%s' % (foo, bar)
-     'foobar'
-     >>> '{0}{1}'.format(foo, bar)
-     'foobar'
-     >>> '{foo}{bar}'.format(foo=foo, bar=bar)
-     'foobar'
-     >>> '{{foo}}{bar}'.format(foo=foo, bar=bar)
-     '{foo}bar'
-     >>>
-   #+END_SRC
-
-** 字符串索引方式
-
-   #+BEGIN_SRC python :exports code
-    #  +---+---+---+---+---+---+
-    #  | P | y | t | h | o | n |
-    #  +---+---+---+---+---+---+
-    #  0   1   2   3   4   5   6
-    # -6  -5  -4  -3  -2  -1
-    >>> python = 'Python'
-    >>> python[0]
-    'P'
-    >>> python[-1]
-    'n'
-    >>> python[-3]
-    'h'
-    >>>
-   #+END_SRC
-
-** 字符串查找
-   =find= 查找字符串的内容, 类似的有 =lfind= 和 =rfind= 。 =startswith= 和
-   =endswith= 判定开头和结尾字母。
-
-   #+BEGIN_SRC python :exports code
-     >>> url = 'http://jeanhwea.github.io'
-     >>> url.find('jeanhwea')
-     7
-     >>> url.find('nothing')
-     -1
-     >>> start = 10
-     >>> url.find('e', start)
-     13
-     >>> 'hello, man'.startswith('hi')
-     False
-     >>> 'hello, man'.startswith('hello')
-     True
-     >>> 'hello, man'.endswith('man')
-     True
-     >>>
-   #+END_SRC
-
-** 修改字符串：替换，删除空格
-   =replace= 替换字符串
-
-   #+BEGIN_SRC python :exports code
-     str = "Hello, world"
-     >>> str.replace("world", "Jinghui")
-     'Hello, Jinghui'
-     >>> "aaba".replace("a", "$")
-     '$$b$'
-     >>> "aaba".replace("a", "$", 1)
-     '$aba'
-     >>>
-   #+END_SRC
-
-   =strip= 可以移除字符串前后的空白字符，另外有 =lstrip= 和 =rstrip= 。其它一些
-   转化大小写的函数见代码演示。
-
-   #+BEGIN_SRC python :exports code
-     >>> foo = '   internal whitespace is kept    '
-     >>> foo.strip()
-     'internal whitespace is kept'
-     >>> foo.lstrip()
-     'internal whitespace is kept    '
-     >>> foo.rstrip()
-     '   internal whitespace is kept'
-     >>> foo.upper()
-     '   INTERNAL WHITESPACE IS KEPT    '
-     >>> foo.lower()
-     '   internal whitespace is kept    '
-     >>> foo.strip().capitalize()
-     'Internal whitespace is kept'
-     >>> from string import capwords
-     >>> capwords(foo)
-     'Internal Whitespace Is Kept'
-     >>>
-   #+END_SRC
-
-** 字符串和列表转化: split join
-   =join= 连接字符串， =split= 分割字符串
-   #+BEGIN_SRC python :exports code
-     >>> dirs = 'home' , 'hujh', 'Projects' # tuple
-     >>> dirs
-     ('home', 'hujh', 'Projects')
-     >>> '/'.join(dirs)
-     'home/hujh/Projects'
-     >>> seq = [1, 2, 4]
-     >>> '+'.join([str(n) for n in seq])
-     '1+2+4'
-     >>> '1+2+3+4'.split('+')
-     ['1', '2', '3', '4']
-     >>>
-   #+END_SRC
-
-** 正则表达式
-   正则表达式是处理文档的必备工具，常用的有 =search= ， =match= ， =findall= ，
-   =finditer= 这几个函数。
-
-   =search= 若 string 中包含 pattern 子串，则返回 Match 对象，否则返回 None，注意，如果
-   string 中存在多个 pattern 子串，只返回第一个。
-
-   =match= 从首字母开始开始匹配，string 如果包含 pattern 子串，则匹配成功，返回
-   Match 对象，失败则返回 None，若要完全匹配，pattern 要以$结尾。
-
-   =findall= 返回 string 中所有与 pattern 相匹配的全部字串，返回形式为数组。
-
-   #+BEGIN_SRC python :exports code
-     >>> import re
-     >>> re.search(r'(abc)', 'hello abc.')
-     <_sre.SRE_Match object; span=(6, 9), match='abc'>
-     >>> m = re.search(r'(abc)', 'hello abc.')
-     >>> m.group(0)
-     'abc'
-     >>> m = re.match(r'(abc)', 'hello abc.')
-     >>> m.group(0)
-     Traceback (most recent call last):
-       File "<stdin>", line 1, in <module>
-     AttributeError: 'NoneType' object has no attribute 'group'
-     >>> m = re.match(r'(\w+)', 'hello abc.')
-     >>> m.group(0)
-     'hello'
-     >>> re.findall(r'\w+', 'hello abc.')
-     ['hello', 'abc']
-     >>>
-   #+END_SRC
-* 字典
-** 基本操作： 字典的添加、删除、修改
-   #+BEGIN_SRC python :exports code
-     >>> items = [('name', 'Jeanhwea'), ('age', '24')]
-     >>> d = dict(items)
-     >>> d['name']
-     'Jeanhwea'
-     >>> d['gender'] = 'male'
-     >>> d
-     {'name': 'Jeanhwea', 'age': '24', 'gender': 'male'}
-     >>> len(d)
-     3
-     >>> del d['age']
-     >>> d
-     {'name': 'Jeanhwea', 'gender': 'male'}
-     >>> 'name' in d
-     True
-     >>> d
-     {'name': 'Jeanhwea', 'gender': 'male'}
-     >>> d.clear()
-     >>> d
-     {}
-     >>>
-   #+END_SRC
-
-   关于字典引用的相关操作， *如何优雅地置空原字典而不影响引用的列表*
-
-   #+BEGIN_SRC python :exports code
-     >>> x = {}
-     >>> x['key1'] = 'val1'
-     >>> x
-     {'key1': 'val1'}
-     >>> y = x
-     >>> y
-     {'key1': 'val1'}
-     >>> x.clear() # clear x as well as y
-     >>> y
-     {}
-
-     >>> x['key2'] = 'val2'
-     >>> x
-     {'key2': 'val2'}
-     >>> y
-     {'key2': 'val2'}
-     >>> x = {} # bind x to {}, while y stay it old state
-     >>> y
-     {'key2': 'val2'}
-     >>>
-   #+END_SRC
-
-** 浅拷贝和深拷贝
-
-   字典也有浅拷贝和深拷贝的区别，具体见下面代码。
-
-   #+BEGIN_SRC python :exports code
-     >>> # 浅拷贝
-     >>> x = { 'name': 'Jeanhwea', 'friends': ['Jack', 'Alice'] }
-     >>> y = x.copy()
-     >>> y['name'] = 'Wang'
-     >>> x
-     {'name': 'Jeanhwea', 'friends': ['Jack', 'Alice']}
-     >>> y
-     {'name': 'Wang', 'friends': ['Jack', 'Alice']}
-     >>> y['friends'].remove('Jack')
-     >>> x
-     {'name': 'Jeanhwea', 'friends': ['Alice']}
-     >>> y
-     {'name': 'Wang', 'friends': ['Alice']}
-     >>>
-     >>> # 深拷贝
-     >>> x = { 'name': 'Jeanhwea', 'friends': ['Jack', 'Alice'] }
-     >>> from copy import deepcopy
-     >>> y = deepcopy(x)
-     >>> y['name'] = 'Wang'
-     >>> x
-     {'name': 'Jeanhwea', 'friends': ['Jack', 'Alice']}
-     >>> y
-     {'name': 'Wang', 'friends': ['Jack', 'Alice']}
-     >>> y['friends'].remove('Jack')
-     >>> x
-     {'name': 'Jeanhwea', 'friends': ['Jack', 'Alice']}
-     >>> y
-     {'name': 'Wang', 'friends': ['Alice']}
-     >>>
-   #+END_SRC
-
-** 构造字典
-   =fromkeys= 通过列表生成字典。查字典时， =get= 方法不会引起异常，直接索引会引起异
-   常。
-
-   #+BEGIN_SRC python :exports code
-     >>> keys = ['a', 'b', 'c']
-     >>> {}.fromkeys(keys)
-     {'a': None, 'b': None, 'c': None}
-     >>> {}.fromkeys(keys, '(none)')
-     {'a': '(none)', 'b': '(none)', 'c': '(none)'}
-     >>> x = {'k1': 'val1', 'k2': 'val2'}
-     >>> x['c']
-     Traceback (most recent call last):
-       File "<stdin>", line 1, in <module>
-     KeyError: 'c'
-     >>> x.get('c')
-     >>> x.get('c') == None
-     True
-     >>>
-   #+END_SRC
-
-   下面的创建字典的方法结果是一样的
-   #+BEGIN_SRC python :exports code
-     >>> dict(one=1, two=2, three=3)
-     {'one': 1, 'two': 2, 'three': 3}
-     >>> {'one': 1, 'two': 2, 'three': 3}
-     {'one': 1, 'two': 2, 'three': 3}
-     >>> dict(zip(['one', 'two', 'three'], [1, 2, 3]))
-     {'one': 1, 'two': 2, 'three': 3}
-     >>> dict([('two', 2), ('one', 1), ('three', 3)])
-     {'two': 2, 'one': 1, 'three': 3}
-     >>> dict({'three': 3, 'one': 1, 'two': 2})
-     {'three': 3, 'one': 1, 'two': 2}
-     >>>
-   #+END_SRC
-
-** 键是否存在和迭代器
-   =has_key= 在 Python3.x 中已经弃用，建议用 =in= 关键字判断是否在字典中。
-
-   #+BEGIN_SRC python :exports code
-     x = {'k1': 'val1', 'k2': 'val2'}
-     x.has_key('k1') #>>> True
-     x.has_key('c') #>>> False
-     'k1' in x
-   #+END_SRC
-
-   #+BEGIN_SRC python :exports code
-     x = {'k1': 'val1', 'k2': 'val2'}
-     >>> x.items()
-     dict_items([('k1', 'val1'), ('k2', 'val2')])
-     >>> x.values()
-     dict_values(['val1', 'val2'])
-     >>> x.keys()
-     dict_keys(['k1', 'k2'])
-
-     for k, v in x.iteritems():
-         pass
-     for v in x.itervalues():
-         pass
-     for k in x.iterkeys():
-         pass
-
-   #+END_SRC
-
-** 更新字典
-   =update= 方法通过一个字典的内容来替换另外一个字典。
-
-   #+BEGIN_SRC python :exports code
-     >>> p1 = dict(x=0,y=0)
-     >>> p1
-     {'x': 0, 'y': 0}
-     >>> p2 = dict(x=1, y=2)
-     >>> p2
-     {'x': 1, 'y': 2}
-     >>> p1.update(p2)
-     >>> p1
-     {'x': 1, 'y': 2}
-     >>> p2
-     {'x': 1, 'y': 2}
-     >>>
-   #+END_SRC
-
-** 获取字典的值
-
-   =setdefault= 用于设置字典的默认值，如果元素存在则返回元素的值，并将值写入字典。
-   =get= 方法有同样的取值效果，但是不会将字典中不存在的值写入字典中。
-
-   #+BEGIN_SRC python :exports code
-     >>> person = dict(name='Jinghui', age=18)
-     >>> person
-     {'name': 'Jinghui', 'age': 18}
-     >>> person.setdefault('name', 'anonymous')
-     'Jinghui'
-     >>> person.setdefault('birthday', 'unknown')
-     'unknown'
-     >>> person
-     {'name': 'Jinghui', 'age': 18, 'birthday': 'unknown'}
-     >>> person['height']
-     Traceback (most recent call last):
-       File "<stdin>", line 1, in <module>
-     KeyError: 'height'
-     >>> person.setdefault('height', 120)
-     120
-     >>> person['height']
-     120
-     >>>
-   #+END_SRC
+* 基本常识
+** 帮助和查询
+   - 获取主页帮助: ~help()~
+   - 获取函数帮助: ~help(str.replace)~
+   - 获取模块帮助: ~help(re)~
+   - 查看模块中内容: ~dir(re)~
+   - 查看数据类型: ~type(var)~
+
+** Python 解释器的环境变量
+*** PYTHONDONTWRITEBYTECODE 是否写字节码文件
+    阻止 Python 解释器生成二进制字节码文件，如 =__pycache__=, =*.pyc=, =*.pyo= 等
+
+    #+BEGIN_SRC sh
+      export PYTHONDONTWRITEBYTECODE=1
+    #+END_SRC
+
+    附将字节码一次性删除的命令
+
+    #+BEGIN_SRC sh
+      find . -type f -name "*.py[co]" -delete -or -type d -name "__pycache__" -delete
+    #+END_SRC
+
+*** PYTHONPATH 系统的搜索路径
+    Python 模块的搜索路径，可以通过 =sys.path= 变量查看
+    #+BEGIN_SRC python :exports code
+      >>> import sys
+      >>> sys.path
+      ['d:\\Python36\\DLLs', 'd:\\Python36\\lib', 'd:\\Python36', ...]
+      >>>
+    #+END_SRC
 
 * 控制流
 ** if 条件语句
@@ -582,6 +67,28 @@
      zip(names, ages) #>>> [('anne', 12), ('beth', 33), ('google', 81)]
      for name, age in zip(names, ages):
        pass
+   #+END_SRC
+** try catch 异常相关
+   基本形式
+   #+BEGIN_SRC python
+     try:
+         pass
+     except ValueError as e:
+         print e
+     except (TypeError, AnotherError):
+         pass
+     except:
+         pass
+     finally:
+         pass  # 清理，比如 close db;
+   #+END_SRC
+
+   手动引发异常
+   #+BEGIN_SRC python
+     raise AssertionError  # 断言失败
+     raise SystemExit
+     # 请求程序退出
+     raise RuntimeError('错误信息 :..')
    #+END_SRC
 
 ** 字符串求值 eval 和 exec
@@ -957,30 +464,661 @@
       from sound.effects import echo
       from sound.effects.echo import echofilter
     #+END_SRC
-* 读取用户输入
-** =raw_input= =input=
-   Python3.x 里面已经把 =raw_input()= 给去掉了。事实上是这样的：在 Python3.x 内，
-   将 =raw_input()= 重命名为 =input()= ，这样一来，无须导入也能从标准输入获得数
-   据了。如果您需要保留版本 Python2.x 的 =input()= 功能，可以使用
-   =eval(input())= ，效果基本相同。Python2.x 中， =raw_input()= 会从标准输入
-   =sys.stdin= 读取一个输入并返回一个字符串，且尾部的换行符从末尾移除。其中关于
-   读取用户输入的样例如下：
+* 内置对象
+** 列表
+*** 索引列表元素以及获取子列表
+    常见的有直接下标索引，范围索引，倒序索引。
 
-   #+BEGIN_SRC python :exports code
-     import os, sys
+    #+BEGIN_SRC python :exports code
+      >>> nums = [1, 2, 3, 4, 5, 6, 7]
+      >>> nums[1:3]
+      [2, 3]
+      >>> nums[-3:]
+      [5, 6, 7]
+      >>> nums[-2]
+      6
+      >>>
+    #+END_SRC
 
-     if __name__ == '__main__' :
-       # read raw string
-       name = raw_input('name = ')
-       print('your name is ' + name)
+    使用具有一定步长的索引
 
-       # read a expression, for example, integer
-       age = input('age = ')
-       print(age+1)
-   #+END_SRC
+    #+BEGIN_SRC python :exports code
+      >>> start = 1; end = 7; step  = 2
+      >>> nums[start:end:step]
+      [2, 4, 6]
+      >>>
+    #+END_SRC
 
-** 解析命令行输入
-*** sys.argv
+*** 修改列表内容：添加，扩展，翻转，排序
+    =append= 方法向列表最后添加元素，注意这样添加的方式是 *引用* ， 如果需要复制
+    的方式则需要 *深度复制* 。
+
+    #+BEGIN_SRC python :exports code
+      >>> x = [1, 2, 3]
+      >>> y = x
+      >>> x.append(4)
+      >>> x
+      [1, 2, 3, 4]
+      >>> y
+      [1, 2, 3, 4]
+      >>>
+      >>> from copy import copy
+      >>> y = copy(x)
+      >>> x.append(5)
+      >>> x
+      [1, 2, 3, 4, 5]
+      >>> y
+      [1, 2, 3, 4]
+      >>>
+    #+END_SRC
+
+    =insert= 插入元素， =pop= 出栈元素， =remove=查找并删除特定元素， =clear= 清
+    除所有列表。
+
+    #+BEGIN_SRC python :exports code
+      >>> friuts = ['apple', 'banana', 'orange']
+      >>> friuts.insert(1, 'pear')
+      >>> friuts
+      ['apple', 'pear', 'banana', 'orange']
+      >>> friuts.pop()
+      'orange'
+      >>> friuts
+      ['apple', 'pear', 'banana']
+      >>> friuts.remove('apple')
+      >>> friuts
+      ['pear', 'banana']
+      >>> friuts.clear()
+      >>> friuts
+      []
+      >>>
+    #+END_SRC
+
+    =extend= 使用一个列表来扩展列表，相当于合并两个列表
+
+    #+BEGIN_SRC python :exports code
+      >>> x = [1, 2, 3]; y = [5, 7]
+      >>> x.extend(y)
+      >>> x
+      [1, 2, 3, 5, 7]
+      >>>
+    #+END_SRC
+
+    =reverse= 翻转列表。 =sort= 成员方法在修改当前列表的元素，对其进行排序。
+    =sorted= 返回排序后的副本。
+    #+BEGIN_SRC python :exports code
+      >>> x = [4, 6, 2, 1, 0, 6]
+      >>> x.reverse()
+      >>> x
+      [6, 0, 1, 2, 6, 4]
+      >>> y = sorted(x)
+      >>> x
+      [6, 0, 1, 2, 6, 4]
+      >>> y
+      [0, 1, 2, 4, 6, 6]
+      >>> x.sort()
+      >>> x
+      [0, 1, 2, 4, 6, 6]
+      >>> friuts = ['apple', 'pear', 'banana', 'orange']
+      >>> friuts.sort(key=len) # 按单词长度排序
+      >>> friuts
+      ['pear', 'apple', 'banana', 'orange']
+      >>> friuts.sort() # 按字典序排序
+      >>> friuts
+      ['apple', 'banana', 'orange', 'pear']
+      >>>
+    #+END_SRC
+
+    一个非常重要的技巧， *通过赋值的方式来增加和删除列表中的元素* 。
+
+    #+BEGIN_SRC python :exports code
+      >>> numbers = [1, 5]
+      >>> numbers[1:1] = [2, 3, 4] # add elements by assign
+      >>> numbers
+      [1, 2, 3, 4, 5]
+      >>> numbers[-3:] = [] # delete elements by assign empty list
+      >>> numbers
+      [1, 2]
+      >>>
+    #+END_SRC
+
+*** 统计列表信息: 元素存在性判断，长度，最大最小值
+    使用 =in= 可以判断当前元素是否在一个列表里。 =len= 是求列表的长度， =min= 求列表
+    中的最小值。
+
+    #+BEGIN_SRC python :exports code
+      >>> greeting = 'Hello'
+      >>> 'x' in greeting
+      False
+      >>> 'l' in greeting
+      True
+      >>> len(greeting)
+      5
+      >>> min(greeting)
+      'H'
+      >>>
+    #+END_SRC
+
+*** 列表查找
+    =count= 对列表中的元素计数
+
+    #+BEGIN_SRC python :exports code
+      >>> numbers = [1, 2, 1, 3, 4, 2, 1]
+      >>> numbers.count(1)
+      3
+      >>>
+    #+END_SRC
+
+    =index= 查找元素，返回元素下标。如果元素不存在则抛出 ValueError 异常
+
+    #+BEGIN_SRC python :exports code
+      >>> friuts = ['apple', 'banana', 'orange']
+      >>> friuts.index("apple")
+      0
+      >>> friuts.index("foo")
+      Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+      ValueError: 'foo' is not in list
+      >>>
+    #+END_SRC
+
+** 字符串
+*** 基本操作，格式化输出，模板字符串
+
+    字符串有类似于列表的索引操作，也可以使用 =%= 和元组的组合方式来输出格式化字符
+    串。
+
+    #+BEGIN_SRC python :exports code
+      >>> url = 'http://jeanhwea.github.io'
+      >>> url[-2:]
+      'io'
+      >>> fmt = 'first: %s, second: %s'
+      >>> val = ('hello', 'Jeanhwea')
+      >>> fmt % val
+      'first: hello, second: Jeanhwea'
+      >>>
+    #+END_SRC
+
+    Python 支持字符串模板的操作，但是并没有 Ruby 那么好用，一般的操作方式如下：
+
+    #+BEGIN_SRC python :exports code
+      >>> from string import Template
+      >>> s = Template('$friut is $color') # using $$ to diplay $
+      >>> data = {'friut': 'apple', 'color': 'red'}
+      >>> s.substitute(friut='banana', color='yellow')
+      'banana is yellow'
+      >>> s.substitute(data)
+      'apple is red'
+      >>>
+    #+END_SRC
+
+
+    另外一直比较常用的模板字符串形式如下，操作清晰易懂，建议使用这种方式来操作字符串。
+
+    #+BEGIN_SRC python :exports code
+      >>> foo = 'foo'
+      >>> bar = 'bar'
+      >>> '%s%s' % (foo, bar)
+      'foobar'
+      >>> '{0}{1}'.format(foo, bar)
+      'foobar'
+      >>> '{foo}{bar}'.format(foo=foo, bar=bar)
+      'foobar'
+      >>> '{{foo}}{bar}'.format(foo=foo, bar=bar)
+      '{foo}bar'
+      >>>
+    #+END_SRC
+
+*** 字符串索引方式
+
+    #+BEGIN_SRC python :exports code
+     #  +---+---+---+---+---+---+
+     #  | P | y | t | h | o | n |
+     #  +---+---+---+---+---+---+
+     #  0   1   2   3   4   5   6
+     # -6  -5  -4  -3  -2  -1
+     >>> python = 'Python'
+     >>> python[0]
+     'P'
+     >>> python[-1]
+     'n'
+     >>> python[-3]
+     'h'
+     >>>
+    #+END_SRC
+
+*** 字符串查找
+    =find= 查找字符串的内容, 类似的有 =lfind= 和 =rfind= 。 =startswith= 和
+    =endswith= 判定开头和结尾字母。
+
+    #+BEGIN_SRC python :exports code
+      >>> url = 'http://jeanhwea.github.io'
+      >>> url.find('jeanhwea')
+      7
+      >>> url.find('nothing')
+      -1
+      >>> start = 10
+      >>> url.find('e', start)
+      13
+      >>> 'hello, man'.startswith('hi')
+      False
+      >>> 'hello, man'.startswith('hello')
+      True
+      >>> 'hello, man'.endswith('man')
+      True
+      >>>
+    #+END_SRC
+
+*** 修改字符串：替换，删除空格
+    =replace= 替换字符串
+
+    #+BEGIN_SRC python :exports code
+      str = "Hello, world"
+      >>> str.replace("world", "Jinghui")
+      'Hello, Jinghui'
+      >>> "aaba".replace("a", "$")
+      '$$b$'
+      >>> "aaba".replace("a", "$", 1)
+      '$aba'
+      >>>
+    #+END_SRC
+
+    =strip= 可以移除字符串前后的空白字符，另外有 =lstrip= 和 =rstrip= 。其它一些
+    转化大小写的函数见代码演示。
+
+    #+BEGIN_SRC python :exports code
+      >>> foo = '   internal whitespace is kept    '
+      >>> foo.strip()
+      'internal whitespace is kept'
+      >>> foo.lstrip()
+      'internal whitespace is kept    '
+      >>> foo.rstrip()
+      '   internal whitespace is kept'
+      >>> foo.upper()
+      '   INTERNAL WHITESPACE IS KEPT    '
+      >>> foo.lower()
+      '   internal whitespace is kept    '
+      >>> foo.strip().capitalize()
+      'Internal whitespace is kept'
+      >>> from string import capwords
+      >>> capwords(foo)
+      'Internal Whitespace Is Kept'
+      >>>
+    #+END_SRC
+
+*** 字符串和列表转化: split join
+    =join= 连接字符串， =split= 分割字符串
+    #+BEGIN_SRC python :exports code
+      >>> dirs = 'home' , 'hujh', 'Projects' # tuple
+      >>> dirs
+      ('home', 'hujh', 'Projects')
+      >>> '/'.join(dirs)
+      'home/hujh/Projects'
+      >>> seq = [1, 2, 4]
+      >>> '+'.join([str(n) for n in seq])
+      '1+2+4'
+      >>> '1+2+3+4'.split('+')
+      ['1', '2', '3', '4']
+      >>>
+    #+END_SRC
+
+*** 正则表达式
+    正则表达式是处理文档的必备工具，常用的有 =search= ， =match= ， =findall= ，
+    =finditer= 这几个函数。
+
+    =search= 若 string 中包含 pattern 子串，则返回 Match 对象，否则返回 None，注意，如果
+    string 中存在多个 pattern 子串，只返回第一个。
+
+    =match= 从首字母开始开始匹配，string 如果包含 pattern 子串，则匹配成功，返回
+    Match 对象，失败则返回 None，若要完全匹配，pattern 要以$结尾。
+
+    =findall= 返回 string 中所有与 pattern 相匹配的全部字串，返回形式为数组。
+
+    #+BEGIN_SRC python :exports code
+      >>> import re
+      >>> re.search(r'(abc)', 'hello abc.')
+      <_sre.SRE_Match object; span=(6, 9), match='abc'>
+      >>> m = re.search(r'(abc)', 'hello abc.')
+      >>> m.group(0)
+      'abc'
+      >>> m = re.match(r'(abc)', 'hello abc.')
+      >>> m.group(0)
+      Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+      AttributeError: 'NoneType' object has no attribute 'group'
+      >>> m = re.match(r'(\w+)', 'hello abc.')
+      >>> m.group(0)
+      'hello'
+      >>> re.findall(r'\w+', 'hello abc.')
+      ['hello', 'abc']
+      >>>
+    #+END_SRC
+** 字典
+*** 基本操作： 字典的添加、删除、修改
+    #+BEGIN_SRC python :exports code
+      >>> items = [('name', 'Jeanhwea'), ('age', '24')]
+      >>> d = dict(items)
+      >>> d['name']
+      'Jeanhwea'
+      >>> d['gender'] = 'male'
+      >>> d
+      {'name': 'Jeanhwea', 'age': '24', 'gender': 'male'}
+      >>> len(d)
+      3
+      >>> del d['age']
+      >>> d
+      {'name': 'Jeanhwea', 'gender': 'male'}
+      >>> 'name' in d
+      True
+      >>> d
+      {'name': 'Jeanhwea', 'gender': 'male'}
+      >>> d.clear()
+      >>> d
+      {}
+      >>>
+    #+END_SRC
+
+    关于字典引用的相关操作， *如何优雅地置空原字典而不影响引用的列表*
+
+    #+BEGIN_SRC python :exports code
+      >>> x = {}
+      >>> x['key1'] = 'val1'
+      >>> x
+      {'key1': 'val1'}
+      >>> y = x
+      >>> y
+      {'key1': 'val1'}
+      >>> x.clear() # clear x as well as y
+      >>> y
+      {}
+
+      >>> x['key2'] = 'val2'
+      >>> x
+      {'key2': 'val2'}
+      >>> y
+      {'key2': 'val2'}
+      >>> x = {} # bind x to {}, while y stay it old state
+      >>> y
+      {'key2': 'val2'}
+      >>>
+    #+END_SRC
+
+*** 浅拷贝和深拷贝
+
+    字典也有浅拷贝和深拷贝的区别，具体见下面代码。
+
+    #+BEGIN_SRC python :exports code
+      >>> # 浅拷贝
+      >>> x = { 'name': 'Jeanhwea', 'friends': ['Jack', 'Alice'] }
+      >>> y = x.copy()
+      >>> y['name'] = 'Wang'
+      >>> x
+      {'name': 'Jeanhwea', 'friends': ['Jack', 'Alice']}
+      >>> y
+      {'name': 'Wang', 'friends': ['Jack', 'Alice']}
+      >>> y['friends'].remove('Jack')
+      >>> x
+      {'name': 'Jeanhwea', 'friends': ['Alice']}
+      >>> y
+      {'name': 'Wang', 'friends': ['Alice']}
+      >>>
+      >>> # 深拷贝
+      >>> x = { 'name': 'Jeanhwea', 'friends': ['Jack', 'Alice'] }
+      >>> from copy import deepcopy
+      >>> y = deepcopy(x)
+      >>> y['name'] = 'Wang'
+      >>> x
+      {'name': 'Jeanhwea', 'friends': ['Jack', 'Alice']}
+      >>> y
+      {'name': 'Wang', 'friends': ['Jack', 'Alice']}
+      >>> y['friends'].remove('Jack')
+      >>> x
+      {'name': 'Jeanhwea', 'friends': ['Jack', 'Alice']}
+      >>> y
+      {'name': 'Wang', 'friends': ['Alice']}
+      >>>
+    #+END_SRC
+
+*** 构造字典
+    =fromkeys= 通过列表生成字典。查字典时， =get= 方法不会引起异常，直接索引会引起异
+    常。
+
+    #+BEGIN_SRC python :exports code
+      >>> keys = ['a', 'b', 'c']
+      >>> {}.fromkeys(keys)
+      {'a': None, 'b': None, 'c': None}
+      >>> {}.fromkeys(keys, '(none)')
+      {'a': '(none)', 'b': '(none)', 'c': '(none)'}
+      >>> x = {'k1': 'val1', 'k2': 'val2'}
+      >>> x['c']
+      Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+      KeyError: 'c'
+      >>> x.get('c')
+      >>> x.get('c') == None
+      True
+      >>>
+    #+END_SRC
+
+    下面的创建字典的方法结果是一样的
+    #+BEGIN_SRC python :exports code
+      >>> dict(one=1, two=2, three=3)
+      {'one': 1, 'two': 2, 'three': 3}
+      >>> {'one': 1, 'two': 2, 'three': 3}
+      {'one': 1, 'two': 2, 'three': 3}
+      >>> dict(zip(['one', 'two', 'three'], [1, 2, 3]))
+      {'one': 1, 'two': 2, 'three': 3}
+      >>> dict([('two', 2), ('one', 1), ('three', 3)])
+      {'two': 2, 'one': 1, 'three': 3}
+      >>> dict({'three': 3, 'one': 1, 'two': 2})
+      {'three': 3, 'one': 1, 'two': 2}
+      >>>
+    #+END_SRC
+
+*** 键是否存在和迭代器
+    =has_key= 在 Python3.x 中已经弃用，建议用 =in= 关键字判断是否在字典中。
+
+    #+BEGIN_SRC python :exports code
+      x = {'k1': 'val1', 'k2': 'val2'}
+      x.has_key('k1') #>>> True
+      x.has_key('c') #>>> False
+      'k1' in x
+    #+END_SRC
+
+    #+BEGIN_SRC python :exports code
+      x = {'k1': 'val1', 'k2': 'val2'}
+      >>> x.items()
+      dict_items([('k1', 'val1'), ('k2', 'val2')])
+      >>> x.values()
+      dict_values(['val1', 'val2'])
+      >>> x.keys()
+      dict_keys(['k1', 'k2'])
+
+      for k, v in x.iteritems():
+          pass
+      for v in x.itervalues():
+          pass
+      for k in x.iterkeys():
+          pass
+
+    #+END_SRC
+
+*** 更新字典
+    =update= 方法通过一个字典的内容来替换另外一个字典。
+
+    #+BEGIN_SRC python :exports code
+      >>> p1 = dict(x=0,y=0)
+      >>> p1
+      {'x': 0, 'y': 0}
+      >>> p2 = dict(x=1, y=2)
+      >>> p2
+      {'x': 1, 'y': 2}
+      >>> p1.update(p2)
+      >>> p1
+      {'x': 1, 'y': 2}
+      >>> p2
+      {'x': 1, 'y': 2}
+      >>>
+    #+END_SRC
+
+*** 获取字典的值
+
+    =setdefault= 用于设置字典的默认值，如果元素存在则返回元素的值，并将值写入字典。
+    =get= 方法有同样的取值效果，但是不会将字典中不存在的值写入字典中。
+
+    #+BEGIN_SRC python :exports code
+      >>> person = dict(name='Jinghui', age=18)
+      >>> person
+      {'name': 'Jinghui', 'age': 18}
+      >>> person.setdefault('name', 'anonymous')
+      'Jinghui'
+      >>> person.setdefault('birthday', 'unknown')
+      'unknown'
+      >>> person
+      {'name': 'Jinghui', 'age': 18, 'birthday': 'unknown'}
+      >>> person['height']
+      Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+      KeyError: 'height'
+      >>> person.setdefault('height', 120)
+      120
+      >>> person['height']
+      120
+      >>>
+    #+END_SRC
+
+** 时间和日期
+*** 基本操作
+    =time= 模块提供和时间相关的处理函数。 =datetime= 提供和日期相关的处理函数
+
+    #+BEGIN_SRC python :exports code
+      >>> import time
+      >>> time.time()
+      1562066055.218775
+      >>> int(time.time())
+      1562066055
+      >>>
+      >>> from datetime import datetime, timedelta
+      >>> datetime.today()
+      datetime.datetime(2019, 7, 2, 19, 14, 15, 427266)
+      >>>
+      >>> year = timedelta(days=365)
+      >>> year
+      datetime.timedelta(365)
+      >>> year.total_seconds()
+      31536000.0
+      >>> datetime.today() + year
+      datetime.datetime(2020, 7, 1, 19, 14, 15, 692306)
+      >>>
+    #+END_SRC
+
+*** time 模块
+    time 模块中的所有时间通过 =time.struct_time= 数据结构存储，一般使用
+    =struct_time= 作为时间格式转换的中间变量。
+
+    #+BEGIN_SRC python :exports code
+      >>> time.localtime() # local time
+      time.struct_time(tm_year=2019, tm_mon=7, tm_mday=2, tm_hour=19, tm_min=15, tm_sec=46, tm_wday=1, tm_yday=183, tm_isdst=0)
+      >>> time.gmtime()    # UTC time
+      time.struct_time(tm_year=2019, tm_mon=7, tm_mday=2, tm_hour=11, tm_min=15, tm_sec=46, tm_wday=1, tm_yday=183, tm_isdst=0)
+      >>>
+    #+END_SRC
+
+*** 时间戳和 =struct_time= 转换
+
+     #+BEGIN_SRC python :exports code
+       >>> now = time.time()
+       >>> time.localtime(now) # timestamp -> struct_time
+       time.struct_time(tm_year=2019, tm_mon=7, tm_mday=2, tm_hour=19, tm_min=18, tm_sec=38, tm_wday=1, tm_yday=183, tm_isdst=0)
+       >>> local_time = time.localtime()
+       >>> time.mktime(local_time) # the inverse function of localtime(), struct_time -> timestamp
+       1562066319.0
+       >>>
+     #+END_SRC
+
+*** 格式化处理时间, 字符串和 =struct_time= 之间转换
+
+     #+BEGIN_SRC python :exports code
+       >>> fmt = '%Y-%m-%d %H:%M:%S'
+       >>> time.strftime(fmt, time.localtime())
+       '2019-07-02 19:19:38'
+       >>> time.strftime(fmt, time.gmtime())
+       '2019-07-02 11:19:38'
+       >>> time.strptime('2018-10-24 14:51:03', fmt)
+       time.struct_time(tm_year=2018, tm_mon=10, tm_mday=24, tm_hour=14, tm_min=51, tm_sec=3, tm_wday=2, tm_yday=297, tm_isdst=-1)
+       >>>
+     #+END_SRC
+
+*** 时间戳和字符串之间转换
+     需要借助 Python 的 time 模块中的 =struct_time= 作为中间数据结构来进行转换
+
+     #+BEGIN_SRC python :exports code
+       >>> fmt = '%Y-%m-%d %H:%M:%S'
+       >>> now = time.time()
+       >>> time.strftime(fmt, time.localtime(now))
+       '2019-07-02 19:20:42'
+       >>> time.mktime(time.strptime('2018-10-24 15:03:46', fmt))
+       1540364626.0
+       >>>
+     #+END_SRC
+
+*** 时间日期格式化字符串含义表
+    具体定义见下表：
+    | Directive | Meaning                                                                                                                                                                                                     |
+    |-----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | %a        | Locale’s abbreviated weekday name.                                                                                                                                                                          |
+    | %A        | Locale’s full weekday name.                                                                                                                                                                                 |
+    | %b        | Locale’s abbreviated month name.                                                                                                                                                                            |
+    | %B        | Locale’s full month name.                                                                                                                                                                                   |
+    | %c        | Locale’s appropriate date and time representation.                                                                                                                                                          |
+    | %d        | Day of the month as a decimal number [01,31].                                                                                                                                                               |
+    | %H        | Hour (24-hour clock) as a decimal number [00,23].                                                                                                                                                           |
+    | %I        | Hour (12-hour clock) as a decimal number [01,12].                                                                                                                                                           |
+    | %j        | Day of the year as a decimal number [001,366].                                                                                                                                                              |
+    | %m        | Month as a decimal number [01,12].                                                                                                                                                                          |
+    | %M        | Minute as a decimal number [00,59].                                                                                                                                                                         |
+    | %p        | Locale’s equivalent of either AM or PM.                                                                                                                                                                     |
+    | %S        | Second as a decimal number [00,61].                                                                                                                                                                         |
+    | %U        | Week number of the year (Sunday as the first day of the week) as a decimal number [00,53]. All days in a new year preceding the first Sunday are considered to be in week 0.                                |
+    | %w        | Weekday as a decimal number [0(Sunday),6].                                                                                                                                                                  |
+    | %W        | Week number of the year (Monday as the first day of the week) as a decimal number [00,53]. All days in a new year preceding the first Monday are considered to be in week 0.                                |
+    | %x        | Locale’s appropriate date representation.                                                                                                                                                                   |
+    | %X        | Locale’s appropriate time representation.                                                                                                                                                                   |
+    | %y        | Year without century as a decimal number [00,99].                                                                                                                                                           |
+    | %Y        | Year with century as a decimal number.                                                                                                                                                                      |
+    | %z        | Time zone offset indicating a positive or negative time difference from UTC/GMT of the form +HHMM or -HHMM, where H represents decimal hour digits and M represents decimal minute digits [-23:59, +23:59]. |
+    | %Z        | Time zone name (no characters if no time zone exists).                                                                                                                                                      |
+    | %%        | A literal '%' character.                                                                                                                                                                                    |
+
+*** 线程休眠
+     =sleep= 可以是线程休眠相应的秒数。
+
+     #+BEGIN_SRC python :exports code
+       import time
+       time.sleep(5) # 线程休眠 5 秒
+     #+END_SRC
+** 用户输入
+*** =raw_input= 和 =input=
+    Python3.x 里面已经把 =raw_input()= 给去掉了。事实上是这样的：在 Python3.x 内，
+    将 =raw_input()= 重命名为 =input()= ，这样一来，无须导入也能从标准输入获得数
+    据了。如果您需要保留版本 Python2.x 的 =input()= 功能，可以使用
+    =eval(input())= ，效果基本相同。Python2.x 中， =raw_input()= 会从标准输入
+    =sys.stdin= 读取一个输入并返回一个字符串，且尾部的换行符从末尾移除。其中关于
+    读取用户输入的样例如下：
+
+    #+BEGIN_SRC python :exports code
+      import os, sys
+
+      if __name__ == '__main__' :
+        # read raw string
+        name = raw_input('name = ')
+        print('your name is ' + name)
+
+        # read a expression, for example, integer
+        age = input('age = ')
+        print(age+1)
+    #+END_SRC
+
+*** sys.argv 参数
     =sys.argv= 其实是一个列表，在可以直接读取，用法如下：
 
     #+BEGIN_SRC python :exports code
@@ -989,136 +1127,25 @@
         print(sys.argv)
     #+END_SRC
 
-*** argparse
-    =argparse= 是 Python 的标准库，可以用来解析命令行参数，非常好用，详细请参考
-    [[https://docs.python.org/3/library/argparse.html][在线文档]]。
-
-    #+BEGIN_SRC python :exports code
-      import argparse
-
-      if __name__ == '__main__':
-          parser = argparse.ArgumentParser(description="short decription for this
-          command.")
-          parser.add_argument("-v", "--verbose", action="store_true", help="boolean for verbose")
-          parser.add_argument("-a", "--paraA", type=float)
-          parser.add_argument("-b", "--paraB", type=float)
-          parser.add_argument("folders", nargs='+', help="list of folders")
-          args = parser.parse_args()
-
-          yourfunc(args.paraA, args.paraB)
-    #+END_SRC
-
-* 时间和日期
-** 基本操作
-   =time= 模块提供和时间相关的处理函数。 =datetime= 提供和日期相关的处理函数
+** 命令行参数
+   =argparse= 是 Python 的标准库，可以用来解析命令行参数，非常好用，请参考 [[https://docs.python.org/3/library/argparse.html][doc]]
 
    #+BEGIN_SRC python :exports code
-     >>> import time
-     >>> time.time()
-     1562066055.218775
-     >>> int(time.time())
-     1562066055
-     >>>
-     >>> from datetime import datetime, timedelta
-     >>> datetime.today()
-     datetime.datetime(2019, 7, 2, 19, 14, 15, 427266)
-     >>>
-     >>> year = timedelta(days=365)
-     >>> year
-     datetime.timedelta(365)
-     >>> year.total_seconds()
-     31536000.0
-     >>> datetime.today() + year
-     datetime.datetime(2020, 7, 1, 19, 14, 15, 692306)
-     >>>
+     import argparse
+
+     if __name__ == '__main__':
+         parser = argparse.ArgumentParser(description="short decription for this
+         command.")
+         parser.add_argument("-v", "--verbose", action="store_true", help="boolean for verbose")
+         parser.add_argument("-a", "--paraA", type=float)
+         parser.add_argument("-b", "--paraB", type=float)
+         parser.add_argument("folders", nargs='+', help="list of folders")
+         args = parser.parse_args()
+
+         yourfunc(args.paraA, args.paraB)
    #+END_SRC
 
-** time 模块
-   time 模块中的所有时间通过 =time.struct_time= 数据结构存储，一般使用
-   =struct_time= 作为时间格式转换的中间变量。
-
-   #+BEGIN_SRC python :exports code
-     >>> time.localtime() # local time
-     time.struct_time(tm_year=2019, tm_mon=7, tm_mday=2, tm_hour=19, tm_min=15, tm_sec=46, tm_wday=1, tm_yday=183, tm_isdst=0)
-     >>> time.gmtime()    # UTC time
-     time.struct_time(tm_year=2019, tm_mon=7, tm_mday=2, tm_hour=11, tm_min=15, tm_sec=46, tm_wday=1, tm_yday=183, tm_isdst=0)
-     >>>
-   #+END_SRC
-
-** 时间戳和 =struct_time= 转换
-
-    #+BEGIN_SRC python :exports code
-      >>> now = time.time()
-      >>> time.localtime(now) # timestamp -> struct_time
-      time.struct_time(tm_year=2019, tm_mon=7, tm_mday=2, tm_hour=19, tm_min=18, tm_sec=38, tm_wday=1, tm_yday=183, tm_isdst=0)
-      >>> local_time = time.localtime()
-      >>> time.mktime(local_time) # the inverse function of localtime(), struct_time -> timestamp
-      1562066319.0
-      >>>
-    #+END_SRC
-
-** 格式化处理时间, 字符串和 =struct_time= 之间转换
-
-    #+BEGIN_SRC python :exports code
-      >>> fmt = '%Y-%m-%d %H:%M:%S'
-      >>> time.strftime(fmt, time.localtime())
-      '2019-07-02 19:19:38'
-      >>> time.strftime(fmt, time.gmtime())
-      '2019-07-02 11:19:38'
-      >>> time.strptime('2018-10-24 14:51:03', fmt)
-      time.struct_time(tm_year=2018, tm_mon=10, tm_mday=24, tm_hour=14, tm_min=51, tm_sec=3, tm_wday=2, tm_yday=297, tm_isdst=-1)
-      >>>
-    #+END_SRC
-
-** 时间戳和字符串之间转换
-    需要借助 Python 的 time 模块中的 =struct_time= 作为中间数据结构来进行转换
-
-    #+BEGIN_SRC python :exports code
-      >>> fmt = '%Y-%m-%d %H:%M:%S'
-      >>> now = time.time()
-      >>> time.strftime(fmt, time.localtime(now))
-      '2019-07-02 19:20:42'
-      >>> time.mktime(time.strptime('2018-10-24 15:03:46', fmt))
-      1540364626.0
-      >>>
-    #+END_SRC
-
-** 时间日期格式化字符串含义表
-   具体定义见下表：
-   | Directive | Meaning                                                                                                                                                                                                     |
-   |-----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-   | %a        | Locale’s abbreviated weekday name.                                                                                                                                                                          |
-   | %A        | Locale’s full weekday name.                                                                                                                                                                                 |
-   | %b        | Locale’s abbreviated month name.                                                                                                                                                                            |
-   | %B        | Locale’s full month name.                                                                                                                                                                                   |
-   | %c        | Locale’s appropriate date and time representation.                                                                                                                                                          |
-   | %d        | Day of the month as a decimal number [01,31].                                                                                                                                                               |
-   | %H        | Hour (24-hour clock) as a decimal number [00,23].                                                                                                                                                           |
-   | %I        | Hour (12-hour clock) as a decimal number [01,12].                                                                                                                                                           |
-   | %j        | Day of the year as a decimal number [001,366].                                                                                                                                                              |
-   | %m        | Month as a decimal number [01,12].                                                                                                                                                                          |
-   | %M        | Minute as a decimal number [00,59].                                                                                                                                                                         |
-   | %p        | Locale’s equivalent of either AM or PM.                                                                                                                                                                     |
-   | %S        | Second as a decimal number [00,61].                                                                                                                                                                         |
-   | %U        | Week number of the year (Sunday as the first day of the week) as a decimal number [00,53]. All days in a new year preceding the first Sunday are considered to be in week 0.                                |
-   | %w        | Weekday as a decimal number [0(Sunday),6].                                                                                                                                                                  |
-   | %W        | Week number of the year (Monday as the first day of the week) as a decimal number [00,53]. All days in a new year preceding the first Monday are considered to be in week 0.                                |
-   | %x        | Locale’s appropriate date representation.                                                                                                                                                                   |
-   | %X        | Locale’s appropriate time representation.                                                                                                                                                                   |
-   | %y        | Year without century as a decimal number [00,99].                                                                                                                                                           |
-   | %Y        | Year with century as a decimal number.                                                                                                                                                                      |
-   | %z        | Time zone offset indicating a positive or negative time difference from UTC/GMT of the form +HHMM or -HHMM, where H represents decimal hour digits and M represents decimal minute digits [-23:59, +23:59]. |
-   | %Z        | Time zone name (no characters if no time zone exists).                                                                                                                                                      |
-   | %%        | A literal '%' character.                                                                                                                                                                                    |
-
-** 线程休眠
-    =sleep= 可以是线程休眠相应的秒数。
-
-    #+BEGIN_SRC python :exports code
-      import time
-      time.sleep(5) # 线程休眠 5 秒
-    #+END_SRC
-* 读取表格类型数据：excel 和 csv
+* 常用工具
 ** excel
    Python 不是自带操作 excel 的包，需要安装第三方包来完成相应的操作。常见的可以
    操作 excel 文件的包有：pandas, openpyxl, xlrd, xlutils 和 pyexcel。
@@ -1298,89 +1325,109 @@
           for row in rows:
             self.writerow(row)
     #+END_SRC
-* 处理 JSON
-** 处理 JSON 字符串和字典转化
-   #+BEGIN_SRC python :exports code
-     >>> import json
-     >>> str1 = '{"a":1, "b":2}'
-     >>> json.loads(str1)
-     {'a': 1, 'b': 2}
-     >>> d1 = dict(a='apple', b='banana')
-     >>> json.dumps(d1)
-     '{"a": "apple", "b": "banana"}'
-     >>>
-   #+END_SRC
-** 处理 JSON 文件和字典转化
-   #+BEGIN_SRC python :exports code
-     >>> import json
-     >>> with open('/tmp/sample.json', 'r') as f:
-     ...   json.load(f)
-     ...
-     {'k1': 1, 'k2': 2}
-     >>>
-     >>> d2 = dict(name='Tom', age=18)
-     >>> with open('/tmp/d2.json', 'w') as f2:
-     ...   json.dump(d2, f2)
-     ...
-     >>>
-     # cat /tmp/d2.json
-     # {"name": "Tom", "age": 18}
-   #+END_SRC
-* 日志
-  在进行比较大的工程中往往需要配置日志。
+** json
+*** 处理 JSON 字符串和字典转化
+    #+BEGIN_SRC python :exports code
+      >>> import json
+      >>> str1 = '{"a":1, "b":2}'
+      >>> json.loads(str1)
+      {'a': 1, 'b': 2}
+      >>> d1 = dict(a='apple', b='banana')
+      >>> json.dumps(d1)
+      '{"a": "apple", "b": "banana"}'
+      >>>
+    #+END_SRC
 
-** 配置案例
-   我在 GitHub 的 Python 模板工程 [[https://github.com/Jeanhwea/python-project-template][Python Project Template]] 建了日志初始化样例。在
-   项目模块的 init 文件中初始化空的 handler
-   #+BEGIN_SRC python
-     # sample/__init__.py
-     # -*- coding: utf-8 -*-
-     __all__ = ()
-     # https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
-     import logging
-     logging.getLogger(__name__).addHandler(logging.NullHandler())
-   #+END_SRC
+*** 处理 JSON 文件和字典转化
+    #+BEGIN_SRC python :exports code
+      >>> import json
+      >>> with open('/tmp/sample.json', 'r') as f:
+      ...   json.load(f)
+      ...
+      {'k1': 1, 'k2': 2}
+      >>>
+      >>> d2 = dict(name='Tom', age=18)
+      >>> with open('/tmp/d2.json', 'w') as f2:
+      ...   json.dump(d2, f2)
+      ...
+      >>>
+      # cat /tmp/d2.json
+      # {"name": "Tom", "age": 18}
+    #+END_SRC
 
-   在测试的模块 init 文件中读取根目录的[[https://github.com/Jeanhwea/python-project-template/blob/master/custom.yml][配置文件]]，这样的好处是运行单元测试的时候
-   可以看到日志的输出，当项目打包后就屏蔽了日志输出。
-   #+BEGIN_SRC python
-     # test/__init__.py
-     # -*- coding: utf-8 -*-
-     import os
-     import sys
-     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+** yaml
+*** 安装包
+    #+BEGIN_SRC sh
+      pip install pyyaml
+    #+END_SRC
 
-     import logging.config
-     from sample.tool.config import load_logging_config
+*** 读写 yaml
+    #+BEGIN_SRC python
+      import yaml
+      # 读取 yaml
+      with open(filename, 'r') as yamlfile:
+        return yaml.load(yamlfile)
 
-     logging.config.dictConfig(load_logging_config())
-   #+END_SRC
+      # 写入 yaml 文件
+      with open(filename, 'w') as yamlfile:
+        yaml.dump(nested_dict, yamlfile)
+    #+END_SRC
 
-** 使用指南
-   #+BEGIN_SRC python :exports code
-     import logging.config
-     logging.config.fileConfig('logging.conf')
-   #+END_SRC
+** 日志
+   在进行比较大的工程中往往需要配置日志。
 
-   初始化过后就可以记录日志了，这样记录日志方法可以是直接记录，也可以在类里面记录。
-   下面是常用的记录方法：
+*** 配置案例
+    我在 GitHub 的 Python 模板工程 [[https://github.com/Jeanhwea/python-project-template][Python Project Template]] 建了日志初始化样例。在
+    项目模块的 init 文件中初始化空的 handler
+    #+BEGIN_SRC python
+      # sample/__init__.py
+      # -*- coding: utf-8 -*-
+      __all__ = ()
+      # https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
+      import logging
+      logging.getLogger(__name__).addHandler(logging.NullHandler())
+    #+END_SRC
 
-   #+BEGIN_SRC python :exports code
-     import logging
+    在测试的模块 init 文件中读取根目录的[[https://github.com/Jeanhwea/python-project-template/blob/master/custom.yml][配置文件]]，这样的好处是运行单元测试的时候
+    可以看到日志的输出，当项目打包后就屏蔽了日志输出。
+    #+BEGIN_SRC python
+      # test/__init__.py
+      # -*- coding: utf-8 -*-
+      import os
+      import sys
+      sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-     # logging directly
-     logger = logging.getLogger(__name__)
-     logging.info("...")
+      import logging.config
+      from sample.tool.config import load_logging_config
 
-     # logging in Class
-     class Hello:
+      logging.config.dictConfig(load_logging_config())
+    #+END_SRC
 
-       def __init__(self):
-         self.logger = logging.getLogger(__name__)
+*** 使用指南
+    #+BEGIN_SRC python :exports code
+      import logging.config
+      logging.config.fileConfig('logging.conf')
+    #+END_SRC
 
-       def hello(self):
-     self.info("...")
-   #+END_SRC
+    初始化过后就可以记录日志了，这样记录日志方法可以是直接记录，也可以在类里面记录。
+    下面是常用的记录方法：
+
+    #+BEGIN_SRC python :exports code
+      import logging
+
+      # logging directly
+      logger = logging.getLogger(__name__)
+      logging.info("...")
+
+      # logging in Class
+      class Hello:
+
+        def __init__(self):
+          self.logger = logging.getLogger(__name__)
+
+        def hello(self):
+      self.info("...")
+    #+END_SRC
 
 * 参考链接
   1. [[https://docs.python-guide.org][The Hitchhiker’s Guide to Python!]]
