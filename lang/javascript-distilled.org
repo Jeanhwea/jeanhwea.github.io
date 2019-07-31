@@ -1398,3 +1398,95 @@
 
       new User("Dude").sayHi(); // Hello Dude!
     #+END_SRC
+* 浏览器相关
+  大部分 JavaScript 的应用是运行于浏览器中的，浏览器包括如下基本对象
+  - DOM: Document Object Model
+  - BOM: Browser Object Model, =navigator=, =screen=, =location=, =frames=,
+    =history=, =XMLHttpRequest=, ...
+  - JavaScript: =Object=, =Array=, =Function=, ...
+
+** Document
+*** 节点类型及相应对应关系
+    DOM 中定义了 [[https://dom.spec.whatwg.org/#node][12 种节点]]，在实践中常用的有以下四种：
+    - ~DOCUMENT_NODE~ 文档根节点, =document=
+    - ~ELEMENT_NODE~ 元素节点
+    - ~ATTRIBUTE_NODE~ 属性节点
+    - ~TEXT_NODE~ 文本节点
+
+    节点 DOM 和 HTML 对应关系表格
+    | DOM                               | HTML                        |
+    |-----------------------------------+-----------------------------|
+    | =<html>=                          | ~document.documentElement~  |
+    | =<body>=                          | ~document.body~             |
+    | =<head>=                          | ~document.head~             |
+    | =<tr>=                            | ~table.rows~                |
+    |                                   | ~tr.cells~                  |
+    |                                   | ~tr.rowIndex~               |
+    |                                   | ~tr.sectionRowIndex~        |
+    | =<td>=                            | ~td.cellIndex~              |
+    | =<caption>=, =<thead>=, =<tfoot>= | ~table.caption/tHead/tFoot~ |
+    | =<tbody>=                         | ~table.tBodies~             |
+
+*** 节点工具函数
+    DOM 提供了一些可以遍历 html 节点的函数，具体入下
+    - 针对于所有类型节点方法: parentNode, childNodes, firstChild, lastChild,
+      previousSibling, nextSibling.
+    - 仅仅针对元素节点: parentElement, children, firstElementChild,
+      lastElementChild, previousElementSibling, nextElementSibling
+
+*** 节点选择器
+    =getElementsBy*= 和 =querySelector*= 是选取 DOM 元素的基本方法，它的介绍见下表
+    | 方法名                 | 传入参数     | 元素能否调用 | 返回实时结果 |
+    |------------------------+--------------+--------------+--------------|
+    | getElementById         | id           | -            | -            |
+    | getElementsByName      | name         | -            | yes          |
+    | getElementsByTagName   | tag or '*'   | yes          | yes          |
+    | getElementsByClassName | class        | yes          | yes          |
+    | querySelector          | CSS-selector | yes          | -            |
+    | querySelectorAll       | CSS-selector | yes          | -            |
+
+*** 节点属性
+    节点的类的继承见下图，其中 EventTarget 是节点的抽象基类
+
+    [[file:../static/image/2019/07/dom-node-class.png]]
+
+    - nodeType 属性表明了 DOM 节点的属性，它是一个整数值：
+      - =1= 表示元素节点
+      - =3= 表示文本节点
+      - =9= 表示 document 对象
+    - nodeName/tagName
+    - innerHTML
+    - outerHTML
+    - nodeValue/data
+    - textContent
+    - hidden 如果为 true，和 CSS 的 ~display:none~ 表示同一意思
+
+*** 属性 Attribute 和 Properties
+    Attribute 存在于 HTML 中，大小写不敏感，必须是字符串；Properties 存在于 DOM
+    对象中，大小写敏感，可以是任何基础的值，一般使用点操作符来引用。例如：
+    - ~elem.hasAttribute(name)~ – to check for existence.
+    - ~elem.getAttribute(name)~ – to get the value.
+    - ~elem.setAttribute(name, value)~ – to set the value.
+    - ~elem.removeAttribute(name)~ – to remove the attribute.
+    - ~elem.attributes~ is a collection of all attributes.
+
+*** 创建/插入/删除 节点
+    - ~document.createElement(tag)~ 通过 tag 创建新的节点
+    - ~document.createTextNode(value)~ 创建文本节点
+    - ~elem.cloneNode(deep)~ 克隆节点
+    - ~parent.appendChild(node)~
+    - ~parent.insertBefore(node, nextSibling)~
+    - ~parent.removeChild(node)~
+    - ~parent.replaceChild(newElem, node)~
+    - ~node.append(...nodes or strings)~
+    - ~node.prepend(...nodes or strings)~
+    - ~node.before(...nodes or strings)~
+    - ~node.after(...nodes or strings)~ –
+    - ~node.replaceWith(...nodes or strings)~
+    - ~node.remove()~
+    - ~elem.insertAdjacentHTML(where, html)~
+      - where: ="beforebegin"= ="afterbegin"= ="beforeend"= ="afterend"=
+
+** 事件
+
+** 表单和控制
