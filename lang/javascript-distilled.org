@@ -1552,7 +1552,8 @@
        - handler 回调的事件处理函数
        - options 可选项，
          - once 如果真，当事件调用一次自动移除
-         - capture 在哪个阶段的事件
+         - phase 布尔值。默认为假，表示 bubbling 阶段的事件；真表示 capturing 阶
+           段的事件
          - passive 如果真，则不会有 =preventDefault()=
 
     绑定的处理事件的回调函数传入一个 Event 对象作为参数
@@ -1581,8 +1582,21 @@
 
      - ~event.target~ 指向最先触发事件的 DOM 元素，主要和 ~event.currentTarget~
        的区别
+     - ~event.eventPhase~ 当前的阶段。 ~capturing=1, bubbing=3~
      - ~event.stopPropagation()~ 可以阻止事件冒泡，注意： *如果不是必要的话，千万
        不要阻止事件冒泡*
+     - ~event.preventDefault()~ 阻止浏览器默认的事件，方便改变浏览器的行为。例如：
+       阻止 ~<input type="submit">~ 的行为，可以自己实现提交
+     - ~event.defaultPrevented~ 如果为真表示浏览器默认事件被阻止了
+
+     下面是一个阻止 a 标签打开链接的例子
+     #+BEGIN_SRC html
+       <!-- 老方法 -->
+       <a href="/" onclick="return false">Click here</a>
+
+       <!-- 新方法 -->
+       <a href="/" onclick="event.preventDefault()">here</a>
+     #+END_SRC
 
 **** 事件捕获
      事件捕获在实际代码中用的比较少，但是有时非常好用。在 DOM 事件的处理中，分成以
@@ -1593,4 +1607,165 @@
 
      [[file:../static/image/2019/08/dom-capturing-target-bubbling.png]]
 
-** 表单和控制
+**** 事件代理
+     Capturing 和 Bubbling 使得可以使用事件代理， *减少重复代码* ，如下可以使用
+     代理点击事件来高亮表格的单元格
+     #+BEGIN_SRC js
+       let selectedTd;
+
+       table.onclick = function(event) {
+         let target = event.target;
+         if (target.tagName != 'TD') return;
+         highlight(target);
+       };
+
+       function highlight(td) {
+         if (selectedTd) {
+           selectedTd.classList.remove('highlight');
+         }
+         selectedTd = td;
+         selectedTd.classList.add('highlight');
+       }
+     #+END_SRC
+
+     在父节点中代理事件时，子节点一定不能阻止事件冒泡 ~event.stopPropagation()~
+
+**** 事件分发
+     W3C 中定义的事件列表参考 [[https://www.w3.org/TR/uievents/][uievents]]
+     - Event 的构造器 ~new Event(event[, options]);~
+       + event 事件类型
+       + options 选项
+         - bubbles 是否冒泡
+         - cancelable 如果真，则可以调用 ~event.preventDefault()~ ，否则调用无效
+     - 事件中嵌套事件时同步的，即在事件回调函数中使用 ~addEventListener~ 定义事
+       件不能达到异步执行的效果
+     - 分发事件调用 ~elem.dispatchEvent(event)~
+
+     #+BEGIN_SRC html
+       <button id="elem" onclick="alert('Click!');">Autoclick</button>
+
+       <script>
+         let event = new Event("click");
+         elem.dispatchEvent(event);
+       </script>
+     #+END_SRC
+
+**** 常见事件
+***** 鼠标事件
+      - 简单事件
+        + ~mousedown/mouseup~
+        + ~mouseover/mouseout~
+        + ~mousemove~
+      - 复杂事件
+        + ~click~
+        + ~contextmenu~
+        + ~dblclick~
+      - 鼠标事件参数
+        + =which= 鼠标左键(1)，鼠标中键(2)，鼠标右键(3)
+        + 修饰键 =shiftKey=, =altKey=, =ctrlKey=, =metaKey=
+        + 坐标，window 的相对坐标 ~clientX/clientY~, document 的相对坐标
+          ~pageX/pageY~
+
+      #+BEGIN_SRC js
+        button.onclick = function(event) {
+          if (event.altKey && event.shiftKey) {
+            alert('Hooray!');
+          }
+        };
+      #+END_SRC
+
+***** 键盘事件
+      - 键盘事件 ~keydown/keyup~
+      - ~event.code/event.key~ 按下 Z 键： code="KeyZ", key=z；同时按下 Shift 和
+        Z 键：code="KeyZ", key=Z。
+     #+BEGIN_SRC js
+       document.addEventListener('keydown', function(event) {
+         if (event.code == 'KeyZ' && (event.ctrlKey || event.metaKey)) {
+           alert('Undo!')
+         }
+       });
+     #+END_SRC
+
+***** 滚动事件
+      - 滚动事件 ~onscroll~
+      - 阻止滚动行为： ~onscroll="event.preventDefault()"~
+      #+BEGIN_SRC js
+        window.addEventListener('scroll', function() {
+          document.getElementById('showScroll').innerHTML = pageYOffset + 'px';
+        });
+      #+END_SRC
+
+***** 页面生命周期中的事件
+      - ~DOMContentLoaded~: 当初始的 HTML 文档被完全加载和解析完成之后触发
+      - ~windows.onload/onbeforeload/onunload~
+        + ~document.readyState~: "loading", "interactive", "complete"
+
+      #+BEGIN_SRC js
+        function work() { /*...*/ }
+
+        if (document.readyState == 'loading') {
+          document.addEventListener('DOMContentLoaded', work);
+        } else {
+          work();
+        }
+      #+END_SRC
+
+** 表单
+*** 表单属性和方法
+    基本的表单见下面的示例
+    #+BEGIN_SRC html
+      <form name="my">
+        <input name="one" value="1">
+        <input name="two" value="2">
+      </form>
+
+      <script>
+        // get the form
+        let form = document.forms.my; // <form name="my"> element
+
+        // get the element
+        let elem = form.elements.one; // <input name="one"> element
+
+        alert(elem.value); // 1
+      </script>
+    #+END_SRC
+
+    - ~document.forms~ 获取页面中的所有表单
+    - =input.value= 和 =textarea.value= 获取值
+    - =select= 和 =option=
+      - =select.options= 获取 select 下面所有的 option 的集合
+      - =select.value= 获取选取的 option 的值
+      - =select.selectedIndex= 获取选取的下标
+    - =focus= 和 =blur= 捕获焦点和失去焦点的事件，当前聚焦的元素可以通过
+      ~document.activeElement~ 来获取
+
+   #+BEGIN_SRC html
+     <select id="select">
+       <option value="apple">Apple</option>
+       <option value="pear">Pear</option>
+       <option value="banana">Banana</option>
+     </select>
+
+     <script>
+       // all three lines do the same thing
+       select.options[2].selected = true;
+       select.selectedIndex = 2;
+       select.value = 'banana';
+     </script>
+   #+END_SRC
+
+*** 表单提交
+    触发表单提交主要有几种方法：
+    1. 点击 ~<input type="submit">~ 或 ~<input type="image">~
+    2. 在 input 标签中按回车键
+    3. 调用 ~form.submit()~
+
+    #+BEGIN_SRC html
+      <form onsubmit="alert('submit!');return false">
+        First: Enter in the input field <input type="text" value="text"><br>
+        Second: Click "submit": <input type="submit" value="Submit">
+      </form>
+    #+END_SRC
+
+* 参考链接
+  1. [[http://javascript.info/][The Modern JavaScript Tutorial]]
