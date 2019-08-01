@@ -1,0 +1,75 @@
+digraph DomCapturingTargetBubbling {
+  ranksep=0.75;
+  node
+  [
+    shape=box;
+    style="filled";
+    color="#666666";
+    fontcolor="#ffffff";
+    fontname="Arial"
+  ];
+
+  edge [color="#666666"];
+  html_note
+  [
+   shape=note,
+   style=normal,
+   fontcolor=black,
+   fontname="Arial",
+   fontsize=12,
+   label="<form onclick=...>\l  <div onclick=...>\l    <p onclick=...></p>\l  </div>\l</form>\l"
+   ];
+
+  form_note
+  [
+   shape=ellipse,
+   style=normal,
+   fontcolor=black,
+   fontname="MicroSoft YaHei",
+   fontsize=12,
+   label="点击 <p>"
+   ];
+
+  form [width=1.5, label="<form>", group=g_form];
+  p00, p04 [shape=point, width=0, label="", group=g_form];
+  p0 [style=invis, label="", group=g_form];
+  form -> p00 [style=dashed, arrowhead=none];
+  p00 -> p04 [style=none, penwidth=5, arrowhead=none];
+  p04 -> p0 [style=dashed, arrowhead=none];
+
+  div [width=1.5, label="<div>", group=g_div];
+  p10, p11, p13, p14 [shape=point, width=0, label="", group=g_div];
+  p1 [style=invis, label="", group=g_div];
+  div -> p10 [style=dashed, arrowhead=none];
+  p10 -> p11 -> p13 -> p14 [style=none, penwidth=5, arrowhead=none];
+  p14 -> p1 [style=dashed, arrowhead=none];
+
+
+  p [width=1.5, label="<p>", group=g_p];
+  p21, p22, p23 [shape=point, width=0, label="", group=g_p];
+  p2 [style=invis, label="", group=g_p];
+  p -> p21 [style=dashed, arrowhead=none];
+  p21 -> p22 -> p23 [style=none, penwidth=5, arrowhead=none];
+  p23 -> p2 [style=dashed, arrowhead=none];
+
+
+  { rank=same; form; div; p}
+  { rank=same; p0; p1; p2 }
+  form -> div -> p [style=invis];
+
+  edge [fontname="Arial"];
+  p00 -> p10 [color="#f30067", penwidth=1.2, arrowhead=normal, label="1: Capturing"];
+  { rank = same; p00; p10};
+  p11 -> p21 [color="#f30067", penwidth=1.2, arrowhead=normal, label="1: Capturing"];
+  { rank = same; p11; p21};
+  p22 -> p22 [color="#f8b739", penwidth=1.2, arrowhead=normal, label="2: Target"];
+  p13 -> p23 [color="#00bdaa", penwidth=1.2, arrowhead=normal, dir=back, style=dashed, label="3: Bubbling"];
+  { rank = same; p13; p23};
+  p04 -> p14 [color="#00bdaa", penwidth=1.2, arrowhead=normal, dir=back, style=dashed, label="3: Bubbling"];
+  { rank = same; p04; p14};
+
+
+
+  form_note -> p00;
+  { rank=same; form_note; p00 }
+}

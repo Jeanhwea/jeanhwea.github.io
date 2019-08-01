@@ -1555,6 +1555,42 @@
          - capture 在哪个阶段的事件
          - passive 如果真，则不会有 =preventDefault()=
 
+    绑定的处理事件的回调函数传入一个 Event 对象作为参数
+    #+BEGIN_SRC js
+      elem.onclick = function(event) {
+        // ...
+      }
+    #+END_SRC
+    Event 对象有以下基本属性：
+    - ~event.type~ 事件类型，例如: "click"
+    - ~event.currentTarget~ 指向事件所处理的当前 DOM 元素
+    - ~event.clientX~ / ~event.clientY~ 对应鼠标事件，这两个值表示鼠标的坐标
+
 *** 事件冒泡(bubbing)和捕获(capturing)
+**** 事件冒泡
+     事件冒泡指的是当 HTML 节点嵌套时，子节点的事件依次引发父节点的相应事件。例如：
+     在下面的代码中，当点击 =p= 标签时会触发 =div= 和 =form= 的点击事件
+     #+BEGIN_SRC html
+       <form onclick="alert('form')">FORM
+         <div onclick="alert('div')">DIV
+           <p onclick="alert('p')">P</p>
+         </div>
+       </form>
+     #+END_SRC
+     *除了 focus 以外*, 几乎所有的事件都是冒泡的
+
+     - ~event.target~ 指向最先触发事件的 DOM 元素，主要和 ~event.currentTarget~
+       的区别
+     - ~event.stopPropagation()~ 可以阻止事件冒泡，注意： *如果不是必要的话，千万
+       不要阻止事件冒泡*
+
+**** 事件捕获
+     事件捕获在实际代码中用的比较少，但是有时非常好用。在 DOM 事件的处理中，分成以
+     下三个阶段：
+     1. Capturing 阶段：父节点捕获到事件时，将事件从父节点传到子节点时期
+     2. Target 阶段：事件到达目标节点时期
+     3. Bubbling 阶段：子节点处理好事件后，将事件从子节点回传到父节点时期
+
+     [[file:../static/image/2019/08/dom-capturing-target-bubbling.png]]
 
 ** 表单和控制
