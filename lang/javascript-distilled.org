@@ -509,6 +509,7 @@
 
 *** 字符串替换/正则表达式
     - ~str.replace(regexp|substr,newSubstr|function)~
+      - ~str.replace(/a/g, 'b')~ 将 str 中所有的 a 替换成 b
     - ~str.match(regexp)~ : 匹配 regexp 返回数组，如果 regexp 是 null 则返回空
     - ~str.search(regexp)~
     #+BEGIN_SRC js
@@ -535,6 +536,56 @@
         groups: undefined ]
       > 'abaa'.match(null)
       null
+    #+END_SRC
+
+    创建正则表达式的方法
+    #+BEGIN_SRC js
+      // 标准创建方法
+      let regexp = new RegExp("pattern", "flags");
+      // 语法糖
+      let regexp1 = /pattern/; // no flags
+      let regexp2 = /pattern/gmi; // with flags g,m and i
+    #+END_SRC
+
+    - ~re.test(str)~ 测试 str 是否满足正则表达式 re
+    - ~re.exec(str)~
+
+    常用的字符组如下：
+    - =\d= digitals, =\D= non-digitals
+    - =\s= spaces, =\S= non-spaces
+    - =\w= words, =\W= non-words
+    - =\b= word boundary
+    #+BEGIN_SRC js
+      > /^\d*$/.test('1231a23')
+      false
+      > /^\d*$/.test('123123')
+      true
+      > "Hello, Java!".match(/\bJava\b/)
+      [ 'Java', index: 7, input: 'Hello, Java!', groups: undefined ]
+      > "Hello, JavaScript!".match(/\bJava\b/)
+      null
+    #+END_SRC
+
+    - Lazy 匹配模式使用 =?=
+    - 分组使用小括号，在替换中引用使用 ~$n~, 在正则表达式中引用使用 ~\n~ 。其中 n
+      是数字
+    #+BEGIN_SRC js
+      > /\d+/.exec('121-a-88-122')
+      [ '121', index: 0, input: '121-a-88-122', groups: undefined ]
+      > /\d+?/.exec('121-a-88-122') // lazy mode
+      [ '1', index: 0, input: '121-a-88-122', groups: undefined ]
+      > 'Jinghui Hu'.replace(/(\w+) (\w+)/i, "$2, $1")
+      'Hu, Jinghui'
+      > /(\w+) (\w+)/i.exec('Jinghui Hu')
+      [ 'Jinghui Hu',
+        'Jinghui',
+        'Hu',
+        index: 0,
+        input: 'Jinghui Hu',
+        groups: undefined ]
+      > 'He said: "She is the one!".'.match(/(['"])(.*?)\1/g)
+      [ '"She is the one!"' ]
+      >
     #+END_SRC
 
 *** 其它字符串函数
