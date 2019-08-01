@@ -1458,7 +1458,7 @@
 
       new User("Dude").sayHi(); // Hello Dude!
     #+END_SRC
-* 浏览器相关
+* 浏览器知识
   大部分 JavaScript 的应用是运行于浏览器中的，浏览器包括如下基本对象
   - DOM: Document Object Model
   - BOM: Browser Object Model, =navigator=, =screen=, =location=, =frames=,
@@ -1826,6 +1826,95 @@
         Second: Click "submit": <input type="submit" value="Submit">
       </form>
     #+END_SRC
+
+* 异步
+** XMLHttpRequest 和 AJAX
+   传统的异步请求是使用 AJAX 技术来实现，AJAX 使用到一个 XMLHttpRequest 对象
+   #+BEGIN_SRC js
+     let xhr = new XMLHttpRequest();
+     xhr.open('GET', '/my/url');
+     xhr.send();
+
+     xhr.onload = function() {
+       // we can check
+       // status, statusText - for response HTTP status
+       // responseText, responseXML (when content-type: text/xml) - for the response
+
+       if (this.status != 200) {
+         // handle error
+         alert( 'error: ' + this.status);
+         return;
+       }
+       // get the response from this.responseText
+     };
+
+     xhr.onerror = function() {
+       // handle error
+     };
+   #+END_SRC
+   - ~xhr.open(method,URL,async,user,password)~
+     + =method=, =URL= HTTP 方法和资源 URL
+     + =async= 默认为假，表示同步请求
+     + =user=, =password= 用户名和密码
+   - ~xhr.send([body])~ 发送请求
+   - ~xhr.abort()~ 终止请求，也可以设置超时 ~xhr.timeout=10000~
+   - 异步请求的相关事件: =load=, =error=, =timeout=, =progress=
+   - 相应结果：
+     + =status= 状态码，例如：200， 404
+     + =statusText= 返回状态短消息，例如： "OK", "Not Found"
+     + =responseText= 返回的文本
+   - ~setRequestHeader(name,value)~/~getResponseHeader(name)~ 设置/获取消息头，
+     ~xhr.setRequestHeader('Content-Type','application/json');~
+
+** Promise
+   Promise 对象可以用来解决 JavaScript 的 callback hell 的窘境
+   #+BEGIN_SRC js
+     let promise = new Promise(function(resolve, reject) {
+       // executor (the producing code, "singer")
+     });
+   #+END_SRC
+
+   Promise 对象有 =state= 和 =result= 这两个属性，满足如下状态图
+   [[file:../static/image/2019/08/promise-states.png]]
+
+   Promise 有 =then= 和 =catch= 两个成员函数
+   - =then= 方法可以用来实现链式调用
+     + ~then~ 返回普通值时，会立马返回结果到下一个 handler
+     + 当 ~then~ 方法返回一个新的 Promise 对象时，直到调用完毕后才返回结果
+   - =catch= 方法用来错误处理
+
+   #+BEGIN_SRC js
+     // 串行逻辑的 =then= 调用
+     new Promise(function(resolve, reject) {
+       setTimeout(() => resolve(1), 1000);
+     }).then(function(result) {
+       alert(result); // 1
+       return result * 2;
+     }).then(function(result) {
+       alert(result); // 2
+       return result * 2;
+     }).then(function(result) {
+       alert(result); // 4
+       return result * 2;
+     });
+
+     // 并行版本的 =then= 调用
+     let promise = new Promise(function(resolve, reject) {
+       setTimeout(() => resolve(1), 1000);
+     });
+     promise.then(function(result) {
+       alert(result); // 1
+       return result * 2;
+     });
+     promise.then(function(result) {
+       alert(result); // 1
+       return result * 2;
+     });
+     promise.then(function(result) {
+       alert(result); // 1
+       return result * 2;
+     });
+   #+END_SRC
 
 * 参考链接
   1. [[http://javascript.info/][The Modern JavaScript Tutorial]]
