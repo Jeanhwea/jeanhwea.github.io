@@ -1875,7 +1875,11 @@
       });
     #+END_SRC
 
-    Promise 对象有 =state= 和 =result= 这两个属性，满足如下状态图：
+    Promise 对象有两个重要属性：
+    - ~[[PromiseStatus]]~ Promise 对象当前的状态
+    - ~[[PromiseValue]]~ Promise 的初始值
+    满足如下状态图：
+
     [[file:../static/image/2019/08/promise-states.png]]
 
 *** ~Promise.then/catch(handler)~
@@ -1965,6 +1969,37 @@
         3  // treated as Promise.resolve(3)
       ]).then(alert); // 1, 2, 3
     #+END_SRC
+
+*** 异步函数 ~async/await~
+    - 异步函数的定义是在普通函数前面添加 ~async~ 关键字
+    - 当调用异步函数是返回一个 Promise 对象
+    - 可以是函数里面使用 ~await~ 关键字
+    #+BEGIN_SRC js
+      > async function f() { return 1; }
+      > f
+      [AsyncFunction: f]
+      > f()
+      Promise {
+        1,
+        domain:
+         Domain { ... }}
+      > f().then(console.log)
+      Promise {
+        <pending>,
+        domain:
+         Domain { ... }}
+      1
+      >
+    #+END_SRC
+
+    - 在异步函数中使用 ~await~ 可以等待返回结果， ~let res = await promise~
+    - ~await~ 只能用于异步函数中
+    - ~await~ 不能用于在顶层调用， 例如下面的调用时错误的
+      #+BEGIN_SRC js
+        // 错误调用方式
+        let response = await  fetch('/article/promise-chaining/user.json');
+        let user = await response.json();
+      #+END_SRC
 
 * 参考链接
   1. [[http://javascript.info/][The Modern JavaScript Tutorial]]
