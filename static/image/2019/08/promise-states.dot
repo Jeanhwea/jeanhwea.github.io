@@ -1,16 +1,16 @@
 digraph PromiseStates {
   rankdir=LR;
-  new_note[shape=note, label="new Promise(executor)"];
+  new_note[shape=note, label="new Promise(executor)\lexecutor: (resolve, reject) => {...}"];
 
   node [shape=Mrecord, fontname="Arial"];
   edge [minlen=4, fontname="Arial"];
 
-  pending [label="state: pending|result: undefined"];
-  fulfilled [label="state: fulfilled|result: value"];
-  rejected [label="state: rejected|result: error"];
+  pending [label="[[PromiseStatus]]: pending|[[PromiseValue]]: undefined"];
+  resolved [label="[[PromiseStatus]]: resolved|[[PromiseValue]]: value"];
+  rejected [label="[[PromiseStatus]]: rejected|[[PromiseValue]]: error"];
 
   new_note -> pending [style=dashed, arrowhead=dot, arrowsize=0.6, minlen=2];
-  pending -> fulfilled [label="resolve(value)"];
-  pending -> rejected [label="reject(error)"];
+  pending -> resolved [label="Promise.resolve(value)"];
+  pending -> rejected [label="Promise.reject(error)"];
 
 }
