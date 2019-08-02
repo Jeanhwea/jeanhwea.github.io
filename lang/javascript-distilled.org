@@ -1506,7 +1506,7 @@
     | querySelectorAll       | CSS-selector | yes          | -            |
 
 *** 节点属性
-    节点的类的继承见下图，其中 EventTarget 是节点的抽象基类
+    节点的类的继承见下图，其中 [[https://developer.mozilla.org/en-US/docs/Web/API/EventTarget][EventTarget]] 是节点的抽象基类
 
     [[file:../static/image/2019/07/dom-node-class.png]]
 
@@ -1970,36 +1970,73 @@
       ]).then(alert); // 1, 2, 3
     #+END_SRC
 
-*** 异步函数 ~async/await~
-    - 异步函数的定义是在普通函数前面添加 ~async~ 关键字
-    - 当调用异步函数是返回一个 Promise 对象
-    - 可以是函数里面使用 ~await~ 关键字
+** 异步函数 ~async/await~
+   - 异步函数的定义是在普通函数前面添加 ~async~ 关键字
+   - 当调用异步函数是返回一个 Promise 对象
+   - 可以是函数里面使用 ~await~ 关键字
+   #+BEGIN_SRC js
+     > async function f() { return 1; }
+     > f
+     [AsyncFunction: f]
+     > f()
+     Promise {
+       1,
+       domain:
+        Domain { ... }}
+     > f().then(console.log)
+     Promise {
+       <pending>,
+       domain:
+        Domain { ... }}
+     1
+     >
+   #+END_SRC
+
+   - 在异步函数中使用 ~await~ 可以等待返回结果， ~let res = await promise~
+   - ~await~ 只能用于异步函数中
+   - ~await~ 不能用于在顶层调用， 例如下面的调用时错误的
+     #+BEGIN_SRC js
+       // 错误调用方式
+       let response = await  fetch('/article/promise-chaining/user.json');
+       let user = await response.json();
+     #+END_SRC
+
+** RxJS
+   [[http://reactivex.io/rxjs/manual/overview.html][RxJS]] 是一个事件驱动的异步调用函数库，官网上宣称是 *事件版本的 Lodash 库* ，
+   RxJS 库的核心概念如下：
+   - Observable 表示可以被唤起的值和事件的数据结构
+   - Observer 回调函数集合，当回调函数返回值后将结果传递给 Observable
+   - Subscription 表示 Observable 的执行
+   - Operator 操作符，提供函数式编程的接口
+   - Subject 和事件发射器相似，用于多播异步回调函数的返回值到 Observer 对象中
+   - Scheduler 并发操作的中心分发器
+
+*** 基本使用示例
+    ~Observable.fromEvent(target, eventName, options, selector)~ 可以将事件回调
+    函数绑定到 DOM 元素中
     #+BEGIN_SRC js
-      > async function f() { return 1; }
-      > f
-      [AsyncFunction: f]
-      > f()
-      Promise {
-        1,
-        domain:
-         Domain { ... }}
-      > f().then(console.log)
-      Promise {
-        <pending>,
-        domain:
-         Domain { ... }}
-      1
-      >
+      Rx.Observable.fromEvent(button, 'click')
+        .subscribe(() => console.log('Clicked!'));
     #+END_SRC
 
-    - 在异步函数中使用 ~await~ 可以等待返回结果， ~let res = await promise~
-    - ~await~ 只能用于异步函数中
-    - ~await~ 不能用于在顶层调用， 例如下面的调用时错误的
-      #+BEGIN_SRC js
-        // 错误调用方式
-        let response = await  fetch('/article/promise-chaining/user.json');
-        let user = await response.json();
-      #+END_SRC
+*** 创建 Observable 对象
+    - ~of(...items)~ 通过 Array-like 对象创建 Observable
+    - ~from(iter)~ 通过迭代器创建 Observable
+    #+BEGIN_SRC js
+      Rx.Observable.of(1,2,3);
+      Rx.Observable.from([1,2,3]);
+    #+END_SRC
+
+*** 订阅 Observable 实例
+    - ~observable.subscribe(res => ..., err => ..., () => ...)~ 方法可以订阅 Observable 实例
+    - subscribe 中有三个参数，第一个是正常调用的 handler；第二个是错误处理的
+      handler；第三个是完成后的 handler
+    #+BEGIN_SRC js
+      myObservable.subscribe({
+        next(num) { console.log('Next num: ' + num)},
+        error(err) { console.log('Received an errror: ' + err)}
+      });
+    #+END_SRC
 
 * 参考链接
   1. [[http://javascript.info/][The Modern JavaScript Tutorial]]
