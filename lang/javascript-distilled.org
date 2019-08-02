@@ -1867,58 +1867,84 @@
      ~xhr.setRequestHeader('Content-Type','application/json');~
 
 ** Promise
-   Promise 对象可以用来解决 JavaScript 的 callback hell 的窘境
-   #+BEGIN_SRC js
-     let promise = new Promise(function(resolve, reject) {
-       // executor (the producing code, "singer")
-     });
-   #+END_SRC
+*** Promise
+    Promise 对象可以用来解决 JavaScript 的 callback hell 的窘境
+    #+BEGIN_SRC js
+      let promise = new Promise(function(resolve, reject) {
+        // executor (the producing code, "singer")
+      });
+    #+END_SRC
 
-   Promise 对象有 =state= 和 =result= 这两个属性，满足如下状态图：
-   [[file:../static/image/2019/08/promise-states.png]]
+    Promise 对象有 =state= 和 =result= 这两个属性，满足如下状态图：
+    [[file:../static/image/2019/08/promise-states.png]]
 
-   Promise 有 ~then/catch(handler)~ 两个成员函数
-   - ~then~ 方法返回一个 Promise 对象，可以用来实现链式调用，有一点比较有用的是
-     ~then~ 的行为会根据 ~then~ handler 的返回值类型改变
-     + 当 handler 返回普通值时， ~then~ 方法会立马返回处理到下一个 handler
-     + 当 handler 抛出异常时， ~then~ 相当发生错误，调用 ~catch~ 方法的 handler
-       来进行错误处理
-     + 当 handler 返回值是 Promise 对象时，直到等待 Promise 的异步调用完毕后
-       才返回结果
-   - ~catch~ 方法用来错误处理
+*** ~Promise.then/catch(handler)~
+    Promise 有 ~then/catch(handler)~ 两个成员函数
+    - ~then~ 方法返回一个 Promise 对象，可以用来实现链式调用，有一点比较有用的是
+      ~then~ 的行为会根据 ~then~ handler 的返回值类型改变
+      + 当 handler 返回普通值时， ~then~ 方法会立马返回处理到下一个 handler
+      + 当 handler 抛出异常时， ~then~ 相当发生错误，调用 ~catch~ 方法的 handler
+        来进行错误处理
+      + 当 handler 返回值是 Promise 对象时，直到等待 Promise 的异步调用完毕后
+        才返回结果
+    - ~catch~ 方法用来错误处理
 
-   #+BEGIN_SRC js
-     // 串行逻辑的 then 调用
-     new Promise(function(resolve, reject) {
-       setTimeout(() => resolve(1), 1000);
-     }).then(function(result) {
-       alert(result); // 1
-       return result * 2;
-     }).then(function(result) {
-       alert(result); // 2
-       return result * 2;
-     }).then(function(result) {
-       alert(result); // 4
-       return result * 2;
-     });
+    #+BEGIN_SRC js
+      // 串行逻辑的 then 调用
+      new Promise(function(resolve, reject) {
+        setTimeout(() => resolve(1), 1000);
+      }).then(function(result) {
+        alert(result); // 1
+        return result * 2;
+      }).then(function(result) {
+        alert(result); // 2
+        return result * 2;
+      }).then(function(result) {
+        alert(result); // 4
+        return result * 2;
+      });
 
-     // 并行版本的 then 调用
-     let promise = new Promise(function(resolve, reject) {
-       setTimeout(() => resolve(1), 1000);
-     });
-     promise.then(function(result) {
-       alert(result); // 1
-       return result * 2;
-     });
-     promise.then(function(result) {
-       alert(result); // 1
-       return result * 2;
-     });
-     promise.then(function(result) {
-       alert(result); // 1
-       return result * 2;
-     });
-   #+END_SRC
+      // 并行版本的 then 调用
+      let promise = new Promise(function(resolve, reject) {
+        setTimeout(() => resolve(1), 1000);
+      });
+      promise.then(function(result) {
+        alert(result); // 1
+        return result * 2;
+      });
+      promise.then(function(result) {
+        alert(result); // 1
+        return result * 2;
+      });
+      promise.then(function(result) {
+        alert(result); // 1
+        return result * 2;
+      });
+    #+END_SRC
+
+*** fetch
+    [[https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch][fetch]] 函数可以请求远端的服务器，然后返回一个 Promise 对象。在 Chrome 浏览器中
+    请求的样例如下：
+
+    [[file:../static/image/2019/08/fetch-github-api.png]]
+
+    #+BEGIN_SRC js
+      fetch('/article/promise-chaining/user.json')
+        .then(response => response.json())
+        .then(user => fetch(`https://api.github.com/users/${user.name}`))
+        .then(response => response.json())
+        .then(githubUser => new Promise(function(resolve, reject) {
+          let img = document.createElement('img');
+          img.src = githubUser.avatar_url;
+          img.className = "promise-avatar-example";
+          document.body.append(img);
+          setTimeout(() => {
+            img.remove();
+            resolve(githubUser);
+          }, 3000);
+        }))
+        .then(githubUser => alert(`Finished showing ${githubUser.name}`));
+    #+END_SRC
 
 * 参考链接
   1. [[http://javascript.info/][The Modern JavaScript Tutorial]]
