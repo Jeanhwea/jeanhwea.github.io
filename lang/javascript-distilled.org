@@ -1221,12 +1221,12 @@
      user.fullName = "Alice Cooper";
    #+END_SRC
 
-** 原型 =[Prototype]=
-   JavaScript 的对象中都一个隐藏的 =[Prototype]= 属性，该属性被用来设置对象的原
+** 原型 ~[[Prototype]]~
+   JavaScript 的对象中都一个隐藏的 ~[[Prototype]]~ 属性，该属性被用来设置对象的原
    型关系和一些面向对象的方法
 
 *** 对象的原型 ~obj.__proto__~
-    可以通过 ~obj.__proto__~ 来访问它 =[Prototype]= 。JavaScript 的继承关系都是
+    可以通过 ~obj.__proto__~ 来访问它 ~[[Prototype]]~ 。JavaScript 的继承关系都是
     靠 ~__proto__~ 来实现的
     #+BEGIN_SRC js
       > let animal = { eats: true };
@@ -1263,7 +1263,7 @@
 
     ~F.prototype~ 需要注意以下几点：
     - ~F.prototype~ 和 ~obj.__proto__~ 相似，但是在 new 对象的时候设置了对象的
-      =[Prototype]= 属性
+      ~[[Prototype]]~ 属性
     - ~F.prototype~ 要不是一个对象，要不为 ~null~
     - ~F.prototype~ 除了设置了 ~obj.__proto__~ 之外还设置了对象的构造器，即对象
       的 ~obj.constructor~ 属性
@@ -1922,7 +1922,7 @@
       });
     #+END_SRC
 
-*** fetch
+*** fetch 请求服务器
     [[https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch][fetch]] 函数可以请求远端的服务器，然后返回一个 Promise 对象。在 Chrome 浏览器中
     请求的样例如下：
 
@@ -1944,6 +1944,26 @@
           }, 3000);
         }))
         .then(githubUser => alert(`Finished showing ${githubUser.name}`));
+    #+END_SRC
+
+*** Promise API
+    Promise 的调用接口是一些静态成员方法：
+    - ~Promise.resolve(value)~
+    - ~Promise.reject(error)~
+    - ~Promise.all(promises)~ 等待所有的 Promise 完成后继续：
+      + promises 传入一个数组
+      + 如果任何一个 Promise 被拒绝了，则会返回 error 状态，并且后续的 Promise 会被
+        忽略
+    - ~Promise.race(promises)~ 同时请求所有的 Promise，当第一个 Promise 返回后，
+      就相当于请求成功，进行后续操作
+    #+BEGIN_SRC js
+      Promise.all([
+        new Promise((resolve, reject) => {
+          setTimeout(() => resolve(1), 1000)
+        }),
+        2, // treated as Promise.resolve(2)
+        3  // treated as Promise.resolve(3)
+      ]).then(alert); // 1, 2, 3
     #+END_SRC
 
 * 参考链接
