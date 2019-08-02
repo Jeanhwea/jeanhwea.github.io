@@ -1874,17 +1874,21 @@
      });
    #+END_SRC
 
-   Promise 对象有 =state= 和 =result= 这两个属性，满足如下状态图
+   Promise 对象有 =state= 和 =result= 这两个属性，满足如下状态图：
    [[file:../static/image/2019/08/promise-states.png]]
 
-   Promise 有 =then= 和 =catch= 两个成员函数
-   - =then= 方法可以用来实现链式调用
-     + ~then~ 返回普通值时，会立马返回结果到下一个 handler
-     + 当 ~then~ 方法返回一个新的 Promise 对象时，直到调用完毕后才返回结果
-   - =catch= 方法用来错误处理
+   Promise 有 ~then/catch(handler)~ 两个成员函数
+   - ~then~ 方法返回一个 Promise 对象，可以用来实现链式调用，有一点比较有用的是
+     ~then~ 的行为会根据 ~then~ handler 的返回值类型改变
+     + 当 handler 返回普通值时， ~then~ 方法会立马返回处理到下一个 handler
+     + 当 handler 抛出异常时， ~then~ 相当发生错误，调用 ~catch~ 方法的 handler
+       来进行错误处理
+     + 当 handler 返回值是 Promise 对象时，直到等待 Promise 的异步调用完毕后
+       才返回结果
+   - ~catch~ 方法用来错误处理
 
    #+BEGIN_SRC js
-     // 串行逻辑的 =then= 调用
+     // 串行逻辑的 then 调用
      new Promise(function(resolve, reject) {
        setTimeout(() => resolve(1), 1000);
      }).then(function(result) {
@@ -1898,7 +1902,7 @@
        return result * 2;
      });
 
-     // 并行版本的 =then= 调用
+     // 并行版本的 then 调用
      let promise = new Promise(function(resolve, reject) {
        setTimeout(() => resolve(1), 1000);
      });
