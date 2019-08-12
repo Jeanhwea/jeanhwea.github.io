@@ -46,7 +46,6 @@
      # 删除用户，2. 动员 userdel 删除用户；2. 删除用户的家目录
      deluser user
 
-
      # 修改密码, 重置密码
      passwd
      sudo passwd user
@@ -66,10 +65,126 @@
      usermod -s /bin/zsh user
    #+END_SRC
 
+* 文件系统
+** 目录操作
+*** 查看目录信息
+    #+BEGIN_SRC shell
+      # 列出当前目录的内容
+      ls
+      # 只显示文件名
+      ls -1
+      # 显示隐藏文件
+      ls -a
+      # 按招时间由新到旧排序
+      ls -t
+    #+END_SRC
+
+*** 修改目录
+    #+BEGIN_SRC shell
+      # 进入 dir 目录
+      cd dir
+      # 打印当前目录
+      pwd
+      # 返回到家目录
+      cd
+      # 返回之前的目录
+      cd -
+      # 返回之前第 N 个目录, cd -2 返回倒数第二个目录
+      cd -N
+      # 返回到 git 根目录
+      cd $(git rev-parse --show-toplevel)
+
+      # 新建目录
+      mkdir dir
+      # 递归新建多级目录
+      mkdir -p dir1/dir2/dir3
+
+      # 目录栈的入栈和出栈
+      pushd dir
+      popd
+      # 列出当前目录栈
+      dirs -v
+    #+END_SRC
+
+** 文件操作
+*** 查看文件信息
+    #+BEGIN_SRC shell
+      # 打印文件内容
+      cat file
+      # 查看文件行数
+      wc -l file
+      # 打印文件头部行数
+      head file
+      head -n 3 file
+      # 打印文件尾部行数
+      tail file
+      tail -n 3 file
+
+      # 文件的名字（不包含路径）
+      basename file
+      # 文件的路径（不包含名字）
+      dirname file
+
+      # 检测文件类型和编码
+      file file
+      # 文件的详细信息
+      stat file
+
+      # 分页查看, less is more, less 可以往回翻页， more 不行
+      less file
+      more file
+    #+END_SRC
+
+*** 文件复制、移动和删除
+    #+BEGIN_SRC shell
+      # 复制文件
+      cp src des
+      # 递归复制文件
+      cp -rf src des
+      # 更新模式复制文件，即 src 比 des 新则复制
+      cp -u src des
+      # 移动文件，重命名文件
+      mv src des
+      # 删除文件
+      rm file
+      # 递归删除，非常小心地用这个命令
+      rm -rf dir
+
+      # 创建软连接, dest 是所指向的文件，link 是软连接
+      # 例如: ln -s /tmp ~/Public/tmp 相当于在 ~/Public 中建了一个 tmp 软连接，指向 /tmp
+      ln -s dens link
+    #+END_SRC
+
+*** 更新文件信息
+    #+BEGIN_SRC shell
+      # 更新一下文件
+      touch file
+
+      # 更新文件权限为 644，-R 可以递归修改
+      chmod 644 file
+      # 更新文件的组/用户，-R 可以递归修改
+      chgrp group file
+      chown user file
+      # 同时更改文件的组合用户，-R 可以递归修改
+      chown user:group file
+    #+END_SRC
+
+*** 重定向
+    #+BEGIN_SRC shell
+      # 将 cmd 的 stdout 重定向到 file 中
+      cmd > file
+      # 将 cmd 的 stderr 重定向到 file 中
+      cmd 2> file
+      # 将 cmd 的 stdout 和 stderr 重定向到 file 中, 2>&1 的必须放在 > file 后面
+      cmd > file 2>&1
+
+      # 将 cmd 的 stdout 和 stderr 重定向到 /dev/null 中，并挂载成后台任务
+      cmd >/dev/null 2>&1 &
+    #+END_SRC
 
 * 网络管理
 ** route 命令
-    #+BEGIN_SRC shell
+   #+BEGIN_SRC shell
       # 打印路由表
       route -n
 
@@ -80,7 +195,7 @@
 
       # 删除默认路由
       route del default gw 192.168.1.1
-    #+END_SRC
+   #+END_SRC
 
 ** ifconfig 命令
    #+BEGIN_SRC shell
