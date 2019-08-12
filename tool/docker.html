@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-12 Fri 08:15 -->
+<!-- 2019-08-12 Mon 16:08 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Docker 容器</title>
@@ -238,50 +238,51 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgf0813fc">1. Docker</a></li>
-<li><a href="#orgc575c81">2. Docker 的系统架构</a></li>
-<li><a href="#orgb510c43">3. Docker 容器</a>
+<li><a href="#orge81f68e">1. Docker</a></li>
+<li><a href="#org124ad36">2. Docker 的系统架构</a></li>
+<li><a href="#orgd5f496b">3. Docker 容器</a>
 <ul>
-<li><a href="#org66bcd2e">3.1. 生命周期</a></li>
-<li><a href="#orgc29a310">3.2. 启动和停止</a></li>
-<li><a href="#org7e2f920">3.3. 查看容器的状态</a></li>
-<li><a href="#org4632b39">3.4. 杂项</a></li>
-<li><a href="#org6019631">3.5. 使用容器中 Ubuntu 操作系统</a></li>
+<li><a href="#org221b7f3">3.1. 生命周期</a></li>
+<li><a href="#org73175d6">3.2. 启动和停止</a></li>
+<li><a href="#orge152281">3.3. 查看容器的状态</a></li>
+<li><a href="#org26ba784">3.4. 杂项</a></li>
+<li><a href="#orgac5ac92">3.5. 使用容器中 Ubuntu 操作系统</a></li>
 </ul>
 </li>
-<li><a href="#orgfbcb30d">4. Docker 图像</a>
+<li><a href="#org7f0e10a">4. Docker 图像</a>
 <ul>
-<li><a href="#org0fa8085">4.1. 生命周期</a></li>
-<li><a href="#org8d80b48">4.2. 显示状态</a></li>
+<li><a href="#org84bbb36">4.1. 生命周期</a></li>
+<li><a href="#org33e419a">4.2. 显示状态</a></li>
 </ul>
 </li>
-<li><a href="#org7747806">5. 工作流</a>
+<li><a href="#org0231ee6">5. 工作流</a>
 <ul>
-<li><a href="#orgac7724c">5.1. load/save 图像</a></li>
-<li><a href="#org4569ba2">5.2. import/export 容器</a></li>
+<li><a href="#orge329c76">5.1. load/save 图像</a></li>
+<li><a href="#org115800f">5.2. import/export 容器</a></li>
+<li><a href="#orgdd04bf9">5.3. 添加当前用户到 docker 组</a></li>
 </ul>
 </li>
-<li><a href="#org47f84e3">6. Registry 和 Repository</a>
+<li><a href="#org69e2ddf">6. Registry 和 Repository</a>
 <ul>
-<li><a href="#orge5f5dfb">6.1. 上传图像到私有仓库</a></li>
-<li><a href="#orgd4069d7">6.2. 查询私有仓库中的镜像和 tag</a></li>
-<li><a href="#orgcad9ad1">6.3. 查询所有的私有仓库中镜像和 tag</a></li>
+<li><a href="#orga5a6dee">6.1. 上传图像到私有仓库</a></li>
+<li><a href="#orgcb561c4">6.2. 查询私有仓库中的镜像和 tag</a></li>
+<li><a href="#orgbae1909">6.3. 查询所有的私有仓库中镜像和 tag</a></li>
 </ul>
 </li>
-<li><a href="#orgbbfaa7a">7. 编写 Dockerfile</a>
+<li><a href="#orgab6de63">7. 编写 Dockerfile</a>
 <ul>
-<li><a href="#org314a277">7.1. Dockerfile 的指令</a></li>
-<li><a href="#orgc2d0569">7.2. 通过 docker build 创建图像</a></li>
+<li><a href="#org0685b47">7.1. Dockerfile 的指令</a></li>
+<li><a href="#org53dea70">7.2. 通过 docker build 创建图像</a></li>
 </ul>
 </li>
-<li><a href="#org7f1a439">8. 参考链接</a></li>
+<li><a href="#org86b0e73">8. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgf0813fc" class="outline-2">
-<h2 id="orgf0813fc"><span class="section-number-2">1</span> Docker</h2>
+<div id="outline-container-orge81f68e" class="outline-2">
+<h2 id="orge81f68e"><span class="section-number-2">1</span> Docker</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Docker 和传统虚拟机有着同样的虚拟化硬件资源的功能，但是 Docker 在完成虚拟化是
@@ -301,8 +302,8 @@ Docker 的最低依赖是 3.10.x 的 Linux 内核。并且 Docker 可以安装�
 </div>
 </div>
 
-<div id="outline-container-orgc575c81" class="outline-2">
-<h2 id="orgc575c81"><span class="section-number-2">2</span> Docker 的系统架构</h2>
+<div id="outline-container-org124ad36" class="outline-2">
+<h2 id="org124ad36"><span class="section-number-2">2</span> Docker 的系统架构</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Docker 系统中包含容器（container）、图像（image）等常用概念。概念之间的联系见下图：
@@ -316,16 +317,16 @@ Docker 系统中包含容器（container）、图像（image）等常用概念�
 </div>
 </div>
 
-<div id="outline-container-orgb510c43" class="outline-2">
-<h2 id="orgb510c43"><span class="section-number-2">3</span> Docker 容器</h2>
+<div id="outline-container-orgd5f496b" class="outline-2">
+<h2 id="orgd5f496b"><span class="section-number-2">3</span> Docker 容器</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 容器是一个运行的实例，他是一个图像的运行实体。如果把图像比喻成数轴上点的话，容
 器就是一个区间。
 </p>
 </div>
-<div id="outline-container-org66bcd2e" class="outline-3">
-<h3 id="org66bcd2e"><span class="section-number-3">3.1</span> 生命周期</h3>
+<div id="outline-container-org221b7f3" class="outline-3">
+<h3 id="org221b7f3"><span class="section-number-3">3.1</span> 生命周期</h3>
 <div class="outline-text-3" id="text-3-1">
 <ul class="org-ul">
 <li><code>docker create</code> : 创建容器</li>
@@ -347,8 +348,8 @@ docker 同时启动。这时需要将重启策略设置成 always 。</li>
 </div>
 </div>
 
-<div id="outline-container-orgc29a310" class="outline-3">
-<h3 id="orgc29a310"><span class="section-number-3">3.2</span> 启动和停止</h3>
+<div id="outline-container-org73175d6" class="outline-3">
+<h3 id="org73175d6"><span class="section-number-3">3.2</span> 启动和停止</h3>
 <div class="outline-text-3" id="text-3-2">
 <ul class="org-ul">
 <li><code>docker start</code> : 启动容器</li>
@@ -368,8 +369,8 @@ docker 同时启动。这时需要将重启策略设置成 always 。</li>
 </div>
 </div>
 
-<div id="outline-container-org7e2f920" class="outline-3">
-<h3 id="org7e2f920"><span class="section-number-3">3.3</span> 查看容器的状态</h3>
+<div id="outline-container-orge152281" class="outline-3">
+<h3 id="orge152281"><span class="section-number-3">3.3</span> 查看容器的状态</h3>
 <div class="outline-text-3" id="text-3-3">
 <ul class="org-ul">
 <li><code>docker ps</code> : 显示当前运行的容器， <code>-a</code> 选项可以显示所有的容器</li>
@@ -384,8 +385,8 @@ docker 同时启动。这时需要将重启策略设置成 always 。</li>
 </div>
 </div>
 
-<div id="outline-container-org4632b39" class="outline-3">
-<h3 id="org4632b39"><span class="section-number-3">3.4</span> 杂项</h3>
+<div id="outline-container-org26ba784" class="outline-3">
+<h3 id="org26ba784"><span class="section-number-3">3.4</span> 杂项</h3>
 <div class="outline-text-3" id="text-3-4">
 <ul class="org-ul">
 <li><code>docker cp</code> : 在本地和容器之间复制文件
@@ -412,8 +413,8 @@ docker cp /host/path container:/source/path
 </div>
 </div>
 
-<div id="outline-container-org6019631" class="outline-3">
-<h3 id="org6019631"><span class="section-number-3">3.5</span> 使用容器中 Ubuntu 操作系统</h3>
+<div id="outline-container-orgac5ac92" class="outline-3">
+<h3 id="orgac5ac92"><span class="section-number-3">3.5</span> 使用容器中 Ubuntu 操作系统</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
 下面是使用一些常用命令启动 Ubuntu 图像，并且 attache / detach 终端，具体见如
@@ -472,8 +473,8 @@ CONTAINER ID  IMAGE   COMMAND      CREATED             STATUS                   
 </div>
 </div>
 
-<div id="outline-container-orgfbcb30d" class="outline-2">
-<h2 id="orgfbcb30d"><span class="section-number-2">4</span> Docker 图像</h2>
+<div id="outline-container-org7f0e10a" class="outline-2">
+<h2 id="org7f0e10a"><span class="section-number-2">4</span> Docker 图像</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Docker 图像指的是容器在一个特点时间点的快照，它是一个只读的容器的存储，官网上
@@ -481,8 +482,8 @@ Docker 图像指的是容器在一个特点时间点的快照，它是一个只�
 </p>
 </div>
 
-<div id="outline-container-org0fa8085" class="outline-3">
-<h3 id="org0fa8085"><span class="section-number-3">4.1</span> 生命周期</h3>
+<div id="outline-container-org84bbb36" class="outline-3">
+<h3 id="org84bbb36"><span class="section-number-3">4.1</span> 生命周期</h3>
 <div class="outline-text-3" id="text-4-1">
 <ul class="org-ul">
 <li><code>docker images</code> : 显示所有图像</li>
@@ -496,8 +497,8 @@ Docker 图像指的是容器在一个特点时间点的快照，它是一个只�
 </div>
 </div>
 
-<div id="outline-container-org8d80b48" class="outline-3">
-<h3 id="org8d80b48"><span class="section-number-3">4.2</span> 显示状态</h3>
+<div id="outline-container-org33e419a" class="outline-3">
+<h3 id="org33e419a"><span class="section-number-3">4.2</span> 显示状态</h3>
 <div class="outline-text-3" id="text-4-2">
 <ul class="org-ul">
 <li><code>docker history</code> : 显示所有历史图像</li>
@@ -507,12 +508,12 @@ Docker 图像指的是容器在一个特点时间点的快照，它是一个只�
 </div>
 </div>
 
-<div id="outline-container-org7747806" class="outline-2">
-<h2 id="org7747806"><span class="section-number-2">5</span> 工作流</h2>
+<div id="outline-container-org0231ee6" class="outline-2">
+<h2 id="org0231ee6"><span class="section-number-2">5</span> 工作流</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-orgac7724c" class="outline-3">
-<h3 id="orgac7724c"><span class="section-number-3">5.1</span> load/save 图像</h3>
+<div id="outline-container-orge329c76" class="outline-3">
+<h3 id="orge329c76"><span class="section-number-3">5.1</span> load/save 图像</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 加载文件中的图像
@@ -532,8 +533,8 @@ Docker 图像指的是容器在一个特点时间点的快照，它是一个只�
 </div>
 </div>
 
-<div id="outline-container-org4569ba2" class="outline-3">
-<h3 id="org4569ba2"><span class="section-number-3">5.2</span> import/export 容器</h3>
+<div id="outline-container-org115800f" class="outline-3">
+<h3 id="org115800f"><span class="section-number-3">5.2</span> import/export 容器</h3>
 <div class="outline-text-3" id="text-5-2">
 <p>
 从一个容器文件中导入容器
@@ -557,10 +558,21 @@ Docker 图像指的是容器在一个特点时间点的快照，它是一个只�
 </p>
 </div>
 </div>
+
+<div id="outline-container-orgdd04bf9" class="outline-3">
+<h3 id="orgdd04bf9"><span class="section-number-3">5.3</span> 添加当前用户到 docker 组</h3>
+<div class="outline-text-3" id="text-5-3">
+<ol class="org-ol">
+<li>添加 docker 的用户组， <code>sudo groupadd docker</code></li>
+<li>将当前用户加到 docker 组中， <code>sudo usermod -aG docker $USER</code></li>
+<li>重启机器或者使用 <code>newgrp docker</code> 命令使修改生效</li>
+</ol>
+</div>
+</div>
 </div>
 
-<div id="outline-container-org47f84e3" class="outline-2">
-<h2 id="org47f84e3"><span class="section-number-2">6</span> Registry 和 Repository</h2>
+<div id="outline-container-org69e2ddf" class="outline-2">
+<h2 id="org69e2ddf"><span class="section-number-2">6</span> Registry 和 Repository</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 registry 是一个宿主机器，一个 registry 包含多个 repository。repository 是存储
@@ -576,8 +588,8 @@ registry 是一个宿主机器，一个 registry 包含多个 repository。repos
 </ul>
 </div>
 
-<div id="outline-container-orge5f5dfb" class="outline-3">
-<h3 id="orge5f5dfb"><span class="section-number-3">6.1</span> 上传图像到私有仓库</h3>
+<div id="outline-container-orga5a6dee" class="outline-3">
+<h3 id="orga5a6dee"><span class="section-number-3">6.1</span> 上传图像到私有仓库</h3>
 <div class="outline-text-3" id="text-6-1">
 <p>
 在上传或下载私有仓库的图像时，需要提前设置安全性。通常 docker 私有仓库默认采
@@ -639,8 +651,8 @@ lastest: digest: sha256:9b1b75fa6364b2ec538a5efdb00c3511adee5b6b2f80d5c64b06c445
 </div>
 </div>
 </div>
-<div id="outline-container-orgd4069d7" class="outline-3">
-<h3 id="orgd4069d7"><span class="section-number-3">6.2</span> 查询私有仓库中的镜像和 tag</h3>
+<div id="outline-container-orgcb561c4" class="outline-3">
+<h3 id="orgcb561c4"><span class="section-number-3">6.2</span> 查询私有仓库中的镜像和 tag</h3>
 <div class="outline-text-3" id="text-6-2">
 <p>
 添加一些别名帮助查询远端的仓库内容
@@ -668,8 +680,8 @@ $ rt ubuntu
 </div>
 </div>
 
-<div id="outline-container-orgcad9ad1" class="outline-3">
-<h3 id="orgcad9ad1"><span class="section-number-3">6.3</span> 查询所有的私有仓库中镜像和 tag</h3>
+<div id="outline-container-orgbae1909" class="outline-3">
+<h3 id="orgbae1909"><span class="section-number-3">6.3</span> 查询所有的私有仓库中镜像和 tag</h3>
 <div class="outline-text-3" id="text-6-3">
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #6c71c4;">_reg</span>=http://localhost:5000 &amp;&amp; <span style="color: #2aa198;">\</span>
@@ -719,16 +731,16 @@ ubuntu:18.04:latest
 </div>
 </div>
 
-<div id="outline-container-orgbbfaa7a" class="outline-2">
-<h2 id="orgbbfaa7a"><span class="section-number-2">7</span> 编写 Dockerfile</h2>
+<div id="outline-container-orgab6de63" class="outline-2">
+<h2 id="orgab6de63"><span class="section-number-2">7</span> 编写 Dockerfile</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 Dockerfile 是配置 Docker 容器的配置文件，最佳实践参考<a href="https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/">这里</a> 。
 </p>
 </div>
 
-<div id="outline-container-org314a277" class="outline-3">
-<h3 id="org314a277"><span class="section-number-3">7.1</span> Dockerfile 的指令</h3>
+<div id="outline-container-org0685b47" class="outline-3">
+<h3 id="org0685b47"><span class="section-number-3">7.1</span> Dockerfile 的指令</h3>
 <div class="outline-text-3" id="text-7-1">
 <p>
 常见的指令如下表:
@@ -827,8 +839,8 @@ Dockerfile 是配置 Docker 容器的配置文件，最佳实践参考<a href="h
 </div>
 </div>
 
-<div id="outline-container-orgc2d0569" class="outline-3">
-<h3 id="orgc2d0569"><span class="section-number-3">7.2</span> 通过 docker build 创建图像</h3>
+<div id="outline-container-org53dea70" class="outline-3">
+<h3 id="org53dea70"><span class="section-number-3">7.2</span> 通过 docker build 创建图像</h3>
 <div class="outline-text-3" id="text-7-2">
 <div class="org-src-container">
 <pre class="src src-dockerfile"><span style="color: #859900;">FROM</span> <span style="color: #268bd2; font-weight: bold;">openjdk:8</span>
@@ -867,8 +879,8 @@ Successfully tagged skree:latest
 </div>
 </div>
 
-<div id="outline-container-org7f1a439" class="outline-2">
-<h2 id="org7f1a439"><span class="section-number-2">8</span> 参考链接</h2>
+<div id="outline-container-org86b0e73" class="outline-2">
+<h2 id="org86b0e73"><span class="section-number-2">8</span> 参考链接</h2>
 <div class="outline-text-2" id="text-8">
 <ol class="org-ol">
 <li><a href="https://github.com/wsargent/docker-cheat-sheet">docker cheatsheet</a></li>
@@ -878,7 +890,7 @@ Successfully tagged skree:latest
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-07-12 Fri 08:15. Created by Jinghui Hu at 2018-11-27 Tue 11:04.</p>
+<p class="author">Last Updated 2019-08-12 Mon 16:08. Created by Jinghui Hu at 2018-11-27 Tue 11:04.</p>
 </div>
 </body>
 </html>
