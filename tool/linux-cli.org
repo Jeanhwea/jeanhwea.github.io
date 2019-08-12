@@ -36,13 +36,34 @@
 ** 修改用户信息
    #+BEGIN_SRC shell
      # 添加用户
-     adduser user
+     useradd user
+     useradd -m user # 创建用户，同时创建家目录；但不设置用户密码
      # 删除用户
+     userdel user
+
+     # 添加用户，1. 调用 useradd 新建用户; 2. 创建用户的家目录; 3. 为用户设置密码
+     adduser user
+     # 删除用户，2. 动员 userdel 删除用户；2. 删除用户的家目录
      deluser user
+
 
      # 修改密码, 重置密码
      passwd
      sudo passwd user
+   #+END_SRC
+
+** 修改用户组
+   #+BEGIN_SRC shell
+     # 新建一个组
+     groupadd group
+
+     # 将 user 添加到 group 中
+     usermod -aG group user
+     # 将当前用户添加到 group 中
+     usermod -aG group $USER
+
+     # 修改用户的登录 shell
+     usermod -s /bin/zsh user
    #+END_SRC
 
 

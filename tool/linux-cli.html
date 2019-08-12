@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-08-12 Mon 20:10 -->
+<!-- 2019-08-12 Mon 21:24 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Linux 常用命令</title>
@@ -238,28 +238,29 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgb7c7859">1. 用户管理</a>
+<li><a href="#orgc88f540">1. 用户管理</a>
 <ul>
-<li><a href="#org1ec1b25">1.1. 查看用户信息</a></li>
-<li><a href="#org881e426">1.2. 修改用户信息</a></li>
+<li><a href="#orgec505dd">1.1. 查看用户信息</a></li>
+<li><a href="#org82d76df">1.2. 修改用户信息</a></li>
+<li><a href="#orge41c234">1.3. 修改用户组</a></li>
 </ul>
 </li>
-<li><a href="#org1706b8e">2. 网络管理</a>
+<li><a href="#org1d9d1ca">2. 网络管理</a>
 <ul>
-<li><a href="#orgd4e13aa">2.1. route 命令</a></li>
-<li><a href="#org5533128">2.2. ifconfig 命令</a></li>
+<li><a href="#orgd21df3b">2.1. route 命令</a></li>
+<li><a href="#org9fcc2c6">2.2. ifconfig 命令</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgb7c7859" class="outline-2">
-<h2 id="orgb7c7859"><span class="section-number-2">1</span> 用户管理</h2>
+<div id="outline-container-orgc88f540" class="outline-2">
+<h2 id="orgc88f540"><span class="section-number-2">1</span> 用户管理</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org1ec1b25" class="outline-3">
-<h3 id="org1ec1b25"><span class="section-number-3">1.1</span> 查看用户信息</h3>
+<div id="outline-container-orgec505dd" class="outline-3">
+<h3 id="orgec505dd"><span class="section-number-3">1.1</span> 查看用户信息</h3>
 <div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
 <pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26174;&#31034;&#24403;&#21069;&#29992;&#25143;&#21517;</span>
@@ -289,14 +290,21 @@ lastb
 </div>
 </div>
 
-<div id="outline-container-org881e426" class="outline-3">
-<h3 id="org881e426"><span class="section-number-3">1.2</span> 修改用户信息</h3>
+<div id="outline-container-org82d76df" class="outline-3">
+<h3 id="org82d76df"><span class="section-number-3">1.2</span> 修改用户信息</h3>
 <div class="outline-text-3" id="text-1-2">
 <div class="org-src-container">
 <pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#28155;&#21152;&#29992;&#25143;</span>
-adduser user
+useradd user
+useradd -m user <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21019;&#24314;&#29992;&#25143;&#65292;&#21516;&#26102;&#21019;&#24314;&#23478;&#30446;&#24405;&#65307;&#20294;&#19981;&#35774;&#32622;&#29992;&#25143;&#23494;&#30721;</span>
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21024;&#38500;&#29992;&#25143;</span>
+userdel user
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#28155;&#21152;&#29992;&#25143;&#65292;1. &#35843;&#29992; useradd &#26032;&#24314;&#29992;&#25143;; 2. &#21019;&#24314;&#29992;&#25143;&#30340;&#23478;&#30446;&#24405;; 3. &#20026;&#29992;&#25143;&#35774;&#32622;&#23494;&#30721;</span>
+adduser user
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21024;&#38500;&#29992;&#25143;&#65292;2. &#21160;&#21592; userdel &#21024;&#38500;&#29992;&#25143;&#65307;2. &#21024;&#38500;&#29992;&#25143;&#30340;&#23478;&#30446;&#24405;</span>
 deluser user
+
 
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20462;&#25913;&#23494;&#30721;, &#37325;&#32622;&#23494;&#30721;</span>
 passwd
@@ -305,15 +313,34 @@ sudo passwd user
 </div>
 </div>
 </div>
+
+<div id="outline-container-orge41c234" class="outline-3">
+<h3 id="orge41c234"><span class="section-number-3">1.3</span> 修改用户组</h3>
+<div class="outline-text-3" id="text-1-3">
+<div class="org-src-container">
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26032;&#24314;&#19968;&#20010;&#32452;</span>
+groupadd group
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558; user &#28155;&#21152;&#21040; group &#20013;</span>
+usermod -aG group user
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#24403;&#21069;&#29992;&#25143;&#28155;&#21152;&#21040; group &#20013;</span>
+usermod -aG group $<span style="color: #6c71c4;">USER</span>
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20462;&#25913;&#29992;&#25143;&#30340;&#30331;&#24405; shell</span>
+usermod -s /bin/zsh user
+</pre>
+</div>
+</div>
+</div>
 </div>
 
 
-<div id="outline-container-org1706b8e" class="outline-2">
-<h2 id="org1706b8e"><span class="section-number-2">2</span> 网络管理</h2>
+<div id="outline-container-org1d9d1ca" class="outline-2">
+<h2 id="org1d9d1ca"><span class="section-number-2">2</span> 网络管理</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgd4e13aa" class="outline-3">
-<h3 id="orgd4e13aa"><span class="section-number-3">2.1</span> route 命令</h3>
+<div id="outline-container-orgd21df3b" class="outline-3">
+<h3 id="orgd21df3b"><span class="section-number-3">2.1</span> route 命令</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#36335;&#30001;&#34920;</span>
@@ -331,8 +358,8 @@ route del default gw 192.168.1.1
 </div>
 </div>
 
-<div id="outline-container-org5533128" class="outline-3">
-<h3 id="org5533128"><span class="section-number-3">2.2</span> ifconfig 命令</h3>
+<div id="outline-container-org9fcc2c6" class="outline-3">
+<h3 id="org9fcc2c6"><span class="section-number-3">2.2</span> ifconfig 命令</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 <pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26174;&#31034;&#25152;&#26377;&#32593;&#21345;&#21644;&#25509;&#21475;&#20449;&#24687;</span>
@@ -362,7 +389,7 @@ ifconfig eth0 hw ether 00:aa:bb:cc:dd:ee
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-08-12 Mon 20:10. Created by Jinghui Hu at 2019-02-18 Mon 11:04.</p>
+<p class="author">Last Updated 2019-08-12 Mon 21:24. Created by Jinghui Hu at 2019-02-18 Mon 11:04.</p>
 </div>
 </body>
 </html>
