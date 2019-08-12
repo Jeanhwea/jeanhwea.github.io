@@ -6,7 +6,7 @@
 <!-- 2019-08-12 Mon 10:51 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>殊蕤的工作笔记</title>
+<title>创建 Ubuntu 的 USB 启动盘</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="Jinghui Hu" />
 <style type="text/css">
@@ -229,119 +229,131 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="org-div-home-and-up">
- <a accesskey="h" href="index.html"> UP </a>
+ <a accesskey="h" href="../readme.html"> UP </a>
  |
- <a accesskey="H" href="index.html"> HOME </a>
+ <a accesskey="H" href="../index.html"> HOME </a>
 </div><div id="content">
-<h1 class="title">殊蕤的工作笔记</h1>
+<h1 class="title">创建 Ubuntu 的 USB 启动盘</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgf91bba5">1. 准备的原料</a></li>
+<li><a href="#org0ea8f4f">2. 安装的相关命令</a>
+<ul>
+<li><a href="#orgabe5b0d">2.1. 格式化 U 盘</a></li>
+<li><a href="#org4ea441e">2.2. 制作启动盘</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orgf91bba5" class="outline-2">
+<h2 id="orgf91bba5"><span class="section-number-2">1</span> 准备的原料</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+首先下载需要安装的 Ubuntu 系统镜像，推荐去清华镜像源中下载
+</p>
+<ol class="org-ol">
+<li><code>ubuntu-18.04.3-live-server-amd64.iso</code>, 直接去 <a href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu-releases/18.04/">ubuntu release 18.04</a> 中点击链接下载</li>
+<li>已经安装好的 Ubuntu 操作系统</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org0ea8f4f" class="outline-2">
+<h2 id="org0ea8f4f"><span class="section-number-2">2</span> 安装的相关命令</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgabe5b0d" class="outline-3">
+<h3 id="orgabe5b0d"><span class="section-number-3">2.1</span> 格式化 U 盘</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+为了保护好数据最好把 U 盘中的数据拷贝出来，因为待会儿会直接将 U 盘中的数据都格式
+化掉
+</p>
+
+<p>
+使用 fdisk 查看可以用的 U 盘的设备路径
+</p>
 <div class="org-src-container">
-<pre class="src src-text">   _                          _
-  (_)                        | |
-   _    ___    __ _   _ __   | |__   __      __   ___    __ _
-  | |  / _ \  / _` | | '_ \  | '_ \  \ \ /\ / /  / _ \  / _` |
-  | | |  __/ | (_| | | | | | | | | |  \ V  V /  |  __/ | (_| |
-  | |  \___|  \__,_| |_| |_| |_| |_|   \_/\_/    \___|  \__,_|
- _/ |
-|__/
+<pre class="src src-shell">ub64@volantis:~$ sudo fdisk -l
+[sudo] password for ub64:
+Disk /dev/loop0: 13 MiB, 13619200 bytes, 26600 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+Disk /dev/sda: 64 GiB, 68719476736 bytes, 134217728 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x1c8c12bb
+
+Device     Boot Start       End   Sectors Size Id Type
+/dev/sda1  *     2048 134215679 134213632  64G 83 Linux
+
+
+Disk /dev/sdb: 14.4 GiB, 15502147584 bytes, 30277632 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x663eb4c4
+
+Device     Boot   Start     End Sectors  Size Id Type
+/dev/sdb1  *          0 3815135 3815136  1.8G  0 Empty
+/dev/sdb2       3737268 3741939    4672  2.3M ef EFI (FAT-12/16/32)
 </pre>
 </div>
-<div id="outline-container-orgb36f6d3" class="outline-2">
-<h2 id="orgb36f6d3"><span class="section-number-2">1</span> 目录</h2>
-<div class="outline-text-2" id="text-1">
+
+<p>
+这里的 U 盘是 <code>/dev/sdb</code>, 卸载 <code>sdb1</code> 和 <code>sdb</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">ub64@volantis:~$ sudo umount /dev/sdb
+ub64@volantis:~$ sudo umount /dev/sdb1
+</pre>
 </div>
-<div id="outline-container-org5ed6332" class="outline-3">
-<h3 id="org5ed6332"><span class="section-number-3">1.1</span> 技术文章</h3>
-<div class="outline-text-3" id="text-1-1">
-<ol class="org-ol">
-<li><a href="./article/make-bootable-usb-ubuntu-disk.html">创建 Ubuntu 的 USB 启动盘</a> 2019-08-12</li>
-<li><a href="./article/nginx-conf-setup.html">Ngnix 常见应用场景配置</a> 2019-07-26</li>
-<li><a href="./article/oauth-2.0-protocol.html">OAuth 2.0 应用授权协议</a> 2019-07-24</li>
-<li><a href="./article/redirect-html-page.html">重定向 Web 页面</a> 2019-07-19</li>
-<li><a href="./article/color-theme-sites.html">主题配色网站</a> 2019-07-15</li>
-<li><a href="./article/drawing-graphs-with-dot.html">使用 dot 画图工具</a> 2019-07-12</li>
-<li><a href="./article/relational-database-design.html">关系型数据库设计</a> 2019-06-28</li>
-<li><a href="./article/project-names.html">项目名称</a> 2019-05-18</li>
-<li><a href="./article/metallographic-database.html">Metallographic database</a> 2019-02-19</li>
-<li><a href="./article/router-command.html">Linux 修改路由表</a> 2019-02-18</li>
-<li><a href="./article/convolution-operator.html">卷积操作符</a> 2019-01-18</li>
-<li><a href="./article/using-osxfuse-to-mount-filesystem.html">使用 osxfuse 挂载文件系统</a> 2018-11-13</li>
-<li><a href="./article/angular-passing-value-between-component.html">Angular 组件之间传值</a> 2018-11-09</li>
-<li><a href="./article/count-words-from-cli.html">使用命令行统计项目中词汇的频率</a> 2018-10-27</li>
-<li><a href="./article/make-gif-images-with-ffmpeg.html">使用 ffmpeg 制作 gif 动态图</a> 2018-10-27</li>
-<li><a href="./article/capture-screen-with-ffmpeg.html">使用 ffmpeg 录屏</a> 2018-10-16</li>
-<li><a href="./article/export-excel-by-javascript.html">使用 JavaScript 导出 Excel 文件</a> 2018-10-16</li>
-<li><a href="./article/tensorflow-startup-notes.html">TensorFlow 安装笔记</a> 2018-10-12</li>
-<li><a href="./article/emmet-mode-or-zen-coding.html">Emmet-mode 或者 Zen Coding</a> 2018-10-11</li>
-<li><a href="./article/qrcode-decoder-by-javascript.html">使用 JavaScript 解析二维码</a> 2018-10-11</li>
-<li><a href="./article/typescript-learning-notes.html">学习 Typescript 的笔记</a> 2018-10-11</li>
-<li><a href="./article/RESTful-API-in-Practice.html">RESTful API 设计实践</a> 2018-10-10</li>
-<li><a href="./article/setup-ROR-enviroment.html">安装 ROR 开发环境</a> 2018-10-09</li>
-<li><a href="./article/chrome-options.html">chrome 浏览器相关设置</a> 2018-10-08</li>
-<li><a href="./article/download-all-site-via-wget.html">离线下载整个站点</a> 2018-10-08</li>
-<li><a href="./article/emacs-org-mode-note.html">Emacs org-mode 的相关笔记</a> 2018-10-08</li>
-<li><a href="./article/firefox-default-zoom-pixel.html">Firefox 的默认缩放大小</a> 2018-10-08</li>
-<li><a href="./article/generate-ssh-key.html">生成 RSA 加密的 SSH 公钥和私钥</a> 2018-10-08</li>
-<li><a href="./article/start-angular-project.html">编写 Angular 项目</a> 2018-10-08</li>
-<li><a href="./article/rename-many-files.html">批量规范化重命名大量的文件</a> 2018-10-05</li>
-</ol>
+
+<p>
+<code>mkfs.vfat</code> 将 U 盘格式化成 vfat 的格式，一般的系统启动认这种类型是格式
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">ub64@volantis:~$ sudo mkfs.vfat /dev/sdb -I
+mkfs.fat 4.1 (2017-01-24)
+attribute <span style="color: #2aa198;">"partition"</span> not found
+ub64@volantis:~$
+</pre>
 </div>
 </div>
-<div id="outline-container-org335ca62" class="outline-3">
-<h3 id="org335ca62"><span class="section-number-3">1.2</span> 编程语言</h3>
-<div class="outline-text-3" id="text-1-2">
-<ol class="org-ol">
-<li><a href="./lang/java-distilled.html">Java 编程语言精粹</a> 2019-07-03</li>
-<li><a href="./lang/java-lib-spring.html">Spring 全家桶</a> 2019-07-10</li>
-<li><a href="./lang/javascript-distilled.html">JavaScript 编程语言精粹</a> 2019-07-02</li>
-<li><a href="./lang/python-distilled.html">Python 编程语言精粹</a> 2018-10-23</li>
-<li><a href="./lang/python-lib-matplotlib.html">matplotlib 绘图包</a> 2018-10-26</li>
-<li><a href="./lang/python-lib-numpy.html">numpy 科学计算数组工具集</a> 2018-10-26</li>
-<li><a href="./lang/python-lib-opencv.html">OpenCV 图像处理工具包</a> 2019-01-25</li>
-<li><a href="./lang/python-lib-pandas.html">pandas 数据处理包</a> 2018-10-12</li>
-</ol>
 </div>
+
+<div id="outline-container-org4ea441e" class="outline-3">
+<h3 id="org4ea441e"><span class="section-number-3">2.2</span> 制作启动盘</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+直接使用 dd 命令复制镜像就可以制作成功启动盘。注意，这里一定要添加
+<code>status=progress</code>, 因为 dd 复制一般时间很长，显示进度会让你不会怀疑 dd 命令死了
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">ub64@volantis:~$ sudo dd <span style="color: #6c71c4;">if</span>=~/Downloads/ubuntu-18.04.3-live-server-amd64.iso <span style="color: #6c71c4;">of</span>=/dev/sdb <span style="color: #6c71c4;">status</span>=progress
+3883520 bytes (3.9 MB, 3.7 MiB) copied, 3 s, 1.3 MB/s
+</pre>
 </div>
-<div id="outline-container-org7aae601" class="outline-3">
-<h3 id="org7aae601"><span class="section-number-3">1.3</span> 开发工具</h3>
-<div class="outline-text-3" id="text-1-3">
-<ol class="org-ol">
-<li><a href="./tool/curl.html">cRUL 工具</a> 2018-11-03</li>
-<li><a href="./tool/docker.html">Docker 容器</a> 2018-11-27</li>
-<li><a href="./tool/git.html">Git 项目管理工具</a> 2018-10-08</li>
-<li><a href="./tool/makefile.html">Makefile 笔记</a> 2019-08-05</li>
-<li><a href="./tool/maven.html">Maven 包管理工具</a> 2018-10-08</li>
-<li><a href="./tool/npm-yarn-cli.html">npm 和 yarn - NodeJs 包管理工具</a> 2018-10-08</li>
-<li><a href="./tool/pip-cli.html">pip 包管理工具</a> 2018-10-08</li>
-<li><a href="./tool/sed-awk-shell.html">Linux 三剑客: sed, awk 和 shell</a> 2019-07-18</li>
-<li><a href="./tool/springboot-cli.html">Spring Boot 命令行 - 快速迭代 Java Web 项目</a> 2018-10-10</li>
-</ol>
-</div>
-</div>
-<div id="outline-container-orga5d87e4" class="outline-3">
-<h3 id="orga5d87e4"><span class="section-number-3">1.4</span> 数据库</h3>
-<div class="outline-text-3" id="text-1-4">
-<ol class="org-ol">
-<li><a href="./database/mysql.html">MySQL 关系数据库</a> 2019-07-05</li>
-<li><a href="./database/oracle.html">Oracle 关系数据库</a> 2019-07-08</li>
-<li><a href="./database/postgres.html">PostgreSQL 关系数据库</a> 2018-12-10</li>
-</ol>
-</div>
-</div>
-<div id="outline-container-orga10f997" class="outline-3">
-<h3 id="orga10f997"><span class="section-number-3">1.5</span> 杂文随笔</h3>
-<div class="outline-text-3" id="text-1-5">
-<ol class="org-ol">
-<li><a href="./misc/journal-and-conference.html">部分期刊会议链接</a> 2019-02-20</li>
-<li><a href="./misc/the-health-way.html">健康本该如此</a> 2019-02-09</li>
-<li><a href="./misc/common-used-condiment.html">常用调味品</a> 2018-10-18</li>
-<li><a href="./misc/folder-structure.html">文件夹结构</a> 2018-10-15</li>
-</ol>
+
+<p>
+然后等 dd 完成过后就可以愉快地启动了。
+</p>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-08-12 Mon 10:51. Created by Jinghui Hu at 2018-10-05 Fri 11:04.</p>
+<p class="author">Last Updated 2019-08-12 Mon 10:51. Created by Jinghui Hu at 2019-08-12 Mon 10:34.</p>
 </div>
 </body>
 </html>
