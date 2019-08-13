@@ -9,29 +9,46 @@
 
 
 * sed
+  sed 是 Linux 下著名的行编辑器
+  #+BEGIN_SRC shell
+    # 替换文件中首次出现的字符串
+    sed 's/find/replace/' file
+  #+END_SRC
 
 * awk
-** 分割符
-   awk 的默认分割符是空格，如果想要修改可以使用 =-F= 选项指定
-   #+BEGIN_SRC sh :exports both :results output
-     head -n 3 /etc/passwd | awk '{print $1}'
-   #+END_SRC
+  awk 一般用于文本预处理，并且支持编程
+  #+BEGIN_SRC shell
+    # -F 选项指定分隔符, 默认以空格分隔
+    awk -F ':' '{print $1}' file
 
-   #+RESULTS:
-   : root:x:0:0:root:/root:/bin/bash
-   : daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
-   : bin:x:2:2:bin:/bin:/usr/sbin/nologin
-
-   #+BEGIN_SRC sh :exports both :results output
-     head -n 3 /etc/passwd | awk -F: '{print $1}'
-   #+END_SRC
-
-   #+RESULTS:
-   : root
-   : daemon
-   : bin
+    # 使用正则表达式匹配过滤结果
+    awk '/reg/ {print $5}' file
+    awk '$1 ~ /reg/ {print $5}' file
+    # 打印用户名以 b 开头的用户名
+    awk -F ':' ' $1 ~ /^b/ {print $1}' /etc/passwd
+  #+END_SRC
 
 * shell
+** 数组
+   #+BEGIN_SRC shell
+     # 定义数组
+     array[0]=valA
+     array[1]=valB
+     array[2]=valC
+
+     array=([0]=valA [1]=valB [2]=valC)
+     array=(valA valB valC)
+
+     # 取得数组中的元素
+     ${array[i]}
+     # 取得数组的长度
+     ${#array[@]}
+     # 取得数组中某个变量的长度
+     ${#array[i]}
+
+     # 查看所有数组
+     declare -a
+   #+END_SRC
 
 * link
   1. [[https://github.com/skywind3000/awesome-cheatsheets/blob/master/languages/bash.sh][bash]]

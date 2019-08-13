@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-31 Wed 09:09 -->
+<!-- 2019-08-13 Tue 08:43 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Linux 三剑客: sed, awk 和 shell</title>
@@ -238,52 +238,86 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org4bd4cea">1. sed</a></li>
-<li><a href="#orgdcbf2a2">2. awk</a>
+<li><a href="#org9381946">1. sed</a></li>
+<li><a href="#org4e0cc9a">2. awk</a></li>
+<li><a href="#org524a9ed">3. shell</a>
 <ul>
-<li><a href="#org8ebd31c">2.1. 分割符</a></li>
+<li><a href="#org2f77342">3.1. 数组</a></li>
 </ul>
 </li>
-<li><a href="#org1fdf4e6">3. shell</a></li>
-<li><a href="#org8aaf659">4. link</a></li>
+<li><a href="#org93f16a8">4. link</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org4bd4cea" class="outline-2">
-<h2 id="org4bd4cea"><span class="section-number-2">1</span> sed</h2>
-</div>
-
-<div id="outline-container-orgdcbf2a2" class="outline-2">
-<h2 id="orgdcbf2a2"><span class="section-number-2">2</span> awk</h2>
-<div class="outline-text-2" id="text-2">
-</div>
-<div id="outline-container-org8ebd31c" class="outline-3">
-<h3 id="org8ebd31c"><span class="section-number-3">2.1</span> 分割符</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-org9381946" class="outline-2">
+<h2 id="org9381946"><span class="section-number-2">1</span> sed</h2>
+<div class="outline-text-2" id="text-1">
 <p>
-awk 的默认分割符是空格，如果想要修改可以使用 <code>-F</code> 选项指定
+sed 是 Linux 下著名的行编辑器
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">head -n 3 /etc/passwd | awk <span style="color: #2aa198;">'{print $1}'</span>
+<pre class="src src-shell"><span style="color: #8e908c; font-style: italic;"># </span><span style="color: #8e908c; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#20013;&#39318;&#27425;&#20986;&#29616;&#30340;&#23383;&#31526;&#20018;</span>
+sed <span style="color: #3e999f;">'s/find/replace/'</span> file
 </pre>
 </div>
+</div>
+</div>
 
+<div id="outline-container-org4e0cc9a" class="outline-2">
+<h2 id="org4e0cc9a"><span class="section-number-2">2</span> awk</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+awk 一般用于文本预处理，并且支持编程
+</p>
 <div class="org-src-container">
-<pre class="src src-sh">head -n 3 /etc/passwd | awk -F: <span style="color: #2aa198;">'{print $1}'</span>
+<pre class="src src-shell"><span style="color: #8e908c; font-style: italic;"># </span><span style="color: #8e908c; font-style: italic;">-F &#36873;&#39033;&#25351;&#23450;&#20998;&#38548;&#31526;, &#40664;&#35748;&#20197;&#31354;&#26684;&#20998;&#38548;</span>
+awk -F <span style="color: #3e999f;">':'</span> <span style="color: #3e999f;">'{print $1}'</span> file
+
+<span style="color: #8e908c; font-style: italic;"># </span><span style="color: #8e908c; font-style: italic;">&#20351;&#29992;&#27491;&#21017;&#34920;&#36798;&#24335;&#21305;&#37197;&#36807;&#28388;&#32467;&#26524;</span>
+awk <span style="color: #3e999f;">'/reg/ {print $5}'</span> file
+awk <span style="color: #3e999f;">'$1 ~ /reg/ {print $5}'</span> file
+<span style="color: #8e908c; font-style: italic;"># </span><span style="color: #8e908c; font-style: italic;">&#25171;&#21360;&#29992;&#25143;&#21517;&#20197; b &#24320;&#22836;&#30340;&#29992;&#25143;&#21517;</span>
+awk -F <span style="color: #3e999f;">':'</span> <span style="color: #3e999f;">' $1 ~ /^b/ {print $1}'</span> /etc/passwd
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org524a9ed" class="outline-2">
+<h2 id="org524a9ed"><span class="section-number-2">3</span> shell</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org2f77342" class="outline-3">
+<h3 id="org2f77342"><span class="section-number-3">3.1</span> 数组</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+<pre class="src src-shell"><span style="color: #8e908c; font-style: italic;"># </span><span style="color: #8e908c; font-style: italic;">&#23450;&#20041;&#25968;&#32452;</span>
+array[0]=valA
+array[1]=valB
+array[2]=valC
+
+<span style="color: #eab700;">array</span>=([0]=valA [1]=valB [2]=valC)
+<span style="color: #eab700;">array</span>=(valA valB valC)
+
+<span style="color: #8e908c; font-style: italic;"># </span><span style="color: #8e908c; font-style: italic;">&#21462;&#24471;&#25968;&#32452;&#20013;&#30340;&#20803;&#32032;</span>
+${<span style="color: #eab700;">array</span>[i]}
+<span style="color: #8e908c; font-style: italic;"># </span><span style="color: #8e908c; font-style: italic;">&#21462;&#24471;&#25968;&#32452;&#30340;&#38271;&#24230;</span>
+${#<span style="color: #eab700;">array</span>[@]}
+<span style="color: #8e908c; font-style: italic;"># </span><span style="color: #8e908c; font-style: italic;">&#21462;&#24471;&#25968;&#32452;&#20013;&#26576;&#20010;&#21464;&#37327;&#30340;&#38271;&#24230;</span>
+${#<span style="color: #eab700;">array</span>[i]}
+
+<span style="color: #8e908c; font-style: italic;"># </span><span style="color: #8e908c; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#25968;&#32452;</span>
+declare -a
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org1fdf4e6" class="outline-2">
-<h2 id="org1fdf4e6"><span class="section-number-2">3</span> shell</h2>
-</div>
-
-<div id="outline-container-org8aaf659" class="outline-2">
-<h2 id="org8aaf659"><span class="section-number-2">4</span> link</h2>
+<div id="outline-container-org93f16a8" class="outline-2">
+<h2 id="org93f16a8"><span class="section-number-2">4</span> link</h2>
 <div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li><a href="https://github.com/skywind3000/awesome-cheatsheets/blob/master/languages/bash.sh">bash</a></li>
@@ -292,7 +326,7 @@ awk 的默认分割符是空格，如果想要修改可以使用 <code>-F</code>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-07-31 Wed 09:09. Created by Jinghui Hu at 2019-07-18 Thu 14:51.</p>
+<p class="author">Last Updated 2019-08-13 Tue 08:43. Created by Jinghui Hu at 2019-07-18 Thu 14:51.</p>
 </div>
 </body>
 </html>
