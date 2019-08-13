@@ -16,9 +16,9 @@
      w
      users
 
-     # 查看用户指纹，用户id，名字，登录状态
+     # 查看用户指纹，用户 id，名字，登录状态
      finger user
-     # 查看用户的各种id，uid，gid
+     # 查看用户的各种 id，uid，gid
      id user
      # 打印 uid
      id -u user
@@ -182,22 +182,100 @@
       cmd >/dev/null 2>&1 &
     #+END_SRC
 
-* 网络管理
-** route 命令
+* 进程管理
+** 查看进程
    #+BEGIN_SRC shell
-      # 打印路由表
-      route -n
+     # 以不同模式查看进程
+     ps
+     ps -ef
+     ps aux
+     # 查看用户名 user 的进程
+     ps -u user
+     # 指定格式查看进程
+     ps -eo pid,user,command
+     # 查看父进程 ppid 为 1 的子进程
+     ps -eo ppid,pid,user,command | awk '$1 ~ /^1$/'
 
-      # 添加默认网关为 192.168.1.1, 即默认路由
-      route add default gw 192.168.1.1
-      # 添加一条普通路由项
-      route add 192.168.1.0/32 gw 192.168.1.1
+     # 进程监视器
+     top
+     top -u user
 
-      # 删除默认路由
-      route del default gw 192.168.1.1
+     # htop 和 top 类似，但是比 top 要好看一点，需要安装
+     htop
    #+END_SRC
 
-** ifconfig 命令
+** 后台进程
+   #+BEGIN_SRC shell
+     # & 符号表示将进程挂在后台运行
+     cmd &
+     # 查看所有后台进程
+     jobs
+     # 查看后台进程，并切换过去
+     bg
+     # 切换后台进程到前台
+     fg
+     # 切换指定的 job 到前台
+     fg jid
+
+     # 长期运行后台进程，退出 shell 后任然保持运行
+     nohup cmd
+     # 在后台长期运行程序
+     nohup cmd &
+     # 将指定 pid 或者 jid 从后台任务列表移除
+     disown pid|jid
+     # 等待所以后台进程任务结束
+     wait
+   #+END_SRC
+
+* 远程交换
+** ssh
+   #+BEGIN_SRC shell
+     # 远程登录
+     ssh user@host
+     # 指定 ssh 端口为 2222 登录到远程机器上
+     ssh -p 2222 user@host
+
+     # 复制 ssh 公钥到远程机器上
+     ssh-copy-id user@host
+     ssh-copy-id -i ~/.ssh/id_rsa.pub user@host
+
+     # 生成 ssh 公钥和私钥
+     ssh-keygen -t rsa -b 4096 -C "hujinghui@buaa.edu.cn"
+   #+END_SRC
+
+** scp 和 rsync
+   #+BEGIN_SRC shell
+     # 本地到远程复制文件, -r 选项表示递归复制
+     scp file user@host:path
+     scp user@host:path file
+     scp -r file user@host:path
+
+     # 增量同步文件
+     rsync -av dir user@host:path
+     # 增量同步文件，忽略 *.log 文件
+     rsync -av --exclude='*.log' dir user@host:path
+     # 增量同步文件，删除远程中多余的文件
+     rsync -av --delete dir user@host:path
+     # 增量同步文件，删除远程中多余的文件， *.log 文件会被忽略，不会被删除
+     rsync -av --exclude='*.log' --delete dir user@host:path
+   #+END_SRC
+
+* 网络管理
+** route
+   #+BEGIN_SRC shell
+     # 打印路由表
+     route -n
+
+     # 添加默认网关为 192.168.1.1, 即默认路由
+     route add default gw 192.168.1.1
+     # 添加一条普通路由项
+     route add 192.168.1.0/32 gw 192.168.1.1
+
+     # 删除默认路由
+     route del default gw 192.168.1.1
+   #+END_SRC
+
+** ifconfig
    #+BEGIN_SRC shell
      # 显示所有网卡和接口信息
      ifconfig
@@ -219,4 +297,44 @@
      ifconfig eth0 192.168.120.56 netmask 255.255.255.0 up
      # 修改 MAC 地址
      ifconfig eth0 hw ether 00:aa:bb:cc:dd:ee
+   #+END_SRC
+
+** netstat
+   #+BEGIN_SRC shell
+     # 列出所有端口
+     netstat -a
+     # 查看所有连接信息，不解析域名
+     netstat -an
+     # 查看所有连接信息，包含进程信息（需要 sudo）
+     netstat -anp
+     # 查看所有监听的端口
+     netstat -l
+     # 查看所有 TCP 链接
+     netstat -t
+     # 显示所有正在监听的 TCP 和 UDP 信息
+     netstat -lntu
+     # 显示所有正在监听的 socket 及进程信息
+     netstat -lntup
+     # 显示网卡信息
+     netstat -i
+     # 显示当前系统路由表，同 route -n
+     netstat -rn
+   #+END_SRC
+
+** 网络连通性和 DNS
+   #+BEGIN_SRC shell
+     # 连通性
+     ping host/ip
+     ping -c 3 host/ip
+
+     # 路由跳转追踪
+     traceroute host
+
+     # 查看暴露的外网 ip
+     curl http://httpbin.org/ip
+
+     # DNS 查询
+     host domain
+     whois domain
+     dig domain
    #+END_SRC
