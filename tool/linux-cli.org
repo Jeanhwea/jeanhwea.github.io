@@ -350,8 +350,14 @@
    #+BEGIN_SRC shell
      # 在本地 9595 端口开启一个 socks5 的代理服务
      ssh -N -D 9595 user@proxyer
+
      # 测试连通性: --socks5-hostname 表示使用代理机的 DNS 来解析域名
      curl --socks5-hostname 127.0.0.1:9595 http://httpbin.org/ip
+
+     # 优雅地启动 socks5 代理
+     # -f 挂后台, -q 静默, -n 屏蔽 stdin, -T 阻止分配 tty
+     # -N 不执行 ssh 命令，只作端口转发， -D 指定本地监听端口号
+     ssh -fqnTN -D 9595 user@proxyer
    #+END_SRC
 
 * 参考链接
