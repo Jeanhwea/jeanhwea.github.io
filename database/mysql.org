@@ -54,6 +54,27 @@
       apt-get install libaio1
       apt-get install mysql-client mysql-server
     #+END_SRC
+*** Docker
+    下载 mysql 5.7 的镜像
+    #+BEGIN_SRC shell
+      docker pull mysql:5.7
+    #+END_SRC
+
+    启动 mysql 镜像即可
+    #+BEGIN_SRC shell
+      # 启动裸 root 用户的容器
+      docker run -d --restart always --name mysql \
+             -e 'MYSQL_ROOT_PASSWORD=root' \
+             -p 3306:3306 mysql:5.7
+
+      # 启动带有初始化数据库的容器
+      docker run -d --restart always --name mysql \
+             -e 'MYSQL_ROOT_PASSWORD=root' \
+             -e 'MYSQL_USER=username' \
+             -e 'MYSQL_PASSWORD=password' \
+             -e 'MYSQL_DATABASE=database' \
+             -p 3306:3306 mysql:5.7
+    #+END_SRC
 
 ** 参考手册
    1. [[https://dev.mysql.com/doc/][MySQL 文档]]
