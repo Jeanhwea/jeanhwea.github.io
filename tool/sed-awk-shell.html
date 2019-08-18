@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-08-18 Sun 10:47 -->
+<!-- 2019-08-18 Sun 14:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Linux 三剑客: sed, awk 和 shell</title>
@@ -238,21 +238,22 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org128497d">1. sed</a></li>
-<li><a href="#orgd9e41ea">2. awk</a></li>
-<li><a href="#org5c69d2a">3. shell</a>
+<li><a href="#org0147600">1. sed</a></li>
+<li><a href="#org99db5ff">2. awk</a></li>
+<li><a href="#org524213d">3. shell</a>
 <ul>
-<li><a href="#orgecc125a">3.1. 数组</a></li>
+<li><a href="#org30b1637">3.1. 变量</a></li>
+<li><a href="#org1f7f23b">3.2. 数组</a></li>
 </ul>
 </li>
-<li><a href="#org46cca04">4. link</a></li>
+<li><a href="#orga125727">4. link</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org128497d" class="outline-2">
-<h2 id="org128497d"><span class="section-number-2">1</span> sed</h2>
+<div id="outline-container-org0147600" class="outline-2">
+<h2 id="org0147600"><span class="section-number-2">1</span> sed</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 sed 是 Linux 下著名的行编辑器
@@ -265,8 +266,8 @@ sed <span style="color: #2aa198;">'s/find/replace/'</span> file
 </div>
 </div>
 
-<div id="outline-container-orgd9e41ea" class="outline-2">
-<h2 id="orgd9e41ea"><span class="section-number-2">2</span> awk</h2>
+<div id="outline-container-org99db5ff" class="outline-2">
+<h2 id="org99db5ff"><span class="section-number-2">2</span> awk</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 awk 一般用于文本预处理，并且支持编程
@@ -285,13 +286,43 @@ awk -F <span style="color: #2aa198;">':'</span> <span style="color: #2aa198;">' 
 </div>
 </div>
 
-<div id="outline-container-org5c69d2a" class="outline-2">
-<h2 id="org5c69d2a"><span class="section-number-2">3</span> shell</h2>
+<div id="outline-container-org524213d" class="outline-2">
+<h2 id="org524213d"><span class="section-number-2">3</span> shell</h2>
 <div class="outline-text-2" id="text-3">
+<p>
+shell 时 Linux 中的交互环境，常见的 shell 有 sh, bash, zsh, fish 等。我比较喜欢使用
+zsh, 但是目前的服务器端一般默认使用 bash, 这里基本上介绍 bash 脚本的一些知识
+</p>
 </div>
-<div id="outline-container-orgecc125a" class="outline-3">
-<h3 id="orgecc125a"><span class="section-number-3">3.1</span> 数组</h3>
+
+<div id="outline-container-org30b1637" class="outline-3">
+<h3 id="org30b1637"><span class="section-number-3">3.1</span> 变量</h3>
 <div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#21464;&#37327;</span>
+<span style="color: #6c71c4;">var</span>=value
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#21464;&#37327;&#65292;&#24182;&#22312;&#23376;&#36827;&#31243;&#20013;&#20351;&#29992;&#21464;&#37327;</span>
+<span style="color: #6c71c4;">var</span>=value command
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#21464;&#37327;&#30340;&#20540;</span>
+<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">var</span>
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#29305;&#27530;&#30340;&#21464;&#37327;</span>
+<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">$</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24403;&#21069; shell &#30340;&#36827;&#31243;&#21495;</span>
+<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">!</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26368;&#36817;&#35843;&#29992;&#30340;&#21518;&#21488;&#20219;&#21153;&#36827;&#31243;</span>
+<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">?</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26368;&#36817;&#19968;&#27425;&#21629;&#20196;&#30340;&#36820;&#22238;&#20540;</span>
+<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">!</span>
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#28155;&#21152;&#29615;&#22659;&#21464;&#37327;</span>
+<span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">var</span>=value
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1f7f23b" class="outline-3">
+<h3 id="org1f7f23b"><span class="section-number-3">3.2</span> 数组</h3>
+<div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 <pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#25968;&#32452;</span>
 <span style="color: #6c71c4;">array</span>[0]=valA
@@ -316,8 +347,8 @@ ${#<span style="color: #6c71c4;">array</span>[i]}
 </div>
 </div>
 
-<div id="outline-container-org46cca04" class="outline-2">
-<h2 id="org46cca04"><span class="section-number-2">4</span> link</h2>
+<div id="outline-container-orga125727" class="outline-2">
+<h2 id="orga125727"><span class="section-number-2">4</span> link</h2>
 <div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li><a href="https://github.com/skywind3000/awesome-cheatsheets/blob/master/languages/bash.sh">bash</a></li>
@@ -326,7 +357,7 @@ ${#<span style="color: #6c71c4;">array</span>[i]}
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-08-18 Sun 10:47. Created by Jinghui Hu at 2019-07-18 Thu 14:51.</p>
+<p class="author">Last Updated 2019-08-18 Sun 14:44. Created by Jinghui Hu at 2019-07-18 Thu 14:51.</p>
 </div>
 </body>
 </html>
