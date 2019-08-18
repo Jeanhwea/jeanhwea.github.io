@@ -13,6 +13,14 @@
     - Python 2: ~python -m SimpleHTTPServer 7777~
     - Python 3: ~python -m http.server 7777~
 
+** 帮助文档
+   #+BEGIN_SRC shell
+     # 查看 topic 的相关文档
+     man topic
+     # 搜索 keyword 的 topic
+     man -k keyword
+   #+END_SRC
+
 * 用户管理
 ** 查看用户信息
    #+BEGIN_SRC shell
@@ -202,13 +210,28 @@
      ps -eo pid,user,command
      # 查看父进程 ppid 为 1 的子进程
      ps -eo ppid,pid,user,command | awk '$1 ~ /^1$/'
+   #+END_SRC
 
+** 监控进程
+   #+BEGIN_SRC shell
      # 进程监视器
      top
+
+     # 进程监视器, 仅仅监控 user 的进程
      top -u user
+     top -u $USER
 
      # htop 和 top 类似，但是比 top 要好看一点，需要安装
      htop
+
+     # 内存监视器
+     vmstat
+     # 每 3 秒打印一行内存和 CPU 使用情况
+     vmstat 3
+     # 查看内存和 swap 的使用情况
+     free
+     # 每 3 秒刷新显示
+     while sleep 3; do clear && free; done
    #+END_SRC
 
 ** 后台进程
@@ -242,12 +265,12 @@
      # 指定 ssh 端口为 2222 登录到远程机器上
      ssh -p 2222 user@host
 
+     # 生成 ssh 公钥和私钥
+     ssh-keygen -t rsa -b 4096 -C "hujinghui@buaa.edu.cn"
+
      # 复制 ssh 公钥到远程机器上
      ssh-copy-id user@host
      ssh-copy-id -i ~/.ssh/id_rsa.pub user@host
-
-     # 生成 ssh 公钥和私钥
-     ssh-keygen -t rsa -b 4096 -C "hujinghui@buaa.edu.cn"
    #+END_SRC
 
 ** scp 和 rsync
