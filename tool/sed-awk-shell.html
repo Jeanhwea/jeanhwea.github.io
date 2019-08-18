@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-08-18 Sun 14:44 -->
+<!-- 2019-08-18 Sun 15:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Linux 三剑客: sed, awk 和 shell</title>
@@ -238,22 +238,23 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org0147600">1. sed</a></li>
-<li><a href="#org99db5ff">2. awk</a></li>
-<li><a href="#org524213d">3. shell</a>
+<li><a href="#org44c921f">1. sed</a></li>
+<li><a href="#orgf5cd54b">2. awk</a></li>
+<li><a href="#org2b84d5d">3. shell</a>
 <ul>
-<li><a href="#org30b1637">3.1. 变量</a></li>
-<li><a href="#org1f7f23b">3.2. 数组</a></li>
+<li><a href="#orgbdabba5">3.1. 基本</a></li>
+<li><a href="#orgd8db36e">3.2. 变量</a></li>
+<li><a href="#org0c324b0">3.3. 数组</a></li>
 </ul>
 </li>
-<li><a href="#orga125727">4. link</a></li>
+<li><a href="#orgc7486a6">4. link</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org0147600" class="outline-2">
-<h2 id="org0147600"><span class="section-number-2">1</span> sed</h2>
+<div id="outline-container-org44c921f" class="outline-2">
+<h2 id="org44c921f"><span class="section-number-2">1</span> sed</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 sed 是 Linux 下著名的行编辑器
@@ -266,8 +267,8 @@ sed <span style="color: #2aa198;">'s/find/replace/'</span> file
 </div>
 </div>
 
-<div id="outline-container-org99db5ff" class="outline-2">
-<h2 id="org99db5ff"><span class="section-number-2">2</span> awk</h2>
+<div id="outline-container-orgf5cd54b" class="outline-2">
+<h2 id="orgf5cd54b"><span class="section-number-2">2</span> awk</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 awk 一般用于文本预处理，并且支持编程
@@ -286,8 +287,8 @@ awk -F <span style="color: #2aa198;">':'</span> <span style="color: #2aa198;">' 
 </div>
 </div>
 
-<div id="outline-container-org524213d" class="outline-2">
-<h2 id="org524213d"><span class="section-number-2">3</span> shell</h2>
+<div id="outline-container-org2b84d5d" class="outline-2">
+<h2 id="org2b84d5d"><span class="section-number-2">3</span> shell</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 shell 时 Linux 中的交互环境，常见的 shell 有 sh, bash, zsh, fish 等。我比较喜欢使用
@@ -295,9 +296,22 @@ zsh, 但是目前的服务器端一般默认使用 bash, 这里基本上介绍 b
 </p>
 </div>
 
-<div id="outline-container-org30b1637" class="outline-3">
-<h3 id="org30b1637"><span class="section-number-3">3.1</span> 变量</h3>
+<div id="outline-container-orgbdabba5" class="outline-3">
+<h3 id="orgbdabba5"><span class="section-number-3">3.1</span> 基本</h3>
 <div class="outline-text-3" id="text-3-1">
+<p>
+查看 Bash 的文档
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">man bash
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd8db36e" class="outline-3">
+<h3 id="orgd8db36e"><span class="section-number-3">3.2</span> 变量</h3>
+<div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 <pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#21464;&#37327;</span>
 <span style="color: #6c71c4;">var</span>=value
@@ -317,12 +331,52 @@ zsh, 但是目前的服务器端一般默认使用 bash, 这里基本上介绍 b
 <span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">var</span>=value
 </pre>
 </div>
+
+<p>
+变量展开（Parameter Expansion）可以根据变量的状态（是否为空、是否定义等）来改
+变它的值，是编写 bash 脚本的常用技巧
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#36820;&#22238;&#21464;&#37327;&#30340;&#20540;</span>
+${<span style="color: #6c71c4;">var</span>}
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238;&#21464;&#37327;&#20540;&#65307;&#21542;&#21017;&#65292;&#36820;&#22238; word</span>
+${<span style="color: #6c71c4;">var</span>:-word}
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238;&#21464;&#37327;&#20540;&#65307;&#21542;&#21017;&#65292;&#23558; var &#36171;&#20540;&#25104; word &#24182;&#36820;&#22238; word</span>
+${<span style="color: #6c71c4;">var</span>:=word}
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238;&#21464;&#37327;&#20540;&#65307;&#21542;&#21017;&#65292;&#25171;&#21360;&#38169;&#35823;&#20449;&#24687;&#24182;&#36864;&#20986;</span>
+${<span style="color: #6c71c4;">var</span>:?message}
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238; word&#65307;&#21542;&#21017;&#65292;&#36820;&#22238;&#31354;</span>
+${<span style="color: #6c71c4;">var</span>:+word}
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#33719;&#21462;&#23383;&#31526;&#20018;&#30340;&#38271;&#24230;</span>
+${#<span style="color: #6c71c4;">var</span>}
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#33719;&#21462;&#23383;&#31526;&#20018;&#30340;&#23383;&#20018;</span>
+${<span style="color: #6c71c4;">var</span>:offset:len}
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21464;&#37327;&#25193;&#23637;&#30340; pattern &#26159; Path Expansion, &#21487;&#20197;&#20351;&#29992; * ? [...] &#31561;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#22836;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#23567;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
+${<span style="color: #6c71c4;">var</span>#pattern}
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#22836;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#22823;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
+${<span style="color: #6c71c4;">var</span>##pattern}
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#23614;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#23567;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
+${<span style="color: #6c71c4;">var</span>%pattern}
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#23614;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#22823;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
+${<span style="color: #6c71c4;">var</span>%%pattern}
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#21464;&#37327;&#20013;&#31532;&#19968;&#20010;&#21305;&#37197; pattern &#30340;&#26367;&#25442;&#25104; str&#65292;&#24182;&#36820;&#22238;</span>
+${<span style="color: #6c71c4;">var</span>/pattern/str}
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#21464;&#37327;&#20013;&#25152;&#26377;&#21305;&#37197; pattern &#30340;&#22320;&#26041;&#26367;&#25442;&#25104; str &#24182;&#36820;&#22238;</span>
+${<span style="color: #6c71c4;">var</span>//pattern/str}
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#31561;&#20215;&#20110; echo $PATH | tr : '\n'</span>
+<span style="color: #6c71c4;">echo</span> ${<span style="color: #6c71c4;">PATH</span>//:/<span style="color: #2aa198;">\\</span>n}
+</pre>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org1f7f23b" class="outline-3">
-<h3 id="org1f7f23b"><span class="section-number-3">3.2</span> 数组</h3>
-<div class="outline-text-3" id="text-3-2">
+<div id="outline-container-org0c324b0" class="outline-3">
+<h3 id="org0c324b0"><span class="section-number-3">3.3</span> 数组</h3>
+<div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
 <pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#25968;&#32452;</span>
 <span style="color: #6c71c4;">array</span>[0]=valA
@@ -347,8 +401,8 @@ ${#<span style="color: #6c71c4;">array</span>[i]}
 </div>
 </div>
 
-<div id="outline-container-orga125727" class="outline-2">
-<h2 id="orga125727"><span class="section-number-2">4</span> link</h2>
+<div id="outline-container-orgc7486a6" class="outline-2">
+<h2 id="orgc7486a6"><span class="section-number-2">4</span> link</h2>
 <div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li><a href="https://github.com/skywind3000/awesome-cheatsheets/blob/master/languages/bash.sh">bash</a></li>
@@ -357,7 +411,7 @@ ${#<span style="color: #6c71c4;">array</span>[i]}
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-08-18 Sun 14:44. Created by Jinghui Hu at 2019-07-18 Thu 14:51.</p>
+<p class="author">Last Updated 2019-08-18 Sun 15:15. Created by Jinghui Hu at 2019-07-18 Thu 14:51.</p>
 </div>
 </body>
 </html>

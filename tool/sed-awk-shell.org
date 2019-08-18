@@ -31,6 +31,12 @@
   shell 时 Linux 中的交互环境，常见的 shell 有 sh, bash, zsh, fish 等。我比较喜欢使用
   zsh, 但是目前的服务器端一般默认使用 bash, 这里基本上介绍 bash 脚本的一些知识
 
+** 基本
+   查看 Bash 的文档
+   #+BEGIN_SRC shell
+     man bash
+   #+END_SRC
+
 ** 变量
    #+BEGIN_SRC shell
      # 定义变量
@@ -49,6 +55,43 @@
 
      # 添加环境变量
      export var=value
+   #+END_SRC
+
+   变量展开（Parameter Expansion）可以根据变量的状态（是否为空、是否定义等）来改
+   变它的值，是编写 bash 脚本的常用技巧
+   #+BEGIN_SRC shell
+     # 返回变量的值
+     ${var}
+     # 如果 var 不为空，返回变量值；否则，返回 word
+     ${var:-word}
+     # 如果 var 不为空，返回变量值；否则，将 var 赋值成 word 并返回 word
+     ${var:=word}
+     # 如果 var 不为空，返回变量值；否则，打印错误信息并退出
+     ${var:?message}
+     # 如果 var 不为空，返回 word；否则，返回空
+     ${var:+word}
+
+     # 获取字符串的长度
+     ${#var}
+     # 获取字符串的字串
+     ${var:offset:len}
+
+     # 变量扩展的 pattern 是 Path Expansion, 可以使用 * ? [...] 等
+     # 如果变量头部匹配 pattern，则删除最小匹配部分返回剩下的
+     ${var#pattern}
+     # 如果变量头部匹配 pattern，则删除最大匹配部分返回剩下的
+     ${var##pattern}
+     # 如果变量尾部匹配 pattern，则删除最小匹配部分返回剩下的
+     ${var%pattern}
+     # 如果变量尾部匹配 pattern，则删除最大匹配部分返回剩下的
+     ${var%%pattern}
+     # 将变量中第一个匹配 pattern 的替换成 str，并返回
+     ${var/pattern/str}
+     # 将变量中所有匹配 pattern 的地方替换成 str 并返回
+     ${var//pattern/str}
+
+     # 等价于 echo $PATH | tr : '\n'
+     echo ${PATH//:/\\n}
    #+END_SRC
 
 ** 数组
