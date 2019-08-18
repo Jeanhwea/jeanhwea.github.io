@@ -228,5 +228,82 @@
      declare -f
    #+END_SRC
 
+** 条件判断
+   在 shell 编程中往往需要进行条件判断，即 test。可以通过 ~man test~ 来查看条件
+   判断的相关说明
+   #+BEGIN_SRC shell
+     # 测试条件，当使用方括号是注意空格
+     test expr
+     [ expr ]
+
+     # and 逻辑
+     stmt1 && stmt2
+     # or 逻辑
+     stmt1 || stmt2
+
+
+     # exp1 和 exp2 同时为真时返回真（POSIX XSI 扩展）
+     exp1 -a exp2
+     # exp1 和 exp2 有一个为真就返回真（POSIX XSI 扩展）
+     exp1 -o exp2
+     # 如果 expr 为真时返回真，输入注意括号前反斜杆
+     ( expr )
+     # 如果 expr 为假那返回真
+     ! expr
+
+     # 判断字符串相等，如 [ "$x" = "$y" ] && echo yes
+     str1 = str2
+     # 判断字符串不等，如 [ "$x" != "$y" ] && echo yes
+     str1 != str2
+     # 字符串小于，如 [ "$x" \< "$y" ] && echo yes
+     str1 < str2
+     # 字符串大于，注意 < 或 > 是字面量，输入时要加反斜杆
+     str2 > str2
+     # 判断字符串不为空（长度大于零）
+     -n str1
+     # 判断字符串为空（长度等于零）
+     -z str1
+
+     # 判断文件存在，如 [ -a /tmp/abc ] && echo "exists"
+     -a file
+     # 判断文件存在，且该文件是一个目录
+     -d file
+     # 判断文件存在，和 -a 等价
+     -e file
+     # 判断文件存在，且该文件是一个普通文件（非目录等）
+     -f file
+     # 判断文件存在，且可读
+     -r file
+     # 判断文件存在，且尺寸大于 0
+     -s file
+     # 判断文件存在，且可写
+     -w file
+     # 判断文件存在，且执行
+     -x file
+     # 文件上次修改过后还没有读取过
+     -N file
+     # 文件存在且属于当前用户
+     -O file
+     # 文件存在且匹配你的用户组
+     -G file
+     # 文件 1 比 文件 2 新
+     file1 -nt file2
+     # 文件 1 比 文件 2 旧
+     file1 -ot file2
+
+     # 数字判断：num1 == num2
+     num1 -eq num2
+     # 数字判断：num1 != num2
+     num1 -ne num2
+     # 数字判断：num1 < num2
+     num1 -lt num2
+     # 数字判断：num1 <= num2
+     num1 -le num2
+     # 数字判断：num1 > num2
+     num1 -gt num2
+     # 数字判断：num1 >= num2
+     num1 -ge num2
+   #+END_SRC
+
 * link
   1. [[https://github.com/skywind3000/awesome-cheatsheets/blob/master/languages/bash.sh][bash]]
