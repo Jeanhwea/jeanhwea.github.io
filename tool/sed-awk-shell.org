@@ -37,6 +37,24 @@
      man bash
    #+END_SRC
 
+   查看定义的变量
+   #+BEGIN_SRC shell
+     # 查看所有数组
+     declare -a
+     # 查看所有函数
+     declare -f
+     # 查看所有函数，仅显示函数名
+     declare -F
+     # 查看所有整数
+     declare -i
+     # 查看所有只读变量
+     declare -r
+     # 查看所有被导出成环境变量的东西
+     declare -x
+     # 输出变量是怎么定义的（类型+值）
+     declare -p varname
+   #+END_SRC
+
 ** 变量
    #+BEGIN_SRC shell
      # 定义变量
@@ -52,13 +70,11 @@
      echo $! # 最近调用的后台任务进程
      echo $? # 最近一次命令的返回值
 
-     echo !$ # 上个命令的最后一个参数
-
      # 添加环境变量
      export var=value
    #+END_SRC
 
-   变量展开（Parameter Expansion）可以根据变量的状态（是否为空、是否定义等）来改
+   参数展开（Parameter Expansion）可以根据变量的状态（是否为空、是否定义等）来改
    变它的值，是编写 bash 脚本的常用技巧
    #+BEGIN_SRC shell
      # 返回变量的值
@@ -90,9 +106,49 @@
      ${var/pattern/str}
      # 将变量中所有匹配 pattern 的地方替换成 str 并返回
      ${var//pattern/str}
-
-     # 等价于 echo $PATH | tr : '\n'
+     # 例如：等价于 echo $PATH | tr : '\n'
      echo ${PATH//:/\\n}
+
+     # 零次或者多次匹配
+     ,*(patternlist)
+     # 一次或者多次匹配
+     +(patternlist)
+     # 零次或者一次匹配
+     ?(patternlist)
+     # 单词匹配
+     @(patternlist)
+     # 不匹配
+     !(patternlist)
+
+
+     # 按空格分隔 text 成数组，并赋值给变量
+     array=($text)
+     # 按斜杆分隔字符串 text 成数组，并赋值给变量
+     IFS="/" array=($text)
+     # 用空格链接数组并赋值给变量
+     text="${array[*]}"
+     # 用斜杠链接数组并赋值给变量
+     text=$(IFS=/; echo "${array[*]}")
+   #+END_SRC
+
+   计算方法，bash 的计算方式一般是 ~$((...))~ 来实现，为了兼容老的 sh，还可以使
+   用 expr 命令来进行计算
+   #+BEGIN_SRC shell
+     # 兼容 posix sh 的计算，使用 expr 命令计算结果
+     num=$(expr 1 + 2)
+     # 数字自增
+     num=$(expr $num + 1)
+     # 兼容 posix sh 的复杂计算，输出 10
+     expr 2 \* \( 2 + 3 \)
+
+     # 计算 1+2 赋值给 num，使用 bash 独有的 $((..)) 计算
+     num=$((1 + 2))
+     # 变量递增
+     num=$(($num + 1))
+     # 变量递增，双括号内的 $ 可以省略
+     num=$((num + 1))
+     # 复杂计算
+     num=$((1 + (2 + 3) * 2))
    #+END_SRC
 
 ** 数组
@@ -114,6 +170,62 @@
 
      # 查看所有数组
      declare -a
+
+     # 数组定义
+     A=( foo bar "a  b c" 42 )
+     # 数组切片：B=( bar "a  b c" )
+     B=("${A[@]:1:2}")
+     # 数组切片：C=( bar "a  b c" 42 )
+     C=("${A[@]:1}")
+     echo "${B[@]}"            # bar a  b c
+     echo "${B[1]}"            # a  b c
+     echo "${C[@]}"            # bar a  b c 42
+     echo "${C[@]: -2:2}"      # a  b c 42  减号前的空格是必须的
+   #+END_SRC
+
+** 事件指示符
+   #+BEGIN_SRC shell
+     # 上一条命令
+     !!
+     # 上一条命令的第一个单词
+     !^
+     # 上一条命令的最后一个单词
+     !$
+     # 最近一条包含 string 的命令
+     !string
+     # 最近一条包含 string1 的命令, 快速替换为 string2, 相当于!!:s/string1/string2/
+     !^string1^string2
+     # 本条命令之前所有的输入内容
+     !#
+   #+END_SRC
+
+** 函数
+   #+BEGIN_SRC shell
+     # 定义一个新函数
+     function myfunc() {
+       # $1 代表第一个参数，$N 代表第 N 个参数
+       # $# 代表参数个数
+       # $0 代表被调用者自身的名字
+       # $@ 代表所有参数，类型是个数组，想传递所有参数给其他命令用 cmd "$@"
+       # $* 空格链接起来的所有参数，类型是字符串
+       {shell commands ...}
+     }
+
+     # 调用函数 myfunc
+     myfunc
+     # 带参数的函数调用
+     myfunc arg1 arg2 arg3
+     # 将所有参数传递给函数
+     myfunc "$@"
+     # 将一个数组当作多个参数传递给函数
+     myfunc "${array[@]}"
+     # 参数左移
+     shift
+
+     # 删除函数
+     unset -f myfunc
+     # 列出函数定义
+     declare -f
    #+END_SRC
 
 * link
