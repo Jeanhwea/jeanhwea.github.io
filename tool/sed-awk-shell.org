@@ -32,12 +32,12 @@
   较受欢迎的, 服务器端一般默认使用 bash, 这里基本上介绍 bash 脚本的一些知识
 
 ** 基本
-   查看 Bash 的文档
+*** 查看 Bash 的文档
    #+BEGIN_SRC shell
      man bash
    #+END_SRC
 
-   查看定义的变量
+*** 查看定义的变量
    #+BEGIN_SRC shell
      # 查看所有数组
      declare -a
@@ -53,6 +53,21 @@
      declare -x
      # 输出变量是怎么定义的（类型+值）
      declare -p varname
+   #+END_SRC
+
+*** 查看命令和使用帮助
+   #+BEGIN_SRC shell
+     # 忽略 alias 直接执行程序或者内建命令 ls
+     command ls
+     # 忽略 alias 直接运行内建的 cd 命令
+     builtin cd
+     # 列出所有 bash 内置命令，或禁止某命令
+     enable
+     # 查看内置命令的帮助（仅限 bash 内置命令）
+     help {builtin_command}
+
+     # 对 script 变量中的字符串求值（执行）
+     eval $script
    #+END_SRC
 
 ** 变量
@@ -237,10 +252,15 @@
      [ expr ]
 
      # and 逻辑
-     stmt1 && stmt2
+     cmd1 && cmd2
      # or 逻辑
-     stmt1 || stmt2
-
+     cmd1 || cmd2
+     # 判断条件为真时执行 cmd1
+     test cond && cmd1
+     # 和上面完全等价
+     [ cond ] && cmd1
+     # 条件为真执行 cmd1 否则执行 cmd2
+     [ cond ] && cmd1 || cmd2
 
      # exp1 和 exp2 同时为真时返回真（POSIX XSI 扩展）
      exp1 -a exp2
@@ -303,6 +323,106 @@
      num1 -gt num2
      # 数字判断：num1 >= num2
      num1 -ge num2
+   #+END_SRC
+
+** 控制流
+
+   #+BEGIN_SRC shell
+     # 查看返回值 echo $? 显示 1，因为条件为假
+     test "abc" = "def"
+     # 查看返回值 echo $? 显示 0，因为条件为真
+     test "abc" != "def"
+
+     # 调用 test 判断 /tmp 是否存在，并打印 test 的返回值
+     test -a /tmp; echo $?
+     [ -a /tmp ]; echo $?
+
+     # if 语句就是判断后面的命令返回值为 0 的话，认为条件为真，否则为假
+     if test -e /etc/passwd; then
+       echo "exist"
+     else
+       echo "not exist"
+     fi
+     # 和上面两个完全等价
+     [ -e /etc/passwd ] && echo "exists" || echo "not exist"
+
+     # 判断变量的值
+     if [ "$varname" = "foo" ]; then
+       echo "this is foo"
+     elif [ "$varname" = "bar" ]; then
+       echo "this is bar"
+     else
+       echo "neither"
+     fi
+
+     # 复杂条件判断，注意 || 和 && 是完全兼容 POSIX 的推荐写法
+     if [ $x -gt 10 ] && [ $x -lt 20 ]; then
+       echo "yes, between 10 and 20"
+     fi
+     # 可以用 && 命令连接符来做和上面完全等价的事情
+     [ $x -gt 10 ] && [ $x -lt 20 ] && echo "yes, between 10 and 20"
+     # 小括号和 -a -o 是 POSIX XSI 扩展写法，小括号是字面量，输入时前面要加反斜杆
+     if [ \( $x -gt 10 \) -a \( $x -lt 20 \) ]; then
+       echo "yes, between 10 and 20"
+     fi
+     # 同样可以用 && 命令连接符来做和上面完全等价的事情
+     [ \( $x -gt 10 \) -a \( $x -lt 20 \) ] && echo "yes, between 10 and 20"
+
+     # 判断程序存在的话就执行
+     [ -x /bin/ls ] && /bin/ls -l
+
+     # 如果不考虑兼容 posix sh 和 dash 这些的话，可用 bash 独有的 ((..)) 和 [[..]]:
+     https://www.ibm.com/developerworks/library/l-bash-test/index.html
+
+     # while 循环
+     while condition; do
+       statements
+     done
+
+     i=1
+     while [ $i -le 10 ]; do
+       echo $i;
+       i=$(expr $i + 1)
+     done
+
+     # for 循环：上面的 while 语句等价
+     for i in {1..10}; do
+       echo $i
+     done
+
+     for name [in list]; do
+       statements
+     done
+     # for 列举某目录下面的所有文件
+     for f in /home/*; do
+       echo $f
+     done
+
+     # bash 独有的 (( .. )) 语句，更接近 C 语言，但是不兼容 posix sh
+     for (( initialisation ; ending condition ; update )); do
+       statements
+     done
+     for ((i = 0; i < 10; i++)); do echo $i; done
+
+     # case 判断
+     case expression in
+       pattern1 )
+         statements ;;
+       pattern2 )
+         statements ;;
+       ,* )
+         otherwise ;;
+     esac
+
+     # until 语句
+     until condition; do
+       statements
+     done
+
+     # select 语句
+     select name [in list]; do
+       statements that can use $name
+     done
    #+END_SRC
 
 * link
