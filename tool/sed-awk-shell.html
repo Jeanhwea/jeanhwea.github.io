@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-08-19 Mon 15:51 -->
+<!-- 2019-08-19 Mon 22:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Linux 三剑客: sed, awk 和 shell</title>
@@ -185,7 +185,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2019 Free Software Foundation, Inc.
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -238,69 +238,132 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgc6cc029">1. sed</a></li>
-<li><a href="#org7d1e2d8">2. awk</a></li>
-<li><a href="#org83b8f2f">3. shell</a>
+<li><a href="#orgab5bf23">1. sed</a></li>
+<li><a href="#org4776d76">2. awk</a></li>
+<li><a href="#org4e6bac3">3. shell</a>
 <ul>
-<li><a href="#orgc1bcb2e">3.1. 基本</a>
+<li><a href="#orge45715b">3.1. 基本</a>
 <ul>
-<li><a href="#orga102bab">3.1.1. 查看 Bash 的文档</a></li>
-<li><a href="#org8eb595f">3.1.2. 查看定义的变量</a></li>
-<li><a href="#orge584282">3.1.3. 查看命令和使用帮助</a></li>
+<li><a href="#orga42484e">3.1.1. 查看 Bash 的文档</a></li>
+<li><a href="#org5b22006">3.1.2. 查看定义的变量</a></li>
+<li><a href="#org22e9e82">3.1.3. 查看命令和使用帮助</a></li>
 </ul>
 </li>
-<li><a href="#orge5a11bf">3.2. 变量</a></li>
-<li><a href="#org51671bb">3.3. 数组</a></li>
-<li><a href="#org57206c4">3.4. 事件指示符</a></li>
-<li><a href="#org8aa5435">3.5. 函数</a></li>
-<li><a href="#org3b94433">3.6. 条件判断</a></li>
-<li><a href="#org6b33cb9">3.7. 控制流</a></li>
-<li><a href="#org4907ea9">3.8. 重定向</a></li>
-<li><a href="#org2f6eedd">3.9. 文本处理</a></li>
+<li><a href="#org760fb4d">3.2. 变量</a></li>
+<li><a href="#orgf5468a4">3.3. 数组</a></li>
+<li><a href="#org43ae61f">3.4. 事件指示符</a></li>
+<li><a href="#orge47cb7a">3.5. 函数</a></li>
+<li><a href="#org066a44e">3.6. 条件判断</a></li>
+<li><a href="#org72b065f">3.7. 控制流</a></li>
+<li><a href="#org805822a">3.8. 重定向</a></li>
+<li><a href="#org05ee359">3.9. 文本处理</a></li>
+<li><a href="#orgc07b330">3.10. 文本排序</a></li>
 </ul>
 </li>
-<li><a href="#org5f41a15">4. link</a></li>
+<li><a href="#org035d75c">4. link</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgc6cc029" class="outline-2">
-<h2 id="orgc6cc029"><span class="section-number-2">1</span> sed</h2>
+<div id="outline-container-orgab5bf23" class="outline-2">
+<h2 id="orgab5bf23"><span class="section-number-2">1</span> sed</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 sed 是 Linux 下著名的行编辑器
 </p>
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#20013;&#39318;&#27425;&#20986;&#29616;&#30340;&#23383;&#31526;&#20018;</span>
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#20013;&#39318;&#27425;&#20986;&#29616;&#30340;&#23383;&#31526;&#20018;&#24182;&#36755;&#20986;&#32467;&#26524;</span>
 sed <span style="color: #2aa198;">'s/find/replace/'</span> file
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#31532; 10 &#34892;&#20869;&#23481;</span>
+sed <span style="color: #2aa198;">'10s/find/replace/'</span> file
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#20013; 10-20 &#34892;&#20869;&#23481;</span>
+sed <span style="color: #2aa198;">'10,20s/find/replace/'</span> file
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#20013;&#25152;&#26377;&#20986;&#29616;&#30340;&#23383;&#31526;&#20018;</span>
+sed -r <span style="color: #2aa198;">'s/regex/replace/g'</span> file
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#20013;&#25152;&#26377;&#20986;&#29616;&#30340;&#23383;&#31526;&#24182;&#19988;&#35206;&#30422;&#25991;&#20214;</span>
+sed -i <span style="color: #2aa198;">'s/find/replace/g'</span> file
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22312;&#25991;&#20214;&#30340;&#21305;&#37197;&#25991;&#26412;&#21069;&#25554;&#20837;&#34892;</span>
+sed -i <span style="color: #2aa198;">'/find/i\newline'</span> file
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22312;&#25991;&#20214;&#30340;&#21305;&#37197;&#25991;&#26412;&#21518;&#25554;&#20837;&#34892;</span>
+sed -i <span style="color: #2aa198;">'/find/a\newline'</span> file
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20808;&#25628;&#32034;&#34892;&#29305;&#24449;&#20877;&#25191;&#34892;&#26367;&#25442;</span>
+sed <span style="color: #2aa198;">'/line/s/find/replace/'</span> file
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25191;&#34892;&#22810;&#27425;&#26367;&#25442;</span>
+sed -e <span style="color: #2aa198;">'s/f/r/'</span> -e <span style="color: #2aa198;">'s/f/r'</span> file
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20351;&#29992; # &#26367;&#25442; / &#26469;&#36991;&#20813; pattern &#20013;&#26377;&#26012;&#26438;</span>
+sed <span style="color: #2aa198;">'s#find#replace#'</span> file
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21024;&#38500;&#25991;&#20214;&#27599;&#34892;&#22836;&#37096;&#31354;&#26684;</span>
+sed -i -r <span style="color: #2aa198;">'s/^\s+//g'</span> file
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21024;&#38500;&#25991;&#20214;&#31354;&#34892;&#24182;&#25171;&#21360;</span>
+sed <span style="color: #2aa198;">'/^$/d'</span> file
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21024;&#38500;&#25991;&#20214;&#27599;&#34892;&#26411;&#23614;&#22810;&#20313;&#31354;&#26684;</span>
+sed -i <span style="color: #2aa198;">'s/\s\+$//'</span> file
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#25991;&#20214;&#31532;&#20108;&#34892;</span>
+sed -n <span style="color: #2aa198;">'2p'</span> file
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#25991;&#20214;&#31532;&#20108;&#21040;&#31532;&#20116;&#34892;</span>
+sed -n <span style="color: #2aa198;">'2,5p'</span> file
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org7d1e2d8" class="outline-2">
-<h2 id="org7d1e2d8"><span class="section-number-2">2</span> awk</h2>
+<div id="outline-container-org4776d76" class="outline-2">
+<h2 id="org4776d76"><span class="section-number-2">2</span> awk</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 awk 一般用于文本预处理，并且支持编程
+#+BEGIN<sub>SRC</sub> shell
 </p>
-<div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">-F &#36873;&#39033;&#25351;&#23450;&#20998;&#38548;&#31526;, &#40664;&#35748;&#20197;&#31354;&#26684;&#20998;&#38548;</span>
-awk -F <span style="color: #2aa198;">':'</span> <span style="color: #2aa198;">'{print $1}'</span> file
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20351;&#29992;&#27491;&#21017;&#34920;&#36798;&#24335;&#21305;&#37197;&#36807;&#28388;&#32467;&#26524;</span>
-awk <span style="color: #2aa198;">'/reg/ {print $5}'</span> file
-awk <span style="color: #2aa198;">'$1 ~ /reg/ {print $5}'</span> file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25171;&#21360;&#29992;&#25143;&#21517;&#20197; b &#24320;&#22836;&#30340;&#29992;&#25143;&#21517;</span>
-awk -F <span style="color: #2aa198;">':'</span> <span style="color: #2aa198;">' $1 ~ /^b/ {print $1}'</span> /etc/passwd
-</pre>
-</div>
+<p>
+awk -F ':' '{print $1}' file
+</p>
+
+<p>
+awk '<i>reg</i> {print $5}' file
+awk '$1 ~ <i>reg</i> {print $5}' file
+</p>
+
+<p>
+awk -F ':' ' $1 ~ <i>^b</i> {print $1}' /etc/passwd
+</p>
+
+<p>
+awk '{print $5}' file
+</p>
+
+<p>
+awk -F ',' '{print $5}' file
+</p>
+
+<p>
+awk '<i>str</i> {print $2}' file
+</p>
+
+<p>
+awk -F ',' '{print $NF}' file
+</p>
+
+<p>
+awk '{s+=$1} END {print s}' file
+</p>
+
+<p>
+  awk 'NR%3==1' file
+#+
+</p>
 </div>
 </div>
 
-<div id="outline-container-org83b8f2f" class="outline-2">
-<h2 id="org83b8f2f"><span class="section-number-2">3</span> shell</h2>
+<div id="outline-container-org4e6bac3" class="outline-2">
+<h2 id="org4e6bac3"><span class="section-number-2">3</span> shell</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 shell 时 Linux 中的交互环境，常见的 shell 有 sh, bash, zsh, fish 等。zsh 是比
@@ -308,12 +371,12 @@ shell 时 Linux 中的交互环境，常见的 shell 有 sh, bash, zsh, fish 等
 </p>
 </div>
 
-<div id="outline-container-orgc1bcb2e" class="outline-3">
-<h3 id="orgc1bcb2e"><span class="section-number-3">3.1</span> 基本</h3>
+<div id="outline-container-orge45715b" class="outline-3">
+<h3 id="orge45715b"><span class="section-number-3">3.1</span> 基本</h3>
 <div class="outline-text-3" id="text-3-1">
 </div>
-<div id="outline-container-orga102bab" class="outline-4">
-<h4 id="orga102bab"><span class="section-number-4">3.1.1</span> 查看 Bash 的文档</h4>
+<div id="outline-container-orga42484e" class="outline-4">
+<h4 id="orga42484e"><span class="section-number-4">3.1.1</span> 查看 Bash 的文档</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <div class="org-src-container">
 <pre class="src src-shell">man bash
@@ -322,43 +385,43 @@ shell 时 Linux 中的交互环境，常见的 shell 有 sh, bash, zsh, fish 等
 </div>
 </div>
 
-<div id="outline-container-org8eb595f" class="outline-4">
-<h4 id="org8eb595f"><span class="section-number-4">3.1.2</span> 查看定义的变量</h4>
+<div id="outline-container-org5b22006" class="outline-4">
+<h4 id="org5b22006"><span class="section-number-4">3.1.2</span> 查看定义的变量</h4>
 <div class="outline-text-4" id="text-3-1-2">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#25968;&#32452;</span>
-declare -a
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#20989;&#25968;</span>
-declare -f
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#20989;&#25968;&#65292;&#20165;&#26174;&#31034;&#20989;&#25968;&#21517;</span>
-declare -F
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#25972;&#25968;</span>
-declare -i
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#21482;&#35835;&#21464;&#37327;</span>
-declare -r
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#34987;&#23548;&#20986;&#25104;&#29615;&#22659;&#21464;&#37327;&#30340;&#19996;&#35199;</span>
-declare -x
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#36755;&#20986;&#21464;&#37327;&#26159;&#24590;&#20040;&#23450;&#20041;&#30340;&#65288;&#31867;&#22411;+&#20540;&#65289;</span>
-declare -p varname
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#25968;&#32452;</span>
+<span style="color: #6c71c4;">declare</span> -a
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#20989;&#25968;</span>
+<span style="color: #6c71c4;">declare</span> -f
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#20989;&#25968;&#65292;&#20165;&#26174;&#31034;&#20989;&#25968;&#21517;</span>
+<span style="color: #6c71c4;">declare</span> -F
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#25972;&#25968;</span>
+<span style="color: #6c71c4;">declare</span> -i
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#21482;&#35835;&#21464;&#37327;</span>
+<span style="color: #6c71c4;">declare</span> -r
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#34987;&#23548;&#20986;&#25104;&#29615;&#22659;&#21464;&#37327;&#30340;&#19996;&#35199;</span>
+<span style="color: #6c71c4;">declare</span> -x
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#36755;&#20986;&#21464;&#37327;&#26159;&#24590;&#20040;&#23450;&#20041;&#30340;&#65288;&#31867;&#22411;+&#20540;&#65289;</span>
+<span style="color: #6c71c4;">declare</span> -p varname
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orge584282" class="outline-4">
-<h4 id="orge584282"><span class="section-number-4">3.1.3</span> 查看命令和使用帮助</h4>
+<div id="outline-container-org22e9e82" class="outline-4">
+<h4 id="org22e9e82"><span class="section-number-4">3.1.3</span> 查看命令和使用帮助</h4>
 <div class="outline-text-4" id="text-3-1-3">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24573;&#30053; alias &#30452;&#25509;&#25191;&#34892;&#31243;&#24207;&#25110;&#32773;&#20869;&#24314;&#21629;&#20196; ls</span>
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24573;&#30053; alias &#30452;&#25509;&#25191;&#34892;&#31243;&#24207;&#25110;&#32773;&#20869;&#24314;&#21629;&#20196; ls</span>
 command ls
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24573;&#30053; alias &#30452;&#25509;&#36816;&#34892;&#20869;&#24314;&#30340; cd &#21629;&#20196;</span>
-builtin cd
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21015;&#20986;&#25152;&#26377; bash &#20869;&#32622;&#21629;&#20196;&#65292;&#25110;&#31105;&#27490;&#26576;&#21629;&#20196;</span>
-enable
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#20869;&#32622;&#21629;&#20196;&#30340;&#24110;&#21161;&#65288;&#20165;&#38480; bash &#20869;&#32622;&#21629;&#20196;&#65289;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24573;&#30053; alias &#30452;&#25509;&#36816;&#34892;&#20869;&#24314;&#30340; cd &#21629;&#20196;</span>
+<span style="color: #6c71c4;">builtin</span> cd
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21015;&#20986;&#25152;&#26377; bash &#20869;&#32622;&#21629;&#20196;&#65292;&#25110;&#31105;&#27490;&#26576;&#21629;&#20196;</span>
+<span style="color: #6c71c4;">enable</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#20869;&#32622;&#21629;&#20196;&#30340;&#24110;&#21161;&#65288;&#20165;&#38480; bash &#20869;&#32622;&#21629;&#20196;&#65289;</span>
 help {builtin_command}
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23545; script &#21464;&#37327;&#20013;&#30340;&#23383;&#31526;&#20018;&#27714;&#20540;&#65288;&#25191;&#34892;&#65289;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23545; script &#21464;&#37327;&#20013;&#30340;&#23383;&#31526;&#20018;&#27714;&#20540;&#65288;&#25191;&#34892;&#65289;</span>
 <span style="color: #6c71c4;">eval</span> $<span style="color: #6c71c4;">script</span>
 </pre>
 </div>
@@ -366,24 +429,24 @@ help {builtin_command}
 </div>
 </div>
 
-<div id="outline-container-orge5a11bf" class="outline-3">
-<h3 id="orge5a11bf"><span class="section-number-3">3.2</span> 变量</h3>
+<div id="outline-container-org760fb4d" class="outline-3">
+<h3 id="org760fb4d"><span class="section-number-3">3.2</span> 变量</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23450;&#20041;&#21464;&#37327;</span>
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#21464;&#37327;</span>
 <span style="color: #6c71c4;">var</span>=value
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23450;&#20041;&#21464;&#37327;&#65292;&#24182;&#22312;&#23376;&#36827;&#31243;&#20013;&#20351;&#29992;&#21464;&#37327;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#21464;&#37327;&#65292;&#24182;&#22312;&#23376;&#36827;&#31243;&#20013;&#20351;&#29992;&#21464;&#37327;</span>
 <span style="color: #6c71c4;">var</span>=value command
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#21464;&#37327;&#30340;&#20540;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#21464;&#37327;&#30340;&#20540;</span>
 <span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">var</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#29305;&#27530;&#30340;&#21464;&#37327;</span>
-<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">$</span> <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24403;&#21069; shell &#30340;&#36827;&#31243;&#21495;</span>
-<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">!</span> <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26368;&#36817;&#35843;&#29992;&#30340;&#21518;&#21488;&#20219;&#21153;&#36827;&#31243;</span>
-<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">?</span> <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26368;&#36817;&#19968;&#27425;&#21629;&#20196;&#30340;&#36820;&#22238;&#20540;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#29305;&#27530;&#30340;&#21464;&#37327;</span>
+<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">$</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24403;&#21069; shell &#30340;&#36827;&#31243;&#21495;</span>
+<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">!</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26368;&#36817;&#35843;&#29992;&#30340;&#21518;&#21488;&#20219;&#21153;&#36827;&#31243;</span>
+<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">?</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26368;&#36817;&#19968;&#27425;&#21629;&#20196;&#30340;&#36820;&#22238;&#20540;</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#28155;&#21152;&#29615;&#22659;&#21464;&#37327;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#28155;&#21152;&#29615;&#22659;&#21464;&#37327;</span>
 <span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">var</span>=value
 </pre>
 </div>
@@ -393,57 +456,57 @@ help {builtin_command}
 变它的值，是编写 bash 脚本的常用技巧
 </p>
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#36820;&#22238;&#21464;&#37327;&#30340;&#20540;</span>
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#36820;&#22238;&#21464;&#37327;&#30340;&#20540;</span>
 ${<span style="color: #6c71c4;">var</span>}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238;&#21464;&#37327;&#20540;&#65307;&#21542;&#21017;&#65292;&#36820;&#22238; word</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238;&#21464;&#37327;&#20540;&#65307;&#21542;&#21017;&#65292;&#36820;&#22238; word</span>
 ${<span style="color: #6c71c4;">var</span>:-word}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238;&#21464;&#37327;&#20540;&#65307;&#21542;&#21017;&#65292;&#23558; var &#36171;&#20540;&#25104; word &#24182;&#36820;&#22238; word</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238;&#21464;&#37327;&#20540;&#65307;&#21542;&#21017;&#65292;&#23558; var &#36171;&#20540;&#25104; word &#24182;&#36820;&#22238; word</span>
 ${<span style="color: #6c71c4;">var</span>:=word}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238;&#21464;&#37327;&#20540;&#65307;&#21542;&#21017;&#65292;&#25171;&#21360;&#38169;&#35823;&#20449;&#24687;&#24182;&#36864;&#20986;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238;&#21464;&#37327;&#20540;&#65307;&#21542;&#21017;&#65292;&#25171;&#21360;&#38169;&#35823;&#20449;&#24687;&#24182;&#36864;&#20986;</span>
 ${<span style="color: #6c71c4;">var</span>:?message}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238; word&#65307;&#21542;&#21017;&#65292;&#36820;&#22238;&#31354;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238; word&#65307;&#21542;&#21017;&#65292;&#36820;&#22238;&#31354;</span>
 ${<span style="color: #6c71c4;">var</span>:+word}
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#23383;&#31526;&#20018;&#30340;&#38271;&#24230;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#33719;&#21462;&#23383;&#31526;&#20018;&#30340;&#38271;&#24230;</span>
 ${#<span style="color: #6c71c4;">var</span>}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#23383;&#31526;&#20018;&#30340;&#23383;&#20018;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#33719;&#21462;&#23383;&#31526;&#20018;&#30340;&#23383;&#20018;</span>
 ${<span style="color: #6c71c4;">var</span>:offset:len}
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21464;&#37327;&#25193;&#23637;&#30340; pattern &#26159; Path Expansion, &#21487;&#20197;&#20351;&#29992; * ? [...] &#31561;</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#22836;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#23567;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21464;&#37327;&#25193;&#23637;&#30340; pattern &#26159; Path Expansion, &#21487;&#20197;&#20351;&#29992; * ? [...] &#31561;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#22836;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#23567;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
 ${<span style="color: #6c71c4;">var</span>#pattern}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#22836;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#22823;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#22836;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#22823;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
 ${<span style="color: #6c71c4;">var</span>##pattern}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#23614;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#23567;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#23614;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#23567;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
 ${<span style="color: #6c71c4;">var</span>%pattern}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#23614;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#22823;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524;&#21464;&#37327;&#23614;&#37096;&#21305;&#37197; pattern&#65292;&#21017;&#21024;&#38500;&#26368;&#22823;&#21305;&#37197;&#37096;&#20998;&#36820;&#22238;&#21097;&#19979;&#30340;</span>
 ${<span style="color: #6c71c4;">var</span>%%pattern}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23558;&#21464;&#37327;&#20013;&#31532;&#19968;&#20010;&#21305;&#37197; pattern &#30340;&#26367;&#25442;&#25104; str&#65292;&#24182;&#36820;&#22238;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#21464;&#37327;&#20013;&#31532;&#19968;&#20010;&#21305;&#37197; pattern &#30340;&#26367;&#25442;&#25104; str&#65292;&#24182;&#36820;&#22238;</span>
 ${<span style="color: #6c71c4;">var</span>/pattern/str}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23558;&#21464;&#37327;&#20013;&#25152;&#26377;&#21305;&#37197; pattern &#30340;&#22320;&#26041;&#26367;&#25442;&#25104; str &#24182;&#36820;&#22238;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#21464;&#37327;&#20013;&#25152;&#26377;&#21305;&#37197; pattern &#30340;&#22320;&#26041;&#26367;&#25442;&#25104; str &#24182;&#36820;&#22238;</span>
 ${<span style="color: #6c71c4;">var</span>//pattern/str}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20363;&#22914;&#65306;&#31561;&#20215;&#20110; echo $PATH | tr : '\n'</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20363;&#22914;&#65306;&#31561;&#20215;&#20110; echo $PATH | tr : '\n'</span>
 <span style="color: #6c71c4;">echo</span> ${<span style="color: #6c71c4;">PATH</span>//:/<span style="color: #2aa198;">\\</span>n}
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#38646;&#27425;&#25110;&#32773;&#22810;&#27425;&#21305;&#37197;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#38646;&#27425;&#25110;&#32773;&#22810;&#27425;&#21305;&#37197;</span>
 *(patternlist)
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#19968;&#27425;&#25110;&#32773;&#22810;&#27425;&#21305;&#37197;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#19968;&#27425;&#25110;&#32773;&#22810;&#27425;&#21305;&#37197;</span>
 +(patternlist)
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#38646;&#27425;&#25110;&#32773;&#19968;&#27425;&#21305;&#37197;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#38646;&#27425;&#25110;&#32773;&#19968;&#27425;&#21305;&#37197;</span>
 ?(patternlist)
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21333;&#35789;&#21305;&#37197;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21333;&#35789;&#21305;&#37197;</span>
 @(patternlist)
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#19981;&#21305;&#37197;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#19981;&#21305;&#37197;</span>
 <span style="color: #268bd2;">!</span>(patternlist)
 
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25353;&#31354;&#26684;&#20998;&#38548; text &#25104;&#25968;&#32452;&#65292;&#24182;&#36171;&#20540;&#32473;&#21464;&#37327;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25353;&#31354;&#26684;&#20998;&#38548; text &#25104;&#25968;&#32452;&#65292;&#24182;&#36171;&#20540;&#32473;&#21464;&#37327;</span>
 <span style="color: #6c71c4;">array</span>=($<span style="color: #6c71c4;">text</span>)
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25353;&#26012;&#26438;&#20998;&#38548;&#23383;&#31526;&#20018; text &#25104;&#25968;&#32452;&#65292;&#24182;&#36171;&#20540;&#32473;&#21464;&#37327;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25353;&#26012;&#26438;&#20998;&#38548;&#23383;&#31526;&#20018; text &#25104;&#25968;&#32452;&#65292;&#24182;&#36171;&#20540;&#32473;&#21464;&#37327;</span>
 <span style="color: #6c71c4;">IFS</span>=<span style="color: #2aa198;">"/"</span> <span style="color: #6c71c4;">array</span>=($<span style="color: #6c71c4;">text</span>)
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#29992;&#31354;&#26684;&#38142;&#25509;&#25968;&#32452;&#24182;&#36171;&#20540;&#32473;&#21464;&#37327;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#29992;&#31354;&#26684;&#38142;&#25509;&#25968;&#32452;&#24182;&#36171;&#20540;&#32473;&#21464;&#37327;</span>
 <span style="color: #6c71c4;">text</span>=<span style="color: #2aa198;">"${array[*]}"</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#29992;&#26012;&#26464;&#38142;&#25509;&#25968;&#32452;&#24182;&#36171;&#20540;&#32473;&#21464;&#37327;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#29992;&#26012;&#26464;&#38142;&#25509;&#25968;&#32452;&#24182;&#36171;&#20540;&#32473;&#21464;&#37327;</span>
 <span style="color: #6c71c4;">text</span>=$(<span style="color: #6c71c4;">IFS</span>=/; <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"${array[*]}"</span>)
 </pre>
 </div>
@@ -453,230 +516,230 @@ ${<span style="color: #6c71c4;">var</span>//pattern/str}
 用 expr 命令来进行计算
 </p>
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20860;&#23481; posix sh &#30340;&#35745;&#31639;&#65292;&#20351;&#29992; expr &#21629;&#20196;&#35745;&#31639;&#32467;&#26524;</span>
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20860;&#23481; posix sh &#30340;&#35745;&#31639;&#65292;&#20351;&#29992; expr &#21629;&#20196;&#35745;&#31639;&#32467;&#26524;</span>
 <span style="color: #6c71c4;">num</span>=$(expr 1 + 2)
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#23383;&#33258;&#22686;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25968;&#23383;&#33258;&#22686;</span>
 <span style="color: #6c71c4;">num</span>=$(expr $<span style="color: #6c71c4;">num</span> + 1)
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20860;&#23481; posix sh &#30340;&#22797;&#26434;&#35745;&#31639;&#65292;&#36755;&#20986; 10</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20860;&#23481; posix sh &#30340;&#22797;&#26434;&#35745;&#31639;&#65292;&#36755;&#20986; 10</span>
 expr 2 <span style="color: #2aa198;">\*</span> <span style="color: #2aa198;">\(</span> 2 + 3 <span style="color: #2aa198;">\)</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#35745;&#31639; 1+2 &#36171;&#20540;&#32473; num&#65292;&#20351;&#29992; bash &#29420;&#26377;&#30340; $((..)) &#35745;&#31639;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#35745;&#31639; 1+2 &#36171;&#20540;&#32473; num&#65292;&#20351;&#29992; bash &#29420;&#26377;&#30340; $((..)) &#35745;&#31639;</span>
 <span style="color: #6c71c4;">num</span>=$((1 + 2))
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21464;&#37327;&#36882;&#22686;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21464;&#37327;&#36882;&#22686;</span>
 <span style="color: #6c71c4;">num</span>=$(($<span style="color: #6c71c4;">num</span> + 1))
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21464;&#37327;&#36882;&#22686;&#65292;&#21452;&#25324;&#21495;&#20869;&#30340; $ &#21487;&#20197;&#30465;&#30053;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21464;&#37327;&#36882;&#22686;&#65292;&#21452;&#25324;&#21495;&#20869;&#30340; $ &#21487;&#20197;&#30465;&#30053;</span>
 <span style="color: #6c71c4;">num</span>=$((num + 1))
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22797;&#26434;&#35745;&#31639;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22797;&#26434;&#35745;&#31639;</span>
 <span style="color: #6c71c4;">num</span>=$((1 + (2 + 3) * 2))
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org51671bb" class="outline-3">
-<h3 id="org51671bb"><span class="section-number-3">3.3</span> 数组</h3>
+<div id="outline-container-orgf5468a4" class="outline-3">
+<h3 id="orgf5468a4"><span class="section-number-3">3.3</span> 数组</h3>
 <div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23450;&#20041;&#25968;&#32452;</span>
-array[0]=valA
-array[1]=valB
-array[2]=valC
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#25968;&#32452;</span>
+<span style="color: #6c71c4;">array</span>[0]=valA
+<span style="color: #6c71c4;">array</span>[1]=valB
+<span style="color: #6c71c4;">array</span>[2]=valC
 
 <span style="color: #6c71c4;">array</span>=([0]=valA [1]=valB [2]=valC)
 <span style="color: #6c71c4;">array</span>=(valA valB valC)
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21462;&#24471;&#25968;&#32452;&#20013;&#30340;&#20803;&#32032;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21462;&#24471;&#25968;&#32452;&#20013;&#30340;&#20803;&#32032;</span>
 ${<span style="color: #6c71c4;">array</span>[i]}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21462;&#24471;&#25968;&#32452;&#30340;&#38271;&#24230;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21462;&#24471;&#25968;&#32452;&#30340;&#38271;&#24230;</span>
 ${#<span style="color: #6c71c4;">array</span>[@]}
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21462;&#24471;&#25968;&#32452;&#20013;&#26576;&#20010;&#21464;&#37327;&#30340;&#38271;&#24230;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21462;&#24471;&#25968;&#32452;&#20013;&#26576;&#20010;&#21464;&#37327;&#30340;&#38271;&#24230;</span>
 ${#<span style="color: #6c71c4;">array</span>[i]}
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#25968;&#32452;</span>
-declare -a
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#25968;&#32452;</span>
+<span style="color: #6c71c4;">declare</span> -a
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#32452;&#23450;&#20041;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25968;&#32452;&#23450;&#20041;</span>
 <span style="color: #6c71c4;">A</span>=( foo bar <span style="color: #2aa198;">"a  b c"</span> 42 )
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#32452;&#20999;&#29255;&#65306;B=( bar "a  b c" )</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25968;&#32452;&#20999;&#29255;&#65306;B=( bar "a  b c" )</span>
 <span style="color: #6c71c4;">B</span>=(<span style="color: #2aa198;">"${A[@]:1:2}"</span>)
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#32452;&#20999;&#29255;&#65306;C=( bar "a  b c" 42 )</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25968;&#32452;&#20999;&#29255;&#65306;C=( bar "a  b c" 42 )</span>
 <span style="color: #6c71c4;">C</span>=(<span style="color: #2aa198;">"${A[@]:1}"</span>)
-<span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"${B[@]}"</span>            <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">bar a  b c</span>
-<span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"${B[1]}"</span>            <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">a  b c</span>
-<span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"${C[@]}"</span>            <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">bar a  b c 42</span>
-<span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"${C[@]: -2:2}"</span>      <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">a  b c 42  &#20943;&#21495;&#21069;&#30340;&#31354;&#26684;&#26159;&#24517;&#39035;&#30340;</span>
+<span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"${B[@]}"</span>            <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">bar a  b c</span>
+<span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"${B[1]}"</span>            <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">a  b c</span>
+<span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"${C[@]}"</span>            <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">bar a  b c 42</span>
+<span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"${C[@]: -2:2}"</span>      <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">a  b c 42  &#20943;&#21495;&#21069;&#30340;&#31354;&#26684;&#26159;&#24517;&#39035;&#30340;</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org57206c4" class="outline-3">
-<h3 id="org57206c4"><span class="section-number-3">3.4</span> 事件指示符</h3>
+<div id="outline-container-org43ae61f" class="outline-3">
+<h3 id="org43ae61f"><span class="section-number-3">3.4</span> 事件指示符</h3>
 <div class="outline-text-3" id="text-3-4">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#19978;&#19968;&#26465;&#21629;&#20196;</span>
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#19978;&#19968;&#26465;&#21629;&#20196;</span>
 <span style="color: #268bd2;">!</span>!
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#19978;&#19968;&#26465;&#21629;&#20196;&#30340;&#31532;&#19968;&#20010;&#21333;&#35789;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#19978;&#19968;&#26465;&#21629;&#20196;&#30340;&#31532;&#19968;&#20010;&#21333;&#35789;</span>
 <span style="color: #268bd2;">!</span>^
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#19978;&#19968;&#26465;&#21629;&#20196;&#30340;&#26368;&#21518;&#19968;&#20010;&#21333;&#35789;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#19978;&#19968;&#26465;&#21629;&#20196;&#30340;&#26368;&#21518;&#19968;&#20010;&#21333;&#35789;</span>
 <span style="color: #268bd2;">!</span>$
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26368;&#36817;&#19968;&#26465;&#21253;&#21547; string &#30340;&#21629;&#20196;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26368;&#36817;&#19968;&#26465;&#21253;&#21547; string &#30340;&#21629;&#20196;</span>
 <span style="color: #268bd2;">!</span>string
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26368;&#36817;&#19968;&#26465;&#21253;&#21547; string1 &#30340;&#21629;&#20196;, &#24555;&#36895;&#26367;&#25442;&#20026; string2, &#30456;&#24403;&#20110;!!:s/string1/string2/</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26368;&#36817;&#19968;&#26465;&#21253;&#21547; string1 &#30340;&#21629;&#20196;, &#24555;&#36895;&#26367;&#25442;&#20026; string2, &#30456;&#24403;&#20110;!!:s/string1/string2/</span>
 <span style="color: #268bd2;">!</span>^string1^string2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26412;&#26465;&#21629;&#20196;&#20043;&#21069;&#25152;&#26377;&#30340;&#36755;&#20837;&#20869;&#23481;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26412;&#26465;&#21629;&#20196;&#20043;&#21069;&#25152;&#26377;&#30340;&#36755;&#20837;&#20869;&#23481;</span>
 <span style="color: #268bd2;">!</span>#
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org8aa5435" class="outline-3">
-<h3 id="org8aa5435"><span class="section-number-3">3.5</span> 函数</h3>
+<div id="outline-container-orge47cb7a" class="outline-3">
+<h3 id="orge47cb7a"><span class="section-number-3">3.5</span> 函数</h3>
 <div class="outline-text-3" id="text-3-5">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23450;&#20041;&#19968;&#20010;&#26032;&#20989;&#25968;</span>
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#19968;&#20010;&#26032;&#20989;&#25968;</span>
 <span style="color: #859900;">function</span> <span style="color: #b58900;">myfunc</span>() {
-  <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">$1 &#20195;&#34920;&#31532;&#19968;&#20010;&#21442;&#25968;&#65292;$N &#20195;&#34920;&#31532; N &#20010;&#21442;&#25968;</span>
-  <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">$# &#20195;&#34920;&#21442;&#25968;&#20010;&#25968;</span>
-  <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">$0 &#20195;&#34920;&#34987;&#35843;&#29992;&#32773;&#33258;&#36523;&#30340;&#21517;&#23383;</span>
-  <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">$@ &#20195;&#34920;&#25152;&#26377;&#21442;&#25968;&#65292;&#31867;&#22411;&#26159;&#20010;&#25968;&#32452;&#65292;&#24819;&#20256;&#36882;&#25152;&#26377;&#21442;&#25968;&#32473;&#20854;&#20182;&#21629;&#20196;&#29992; cmd "$@"</span>
-  <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">$* &#31354;&#26684;&#38142;&#25509;&#36215;&#26469;&#30340;&#25152;&#26377;&#21442;&#25968;&#65292;&#31867;&#22411;&#26159;&#23383;&#31526;&#20018;</span>
+  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">$1 &#20195;&#34920;&#31532;&#19968;&#20010;&#21442;&#25968;&#65292;$N &#20195;&#34920;&#31532; N &#20010;&#21442;&#25968;</span>
+  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">$# &#20195;&#34920;&#21442;&#25968;&#20010;&#25968;</span>
+  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">$0 &#20195;&#34920;&#34987;&#35843;&#29992;&#32773;&#33258;&#36523;&#30340;&#21517;&#23383;</span>
+  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">$@ &#20195;&#34920;&#25152;&#26377;&#21442;&#25968;&#65292;&#31867;&#22411;&#26159;&#20010;&#25968;&#32452;&#65292;&#24819;&#20256;&#36882;&#25152;&#26377;&#21442;&#25968;&#32473;&#20854;&#20182;&#21629;&#20196;&#29992; cmd "$@"</span>
+  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">$* &#31354;&#26684;&#38142;&#25509;&#36215;&#26469;&#30340;&#25152;&#26377;&#21442;&#25968;&#65292;&#31867;&#22411;&#26159;&#23383;&#31526;&#20018;</span>
   {shell commands ...}
 }
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#35843;&#29992;&#20989;&#25968; myfunc</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#35843;&#29992;&#20989;&#25968; myfunc</span>
 myfunc
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24102;&#21442;&#25968;&#30340;&#20989;&#25968;&#35843;&#29992;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24102;&#21442;&#25968;&#30340;&#20989;&#25968;&#35843;&#29992;</span>
 myfunc arg1 arg2 arg3
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23558;&#25152;&#26377;&#21442;&#25968;&#20256;&#36882;&#32473;&#20989;&#25968;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#25152;&#26377;&#21442;&#25968;&#20256;&#36882;&#32473;&#20989;&#25968;</span>
 myfunc <span style="color: #2aa198;">"$@"</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23558;&#19968;&#20010;&#25968;&#32452;&#24403;&#20316;&#22810;&#20010;&#21442;&#25968;&#20256;&#36882;&#32473;&#20989;&#25968;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#19968;&#20010;&#25968;&#32452;&#24403;&#20316;&#22810;&#20010;&#21442;&#25968;&#20256;&#36882;&#32473;&#20989;&#25968;</span>
 myfunc <span style="color: #2aa198;">"${array[@]}"</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21442;&#25968;&#24038;&#31227;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21442;&#25968;&#24038;&#31227;</span>
 <span style="color: #6c71c4;">shift</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21024;&#38500;&#20989;&#25968;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21024;&#38500;&#20989;&#25968;</span>
 <span style="color: #6c71c4;">unset</span> -f myfunc
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21015;&#20986;&#20989;&#25968;&#23450;&#20041;</span>
-declare -f
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21015;&#20986;&#20989;&#25968;&#23450;&#20041;</span>
+<span style="color: #6c71c4;">declare</span> -f
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org3b94433" class="outline-3">
-<h3 id="org3b94433"><span class="section-number-3">3.6</span> 条件判断</h3>
+<div id="outline-container-org066a44e" class="outline-3">
+<h3 id="org066a44e"><span class="section-number-3">3.6</span> 条件判断</h3>
 <div class="outline-text-3" id="text-3-6">
 <p>
 在 shell 编程中往往需要进行条件判断，即 test。可以通过 <code>man test</code> 来查看条件
 判断的相关说明
 </p>
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#27979;&#35797;&#26465;&#20214;&#65292;&#24403;&#20351;&#29992;&#26041;&#25324;&#21495;&#26159;&#27880;&#24847;&#31354;&#26684;</span>
-<span style="color: #6c71c4;">test</span> expr
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#27979;&#35797;&#26465;&#20214;&#65292;&#24403;&#20351;&#29992;&#26041;&#25324;&#21495;&#26159;&#27880;&#24847;&#31354;&#26684;</span>
+test expr
 [ expr ]
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">and &#36923;&#36753;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">and &#36923;&#36753;</span>
 cmd1 &amp;&amp; cmd2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">or &#36923;&#36753;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">or &#36923;&#36753;</span>
 cmd1 || cmd2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#26465;&#20214;&#20026;&#30495;&#26102;&#25191;&#34892; cmd1</span>
-<span style="color: #6c71c4;">test</span> cond &amp;&amp; cmd1
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21644;&#19978;&#38754;&#23436;&#20840;&#31561;&#20215;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#26465;&#20214;&#20026;&#30495;&#26102;&#25191;&#34892; cmd1</span>
+test cond &amp;&amp; cmd1
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21644;&#19978;&#38754;&#23436;&#20840;&#31561;&#20215;</span>
 [ cond ] &amp;&amp; cmd1
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26465;&#20214;&#20026;&#30495;&#25191;&#34892; cmd1 &#21542;&#21017;&#25191;&#34892; cmd2</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26465;&#20214;&#20026;&#30495;&#25191;&#34892; cmd1 &#21542;&#21017;&#25191;&#34892; cmd2</span>
 [ cond ] &amp;&amp; cmd1 || cmd2
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">exp1 &#21644; exp2 &#21516;&#26102;&#20026;&#30495;&#26102;&#36820;&#22238;&#30495;&#65288;POSIX XSI &#25193;&#23637;&#65289;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">exp1 &#21644; exp2 &#21516;&#26102;&#20026;&#30495;&#26102;&#36820;&#22238;&#30495;&#65288;POSIX XSI &#25193;&#23637;&#65289;</span>
 exp1 -a exp2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">exp1 &#21644; exp2 &#26377;&#19968;&#20010;&#20026;&#30495;&#23601;&#36820;&#22238;&#30495;&#65288;POSIX XSI &#25193;&#23637;&#65289;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">exp1 &#21644; exp2 &#26377;&#19968;&#20010;&#20026;&#30495;&#23601;&#36820;&#22238;&#30495;&#65288;POSIX XSI &#25193;&#23637;&#65289;</span>
 exp1 -o exp2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22914;&#26524; expr &#20026;&#30495;&#26102;&#36820;&#22238;&#30495;&#65292;&#36755;&#20837;&#27880;&#24847;&#25324;&#21495;&#21069;&#21453;&#26012;&#26438;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524; expr &#20026;&#30495;&#26102;&#36820;&#22238;&#30495;&#65292;&#36755;&#20837;&#27880;&#24847;&#25324;&#21495;&#21069;&#21453;&#26012;&#26438;</span>
 ( expr )
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22914;&#26524; expr &#20026;&#20551;&#37027;&#36820;&#22238;&#30495;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524; expr &#20026;&#20551;&#37027;&#36820;&#22238;&#30495;</span>
 <span style="color: #268bd2;">!</span> expr
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#23383;&#31526;&#20018;&#30456;&#31561;&#65292;&#22914; [ "$x" = "$y" ] &amp;&amp; echo yes</span>
-str1 = str2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#23383;&#31526;&#20018;&#19981;&#31561;&#65292;&#22914; [ "$x" != "$y" ] &amp;&amp; echo yes</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#23383;&#31526;&#20018;&#30456;&#31561;&#65292;&#22914; [ "$x" = "$y" ] &amp;&amp; echo yes</span>
+<span style="color: #6c71c4;">str1</span> = str2
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#23383;&#31526;&#20018;&#19981;&#31561;&#65292;&#22914; [ "$x" != "$y" ] &amp;&amp; echo yes</span>
 str1 != str2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23383;&#31526;&#20018;&#23567;&#20110;&#65292;&#22914; [ "$x" \&lt; "$y" ] &amp;&amp; echo yes</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23383;&#31526;&#20018;&#23567;&#20110;&#65292;&#22914; [ "$x" \&lt; "$y" ] &amp;&amp; echo yes</span>
 str1 &lt; str2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23383;&#31526;&#20018;&#22823;&#20110;&#65292;&#27880;&#24847; &lt; &#25110; &gt; &#26159;&#23383;&#38754;&#37327;&#65292;&#36755;&#20837;&#26102;&#35201;&#21152;&#21453;&#26012;&#26438;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23383;&#31526;&#20018;&#22823;&#20110;&#65292;&#27880;&#24847; &lt; &#25110; &gt; &#26159;&#23383;&#38754;&#37327;&#65292;&#36755;&#20837;&#26102;&#35201;&#21152;&#21453;&#26012;&#26438;</span>
 str2 &gt; str2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#23383;&#31526;&#20018;&#19981;&#20026;&#31354;&#65288;&#38271;&#24230;&#22823;&#20110;&#38646;&#65289;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#23383;&#31526;&#20018;&#19981;&#20026;&#31354;&#65288;&#38271;&#24230;&#22823;&#20110;&#38646;&#65289;</span>
 -n str1
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#23383;&#31526;&#20018;&#20026;&#31354;&#65288;&#38271;&#24230;&#31561;&#20110;&#38646;&#65289;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#23383;&#31526;&#20018;&#20026;&#31354;&#65288;&#38271;&#24230;&#31561;&#20110;&#38646;&#65289;</span>
 -z str1
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#22914; [ -a /tmp/abc ] &amp;&amp; echo "exists"</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#22914; [ -a /tmp/abc ] &amp;&amp; echo "exists"</span>
 -a file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#35813;&#25991;&#20214;&#26159;&#19968;&#20010;&#30446;&#24405;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#35813;&#25991;&#20214;&#26159;&#19968;&#20010;&#30446;&#24405;</span>
 -d file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#21644; -a &#31561;&#20215;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#21644; -a &#31561;&#20215;</span>
 -e file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#35813;&#25991;&#20214;&#26159;&#19968;&#20010;&#26222;&#36890;&#25991;&#20214;&#65288;&#38750;&#30446;&#24405;&#31561;&#65289;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#35813;&#25991;&#20214;&#26159;&#19968;&#20010;&#26222;&#36890;&#25991;&#20214;&#65288;&#38750;&#30446;&#24405;&#31561;&#65289;</span>
 -f file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#21487;&#35835;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#21487;&#35835;</span>
 -r file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#23610;&#23544;&#22823;&#20110; 0</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#23610;&#23544;&#22823;&#20110; 0</span>
 -s file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#21487;&#20889;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#21487;&#20889;</span>
 -w file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#25191;&#34892;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#25991;&#20214;&#23384;&#22312;&#65292;&#19988;&#25191;&#34892;</span>
 -x file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25991;&#20214;&#19978;&#27425;&#20462;&#25913;&#36807;&#21518;&#36824;&#27809;&#26377;&#35835;&#21462;&#36807;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25991;&#20214;&#19978;&#27425;&#20462;&#25913;&#36807;&#21518;&#36824;&#27809;&#26377;&#35835;&#21462;&#36807;</span>
 -N file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25991;&#20214;&#23384;&#22312;&#19988;&#23646;&#20110;&#24403;&#21069;&#29992;&#25143;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25991;&#20214;&#23384;&#22312;&#19988;&#23646;&#20110;&#24403;&#21069;&#29992;&#25143;</span>
 -O file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25991;&#20214;&#23384;&#22312;&#19988;&#21305;&#37197;&#20320;&#30340;&#29992;&#25143;&#32452;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25991;&#20214;&#23384;&#22312;&#19988;&#21305;&#37197;&#20320;&#30340;&#29992;&#25143;&#32452;</span>
 -G file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25991;&#20214; 1 &#27604; &#25991;&#20214; 2 &#26032;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25991;&#20214; 1 &#27604; &#25991;&#20214; 2 &#26032;</span>
 file1 -nt file2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25991;&#20214; 1 &#27604; &#25991;&#20214; 2 &#26087;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25991;&#20214; 1 &#27604; &#25991;&#20214; 2 &#26087;</span>
 file1 -ot file2
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 == num2</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 == num2</span>
 num1 -eq num2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 != num2</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 != num2</span>
 num1 -ne num2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 &lt; num2</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 &lt; num2</span>
 num1 -lt num2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 &lt;= num2</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 &lt;= num2</span>
 num1 -le num2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 &gt; num2</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 &gt; num2</span>
 num1 -gt num2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 &gt;= num2</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25968;&#23383;&#21028;&#26029;&#65306;num1 &gt;= num2</span>
 num1 -ge num2
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org6b33cb9" class="outline-3">
-<h3 id="org6b33cb9"><span class="section-number-3">3.7</span> 控制流</h3>
+<div id="outline-container-org72b065f" class="outline-3">
+<h3 id="org72b065f"><span class="section-number-3">3.7</span> 控制流</h3>
 <div class="outline-text-3" id="text-3-7">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#36820;&#22238;&#20540; echo $? &#26174;&#31034; 1&#65292;&#22240;&#20026;&#26465;&#20214;&#20026;&#20551;</span>
-<span style="color: #6c71c4;">test</span> <span style="color: #2aa198;">"abc"</span> = <span style="color: #2aa198;">"def"</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#36820;&#22238;&#20540; echo $? &#26174;&#31034; 0&#65292;&#22240;&#20026;&#26465;&#20214;&#20026;&#30495;</span>
-<span style="color: #6c71c4;">test</span> <span style="color: #2aa198;">"abc"</span> != <span style="color: #2aa198;">"def"</span>
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#36820;&#22238;&#20540; echo $? &#26174;&#31034; 1&#65292;&#22240;&#20026;&#26465;&#20214;&#20026;&#20551;</span>
+test <span style="color: #2aa198;">"abc"</span> = <span style="color: #2aa198;">"def"</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#36820;&#22238;&#20540; echo $? &#26174;&#31034; 0&#65292;&#22240;&#20026;&#26465;&#20214;&#20026;&#30495;</span>
+test <span style="color: #2aa198;">"abc"</span> != <span style="color: #2aa198;">"def"</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#35843;&#29992; test &#21028;&#26029; /tmp &#26159;&#21542;&#23384;&#22312;&#65292;&#24182;&#25171;&#21360; test &#30340;&#36820;&#22238;&#20540;</span>
-<span style="color: #6c71c4;">test</span> -a /tmp; <span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">?</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#35843;&#29992; test &#21028;&#26029; /tmp &#26159;&#21542;&#23384;&#22312;&#65292;&#24182;&#25171;&#21360; test &#30340;&#36820;&#22238;&#20540;</span>
+test -a /tmp; <span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">?</span>
 [ -a /tmp ]; <span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">?</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">if &#35821;&#21477;&#23601;&#26159;&#21028;&#26029;&#21518;&#38754;&#30340;&#21629;&#20196;&#36820;&#22238;&#20540;&#20026; 0 &#30340;&#35805;&#65292;&#35748;&#20026;&#26465;&#20214;&#20026;&#30495;&#65292;&#21542;&#21017;&#20026;&#20551;</span>
-<span style="color: #859900;">if </span><span style="color: #6c71c4;">test</span> -e /etc/passwd; <span style="color: #859900;">then</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">if &#35821;&#21477;&#23601;&#26159;&#21028;&#26029;&#21518;&#38754;&#30340;&#21629;&#20196;&#36820;&#22238;&#20540;&#20026; 0 &#30340;&#35805;&#65292;&#35748;&#20026;&#26465;&#20214;&#20026;&#30495;&#65292;&#21542;&#21017;&#20026;&#20551;</span>
+<span style="color: #859900;">if</span> test -e /etc/passwd; <span style="color: #859900;">then</span>
   <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"exist"</span>
 <span style="color: #859900;">else</span>
   <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"not exist"</span>
 <span style="color: #859900;">fi</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21644;&#19978;&#38754;&#20004;&#20010;&#23436;&#20840;&#31561;&#20215;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21644;&#19978;&#38754;&#20004;&#20010;&#23436;&#20840;&#31561;&#20215;</span>
 [ -e /etc/passwd ] &amp;&amp; <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"exists"</span> || <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"not exist"</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#21464;&#37327;&#30340;&#20540;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#21464;&#37327;&#30340;&#20540;</span>
 <span style="color: #859900;">if</span> [ <span style="color: #2aa198;">"$varname"</span> = <span style="color: #2aa198;">"foo"</span> ]; <span style="color: #859900;">then</span>
   <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"this is foo"</span>
 <span style="color: #859900;">elif</span> [ <span style="color: #2aa198;">"$varname"</span> = <span style="color: #2aa198;">"bar"</span> ]; <span style="color: #859900;">then</span>
@@ -685,26 +748,26 @@ num1 -ge num2
   <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"neither"</span>
 <span style="color: #859900;">fi</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22797;&#26434;&#26465;&#20214;&#21028;&#26029;&#65292;&#27880;&#24847; || &#21644; &amp;&amp; &#26159;&#23436;&#20840;&#20860;&#23481; POSIX &#30340;&#25512;&#33616;&#20889;&#27861;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22797;&#26434;&#26465;&#20214;&#21028;&#26029;&#65292;&#27880;&#24847; || &#21644; &amp;&amp; &#26159;&#23436;&#20840;&#20860;&#23481; POSIX &#30340;&#25512;&#33616;&#20889;&#27861;</span>
 <span style="color: #859900;">if</span> [ $<span style="color: #6c71c4;">x</span> -gt 10 ] &amp;&amp; [ $<span style="color: #6c71c4;">x</span> -lt 20 ]; <span style="color: #859900;">then</span>
   <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"yes, between 10 and 20"</span>
 <span style="color: #859900;">fi</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21487;&#20197;&#29992; &amp;&amp; &#21629;&#20196;&#36830;&#25509;&#31526;&#26469;&#20570;&#21644;&#19978;&#38754;&#23436;&#20840;&#31561;&#20215;&#30340;&#20107;&#24773;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21487;&#20197;&#29992; &amp;&amp; &#21629;&#20196;&#36830;&#25509;&#31526;&#26469;&#20570;&#21644;&#19978;&#38754;&#23436;&#20840;&#31561;&#20215;&#30340;&#20107;&#24773;</span>
 [ $<span style="color: #6c71c4;">x</span> -gt 10 ] &amp;&amp; [ $<span style="color: #6c71c4;">x</span> -lt 20 ] &amp;&amp; <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"yes, between 10 and 20"</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23567;&#25324;&#21495;&#21644; -a -o &#26159; POSIX XSI &#25193;&#23637;&#20889;&#27861;&#65292;&#23567;&#25324;&#21495;&#26159;&#23383;&#38754;&#37327;&#65292;&#36755;&#20837;&#26102;&#21069;&#38754;&#35201;&#21152;&#21453;&#26012;&#26438;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23567;&#25324;&#21495;&#21644; -a -o &#26159; POSIX XSI &#25193;&#23637;&#20889;&#27861;&#65292;&#23567;&#25324;&#21495;&#26159;&#23383;&#38754;&#37327;&#65292;&#36755;&#20837;&#26102;&#21069;&#38754;&#35201;&#21152;&#21453;&#26012;&#26438;</span>
 <span style="color: #859900;">if</span> [ <span style="color: #2aa198;">\(</span> $<span style="color: #6c71c4;">x</span> -gt 10 <span style="color: #2aa198;">\)</span> -a <span style="color: #2aa198;">\(</span> $<span style="color: #6c71c4;">x</span> -lt 20 <span style="color: #2aa198;">\)</span> ]; <span style="color: #859900;">then</span>
   <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"yes, between 10 and 20"</span>
 <span style="color: #859900;">fi</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21516;&#26679;&#21487;&#20197;&#29992; &amp;&amp; &#21629;&#20196;&#36830;&#25509;&#31526;&#26469;&#20570;&#21644;&#19978;&#38754;&#23436;&#20840;&#31561;&#20215;&#30340;&#20107;&#24773;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21516;&#26679;&#21487;&#20197;&#29992; &amp;&amp; &#21629;&#20196;&#36830;&#25509;&#31526;&#26469;&#20570;&#21644;&#19978;&#38754;&#23436;&#20840;&#31561;&#20215;&#30340;&#20107;&#24773;</span>
 [ <span style="color: #2aa198;">\(</span> $<span style="color: #6c71c4;">x</span> -gt 10 <span style="color: #2aa198;">\)</span> -a <span style="color: #2aa198;">\(</span> $<span style="color: #6c71c4;">x</span> -lt 20 <span style="color: #2aa198;">\)</span> ] &amp;&amp; <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"yes, between 10 and 20"</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21028;&#26029;&#31243;&#24207;&#23384;&#22312;&#30340;&#35805;&#23601;&#25191;&#34892;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21028;&#26029;&#31243;&#24207;&#23384;&#22312;&#30340;&#35805;&#23601;&#25191;&#34892;</span>
 [ -x /bin/ls ] &amp;&amp; /bin/ls -l
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22914;&#26524;&#19981;&#32771;&#34385;&#20860;&#23481; posix sh &#21644; dash &#36825;&#20123;&#30340;&#35805;&#65292;&#21487;&#29992; bash &#29420;&#26377;&#30340; ((..)) &#21644; [[..]]:</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524;&#19981;&#32771;&#34385;&#20860;&#23481; posix sh &#21644; dash &#36825;&#20123;&#30340;&#35805;&#65292;&#21487;&#29992; bash &#29420;&#26377;&#30340; ((..)) &#21644; [[..]]:</span>
 https://www.ibm.com/developerworks/library/l-bash-test/index.html
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">while &#24490;&#29615;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">while &#24490;&#29615;</span>
 <span style="color: #859900;">while</span> condition; <span style="color: #859900;">do</span>
   statements
 <span style="color: #859900;">done</span>
@@ -715,7 +778,7 @@ https://www.ibm.com/developerworks/library/l-bash-test/index.html
   <span style="color: #6c71c4;">i</span>=$(expr $<span style="color: #6c71c4;">i</span> + 1)
 <span style="color: #859900;">done</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">for &#24490;&#29615;&#65306;&#19978;&#38754;&#30340; while &#35821;&#21477;&#31561;&#20215;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">for &#24490;&#29615;&#65306;&#19978;&#38754;&#30340; while &#35821;&#21477;&#31561;&#20215;</span>
 <span style="color: #859900;">for</span> i<span style="color: #859900;"> in</span> {1..10}; <span style="color: #859900;">do</span>
   <span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">i</span>
 <span style="color: #859900;">done</span>
@@ -723,18 +786,18 @@ https://www.ibm.com/developerworks/library/l-bash-test/index.html
 <span style="color: #859900;">for</span> name [in list]; <span style="color: #859900;">do</span>
   statements
 <span style="color: #859900;">done</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">for &#21015;&#20030;&#26576;&#30446;&#24405;&#19979;&#38754;&#30340;&#25152;&#26377;&#25991;&#20214;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">for &#21015;&#20030;&#26576;&#30446;&#24405;&#19979;&#38754;&#30340;&#25152;&#26377;&#25991;&#20214;</span>
 <span style="color: #859900;">for</span> f<span style="color: #859900;"> in</span> /home/*; <span style="color: #859900;">do</span>
   <span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">f</span>
 <span style="color: #859900;">done</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">bash &#29420;&#26377;&#30340; (( .. )) &#35821;&#21477;&#65292;&#26356;&#25509;&#36817; C &#35821;&#35328;&#65292;&#20294;&#26159;&#19981;&#20860;&#23481; posix sh</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">bash &#29420;&#26377;&#30340; (( .. )) &#35821;&#21477;&#65292;&#26356;&#25509;&#36817; C &#35821;&#35328;&#65292;&#20294;&#26159;&#19981;&#20860;&#23481; posix sh</span>
 <span style="color: #859900;">for</span> (( initialisation ; ending condition ; update )); <span style="color: #859900;">do</span>
   statements
 <span style="color: #859900;">done</span>
-<span style="color: #859900;">for</span> ((i = 0; i &lt; 10; i++)); <span style="color: #859900;">do </span><span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">i</span>; <span style="color: #859900;">done</span>
+<span style="color: #859900;">for</span> ((<span style="color: #6c71c4;">i</span> = 0; i &lt; 10; i++)); <span style="color: #859900;">do </span><span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">i</span>; <span style="color: #859900;">done</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">case &#21028;&#26029;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">case &#21028;&#26029;</span>
 <span style="color: #859900;">case</span> expression<span style="color: #859900;"> in</span>
   pattern1 )
     statements ;;
@@ -744,13 +807,13 @@ https://www.ibm.com/developerworks/library/l-bash-test/index.html
     otherwise ;;
 <span style="color: #859900;">esac</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">until &#35821;&#21477;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">until &#35821;&#21477;</span>
 <span style="color: #859900;">until</span> condition; <span style="color: #859900;">do</span>
   statements
 <span style="color: #859900;">done</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">select &#35821;&#21477;</span>
-select name [in list]; <span style="color: #859900;">do</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">select &#35821;&#21477;</span>
+<span style="color: #859900;">select</span> name [in list]; <span style="color: #859900;">do</span>
   statements that can use $<span style="color: #6c71c4;">name</span>
 <span style="color: #859900;">done</span>
 </pre>
@@ -758,91 +821,110 @@ select name [in list]; <span style="color: #859900;">do</span>
 </div>
 </div>
 
-<div id="outline-container-org4907ea9" class="outline-3">
-<h3 id="org4907ea9"><span class="section-number-3">3.8</span> 重定向</h3>
+<div id="outline-container-org805822a" class="outline-3">
+<h3 id="org805822a"><span class="section-number-3">3.8</span> 重定向</h3>
 <div class="outline-text-3" id="text-3-8">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#31649;&#36947;&#65292;cmd1 &#30340;&#26631;&#20934;&#36755;&#20986;&#25509;&#21040; cmd2 &#30340;&#26631;&#20934;&#36755;&#20837;</span>
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#31649;&#36947;&#65292;cmd1 &#30340;&#26631;&#20934;&#36755;&#20986;&#25509;&#21040; cmd2 &#30340;&#26631;&#20934;&#36755;&#20837;</span>
 cmd1 | cmd2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23558;&#25991;&#20214;&#20869;&#23481;&#37325;&#23450;&#21521;&#20026;&#21629;&#20196;&#30340;&#26631;&#20934;&#36755;&#20837;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#25991;&#20214;&#20869;&#23481;&#37325;&#23450;&#21521;&#20026;&#21629;&#20196;&#30340;&#26631;&#20934;&#36755;&#20837;</span>
 &lt; file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23558;&#21629;&#20196;&#30340;&#26631;&#20934;&#36755;&#20986;&#37325;&#23450;&#21521;&#21040;&#25991;&#20214;&#65292;&#20250;&#35206;&#30422;&#25991;&#20214;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#21629;&#20196;&#30340;&#26631;&#20934;&#36755;&#20986;&#37325;&#23450;&#21521;&#21040;&#25991;&#20214;&#65292;&#20250;&#35206;&#30422;&#25991;&#20214;</span>
 &gt; file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23558;&#21629;&#20196;&#30340;&#26631;&#20934;&#36755;&#20986;&#37325;&#23450;&#21521;&#21040;&#25991;&#20214;&#65292;&#36861;&#21152;&#19981;&#35206;&#30422;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#21629;&#20196;&#30340;&#26631;&#20934;&#36755;&#20986;&#37325;&#23450;&#21521;&#21040;&#25991;&#20214;&#65292;&#36861;&#21152;&#19981;&#35206;&#30422;</span>
 &gt;&gt; file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24378;&#21046;&#36755;&#20986;&#21040;&#25991;&#20214;&#65292;&#21363;&#20415;&#35774;&#32622;&#36807;&#65306;set -o noclobber</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24378;&#21046;&#36755;&#20986;&#21040;&#25991;&#20214;&#65292;&#21363;&#20415;&#35774;&#32622;&#36807;&#65306;set -o noclobber</span>
 &gt;| file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24378;&#21046;&#23558;&#25991;&#20214;&#25551;&#36848;&#31526; n &#30340;&#36755;&#20986;&#37325;&#23450;&#21521;&#21040;&#25991;&#20214;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24378;&#21046;&#23558;&#25991;&#20214;&#25551;&#36848;&#31526; n &#30340;&#36755;&#20986;&#37325;&#23450;&#21521;&#21040;&#25991;&#20214;</span>
 n&gt;| file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21516;&#26102;&#20351;&#29992;&#35813;&#25991;&#20214;&#20316;&#20026;&#26631;&#20934;&#36755;&#20837;&#21644;&#26631;&#20934;&#36755;&#20986;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21516;&#26102;&#20351;&#29992;&#35813;&#25991;&#20214;&#20316;&#20026;&#26631;&#20934;&#36755;&#20837;&#21644;&#26631;&#20934;&#36755;&#20986;</span>
 &lt;&gt; file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21516;&#26102;&#20351;&#29992;&#25991;&#20214;&#20316;&#20026;&#25991;&#20214;&#25551;&#36848;&#31526; n &#30340;&#36755;&#20986;&#21644;&#36755;&#20837;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21516;&#26102;&#20351;&#29992;&#25991;&#20214;&#20316;&#20026;&#25991;&#20214;&#25551;&#36848;&#31526; n &#30340;&#36755;&#20986;&#21644;&#36755;&#20837;</span>
 n&lt;&gt; file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#37325;&#23450;&#21521;&#25991;&#20214;&#25551;&#36848;&#31526; n &#30340;&#36755;&#20986;&#21040;&#25991;&#20214;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#37325;&#23450;&#21521;&#25991;&#20214;&#25551;&#36848;&#31526; n &#30340;&#36755;&#20986;&#21040;&#25991;&#20214;</span>
 n&gt; file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#37325;&#23450;&#21521;&#25991;&#20214;&#25551;&#36848;&#31526; n &#30340;&#36755;&#20837;&#20026;&#25991;&#20214;&#20869;&#23481;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#37325;&#23450;&#21521;&#25991;&#20214;&#25551;&#36848;&#31526; n &#30340;&#36755;&#20837;&#20026;&#25991;&#20214;&#20869;&#23481;</span>
 n&lt; file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23558;&#26631;&#20934;&#36755;&#20986; dup/&#21512;&#24182; &#21040;&#25991;&#20214;&#25551;&#36848;&#31526; n</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#26631;&#20934;&#36755;&#20986; dup/&#21512;&#24182; &#21040;&#25991;&#20214;&#25551;&#36848;&#31526; n</span>
 n&gt;&amp;
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23558;&#26631;&#20934;&#36755;&#20837; dump/&#21512;&#24182; &#23450;&#21521;&#20026;&#25551;&#36848;&#31526; n</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#26631;&#20934;&#36755;&#20837; dump/&#21512;&#24182; &#23450;&#21521;&#20026;&#25551;&#36848;&#31526; n</span>
 n&lt;&amp;
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25991;&#20214;&#25551;&#36848;&#31526; n &#34987;&#20316;&#20026;&#25551;&#36848;&#31526; m &#30340;&#21103;&#26412;&#65292;&#36755;&#20986;&#29992;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25991;&#20214;&#25551;&#36848;&#31526; n &#34987;&#20316;&#20026;&#25551;&#36848;&#31526; m &#30340;&#21103;&#26412;&#65292;&#36755;&#20986;&#29992;</span>
 n&gt;&amp;m
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25991;&#20214;&#25551;&#36848;&#31526; n &#34987;&#20316;&#20026;&#25551;&#36848;&#31526; m &#30340;&#21103;&#26412;&#65292;&#36755;&#20837;&#29992;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25991;&#20214;&#25551;&#36848;&#31526; n &#34987;&#20316;&#20026;&#25551;&#36848;&#31526; m &#30340;&#21103;&#26412;&#65292;&#36755;&#20837;&#29992;</span>
 n&lt;&amp;m
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23558;&#26631;&#20934;&#36755;&#20986;&#21644;&#26631;&#20934;&#38169;&#35823;&#37325;&#23450;&#21521;&#21040;&#25991;&#20214;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#26631;&#20934;&#36755;&#20986;&#21644;&#26631;&#20934;&#38169;&#35823;&#37325;&#23450;&#21521;&#21040;&#25991;&#20214;</span>
 &amp;&gt;file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20851;&#38381;&#26631;&#20934;&#36755;&#20837;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20851;&#38381;&#26631;&#20934;&#36755;&#20837;</span>
 &lt;&amp;-
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20851;&#38381;&#26631;&#20934;&#36755;&#20986;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20851;&#38381;&#26631;&#20934;&#36755;&#20986;</span>
 &gt;&amp;-
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20851;&#38381;&#20316;&#20026;&#36755;&#20986;&#30340;&#25991;&#20214;&#25551;&#36848;&#31526; n</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20851;&#38381;&#20316;&#20026;&#36755;&#20986;&#30340;&#25991;&#20214;&#25551;&#36848;&#31526; n</span>
 n&gt;&amp;-
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20851;&#38381;&#20316;&#20026;&#36755;&#20837;&#30340;&#25991;&#20214;&#25551;&#36848;&#31526; n</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20851;&#38381;&#20316;&#20026;&#36755;&#20837;&#30340;&#25991;&#20214;&#25551;&#36848;&#31526; n</span>
 n&lt;&amp;-
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#27604;&#36739;&#20004;&#20010;&#21629;&#20196;&#30340;&#36755;&#20986;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#27604;&#36739;&#20004;&#20010;&#21629;&#20196;&#30340;&#36755;&#20986;</span>
 diff &lt;(cmd1) &lt;(cmd2)
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org2f6eedd" class="outline-3">
-<h3 id="org2f6eedd"><span class="section-number-3">3.9</span> 文本处理</h3>
+<div id="outline-container-org05ee359" class="outline-3">
+<h3 id="org05ee359"><span class="section-number-3">3.9</span> 文本处理</h3>
 <div class="outline-text-3" id="text-3-9">
 <p>
 简单的文本处理使用 tr/cut/paste 等，复杂的文本处理使用 sed/awk
 </p>
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25130;&#21462;&#27599;&#34892;&#22836; 16 &#20010;&#23383;&#31526;</span>
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#27599;&#34892;&#22836; 16 &#20010;&#23383;&#31526;</span>
 cut -c 1-16
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25130;&#21462;&#25351;&#23450;&#25991;&#20214;&#20013;&#27599;&#34892;&#22836; 16 &#20010;&#23383;&#31526;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#25351;&#23450;&#25991;&#20214;&#20013;&#27599;&#34892;&#22836; 16 &#20010;&#23383;&#31526;</span>
 cut -c 1-16 file
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25130;&#21462;&#27599;&#34892;&#20174;&#31532;&#19977;&#20010;&#23383;&#31526;&#24320;&#22987;&#21040;&#34892;&#26411;&#30340;&#20869;&#23481;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#27599;&#34892;&#20174;&#31532;&#19977;&#20010;&#23383;&#31526;&#24320;&#22987;&#21040;&#34892;&#26411;&#30340;&#20869;&#23481;</span>
 cut -c3-
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25130;&#21462;&#29992;&#20882;&#21495;&#20998;&#38548;&#30340;&#31532;&#20116;&#21015;&#20869;&#23481;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#29992;&#20882;&#21495;&#20998;&#38548;&#30340;&#31532;&#20116;&#21015;&#20869;&#23481;</span>
 cut -d<span style="color: #2aa198;">':'</span> -f5
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25130;&#21462;&#29992;&#20998;&#21495;&#20998;&#38548;&#30340;&#31532;&#20108;&#21644;&#31532;&#21313;&#21015;&#20869;&#23481;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#29992;&#20998;&#21495;&#20998;&#38548;&#30340;&#31532;&#20108;&#21644;&#31532;&#21313;&#21015;&#20869;&#23481;</span>
 cut -d<span style="color: #2aa198;">';'</span> -f2,10
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25130;&#21462;&#31354;&#26684;&#20998;&#38548;&#30340;&#19977;&#21040;&#19971;&#21015;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#31354;&#26684;&#20998;&#38548;&#30340;&#19977;&#21040;&#19971;&#21015;</span>
 cut -d<span style="color: #2aa198;">' '</span> -f3-7
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26174;&#31034; hel</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26174;&#31034; hel</span>
 <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"hello"</span> | cut -c1-3
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26174;&#31034; sir</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26174;&#31034; sir</span>
 <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"hello sir"</span> | cut -d<span style="color: #2aa198;">' '</span> -f2
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">cut &#25645;&#37197; tr &#21387;&#32553;&#23383;&#31526;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">cut &#25645;&#37197; tr &#21387;&#32553;&#23383;&#31526;</span>
 ps | tr -s <span style="color: #2aa198;">" "</span> | cut -d <span style="color: #2aa198;">" "</span> -f 2,3,4
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25171;&#21360; PATH &#21464;&#37327;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360; PATH &#21464;&#37327;</span>
 <span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">PATH</span> | tr : <span style="color: #2aa198;">'\n'</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc07b330" class="outline-3">
+<h3 id="orgc07b330"><span class="section-number-3">3.10</span> 文本排序</h3>
+<div class="outline-text-3" id="text-3-10">
+<div class="org-src-container">
+<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25490;&#24207;&#25991;&#20214;</span>
+sort file
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21453;&#21521;&#25490;&#24207;&#65288;&#38477;&#24207;&#65289;</span>
+sort -r file
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20351;&#29992;&#25968;&#23383;&#32780;&#19981;&#26159;&#23383;&#31526;&#20018;&#36827;&#34892;&#27604;&#36739;</span>
+sort -n file
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25353; passwd &#25991;&#20214;&#30340;&#31532;&#19977;&#21015;&#36827;&#34892;&#25490;&#24207;, -t &#34920;&#31034;&#20998;&#38548;&#31526;</span>
+sort -t: -k 3n /etc/passwd
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21435;&#37325;&#25490;&#24207;</span>
+sort -u file
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org5f41a15" class="outline-2">
-<h2 id="org5f41a15"><span class="section-number-2">4</span> link</h2>
+<div id="outline-container-org035d75c" class="outline-2">
+<h2 id="org035d75c"><span class="section-number-2">4</span> link</h2>
 <div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li><a href="https://github.com/skywind3000/awesome-cheatsheets/blob/master/languages/bash.sh">bash</a></li>
@@ -851,7 +933,7 @@ ps | tr -s <span style="color: #2aa198;">" "</span> | cut -d <span style="color:
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-08-19 Mon 15:51. Created by Jinghui Hu at 2019-07-18 Thu 14:51.</p>
+<p class="author">Last Updated 2019-08-19 Mon 22:15. Created by Jinghui Hu at 2019-07-18 Thu 14:51.</p>
 </div>
 </body>
 </html>
