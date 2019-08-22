@@ -163,6 +163,77 @@
     git update-ref refs/heads/master <sha-commit>
   #+END_SRC
 
+* Git 工具
+
+** 子模块
+   子模块允许你将一个 Git 仓库作为另一个 Git 仓库的子目录。 它能让你将另一个仓库
+   克隆到自己的项目中，同时还保持提交的独立。
+
+*** 使用子模块
+    添加子模块后会在同名目录下创建 ~.gitmodules~ 文件，该文件保存子项目的 URL 和
+    当前仓库目录的映射关系
+    #+BEGIN_SRC shell
+      # 为当前仓库添加子模块
+      git submodule add <url>
+    #+END_SRC
+
+*** 克隆含有子模块的项目
+    #+BEGIN_SRC shell
+      # 初始化本地配置文件
+      git submodule init
+      # 抓取所有数据并检出父项目中列出的合适的提交
+      git submodule update
+
+      # 或者直接使用 --recursive 选项自动初始化并更新仓库中的每一个子模块
+      git clone --recursive <url>
+    #+END_SRC
+
+*** 在包含子模块项目中工作
+    更新某个子模块
+    #+BEGIN_SRC shell
+      # 进入 SubModuleName 子模块然后抓取并更新
+      git submodule update --remote SubModuleName
+    #+END_SRC
+
+    修改子模块的分支
+    #+BEGIN_SRC shell
+      git config -f .gitmodules submodule.SubModuleName.branch stable
+      # 抓取子模块并更新
+      git submodule update --remote
+    #+END_SRC
+
+*** 在子模块中工作
+    拉去远端子模块的更新并合并
+    #+BEGIN_SRC shell
+      git submodule update --remote --merge
+    #+END_SRC
+
+    使用 rebase
+    #+BEGIN_SRC shell
+      git submodule update --remote --rebase
+    #+END_SRC
+
+*** 发布子模块的改动
+     git push 命令接受可以设置为 =check= 或 =on-demand= 的
+     ~--recurse-submodules~ 参数。 如果任何提交的子模块改动没有推送那么 =check=
+     选项会直接使 push 操作失败
+    #+BEGIN_SRC shell
+      git push --recurse-submodules=check
+    #+END_SRC
+    =on-demand= 选项按需推送
+    #+BEGIN_SRC shell
+      git push --recurse-submodules=on-demand
+    #+END_SRC
+
+*** 遍历子模块
+    #+BEGIN_SRC shell
+      # stash 所有子模块
+      git submodule foreach 'git stash'
+
+      # 检出所有子模块
+      git submodule foreach 'git checkout -b featureA'
+    #+END_SRC
+
 * 常见工作流
 ** 批量更新当前文件夹下代码仓库
    #+BEGIN_SRC sh
