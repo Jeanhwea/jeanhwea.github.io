@@ -1,0 +1,105 @@
+#+TITLE: 管理操作系统的路由表
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2019-08-23 Fri 08:13:54>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+TAGS: routing-table route
+
+
+* 路由表
+
+  路由表中的表项内容包括：
+  - destination：目的地址，用来标识 IP 包的目的地址或者目的网络
+  - mask：网络掩码，与目的地址一起标识目的主机或者路由器所在的网段的地址
+  - pre：标识路由加入 IP 路由表的优先级。可能到达一个目的地有多条路由，但是优先
+    级的存在让他们先选择优先级高的路由进行利用
+  - cost：路由开销，当到达一个目的地的多个路由优先级相同时，路由开销最小的将成为
+    最优路由
+  - interface：输出接口，说明 IP 包将从该路由器哪个接口转发
+  - nexthop：下一跳 IP 地址，说明 IP 包所经过的下一个路由器
+
+* Windows
+  Windows 下可以使用 route 命令来管理路由表
+  #+BEGIN_SRC shell
+    # 查看路由表
+    route PRINT
+
+    # ipv4 路由表
+    route PRINT -4
+    # ipv6 路由表
+    route PRINT -6
+
+    # 打印匹配 192* 的路由表
+    route PRINT 192*
+  #+END_SRC
+
+  #+BEGIN_SRC text
+    ===========================================================================
+    Interface List
+     11...30 9c 23 bf 31 e9 ......Intel(R) Ethernet Connection (2) I219-LM
+     16...0a 00 27 00 00 10 ......VirtualBox Host-Only Ethernet Adapter
+     17...00 50 56 c0 00 01 ......VMware Virtual Ethernet Adapter for VMnet1
+     18...00 50 56 c0 00 08 ......VMware Virtual Ethernet Adapter for VMnet8
+      1...........................Software Loopback Interface 1
+     15...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter
+     13...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter #3
+     14...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter #4
+     20...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter #5
+    ===========================================================================
+
+    IPv4 Route Table
+    ===========================================================================
+    Active Routes:
+    Network Destination        Netmask          Gateway       Interface  Metric
+              0.0.0.0          0.0.0.0      192.168.0.1    192.168.0.106    266
+            127.0.0.0        255.0.0.0         On-link         127.0.0.1    306
+            127.0.0.1  255.255.255.255         On-link         127.0.0.1    306
+    ...
+      255.255.255.255  255.255.255.255         On-link     192.168.0.106    266
+      255.255.255.255  255.255.255.255         On-link      192.168.56.1    266
+      255.255.255.255  255.255.255.255         On-link     192.168.195.1    276
+      255.255.255.255  255.255.255.255         On-link      192.168.17.1    276
+    ===========================================================================
+    Persistent Routes:
+      Network Address          Netmask  Gateway Address  Metric
+              0.0.0.0          0.0.0.0      192.168.0.1  Default
+    ===========================================================================
+
+    IPv6 Route Table
+    ===========================================================================
+    Active Routes:
+     If Metric Network Destination      Gateway
+      1    306 ::1/128                  On-link
+     11    266 fe80::/64                On-link
+     16    266 fe80::/64                On-link
+     17    276 fe80::/64                On-link
+     18    276 fe80::/64                On-link
+     16    266 fe80::17a:6095:c21d:649/128
+                                        On-link
+     18    276 fe80::3d40:689a:d685:3cf7/128
+                                        On-link
+     11    266 fe80::4464:1783:3bfe:efbf/128
+                                        On-link
+     17    276 fe80::74e0:b735:137e:87bd/128
+                                        On-link
+      1    306 ff00::/8                 On-link
+     11    266 ff00::/8                 On-link
+     16    266 ff00::/8                 On-link
+     17    276 ff00::/8                 On-link
+     18    276 ff00::/8                 On-link
+    ===========================================================================
+    Persistent Routes:
+      None
+  #+END_SRC
+
+  #+BEGIN_SRC shell
+    route ADD 192.168.0.0 MASK 255.255.255.0 192.168.0.1 METRIC 3 IF 2
+    route ADD 3ffe::/32 3ffe::1
+
+    # CHANGE is used to modify gateway and/or metric only.
+    route CHANGE 157.0.0.0 MASK 255.0.0.0 157.55.80.5 METRIC 2 IF 2
+
+    route DELETE 157.0.0.0
+    route DELETE 3ffe::/32
+  #+END_SRC

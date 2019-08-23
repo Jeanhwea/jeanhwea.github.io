@@ -6,7 +6,7 @@
 <!-- 2019-08-23 Fri 08:24 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>殊蕤的工作笔记</title>
+<title>路由表</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="Jinghui Hu" />
 <style type="text/css">
@@ -229,120 +229,137 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="org-div-home-and-up">
- <a accesskey="h" href="index.html"> UP </a>
+ <a accesskey="h" href="../readme.html"> UP </a>
  |
- <a accesskey="H" href="index.html"> HOME </a>
+ <a accesskey="H" href="../index.html"> HOME </a>
 </div><div id="content">
-<h1 class="title">殊蕤的工作笔记</h1>
+<h1 class="title">路由表</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org7430790">1. 路由表</a></li>
+<li><a href="#org662488e">2. Windows</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org7430790" class="outline-2">
+<h2 id="org7430790"><span class="section-number-2">1</span> 路由表</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+路由表中的表项内容包括：
+</p>
+<ul class="org-ul">
+<li>destination：目的地址，用来标识 IP 包的目的地址或者目的网络</li>
+<li>mask：网络掩码，与目的地址一起标识目的主机或者路由器所在的网段的地址</li>
+<li>pre：标识路由加入 IP 路由表的优先级。可能到达一个目的地有多条路由，但是优先
+级的存在让他们先选择优先级高的路由进行利用</li>
+<li>cost：路由开销，当到达一个目的地的多个路由优先级相同时，路由开销最小的将成为
+最优路由</li>
+<li>interface：输出接口，说明 IP 包将从该路由器哪个接口转发</li>
+<li>nexthop：下一跳 IP 地址，说明 IP 包所经过的下一个路由器</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org662488e" class="outline-2">
+<h2 id="org662488e"><span class="section-number-2">2</span> Windows</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Windows 下可以使用 route 命令来管理路由表
+</p>
 <div class="org-src-container">
-<pre class="src src-text">   _                          _
-  (_)                        | |
-   _    ___    __ _   _ __   | |__   __      __   ___    __ _
-  | |  / _ \  / _` | | '_ \  | '_ \  \ \ /\ / /  / _ \  / _` |
-  | | |  __/ | (_| | | | | | | | | |  \ V  V /  |  __/ | (_| |
-  | |  \___|  \__,_| |_| |_| |_| |_|   \_/\_/    \___|  \__,_|
- _/ |
-|__/
+<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#36335;&#30001;&#34920;</span>
+route PRINT
+
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">ipv4 &#36335;&#30001;&#34920;</span>
+route PRINT -4
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">ipv6 &#36335;&#30001;&#34920;</span>
+route PRINT -6
+
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25171;&#21360;&#21305;&#37197; 192* &#30340;&#36335;&#30001;&#34920;</span>
+route PRINT 192*
 </pre>
 </div>
-<div id="outline-container-orgd368d86" class="outline-2">
-<h2 id="orgd368d86"><span class="section-number-2">1</span> 目录</h2>
-<div class="outline-text-2" id="text-1">
+
+<div class="org-src-container">
+<pre class="src src-text">===========================================================================
+Interface List
+ 11...30 9c 23 bf 31 e9 ......Intel(R) Ethernet Connection (2) I219-LM
+ 16...0a 00 27 00 00 10 ......VirtualBox Host-Only Ethernet Adapter
+ 17...00 50 56 c0 00 01 ......VMware Virtual Ethernet Adapter for VMnet1
+ 18...00 50 56 c0 00 08 ......VMware Virtual Ethernet Adapter for VMnet8
+  1...........................Software Loopback Interface 1
+ 15...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter
+ 13...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter #3
+ 14...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter #4
+ 20...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter #5
+===========================================================================
+
+IPv4 Route Table
+===========================================================================
+Active Routes:
+Network Destination        Netmask          Gateway       Interface  Metric
+          0.0.0.0          0.0.0.0      192.168.0.1    192.168.0.106    266
+        127.0.0.0        255.0.0.0         On-link         127.0.0.1    306
+        127.0.0.1  255.255.255.255         On-link         127.0.0.1    306
+...
+  255.255.255.255  255.255.255.255         On-link     192.168.0.106    266
+  255.255.255.255  255.255.255.255         On-link      192.168.56.1    266
+  255.255.255.255  255.255.255.255         On-link     192.168.195.1    276
+  255.255.255.255  255.255.255.255         On-link      192.168.17.1    276
+===========================================================================
+Persistent Routes:
+  Network Address          Netmask  Gateway Address  Metric
+          0.0.0.0          0.0.0.0      192.168.0.1  Default
+===========================================================================
+
+IPv6 Route Table
+===========================================================================
+Active Routes:
+ If Metric Network Destination      Gateway
+  1    306 ::1/128                  On-link
+ 11    266 fe80::/64                On-link
+ 16    266 fe80::/64                On-link
+ 17    276 fe80::/64                On-link
+ 18    276 fe80::/64                On-link
+ 16    266 fe80::17a:6095:c21d:649/128
+                                    On-link
+ 18    276 fe80::3d40:689a:d685:3cf7/128
+                                    On-link
+ 11    266 fe80::4464:1783:3bfe:efbf/128
+                                    On-link
+ 17    276 fe80::74e0:b735:137e:87bd/128
+                                    On-link
+  1    306 ff00::/8                 On-link
+ 11    266 ff00::/8                 On-link
+ 16    266 ff00::/8                 On-link
+ 17    276 ff00::/8                 On-link
+ 18    276 ff00::/8                 On-link
+===========================================================================
+Persistent Routes:
+  None
+</pre>
 </div>
-<div id="outline-container-orgb129e14" class="outline-3">
-<h3 id="orgb129e14"><span class="section-number-3">1.1</span> 技术文章</h3>
-<div class="outline-text-3" id="text-1-1">
-<ol class="org-ol">
-<li><a href="./article/routing-table.html">管理操作系统的路由表</a> 2019-08-23</li>
-<li><a href="./article/intall-ubuntu-os.html">安装 Ubuntu 系统</a> 2019-08-12</li>
-<li><a href="./article/nginx-conf-setup.html">Ngnix 常见应用场景配置</a> 2019-07-26</li>
-<li><a href="./article/oauth-2.0-protocol.html">OAuth 2.0 应用授权协议</a> 2019-07-24</li>
-<li><a href="./article/redirect-html-page.html">重定向 Web 页面</a> 2019-07-19</li>
-<li><a href="./article/color-theme-sites.html">主题配色网站</a> 2019-07-15</li>
-<li><a href="./article/drawing-graphs-with-dot.html">使用 dot 画图工具</a> 2019-07-12</li>
-<li><a href="./article/relational-database-design.html">关系型数据库设计</a> 2019-06-28</li>
-<li><a href="./article/project-names.html">项目名称</a> 2019-05-18</li>
-<li><a href="./article/metallographic-database.html">Metallographic database</a> 2019-02-19</li>
-<li><a href="./article/convolution-operator.html">卷积操作符</a> 2019-01-18</li>
-<li><a href="./article/using-osxfuse-to-mount-filesystem.html">使用 osxfuse 挂载文件系统</a> 2018-11-13</li>
-<li><a href="./article/angular-passing-value-between-component.html">Angular 组件之间传值</a> 2018-11-09</li>
-<li><a href="./article/count-words-from-cli.html">使用命令行统计项目中词汇的频率</a> 2018-10-27</li>
-<li><a href="./article/make-gif-images-with-ffmpeg.html">使用 ffmpeg 制作 gif 动态图</a> 2018-10-27</li>
-<li><a href="./article/capture-screen-with-ffmpeg.html">使用 ffmpeg 录屏</a> 2018-10-16</li>
-<li><a href="./article/export-excel-by-javascript.html">使用 JavaScript 导出 Excel 文件</a> 2018-10-16</li>
-<li><a href="./article/tensorflow-startup-notes.html">TensorFlow 安装笔记</a> 2018-10-12</li>
-<li><a href="./article/emmet-mode-or-zen-coding.html">Emmet-mode 或者 Zen Coding</a> 2018-10-11</li>
-<li><a href="./article/qrcode-decoder-by-javascript.html">使用 JavaScript 解析二维码</a> 2018-10-11</li>
-<li><a href="./article/typescript-learning-notes.html">学习 Typescript 的笔记</a> 2018-10-11</li>
-<li><a href="./article/RESTful-API-in-Practice.html">RESTful API 设计实践</a> 2018-10-10</li>
-<li><a href="./article/setup-ROR-enviroment.html">安装 ROR 开发环境</a> 2018-10-09</li>
-<li><a href="./article/chrome-options.html">chrome 浏览器相关设置</a> 2018-10-08</li>
-<li><a href="./article/download-all-site-via-wget.html">离线下载整个站点</a> 2018-10-08</li>
-<li><a href="./article/emacs-org-mode-note.html">Emacs org-mode 的相关笔记</a> 2018-10-08</li>
-<li><a href="./article/firefox-default-zoom-pixel.html">Firefox 的默认缩放大小</a> 2018-10-08</li>
-<li><a href="./article/generate-ssh-key.html">生成 RSA 加密的 SSH 公钥和私钥</a> 2018-10-08</li>
-<li><a href="./article/rename-many-files.html">批量规范化重命名大量的文件</a> 2018-10-05</li>
-</ol>
-</div>
-</div>
-<div id="outline-container-org36ffab6" class="outline-3">
-<h3 id="org36ffab6"><span class="section-number-3">1.2</span> 编程语言</h3>
-<div class="outline-text-3" id="text-1-2">
-<ol class="org-ol">
-<li><a href="./lang/java-distilled.html">Java 编程语言精粹</a> 2019-07-03</li>
-<li><a href="./lang/java-lib-spring.html">Spring 全家桶</a> 2019-07-10</li>
-<li><a href="./lang/javascript-distilled.html">JavaScript 编程语言精粹</a> 2019-07-02</li>
-<li><a href="./lang/python-distilled.html">Python 编程语言精粹</a> 2018-10-23</li>
-<li><a href="./lang/python-lib-matplotlib.html">matplotlib 绘图包</a> 2018-10-26</li>
-<li><a href="./lang/python-lib-numpy.html">numpy 科学计算数组工具集</a> 2018-10-26</li>
-<li><a href="./lang/python-lib-opencv.html">OpenCV 图像处理工具包</a> 2019-01-25</li>
-<li><a href="./lang/python-lib-pandas.html">pandas 数据处理包</a> 2018-10-12</li>
-</ol>
-</div>
-</div>
-<div id="outline-container-org90b3c12" class="outline-3">
-<h3 id="org90b3c12"><span class="section-number-3">1.3</span> 开发工具</h3>
-<div class="outline-text-3" id="text-1-3">
-<ol class="org-ol">
-<li><a href="./tool/angular.html">Angular 命令行工具</a> 2019-08-19</li>
-<li><a href="./tool/curl.html">cRUL 工具</a> 2018-11-03</li>
-<li><a href="./tool/docker.html">Docker 容器</a> 2018-11-27</li>
-<li><a href="./tool/git.html">Git 项目管理工具</a> 2018-10-08</li>
-<li><a href="./tool/linux-cli.html">Linux 常用命令</a> 2019-02-18</li>
-<li><a href="./tool/makefile.html">Makefile 笔记</a> 2019-08-05</li>
-<li><a href="./tool/maven.html">Maven 包管理工具</a> 2018-10-08</li>
-<li><a href="./tool/npm-yarn-cli.html">npm 和 yarn - NodeJs 包管理工具</a> 2018-10-08</li>
-<li><a href="./tool/pip-cli.html">pip 包管理工具</a> 2018-10-08</li>
-<li><a href="./tool/sed-awk-shell.html">Linux 三剑客: sed, awk 和 shell</a> 2019-07-18</li>
-<li><a href="./tool/springboot-cli.html">Spring Boot 命令行 - 快速迭代 Java Web 项目</a> 2018-10-10</li>
-</ol>
-</div>
-</div>
-<div id="outline-container-orgc1cb6a4" class="outline-3">
-<h3 id="orgc1cb6a4"><span class="section-number-3">1.4</span> 数据库</h3>
-<div class="outline-text-3" id="text-1-4">
-<ol class="org-ol">
-<li><a href="./database/mysql.html">MySQL 关系数据库</a> 2019-07-05</li>
-<li><a href="./database/oracle.html">Oracle 关系数据库</a> 2019-07-08</li>
-<li><a href="./database/postgres.html">PostgreSQL 关系数据库</a> 2018-12-10</li>
-</ol>
-</div>
-</div>
-<div id="outline-container-org8bad19f" class="outline-3">
-<h3 id="org8bad19f"><span class="section-number-3">1.5</span> 杂文随笔</h3>
-<div class="outline-text-3" id="text-1-5">
-<ol class="org-ol">
-<li><a href="./misc/journal-and-conference.html">部分期刊会议链接</a> 2019-02-20</li>
-<li><a href="./misc/the-health-way.html">健康本该如此</a> 2019-02-09</li>
-<li><a href="./misc/common-used-condiment.html">常用调味品</a> 2018-10-18</li>
-<li><a href="./misc/folder-structure.html">文件夹结构</a> 2018-10-15</li>
-</ol>
+
+<div class="org-src-container">
+<pre class="src src-shell">route ADD 192.168.0.0 MASK 255.255.255.0 192.168.0.1 METRIC 3 IF 2
+route ADD 3ffe::/32 3ffe::1
+
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">CHANGE is used to modify gateway and/or metric only.</span>
+route CHANGE 157.0.0.0 MASK 255.0.0.0 157.55.80.5 METRIC 2 IF 2
+
+route DELETE 157.0.0.0
+route DELETE 3ffe::/32
+</pre>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-08-23 Fri 08:24. Created by Jinghui Hu at 2018-10-05 Fri 11:04.</p>
+<p class="author">Last Updated 2019-08-23 Fri 08:24. Created by Jinghui Hu at 2019-08-23 Fri 08:13.</p>
 </div>
 </body>
 </html>
