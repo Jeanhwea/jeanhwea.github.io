@@ -106,9 +106,6 @@
     #+BEGIN_SRC shell
       export LD_LIBRARY_PATH=/usr/local/java/instantclient_11_2/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
       export PATH=/usr/local/java/instantclient_11_2${PATH:+:${PATH}}
-
-      # 解决中文乱码
-      export NLS_LANG="SIMPLIFIED CHINESE_CHINA.AL32UTF8"
     #+END_SRC
 
 ** 从命令行中连接 SQL*Plus
@@ -1030,7 +1027,24 @@
      SQL>
    #+END_SRC
 
-* 常见错误
+* 常见问题
+** 客户端和服务器字符集不一致
+   #+BEGIN_SRC sql
+     SELECT USERENV('language') FROM DUAL;
+   #+END_SRC
+   #+BEGIN_SRC text
+     SQL> SELECT USERENV('language') FROM DUAL;
+     AMERICAN_AMERICA.AL32UTF8
+   #+END_SRC
+
+   #+BEGIN_SRC shell
+     # 将客户端修改成英文的 Unicode 码
+     export NLS_LANG="AMERICAN_AMERICA.AL32UTF8"
+
+     # 或者直接修改成中文的 Unicode 码，解决中文乱码
+     export NLS_LANG="SIMPLIFIED CHINESE_CHINA.AL32UTF8"
+   #+END_SRC
+
 ** ORA-21561: OID generation failed
    数据库的主机名解析错误
    #+BEGIN_SRC shell
