@@ -1029,3 +1029,28 @@
      Elapsed: 00:00:00.07
      SQL>
    #+END_SRC
+
+* 常见错误
+** ORA-21561: OID generation failed
+   数据库的主机名解析错误
+   #+BEGIN_SRC shell
+     $ hostname
+     Jesenia.local
+     $ ping Jesenia.local
+     ping: cannot resolve Jesenia.local: Unknown host
+     $ cat /etc/hosts
+     ##
+     # Host Database
+     #
+     # localhost is used to configure the loopback interface
+     # when the system is booting.  Do not change this entry.
+     ##
+     127.0.0.1	localhost
+     255.255.255.255	broadcasthost
+     ::1             localhost
+   #+END_SRC
+
+   在 hosts 文件结尾追加当前主机的解析地址即可
+   #+BEGIN_SRC shell
+     sudo echo "127.0.0.1 $(hostname)" >> /etc/hosts
+   #+END_SRC
