@@ -177,16 +177,19 @@
 
 * 创建新的表空间以及用户
 ** 创建数据储存的目录
+   Oracle 数据库的表空间的存储目录需要显示创建
    #+BEGIN_SRC shell
-     mkdir -p /u01/app/oracle/oradata/ora11g
+     mkdir -p /u01/app/oracle/oradata/XE
    #+END_SRC
 
 ** 创建表空间
-   创建数据表空间
+   Oracle 在创建用户前最好为当前用户显示创建表空间，否则创建的新用户会使用默认的
+   表空间。为了避免这种情况，提前创建数据表空间和临时表空间
    #+BEGIN_SRC sql
-     CREATE TABLESPACE AVIC_P01
-       DATAFILE '/u01/app/oracle/oradata/ora11g/avic_p1.dbf'
-       SIZE 1024M AUTOEXTEND OFF
+     -- 创建数据表空间
+     CREATE TABLESPACE PFile1
+       DATAFILE '/u01/app/oracle/oradata/XE/pfile1.dbf'
+       SIZE 128M AUTOEXTEND OFF
        LOGGING
        ONLINE
        PERMANENT
@@ -194,25 +197,24 @@
        BLOCKSIZE 8K
        SEGMENT SPACE MANAGEMENT AUTO
        FLASHBACK ON;
-   #+END_SRC
 
-   创建临时表空间
-   #+BEGIN_SRC sql
-     CREATE TEMPORARY TABLESPACE AVIC_T01
-       TEMPFILE '/u01/app/oracle/oradata/ora11g/avic_t1.dbf'
+     -- 创建临时表空间
+     CREATE TEMPORARY TABLESPACE TFile1
+       TEMPFILE '/u01/app/oracle/oradata/XE/tfile1.dbf'
        SIZE 2048M AUTOEXTEND OFF
        TABLESPACE GROUP ''
        EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M;
    #+END_SRC
 
 ** 创建用户
+   创建新的用户
    #+BEGIN_SRC sql
      DROP USER AVICTOR CASCADE;
 
      CREATE USER AVICTOR
-       IDENTIFIED BY VALUES 'Pa$$word'
-       DEFAULT TABLESPACE AVIC_P01
-       TEMPORARY TABLESPACE AVIC_T01
+       IDENTIFIED BY secret
+       DEFAULT TABLESPACE PFile1
+       TEMPORARY TABLESPACE TFile1
        PROFILE DEFAULT
        ACCOUNT UNLOCK;
 
@@ -226,7 +228,13 @@
      GRANT SELECT ANY TRANSACTION TO AVICTOR;
      GRANT UNLIMITED TABLESPACE TO AVICTOR;
 
-     ALTER USER AVICTOR IDENTIFIED BY 'Pa$$word';
+     ALTER USER AVICTOR IDENTIFIED BY secret;
+   #+END_SRC
+
+** 登录测试
+   使用 sqlplus 测试一下连接是否成功
+   #+BEGIN_SRC shell
+     sqlplus avictor/secret@localhost/xe
    #+END_SRC
 
 * 数据库
