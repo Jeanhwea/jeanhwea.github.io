@@ -85,10 +85,61 @@
    #+END_SRC
 
 ** 属性选择器
-   #+BEGIN_SRC css
-     /* 选择有 class 属性的 h1 */
-     h1[class] { }
+*** 常见选择器
+    #+BEGIN_SRC css
+      /* 选择有 class 属性的 h1 */
+      h1[class] { }
 
-     /* 选择有 href 和 title 属性的 a 标签 */
-     a[href][title] {font-weight: bold; }
+      /* 选择有 href 和 title 属性的 a 标签 */
+      a[href][title] {font-weight: bold; }
+
+      /* 根据属性值来选择 */
+      p[class="urgent"] { }
+    #+END_SRC
+
+*** 特殊匹配的选择器
+    #+BEGIN_SRC css
+      /* foo 属性值是以空格分隔列表，匹配列表中包含 bar 的所有元素 in list */
+      elem[foo~="bar"] { }
+      /* 匹配 foo 属性值以 bar 开头的所有元素 starts with */
+      elem[foo^="bar"] { }
+      /* 匹配 foo 属性值以 bar 结尾的所有元素 ends with */
+      elem[foo$="bar"] { }
+      /* 匹配 foo 属性值包含 bar 字串的所有元素 substring of */
+      elem[foo*="bar"] { }
+    #+END_SRC
+
+** 后代选择器和子元素选择器
+   根据 DOM 树中的继承关系可以通过空格来标记后代选择器
+   #+BEGIN_SRC css
+     /* 选取 h1 下的所有 p 元素, h1 可以和 p 间隔多层 */
+     h1 p { }
+
+     /* 选取 h1 下的紧邻的所有 p 元素, h1 和 p 只能间隔一层 */
+     h1 > p { }
+
+     /* 选取与 ol 紧邻的 ul 的所有元素 */
+     ol+ul { }
    #+END_SRC
+
+** 伪类和伪元素
+   伪类的元素顺序很重要，一般参考 =link -> visited -> focus -> hover -> active=
+   的顺序
+
+*** 链接伪类
+    - :link 包含 href 属性，并指向一个未访问地址的所有锚
+    - :visited 指向已访问地址超链接的所有锚
+
+    #+BEGIN_SRC css
+      a:link {
+        color: blue;
+      }
+      a:visited {
+        color: red;
+      }
+    #+END_SRC
+
+*** 动态伪类
+    - :focus 当前用户焦点所在元素
+    - :hover 当鼠标指针停留所在的元素
+    - :active 当前被用户激活的元素
