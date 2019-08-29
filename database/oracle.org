@@ -7,10 +7,11 @@
 #+TAGS: oracle database 10g
 
 * Oracle 数据库
-  Oracle Database，又名 Oracle RDBMS，或简称 Oracle。是甲骨文公司的一款关系数据库
-  管理系统。它是在数据库领域一直处于领先地位的产品。可以说 Oracle 数据库系统是目前
-  世界上流行的关系数据库管理系统，系统可移植性好、使用方便、功能强，适用于各类大、
-  中、小、微机环境。它是一种高效率、可靠性好的、适应高吞吐量的数据库解决方案。
+  Oracle Database，又名 Oracle RDBMS，或简称 Oracle。是甲骨文公司的一款关系数据
+  库管理系统。它是在数据库领域一直处于领先地位的产品。可以说 Oracle 数据库系统是
+  目前世界上流行的关系数据库管理系统，系统可移植性好、使用方便、功能强，适用于各
+  类大、中、小、微机环境。它是一种高效率、可靠性好的、适应高吞吐量的数据库解决方
+  案。
 
 ** Ubuntu 18.04 安装数据库
    安装依赖包
@@ -23,7 +24,6 @@
      dpkg --install /assets/oracle-xe_11.2.0-1.0_amd64.deb
    #+END_SRC
 
-
 ** 参考材料
    Oracle 家的配套文档还是很好用的，数据库方面主要有下面的文档：
    1. Oracle Database Concepts - 《Oracle 数据库概念》
@@ -31,11 +31,14 @@
 
    [[file:../static/image/2019/07/oracle-database-documentation.png]]
 
-* SQL*Plus
+* SQL*Plus 命令行工具
   Oracle 的 SQL*Plus 是与 oracle 数据库进行交互的客户端工具，借助 SQL*Plus 可以
   查看、修改数据库记录。在 SQL*Plus 中，可以运行 SQL*Plus 命令与 SQL 语句。
 
-** 安装
+** 安装 instantclient
+   在 mac 和 linux 系统中如果只是想要安装一个 sqlplus 的客户端，可以直接安装
+   instantclient 工具
+
 *** macOS
     mac 下的 Oracle 安装需要下载几个 [[https://www.oracle.com/database/technologies/instant-client/downloads.html][instantclient]] 安装包
     1. instantclient-basic-macos.x64-11.2.0.4.0.zip
@@ -72,6 +75,7 @@
       export PATH="/usr/local/java/instantclient_11_2:$PATH"
       export DYLD_LIBRARY_PATH="/usr/local/java/instantclient_11_2/lib${DYLD_LIBRARY_PATH:+:${DYLD_LIBRARY_PATH}}"
     #+END_SRC
+
 *** Linux
     需要下载的安装文件
     1. instantclient-basic-linux.x64-11.2.0.4.0.zip
@@ -125,7 +129,7 @@
    [[file:../static/image/2018/11/sqlplus-login.png]]
 
    第二种登录方式需要使用 tnsnames.ora 这种格式，下面是 Oracle Client 提供的默认
-   样本。
+   样本
 
    #+BEGIN_SRC text
      # This is a sample tnsnames.ora that contains the NET8 parameters that are
@@ -174,69 +178,6 @@
    - 打印最后执行的 SQL 语句: ~L~
    - 结果输出到文件: ~SPOOL filename~
    - 查看/修改 SQL*Plus 的环境变量: ~SHOW/SET variablename~
-
-* 创建新的表空间以及用户
-** 创建数据储存的目录
-   Oracle 数据库的表空间的存储目录需要显示创建
-   #+BEGIN_SRC shell
-     mkdir -p /u01/app/oracle/oradata/XE
-   #+END_SRC
-
-** 创建表空间
-   Oracle 在创建用户前最好为当前用户显示创建表空间，否则创建的新用户会使用默认的
-   表空间。为了避免这种情况，提前创建数据表空间和临时表空间
-   #+BEGIN_SRC sql
-     -- 创建数据表空间
-     CREATE TABLESPACE PFile1
-       DATAFILE '/u01/app/oracle/oradata/XE/pfile1.dbf'
-       SIZE 128M AUTOEXTEND OFF
-       LOGGING
-       ONLINE
-       PERMANENT
-       EXTENT MANAGEMENT LOCAL AUTOALLOCATE
-       BLOCKSIZE 8K
-       SEGMENT SPACE MANAGEMENT AUTO
-       FLASHBACK ON;
-
-     -- 创建临时表空间
-     CREATE TEMPORARY TABLESPACE TFile1
-       TEMPFILE '/u01/app/oracle/oradata/XE/tfile1.dbf'
-       SIZE 2048M AUTOEXTEND OFF
-       TABLESPACE GROUP ''
-       EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M;
-   #+END_SRC
-
-** 创建用户
-   创建新的用户
-   #+BEGIN_SRC sql
-     DROP USER AVICTOR CASCADE;
-
-     CREATE USER AVICTOR
-       IDENTIFIED BY secret
-       DEFAULT TABLESPACE PFile1
-       TEMPORARY TABLESPACE TFile1
-       PROFILE DEFAULT
-       ACCOUNT UNLOCK;
-
-     GRANT CONNECT TO AVICTOR;
-     GRANT DBA TO AVICTOR;
-     ALTER USER AVICTOR DEFAULT ROLE ALL;
-
-     GRANT SELECT ANY DICTIONARY TO AVICTOR;
-     GRANT SELECT ANY SEQUENCE TO AVICTOR;
-     GRANT SELECT ANY TABLE TO AVICTOR;
-     GRANT SELECT ANY TRANSACTION TO AVICTOR;
-     GRANT UNLIMITED TABLESPACE TO AVICTOR;
-
-     ALTER USER AVICTOR IDENTIFIED BY secret;
-   #+END_SRC
-
-** 登录测试
-   使用 sqlplus 测试一下连接是否成功
-   #+BEGIN_SRC shell
-     sqlplus avictor/secret@localhost/xe
-   #+END_SRC
-
 * 数据库
 ** 查看当前数据库
    #+BEGIN_SRC sql
@@ -318,9 +259,11 @@
      SHOW USER;
      SELECT USER FROM DUAL;
    #+END_SRC
+
+   例如：
    #+BEGIN_SRC text
      SQL> SHOW USER;
-     USER is "Apple"
+     USER is "APPLE"
      SQL> SELECT USER FROM DUAL;
      Apple
    #+END_SRC
@@ -336,8 +279,11 @@
    #+END_SRC
 
 ** 修改用户密码
+   有时候修改用户密码但是不知道用户的原始密码，可以添加 =VALUES= 传入的是数据库
+   加密后的密码字符串
    #+BEGIN_SRC sql
      ALTER USER <username> IDENTIFIED BY <password>;
+     ALTER USER <username> IDENTIFIED BY VALUES <encrypted_password>;
    #+END_SRC
 
 ** 角色和授权
@@ -910,6 +856,7 @@
 
 ** 获取表的元信息：列的属性，唯一性约束
 *** 表列属性
+    可以查看表中每列的名字，数据类型，长度等信息
     #+BEGIN_SRC sql
       SELECT USER_TAB_COLUMNS.TABLE_NAME ||
                ',' || USER_TAB_COLUMNS.COLUMN_NAME ||
@@ -966,7 +913,78 @@
        ORDER BY USER_COL_COMMENTS.TABLE_NAME;
     #+END_SRC
 
-* 使用笔记
+* 一些使用场景
+
+** 创建新的表空间以及用户
+*** 创建数据储存的目录
+    Oracle 数据库的表空间的存储目录需要显示创建
+    #+BEGIN_SRC shell
+      mkdir -p /u01/app/oracle/oradata/XE
+    #+END_SRC
+
+*** 创建表空间
+    Oracle 在创建用户前最好为当前用户显示创建表空间，否则创建的新用户会使用默认
+    的表空间。为了避免这种情况，提前创建默认表空间和临时表空间
+    #+BEGIN_SRC sql
+      -- 创建默认表空间
+      CREATE TABLESPACE PFile1
+        DATAFILE '/u01/app/oracle/oradata/XE/pfile1.dbf'
+        SIZE 128M AUTOEXTEND OFF
+        LOGGING
+        ONLINE
+        PERMANENT
+        EXTENT MANAGEMENT LOCAL AUTOALLOCATE
+        BLOCKSIZE 8K
+        SEGMENT SPACE MANAGEMENT AUTO
+        FLASHBACK ON;
+
+      -- 创建临时表空间
+      CREATE TEMPORARY TABLESPACE TFile1
+        TEMPFILE '/u01/app/oracle/oradata/XE/tfile1.dbf'
+        SIZE 2048M AUTOEXTEND OFF
+        TABLESPACE GROUP ''
+        EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M;
+    #+END_SRC
+
+*** 创建用户
+    创建新的用户
+    #+BEGIN_SRC sql
+      DROP USER AVICTOR CASCADE;
+
+      CREATE USER AVICTOR
+        IDENTIFIED BY secret
+        DEFAULT TABLESPACE PFile1
+        TEMPORARY TABLESPACE TFile1
+        PROFILE DEFAULT
+        ACCOUNT UNLOCK;
+
+      GRANT CONNECT TO AVICTOR;
+      GRANT DBA TO AVICTOR;
+      ALTER USER AVICTOR DEFAULT ROLE ALL;
+
+      GRANT SELECT ANY DICTIONARY TO AVICTOR;
+      GRANT SELECT ANY SEQUENCE TO AVICTOR;
+      GRANT SELECT ANY TABLE TO AVICTOR;
+      GRANT SELECT ANY TRANSACTION TO AVICTOR;
+      GRANT UNLIMITED TABLESPACE TO AVICTOR;
+
+      ALTER USER AVICTOR IDENTIFIED BY secret;
+    #+END_SRC
+
+*** 登录测试
+    使用 sqlplus 测试一下连接是否成功
+    #+BEGIN_SRC shell
+      sqlplus avictor/secret@localhost/xe
+    #+END_SRC
+** 导入/导出数据
+   #+BEGIN_SRC shell
+     -- 导出所有的表
+     exp user/pass@host:port/sid full=y file=data.dmp
+
+     -- 导入所有的表
+     imp user/pass@host:port/sid full=y file=data.dmp
+   #+END_SRC
+
 ** 正则化表达式匹配
    Oracle 可以使用 ~regexp_like~ 来做正则表达式匹配
    #+BEGIN_SRC sql
