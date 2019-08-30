@@ -180,18 +180,18 @@
    - 查看/修改 SQL*Plus 的环境变量: ~SHOW/SET variablename~
 
    #+BEGIN_SRC shell
-     # 执行 file.sql 脚本后退出,
-     echo 'exit' | sqlplus -S user/pass@host:port/sid @file.sql
+     # 执行 script.sql 脚本后退出,
+     echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql
 
-     # 使用重定向执行 file.sql 脚本
-     sqlplus -S user/pass@host:port/sid < file.sql
+     # 使用重定向执行 script.sql 脚本
+     sqlplus -S user/pass@host:port/sid < script.sql
 
      # 使用重定向执行脚本并追加方式输出日志
-     sqlplus -S user/pass@host:port/sid < file.sql >> /tmp/sqlplus.log
+     sqlplus -S user/pass@host:port/sid < script.sql >> /tmp/sqlplus.log
 
      # .sql 文件后缀名不是必须的，例如下面的两句是同样效果的
-     echo 'exit' | sqlplus -S user/pass@host:port/sid @file.sql
-     echo 'exit' | sqlplus -S user/pass@host:port/sid @file
+     echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql
+     echo 'exit' | sqlplus -S user/pass@host:port/sid @script
    #+END_SRC
 
 ** SQL*Plus 使用变量
@@ -220,7 +220,19 @@
      01-FEB-98
 
      SQL>
+   #+END_SRC
 
+** 给 script.sql 中传入参数
+   在调用脚本时直接将参数写到后面，见下面的例子
+   #+BEGIN_SRC shell
+     echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql arg1 arg2
+   #+END_SRC
+
+   然后在脚本中使用 ~&1~ 引用第一个参数， ~&2~ 引用第二个参数
+   #+BEGIN_SRC sql
+     -- script.sql
+     DEFINE arg1 = &1
+     SELECT '&arg1' FROM DUAL;
    #+END_SRC
 
 * 数据库
