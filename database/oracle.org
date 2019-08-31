@@ -1014,6 +1014,48 @@
        ORDER BY USER_COL_COMMENTS.TABLE_NAME;
     #+END_SRC
 
+* PL/SQL
+** 存储过程
+   #+BEGIN_SRC sql
+     DECLARE
+       -- 定义变量
+       i INTEGER;
+     BEGIN
+       -- sqlplus 中默认输出是关闭的，可以使用下面方法开启选项
+       -- SET SERVEROUTPUT ON
+       DBMS_OUTPUT.put_line('Hello world');
+     END;
+   #+END_SRC
+** 变量
+*** 变量类型
+    - 普通变量（CHAR, VARCHAR2, DATE, NUMBER, BOOLEAN, LONG）
+    - 特殊变量（引用型变量，记录型变量）
+
+    #+BEGIN_SRC sql
+      varname varchar2(20);
+    #+END_SRC
+
+*** 变量赋值
+    - 直接赋值 ~:=~
+    - 语句赋值，使用 ~SELECT ... INTO ...~
+
+    #+BEGIN_SRC sql
+      DECLARE
+        v_name varchar(20) := ''; -- 初始化赋值
+        v_sal number;
+        v_addr varchar(200);
+      BEGIN
+        -- 直接赋值
+        v_sal := 2383;
+
+        -- 语句赋值
+        SELECT '北京市朝阳区' INTO v_addr FROM DUAL;
+
+        DBMS_OUTPUT.put_line('姓名: ' || v_name || ', 薪水: ' || v_sal || ', 地址 c: ' || v_addr);
+      END;
+    #+END_SRC
+
+
 * 一些使用场景
 
 ** 创建新的表空间以及用户
