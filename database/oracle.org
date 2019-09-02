@@ -27,12 +27,12 @@
 
 ** Ubuntu 18.04 安装数据库
    安装依赖包
-   #+BEGIN_SRC shell
+   #+BEGIN_SRC sh
      sudo apt-get install -y libaio1 libaio-dev net-tools
    #+END_SRC
 
    安装软件包
-   #+BEGIN_SRC shell
+   #+BEGIN_SRC sh
      dpkg --install /assets/oracle-xe_11.2.0-1.0_amd64.deb
    #+END_SRC
 
@@ -58,20 +58,20 @@
     3. instantclient-sqlplus-macos.x64-11.2.0.4.0.zip
 
     解压安装包
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       unzip instantclient-basic-macos.x64-11.2.0.4.0.zip
       unzip instantclient-sdk-macos.x64-11.2.0.4.0.zip
       unzip instantclient-sqlplus-macos.x64-11.2.0.4.0.zip
     #+END_SRC
 
     解压后生成一个 =instantclient_11_2= 文件夹，直接拷贝到安装的文件夹中
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       sudo mkdir -p /usr/local/java
       sudo cp -r instantclient_11_2 /usr/local/java
     #+END_SRC
 
     建立软连接
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       cd /usr/local/java/instantclient_11_2
       mkdir lib
 
@@ -83,7 +83,7 @@
     #+END_SRC
 
     添加环境变量到 .bashrc 中
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       export PATH="/usr/local/java/instantclient_11_2:$PATH"
       export DYLD_LIBRARY_PATH="/usr/local/java/instantclient_11_2/lib${DYLD_LIBRARY_PATH:+:${DYLD_LIBRARY_PATH}}"
     #+END_SRC
@@ -95,14 +95,14 @@
     3. instantclient-sqlplus-linux.x64-11.2.0.4.0.zip
 
     解压安装包
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       unzip instantclient-basic-linux.x64-11.2.0.4.0.zip
       unzip instantclient-sdk-linux.x64-11.2.0.4.0.zip
       unzip instantclient-sqlplus-linux.x64-11.2.0.4.0.zip
     #+END_SRC
 
     构建目录结构
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       [ ! -d /usr/local/java ] && mkdir -p /usr/local/java
       sudo mv instantclient_11_2 /usr/local/java
       cd /usr/local/java/instantclient_11_2
@@ -110,7 +110,7 @@
     #+END_SRC
 
     建立软连接
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       ln -s libclntsh.so.11.1 libclntsh.so
       ln -s libocci.so.11.1 libocci.so
 
@@ -124,7 +124,7 @@
     #+END_SRC
 
     添加环境变量
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       export LD_LIBRARY_PATH=/usr/local/java/instantclient_11_2/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
       export PATH=/usr/local/java/instantclient_11_2${PATH:+:${PATH}}
     #+END_SRC
@@ -190,7 +190,7 @@
 *** 添加 readline 的支持
     sqlplus 本身不支持 readline 的特性，不过可以通过安装 rlwrap 来将 readline 特性添
     加到 sqlplus 中
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       # mac
       brew install rlwrap
 
@@ -199,7 +199,7 @@
     #+END_SRC
 
     通过 rlwrap 来启动 sqlplus
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       rlwrap -c sqlplus user/pass@host/sid
     #+END_SRC
 
@@ -214,7 +214,7 @@
     - 查看/修改 SQL*Plus 的环境变量: ~SHOW/SET variablename~
 
 *** 执行 sql 脚本的方法
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       # 执行 script.sql 脚本后退出,
       echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql
 
@@ -291,7 +291,7 @@
 
 ** 给 script.sql 中传入参数
    在调用脚本时直接将参数写到后面，见下面的例子
-   #+BEGIN_SRC shell
+   #+BEGIN_SRC sh
      echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql arg1 arg2
    #+END_SRC
 
@@ -1091,7 +1091,7 @@
 ** 创建新的表空间以及用户
 *** 创建数据储存的目录
     Oracle 数据库的表空间的存储目录需要显示创建
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       mkdir -p /u01/app/oracle/oradata/XE
     #+END_SRC
 
@@ -1146,11 +1146,11 @@
 
 *** 登录测试
     使用 sqlplus 测试一下连接是否成功
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC sh
       sqlplus avictor/secret@localhost/xe
     #+END_SRC
 ** 导入/导出数据
-   #+BEGIN_SRC shell
+   #+BEGIN_SRC sh
      -- 导出所有的表
      exp user/pass@host:port/sid full=y file=data.dmp
 
@@ -1297,7 +1297,7 @@
    #+END_SRC
 
    根据服务器的编码格式来修改客户端的编码格式
-   #+BEGIN_SRC shell
+   #+BEGIN_SRC sh
      # 将客户端修改成英文的 Unicode 码
      export NLS_LANG="AMERICAN_AMERICA.AL32UTF8"
 
@@ -1307,7 +1307,7 @@
 
 ** ORA-21561: OID generation failed
    数据库的主机名解析错误
-   #+BEGIN_SRC shell
+   #+BEGIN_SRC sh
      $ hostname
      Jesenia.local
      $ ping Jesenia.local
@@ -1325,6 +1325,6 @@
    #+END_SRC
 
    在 hosts 文件结尾追加当前主机的解析地址即可
-   #+BEGIN_SRC shell
+   #+BEGIN_SRC sh
      sudo echo "127.0.0.1 $(hostname)" >> /etc/hosts
    #+END_SRC
