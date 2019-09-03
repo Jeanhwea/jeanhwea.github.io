@@ -26,6 +26,27 @@
 
     [[file:../static/image/2019/09/oracle-instance-and-database.png]]
 
+*** 数据存储结构
+    数据存可以分成物理存储好逻辑存储两个部分
+**** 物理存储结构
+     当执行 ~CREATE DATABASE~ 时，下面的文件将被创建
+     - Data files 包含所有的数据库的数据，数据的逻辑结构例如表、索引都是存储在 Data files
+     - Control files 包含物理结构的一些元信息，例如：数据库名称和数据库文件的路径
+     - Online redo log files 包含 redo 的日志文件，每个 redo log 由一系列的 redo
+       entires (也被称为 redo records)组成
+     - 还一些其他的物理文件 例如：parameter files, diagnostic files, backup
+       files, archived redo log files 等
+
+**** 逻辑存储结构
+     逻辑结构是存储在一系列 data blocks 中
+     - Data blocks 由定长字节的文件组成的二进制文件
+     - Extents 由定长的逻辑连续 Data blocks 构成。Extends 一次性分配，用来存储特
+       定类型的信息
+     - Segments 由一系列的 Extents 构成，可以对应一些用户的对象，例如：表、索引、
+       undo data 和 temporary data
+     - Tablespace 一个 Database 被分成多个逻辑的 Tablespace 单元。Tablespace 是
+       Segments 的逻辑容器。 *每个 Tablespace 至少有一个 Data file 构成*
+
 ** 数据库基本知识
 *** SQL 语句的分类
     - DML 语句（数据库操作语言）： INSERT/UPDATE/DETETE/MERGE
