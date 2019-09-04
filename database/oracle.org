@@ -47,6 +47,26 @@
      - Tablespace 一个 Database 被分成多个逻辑的 Tablespace 单元。Tablespace 是
        Segments 的逻辑容器。 *每个 Tablespace 至少有一个 Data file 构成*
 
+*** 数据库实例结构
+    数据库实例是使用内存数据结构和进程来管理数据库，当应用需要连接数据库时，它将
+    会首先连接到一个数据库实例中
+
+**** Oracle 数据进程
+     Oracle 数据库在启动时会启动一系列的数据库实例
+     - client processes 用来运行软件或 Oracle 工具，大部分运行环境是在不同电脑上
+     - background processes 用来处理多个 Oracle 数据库程序，可以进行异步 I/O 或
+       者监控其它 Oracle 数据库。
+     - server processes 和 client processes 与 Oracle 数据库交互，用来完成处理请
+       求
+     Oracle processes 包括 server processes 和 background processes。大多数情况
+     下， Oracle processes 和 client processes 运行在不同电脑中。
+
+**** 实例内存结构
+     - SGA 是包含一个数据库实例的数据和控制信息的一组共享内存的。例如：SGA 包含
+       cached data blocks 和 shared SQL area
+     - PGA 是包含一个 background processes 和 server processes 实例的数据和控制
+       信息的一组内存区域
+
 ** 数据库基本知识
 *** SQL 语句的分类
     - DML 语句（数据库操作语言）： INSERT/UPDATE/DETETE/MERGE
