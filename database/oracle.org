@@ -1228,13 +1228,45 @@
       sqlplus avictor/secret@localhost/xe
     #+END_SRC
 ** 导入/导出数据
-   #+BEGIN_SRC sh
-     -- 导出所有的表
-     exp user/pass@host:port/sid full=y file=data.dmp
+*** 导出全部数据库
+    如果两个数据库的磁盘的物理路径都是相同的，可以指定 ~full=y~ 的方式导入所有的
+    数据库，这种方式导出的表空间会绑定到磁盘上存储的 Datafile 路径
+    #+BEGIN_SRC sh
+      -- 导出所有的表
+      exp user/pass@host:port/sid full=y file=data.dmp
 
-     -- 导入所有的表
-     imp user/pass@host:port/sid full=y file=data.dmp
-   #+END_SRC
+      -- 导入所有的表
+      imp user/pass@host:port/sid full=y file=data.dmp
+    #+END_SRC
+
+*** 导出用户的数据库
+    如果要导出某个特定用户的所有数据库，这种方式导出的数据库的表空间文件不会绑定
+    到磁盘存储的物理位置，使用下面命令可以查看所有的帮忙选项
+    #+BEGIN_SRC sh
+      -- 查看帮助和可选的参数
+      exp HELP=y
+      imp HELP=y
+    #+END_SRC
+
+    最后新建一个保存参数是文件，这样使用 exp 和 imp 文件时就可以少敲一些命令，这
+    里将相关参数保存成 =options.txt=
+    #+BEGIN_SRC text
+      USERID=system/oracle@host/sid
+      FILE=data.dmp
+      GRANTS=y
+      INDEXES=y
+      CONSTRAINTS=y
+      ROWS=y
+    #+END_SRC
+
+    导入和导出命令
+    #+BEGIN_SRC sh
+      -- 导出数据库
+      exp PARFILE=options.txt LOG=export.log OWNER=owner1
+
+      -- 导入数据库
+      imp PARFILE=options.txt LOG=import.log FROMUSER=owner1 TOUSER=owner2
+    #+END_SRC
 
 ** 正则化表达式匹配
    Oracle 可以使用 ~regexp_like~ 来做正则表达式匹配
@@ -1443,7 +1475,7 @@
 
      SELECT PROPERTY_NAME, PROPERTY_VALUE, DESCRIPTION
        FROM DATABASE_PROPERTIES WHERE PROPERTY_NAME LIKE 'NLS_%';
-   #+END_SRC
+  #+END_SRC
 
 * 参考链接
   1. [[http://www.dbatoolz.com/][Vitaliy Mogilevskiy]]
