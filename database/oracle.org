@@ -1407,5 +1407,43 @@
      sudo echo "127.0.0.1 $(hostname)" >> /etc/hosts
    #+END_SRC
 
+** 将服务器字符集从 UTF8 强转成 GBK
+   修改数据库字符集最好放在在安装数据库的最初阶段，如果修改一个已经运行的数据库
+   可能会发生一些不可预料的错误
+   #+BEGIN_SRC sql
+     -- 本操作必须使用 DBA 权限
+     CONNECT SYS/oracle AS SYSDBA;
+
+     -- 关闭连接断开所有已经建立的链接
+     SHUTDOWN IMMEDIATE;
+     STARTUP MOUNT;
+
+     -- 预先设置处理工作
+     ALTER SYSTEM ENABLE RESTRICTED SESSION;
+     ALTER SYSTEM SET JOB_QUEUE_PROCESSES=0;
+     ALTER SYSTEM SET AQ_TM_PROCESSES=0;
+     ALTER DATABASE OPEN;
+
+     -- ALTER DATABASE CHARACTER SET ZHS16GBK ;
+     -- *ERROR at line 1:
+     -- ORA-12712: new character set must be a superset of old character set
+     -- 报字符集不兼容，此时下 INTERNAL_USE 指令不对字符集超集进行检查：
+     ALTER DATABASE CHARACTER SET INTERNAL_USE ZHS16GBK;
+
+     -- 重启数据库
+     SHUTDOWN IMMEDIATE;
+     STARTUP;
+   #+END_SRC
+
+   查看当前数据库的字符集
+   #+BEGIN_SRC sql
+     COLUMN PROPERTY_NAME FORMAT A32 HEADING 'Name';
+     COLUMN PROPERTY_VALUE FORMAT A32 HEADING 'Value';
+     COLUMN DESCRIPTION FORMAT A80 HEADING 'Description' TRUNCATE;
+
+     SELECT PROPERTY_NAME, PROPERTY_VALUE, DESCRIPTION
+       FROM DATABASE_PROPERTIES WHERE PROPERTY_NAME LIKE 'NLS_%';
+   #+END_SRC
+
 * 参考链接
   1. [[http://www.dbatoolz.com/][Vitaliy Mogilevskiy]]
