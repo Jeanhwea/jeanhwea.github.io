@@ -1415,30 +1415,6 @@
      export NLS_LANG="SIMPLIFIED CHINESE_CHINA.AL32UTF8"
    #+END_SRC
 
-** ORA-21561: OID generation failed
-   数据库的主机名解析错误
-   #+BEGIN_SRC sh
-     $ hostname
-     Jesenia.local
-     $ ping Jesenia.local
-     ping: cannot resolve Jesenia.local: Unknown host
-     $ cat /etc/hosts
-     ##
-     # Host Database
-     #
-     # localhost is used to configure the loopback interface
-     # when the system is booting.  Do not change this entry.
-     ##
-     127.0.0.1	localhost
-     255.255.255.255	broadcasthost
-     ::1             localhost
-   #+END_SRC
-
-   在 hosts 文件结尾追加当前主机的解析地址即可
-   #+BEGIN_SRC sh
-     sudo echo "127.0.0.1 $(hostname)" >> /etc/hosts
-   #+END_SRC
-
 ** 将服务器字符集从 UTF8 强转成 GBK
    修改数据库字符集最好放在在安装数据库的最初阶段，如果修改一个已经运行的数据库
    可能会发生一些不可预料的错误
@@ -1497,6 +1473,30 @@
    #+END_SRC
 
    查了一下在不动数据库的前提下解决这种问题最好方法是： *将导出客户端换成 10g*
+
+** ORA-21561: OID generation failed
+   数据库的主机名解析错误
+   #+BEGIN_SRC sh
+     $ hostname
+     Jesenia.local
+     $ ping Jesenia.local
+     ping: cannot resolve Jesenia.local: Unknown host
+     $ cat /etc/hosts
+     ##
+     # Host Database
+     #
+     # localhost is used to configure the loopback interface
+     # when the system is booting.  Do not change this entry.
+     ##
+     127.0.0.1	localhost
+     255.255.255.255	broadcasthost
+     ::1             localhost
+   #+END_SRC
+
+   在 hosts 文件结尾追加当前主机的解析地址即可
+   #+BEGIN_SRC sh
+     sudo echo "127.0.0.1 $(hostname)" >> /etc/hosts
+   #+END_SRC
 
 * 参考链接
   1. [[http://www.dbatoolz.com/][Vitaliy Mogilevskiy]]
