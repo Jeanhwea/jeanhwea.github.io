@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-09-12 Thu 06:03 -->
+<!-- 2019-09-12 Thu 21:43 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>解决解压 zip 压缩包中的中文文字乱码</title>
@@ -238,15 +238,16 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org2ef0a5c">1. 问题</a></li>
-<li><a href="#org148b647">2. 解决方法</a></li>
+<li><a href="#orgdfdf850">1. 问题</a></li>
+<li><a href="#orgbbbcfc7">2. 解决方法</a></li>
+<li><a href="#org13f98e6">3. 更多用法</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org2ef0a5c" class="outline-2">
-<h2 id="org2ef0a5c"><span class="section-number-2">1</span> 问题</h2>
+<div id="outline-container-orgdfdf850" class="outline-2">
+<h2 id="orgdfdf850"><span class="section-number-2">1</span> 问题</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 别人给发的 Windows 下压缩的 zip 包在 Mac 下解压出来的往往是乱码的，大概如下图所示
@@ -260,8 +261,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org148b647" class="outline-2">
-<h2 id="org148b647"><span class="section-number-2">2</span> 解决方法</h2>
+<div id="outline-container-orgbbbcfc7" class="outline-2">
+<h2 id="orgbbbcfc7"><span class="section-number-2">2</span> 解决方法</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 分析可能是 Windows 默认使用 GBK 编码，到 Mac 下不认，所以安装 unar 工具，使用 GBK 方式
@@ -278,9 +279,59 @@ unar -e GBK data.zip
 </div>
 </div>
 </div>
+
+<div id="outline-container-org13f98e6" class="outline-2">
+<h2 id="org13f98e6"><span class="section-number-2">3</span> 更多用法</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+当然 unar 也可以在 Ubuntu 上安装
+</p>
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">Linux &#23433;&#35013;</span>
+sudo apt-get install unar
+</pre>
+</div>
+
+<p>
+列出压缩包内容
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">lsar data.zip
+</pre>
+</div>
+
+<p>
+指定解压结果保存的位置
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">unar document.zip -o /home/dir/
+</pre>
+</div>
+
+<p>
+指定解压密码
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">unar -p 123456 document.zip
+</pre>
+</div>
+
+<p>
+解决 linux 解压压缩包中文文件名乱码问题
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">lsar document.zip
+<span style="color: #586e75; font-style: italic;">###</span><span style="color: #586e75; font-style: italic;">&#33509;&#21457;&#29616;&#20081;&#30721;&#65292;&#21487;&#25351;&#23450;&#21387;&#32553;&#21253;&#25991;&#20214;&#21517;&#20351;&#29992;&#30340;&#32534;&#30721;&#26684;&#24335;##</span>
+lsar -e GB18030 document.zip
+<span style="color: #586e75; font-style: italic;">###</span><span style="color: #586e75; font-style: italic;">&#33509;&#33021;&#27491;&#24120;&#21015;&#20986;&#25991;&#20214;&#21517;&#65292;&#21487;&#35299;&#21387;###</span>
+unar -e GB18030 document.zip
+</pre>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-09-12 Thu 06:03. Created by Jinghui Hu at 2019-09-12 Thu 05:56.</p>
+<p class="author">Last Updated 2019-09-12 Thu 21:43. Created by Jinghui Hu at 2019-09-12 Thu 05:56.</p>
 </div>
 </body>
 </html>
