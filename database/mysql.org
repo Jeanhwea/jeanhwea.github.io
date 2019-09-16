@@ -1758,14 +1758,26 @@
       mysqldump -u user -p pass -B dbname1 dbname2 > /tmp/out.sql # 导出多数据库
     #+END_SRC
 *** 导入数据
+    导入数据时先建用户和数据库
+    #+BEGIN_SRC sql
+      -- 新建数据库
+      CREATE DATABASE dbname DEFAULT CHARACTER SET utf8;
+      -- 新建用户并添加权限
+      GRANT ALL PRIVILEGES ON dbname.* TO 'username'@'%' IDENTIFIED BY 'password';
+      -- mysql 需要显示刷新权限
+      FLUSH PRIVILEGES;
+    #+END_SRC
+
     在 MySQL 命令行里面使用 source 导入数据
     #+BEGIN_SRC sql
       source out.sql
     #+END_SRC
+
     在 shell 可以使用非交互式命令导入
     #+BEGIN_SRC sh
       mysql -u user -p pass dbname < out.sql
     #+END_SRC
+
 * 内置函数
 ** 数值函数
    - ~abs(x)~ : 绝对值 abs(-10.9) = 10
