@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-08-24 Sat 22:38 -->
+<!-- 2019-09-18 Wed 00:37 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Linux 三剑客: sed, awk 和 shell</title>
+<title>shell 编程</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="Jinghui Hu" />
 <style type="text/css">
@@ -233,148 +233,63 @@ for the JavaScript code in this tag.
  |
  <a accesskey="H" href="../index.html"> HOME </a>
 </div><div id="content">
-<h1 class="title">Linux 三剑客: sed, awk 和 shell</h1>
+<h1 class="title">shell 编程</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org7a21118">1. sed</a></li>
-<li><a href="#orgb9b8d15">2. awk</a></li>
-<li><a href="#org8f6a013">3. shell</a>
+<li><a href="#orgdddd882">1. shell</a>
 <ul>
-<li><a href="#org48176cd">3.1. 基本</a>
+<li><a href="#org84f0d7b">1.1. 基本</a>
 <ul>
-<li><a href="#org424f3ec">3.1.1. 查看 Bash 的文档</a></li>
-<li><a href="#org3b70a58">3.1.2. 查看定义的变量</a></li>
-<li><a href="#org2ee013b">3.1.3. 查看命令和使用帮助</a></li>
+<li><a href="#orgb1cb4f3">1.1.1. 查看 Bash 的文档</a></li>
+<li><a href="#org314b0fb">1.1.2. 查看定义的变量</a></li>
+<li><a href="#orgd2ac70f">1.1.3. 查看命令和使用帮助</a></li>
 </ul>
 </li>
-<li><a href="#org3cc0572">3.2. 变量</a></li>
-<li><a href="#org84acf19">3.3. 数组</a></li>
-<li><a href="#org8a57a60">3.4. 事件指示符</a></li>
-<li><a href="#orgce423f8">3.5. 函数</a></li>
-<li><a href="#orgf264cc4">3.6. 条件判断</a></li>
-<li><a href="#orgcd54bc6">3.7. 控制流</a></li>
-<li><a href="#org82ce6ef">3.8. 重定向</a></li>
-<li><a href="#org240ea21">3.9. 文本处理</a></li>
-<li><a href="#orge1f56ee">3.10. 文本排序</a></li>
+<li><a href="#orga948565">1.2. 变量</a></li>
+<li><a href="#org72718be">1.3. 数组</a></li>
+<li><a href="#orga988985">1.4. 事件指示符</a></li>
+<li><a href="#orge4aebce">1.5. 函数</a></li>
+<li><a href="#org4f7cf5e">1.6. 条件判断</a></li>
+<li><a href="#org1769023">1.7. 控制流</a></li>
+<li><a href="#org22c6112">1.8. 重定向</a></li>
 </ul>
 </li>
-<li><a href="#org5b714cc">4. link</a></li>
+<li><a href="#org8011553">2. link</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org7a21118" class="outline-2">
-<h2 id="org7a21118"><span class="section-number-2">1</span> sed</h2>
+<div id="outline-container-orgdddd882" class="outline-2">
+<h2 id="orgdddd882"><span class="section-number-2">1</span> shell</h2>
 <div class="outline-text-2" id="text-1">
-<p>
-sed 是 Linux 下著名的行编辑器
-</p>
-<div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#20013;&#39318;&#27425;&#20986;&#29616;&#30340;&#23383;&#31526;&#20018;&#24182;&#36755;&#20986;&#32467;&#26524;</span>
-sed <span style="color: #2aa198;">'s/find/replace/'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#31532; 10 &#34892;&#20869;&#23481;</span>
-sed <span style="color: #2aa198;">'10s/find/replace/'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#20013; 10-20 &#34892;&#20869;&#23481;</span>
-sed <span style="color: #2aa198;">'10,20s/find/replace/'</span> file
-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#20013;&#25152;&#26377;&#20986;&#29616;&#30340;&#23383;&#31526;&#20018;</span>
-sed -r <span style="color: #2aa198;">'s/regex/replace/g'</span> file
-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26367;&#25442;&#25991;&#20214;&#20013;&#25152;&#26377;&#20986;&#29616;&#30340;&#23383;&#31526;&#24182;&#19988;&#35206;&#30422;&#25991;&#20214;</span>
-sed -i <span style="color: #2aa198;">'s/find/replace/g'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22312;&#25991;&#20214;&#30340;&#21305;&#37197;&#25991;&#26412;&#21069;&#25554;&#20837;&#34892;</span>
-sed -i <span style="color: #2aa198;">'/find/i\newline'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22312;&#25991;&#20214;&#30340;&#21305;&#37197;&#25991;&#26412;&#21518;&#25554;&#20837;&#34892;</span>
-sed -i <span style="color: #2aa198;">'/find/a\newline'</span> file
-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20808;&#25628;&#32034;&#34892;&#29305;&#24449;&#20877;&#25191;&#34892;&#26367;&#25442;</span>
-sed <span style="color: #2aa198;">'/line/s/find/replace/'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25191;&#34892;&#22810;&#27425;&#26367;&#25442;</span>
-sed -e <span style="color: #2aa198;">'s/f/r/'</span> -e <span style="color: #2aa198;">'s/f/r'</span> file
-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20351;&#29992; # &#26367;&#25442; / &#26469;&#36991;&#20813; pattern &#20013;&#26377;&#26012;&#26438;</span>
-sed <span style="color: #2aa198;">'s#find#replace#'</span> file
-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21024;&#38500;&#25991;&#20214;&#27599;&#34892;&#22836;&#37096;&#31354;&#26684;</span>
-sed -i -r <span style="color: #2aa198;">'s/^\s+//g'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21024;&#38500;&#25991;&#20214;&#31354;&#34892;&#24182;&#25171;&#21360;</span>
-sed <span style="color: #2aa198;">'/^$/d'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21024;&#38500;&#25991;&#20214;&#27599;&#34892;&#26411;&#23614;&#22810;&#20313;&#31354;&#26684;</span>
-sed -i <span style="color: #2aa198;">'s/\s\+$//'</span> file
-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#25991;&#20214;&#31532;&#20108;&#34892;</span>
-sed -n <span style="color: #2aa198;">'2p'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#25991;&#20214;&#31532;&#20108;&#21040;&#31532;&#20116;&#34892;</span>
-sed -n <span style="color: #2aa198;">'2,5p'</span> file
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-orgb9b8d15" class="outline-2">
-<h2 id="orgb9b8d15"><span class="section-number-2">2</span> awk</h2>
-<div class="outline-text-2" id="text-2">
-<p>
-awk 一般用于文本预处理，并且支持编程
-</p>
-<div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">-F &#36873;&#39033;&#25351;&#23450;&#20998;&#38548;&#31526;, &#40664;&#35748;&#20197;&#31354;&#26684;&#20998;&#38548;</span>
-awk -F <span style="color: #2aa198;">':'</span> <span style="color: #2aa198;">'{print $1}'</span> file
-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20351;&#29992;&#27491;&#21017;&#34920;&#36798;&#24335;&#21305;&#37197;&#36807;&#28388;&#32467;&#26524;</span>
-awk <span style="color: #2aa198;">'/reg/ {print $5}'</span> file
-awk <span style="color: #2aa198;">'$1 ~ /reg/ {print $5}'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#29992;&#25143;&#21517;&#20197; b &#24320;&#22836;&#30340;&#29992;&#25143;&#21517;</span>
-awk -F <span style="color: #2aa198;">':'</span> <span style="color: #2aa198;">' $1 ~ /^b/ {print $1}'</span> /etc/passwd
-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#25991;&#20214;&#20013;&#20197;&#31354;&#26684;&#20998;&#38548;&#30340;&#31532;&#20116;&#21015;</span>
-awk <span style="color: #2aa198;">'{print $5}'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#25991;&#20214;&#20013;&#20197;&#36887;&#21495;&#20998;&#38548;&#30340;&#31532;&#20116;&#21015;</span>
-awk -F <span style="color: #2aa198;">','</span> <span style="color: #2aa198;">'{print $5}'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#25991;&#20214;&#20013;&#21253;&#21547; str &#30340;&#25152;&#26377;&#34892;&#30340;&#31532;&#20108;&#21015;</span>
-awk <span style="color: #2aa198;">'/str/ {print $2}'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#36887;&#21495;&#20998;&#38548;&#30340;&#25991;&#20214;&#20013;&#30340;&#27599;&#34892;&#26368;&#21518;&#19968;&#21015;</span>
-awk -F <span style="color: #2aa198;">','</span> <span style="color: #2aa198;">'{print $NF}'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#35745;&#31639;&#25152;&#26377;&#31532;&#19968;&#21015;&#30340;&#21644;</span>
-awk <span style="color: #2aa198;">'{s+=$1} END {print s}'</span> file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20174;&#31532;&#19968;&#34892;&#24320;&#22987;&#65292;&#27599;&#38548;&#19977;&#34892;&#25171;&#21360;&#19968;&#34892;</span>
-awk <span style="color: #2aa198;">'NR%3==1'</span> file
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org8f6a013" class="outline-2">
-<h2 id="org8f6a013"><span class="section-number-2">3</span> shell</h2>
-<div class="outline-text-2" id="text-3">
 <p>
 shell 时 Linux 中的交互环境，常见的 shell 有 sh, bash, zsh, fish 等。zsh 是比
 较受欢迎的, 服务器端一般默认使用 bash, 这里基本上介绍 bash 脚本的一些知识
 </p>
 </div>
 
-<div id="outline-container-org48176cd" class="outline-3">
-<h3 id="org48176cd"><span class="section-number-3">3.1</span> 基本</h3>
-<div class="outline-text-3" id="text-3-1">
+<div id="outline-container-org84f0d7b" class="outline-3">
+<h3 id="org84f0d7b"><span class="section-number-3">1.1</span> 基本</h3>
+<div class="outline-text-3" id="text-1-1">
 </div>
-<div id="outline-container-org424f3ec" class="outline-4">
-<h4 id="org424f3ec"><span class="section-number-4">3.1.1</span> 查看 Bash 的文档</h4>
-<div class="outline-text-4" id="text-3-1-1">
+<div id="outline-container-orgb1cb4f3" class="outline-4">
+<h4 id="orgb1cb4f3"><span class="section-number-4">1.1.1</span> 查看 Bash 的文档</h4>
+<div class="outline-text-4" id="text-1-1-1">
 <div class="org-src-container">
-<pre class="src src-shell">man bash
+<pre class="src src-sh">man bash
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org3b70a58" class="outline-4">
-<h4 id="org3b70a58"><span class="section-number-4">3.1.2</span> 查看定义的变量</h4>
-<div class="outline-text-4" id="text-3-1-2">
+<div id="outline-container-org314b0fb" class="outline-4">
+<h4 id="org314b0fb"><span class="section-number-4">1.1.2</span> 查看定义的变量</h4>
+<div class="outline-text-4" id="text-1-1-2">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#25968;&#32452;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#25968;&#32452;</span>
 <span style="color: #6c71c4;">declare</span> -a
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#20989;&#25968;</span>
 <span style="color: #6c71c4;">declare</span> -f
@@ -393,11 +308,11 @@ shell 时 Linux 中的交互环境，常见的 shell 有 sh, bash, zsh, fish 等
 </div>
 </div>
 
-<div id="outline-container-org2ee013b" class="outline-4">
-<h4 id="org2ee013b"><span class="section-number-4">3.1.3</span> 查看命令和使用帮助</h4>
-<div class="outline-text-4" id="text-3-1-3">
+<div id="outline-container-orgd2ac70f" class="outline-4">
+<h4 id="orgd2ac70f"><span class="section-number-4">1.1.3</span> 查看命令和使用帮助</h4>
+<div class="outline-text-4" id="text-1-1-3">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24573;&#30053; alias &#30452;&#25509;&#25191;&#34892;&#31243;&#24207;&#25110;&#32773;&#20869;&#24314;&#21629;&#20196; ls</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24573;&#30053; alias &#30452;&#25509;&#25191;&#34892;&#31243;&#24207;&#25110;&#32773;&#20869;&#24314;&#21629;&#20196; ls</span>
 command ls
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24573;&#30053; alias &#30452;&#25509;&#36816;&#34892;&#20869;&#24314;&#30340; cd &#21629;&#20196;</span>
 <span style="color: #6c71c4;">builtin</span> cd
@@ -414,11 +329,11 @@ help {builtin_command}
 </div>
 </div>
 
-<div id="outline-container-org3cc0572" class="outline-3">
-<h3 id="org3cc0572"><span class="section-number-3">3.2</span> 变量</h3>
-<div class="outline-text-3" id="text-3-2">
+<div id="outline-container-orga948565" class="outline-3">
+<h3 id="orga948565"><span class="section-number-3">1.2</span> 变量</h3>
+<div class="outline-text-3" id="text-1-2">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#21464;&#37327;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#21464;&#37327;</span>
 <span style="color: #6c71c4;">var</span>=value
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#21464;&#37327;&#65292;&#24182;&#22312;&#23376;&#36827;&#31243;&#20013;&#20351;&#29992;&#21464;&#37327;</span>
 <span style="color: #6c71c4;">var</span>=value command
@@ -441,7 +356,7 @@ help {builtin_command}
 变它的值，是编写 bash 脚本的常用技巧
 </p>
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#36820;&#22238;&#21464;&#37327;&#30340;&#20540;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#36820;&#22238;&#21464;&#37327;&#30340;&#20540;</span>
 ${<span style="color: #6c71c4;">var</span>}
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524; var &#19981;&#20026;&#31354;&#65292;&#36820;&#22238;&#21464;&#37327;&#20540;&#65307;&#21542;&#21017;&#65292;&#36820;&#22238; word</span>
 ${<span style="color: #6c71c4;">var</span>:-word}
@@ -501,7 +416,7 @@ ${<span style="color: #6c71c4;">var</span>//pattern/str}
 用 expr 命令来进行计算
 </p>
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20860;&#23481; posix sh &#30340;&#35745;&#31639;&#65292;&#20351;&#29992; expr &#21629;&#20196;&#35745;&#31639;&#32467;&#26524;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20860;&#23481; posix sh &#30340;&#35745;&#31639;&#65292;&#20351;&#29992; expr &#21629;&#20196;&#35745;&#31639;&#32467;&#26524;</span>
 <span style="color: #6c71c4;">num</span>=$(expr 1 + 2)
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25968;&#23383;&#33258;&#22686;</span>
 <span style="color: #6c71c4;">num</span>=$(expr $<span style="color: #6c71c4;">num</span> + 1)
@@ -521,11 +436,11 @@ expr 2 <span style="color: #2aa198;">\*</span> <span style="color: #2aa198;">\(<
 </div>
 </div>
 
-<div id="outline-container-org84acf19" class="outline-3">
-<h3 id="org84acf19"><span class="section-number-3">3.3</span> 数组</h3>
-<div class="outline-text-3" id="text-3-3">
+<div id="outline-container-org72718be" class="outline-3">
+<h3 id="org72718be"><span class="section-number-3">1.3</span> 数组</h3>
+<div class="outline-text-3" id="text-1-3">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#25968;&#32452;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#25968;&#32452;</span>
 <span style="color: #6c71c4;">array</span>[0]=valA
 <span style="color: #6c71c4;">array</span>[1]=valB
 <span style="color: #6c71c4;">array</span>[2]=valC
@@ -558,11 +473,11 @@ ${#<span style="color: #6c71c4;">array</span>[i]}
 </div>
 </div>
 
-<div id="outline-container-org8a57a60" class="outline-3">
-<h3 id="org8a57a60"><span class="section-number-3">3.4</span> 事件指示符</h3>
-<div class="outline-text-3" id="text-3-4">
+<div id="outline-container-orga988985" class="outline-3">
+<h3 id="orga988985"><span class="section-number-3">1.4</span> 事件指示符</h3>
+<div class="outline-text-3" id="text-1-4">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#19978;&#19968;&#26465;&#21629;&#20196;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#19978;&#19968;&#26465;&#21629;&#20196;</span>
 <span style="color: #268bd2;">!</span>!
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#19978;&#19968;&#26465;&#21629;&#20196;&#30340;&#31532;&#19968;&#20010;&#21333;&#35789;</span>
 <span style="color: #268bd2;">!</span>^
@@ -579,11 +494,11 @@ ${#<span style="color: #6c71c4;">array</span>[i]}
 </div>
 </div>
 
-<div id="outline-container-orgce423f8" class="outline-3">
-<h3 id="orgce423f8"><span class="section-number-3">3.5</span> 函数</h3>
-<div class="outline-text-3" id="text-3-5">
+<div id="outline-container-orge4aebce" class="outline-3">
+<h3 id="orge4aebce"><span class="section-number-3">1.5</span> 函数</h3>
+<div class="outline-text-3" id="text-1-5">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#19968;&#20010;&#26032;&#20989;&#25968;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23450;&#20041;&#19968;&#20010;&#26032;&#20989;&#25968;</span>
 <span style="color: #859900;">function</span> <span style="color: #b58900;">myfunc</span>() {
   <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">$1 &#20195;&#34920;&#31532;&#19968;&#20010;&#21442;&#25968;&#65292;$N &#20195;&#34920;&#31532; N &#20010;&#21442;&#25968;</span>
   <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">$# &#20195;&#34920;&#21442;&#25968;&#20010;&#25968;</span>
@@ -613,15 +528,15 @@ myfunc <span style="color: #2aa198;">"${array[@]}"</span>
 </div>
 </div>
 
-<div id="outline-container-orgf264cc4" class="outline-3">
-<h3 id="orgf264cc4"><span class="section-number-3">3.6</span> 条件判断</h3>
-<div class="outline-text-3" id="text-3-6">
+<div id="outline-container-org4f7cf5e" class="outline-3">
+<h3 id="org4f7cf5e"><span class="section-number-3">1.6</span> 条件判断</h3>
+<div class="outline-text-3" id="text-1-6">
 <p>
 在 shell 编程中往往需要进行条件判断，即 test。可以通过 <code>man test</code> 来查看条件
 判断的相关说明
 </p>
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#27979;&#35797;&#26465;&#20214;&#65292;&#24403;&#20351;&#29992;&#26041;&#25324;&#21495;&#26159;&#27880;&#24847;&#31354;&#26684;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#27979;&#35797;&#26465;&#20214;&#65292;&#24403;&#20351;&#29992;&#26041;&#25324;&#21495;&#26159;&#27880;&#24847;&#31354;&#26684;</span>
 test expr
 [ expr ]
 
@@ -702,11 +617,11 @@ num1 -ge num2
 </div>
 </div>
 
-<div id="outline-container-orgcd54bc6" class="outline-3">
-<h3 id="orgcd54bc6"><span class="section-number-3">3.7</span> 控制流</h3>
-<div class="outline-text-3" id="text-3-7">
+<div id="outline-container-org1769023" class="outline-3">
+<h3 id="org1769023"><span class="section-number-3">1.7</span> 控制流</h3>
+<div class="outline-text-3" id="text-1-7">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#36820;&#22238;&#20540; echo $? &#26174;&#31034; 1&#65292;&#22240;&#20026;&#26465;&#20214;&#20026;&#20551;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#36820;&#22238;&#20540; echo $? &#26174;&#31034; 1&#65292;&#22240;&#20026;&#26465;&#20214;&#20026;&#20551;</span>
 test <span style="color: #2aa198;">"abc"</span> = <span style="color: #2aa198;">"def"</span>
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#36820;&#22238;&#20540; echo $? &#26174;&#31034; 0&#65292;&#22240;&#20026;&#26465;&#20214;&#20026;&#30495;</span>
 test <span style="color: #2aa198;">"abc"</span> != <span style="color: #2aa198;">"def"</span>
@@ -806,11 +721,11 @@ https://www.ibm.com/developerworks/library/l-bash-test/index.html
 </div>
 </div>
 
-<div id="outline-container-org82ce6ef" class="outline-3">
-<h3 id="org82ce6ef"><span class="section-number-3">3.8</span> 重定向</h3>
-<div class="outline-text-3" id="text-3-8">
+<div id="outline-container-org22c6112" class="outline-3">
+<h3 id="org22c6112"><span class="section-number-3">1.8</span> 重定向</h3>
+<div class="outline-text-3" id="text-1-8">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#31649;&#36947;&#65292;cmd1 &#30340;&#26631;&#20934;&#36755;&#20986;&#25509;&#21040; cmd2 &#30340;&#26631;&#20934;&#36755;&#20837;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#31649;&#36947;&#65292;cmd1 &#30340;&#26631;&#20934;&#36755;&#20986;&#25509;&#21040; cmd2 &#30340;&#26631;&#20934;&#36755;&#20837;</span>
 cmd1 | cmd2
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#25991;&#20214;&#20869;&#23481;&#37325;&#23450;&#21521;&#20026;&#21629;&#20196;&#30340;&#26631;&#20934;&#36755;&#20837;</span>
 &lt; file
@@ -854,63 +769,11 @@ diff &lt;(cmd1) &lt;(cmd2)
 </div>
 </div>
 </div>
-
-<div id="outline-container-org240ea21" class="outline-3">
-<h3 id="org240ea21"><span class="section-number-3">3.9</span> 文本处理</h3>
-<div class="outline-text-3" id="text-3-9">
-<p>
-简单的文本处理使用 tr/cut/paste 等，复杂的文本处理使用 sed/awk
-</p>
-<div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#27599;&#34892;&#22836; 16 &#20010;&#23383;&#31526;</span>
-cut -c 1-16
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#25351;&#23450;&#25991;&#20214;&#20013;&#27599;&#34892;&#22836; 16 &#20010;&#23383;&#31526;</span>
-cut -c 1-16 file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#27599;&#34892;&#20174;&#31532;&#19977;&#20010;&#23383;&#31526;&#24320;&#22987;&#21040;&#34892;&#26411;&#30340;&#20869;&#23481;</span>
-cut -c3-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#29992;&#20882;&#21495;&#20998;&#38548;&#30340;&#31532;&#20116;&#21015;&#20869;&#23481;</span>
-cut -d<span style="color: #2aa198;">':'</span> -f5
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#29992;&#20998;&#21495;&#20998;&#38548;&#30340;&#31532;&#20108;&#21644;&#31532;&#21313;&#21015;&#20869;&#23481;</span>
-cut -d<span style="color: #2aa198;">';'</span> -f2,10
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25130;&#21462;&#31354;&#26684;&#20998;&#38548;&#30340;&#19977;&#21040;&#19971;&#21015;</span>
-cut -d<span style="color: #2aa198;">' '</span> -f3-7
-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26174;&#31034; hel</span>
-<span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"hello"</span> | cut -c1-3
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26174;&#31034; sir</span>
-<span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">"hello sir"</span> | cut -d<span style="color: #2aa198;">' '</span> -f2
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">cut &#25645;&#37197; tr &#21387;&#32553;&#23383;&#31526;</span>
-ps | tr -s <span style="color: #2aa198;">" "</span> | cut -d <span style="color: #2aa198;">" "</span> -f 2,3,4
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360; PATH &#21464;&#37327;</span>
-<span style="color: #6c71c4;">echo</span> $<span style="color: #6c71c4;">PATH</span> | tr : <span style="color: #2aa198;">'\n'</span>
-</pre>
-</div>
-</div>
 </div>
 
-<div id="outline-container-orge1f56ee" class="outline-3">
-<h3 id="orge1f56ee"><span class="section-number-3">3.10</span> 文本排序</h3>
-<div class="outline-text-3" id="text-3-10">
-<div class="org-src-container">
-<pre class="src src-shell"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25490;&#24207;&#25991;&#20214;</span>
-sort file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21453;&#21521;&#25490;&#24207;&#65288;&#38477;&#24207;&#65289;</span>
-sort -r file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20351;&#29992;&#25968;&#23383;&#32780;&#19981;&#26159;&#23383;&#31526;&#20018;&#36827;&#34892;&#27604;&#36739;</span>
-sort -n file
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25353; passwd &#25991;&#20214;&#30340;&#31532;&#19977;&#21015;&#36827;&#34892;&#25490;&#24207;, -t &#34920;&#31034;&#20998;&#38548;&#31526;</span>
-sort -t: -k 3n /etc/passwd
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21435;&#37325;&#25490;&#24207;</span>
-sort -u file
-</pre>
-</div>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org5b714cc" class="outline-2">
-<h2 id="org5b714cc"><span class="section-number-2">4</span> link</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-org8011553" class="outline-2">
+<h2 id="org8011553"><span class="section-number-2">2</span> link</h2>
+<div class="outline-text-2" id="text-2">
 <ol class="org-ol">
 <li><a href="https://github.com/skywind3000/awesome-cheatsheets/blob/master/languages/bash.sh">bash</a></li>
 </ol>
@@ -918,7 +781,7 @@ sort -u file
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-08-24 Sat 22:38. Created by Jinghui Hu at 2019-07-18 Thu 14:51.</p>
+<p class="author">Last Updated 2019-09-18 Wed 00:37. Created by Jinghui Hu at 2019-07-18 Thu 14:51.</p>
 </div>
 </body>
 </html>
