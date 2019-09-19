@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-08-18 Sun 22:41 -->
+<!-- 2019-09-19 Thu 12:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Makefile 笔记</title>
@@ -185,7 +185,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -238,25 +238,26 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org037e034">1. Makefile</a></li>
-<li><a href="#org5d7f171">2. 语法</a>
+<li><a href="#orgebab379">1. Makefile</a></li>
+<li><a href="#org6000bc2">2. 语法</a>
 <ul>
-<li><a href="#org73bdb61">2.1. 基本语法</a></li>
-<li><a href="#org353693c">2.2. 变量</a>
+<li><a href="#orgf444375">2.1. 基本语法</a></li>
+<li><a href="#orgb878103">2.2. 变量</a>
 <ul>
-<li><a href="#org7b2c411">2.2.1. 读取文件名</a></li>
+<li><a href="#orgf765053">2.2.1. 读取文件名</a></li>
+<li><a href="#org062828f">2.2.2. 覆盖变量</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org43c090b">3. 参考链接</a></li>
+<li><a href="#org2f34ca9">3. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org037e034" class="outline-2">
-<h2 id="org037e034"><span class="section-number-2">1</span> Makefile</h2>
+<div id="outline-container-orgebab379" class="outline-2">
+<h2 id="orgebab379"><span class="section-number-2">1</span> Makefile</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Makefile 是 Linux 系统中的一个比较重要的工具，通常可以用来管理软件项目的编译，
@@ -265,12 +266,12 @@ Makefile 是 Linux 系统中的一个比较重要的工具，通常可以用来�
 </div>
 </div>
 
-<div id="outline-container-org5d7f171" class="outline-2">
-<h2 id="org5d7f171"><span class="section-number-2">2</span> 语法</h2>
+<div id="outline-container-org6000bc2" class="outline-2">
+<h2 id="org6000bc2"><span class="section-number-2">2</span> 语法</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org73bdb61" class="outline-3">
-<h3 id="org73bdb61"><span class="section-number-3">2.1</span> 基本语法</h3>
+<div id="outline-container-orgf444375" class="outline-3">
+<h3 id="orgf444375"><span class="section-number-3">2.1</span> 基本语法</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 Makefile 的基本语法是由目标、依赖和命令组成，它的语法如下：
@@ -289,8 +290,8 @@ Makefile 的基本语法是由目标、依赖和命令组成，它的语法如�
 </div>
 </div>
 
-<div id="outline-container-org353693c" class="outline-3">
-<h3 id="org353693c"><span class="section-number-3">2.2</span> 变量</h3>
+<div id="outline-container-orgb878103" class="outline-3">
+<h3 id="orgb878103"><span class="section-number-3">2.2</span> 变量</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 变量定义的方法是使用一个等于号连接变量和如下：
@@ -301,8 +302,8 @@ Makefile 的基本语法是由目标、依赖和命令组成，它的语法如�
 </div>
 </div>
 
-<div id="outline-container-org7b2c411" class="outline-4">
-<h4 id="org7b2c411"><span class="section-number-4">2.2.1</span> 读取文件名</h4>
+<div id="outline-container-orgf765053" class="outline-4">
+<h4 id="orgf765053"><span class="section-number-4">2.2.1</span> 读取文件名</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <div class="org-src-container">
 <pre class="src src-makefile"><span style="color: #6c71c4;">SRCS</span> = $(<span style="color: #6c71c4;">shell</span> ls *.cc)
@@ -310,11 +311,40 @@ Makefile 的基本语法是由目标、依赖和命令组成，它的语法如�
 </div>
 </div>
 </div>
+
+<div id="outline-container-org062828f" class="outline-4">
+<h4 id="org062828f"><span class="section-number-4">2.2.2</span> 覆盖变量</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+首先在 Makefile 中定义 TEST 变量
+</p>
+<div class="org-src-container">
+<pre class="src src-makefile"><span style="color: #6c71c4;">TEST</span> = apple
+
+<span style="color: #b58900;">all</span>:
+    echo $(<span style="color: #6c71c4;">TEST</span>)
+</pre>
+</div>
+
+<p>
+在 make 命令后面可以使用 <code>VAR=value</code> 的方式可以覆盖 Makefile 里面的变量
+</p>
+<div class="org-src-container">
+<pre class="src src-text">$ make all
+echo apple
+apple
+$ make all TEST=banana
+echo banana
+banana
+</pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org43c090b" class="outline-2">
-<h2 id="org43c090b"><span class="section-number-2">3</span> 参考链接</h2>
+<div id="outline-container-org2f34ca9" class="outline-2">
+<h2 id="org2f34ca9"><span class="section-number-2">3</span> 参考链接</h2>
 <div class="outline-text-2" id="text-3">
 <ol class="org-ol">
 <li><a href="https://www.gnu.org/software/make/manual/make.html">GNU make</a></li>
@@ -323,7 +353,7 @@ Makefile 的基本语法是由目标、依赖和命令组成，它的语法如�
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-08-18 Sun 22:41. Created by Jinghui Hu at 2019-08-05 Mon 20:47.</p>
+<p class="author">Last Updated 2019-09-19 Thu 12:53. Created by Jinghui Hu at 2019-08-05 Mon 20:47.</p>
 </div>
 </body>
 </html>
