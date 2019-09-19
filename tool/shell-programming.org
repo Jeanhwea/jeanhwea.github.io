@@ -7,446 +7,445 @@
 #+TAGS: sed awk shell
 
 
-* shell
+* 基本
   shell 时 Linux 中的交互环境，常见的 shell 有 sh, bash, zsh, fish 等。zsh 是比
   较受欢迎的, 服务器端一般默认使用 bash, 这里基本上介绍 bash 脚本的一些知识
 
-** 基本
-*** 查看 Bash 的文档
-   #+BEGIN_SRC sh
-     man bash
-   #+END_SRC
+** 查看 Bash 的文档
+  #+BEGIN_SRC sh
+    man bash
+  #+END_SRC
 
-*** 查看定义的变量
-   #+BEGIN_SRC sh
-     # 查看所有数组
-     declare -a
-     # 查看所有函数
-     declare -f
-     # 查看所有函数，仅显示函数名
-     declare -F
-     # 查看所有整数
-     declare -i
-     # 查看所有只读变量
-     declare -r
-     # 查看所有被导出成环境变量的东西
-     declare -x
-     # 输出变量是怎么定义的（类型+值）
-     declare -p varname
-   #+END_SRC
+** 查看定义的变量
+  #+BEGIN_SRC sh
+    # 查看所有数组
+    declare -a
+    # 查看所有函数
+    declare -f
+    # 查看所有函数，仅显示函数名
+    declare -F
+    # 查看所有整数
+    declare -i
+    # 查看所有只读变量
+    declare -r
+    # 查看所有被导出成环境变量的东西
+    declare -x
+    # 输出变量是怎么定义的（类型+值）
+    declare -p varname
+  #+END_SRC
 
-*** 查看命令和使用帮助
-   #+BEGIN_SRC sh
-     # 忽略 alias 直接执行程序或者内建命令 ls
-     command ls
-     # 忽略 alias 直接运行内建的 cd 命令
-     builtin cd
-     # 列出所有 bash 内置命令，或禁止某命令
-     enable
-     # 查看内置命令的帮助（仅限 bash 内置命令）
-     help {builtin_command}
+** 查看命令和使用帮助
+  #+BEGIN_SRC sh
+    # 忽略 alias 直接执行程序或者内建命令 ls
+    command ls
+    # 忽略 alias 直接运行内建的 cd 命令
+    builtin cd
+    # 列出所有 bash 内置命令，或禁止某命令
+    enable
+    # 查看内置命令的帮助（仅限 bash 内置命令）
+    help {builtin_command}
 
-     # 对 script 变量中的字符串求值（执行）
-     eval $script
-   #+END_SRC
+    # 对 script 变量中的字符串求值（执行）
+    eval $script
+  #+END_SRC
 
-** 变量
-   #+BEGIN_SRC sh
-     # 定义变量
-     var=value
-     # 定义变量，并在子进程中使用变量
-     var=value command
+* 变量
+  #+BEGIN_SRC sh
+    # 定义变量
+    var=value
+    # 定义变量，并在子进程中使用变量
+    var=value command
 
-     # 查看变量的值
-     echo $var
+    # 查看变量的值
+    echo $var
 
-     # 特殊的变量
-     echo $$ # 当前 shell 的进程号
-     echo $! # 最近调用的后台任务进程
-     echo $? # 最近一次命令的返回值
+    # 特殊的变量
+    echo $$ # 当前 shell 的进程号
+    echo $! # 最近调用的后台任务进程
+    echo $? # 最近一次命令的返回值
 
-     # 添加环境变量
-     export var=value
-   #+END_SRC
+    # 添加环境变量
+    export var=value
+  #+END_SRC
 
-   参数展开（Parameter Expansion）可以根据变量的状态（是否为空、是否定义等）来改
-   变它的值，是编写 bash 脚本的常用技巧
-   #+BEGIN_SRC sh
-     # 返回变量的值
-     ${var}
-     # 如果 var 不为空，返回变量值；否则，返回 word
-     ${var:-word}
-     # 如果 var 不为空，返回变量值；否则，将 var 赋值成 word 并返回 word
-     ${var:=word}
-     # 如果 var 不为空，返回变量值；否则，打印错误信息并退出
-     ${var:?message}
-     # 如果 var 不为空，返回 word；否则，返回空
-     ${var:+word}
+  参数展开（Parameter Expansion）可以根据变量的状态（是否为空、是否定义等）来改
+  变它的值，是编写 bash 脚本的常用技巧
+  #+BEGIN_SRC sh
+    # 返回变量的值
+    ${var}
+    # 如果 var 不为空，返回变量值；否则，返回 word
+    ${var:-word}
+    # 如果 var 不为空，返回变量值；否则，将 var 赋值成 word 并返回 word
+    ${var:=word}
+    # 如果 var 不为空，返回变量值；否则，打印错误信息并退出
+    ${var:?message}
+    # 如果 var 不为空，返回 word；否则，返回空
+    ${var:+word}
 
-     # 获取字符串的长度
-     ${#var}
-     # 获取字符串的字串
-     ${var:offset:len}
+    # 获取字符串的长度
+    ${#var}
+    # 获取字符串的字串
+    ${var:offset:len}
 
-     # 变量扩展的 pattern 是 Path Expansion, 可以使用 * ? [...] 等
-     # 如果变量头部匹配 pattern，则删除最小匹配部分返回剩下的
-     ${var#pattern}
-     # 如果变量头部匹配 pattern，则删除最大匹配部分返回剩下的
-     ${var##pattern}
-     # 如果变量尾部匹配 pattern，则删除最小匹配部分返回剩下的
-     ${var%pattern}
-     # 如果变量尾部匹配 pattern，则删除最大匹配部分返回剩下的
-     ${var%%pattern}
-     # 将变量中第一个匹配 pattern 的替换成 str，并返回
-     ${var/pattern/str}
-     # 将变量中所有匹配 pattern 的地方替换成 str 并返回
-     ${var//pattern/str}
-     # 例如：等价于 echo $PATH | tr : '\n'
-     echo ${PATH//:/\\n}
+    # 变量扩展的 pattern 是 Path Expansion, 可以使用 * ? [...] 等
+    # 如果变量头部匹配 pattern，则删除最小匹配部分返回剩下的
+    ${var#pattern}
+    # 如果变量头部匹配 pattern，则删除最大匹配部分返回剩下的
+    ${var##pattern}
+    # 如果变量尾部匹配 pattern，则删除最小匹配部分返回剩下的
+    ${var%pattern}
+    # 如果变量尾部匹配 pattern，则删除最大匹配部分返回剩下的
+    ${var%%pattern}
+    # 将变量中第一个匹配 pattern 的替换成 str，并返回
+    ${var/pattern/str}
+    # 将变量中所有匹配 pattern 的地方替换成 str 并返回
+    ${var//pattern/str}
+    # 例如：等价于 echo $PATH | tr : '\n'
+    echo ${PATH//:/\\n}
 
-     # 零次或者多次匹配
-     ,*(patternlist)
-     # 一次或者多次匹配
-     +(patternlist)
-     # 零次或者一次匹配
-     ?(patternlist)
-     # 单词匹配
-     @(patternlist)
-     # 不匹配
-     !(patternlist)
+    # 零次或者多次匹配
+    ,*(patternlist)
+    # 一次或者多次匹配
+    +(patternlist)
+    # 零次或者一次匹配
+    ?(patternlist)
+    # 单词匹配
+    @(patternlist)
+    # 不匹配
+    !(patternlist)
 
 
-     # 按空格分隔 text 成数组，并赋值给变量
-     array=($text)
-     # 按斜杆分隔字符串 text 成数组，并赋值给变量
-     IFS="/" array=($text)
-     # 用空格链接数组并赋值给变量
-     text="${array[*]}"
-     # 用斜杠链接数组并赋值给变量
-     text=$(IFS=/; echo "${array[*]}")
-   #+END_SRC
+    # 按空格分隔 text 成数组，并赋值给变量
+    array=($text)
+    # 按斜杆分隔字符串 text 成数组，并赋值给变量
+    IFS="/" array=($text)
+    # 用空格链接数组并赋值给变量
+    text="${array[*]}"
+    # 用斜杠链接数组并赋值给变量
+    text=$(IFS=/; echo "${array[*]}")
+  #+END_SRC
 
-   计算方法，bash 的计算方式一般是 ~$((...))~ 来实现，为了兼容老的 sh，还可以使
-   用 expr 命令来进行计算
-   #+BEGIN_SRC sh
-     # 兼容 posix sh 的计算，使用 expr 命令计算结果
-     num=$(expr 1 + 2)
-     # 数字自增
-     num=$(expr $num + 1)
-     # 兼容 posix sh 的复杂计算，输出 10
-     expr 2 \* \( 2 + 3 \)
+  计算方法，bash 的计算方式一般是 ~$((...))~ 来实现，为了兼容老的 sh，还可以使
+  用 expr 命令来进行计算
+  #+BEGIN_SRC sh
+    # 兼容 posix sh 的计算，使用 expr 命令计算结果
+    num=$(expr 1 + 2)
+    # 数字自增
+    num=$(expr $num + 1)
+    # 兼容 posix sh 的复杂计算，输出 10
+    expr 2 \* \( 2 + 3 \)
 
-     # 计算 1+2 赋值给 num，使用 bash 独有的 $((..)) 计算
-     num=$((1 + 2))
-     # 变量递增
-     num=$(($num + 1))
-     # 变量递增，双括号内的 $ 可以省略
-     num=$((num + 1))
-     # 复杂计算
-     num=$((1 + (2 + 3) * 2))
-   #+END_SRC
+    # 计算 1+2 赋值给 num，使用 bash 独有的 $((..)) 计算
+    num=$((1 + 2))
+    # 变量递增
+    num=$(($num + 1))
+    # 变量递增，双括号内的 $ 可以省略
+    num=$((num + 1))
+    # 复杂计算
+    num=$((1 + (2 + 3) * 2))
+  #+END_SRC
 
-** 数组
-   #+BEGIN_SRC sh
-     # 定义数组
-     array[0]=valA
-     array[1]=valB
-     array[2]=valC
+* 数组
+  #+BEGIN_SRC sh
+    # 定义数组
+    array[0]=valA
+    array[1]=valB
+    array[2]=valC
 
-     array=([0]=valA [1]=valB [2]=valC)
-     array=(valA valB valC)
+    array=([0]=valA [1]=valB [2]=valC)
+    array=(valA valB valC)
 
-     # 取得数组中的元素
-     ${array[i]}
-     # 取得数组的长度
-     ${#array[@]}
-     # 取得数组中某个变量的长度
-     ${#array[i]}
+    # 取得数组中的元素
+    ${array[i]}
+    # 取得数组的长度
+    ${#array[@]}
+    # 取得数组中某个变量的长度
+    ${#array[i]}
 
-     # 查看所有数组
-     declare -a
+    # 查看所有数组
+    declare -a
 
-     # 数组定义
-     A=( foo bar "a  b c" 42 )
-     # 数组切片：B=( bar "a  b c" )
-     B=("${A[@]:1:2}")
-     # 数组切片：C=( bar "a  b c" 42 )
-     C=("${A[@]:1}")
-     echo "${B[@]}"            # bar a  b c
-     echo "${B[1]}"            # a  b c
-     echo "${C[@]}"            # bar a  b c 42
-     echo "${C[@]: -2:2}"      # a  b c 42  减号前的空格是必须的
-   #+END_SRC
+    # 数组定义
+    A=( foo bar "a  b c" 42 )
+    # 数组切片：B=( bar "a  b c" )
+    B=("${A[@]:1:2}")
+    # 数组切片：C=( bar "a  b c" 42 )
+    C=("${A[@]:1}")
+    echo "${B[@]}"            # bar a  b c
+    echo "${B[1]}"            # a  b c
+    echo "${C[@]}"            # bar a  b c 42
+    echo "${C[@]: -2:2}"      # a  b c 42  减号前的空格是必须的
+  #+END_SRC
 
-** 事件指示符
-   #+BEGIN_SRC sh
-     # 上一条命令
-     !!
-     # 上一条命令的第一个单词
-     !^
-     # 上一条命令的最后一个单词
-     !$
-     # 最近一条包含 string 的命令
-     !string
-     # 最近一条包含 string1 的命令, 快速替换为 string2, 相当于!!:s/string1/string2/
-     !^string1^string2
-     # 本条命令之前所有的输入内容
-     !#
-   #+END_SRC
+* 事件指示符
+  #+BEGIN_SRC sh
+    # 上一条命令
+    !!
+    # 上一条命令的第一个单词
+    !^
+    # 上一条命令的最后一个单词
+    !$
+    # 最近一条包含 string 的命令
+    !string
+    # 最近一条包含 string1 的命令, 快速替换为 string2, 相当于!!:s/string1/string2/
+    !^string1^string2
+    # 本条命令之前所有的输入内容
+    !#
+  #+END_SRC
 
-** 函数
-   #+BEGIN_SRC sh
-     # 定义一个新函数
-     function myfunc() {
-       # $1 代表第一个参数，$N 代表第 N 个参数
-       # $# 代表参数个数
-       # $0 代表被调用者自身的名字
-       # $@ 代表所有参数，类型是个数组，想传递所有参数给其他命令用 cmd "$@"
-       # $* 空格链接起来的所有参数，类型是字符串
-       {shell commands ...}
-     }
+* 函数
+  #+BEGIN_SRC sh
+    # 定义一个新函数
+    function myfunc() {
+      # $1 代表第一个参数，$N 代表第 N 个参数
+      # $# 代表参数个数
+      # $0 代表被调用者自身的名字
+      # $@ 代表所有参数，类型是个数组，想传递所有参数给其他命令用 cmd "$@"
+      # $* 空格链接起来的所有参数，类型是字符串
+      {shell commands ...}
+    }
 
-     # 调用函数 myfunc
-     myfunc
-     # 带参数的函数调用
-     myfunc arg1 arg2 arg3
-     # 将所有参数传递给函数
-     myfunc "$@"
-     # 将一个数组当作多个参数传递给函数
-     myfunc "${array[@]}"
-     # 参数左移
-     shift
+    # 调用函数 myfunc
+    myfunc
+    # 带参数的函数调用
+    myfunc arg1 arg2 arg3
+    # 将所有参数传递给函数
+    myfunc "$@"
+    # 将一个数组当作多个参数传递给函数
+    myfunc "${array[@]}"
+    # 参数左移
+    shift
 
-     # 删除函数
-     unset -f myfunc
-     # 列出函数定义
-     declare -f
-   #+END_SRC
+    # 删除函数
+    unset -f myfunc
+    # 列出函数定义
+    declare -f
+  #+END_SRC
 
-** 条件判断
-   在 shell 编程中往往需要进行条件判断，即 test。可以通过 ~man test~ 来查看条件
-   判断的相关说明
-   #+BEGIN_SRC sh
-     # 测试条件，当使用方括号是注意空格
-     test expr
-     [ expr ]
+* 条件判断
+  在 shell 编程中往往需要进行条件判断，即 test。可以通过 ~man test~ 来查看条件
+  判断的相关说明
+  #+BEGIN_SRC sh
+    # 测试条件，当使用方括号是注意空格
+    test expr
+    [ expr ]
 
-     # and 逻辑
-     cmd1 && cmd2
-     # or 逻辑
-     cmd1 || cmd2
-     # 判断条件为真时执行 cmd1
-     test cond && cmd1
-     # 和上面完全等价
-     [ cond ] && cmd1
-     # 条件为真执行 cmd1 否则执行 cmd2
-     [ cond ] && cmd1 || cmd2
+    # and 逻辑
+    cmd1 && cmd2
+    # or 逻辑
+    cmd1 || cmd2
+    # 判断条件为真时执行 cmd1
+    test cond && cmd1
+    # 和上面完全等价
+    [ cond ] && cmd1
+    # 条件为真执行 cmd1 否则执行 cmd2
+    [ cond ] && cmd1 || cmd2
 
-     # exp1 和 exp2 同时为真时返回真（POSIX XSI 扩展）
-     exp1 -a exp2
-     # exp1 和 exp2 有一个为真就返回真（POSIX XSI 扩展）
-     exp1 -o exp2
-     # 如果 expr 为真时返回真，输入注意括号前反斜杆
-     ( expr )
-     # 如果 expr 为假那返回真
-     ! expr
+    # exp1 和 exp2 同时为真时返回真（POSIX XSI 扩展）
+    exp1 -a exp2
+    # exp1 和 exp2 有一个为真就返回真（POSIX XSI 扩展）
+    exp1 -o exp2
+    # 如果 expr 为真时返回真，输入注意括号前反斜杆
+    ( expr )
+    # 如果 expr 为假那返回真
+    ! expr
 
-     # 判断字符串相等，如 [ "$x" = "$y" ] && echo yes
-     str1 = str2
-     # 判断字符串不等，如 [ "$x" != "$y" ] && echo yes
-     str1 != str2
-     # 字符串小于，如 [ "$x" \< "$y" ] && echo yes
-     str1 < str2
-     # 字符串大于，注意 < 或 > 是字面量，输入时要加反斜杆
-     str2 > str2
-     # 判断字符串不为空（长度大于零）
-     -n str1
-     # 判断字符串为空（长度等于零）
-     -z str1
+    # 判断字符串相等，如 [ "$x" = "$y" ] && echo yes
+    str1 = str2
+    # 判断字符串不等，如 [ "$x" != "$y" ] && echo yes
+    str1 != str2
+    # 字符串小于，如 [ "$x" \< "$y" ] && echo yes
+    str1 < str2
+    # 字符串大于，注意 < 或 > 是字面量，输入时要加反斜杆
+    str2 > str2
+    # 判断字符串不为空（长度大于零）
+    -n str1
+    # 判断字符串为空（长度等于零）
+    -z str1
 
-     # 判断文件存在，如 [ -a /tmp/abc ] && echo "exists"
-     -a file
-     # 判断文件存在，且该文件是一个目录
-     -d file
-     # 判断文件存在，和 -a 等价
-     -e file
-     # 判断文件存在，且该文件是一个普通文件（非目录等）
-     -f file
-     # 判断文件存在，且可读
-     -r file
-     # 判断文件存在，且尺寸大于 0
-     -s file
-     # 判断文件存在，且可写
-     -w file
-     # 判断文件存在，且执行
-     -x file
-     # 文件上次修改过后还没有读取过
-     -N file
-     # 文件存在且属于当前用户
-     -O file
-     # 文件存在且匹配你的用户组
-     -G file
-     # 文件 1 比 文件 2 新
-     file1 -nt file2
-     # 文件 1 比 文件 2 旧
-     file1 -ot file2
+    # 判断文件存在，如 [ -a /tmp/abc ] && echo "exists"
+    -a file
+    # 判断文件存在，且该文件是一个目录
+    -d file
+    # 判断文件存在，和 -a 等价
+    -e file
+    # 判断文件存在，且该文件是一个普通文件（非目录等）
+    -f file
+    # 判断文件存在，且可读
+    -r file
+    # 判断文件存在，且尺寸大于 0
+    -s file
+    # 判断文件存在，且可写
+    -w file
+    # 判断文件存在，且执行
+    -x file
+    # 文件上次修改过后还没有读取过
+    -N file
+    # 文件存在且属于当前用户
+    -O file
+    # 文件存在且匹配你的用户组
+    -G file
+    # 文件 1 比 文件 2 新
+    file1 -nt file2
+    # 文件 1 比 文件 2 旧
+    file1 -ot file2
 
-     # 数字判断：num1 == num2
-     num1 -eq num2
-     # 数字判断：num1 != num2
-     num1 -ne num2
-     # 数字判断：num1 < num2
-     num1 -lt num2
-     # 数字判断：num1 <= num2
-     num1 -le num2
-     # 数字判断：num1 > num2
-     num1 -gt num2
-     # 数字判断：num1 >= num2
-     num1 -ge num2
-   #+END_SRC
+    # 数字判断：num1 == num2
+    num1 -eq num2
+    # 数字判断：num1 != num2
+    num1 -ne num2
+    # 数字判断：num1 < num2
+    num1 -lt num2
+    # 数字判断：num1 <= num2
+    num1 -le num2
+    # 数字判断：num1 > num2
+    num1 -gt num2
+    # 数字判断：num1 >= num2
+    num1 -ge num2
+  #+END_SRC
 
-** 控制流
-   #+BEGIN_SRC sh
-     # 查看返回值 echo $? 显示 1，因为条件为假
-     test "abc" = "def"
-     # 查看返回值 echo $? 显示 0，因为条件为真
-     test "abc" != "def"
+* 控制流
+  #+BEGIN_SRC sh
+    # 查看返回值 echo $? 显示 1，因为条件为假
+    test "abc" = "def"
+    # 查看返回值 echo $? 显示 0，因为条件为真
+    test "abc" != "def"
 
-     # 调用 test 判断 /tmp 是否存在，并打印 test 的返回值
-     test -a /tmp; echo $?
-     [ -a /tmp ]; echo $?
+    # 调用 test 判断 /tmp 是否存在，并打印 test 的返回值
+    test -a /tmp; echo $?
+    [ -a /tmp ]; echo $?
 
-     # if 语句就是判断后面的命令返回值为 0 的话，认为条件为真，否则为假
-     if test -e /etc/passwd; then
-       echo "exist"
-     else
-       echo "not exist"
-     fi
-     # 和上面两个完全等价
-     [ -e /etc/passwd ] && echo "exists" || echo "not exist"
+    # if 语句就是判断后面的命令返回值为 0 的话，认为条件为真，否则为假
+    if test -e /etc/passwd; then
+      echo "exist"
+    else
+      echo "not exist"
+    fi
+    # 和上面两个完全等价
+    [ -e /etc/passwd ] && echo "exists" || echo "not exist"
 
-     # 判断变量的值
-     if [ "$varname" = "foo" ]; then
-       echo "this is foo"
-     elif [ "$varname" = "bar" ]; then
-       echo "this is bar"
-     else
-       echo "neither"
-     fi
+    # 判断变量的值
+    if [ "$varname" = "foo" ]; then
+      echo "this is foo"
+    elif [ "$varname" = "bar" ]; then
+      echo "this is bar"
+    else
+      echo "neither"
+    fi
 
-     # 复杂条件判断，注意 || 和 && 是完全兼容 POSIX 的推荐写法
-     if [ $x -gt 10 ] && [ $x -lt 20 ]; then
-       echo "yes, between 10 and 20"
-     fi
-     # 可以用 && 命令连接符来做和上面完全等价的事情
-     [ $x -gt 10 ] && [ $x -lt 20 ] && echo "yes, between 10 and 20"
-     # 小括号和 -a -o 是 POSIX XSI 扩展写法，小括号是字面量，输入时前面要加反斜杆
-     if [ \( $x -gt 10 \) -a \( $x -lt 20 \) ]; then
-       echo "yes, between 10 and 20"
-     fi
-     # 同样可以用 && 命令连接符来做和上面完全等价的事情
-     [ \( $x -gt 10 \) -a \( $x -lt 20 \) ] && echo "yes, between 10 and 20"
+    # 复杂条件判断，注意 || 和 && 是完全兼容 POSIX 的推荐写法
+    if [ $x -gt 10 ] && [ $x -lt 20 ]; then
+      echo "yes, between 10 and 20"
+    fi
+    # 可以用 && 命令连接符来做和上面完全等价的事情
+    [ $x -gt 10 ] && [ $x -lt 20 ] && echo "yes, between 10 and 20"
+    # 小括号和 -a -o 是 POSIX XSI 扩展写法，小括号是字面量，输入时前面要加反斜杆
+    if [ \( $x -gt 10 \) -a \( $x -lt 20 \) ]; then
+      echo "yes, between 10 and 20"
+    fi
+    # 同样可以用 && 命令连接符来做和上面完全等价的事情
+    [ \( $x -gt 10 \) -a \( $x -lt 20 \) ] && echo "yes, between 10 and 20"
 
-     # 判断程序存在的话就执行
-     [ -x /bin/ls ] && /bin/ls -l
+    # 判断程序存在的话就执行
+    [ -x /bin/ls ] && /bin/ls -l
 
-     # 如果不考虑兼容 posix sh 和 dash 这些的话，可用 bash 独有的 ((..)) 和 [[..]]:
-     https://www.ibm.com/developerworks/library/l-bash-test/index.html
+    # 如果不考虑兼容 posix sh 和 dash 这些的话，可用 bash 独有的 ((..)) 和 [[..]]:
+    https://www.ibm.com/developerworks/library/l-bash-test/index.html
 
-     # while 循环
-     while condition; do
-       statements
-     done
+    # while 循环
+    while condition; do
+      statements
+    done
 
-     i=1
-     while [ $i -le 10 ]; do
-       echo $i;
-       i=$(expr $i + 1)
-     done
+    i=1
+    while [ $i -le 10 ]; do
+      echo $i;
+      i=$(expr $i + 1)
+    done
 
-     # for 循环：上面的 while 语句等价
-     for i in {1..10}; do
-       echo $i
-     done
+    # for 循环：上面的 while 语句等价
+    for i in {1..10}; do
+      echo $i
+    done
 
-     for name [in list]; do
-       statements
-     done
-     # for 列举某目录下面的所有文件
-     for f in /home/*; do
-       echo $f
-     done
+    for name [in list]; do
+      statements
+    done
+    # for 列举某目录下面的所有文件
+    for f in /home/*; do
+      echo $f
+    done
 
-     # bash 独有的 (( .. )) 语句，更接近 C 语言，但是不兼容 posix sh
-     for (( initialisation ; ending condition ; update )); do
-       statements
-     done
-     for ((i = 0; i < 10; i++)); do echo $i; done
+    # bash 独有的 (( .. )) 语句，更接近 C 语言，但是不兼容 posix sh
+    for (( initialisation ; ending condition ; update )); do
+      statements
+    done
+    for ((i = 0; i < 10; i++)); do echo $i; done
 
-     # case 判断
-     case expression in
-       pattern1 )
-         statements ;;
-       pattern2 )
-         statements ;;
-       ,* )
-         otherwise ;;
-     esac
+    # case 判断
+    case expression in
+      pattern1 )
+        statements ;;
+      pattern2 )
+        statements ;;
+      ,* )
+        otherwise ;;
+    esac
 
-     # until 语句
-     until condition; do
-       statements
-     done
+    # until 语句
+    until condition; do
+      statements
+    done
 
-     # select 语句
-     select name [in list]; do
-       statements that can use $name
-     done
-   #+END_SRC
+    # select 语句
+    select name [in list]; do
+      statements that can use $name
+    done
+  #+END_SRC
 
-** 重定向
-   #+BEGIN_SRC sh
-     # 管道，cmd1 的标准输出接到 cmd2 的标准输入
-     cmd1 | cmd2
-     # 将文件内容重定向为命令的标准输入
-     < file
-     # 将命令的标准输出重定向到文件，会覆盖文件
-     > file
-     # 将命令的标准输出重定向到文件，追加不覆盖
-     >> file
-     # 强制输出到文件，即便设置过：set -o noclobber
-     >| file
-     # 强制将文件描述符 n 的输出重定向到文件
-     n>| file
-     # 同时使用该文件作为标准输入和标准输出
-     <> file
-     # 同时使用文件作为文件描述符 n 的输出和输入
-     n<> file
-     # 重定向文件描述符 n 的输出到文件
-     n> file
-     # 重定向文件描述符 n 的输入为文件内容
-     n< file
-     # 将标准输出 dup/合并 到文件描述符 n
-     n>&
-     # 将标准输入 dump/合并 定向为描述符 n
-     n<&
-     # 文件描述符 n 被作为描述符 m 的副本，输出用
-     n>&m
-     # 文件描述符 n 被作为描述符 m 的副本，输入用
-     n<&m
-     # 将标准输出和标准错误重定向到文件
-     &>file
-     # 关闭标准输入
-     <&-
-     # 关闭标准输出
-     >&-
-     # 关闭作为输出的文件描述符 n
-     n>&-
-     # 关闭作为输入的文件描述符 n
-     n<&-
-     # 比较两个命令的输出
-     diff <(cmd1) <(cmd2)
-   #+END_SRC
+* 重定向
+  #+BEGIN_SRC sh
+    # 管道，cmd1 的标准输出接到 cmd2 的标准输入
+    cmd1 | cmd2
+    # 将文件内容重定向为命令的标准输入
+    < file
+    # 将命令的标准输出重定向到文件，会覆盖文件
+    > file
+    # 将命令的标准输出重定向到文件，追加不覆盖
+    >> file
+    # 强制输出到文件，即便设置过：set -o noclobber
+    >| file
+    # 强制将文件描述符 n 的输出重定向到文件
+    n>| file
+    # 同时使用该文件作为标准输入和标准输出
+    <> file
+    # 同时使用文件作为文件描述符 n 的输出和输入
+    n<> file
+    # 重定向文件描述符 n 的输出到文件
+    n> file
+    # 重定向文件描述符 n 的输入为文件内容
+    n< file
+    # 将标准输出 dup/合并 到文件描述符 n
+    n>&
+    # 将标准输入 dump/合并 定向为描述符 n
+    n<&
+    # 文件描述符 n 被作为描述符 m 的副本，输出用
+    n>&m
+    # 文件描述符 n 被作为描述符 m 的副本，输入用
+    n<&m
+    # 将标准输出和标准错误重定向到文件
+    &>file
+    # 关闭标准输入
+    <&-
+    # 关闭标准输出
+    >&-
+    # 关闭作为输出的文件描述符 n
+    n>&-
+    # 关闭作为输入的文件描述符 n
+    n<&-
+    # 比较两个命令的输出
+    diff <(cmd1) <(cmd2)
+  #+END_SRC
 
-* link
+* 参考链接
   1. [[https://github.com/skywind3000/awesome-cheatsheets/blob/master/languages/bash.sh][bash]]
