@@ -628,6 +628,29 @@
    此模块处理对基于 JPA 的数据访问层的增强支持。 它使构建使用数据访问技术的
    Spring 驱动应用程序变得更加容易。其代码托管于 [[https://github.com/spring-projects/spring-data-jpa][GitHub]] ， 文档见 [[https://docs.spring.io/spring-data/jpa/docs/current/reference/html/][reference]] 。
 
+*** 格式化 JSON 的时间字符串
+    使用 JsonFormat 标注可以设置 JSON 字段序列化的格式
+    #+BEGIN_SRC java
+      import com.fasterxml.jackson.annotation.JsonFormat;
+      import com.fasterxml.jackson.annotation.JsonProperty;
+
+      class ExampleEntity {
+
+        @Column(name = "BIRTHDAY")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private Timestamp birthday; // 出生日期
+
+        @JsonProperty("birthday")
+        public Timestamp birthday() {
+          return this.birthday;
+        }
+
+        public void birthday(Timestamp birthday) {
+          this.birthday = birthday;
+        }
+      }
+    #+END_SRC
+
 * Spring Cloud
   [[https://spring.io/projects/spring-cloud][Spring Cloud]] 是一系列框架的有序集合。它利用 Spring Boot 的开发便利性巧妙地简化了
   分布式系统基础设施的开发，如服务发现注册、配置中心、消息总线、负载均衡、断路器、
