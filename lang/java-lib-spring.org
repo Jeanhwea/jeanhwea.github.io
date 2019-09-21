@@ -304,6 +304,54 @@
       }
     #+END_SRC
 
+** 允许跨域
+   Spring Boot 可以通过添加配置类的方法来启用跨域设置，具体参考下面的代码
+   #+BEGIN_SRC java
+     import org.springframework.context.annotation.Configuration;
+     import org.springframework.web.servlet.config.annotation.CorsRegistry;
+     import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+     import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+     @Configuration
+     @EnableWebMvc
+     public class CorsConfiguration implements WebMvcConfigurer {
+
+       private static final String[] CORS_METHODS =
+           new String[] {"GET", "OPTIONS", "POST", "PUT", "DELETE"};
+
+       private static final String[] CORS_HEADERS =
+           new String[] {
+             "Access-Control-Request-Headers",
+             "Access-Control-Request-Method",
+             "Accept",
+             "Authorization",
+             "Cache-Control",
+             "Content-Type",
+             "DNT",
+             "If-Modified-Since",
+             "Keep-Alive",
+             "Origin",
+             "Referer",
+             "User-Agent",
+             "X-Mx-ReqToken",
+             "X-Requested-With"
+           };
+
+       @Override
+       public void addCorsMappings(CorsRegistry registry) {
+         registry
+             .addMapping("/**")
+             .allowedOrigins("*")
+             .allowedMethods(CORS_METHODS)
+             .allowedHeaders(CORS_HEADERS)
+             .exposedHeaders(CORS_HEADERS)
+             .allowCredentials(true)
+             .maxAge(3600);
+       }
+     }
+
+   #+END_SRC
+
 ** 日志
    Spring Boot 提供了一个统一的日志配置，可以兼容 Java Util Logging、Log4J2 和
    Logback 等日志系统作为后端。
