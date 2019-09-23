@@ -252,13 +252,9 @@
    #+END_SRC
 
 ** 私有仓库中的 API 接口
-   添加一些别名帮助查询远端的仓库内容
-
+   添加一些别名帮助查询远端的仓库内容，添加远端仓库的环境变量
    #+BEGIN_SRC sh
      export REGISTRY=localhost:5000
-
-     alias ri='_f(){ curl -XGET $REGISTRY/v2/_catalog; }; _f'
-     alias rt='_f(){ curl -XGET $REGISTRY/v2/$1/tags/list; }; _f'
    #+END_SRC
 
 *** Registry 的 API 接口
@@ -280,24 +276,28 @@
 
     添加以下帮助脚本
     #+BEGIN_SRC sh
-      _dk_repos() {
+      # list repositories
+      dkrepos() {
         curl -s -XGET "http://${REGISTRY}/v2/_catalog"
       }
 
-      _dk_repo_tags() {
+      # list tags
+      dktags() {
         local repo=$1
         curl -s -XGET "http://${REGISTRY}/v2/${repo}/tags/list"
       }
 
-      _dk_rm_repo_tag() {
+      # remove tag
+      dkrmt() {
         local repo=$1
         local tag=$2
 
         local header="Accept: application/vnd.docker.distribution.manifest.v2+json"
         local url="http://${REGISTRY}/v2/${repo}/manifests/${tag}"
-        local digest=$(curl --header ${header} -sI -XGET ${url} | sed '/^Docker-Content-Digest:/!d;s/^.*: \(.*\)$/\1/')
+        local digest=$(curl -sI -H ${header} -XGET ${url%$'\r'} | sed '/^Docker-Content-Digest:/!d;s/^.*: \(.*\)$/\1/')
 
-        curl -sI -XDELETE "http://${REGISTRY}/v2/${repo}/manifests/${digest}"
+        local url2="http://${REGISTRY}/v2/${repo}/manifests/${digest}"
+        curl -sI -XDELETE ${url2%$'\r'}
       }
     #+END_SRC
 
