@@ -194,7 +194,7 @@
   - ~docker login~ : 登入 registry
   - ~docker logout~ : 注销 registry
   - ~docker search~ : 搜索图像
-  - ~docker pull~ : 拉取 registry 的镜像
+  - ~docker pull~ : 拉取 registry 的图像
   - ~docker push~ : 上传本地图像到 registry
 
 ** 上传图像到私有仓库
@@ -239,66 +239,67 @@
      cfce7a8ae632: Pushed
      lastest: digest: sha256:9b1b75fa6364b2ec538a5efdb00c3511adee5b6b2f80d5c64b06c4456ad573f6 size: 1571
    #+END_SRC
-** 查询私有仓库中的镜像和 tag
+
+** 开启私有仓库允许删除图像的接口
+   registry 默认不允许删除已经上传的图像，可以通过以下设置来开启允许删除的配置
+   #+BEGIN_SRC sh
+     # 查看默认配置
+     docker exec -it  registry sh -c 'cat /etc/docker/registry/config.yml'
+     # 开启删除的配置项 (添加  delete: enabled: true)
+     docker exec -it  registry sh -c "sed -i '/storage:/a\  delete:\n\    enabled: true' /etc/docker/registry/config.yml"
+     # 重启以生效
+     docker restart registry
+   #+END_SRC
+
+** 私有仓库中的 API 接口
    添加一些别名帮助查询远端的仓库内容
 
    #+BEGIN_SRC sh
-     export REGISTRY='http://localhost:5000'
+     export REGISTRY=localhost:5000
 
      alias ri='_f(){ curl -XGET $REGISTRY/v2/_catalog; }; _f'
      alias rt='_f(){ curl -XGET $REGISTRY/v2/$1/tags/list; }; _f'
    #+END_SRC
 
-   输出结果
-   #+BEGIN_SRC text
-     $ ri
-     {"repositories":["gitlab/gitlab-ce","registry","ubuntu"]}
+*** Registry 的 API 接口
+    #+BEGIN_SRC sh
+      # 查询 registry 中所有的 repository
+      curl -s -XGET "http://${REGISTRY}/v2/_catalog"
 
-     $ rt ubuntu
-     {"name":"ubuntu","tags":["18.04","latest"]}
-   #+END_SRC
+      # 查询 repository 的所有 tag
+      curl -s -XGET "http://${REGISTRY}/v2/<repo>/tags/list"
 
-** 查询所有的私有仓库中镜像和 tag
-   #+BEGIN_SRC sh
-     _reg=http://localhost:5000 && \
-       curl -XGET $_reg/v2/_catalog | \
-         jq '.repositories[]' | \
-         xargs -I repo curl -XGET $_reg/v2/repo/tags/list
-   #+END_SRC
-   #+BEGIN_SRC text
-     {"name":"cassandra","tags":["3.11.2"]}
-     {"name":"elasticsearch","tags":["6.4.3"]}
-     {"name":"gitlab/gitlab-ce","tags":["20181128"]}
-     {"name":"mysql","tags":["5.7","5.7.26","8.0","8.0.16"]}
-     {"name":"openjdk","tags":["8"]}
-     {"name":"rabbitmq","tags":["3.7"]}
-     {"name":"redis","tags":["4.0.6"]}
-     {"name":"ubuntu","tags":["18.04"]}
-   #+END_SRC
+      # 删除 registry 中的 repository 的 tag
+      # 先获取 tag 的 digest
+      curl --header "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+        -I -s -XGET "http://${REGISTRY}/v2/<repo>/manifests/<tag>" | \
+        sed '/^Docker-Content-Digest:/!d;s/^Docker-Content-Digest: \(.*\)$/\1/'
+      # 然后通过 digest 删除 tag
+      curl -s -I -XDELETE "http://${REGISTRY}/v2/<repo>/manifests/<digest>"
+    #+END_SRC
 
-   #+BEGIN_SRC sh
-     _reg=http://192.168.0.202:5000 && \
-       wget -q $_reg/v2/_catalog -O- | \
-         sed 's/^.*\[\(.*\)\].*$/\1/;s/,/\n/g' | \
-         xargs -I repo wget -q $_reg/v2/repo/tags/list -O- | \
-         sed 's/.*"name":"\(.*\)".*"tags":\[\(.*\)\].*/\1:\2/;s/"//g;s/,/:/g'
-   #+END_SRC
-   #+BEGIN_SRC text
-     alpine:latest
-     elasticsearch:6.4.3
-     gitlab/gitlab-ce:20181127:latest
-     mongo:latest
-     mysql:5.7.26:8.0.16
-     nginx:1.14:1.15:latest
-     node:latest
-     openjdk:8
-     postgres:9.6:latest
-     rabbitmq:3.7:latest
-     redis:4.0.6
-     registry:20181127:latest
-     skree:20190704
-     ubuntu:18.04:latest
-   #+END_SRC
+    添加以下帮助脚本
+    #+BEGIN_SRC sh
+      _dk_repos() {
+        curl -s -XGET "http://${REGISTRY}/v2/_catalog"
+      }
+
+      _dk_repo_tags() {
+        local repo=$1
+        curl -s -XGET "http://${REGISTRY}/v2/${repo}/tags/list"
+      }
+
+      _dk_rm_repo_tag() {
+        local repo=$1
+        local tag=$2
+
+        local header="Accept: application/vnd.docker.distribution.manifest.v2+json"
+        local url="http://${REGISTRY}/v2/${repo}/manifests/${tag}"
+        local digest=$(curl --header ${header} -sI -XGET ${url} | sed '/^Docker-Content-Digest:/!d;s/^.*: \(.*\)$/\1/')
+
+        curl -sI -XDELETE "http://${REGISTRY}/v2/${repo}/manifests/${digest}"
+      }
+    #+END_SRC
 
 * 编写 Dockerfile
   Dockerfile 是配置 Docker 容器的配置文件，最佳实践参考[[https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/][这里]] 。
@@ -334,7 +335,7 @@
      CMD java -jar myapp.jar
    #+END_SRC
 
-   使用 ~docker build~ 命令来新建镜像
+   使用 ~docker build~ 命令来新建图像
    #+BEGIN_SRC sh
      docker build -t myapp .
    #+END_SRC
