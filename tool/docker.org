@@ -246,7 +246,8 @@
      # 查看默认配置
      docker exec -it  registry sh -c 'cat /etc/docker/registry/config.yml'
      # 开启删除的配置项 (添加  delete: enabled: true)
-     docker exec -it  registry sh -c "sed -i '/storage:/a\  delete:\n\    enabled: true' /etc/docker/registry/config.yml"
+     docker exec -it  registry sh -c "sed -i '/storage:/a\  delete:' /etc/docker/registry/config.yml"
+     docker exec -it  registry sh -c "sed -i '/delete:/a\    enabled: true' /etc/docker/registry/config.yml"
      # 重启以生效
      docker restart registry
    #+END_SRC
@@ -272,6 +273,8 @@
         sed '/^Docker-Content-Digest:/!d;s/^Docker-Content-Digest: \(.*\)$/\1/'
       # 然后通过 digest 删除 tag
       curl -s -I -XDELETE "http://${REGISTRY}/v2/<repo>/manifests/<digest>"
+      # 删除后需要垃圾回收才会真正删除 blob 对象
+      docker exec -it registry bin/registry garbage-collect /etc/docker/registry/config.yml
     #+END_SRC
 
     添加以下帮助脚本
@@ -297,7 +300,6 @@
         local digest=$(curl -sI -H ${header} -XGET ${url%$'\r'} | sed '/^Docker-Content-Digest:/!d;s/^.*: \(.*\)$/\1/')
 
         local url2="http://${REGISTRY}/v2/${repo}/manifests/${digest}"
-        curl -sI -XDELETE ${url2%$'\r'}
       }
     #+END_SRC
 
