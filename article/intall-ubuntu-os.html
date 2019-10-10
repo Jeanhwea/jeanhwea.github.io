@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-08-23 Fri 06:14 -->
+<!-- 2019-10-10 Thu 21:24 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>安装 Ubuntu 系统</title>
@@ -238,20 +238,20 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org84188c1">1. 创建 Ubuntu 的 USB 启动盘</a>
+<li><a href="#orged83979">1. 创建 Ubuntu 的 USB 启动盘</a>
 <ul>
-<li><a href="#orgf8b05cb">1.1. 准备的原料</a></li>
-<li><a href="#orgf466754">1.2. 安装的相关命令</a>
+<li><a href="#org92c8d8a">1.1. 准备的原料</a></li>
+<li><a href="#orgf68af47">1.2. 安装的相关命令</a>
 <ul>
-<li><a href="#orgf6318ef">1.2.1. 格式化 U 盘</a></li>
-<li><a href="#org9e9fe4e">1.2.2. 制作启动盘</a></li>
+<li><a href="#orga0552bc">1.2.1. 格式化 U 盘</a></li>
+<li><a href="#orgc9dc2d2">1.2.2. 制作启动盘</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org34048fe">2. 安装过程的坑</a>
+<li><a href="#orgd4a99ba">2. 安装过程的坑</a>
 <ul>
-<li><a href="#orgf4842db">2.1. 关闭 NVIDIA 驱动安装</a></li>
+<li><a href="#org90086e5">2.1. 关闭 NVIDIA 驱动安装</a></li>
 </ul>
 </li>
 </ul>
@@ -259,12 +259,12 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-org84188c1" class="outline-2">
-<h2 id="org84188c1"><span class="section-number-2">1</span> 创建 Ubuntu 的 USB 启动盘</h2>
+<div id="outline-container-orged83979" class="outline-2">
+<h2 id="orged83979"><span class="section-number-2">1</span> 创建 Ubuntu 的 USB 启动盘</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgf8b05cb" class="outline-3">
-<h3 id="orgf8b05cb"><span class="section-number-3">1.1</span> 准备的原料</h3>
+<div id="outline-container-org92c8d8a" class="outline-3">
+<h3 id="org92c8d8a"><span class="section-number-3">1.1</span> 准备的原料</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 首先下载需要安装的 Ubuntu 系统镜像，推荐去清华镜像源中下载
@@ -276,12 +276,12 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orgf466754" class="outline-3">
-<h3 id="orgf466754"><span class="section-number-3">1.2</span> 安装的相关命令</h3>
+<div id="outline-container-orgf68af47" class="outline-3">
+<h3 id="orgf68af47"><span class="section-number-3">1.2</span> 安装的相关命令</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
-<div id="outline-container-orgf6318ef" class="outline-4">
-<h4 id="orgf6318ef"><span class="section-number-4">1.2.1</span> 格式化 U 盘</h4>
+<div id="outline-container-orga0552bc" class="outline-4">
+<h4 id="orga0552bc"><span class="section-number-4">1.2.1</span> 格式化 U 盘</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <p>
 为了保护好数据最好把 U 盘中的数据拷贝出来，因为待会儿会直接将 U 盘中的数据都格式
@@ -292,7 +292,7 @@ for the JavaScript code in this tag.
 使用 fdisk 查看可以用的 U 盘的设备路径
 </p>
 <div class="org-src-container">
-<pre class="src src-shell">ub64@volantis:~$ sudo fdisk -l
+<pre class="src src-sh">ub64@volantis:~$ sudo fdisk -l
 [sudo] password for ub64:
 Disk /dev/loop0: 13 MiB, 13619200 bytes, 26600 sectors
 Units: sectors of 1 * <span style="color: #6c71c4;">512</span> = 512 bytes
@@ -327,7 +327,7 @@ Device     Boot   Start     End Sectors  Size Id Type
 这里的 U 盘是 <code>/dev/sdb</code>, 卸载 <code>sdb1</code> 和 <code>sdb</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-shell">ub64@volantis:~$ sudo umount /dev/sdb
+<pre class="src src-sh">ub64@volantis:~$ sudo umount /dev/sdb
 ub64@volantis:~$ sudo umount /dev/sdb1
 </pre>
 </div>
@@ -336,7 +336,7 @@ ub64@volantis:~$ sudo umount /dev/sdb1
 <code>mkfs.vfat</code> 将 U 盘格式化成 vfat 的格式，一般的系统启动认这种类型是格式
 </p>
 <div class="org-src-container">
-<pre class="src src-shell">ub64@volantis:~$ sudo mkfs.vfat /dev/sdb -I
+<pre class="src src-sh">ub64@volantis:~$ sudo mkfs.vfat /dev/sdb -I
 mkfs.fat 4.1 (2017-01-24)
 attribute <span style="color: #2aa198;">"partition"</span> not found
 ub64@volantis:~$
@@ -345,15 +345,15 @@ ub64@volantis:~$
 </div>
 </div>
 
-<div id="outline-container-org9e9fe4e" class="outline-4">
-<h4 id="org9e9fe4e"><span class="section-number-4">1.2.2</span> 制作启动盘</h4>
+<div id="outline-container-orgc9dc2d2" class="outline-4">
+<h4 id="orgc9dc2d2"><span class="section-number-4">1.2.2</span> 制作启动盘</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <p>
 直接使用 dd 命令复制镜像就可以制作成功启动盘。注意，这里一定要添加
 <code>status=progress</code>, 因为 dd 复制一般时间很长，显示进度会让你不会怀疑 dd 命令死了
 </p>
 <div class="org-src-container">
-<pre class="src src-shell">ub64@volantis:~$ sudo dd <span style="color: #6c71c4;">if</span>=~/Downloads/ubuntu-18.04.3-live-server-amd64.iso <span style="color: #6c71c4;">of</span>=/dev/sdb <span style="color: #6c71c4;">status</span>=progress
+<pre class="src src-sh">ub64@volantis:~$ sudo dd <span style="color: #6c71c4;">if</span>=~/Downloads/ubuntu-18.04.3-live-server-amd64.iso <span style="color: #6c71c4;">of</span>=/dev/sdb <span style="color: #6c71c4;">status</span>=progress
 3883520 bytes (3.9 MB, 3.7 MiB) copied, 3 s, 1.3 MB/s
 </pre>
 </div>
@@ -361,17 +361,28 @@ ub64@volantis:~$
 <p>
 然后等 dd 完成过后就可以愉快地启动了。
 </p>
+
+<p>
+Mac 下 dd 可以通过 pv 工具来显示复制进度
+</p>
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">install pv</span>
+brew install pv
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">dd iso image</span>
+sudo pv -cN source &lt; ~/Downloads/ubuntu-18.04.3-desktop-amd64.iso | sudo dd <span style="color: #6c71c4;">of</span>=/dev/disk2 <span style="color: #6c71c4;">bs</span>=4m
+</pre>
+</div>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org34048fe" class="outline-2">
-<h2 id="org34048fe"><span class="section-number-2">2</span> 安装过程的坑</h2>
+<div id="outline-container-orgd4a99ba" class="outline-2">
+<h2 id="orgd4a99ba"><span class="section-number-2">2</span> 安装过程的坑</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgf4842db" class="outline-3">
-<h3 id="orgf4842db"><span class="section-number-3">2.1</span> 关闭 NVIDIA 驱动安装</h3>
+<div id="outline-container-org90086e5" class="outline-3">
+<h3 id="org90086e5"><span class="section-number-3">2.1</span> 关闭 NVIDIA 驱动安装</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 NVIDIA 家的驱动有点时候安装会导致系统卡死，所以需要在安装时禁用驱动的安装。
@@ -407,7 +418,7 @@ NVIDIA 家的驱动有点时候安装会导致系统卡死，所以需要在安�
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-08-23 Fri 06:14. Created by Jinghui Hu at 2019-08-12 Mon 10:34.</p>
+<p class="author">Last Updated 2019-10-10 Thu 21:24. Created by Jinghui Hu at 2019-08-12 Mon 10:34.</p>
 </div>
 </body>
 </html>
