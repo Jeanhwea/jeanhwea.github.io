@@ -1,0 +1,110 @@
+#+TITLE: 几种获取 Spring Framework 控制器中请求参数的方法
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2019-11-19 Tue 21:29:54>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+TAGS: spring controller request parameters
+
+
+* 请求参数
+  在 HTTP 请求中往往有多种请求参数，在 Spring Framework 中的请求参数都是放在如下
+  所示的包中
+
+  #+BEGIN_SRC java
+    import org.springframework.web.bind.annotation.*;
+  #+END_SRC
+
+  下面是处理几种常见请求的控制器的方法：
+
+* URI 路径请求
+  #+BEGIN_SRC text
+    GET /orders/121233
+  #+END_SRC
+
+  上面是请求 orderId=121233 的订单的 RESTFul API。这里的请求参数位于 URL的路径上，
+  可以使用如下代码片段获取参数的值
+
+  #+BEGIN_SRC java
+    @GetMapping("/orders/{orderId}")
+    public Order getOrder(@PathVariable long orderId) {
+
+    }
+  #+END_SRC
+
+* URI 的请求参数
+  #+BEGIN_SRC text
+    GET /orders?status=ready
+  #+END_SRC
+
+  上面是请求所有状态一个就绪的订单，可以使用如下代码片段获取请求参数的值
+
+  #+BEGIN_SRC java
+    @GetMapping("/orders")
+    public List<Order> getOrdersList(
+        @RequestParam(value="status", required=false, defaultValue="idle") String orderStatus) {
+
+    }
+  #+END_SRC
+
+* GET 的Query 字符串中的参数
+  #+BEGIN_SRC text
+    GET /orders?name=new&total=10
+  #+END_SRC
+
+  上面的GET请求中的Query字符串为 ~name=new&total=10~ ，可以理解成一系列的键值对，
+  所以可以使用如下代码来将其转化成 Java 的Map对象
+
+  #+BEGIN_SRC java
+    @GetMapping("/orders")
+    public List<Order> getOrdersList(@RequestParam Map<String, Object> params) {
+
+    }
+  #+END_SRC
+
+  使用 ~@RequestParam~ 的好处是可以直接在控制器中是 Map，而不需要使用额外转化成
+  Map的冗余代码
+
+* POST请求体里面的JSON参数
+  #+BEGIN_SRC text
+    POST /orders
+
+    #################### body ####################
+    {
+      "name": "new",
+      "total": 10
+    }
+  #+END_SRC
+
+  上面的POST请求中使用了JSON 字符串作为请求的消息体，可以使用如下的方式来获取消
+  息体中的参数
+
+  #+BEGIN_SRC java
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/orders")
+    public Order postOrders(@RequestBody Map<String, Object> params) {
+
+    }
+  #+END_SRC
+
+  当定义的RequestBody 是一个 Map 数据结构后，直接可以将请求体中的JSON数据体构造
+  成Java的 params 对象
+
+* HttpServletRequest 对象
+
+  有时候，我们希望直接获取到请求的对象实例，这样就可以调用
+  ~request.getRequestURI()~ 来动态获取请求的相对路径，实现动态响应请求，Spring
+  Framework 提供了一个有效的手段，那就是直接把 HttpServletRequest 对象作为对象传
+  入请求方法中
+
+  #+BEGIN_SRC java
+    import javax.servlet.http.HttpServletRequest;
+
+    @RestController
+    public class ProxyOrderController {
+      @GetMapping("/orders/**")
+      public Object getOrders(HttpServletRequest request) {
+
+      }
+    }
+  #+END_SRC
