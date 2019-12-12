@@ -11,7 +11,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
 数据接口的设计。
 
 * URL 设计
-** 1.1 核心思想
+** 核心思想
    RESTful 的核心思想就是，客户端发出的数据操作指令都是 *动词+宾语* 的结构。比如，
    GET /articles 这个命令，GET 是动词， /articles 是宾语。动词通常就是五种 HTTP
    方法，对应 CRUD 操作。
@@ -21,7 +21,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
    - PATCH：更新（Update），通常是部分更新
    - DELETE：删除（Delete）
 
-** 1.2 动词覆盖
+** 动词覆盖
    有些客户端只能使用 GET 和 POST 这两种 HTTP 方法。这些必要的时候可以使用 POST
    动词来覆盖其它三种方法。例如，X-HTTP-Method-Override 指定本次请求的方法是 PUT，
    而不是 POST。
@@ -30,7 +30,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
      X-HTTP-Method-Override: PUT
    #+END_EXAMPLE
 
-** 1.3 宾语词性
+** 宾语词性
    宾语就是 API 的 URL，是 HTTP 动词作用的对象， *宾语必须名词* 。比如，
    /articles 这个 URL 就是正确的，而下面的 URL 不是名词，所以都是错误的。
    #+BEGIN_EXAMPLE
@@ -39,7 +39,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
      /deleteAllYesterdayArticles
    #+END_EXAMPLE
 
-** 1.4 复数 URL
+** 复数 URL
    URL 作为宾语的单复数形式没有统一的规定。常见的操作是读取一个集合用的是复数。
    #+BEGIN_EXAMPLE
      GET /articles
@@ -50,7 +50,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
      GET /articles/2
    #+END_EXAMPLE
 
-** 1.5 避免多级嵌套
+** 避免多级嵌套
    常见的情况是，资源需要多级分类，因此很容易写出多级的 URL，比如获取某个作者的某一
    类文章。
    #+BEGIN_EXAMPLE
@@ -76,7 +76,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
    总结出来一句话， *使用分类查询最好是用参数的方式来修饰* 。
 
 * 状态码
-** 2.1 状态码必须精确
+** 状态码必须精确
    客户端的每一次请求，服务器都必须给出回应。回应包括 HTTP 状态码和数据两部分。
    HTTP 状态码就是一个三位数，分成五个类别。
 
@@ -88,7 +88,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
    |    4xx | 客户端错误 |
    |    5xx | 服务器错误 |
 
-** 2.2 2xx 状态码
+** 2xx 状态码
    200 状态码表示操作成功，但是不同的方法可以返回更精确的状态码。
    - GET: 200 OK
    - POST: 201 Created
@@ -109,7 +109,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
      }
    #+END_EXAMPLE
 
-** 2.3 3xx 状态码
+** 3xx 状态码
    API 用不到 301 状态码（永久重定向）和 302 状态码（暂时重定向，307 也是这个含
    义），因为它们可以由应用级别返回，浏览器会直接跳转，API 级别可以不考虑这两种
    情况。API 用到的 3xx 状态码，主要是 303 See Other，表示参考另一个 URL。它与
@@ -122,7 +122,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
      Location: /api/articles/12345
    #+END_EXAMPLE
 
-** 2.4 4xx 状态码
+** 4xx 状态码
    4xx 状态码表示客户端错误，主要有下面几种。
 
    | 状态码 | 含义                   | 解释                                                                                    |
@@ -137,7 +137,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
    |    422 | Unprocessable Entity   | 客户端上传的附件无法处理，导致请求失败。                                                |
    |    429 | Too Many Requests      | 客户端的请求次数超过限额。                                                              |
 
-** 2.5 5xx 状态码
+** 5xx 状态码
    5xx 状态码表示服务端错误。一般来说，API 不会向用户透露服务器的详细信息，所以
    只要两个状态码就够了。
 
@@ -147,7 +147,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
    |    503 | Service Unavailable   | 服务器无法处理请求，一般用于网站维护状态。 |
 
 * 服务器回应
-** 3.1 不要返回纯本文
+** 不要返回纯本文
    API 返回的数据格式，不应该是纯文本，而应该是一个 JSON 对象，因为这样才能返回
    标准的结构化数据。所以，服务器回应的 HTTP 头的 Content-Type 属性要设为
    application/json 。客户端请求时，也要明确告诉服务器，可以接受 JSON 格式，即请
@@ -157,7 +157,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
      Accept: application/json
    #+END_EXAMPLE
 
-** 3.2 发生错误时，不要返回 200 状态码
+** 发生错误时，不要返回 200 状态码
    有一种不恰当的做法是，即使发生错误，也返回 200 状态码，把错误信息放在数据体里
    面，就像下面这样。
    #+BEGIN_EXAMPLE
@@ -185,7 +185,7 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
      }
    #+END_EXAMPLE
 
-** 3.3 提供链接
+** 提供链接
    API 的使用者未必知道，URL 是怎么设计的。一个解决方法就是，在回应中，给出相关
    链接，便于下一步操作。这样的话，用户只要记住一个 URL，就可以发现其他的 URL。
    这种方法叫做 HATEOAS。举例来说，GitHub 的 API 都在 *https://api.github.com/*

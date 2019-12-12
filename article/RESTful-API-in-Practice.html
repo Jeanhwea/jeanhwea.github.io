@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-07-10 Wed 15:11 -->
+<!-- 2019-12-12 Thu 21:46 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>RESTful API 设计实践</title>
@@ -238,32 +238,32 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org7fc65c0">1. URL 设计</a>
+<li><a href="#org878e3df">1. URL 设计</a>
 <ul>
-<li><a href="#org811e486">1.1. 1.1 核心思想</a></li>
-<li><a href="#orgcac59c5">1.2. 1.2 动词覆盖</a></li>
-<li><a href="#orgf4f408d">1.3. 1.3 宾语词性</a></li>
-<li><a href="#orgcabdda7">1.4. 1.4 复数 URL</a></li>
-<li><a href="#org394980d">1.5. 1.5 避免多级嵌套</a></li>
+<li><a href="#org0c4031d">1.1. 核心思想</a></li>
+<li><a href="#org13f4136">1.2. 动词覆盖</a></li>
+<li><a href="#orge2ed0a5">1.3. 宾语词性</a></li>
+<li><a href="#org4a31dce">1.4. 复数 URL</a></li>
+<li><a href="#org986cff1">1.5. 避免多级嵌套</a></li>
 </ul>
 </li>
-<li><a href="#org2d167f1">2. 状态码</a>
+<li><a href="#org06d62e1">2. 状态码</a>
 <ul>
-<li><a href="#orgf68eca4">2.1. 2.1 状态码必须精确</a></li>
-<li><a href="#org569ebf1">2.2. 2.2 2xx 状态码</a></li>
-<li><a href="#org0375870">2.3. 2.3 3xx 状态码</a></li>
-<li><a href="#orgc9f6963">2.4. 2.4 4xx 状态码</a></li>
-<li><a href="#org669c9ce">2.5. 2.5 5xx 状态码</a></li>
+<li><a href="#org06c7a49">2.1. 状态码必须精确</a></li>
+<li><a href="#org8a7c89d">2.2. 2xx 状态码</a></li>
+<li><a href="#orgd07d0c9">2.3. 3xx 状态码</a></li>
+<li><a href="#orgac76da3">2.4. 4xx 状态码</a></li>
+<li><a href="#org5d12434">2.5. 5xx 状态码</a></li>
 </ul>
 </li>
-<li><a href="#orgc273b58">3. 服务器回应</a>
+<li><a href="#orgfc23de6">3. 服务器回应</a>
 <ul>
-<li><a href="#org9ec7ed0">3.1. 3.1 不要返回纯本文</a></li>
-<li><a href="#org65c5d9f">3.2. 3.2 发生错误时，不要返回 200 状态码</a></li>
-<li><a href="#org27ea990">3.3. 3.3 提供链接</a></li>
+<li><a href="#org916b8e5">3.1. 不要返回纯本文</a></li>
+<li><a href="#orgc9e73b5">3.2. 发生错误时，不要返回 200 状态码</a></li>
+<li><a href="#orgebbc55b">3.3. 提供链接</a></li>
 </ul>
 </li>
-<li><a href="#org7dba726">4. 参考链接</a></li>
+<li><a href="#org92eb471">4. 参考链接</a></li>
 </ul>
 </div>
 </div>
@@ -272,12 +272,12 @@ RESTful (REpresentational State Transfer) 是目前最流行的 API 设计规范
 数据接口的设计。
 </p>
 
-<div id="outline-container-org7fc65c0" class="outline-2">
-<h2 id="org7fc65c0"><span class="section-number-2">1</span> URL 设计</h2>
+<div id="outline-container-org878e3df" class="outline-2">
+<h2 id="org878e3df"><span class="section-number-2">1</span> URL 设计</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org811e486" class="outline-3">
-<h3 id="org811e486"><span class="section-number-3">1.1</span> 1.1 核心思想</h3>
+<div id="outline-container-org0c4031d" class="outline-3">
+<h3 id="org0c4031d"><span class="section-number-3">1.1</span> 核心思想</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 RESTful 的核心思想就是，客户端发出的数据操作指令都是 <b>动词+宾语</b> 的结构。比如，
@@ -294,8 +294,8 @@ GET /articles 这个命令，GET 是动词， /articles 是宾语。动词通常
 </div>
 </div>
 
-<div id="outline-container-orgcac59c5" class="outline-3">
-<h3 id="orgcac59c5"><span class="section-number-3">1.2</span> 1.2 动词覆盖</h3>
+<div id="outline-container-org13f4136" class="outline-3">
+<h3 id="org13f4136"><span class="section-number-3">1.2</span> 动词覆盖</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 有些客户端只能使用 GET 和 POST 这两种 HTTP 方法。这些必要的时候可以使用 POST
@@ -309,8 +309,8 @@ X-HTTP-Method-Override: PUT
 </div>
 </div>
 
-<div id="outline-container-orgf4f408d" class="outline-3">
-<h3 id="orgf4f408d"><span class="section-number-3">1.3</span> 1.3 宾语词性</h3>
+<div id="outline-container-orge2ed0a5" class="outline-3">
+<h3 id="orge2ed0a5"><span class="section-number-3">1.3</span> 宾语词性</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 宾语就是 API 的 URL，是 HTTP 动词作用的对象， <b>宾语必须名词</b> 。比如，
@@ -324,8 +324,8 @@ X-HTTP-Method-Override: PUT
 </div>
 </div>
 
-<div id="outline-container-orgcabdda7" class="outline-3">
-<h3 id="orgcabdda7"><span class="section-number-3">1.4</span> 1.4 复数 URL</h3>
+<div id="outline-container-org4a31dce" class="outline-3">
+<h3 id="org4a31dce"><span class="section-number-3">1.4</span> 复数 URL</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 URL 作为宾语的单复数形式没有统一的规定。常见的操作是读取一个集合用的是复数。
@@ -343,8 +343,8 @@ GET /articles/2
 </div>
 </div>
 
-<div id="outline-container-org394980d" class="outline-3">
-<h3 id="org394980d"><span class="section-number-3">1.5</span> 1.5 避免多级嵌套</h3>
+<div id="outline-container-org986cff1" class="outline-3">
+<h3 id="org986cff1"><span class="section-number-3">1.5</span> 避免多级嵌套</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 常见的情况是，资源需要多级分类，因此很容易写出多级的 URL，比如获取某个作者的某一
@@ -383,12 +383,12 @@ GET /articles?published=true
 </div>
 </div>
 
-<div id="outline-container-org2d167f1" class="outline-2">
-<h2 id="org2d167f1"><span class="section-number-2">2</span> 状态码</h2>
+<div id="outline-container-org06d62e1" class="outline-2">
+<h2 id="org06d62e1"><span class="section-number-2">2</span> 状态码</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgf68eca4" class="outline-3">
-<h3 id="orgf68eca4"><span class="section-number-3">2.1</span> 2.1 状态码必须精确</h3>
+<div id="outline-container-org06c7a49" class="outline-3">
+<h3 id="org06c7a49"><span class="section-number-3">2.1</span> 状态码必须精确</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 客户端的每一次请求，服务器都必须给出回应。回应包括 HTTP 状态码和数据两部分。
@@ -439,8 +439,8 @@ HTTP 状态码就是一个三位数，分成五个类别。
 </div>
 </div>
 
-<div id="outline-container-org569ebf1" class="outline-3">
-<h3 id="org569ebf1"><span class="section-number-3">2.2</span> 2.2 2xx 状态码</h3>
+<div id="outline-container-org8a7c89d" class="outline-3">
+<h3 id="org8a7c89d"><span class="section-number-3">2.2</span> 2xx 状态码</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 200 状态码表示操作成功，但是不同的方法可以返回更精确的状态码。
@@ -470,8 +470,8 @@ HTTP/1.1 202 Accepted
 </div>
 </div>
 
-<div id="outline-container-org0375870" class="outline-3">
-<h3 id="org0375870"><span class="section-number-3">2.3</span> 2.3 3xx 状态码</h3>
+<div id="outline-container-orgd07d0c9" class="outline-3">
+<h3 id="orgd07d0c9"><span class="section-number-3">2.3</span> 3xx 状态码</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 API 用不到 301 状态码（永久重定向）和 302 状态码（暂时重定向，307 也是这个含
@@ -489,8 +489,8 @@ Location: /api/articles/12345
 </div>
 </div>
 
-<div id="outline-container-orgc9f6963" class="outline-3">
-<h3 id="orgc9f6963"><span class="section-number-3">2.4</span> 2.4 4xx 状态码</h3>
+<div id="outline-container-orgac76da3" class="outline-3">
+<h3 id="orgac76da3"><span class="section-number-3">2.4</span> 4xx 状态码</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 4xx 状态码表示客户端错误，主要有下面几种。
@@ -572,8 +572,8 @@ Location: /api/articles/12345
 </div>
 </div>
 
-<div id="outline-container-org669c9ce" class="outline-3">
-<h3 id="org669c9ce"><span class="section-number-3">2.5</span> 2.5 5xx 状态码</h3>
+<div id="outline-container-org5d12434" class="outline-3">
+<h3 id="org5d12434"><span class="section-number-3">2.5</span> 5xx 状态码</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 5xx 状态码表示服务端错误。一般来说，API 不会向用户透露服务器的详细信息，所以
@@ -615,12 +615,12 @@ Location: /api/articles/12345
 </div>
 </div>
 
-<div id="outline-container-orgc273b58" class="outline-2">
-<h2 id="orgc273b58"><span class="section-number-2">3</span> 服务器回应</h2>
+<div id="outline-container-orgfc23de6" class="outline-2">
+<h2 id="orgfc23de6"><span class="section-number-2">3</span> 服务器回应</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org9ec7ed0" class="outline-3">
-<h3 id="org9ec7ed0"><span class="section-number-3">3.1</span> 3.1 不要返回纯本文</h3>
+<div id="outline-container-org916b8e5" class="outline-3">
+<h3 id="org916b8e5"><span class="section-number-3">3.1</span> 不要返回纯本文</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 API 返回的数据格式，不应该是纯文本，而应该是一个 JSON 对象，因为这样才能返回
@@ -635,8 +635,8 @@ Accept: application/json
 </div>
 </div>
 
-<div id="outline-container-org65c5d9f" class="outline-3">
-<h3 id="org65c5d9f"><span class="section-number-3">3.2</span> 3.2 发生错误时，不要返回 200 状态码</h3>
+<div id="outline-container-orgc9e73b5" class="outline-3">
+<h3 id="orgc9e73b5"><span class="section-number-3">3.2</span> 发生错误时，不要返回 200 状态码</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 有一种不恰当的做法是，即使发生错误，也返回 200 状态码，把错误信息放在数据体里
@@ -671,8 +671,8 @@ Content-Type: application/json
 </div>
 </div>
 
-<div id="outline-container-org27ea990" class="outline-3">
-<h3 id="org27ea990"><span class="section-number-3">3.3</span> 3.3 提供链接</h3>
+<div id="outline-container-orgebbc55b" class="outline-3">
+<h3 id="orgebbc55b"><span class="section-number-3">3.3</span> 提供链接</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 API 的使用者未必知道，URL 是怎么设计的。一个解决方法就是，在回应中，给出相关
@@ -738,8 +738,8 @@ Content-Type: application/json
 </div>
 </div>
 
-<div id="outline-container-org7dba726" class="outline-2">
-<h2 id="org7dba726"><span class="section-number-2">4</span> 参考链接</h2>
+<div id="outline-container-org92eb471" class="outline-2">
+<h2 id="org92eb471"><span class="section-number-2">4</span> 参考链接</h2>
 <div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li><a href="https://blog.florimondmanca.com/restful-api-design-13-best-practices-to-make-your-users-happy">RESTful API Design: 13 Best Practices to Make Your Users Happy</a>, by Florimond Manca</li>
@@ -750,7 +750,7 @@ Content-Type: application/json
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-07-10 Wed 15:11. Created by Jinghui Hu at 2018-10-10 Wed 11:04.</p>
+<p class="author">Last Updated 2019-12-12 Thu 21:46. Created by Jinghui Hu at 2018-10-10 Wed 11:04.</p>
 </div>
 </body>
 </html>
