@@ -854,7 +854,9 @@
       #+BEGIN_SRC yaml
         eureka:
           instance:
-            preferIpAddress: true       # 使用 IP 地址注册，而不是使用主机名注册
+            instanceId: app-instance-id
+            hostname: my.app.host
+            nonSecurePort: 8080 # http 请求的端口号
           client:
             fetchRegistry: true
             registerWithEureka: true
@@ -862,8 +864,14 @@
               defaultZone: http://localhost:8761/eureka/
       #+END_SRC
 
-      通常建议开启 ~preferIpAddress~ ，因为有的时候微服务被部署到 docker 容器中，
-      主机名可能是随机分配的，不好管理。
+      如果开启 ~preferIpAddress~ 就会忽略 ~hostname~ ，因为有的时候微服务被部署
+      到 docker 容器中，主机名可能是随机分配的，不好管理。
+      #+BEGIN_SRC yaml
+        eureka:
+          instance:
+            preferIpAddress: true       # 使用 IP 地址注册，而不是使用主机名注册
+      #+END_SRC
+
 
 ***** 配置引导类
       如果是 Spring Boot 项目的话，添加了
