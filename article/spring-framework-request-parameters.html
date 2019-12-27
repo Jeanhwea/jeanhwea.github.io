@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-11-20 Wed 10:21 -->
+<!-- 2019-12-27 Fri 22:59 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>几种获取 Spring Framework 控制器中请求参数的方法</title>
@@ -238,19 +238,20 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org419be7a">1. 请求参数</a></li>
-<li><a href="#org2740fa5">2. URI 路径请求</a></li>
-<li><a href="#org86e64fa">3. URI 的请求参数</a></li>
-<li><a href="#org9eddcfc">4. GET 的 Query 字符串中的参数</a></li>
-<li><a href="#org337005b">5. POST 请求体里面的 JSON 参数</a></li>
-<li><a href="#org248ccfa">6. HttpServletRequest 对象</a></li>
+<li><a href="#orgc2f9da8">1. 请求参数</a></li>
+<li><a href="#org93622c8">2. URI 路径请求</a></li>
+<li><a href="#org1bf5be5">3. URI 的请求参数</a></li>
+<li><a href="#org535645c">4. GET 的 Query 字符串中的参数</a></li>
+<li><a href="#orgdab1683">5. POST 请求体里面的 JSON 参数</a></li>
+<li><a href="#orge6208ae">6. HttpServletRequest 对象</a></li>
+<li><a href="#orgc042480">7. 请求头</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org419be7a" class="outline-2">
-<h2 id="org419be7a"><span class="section-number-2">1</span> 请求参数</h2>
+<div id="outline-container-orgc2f9da8" class="outline-2">
+<h2 id="orgc2f9da8"><span class="section-number-2">1</span> 请求参数</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 在 HTTP 请求中往往有多种请求参数，在 Spring Framework 中的请求参数都是放在如下
@@ -268,8 +269,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org2740fa5" class="outline-2">
-<h2 id="org2740fa5"><span class="section-number-2">2</span> URI 路径请求</h2>
+<div id="outline-container-org93622c8" class="outline-2">
+<h2 id="org93622c8"><span class="section-number-2">2</span> URI 路径请求</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
 <pre class="src src-text">GET /orders/121233
@@ -291,8 +292,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org86e64fa" class="outline-2">
-<h2 id="org86e64fa"><span class="section-number-2">3</span> URI 的请求参数</h2>
+<div id="outline-container-org1bf5be5" class="outline-2">
+<h2 id="org1bf5be5"><span class="section-number-2">3</span> URI 的请求参数</h2>
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
 <pre class="src src-text">GET /orders?status=ready
@@ -314,8 +315,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org9eddcfc" class="outline-2">
-<h2 id="org9eddcfc"><span class="section-number-2">4</span> GET 的 Query 字符串中的参数</h2>
+<div id="outline-container-org535645c" class="outline-2">
+<h2 id="org535645c"><span class="section-number-2">4</span> GET 的 Query 字符串中的参数</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-text">GET /orders?name=new&amp;total=10
@@ -342,8 +343,8 @@ Map 的冗余代码
 </div>
 </div>
 
-<div id="outline-container-org337005b" class="outline-2">
-<h2 id="org337005b"><span class="section-number-2">5</span> POST 请求体里面的 JSON 参数</h2>
+<div id="outline-container-orgdab1683" class="outline-2">
+<h2 id="orgdab1683"><span class="section-number-2">5</span> POST 请求体里面的 JSON 参数</h2>
 <div class="outline-text-2" id="text-5">
 <div class="org-src-container">
 <pre class="src src-text">POST /orders
@@ -377,8 +378,8 @@ Map 的冗余代码
 </div>
 </div>
 
-<div id="outline-container-org248ccfa" class="outline-2">
-<h2 id="org248ccfa"><span class="section-number-2">6</span> HttpServletRequest 对象</h2>
+<div id="outline-container-orge6208ae" class="outline-2">
+<h2 id="orge6208ae"><span class="section-number-2">6</span> HttpServletRequest 对象</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 有时候，我们希望直接获取到请求的对象实例，这样就可以调用
@@ -401,9 +402,44 @@ Framework 提供了一个有效的手段，那就是直接把 HttpServletRequest
 </div>
 </div>
 </div>
+
+<div id="outline-container-orgc042480" class="outline-2">
+<h2 id="orgc042480"><span class="section-number-2">7</span> 请求头</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+获取所有的请求头
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">import</span> <span style="color: #268bd2;">org</span>.<span style="color: #268bd2;">springframework</span>.<span style="color: #268bd2;">http</span>.<span style="color: #268bd2;">HttpHeaders</span>;
+
+<span style="color: #268bd2;">@RestController</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">ProxyOrderController</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #268bd2;">@GetMapping</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"/orders/**"</span><span style="color: #d8241f;">)</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">getOrders</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@RequestHeader</span> <span style="color: #268bd2;">HttpHeaders</span> <span style="color: #6c71c4;">headers</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+获取特定的请求头
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@RestController</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">ProxyOrderController</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #268bd2;">@GetMapping</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"/orders/**"</span><span style="color: #d8241f;">)</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">getOrders</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@RequestHeader</span><span style="color: #9564bf;">(</span><span style="color: #2aa198;">"User-Agent"</span><span style="color: #9564bf;">)</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">ua</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2019-11-20 Wed 10:21. Created by Jinghui Hu at 2019-11-19 Tue 21:29.</p>
+<p class="author">Last Updated 2019-12-27 Fri 22:59. Created by Jinghui Hu at 2019-11-19 Tue 21:29.</p>
 </div>
 </body>
 </html>
