@@ -84,16 +84,21 @@
    #+END_SRC
 
 *** 最佳实践
-   一般可以将下载的 wheel 包放在摆渡机的 =~/Downloads/wheels= 文件夹中
+   一般可以将下载的 wheel 包放在摆渡机的 =~/.pip/cache= 文件夹中
    #+BEGIN_SRC sh
-     # download and save packages to ~/Downloads/wheels
-     pip download -d ~/Downloads/wheels <name>
+     # download and save packages to ~/.pip/cache
+     pip download -d ~/.pip/cache <name>
 
      # upload packages to remote machine
-     rsync -av ~/Downloads/wheels/ user@host:~/Downloads/wheels
+     rsync -av ~/.pip/cache/ user@host:~/.pip/cache
 
      # install on remote machine
-     pip install --no-index --find-link=~/Downloads/wheels <name>
+     pip install --no-index --find-link=~/.pip/cache <name>
+   #+END_SRC
+
+   也可以添加环境变量来指定 pip 工具的缓存目录
+   #+BEGIN_SRC sh
+     export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
    #+END_SRC
 
 * 虚拟环境
