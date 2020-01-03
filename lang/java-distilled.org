@@ -463,6 +463,60 @@
       }
     #+END_SRC
 
+** 泛型
+   泛型在实际工作中使用的非常频繁，可以很大程度上减少对不同类型的重复操作的代码。
+
+*** 类和接口的泛型
+    类的泛型定义，之间在类名称后添加尖括号来表示
+
+    #+BEGIN_SRC java
+      public class GenericClassOneType<T> {
+        public void performAction(final T action) {
+          // coding
+        }
+      }
+    #+END_SRC
+
+*** 方法的泛型
+    方法的泛型定义在 ~public~, ~abstract~, ~static~ 等关键字后面，例如：
+    #+BEGIN_SRC java
+      public<T, R> R performAction(final T action) {
+        final R result = null;
+        // coding
+        return result;
+      }
+
+      protected static<T, R> R performAction2(final T action) {
+        final R result2 = null;
+        // coding
+        return result2;
+      }
+    #+END_SRC
+
+*** 泛型中使用 extends 和 super 关键字
+    在泛型中可以使用对类型的基础关系
+
+    #+BEGIN_SRC java
+      public <T extends InputStream> void read(final T stream) { }
+      public <T extends Serializable> void store(final T object) { }
+
+      public void interate(final Collection< ? super Integer> objects) { }
+    #+END_SRC
+
+*** 泛型的注意点
+    - Java 中泛型必须是对象，像 ~int~, ~long~, ~double~ 等是不可以定义到泛型中，
+      需要使用对应的适配类
+    - 泛型只是在编译是才存在，编译完成后就没有泛型的留在字节码中。所以对应使用泛
+      型作为传参的其实是一个方法，例如：
+      #+BEGIN_SRC java
+        void sort(Collection<String> strings) { }
+        void sort(Collection<Number> strings) { }
+      #+END_SRC
+      在编译成字节码后其实是一个方法
+      #+BEGIN_SRC java
+        void sort(Collection arg1) { }
+      #+END_SRC
+
 * JDK
   [[https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html][JDK]] 是 Java 语言的软件开发工具包，主要用于移动设备、嵌入式设备上的 JAVA 应用程
   序。JDK 是整个 Java 开发的核心，它包含了 JAVA 的运行环境（JVM+Java 系统类库）
