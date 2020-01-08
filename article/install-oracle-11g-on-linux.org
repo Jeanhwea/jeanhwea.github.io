@@ -1,0 +1,132 @@
+#+TITLE: 在 Oracle Linux 上安装 Oracle 11g 数据库
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2020-01-08 Wed 11:33:40>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+TAGS: oracle database installation
+
+
+* 前置准备和检验工作
+
+** 操作系统的选择
+   基于 Oracle Linux Release6 Update9 来安装的，准备文件为
+   - OracleLinux-R6-U9-Server-x86_64-dvd.iso
+
+   #+BEGIN_SRC text
+     $ cksum OracleLinux-R6-U9-Server-x86_64-dvd.iso
+     3134304474 4048551936 OracleLinux-R6-U9-Server-x86_64-dvd.iso
+   #+END_SRC
+
+** 数据库安装文件
+   下面两个是数据的安装文件
+
+   - p13390677_112040_Linux-x86-64_1of7.zip
+   - p13390677_112040_Linux-x86-64_2of7.zip
+
+   将两个文件解压到统一个文件夹中，得到一个 =database= 的文件夹
+   #+BEGIN_SRC sh
+     unzip p13390677_112040_Linux-x86-64_1of7.zip
+     unzip p13390677_112040_Linux-x86-64_2of7.zip
+   #+END_SRC
+
+** 检验操作系统的内存
+   操作系统的内存至少 8G
+   #+BEGIN_SRC text
+     [root@orange ~]# grep MemTotal /proc/meminfo
+     MemTotal:        7894628 kB
+     [root@orange ~]# uname -m
+     x86_64
+     [root@orange ~]# grep SwapTotal /proc/meminfo
+     SwapTotal:       6709244 kB
+     [root@orange ~]# free
+                  total       used       free     shared    buffers     cached
+     Mem:       7894628    7831300      63328        540      49504    7420032
+     -/+ buffers/cache:     361764    7532864
+     Swap:      6709244          0    6709244
+     [root@orange ~]#
+   #+END_SRC
+
+** 检验操作系统的存储
+   操作状态的 =/tmp= 文件夹需要有超过 1G 的存储空间
+   #+BEGIN_SRC text
+     [root@orange ~]# df -h /tmp
+     Filesystem            Size  Used Avail Use% Mounted on
+     /dev/mapper/vg_orange-lv_root
+                            50G   14G   34G  29% /
+     [root@orange ~]# df -h
+     Filesystem            Size  Used Avail Use% Mounted on
+     /dev/mapper/vg_orange-lv_root
+                            50G   14G   34G  29% /
+     tmpfs                 3.8G     0  3.8G   0% /dev/shm
+     /dev/sda1             477M   84M  364M  19% /boot
+     /dev/mapper/vg_orange-lv_home
+                           6.9G   17M  6.5G   1% /home
+
+   #+END_SRC
+
+* 用户和角色相关
+
+** 创建基本的用户和用户组
+   - The Oracle Inventory group (typically, =oinstall= )
+   - The OSDBA group (typically, =dba= )
+   - The Oracle software owner (typically, =oracle= )
+   - The OSOPER group (optional. Typically, =oper= )
+
+   新建 =oinstall= 和 =dba= 用户组
+   #+BEGIN_SRC sh
+     groupadd oinstall
+     groupadd dba
+   #+END_SRC
+
+   新建 =oracle= 用户
+   #+BEGIN_SRC sh
+     useradd -g oinstall -G dba oracle
+
+     # 如果 oracle 用户已经存在，则直接加入对应用户组即可
+     # usermod -g oinstall -G dba oracle
+   #+END_SRC
+
+   配置 =oracle= 用户的密码
+   #+BEGIN_SRC sh
+     passwd oracle
+   #+END_SRC
+
+   检验建立好的 =oracle= 用户
+   #+BEGIN_SRC sh
+     id oracle
+   #+END_SRC
+   #+BEGIN_SRC text
+     [root@orange ~]# id oracle
+     uid=500(oracle) gid=500(oinstall) groups=500(oinstall),501(dba)
+   #+END_SRC
+
+** 配置内核参数
+   添加或修改配置文件 =/etc/sysctl.conf= ， 如下内核参数
+
+   #+BEGIN_SRC conf
+     fs.aio-max-nr = 1048576
+     fs.file-max = 6815744
+     kernel.shmall = 2097152
+     kernel.shmmax = 536870912
+     kernel.shmmni = 4096
+     kernel.sem = 250 32000 100 128
+     net.ipv4.ip_local_port_range = 9000 65500
+     net.core.rmem_default = 262144
+     net.core.rmem_max = 4194304
+     net.core.wmem_default = 262144
+     net.core.wmem_max = 1048576
+   #+END_SRC
+
+   内核参数文件修改后重启生效
+
+** 修改用户的限制
+   编辑 =/etc/security/limits.conf= 文件，添加如下配置行
+
+   #+BEGIN_SRC conf
+     oracle       soft    nproc   2047
+     oracle       hard    nproc   16384
+     oracle       soft    nofile  1024
+     oracle       hard    nofile  65536
+     oracle       soft    stack   10240
+   #+END_SRC
