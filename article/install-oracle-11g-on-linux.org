@@ -123,6 +123,10 @@
 
     检测是否配置成功
     #+BEGIN_SRC sh
+      # 下载缓存
+      yum makecache
+
+      # 列出可安装包
       yum list
     #+END_SRC
 
@@ -130,23 +134,22 @@
     直接使用 yum 管理器安装
     #+BEGIN_SRC sh
       yum install binutils compat-libcap1-1.10 compat-libstdc++-33-3.2.3 gcc-4.4.4 \
-          gcc-c++-4.4.4 glibc-2.12 glibc-devel-2.12 libgcc-4.4.4 libstdc++-4.4.4 \
+          gcc-c++-4.4.4 glibc-2.12 glibc-devel-2.12 ksh libgcc-4.4.4 libstdc++-4.4.4 \
           libstdc++-devel-4.4.4 libaio-0.3.107 libaio-devel-0.3.107 make-3.81 sysstat-9.0.4
     #+END_SRC
-
 
 * 操作系统相关配置
 
 ** 配置计算机名
    编辑 =/etc/hosts= 文件，添加如下主机名到 IP 的映射
    #+BEGIN_SRC text
-     192.168.0.219 orange219
+     192.168.0.131 orange131 orange131
    #+END_SRC
 
    配置 =/etc/sysconfig/network=
    #+BEGIN_SRC text
      NETWORKING=yes
-     HOSTNAME=orange219
+     HOSTNAME=orange131
    #+END_SRC
 
    测试是否修改成功
@@ -192,12 +195,14 @@
    添加或修改配置文件 =/etc/sysctl.conf= ， 如下内核参数
 
    #+BEGIN_SRC conf
+     kernel.shmmni = 4096
+     # kernel.shmmax = 536870912
+     # kernel.shmall = 2097152
+     kernel.sem = 250 32000 100 128
+
      fs.aio-max-nr = 1048576
      fs.file-max = 6815744
-     kernel.shmall = 2097152
-     kernel.shmmax = 536870912
-     kernel.shmmni = 4096
-     kernel.sem = 250 32000 100 128
+
      net.ipv4.ip_local_port_range = 9000 65500
      net.core.rmem_default = 262144
      net.core.rmem_max = 4194304
@@ -211,33 +216,57 @@
    编辑 =/etc/security/limits.conf= 文件，添加如下配置行
 
    #+BEGIN_SRC conf
-     oracle       soft    nproc   2047
-     oracle       hard    nproc   16384
-     oracle       soft    nofile  1024
-     oracle       hard    nofile  65536
-     oracle       soft    stack   10240
+     oracle   soft   nproc    131072
+     oracle   hard   nproc    131072
+     oracle   soft   nofile   131072
+     oracle   hard   nofile   131072
+     oracle   soft   core     unlimited
+     oracle   hard   core     unlimited
+     oracle   soft   memlock  50000000
+     oracle   hard   memlock  50000000
+   #+END_SRC
+
+** 添加如下的环境变量
+   为了后面操作简单，需要添加一些常用的环境变量和命令别名
+
+   #+BEGIN_SRC sh
+     # 基础变量
+     export ORACLE_BASE=/u01/app/oracle
+     export ORACLE_SID=ora11g
+
+     export ORACLE_HOME=$ORACLE_BASE/product/11.2.0/dbhome_1
+     export PATH=$PATH:$ORACLE_HOME/bin
+
+     export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib
+     export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
+
+     export NLS_LANG="AMERICAN.AL32UTF8"
+
+     # 常用别名
+     alias cdob='cd $ORACLE_BASE'
+     alias cdoh='cd $ORACLE_HOME'
+     alias tns='cd $ORACLE_HOME/network/admin'
+     alias envo='env | grep ORACLE'
    #+END_SRC
 
 ** 创建安装目录
    使用如下命令
    #+BEGIN_SRC sh
-     mkdir -p /u01/app/
-     chown -R oracle:oinstall /u01/app/
-     chmod -R 775 /u01/app/
+     mkdir -p $ORACLE_BASE
+     chown -R oracle:oinstall $ORACLE_BASE
+     chmod -R 775 $ORACLE_BASE
    #+END_SRC
+
+** 禁用 SELINUXX 和系统防火墙
+   编辑 =/etc/selinux/config= 文件
+   #+BEGIN_SRC text
+     SELINUX=disabled
+   #+END_SRC
+
+** 关闭系统的防火墙
+   在图形界面中关闭防火墙
 
 * 配置 Oracle 参数
-
-** 添加如下的环境变量
-   #+BEGIN_SRC sh
-     export ORACLE_BASE=/u01/app/oracle
-     export ORACLE_SID=ora11g
-
-     export ORACLE_HOME=$ORACLE_BASE/product/11.2.0/dbhome_1
-     export PATH=$ORACLE_HOME/bin:$PATH
-
-     export NLS_LANG="SIMPLIFIED CHINESE_CHINA.AL32UTF8"
-   #+END_SRC
 
 ** 启动程序
    启动安装程序
@@ -245,6 +274,13 @@
      # export DISPLAY=192.168.0.106:0.0
      ./runInstaller
    #+END_SRC
+
+** Oracle 11g 连通性测试工具
+
+   - =tsnping= 工具可以
+   - =lsnrctl= 可以开启关闭 Oracle 的监听
+   - =netca= 监听器配置程序
+   - =netmgr= 网络配置助手
 
 * 参考链接
 
