@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-01-09 Thu 08:03 -->
+<!-- 2020-01-09 Thu 09:37 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>在 Oracle Linux 上安装 Oracle 11g 数据库</title>
@@ -238,44 +238,51 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org0ed767a">1. 安装文件</a>
+<li><a href="#org251d6a4">1. 安装文件</a>
 <ul>
-<li><a href="#orgbb3c58a">1.1. 操作系统的选择</a></li>
-<li><a href="#org75df889">1.2. 数据库安装文件</a></li>
+<li><a href="#orgc3b4bd0">1.1. 操作系统的选择</a></li>
+<li><a href="#org82f1f08">1.2. 数据库安装文件</a></li>
 </ul>
 </li>
-<li><a href="#org0fd4e8e">2. 前置准备和检验工作</a>
+<li><a href="#org8605bcd">2. 前置准备和检验工作</a>
 <ul>
-<li><a href="#orge9df13c">2.1. 检验操作系统的内存</a></li>
-<li><a href="#orga961f75">2.2. 检验操作系统的存储</a></li>
+<li><a href="#org753d3ba">2.1. 检验操作系统的内存</a></li>
+<li><a href="#org7a69b6a">2.2. 检验操作系统的存储</a></li>
+<li><a href="#org62659a2">2.3. 安装必要的软件包</a>
+<ul>
+<li><a href="#org1814191">2.3.1. 配置本地的 yum 源</a></li>
+<li><a href="#orgdcd2136">2.3.2. 安装相关依赖包</a></li>
 </ul>
 </li>
-<li><a href="#org719492f">3. 用户和角色相关</a>
-<ul>
-<li><a href="#org7bf44a2">3.1. 创建基本的用户和用户组</a></li>
-<li><a href="#org5925607">3.2. 配置内核参数</a></li>
-<li><a href="#org9b8e2dc">3.3. 修改用户的限制</a></li>
-<li><a href="#orgd098f65">3.4. 创建安装目录</a></li>
 </ul>
 </li>
-<li><a href="#org12e7e13">4. 配置 Oracle 参数</a>
+<li><a href="#orgb27a433">3. 操作系统相关配置</a>
 <ul>
-<li><a href="#org828851f">4.1. 添加如下的环境变量</a></li>
-<li><a href="#org4f7e2fd">4.2. 启动程序</a></li>
+<li><a href="#org55b94d6">3.1. 配置计算机名</a></li>
+<li><a href="#org300547a">3.2. 创建基本的用户和用户组</a></li>
+<li><a href="#org94337af">3.3. 配置内核参数</a></li>
+<li><a href="#org9e8199b">3.4. 修改用户的限制</a></li>
+<li><a href="#orgab07d3c">3.5. 创建安装目录</a></li>
 </ul>
 </li>
-<li><a href="#org78fc911">5. 参考链接</a></li>
+<li><a href="#org76ca7c2">4. 配置 Oracle 参数</a>
+<ul>
+<li><a href="#org0566d0c">4.1. 添加如下的环境变量</a></li>
+<li><a href="#orgfcefb12">4.2. 启动程序</a></li>
+</ul>
+</li>
+<li><a href="#orgb031156">5. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org0ed767a" class="outline-2">
-<h2 id="org0ed767a"><span class="section-number-2">1</span> 安装文件</h2>
+<div id="outline-container-org251d6a4" class="outline-2">
+<h2 id="org251d6a4"><span class="section-number-2">1</span> 安装文件</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgbb3c58a" class="outline-3">
-<h3 id="orgbb3c58a"><span class="section-number-3">1.1</span> 操作系统的选择</h3>
+<div id="outline-container-orgc3b4bd0" class="outline-3">
+<h3 id="orgc3b4bd0"><span class="section-number-3">1.1</span> 操作系统的选择</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 本教程是基于 Oracle Linux Release6 Update9 操作系统来安装的，准备文件为
@@ -292,8 +299,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org75df889" class="outline-3">
-<h3 id="org75df889"><span class="section-number-3">1.2</span> 数据库安装文件</h3>
+<div id="outline-container-org82f1f08" class="outline-3">
+<h3 id="org82f1f08"><span class="section-number-3">1.2</span> 数据库安装文件</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Oracle 数据库选择 11g R2 下面两个是数据的安装文件
@@ -312,16 +319,25 @@ Oracle 数据库选择 11g R2 下面两个是数据的安装文件
 unzip p13390677_112040_Linux-x86-64_2of7.zip
 </pre>
 </div>
+
+<div class="org-src-container">
+<pre class="src src-text">[oracle@orange219 Downloads]$ cksum p13390677_112040_Linux-x86-64_1of7.zip
+153454328 1395582860 p13390677_112040_Linux-x86-64_1of7.zip
+[oracle@orange219 Downloads]$ cksum p13390677_112040_Linux-x86-64_2of7.zip
+2027415580 1151304589 p13390677_112040_Linux-x86-64_2of7.zip
+[oracle@orange219 Downloads]$
+</pre>
+</div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org0fd4e8e" class="outline-2">
-<h2 id="org0fd4e8e"><span class="section-number-2">2</span> 前置准备和检验工作</h2>
+<div id="outline-container-org8605bcd" class="outline-2">
+<h2 id="org8605bcd"><span class="section-number-2">2</span> 前置准备和检验工作</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orge9df13c" class="outline-3">
-<h3 id="orge9df13c"><span class="section-number-3">2.1</span> 检验操作系统的内存</h3>
+<div id="outline-container-org753d3ba" class="outline-3">
+<h3 id="org753d3ba"><span class="section-number-3">2.1</span> 检验操作系统的内存</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 操作系统的内存至少 8G
@@ -344,8 +360,8 @@ Swap:      6709244          0    6709244
 </div>
 </div>
 
-<div id="outline-container-orga961f75" class="outline-3">
-<h3 id="orga961f75"><span class="section-number-3">2.2</span> 检验操作系统的存储</h3>
+<div id="outline-container-org7a69b6a" class="outline-3">
+<h3 id="org7a69b6a"><span class="section-number-3">2.2</span> 检验操作系统的存储</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 操作状态的 <code>/tmp</code> 文件夹需要有超过 1G 的存储空间
@@ -363,20 +379,138 @@ tmpfs                 3.8G     0  3.8G   0% /dev/shm
 /dev/sda1             477M   84M  364M  19% /boot
 /dev/mapper/vg_orange-lv_home
                       6.9G   17M  6.5G   1% /home
+</pre>
+</div>
+</div>
+</div>
 
+<div id="outline-container-org62659a2" class="outline-3">
+<h3 id="org62659a2"><span class="section-number-3">2.3</span> 安装必要的软件包</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+Oracle 11g 有一些必要的安装文件包，在 Oracle Linux 6 中所需要的包
+</p>
+<div class="org-src-container">
+<pre class="src src-text">binutils-2.20.51.0.2-5.11.el6 (x86_64)
+compat-libcap1-1.10-1 (x86_64)
+compat-libstdc++-33-3.2.3-69.el6 (x86_64)
+compat-libstdc++-33-3.2.3-69.el6.i686
+gcc-4.4.4-13.el6 (x86_64)
+gcc-c++-4.4.4-13.el6 (x86_64)
+glibc-2.12-1.7.el6 (i686)
+glibc-2.12-1.7.el6 (x86_64)
+glibc-devel-2.12-1.7.el6 (x86_64)
+glibc-devel-2.12-1.7.el6.i686
+ksh
+libgcc-4.4.4-13.el6 (i686)
+libgcc-4.4.4-13.el6 (x86_64)
+libstdc++-4.4.4-13.el6 (x86_64)
+libstdc++-4.4.4-13.el6.i686
+libstdc++-devel-4.4.4-13.el6 (x86_64)
+libstdc++-devel-4.4.4-13.el6.i686
+libaio-0.3.107-10.el6 (x86_64)
+libaio-0.3.107-10.el6.i686
+libaio-devel-0.3.107-10.el6 (x86_64)
+libaio-devel-0.3.107-10.el6.i686
+make-3.81-19.el6
+sysstat-9.0.4-11.el6 (x86_64)
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org1814191" class="outline-4">
+<h4 id="org1814191"><span class="section-number-4">2.3.1</span> 配置本地的 yum 源</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<p>
+将系统安装的 iso 包加载的 cdrom 中
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">mkdir -p /mnt/cdrom &amp;&amp; mount /dev/cdrom /mnt/cdrom
+</pre>
+</div>
+
+<p>
+添加本地的 repo 配置文件
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">vim /etc/yum.repos.d/local-yum.repo
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-conf">[<span style="color: #268bd2;">local_server</span>]
+<span style="color: #6c71c4;">name</span>=Oracle Linux 6 Local DVD
+<span style="color: #6c71c4;">baseurl</span>=file:///mnt/cdrom/Server
+<span style="color: #6c71c4;">gpgcheck</span>=0
+<span style="color: #6c71c4;">enabled</span>=1
+</pre>
+</div>
+
+<p>
+检测是否配置成功
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">yum list
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgdcd2136" class="outline-4">
+<h4 id="orgdcd2136"><span class="section-number-4">2.3.2</span> 安装相关依赖包</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<p>
+直接使用 yum 管理器安装
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">yum install binutils compat-libcap1-1.10 compat-libstdc++-33-3.2.3 gcc-4.4.4 <span style="color: #2aa198;">\</span>
+    gcc-c++-4.4.4 glibc-2.12 glibc-devel-2.12 libgcc-4.4.4 libstdc++-4.4.4 <span style="color: #2aa198;">\</span>
+    libstdc++-devel-4.4.4 libaio-0.3.107 libaio-devel-0.3.107 make-3.81 sysstat-9.0.4
 </pre>
 </div>
 </div>
 </div>
 </div>
+</div>
 
-<div id="outline-container-org719492f" class="outline-2">
-<h2 id="org719492f"><span class="section-number-2">3</span> 用户和角色相关</h2>
+
+<div id="outline-container-orgb27a433" class="outline-2">
+<h2 id="orgb27a433"><span class="section-number-2">3</span> 操作系统相关配置</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org7bf44a2" class="outline-3">
-<h3 id="org7bf44a2"><span class="section-number-3">3.1</span> 创建基本的用户和用户组</h3>
+<div id="outline-container-org55b94d6" class="outline-3">
+<h3 id="org55b94d6"><span class="section-number-3">3.1</span> 配置计算机名</h3>
 <div class="outline-text-3" id="text-3-1">
+<p>
+编辑 <code>/etc/hosts</code> 文件，添加如下主机名到 IP 的映射
+</p>
+<div class="org-src-container">
+<pre class="src src-text">192.168.0.219 orange219
+</pre>
+</div>
+
+<p>
+配置 <code>/etc/sysconfig/network</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-text">NETWORKING=yes
+HOSTNAME=orange219
+</pre>
+</div>
+
+<p>
+测试是否修改成功
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">hostname
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org300547a" class="outline-3">
+<h3 id="org300547a"><span class="section-number-3">3.2</span> 创建基本的用户和用户组</h3>
+<div class="outline-text-3" id="text-3-2">
 <ul class="org-ul">
 <li>The Oracle Inventory group (typically, <code>oinstall</code> )</li>
 <li>The OSDBA group (typically, <code>dba</code> )</li>
@@ -427,9 +561,9 @@ uid=500(oracle) gid=500(oinstall) groups=500(oinstall),501(dba)
 </div>
 </div>
 
-<div id="outline-container-org5925607" class="outline-3">
-<h3 id="org5925607"><span class="section-number-3">3.2</span> 配置内核参数</h3>
-<div class="outline-text-3" id="text-3-2">
+<div id="outline-container-org94337af" class="outline-3">
+<h3 id="org94337af"><span class="section-number-3">3.3</span> 配置内核参数</h3>
+<div class="outline-text-3" id="text-3-3">
 <p>
 添加或修改配置文件 <code>/etc/sysctl.conf</code> ， 如下内核参数
 </p>
@@ -455,9 +589,9 @@ uid=500(oracle) gid=500(oinstall) groups=500(oinstall),501(dba)
 </div>
 </div>
 
-<div id="outline-container-org9b8e2dc" class="outline-3">
-<h3 id="org9b8e2dc"><span class="section-number-3">3.3</span> 修改用户的限制</h3>
-<div class="outline-text-3" id="text-3-3">
+<div id="outline-container-org9e8199b" class="outline-3">
+<h3 id="org9e8199b"><span class="section-number-3">3.4</span> 修改用户的限制</h3>
+<div class="outline-text-3" id="text-3-4">
 <p>
 编辑 <code>/etc/security/limits.conf</code> 文件，添加如下配置行
 </p>
@@ -473,9 +607,9 @@ oracle       soft    stack   10240
 </div>
 </div>
 
-<div id="outline-container-orgd098f65" class="outline-3">
-<h3 id="orgd098f65"><span class="section-number-3">3.4</span> 创建安装目录</h3>
-<div class="outline-text-3" id="text-3-4">
+<div id="outline-container-orgab07d3c" class="outline-3">
+<h3 id="orgab07d3c"><span class="section-number-3">3.5</span> 创建安装目录</h3>
+<div class="outline-text-3" id="text-3-5">
 <p>
 使用如下命令
 </p>
@@ -489,12 +623,12 @@ chmod -R 775 /u01/app/
 </div>
 </div>
 
-<div id="outline-container-org12e7e13" class="outline-2">
-<h2 id="org12e7e13"><span class="section-number-2">4</span> 配置 Oracle 参数</h2>
+<div id="outline-container-org76ca7c2" class="outline-2">
+<h2 id="org76ca7c2"><span class="section-number-2">4</span> 配置 Oracle 参数</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org828851f" class="outline-3">
-<h3 id="org828851f"><span class="section-number-3">4.1</span> 添加如下的环境变量</h3>
+<div id="outline-container-org0566d0c" class="outline-3">
+<h3 id="org0566d0c"><span class="section-number-3">4.1</span> 添加如下的环境变量</h3>
 <div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">ORACLE_BASE</span>=/u01/app/oracle
@@ -509,8 +643,8 @@ chmod -R 775 /u01/app/
 </div>
 </div>
 
-<div id="outline-container-org4f7e2fd" class="outline-3">
-<h3 id="org4f7e2fd"><span class="section-number-3">4.2</span> 启动程序</h3>
+<div id="outline-container-orgfcefb12" class="outline-3">
+<h3 id="orgfcefb12"><span class="section-number-3">4.2</span> 启动程序</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 启动安装程序
@@ -524,8 +658,8 @@ chmod -R 775 /u01/app/
 </div>
 </div>
 
-<div id="outline-container-org78fc911" class="outline-2">
-<h2 id="org78fc911"><span class="section-number-2">5</span> 参考链接</h2>
+<div id="outline-container-orgb031156" class="outline-2">
+<h2 id="orgb031156"><span class="section-number-2">5</span> 参考链接</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 1.<a href="http://dbaora.com/">DBAORA</a> Tomasz Lesinski 的个人博客
@@ -534,7 +668,7 @@ chmod -R 775 /u01/app/
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-01-09 Thu 08:03. Created by Jinghui Hu at 2020-01-08 Wed 11:33.</p>
+<p class="author">Last Updated 2020-01-09 Thu 09:37. Created by Jinghui Hu at 2020-01-08 Wed 11:33.</p>
 </div>
 </body>
 </html>

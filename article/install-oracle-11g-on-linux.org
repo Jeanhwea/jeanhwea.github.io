@@ -30,6 +30,14 @@
      unzip p13390677_112040_Linux-x86-64_2of7.zip
    #+END_SRC
 
+   #+BEGIN_SRC text
+     [oracle@orange219 Downloads]$ cksum p13390677_112040_Linux-x86-64_1of7.zip
+     153454328 1395582860 p13390677_112040_Linux-x86-64_1of7.zip
+     [oracle@orange219 Downloads]$ cksum p13390677_112040_Linux-x86-64_2of7.zip
+     2027415580 1151304589 p13390677_112040_Linux-x86-64_2of7.zip
+     [oracle@orange219 Downloads]$
+   #+END_SRC
+
 * 前置准备和检验工作
 
 ** 检验操作系统的内存
@@ -64,10 +72,87 @@
      /dev/sda1             477M   84M  364M  19% /boot
      /dev/mapper/vg_orange-lv_home
                            6.9G   17M  6.5G   1% /home
-
    #+END_SRC
 
-* 用户和角色相关
+** 安装必要的软件包
+   Oracle 11g 有一些必要的安装文件包，在 Oracle Linux 6 中所需要的包
+   #+BEGIN_SRC text
+     binutils-2.20.51.0.2-5.11.el6 (x86_64)
+     compat-libcap1-1.10-1 (x86_64)
+     compat-libstdc++-33-3.2.3-69.el6 (x86_64)
+     compat-libstdc++-33-3.2.3-69.el6.i686
+     gcc-4.4.4-13.el6 (x86_64)
+     gcc-c++-4.4.4-13.el6 (x86_64)
+     glibc-2.12-1.7.el6 (i686)
+     glibc-2.12-1.7.el6 (x86_64)
+     glibc-devel-2.12-1.7.el6 (x86_64)
+     glibc-devel-2.12-1.7.el6.i686
+     ksh
+     libgcc-4.4.4-13.el6 (i686)
+     libgcc-4.4.4-13.el6 (x86_64)
+     libstdc++-4.4.4-13.el6 (x86_64)
+     libstdc++-4.4.4-13.el6.i686
+     libstdc++-devel-4.4.4-13.el6 (x86_64)
+     libstdc++-devel-4.4.4-13.el6.i686
+     libaio-0.3.107-10.el6 (x86_64)
+     libaio-0.3.107-10.el6.i686
+     libaio-devel-0.3.107-10.el6 (x86_64)
+     libaio-devel-0.3.107-10.el6.i686
+     make-3.81-19.el6
+     sysstat-9.0.4-11.el6 (x86_64)
+   #+END_SRC
+
+*** 配置本地的 yum 源
+    将系统安装的 iso 包加载的 cdrom 中
+    #+BEGIN_SRC sh
+      mkdir -p /mnt/cdrom && mount /dev/cdrom /mnt/cdrom
+    #+END_SRC
+
+    添加本地的 repo 配置文件
+    #+BEGIN_SRC sh
+      vim /etc/yum.repos.d/local-yum.repo
+    #+END_SRC
+
+    #+BEGIN_SRC conf
+      [local_server]
+      name=Oracle Linux 6 Local DVD
+      baseurl=file:///mnt/cdrom/Server
+      gpgcheck=0
+      enabled=1
+    #+END_SRC
+
+    检测是否配置成功
+    #+BEGIN_SRC sh
+      yum list
+    #+END_SRC
+
+*** 安装相关依赖包
+    直接使用 yum 管理器安装
+    #+BEGIN_SRC sh
+      yum install binutils compat-libcap1-1.10 compat-libstdc++-33-3.2.3 gcc-4.4.4 \
+          gcc-c++-4.4.4 glibc-2.12 glibc-devel-2.12 libgcc-4.4.4 libstdc++-4.4.4 \
+          libstdc++-devel-4.4.4 libaio-0.3.107 libaio-devel-0.3.107 make-3.81 sysstat-9.0.4
+    #+END_SRC
+
+
+* 操作系统相关配置
+
+** 配置计算机名
+   编辑 =/etc/hosts= 文件，添加如下主机名到 IP 的映射
+   #+BEGIN_SRC text
+     192.168.0.219 orange219
+   #+END_SRC
+
+   配置 =/etc/sysconfig/network=
+   #+BEGIN_SRC text
+     NETWORKING=yes
+     HOSTNAME=orange219
+   #+END_SRC
+
+   测试是否修改成功
+   #+BEGIN_SRC sh
+     hostname
+   #+END_SRC
 
 ** 创建基本的用户和用户组
    - The Oracle Inventory group (typically, =oinstall= )
