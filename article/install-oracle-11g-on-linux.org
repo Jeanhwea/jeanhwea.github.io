@@ -376,6 +376,20 @@
      ./runInstaller
    #+END_SRC
 
+** 配置 Oracle 11g 数据库随操作系统启动而自启动
+   修改数据库 =/etc/oratab= 配置文件，将最后一行的 **N** 改成 **Y**
+   #+BEGIN_SRC conf
+     ora11g:/u01/app/oracle/product/11.2.0/dbhome_1:Y
+   #+END_SRC
+
+   添加启动任务， 编辑 =/etc/rc.local= 文件，在最后添加启动 Oracle 监听和 Oracle
+   数据库的命令
+   #+BEGIN_SRC sh
+     # start oracle database
+     su - oracle -c '/u01/app/oracle/product/11.2.0/dbhome_1/bin/lsnrctl start'
+     su - oracle -c 'dbstart /u01/app/oracle/product/11.2.0/dbhome_1'
+   #+END_SRC
+
 ** Oracle 11g 连通性测试命令行工具
    - =tnsping= 工具探测工具
    - =lsnrctl= 可以开启关闭 Oracle 的监听
