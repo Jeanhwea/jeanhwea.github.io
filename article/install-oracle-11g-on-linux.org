@@ -39,43 +39,71 @@
    #+END_SRC
 
 * 前置准备和检验工作
+  在安装操作系统时就需要提前注意以下的配置
 
 ** 检验操作系统的内存
-   操作系统的内存至少 8G
-   #+BEGIN_SRC text
-     [root@orange ~]# grep MemTotal /proc/meminfo
-     MemTotal:        7894628 kB
-     [root@orange ~]# uname -m
-     x86_64
-     [root@orange ~]# grep SwapTotal /proc/meminfo
-     SwapTotal:       6709244 kB
-     [root@orange ~]# free
-                  total       used       free     shared    buffers     cached
-     Mem:       7894628    7831300      63328        540      49504    7420032
-     -/+ buffers/cache:     361764    7532864
-     Swap:      6709244          0    6709244
-     [root@orange ~]#
+   官方文档中说操作系统的 RAM 至少 1G，但是建议分配 2G 以上。另外，还需要 swap 分
+   区的分配，在安装操作系统时就要提前预留好对应的 swap 分区大小，根据官网文档建议如下：
+
+   | RAM            | swap            |
+   |----------------+-----------------|
+   | 1G 到 2G 之间  | RAM 大小的 1.5 倍  |
+   | 2G 到 16G 之间 | 和 RAM 同等大小 |
+   | 16G 以上       | 16G             |
+
+   检测操作系统 RAM 和 Swap 的命令如下：
+   #+BEGIN_SRC sh
+     grep MemTotal /proc/meminfo
+     grep SwapTotal /proc/meminfo
+     free
    #+END_SRC
 
-** 检验操作系统的存储
-   操作状态的 =/tmp= 文件夹需要有超过 1G 的存储空间
-   #+BEGIN_SRC text
-     [root@orange ~]# df -h /tmp
-     Filesystem            Size  Used Avail Use% Mounted on
-     /dev/mapper/vg_orange-lv_root
-                            50G   14G   34G  29% /
-     [root@orange ~]# df -h
-     Filesystem            Size  Used Avail Use% Mounted on
-     /dev/mapper/vg_orange-lv_root
-                            50G   14G   34G  29% /
-     tmpfs                 3.8G     0  3.8G   0% /dev/shm
-     /dev/sda1             477M   84M  364M  19% /boot
-     /dev/mapper/vg_orange-lv_home
-                           6.9G   17M  6.5G   1% /home
+   Oracle 11g 包含 *自动内存管理* 特性，该特性需要更多的共享内存 =/dev/shm= 和文
+   件描述符，可以通过以下命令查看可用的共享内存大小，需要注意的是可用的共享内存
+   值需要比 =MEMORY_MAX_TARGET= 和 =MEMORY_TARGET= 都要大
+   #+BEGIN_SRC sh
+     df -h /dev/shm/
    #+END_SRC
 
-** 安装必要的软件包
+   #+BEGIN_SRC sql
+     SQL> show parameter target
+
+     NAME                                 TYPE        VALUE
+     ------------------------------------ ----------- ------------------------------
+     archive_lag_target                   integer     0
+     db_flashback_retention_target        integer     1440
+     fast_start_io_target                 integer     0
+     fast_start_mttr_target               integer     0
+     memory_max_target                    big integer 0
+     memory_target                        big integer 0
+     parallel_servers_target              integer     512
+     pga_aggregate_target                 big integer 3217M
+     sga_target                           big integer 9664M
+   #+END_SRC
+
+** 检验操作系统的存储大小
+   为了配合 Oracle 安装包释放安装程序，操作系统的 =/tmp= 文件夹需要有超过 1G 的可
+   用存储空间
+   #+BEGIN_SRC sh
+     df -h /tmp
+   #+END_SRC
+
+   另外 Oracle 11g 数据库安装后大约要占用低于 5G 的硬盘存储
+
+** 系统的内核版本要求
+   在 Oracle Linux 6.9 中需要内核版本大于 =2.6.32-71.el6.x86_64= ，默认的内核就
+   满足要求
+
+   #+BEGIN_SRC sh
+     [oracle@orange139 database]$ uname -r
+     4.1.12-61.1.28.el6uek.x86_64
+   #+END_SRC
+
+** 必要的软件包
+
    Oracle 11g 有一些必要的安装文件包，在 Oracle Linux 6 中所需要的包
+
+   安装 database 所需要的包
    #+BEGIN_SRC text
      binutils-2.20.51.0.2-5.11.el6 (x86_64)
      compat-libcap1-1.10-1 (x86_64)
@@ -102,6 +130,14 @@
      sysstat-9.0.4-11.el6 (x86_64)
    #+END_SRC
 
+   安装 client 需要的包
+   #+BEGIN_SRC text
+     unixODBC-2.2.14-11.el6 (x86_64) or later
+     unixODBC-2.2.14-11.el6.i686 or later
+     unixODBC-devel-2.2.14-11.el6 (x86_64) or later
+     unixODBC-devel-2.2.14-11.el6.i686 or later
+   #+END_SRC
+
 *** 配置本地的 yum 源
     将系统安装的 iso 包加载的 cdrom 中
     #+BEGIN_SRC sh
@@ -125,7 +161,6 @@
     #+BEGIN_SRC sh
       # 下载缓存
       yum makecache
-
       # 列出可安装包
       yum list
     #+END_SRC
@@ -135,8 +170,16 @@
     #+BEGIN_SRC sh
       yum install binutils compat-libcap1-1.10 compat-libstdc++-33-3.2.3 gcc-4.4.4 \
           gcc-c++-4.4.4 glibc-2.12 glibc-devel-2.12 ksh libgcc-4.4.4 libstdc++-4.4.4 \
-          libstdc++-devel-4.4.4 libaio-0.3.107 libaio-devel-0.3.107 make-3.81 sysstat-9.0.4
+          libstdc++-devel-4.4.4 libaio-0.3.107 libaio-devel-0.3.107 make-3.81 sysstat-9.0.4 \
+          unixODBC unixODBC-devel
     #+END_SRC
+
+   安装 [[https://github.com/hanslub42/rlwrap/releases][rlwrap]] 工具 （可选项）
+   #+BEGIN_SRC sh
+     ./configure --prefix=/usr/local
+     make
+     make install
+   #+END_SRC
 
 * 操作系统相关配置
 
@@ -167,19 +210,20 @@
    #+BEGIN_SRC sh
      groupadd oinstall
      groupadd dba
+     groupadd oper
    #+END_SRC
 
    新建 =oracle= 用户
    #+BEGIN_SRC sh
-     useradd -g oinstall -G dba oracle
+     useradd -g oinstall -G dba,oper oracle
 
      # 如果 oracle 用户已经存在，则直接加入对应用户组即可
-     # usermod -g oinstall -G dba oracle
+     # usermod -g oinstall -G dba,oper oracle
    #+END_SRC
 
    配置 =oracle= 用户的密码
    #+BEGIN_SRC sh
-     passwd oracle
+     echo system | passwd --stdin oracle
    #+END_SRC
 
    检验建立好的 =oracle= 用户
@@ -192,24 +236,46 @@
    #+END_SRC
 
 ** 配置内核参数
-   添加或修改配置文件 =/etc/sysctl.conf= ， 如下内核参数
+   添加或修改配置文件 =/etc/sysctl.conf= ， 如下内核参数。内核参数一般是要大于如
+   下要求的最小值，对于实际的系统可以需要参考系统默认参数，并计算调优一些参数，
+   修改默认设置
 
    #+BEGIN_SRC conf
+     # 共享内存 cat /proc/sys/kernel/shmall
+     # shmmni 缺省 4096 即可，shmmax 最小 536870912, 最大为物理内存减小 1 字节
+     # 32G 内存大约需要： 32*1024*1024*1024-1 = 34359738367
+     kernel.shmmax = 536870912
      kernel.shmmni = 4096
-     # kernel.shmmax = 536870912
-     # kernel.shmall = 2097152
+     # Linux 的共享内存页大小为 4K，
+     # 对于 32G 内存的系统大约需要最大的页数为: 32*1024*1024/4 = 8388608
+     kernel.shmall = 2097152
+
+     # 进程之间通信消息大小的最大值
+     kernel.msgmax = 65536
+     # 信号量参数： semmsl semmns semopm semmni
      kernel.sem = 250 32000 100 128
 
+     # 文件句柄数量限制
      fs.aio-max-nr = 1048576
      fs.file-max = 6815744
 
+     # 应用程序可用的 ipv4 端口范围
      net.ipv4.ip_local_port_range = 9000 65500
+
+     # 套接字读写缓冲大小
      net.core.rmem_default = 262144
      net.core.rmem_max = 4194304
      net.core.wmem_default = 262144
      net.core.wmem_max = 1048576
    #+END_SRC
 
+   可以使用如下命令查看一些内核参数
+   #+BEGIN_SRC sh
+     # 配置的参数，确保配置文件格式正确
+     sysctl -p
+     # 打印当前所有的参数大小
+     sysctl -a
+   #+END_SRC
    内核参数文件修改后重启生效
 
 ** 修改用户的限制
@@ -247,14 +313,18 @@
      alias cdoh='cd $ORACLE_HOME'
      alias tns='cd $ORACLE_HOME/network/admin'
      alias envo='env | grep ORACLE'
+
+     # rlwrap must be install
+     alias sp='rlwrap sqlplus'
+     alias r='rlwrap rman'
    #+END_SRC
 
 ** 创建安装目录
    使用如下命令
    #+BEGIN_SRC sh
-     mkdir -p $ORACLE_BASE
-     chown -R oracle:oinstall /u01
-     chmod -R 775 /u01
+     mkdir -p /u01/app
+     chown -R oracle:oinstall /u01/app
+     chmod -R 775 /u01/app
    #+END_SRC
 
 ** 禁用 SELINUXX 和系统防火墙
