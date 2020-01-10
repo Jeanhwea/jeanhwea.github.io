@@ -168,10 +168,9 @@
 *** 安装相关依赖包
     直接使用 yum 管理器安装
     #+BEGIN_SRC sh
-      yum install binutils compat-libcap1-1.10 compat-libstdc++-33-3.2.3 gcc-4.4.4 \
-          gcc-c++-4.4.4 glibc-2.12 glibc-devel-2.12 ksh libgcc-4.4.4 libstdc++-4.4.4 \
-          libstdc++-devel-4.4.4 libaio-0.3.107 libaio-devel-0.3.107 make-3.81 sysstat-9.0.4 \
-          unixODBC unixODBC-devel
+      yum install -y binutils compat-libcap1 compat-libstdc++-33 gcc gcc-c++ glibc \
+          glibc-devel ksh libgcc libstdc++ libstdc++-devel libaio libaio-devel make \
+          sysstat unixODBC unixODBC-devel oracleasm-support
     #+END_SRC
 
    安装 [[https://github.com/hanslub42/rlwrap/releases][rlwrap]] 工具 （可选项）
@@ -297,8 +296,20 @@
    内核参数文件修改后重启生效
 
 ** 修改用户的限制
-   编辑 =/etc/security/limits.conf= 文件，添加如下配置行
+   一些用户的限制需配置成下表中所描述的格式
+   | Resource Shell Limit | Resource | Soft Limit    | Hard Limit                   |
+   |----------------------+----------+---------------+------------------------------|
+   | 打开文件描述符数量   | nofile   | 最小 1024     | 最小 65536                   |
+   | 用户可用的进程数量   | nproc    | 最小 2047     | 最小 16384                   |
+   | 进程的栈空间的大小   | stack    | 最小 10240 KB | 最小 10240 KB，最多 32768 KB |
 
+   #+BEGIN_SRC sh
+     echo "nofile: soft=$(ulimit -Sn) hard=$(ulimit -Hn)"
+     echo "nproc:  soft=$(ulimit -Su) hard=$(ulimit -Hu)"
+     echo "stack:  soft=$(ulimit -Ss) hard=$(ulimit -Hs)"
+   #+END_SRC
+
+   编辑 =/etc/security/limits.conf= 文件，添加如下配置行
    #+BEGIN_SRC conf
      oracle   soft   nproc    131072
      oracle   hard   nproc    131072
