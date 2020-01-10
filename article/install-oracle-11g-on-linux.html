@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-01-10 Fri 14:53 -->
+<!-- 2020-01-10 Fri 21:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>在 Oracle Linux 上安装 Oracle 11g 数据库</title>
@@ -161,6 +161,19 @@
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
   .inlinetask {
     padding: 10px;
     border: 2px solid gray;
@@ -185,7 +198,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2019 Free Software Foundation, Inc.
+Copyright (C) 2012-2020 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -238,58 +251,58 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org7894414">1. 安装文件</a>
+<li><a href="#orgad55870">1. 安装文件</a>
 <ul>
-<li><a href="#org36451af">1.1. 操作系统的选择</a></li>
-<li><a href="#orgdd761ce">1.2. 数据库安装文件</a></li>
+<li><a href="#orga62355a">1.1. 操作系统的选择</a></li>
+<li><a href="#org3c9549c">1.2. 数据库安装文件</a></li>
 </ul>
 </li>
-<li><a href="#orga5ebee0">2. 前置准备和检验工作</a>
+<li><a href="#orgf871e18">2. 前置准备和检验工作</a>
 <ul>
-<li><a href="#org158cd57">2.1. 检验操作系统的内存</a></li>
-<li><a href="#org6611328">2.2. 检验操作系统的存储大小</a></li>
-<li><a href="#orgb94addf">2.3. 系统的内核版本要求</a></li>
-<li><a href="#org1fd4fbe">2.4. 必要的软件包</a>
+<li><a href="#orga24e871">2.1. 检验操作系统的内存</a></li>
+<li><a href="#org0c260e7">2.2. 检验操作系统的存储大小</a></li>
+<li><a href="#orgc2d95af">2.3. 系统的内核版本要求</a></li>
+<li><a href="#orgaaf3a5c">2.4. 必要的软件包</a>
 <ul>
-<li><a href="#org575ba48">2.4.1. 配置本地的 yum 源</a></li>
-<li><a href="#orgda4569e">2.4.2. 安装相关依赖包</a></li>
+<li><a href="#orgec9ee14">2.4.1. 配置本地的 yum 源</a></li>
+<li><a href="#orgc802755">2.4.2. 安装相关依赖包</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org4fe6078">3. 操作系统相关配置</a>
+<li><a href="#org375b58e">3. 操作系统相关配置</a>
 <ul>
-<li><a href="#org2ab04d4">3.1. 配置系统的 IP</a></li>
-<li><a href="#org1d1bd33">3.2. 配置计算机名</a></li>
-<li><a href="#orgdfa6ef7">3.3. 创建基本的用户和用户组</a></li>
-<li><a href="#org49b6ab0">3.4. 配置内核参数</a></li>
-<li><a href="#org57ceb97">3.5. 修改用户的限制</a></li>
-<li><a href="#orgb8cccac">3.6. 添加如下的环境变量</a></li>
-<li><a href="#orgb9ea6f4">3.7. 创建安装目录</a></li>
-<li><a href="#orgd11cb60">3.8. 禁用 SELINUXX 和系统防火墙</a></li>
-<li><a href="#orgada4279">3.9. 关闭系统的防火墙</a></li>
+<li><a href="#org9065eb6">3.1. 配置系统的 IP</a></li>
+<li><a href="#orgcfc6567">3.2. 配置计算机名</a></li>
+<li><a href="#org374ab6c">3.3. 创建基本的用户和用户组</a></li>
+<li><a href="#org24b2ab2">3.4. 配置内核参数</a></li>
+<li><a href="#org4f584b4">3.5. 修改用户的限制</a></li>
+<li><a href="#org7d3f9cd">3.6. 添加如下的环境变量</a></li>
+<li><a href="#orgc27e793">3.7. 创建安装目录</a></li>
+<li><a href="#org4a62a6e">3.8. 禁用 SELINUXX 和系统防火墙</a></li>
+<li><a href="#org1f66bdf">3.9. 关闭系统的防火墙</a></li>
 </ul>
 </li>
-<li><a href="#org7d15364">4. 配置 Oracle 参数</a>
+<li><a href="#org974999a">4. 配置 Oracle 参数</a>
 <ul>
-<li><a href="#org26d665a">4.1. 启动程序</a></li>
-<li><a href="#org0cff7f3">4.2. 配置 Oracle 11g 数据库随操作系统启动而自启动</a></li>
-<li><a href="#orgaddb16b">4.3. Oracle 11g 连通性测试命令行工具</a></li>
-<li><a href="#org423572e">4.4. 数据库 GUI 管理工具</a></li>
+<li><a href="#org9de49e4">4.1. 启动程序</a></li>
+<li><a href="#org4883df0">4.2. 配置 Oracle 11g 数据库随操作系统启动而自启动</a></li>
+<li><a href="#org5042590">4.3. Oracle 11g 连通性测试命令行工具</a></li>
+<li><a href="#org367d705">4.4. 数据库 GUI 管理工具</a></li>
 </ul>
 </li>
-<li><a href="#orgc6c4a4f">5. 参考链接</a></li>
+<li><a href="#org7b11fa1">5. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org7894414" class="outline-2">
-<h2 id="org7894414"><span class="section-number-2">1</span> 安装文件</h2>
+<div id="outline-container-orgad55870" class="outline-2">
+<h2 id="orgad55870"><span class="section-number-2">1</span> 安装文件</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org36451af" class="outline-3">
-<h3 id="org36451af"><span class="section-number-3">1.1</span> 操作系统的选择</h3>
+<div id="outline-container-orga62355a" class="outline-3">
+<h3 id="orga62355a"><span class="section-number-3">1.1</span> 操作系统的选择</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 本教程是基于 Oracle Linux Release6 Update9 操作系统来安装的，准备文件为
@@ -306,8 +319,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orgdd761ce" class="outline-3">
-<h3 id="orgdd761ce"><span class="section-number-3">1.2</span> 数据库安装文件</h3>
+<div id="outline-container-org3c9549c" class="outline-3">
+<h3 id="org3c9549c"><span class="section-number-3">1.2</span> 数据库安装文件</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Oracle 数据库选择 11g R2 下面两个是数据的安装文件
@@ -339,16 +352,16 @@ unzip p13390677_112040_Linux-x86-64_2of7.zip
 </div>
 </div>
 
-<div id="outline-container-orga5ebee0" class="outline-2">
-<h2 id="orga5ebee0"><span class="section-number-2">2</span> 前置准备和检验工作</h2>
+<div id="outline-container-orgf871e18" class="outline-2">
+<h2 id="orgf871e18"><span class="section-number-2">2</span> 前置准备和检验工作</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 在安装操作系统时就需要提前注意以下的配置
 </p>
 </div>
 
-<div id="outline-container-org158cd57" class="outline-3">
-<h3 id="org158cd57"><span class="section-number-3">2.1</span> 检验操作系统的内存</h3>
+<div id="outline-container-orga24e871" class="outline-3">
+<h3 id="orga24e871"><span class="section-number-3">2.1</span> 检验操作系统的内存</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 官方文档中说操作系统的 RAM 至少 1G，但是建议分配 2G 以上。另外，还需要 swap 分
@@ -426,8 +439,8 @@ sga_target                           big <span style="color: #268bd2;">integer</
 </div>
 </div>
 
-<div id="outline-container-org6611328" class="outline-3">
-<h3 id="org6611328"><span class="section-number-3">2.2</span> 检验操作系统的存储大小</h3>
+<div id="outline-container-org0c260e7" class="outline-3">
+<h3 id="org0c260e7"><span class="section-number-3">2.2</span> 检验操作系统的存储大小</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 为了配合 Oracle 安装包释放安装程序，操作系统的 <code>/tmp</code> 文件夹需要有超过 1G 的可
@@ -444,8 +457,8 @@ sga_target                           big <span style="color: #268bd2;">integer</
 </div>
 </div>
 
-<div id="outline-container-orgb94addf" class="outline-3">
-<h3 id="orgb94addf"><span class="section-number-3">2.3</span> 系统的内核版本要求</h3>
+<div id="outline-container-orgc2d95af" class="outline-3">
+<h3 id="orgc2d95af"><span class="section-number-3">2.3</span> 系统的内核版本要求</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 在 Oracle Linux 6.9 中需要内核版本大于 <code>2.6.32-71.el6.x86_64</code> ，默认的内核就
@@ -460,8 +473,8 @@ sga_target                           big <span style="color: #268bd2;">integer</
 </div>
 </div>
 
-<div id="outline-container-org1fd4fbe" class="outline-3">
-<h3 id="org1fd4fbe"><span class="section-number-3">2.4</span> 必要的软件包</h3>
+<div id="outline-container-orgaaf3a5c" class="outline-3">
+<h3 id="orgaaf3a5c"><span class="section-number-3">2.4</span> 必要的软件包</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 Oracle 11g 有一些必要的安装文件包，在 Oracle Linux 6 中所需要的包
@@ -509,8 +522,8 @@ unixODBC-devel-2.2.14-11.el6.i686 or later
 </div>
 </div>
 
-<div id="outline-container-org575ba48" class="outline-4">
-<h4 id="org575ba48"><span class="section-number-4">2.4.1</span> 配置本地的 yum 源</h4>
+<div id="outline-container-orgec9ee14" class="outline-4">
+<h4 id="orgec9ee14"><span class="section-number-4">2.4.1</span> 配置本地的 yum 源</h4>
 <div class="outline-text-4" id="text-2-4-1">
 <p>
 将系统安装的 iso 包加载的 cdrom 中
@@ -550,8 +563,8 @@ yum list
 </div>
 </div>
 
-<div id="outline-container-orgda4569e" class="outline-4">
-<h4 id="orgda4569e"><span class="section-number-4">2.4.2</span> 安装相关依赖包</h4>
+<div id="outline-container-orgc802755" class="outline-4">
+<h4 id="orgc802755"><span class="section-number-4">2.4.2</span> 安装相关依赖包</h4>
 <div class="outline-text-4" id="text-2-4-2">
 <p>
 直接使用 yum 管理器安装
@@ -577,16 +590,16 @@ make install
 </div>
 </div>
 
-<div id="outline-container-org4fe6078" class="outline-2">
-<h2 id="org4fe6078"><span class="section-number-2">3</span> 操作系统相关配置</h2>
+<div id="outline-container-org375b58e" class="outline-2">
+<h2 id="org375b58e"><span class="section-number-2">3</span> 操作系统相关配置</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 配置 IP 、主机名、用户、用户组、防火墙等一系列参数
 </p>
 </div>
 
-<div id="outline-container-org2ab04d4" class="outline-3">
-<h3 id="org2ab04d4"><span class="section-number-3">3.1</span> 配置系统的 IP</h3>
+<div id="outline-container-org9065eb6" class="outline-3">
+<h3 id="org9065eb6"><span class="section-number-3">3.1</span> 配置系统的 IP</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 修改操作系统的 <code>/etc/sysconfig/network-scripts/ifcfg-eth1</code> 文件
@@ -607,8 +620,8 @@ make install
 </div>
 </div>
 
-<div id="outline-container-org1d1bd33" class="outline-3">
-<h3 id="org1d1bd33"><span class="section-number-3">3.2</span> 配置计算机名</h3>
+<div id="outline-container-orgcfc6567" class="outline-3">
+<h3 id="orgcfc6567"><span class="section-number-3">3.2</span> 配置计算机名</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 编辑 <code>/etc/hosts</code> 文件，添加如下主机名到 IP 的映射
@@ -637,8 +650,8 @@ HOSTNAME=orange131
 </div>
 </div>
 
-<div id="outline-container-orgdfa6ef7" class="outline-3">
-<h3 id="orgdfa6ef7"><span class="section-number-3">3.3</span> 创建基本的用户和用户组</h3>
+<div id="outline-container-org374ab6c" class="outline-3">
+<h3 id="org374ab6c"><span class="section-number-3">3.3</span> 创建基本的用户和用户组</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 新建如下用户组
@@ -699,8 +712,8 @@ uid=500(oracle) gid=500(oinstall) groups=500(oinstall),501(dba)
 </div>
 </div>
 
-<div id="outline-container-org49b6ab0" class="outline-3">
-<h3 id="org49b6ab0"><span class="section-number-3">3.4</span> 配置内核参数</h3>
+<div id="outline-container-org24b2ab2" class="outline-3">
+<h3 id="org24b2ab2"><span class="section-number-3">3.4</span> 配置内核参数</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 添加或修改配置文件 <code>/etc/sysctl.conf</code> ， 如下内核参数。内核参数一般是要大于如
@@ -709,28 +722,28 @@ uid=500(oracle) gid=500(oinstall) groups=500(oinstall),501(dba)
 </p>
 
 <div class="org-src-container">
-<pre class="src src-conf"># &#20849;&#20139;&#20869;&#23384; cat /proc/sys/kernel/shmall
-# shmmni &#32570;&#30465; 4096 &#21363;&#21487;&#65292;shmmax &#26368;&#23567; 536870912, &#26368;&#22823;&#20026;&#29289;&#29702;&#20869;&#23384;&#20943;&#23567; 1 &#23383;&#33410;
-<span style="color: #6c71c4;"># 32G &#20869;&#23384;&#22823;&#32422;&#38656;&#35201;&#65306; 32*1024*1024*1024-1</span> = 34359738367
+<pre class="src src-conf"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20849;&#20139;&#20869;&#23384; cat /proc/sys/kernel/shmall</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">shmmni &#32570;&#30465; 4096 &#21363;&#21487;&#65292;shmmax &#26368;&#23567; 536870912, &#26368;&#22823;&#20026;&#29289;&#29702;&#20869;&#23384;&#20943;&#23567; 1 &#23383;&#33410;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">32G &#20869;&#23384;&#22823;&#32422;&#38656;&#35201;&#65306; 32*1024*1024*1024-1 = 34359738367</span>
 <span style="color: #6c71c4;">kernel.shmmax</span> = 536870912
 <span style="color: #6c71c4;">kernel.shmmni</span> = 4096
-# Linux &#30340;&#20849;&#20139;&#20869;&#23384;&#39029;&#22823;&#23567;&#20026; 4K&#65292;
-<span style="color: #6c71c4;"># &#23545;&#20110; 32G &#20869;&#23384;&#30340;&#31995;&#32479;&#22823;&#32422;&#38656;&#35201;&#26368;&#22823;&#30340;&#39029;&#25968;&#20026;: 32*1024*1024/4</span> = 8388608
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">Linux &#30340;&#20849;&#20139;&#20869;&#23384;&#39029;&#22823;&#23567;&#20026; 4K&#65292;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23545;&#20110; 32G &#20869;&#23384;&#30340;&#31995;&#32479;&#22823;&#32422;&#38656;&#35201;&#26368;&#22823;&#30340;&#39029;&#25968;&#20026;: 32*1024*1024/4 = 8388608</span>
 <span style="color: #6c71c4;">kernel.shmall</span> = 2097152
 
-# &#36827;&#31243;&#20043;&#38388;&#36890;&#20449;&#28040;&#24687;&#22823;&#23567;&#30340;&#26368;&#22823;&#20540;
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#36827;&#31243;&#20043;&#38388;&#36890;&#20449;&#28040;&#24687;&#22823;&#23567;&#30340;&#26368;&#22823;&#20540;</span>
 <span style="color: #6c71c4;">kernel.msgmax</span> = 65536
-# &#20449;&#21495;&#37327;&#21442;&#25968;&#65306; semmsl semmns semopm semmni
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20449;&#21495;&#37327;&#21442;&#25968;&#65306; semmsl semmns semopm semmni</span>
 <span style="color: #6c71c4;">kernel.sem</span> = 250 32000 100 128
 
-# &#25991;&#20214;&#21477;&#26564;&#25968;&#37327;&#38480;&#21046;
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25991;&#20214;&#21477;&#26564;&#25968;&#37327;&#38480;&#21046;</span>
 <span style="color: #6c71c4;">fs.aio-max-nr</span> = 1048576
 <span style="color: #6c71c4;">fs.file-max</span> = 6815744
 
-# &#24212;&#29992;&#31243;&#24207;&#21487;&#29992;&#30340; ipv4 &#31471;&#21475;&#33539;&#22260;
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24212;&#29992;&#31243;&#24207;&#21487;&#29992;&#30340; ipv4 &#31471;&#21475;&#33539;&#22260;</span>
 <span style="color: #6c71c4;">net.ipv4.ip_local_port_range</span> = 9000 65500
 
-# &#22871;&#25509;&#23383;&#35835;&#20889;&#32531;&#20914;&#22823;&#23567;
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22871;&#25509;&#23383;&#35835;&#20889;&#32531;&#20914;&#22823;&#23567;</span>
 <span style="color: #6c71c4;">net.core.rmem_default</span> = 262144
 <span style="color: #6c71c4;">net.core.rmem_max</span> = 4194304
 <span style="color: #6c71c4;">net.core.wmem_default</span> = 262144
@@ -754,8 +767,8 @@ sysctl -a
 </div>
 </div>
 
-<div id="outline-container-org57ceb97" class="outline-3">
-<h3 id="org57ceb97"><span class="section-number-3">3.5</span> 修改用户的限制</h3>
+<div id="outline-container-org4f584b4" class="outline-3">
+<h3 id="org4f584b4"><span class="section-number-3">3.5</span> 修改用户的限制</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
 一些用户的限制需配置成下表中所描述的格式
@@ -830,8 +843,8 @@ oracle   hard   memlock  50000000
 </div>
 </div>
 
-<div id="outline-container-orgb8cccac" class="outline-3">
-<h3 id="orgb8cccac"><span class="section-number-3">3.6</span> 添加如下的环境变量</h3>
+<div id="outline-container-org7d3f9cd" class="outline-3">
+<h3 id="org7d3f9cd"><span class="section-number-3">3.6</span> 添加如下的环境变量</h3>
 <div class="outline-text-3" id="text-3-6">
 <p>
 为了后面操作简单，需要添加一些常用的环境变量和命令别名
@@ -851,21 +864,21 @@ oracle   hard   memlock  50000000
 <span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">NLS_LANG</span>=<span style="color: #2aa198;">"AMERICAN.AL32UTF8"</span>
 
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24120;&#29992;&#21035;&#21517;</span>
-alias <span style="color: #6c71c4;">cdob</span>=<span style="color: #2aa198;">'cd $ORACLE_BASE'</span>
-alias <span style="color: #6c71c4;">cdoh</span>=<span style="color: #2aa198;">'cd $ORACLE_HOME'</span>
-alias <span style="color: #6c71c4;">tns</span>=<span style="color: #2aa198;">'cd $ORACLE_HOME/network/admin'</span>
-alias <span style="color: #6c71c4;">envo</span>=<span style="color: #2aa198;">'env | grep ORACLE'</span>
+<span style="color: #6c71c4;">alias</span> <span style="color: #6c71c4;">cdob</span>=<span style="color: #2aa198;">'cd $ORACLE_BASE'</span>
+<span style="color: #6c71c4;">alias</span> <span style="color: #6c71c4;">cdoh</span>=<span style="color: #2aa198;">'cd $ORACLE_HOME'</span>
+<span style="color: #6c71c4;">alias</span> <span style="color: #6c71c4;">tns</span>=<span style="color: #2aa198;">'cd $ORACLE_HOME/network/admin'</span>
+<span style="color: #6c71c4;">alias</span> <span style="color: #6c71c4;">envo</span>=<span style="color: #2aa198;">'env | grep ORACLE'</span>
 
 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">rlwrap must be install</span>
-alias <span style="color: #6c71c4;">sp</span>=<span style="color: #2aa198;">'rlwrap sqlplus'</span>
-alias <span style="color: #6c71c4;">r</span>=<span style="color: #2aa198;">'rlwrap rman'</span>
+<span style="color: #6c71c4;">alias</span> <span style="color: #6c71c4;">sp</span>=<span style="color: #2aa198;">'rlwrap sqlplus'</span>
+<span style="color: #6c71c4;">alias</span> <span style="color: #6c71c4;">r</span>=<span style="color: #2aa198;">'rlwrap rman'</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgb9ea6f4" class="outline-3">
-<h3 id="orgb9ea6f4"><span class="section-number-3">3.7</span> 创建安装目录</h3>
+<div id="outline-container-orgc27e793" class="outline-3">
+<h3 id="orgc27e793"><span class="section-number-3">3.7</span> 创建安装目录</h3>
 <div class="outline-text-3" id="text-3-7">
 <p>
 使用如下命令
@@ -879,8 +892,8 @@ chmod -R 775 /u01/app
 </div>
 </div>
 
-<div id="outline-container-orgd11cb60" class="outline-3">
-<h3 id="orgd11cb60"><span class="section-number-3">3.8</span> 禁用 SELINUXX 和系统防火墙</h3>
+<div id="outline-container-org4a62a6e" class="outline-3">
+<h3 id="org4a62a6e"><span class="section-number-3">3.8</span> 禁用 SELINUXX 和系统防火墙</h3>
 <div class="outline-text-3" id="text-3-8">
 <p>
 编辑 <code>/etc/selinux/config</code> 文件
@@ -892,8 +905,8 @@ chmod -R 775 /u01/app
 </div>
 </div>
 
-<div id="outline-container-orgada4279" class="outline-3">
-<h3 id="orgada4279"><span class="section-number-3">3.9</span> 关闭系统的防火墙</h3>
+<div id="outline-container-org1f66bdf" class="outline-3">
+<h3 id="org1f66bdf"><span class="section-number-3">3.9</span> 关闭系统的防火墙</h3>
 <div class="outline-text-3" id="text-3-9">
 <p>
 在图形界面中关闭防火墙
@@ -902,12 +915,12 @@ chmod -R 775 /u01/app
 </div>
 </div>
 
-<div id="outline-container-org7d15364" class="outline-2">
-<h2 id="org7d15364"><span class="section-number-2">4</span> 配置 Oracle 参数</h2>
+<div id="outline-container-org974999a" class="outline-2">
+<h2 id="org974999a"><span class="section-number-2">4</span> 配置 Oracle 参数</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org26d665a" class="outline-3">
-<h3 id="org26d665a"><span class="section-number-3">4.1</span> 启动程序</h3>
+<div id="outline-container-org9de49e4" class="outline-3">
+<h3 id="org9de49e4"><span class="section-number-3">4.1</span> 启动程序</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 启动安装程序
@@ -920,8 +933,8 @@ chmod -R 775 /u01/app
 </div>
 </div>
 
-<div id="outline-container-org0cff7f3" class="outline-3">
-<h3 id="org0cff7f3"><span class="section-number-3">4.2</span> 配置 Oracle 11g 数据库随操作系统启动而自启动</h3>
+<div id="outline-container-org4883df0" class="outline-3">
+<h3 id="org4883df0"><span class="section-number-3">4.2</span> 配置 Oracle 11g 数据库随操作系统启动而自启动</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 修改数据库 <code>/etc/oratab</code> 配置文件，将最后一行的 <b><b>N</b></b> 改成 <b><b>Y</b></b>
@@ -937,15 +950,15 @@ chmod -R 775 /u01/app
 </p>
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">start oracle database</span>
-su - oracle -c <span style="color: #2aa198;">'/u01/app/oracle/product/11.2.0/dbhome_1/bin/lsnrctl start'</span>
+su - oracle -c <span style="color: #2aa198;">'lsnrctl start'</span>
 su - oracle -c <span style="color: #2aa198;">'dbstart /u01/app/oracle/product/11.2.0/dbhome_1'</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgaddb16b" class="outline-3">
-<h3 id="orgaddb16b"><span class="section-number-3">4.3</span> Oracle 11g 连通性测试命令行工具</h3>
+<div id="outline-container-org5042590" class="outline-3">
+<h3 id="org5042590"><span class="section-number-3">4.3</span> Oracle 11g 连通性测试命令行工具</h3>
 <div class="outline-text-3" id="text-4-3">
 <ul class="org-ul">
 <li><code>tnsping</code> 工具探测工具</li>
@@ -967,8 +980,8 @@ su - oracle -c <span style="color: #2aa198;">'dbstart /u01/app/oracle/product/11
 </div>
 </div>
 
-<div id="outline-container-org423572e" class="outline-3">
-<h3 id="org423572e"><span class="section-number-3">4.4</span> 数据库 GUI 管理工具</h3>
+<div id="outline-container-org367d705" class="outline-3">
+<h3 id="org367d705"><span class="section-number-3">4.4</span> 数据库 GUI 管理工具</h3>
 <div class="outline-text-3" id="text-4-4">
 <ul class="org-ul">
 <li><code>netca</code> 监听器配置助手</li>
@@ -979,8 +992,8 @@ su - oracle -c <span style="color: #2aa198;">'dbstart /u01/app/oracle/product/11
 </div>
 </div>
 
-<div id="outline-container-orgc6c4a4f" class="outline-2">
-<h2 id="orgc6c4a4f"><span class="section-number-2">5</span> 参考链接</h2>
+<div id="outline-container-org7b11fa1" class="outline-2">
+<h2 id="org7b11fa1"><span class="section-number-2">5</span> 参考链接</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 1.<a href="http://dbaora.com/">DBAORA</a> Tomasz Lesinski 的个人博客
@@ -989,7 +1002,7 @@ su - oracle -c <span style="color: #2aa198;">'dbstart /u01/app/oracle/product/11
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-01-10 Fri 14:53. Created by Jinghui Hu at 2020-01-08 Wed 11:33.</p>
+<p class="author">Last Updated 2020-01-10 Fri 21:22. Created by Jinghui Hu at 2020-01-08 Wed 11:33.</p>
 </div>
 </body>
 </html>
