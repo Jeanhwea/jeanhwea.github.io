@@ -49,6 +49,12 @@
    | 2G 到 16G 之间 | 和 RAM 同等大小 |
    | 16G 以上       | 16G             |
 
+   但是注意，这里有一个坑，如果系统内存为 32G 的话，最好把 swap 分区设计得和内存
+   的大小差不多，也就是 swap 也修改成 32G，否则后面装 Oracle 数据库是分配数据库
+   内存是不允许超过 swap 的大小
+
+   [[file:../static/image/2020/01/oinstall-target-database-memory-config.png]]
+
    检测操作系统 RAM 和 Swap 的命令如下：
    #+BEGIN_SRC sh
      grep MemTotal /proc/meminfo
@@ -199,7 +205,7 @@
 ** 配置计算机名
    编辑 =/etc/hosts= 文件，添加如下主机名到 IP 的映射
    #+BEGIN_SRC text
-     192.168.0.131 orange131 orange131
+     192.168.0.131 orange131 orange131.localdomain
    #+END_SRC
 
    配置 =/etc/sysconfig/network=
@@ -337,22 +343,25 @@
      export ORACLE_SID=ora11g
 
      export ORACLE_HOME=$ORACLE_BASE/product/11.2.0/dbhome_1
+     export TNS_HOME=$ORACLE_HOME/network/admin
      export PATH=$PATH:$ORACLE_HOME/bin
 
-     export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib
+     export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib:/usr/local/lib
      export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
 
-     export NLS_LANG="AMERICAN.AL32UTF8"
+     # export NLS_LANG="AMERICAN.AL32UTF8"
+     export NLS_LANG=".AL32UTF8"
 
      # 常用别名
      alias cdob='cd $ORACLE_BASE'
      alias cdoh='cd $ORACLE_HOME'
-     alias tns='cd $ORACLE_HOME/network/admin'
+     alias cdtns='cd $TNS_HOME'
+     alias cdod='cd $ORACLE_BASE/oradata'
      alias envo='env | grep ORACLE'
 
      # rlwrap must be install
      alias sp='rlwrap sqlplus'
-     alias r='rlwrap rman'
+     alias rman='rlwrap rman'
    #+END_SRC
 
 ** 创建安装目录
