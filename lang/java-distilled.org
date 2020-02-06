@@ -7,29 +7,49 @@
 #+TAGS: java programming language distilled
 
 
-* 基本用法
-** Java 的命令行工具
-   - javac Java 的编辑器
-   - java Java 的执行器
+* 开发工具
+** 编译器和虚拟机
+   Java 的两个基本工具是 =javac= 和 =java=, 其中这两个工具功能如下：
+   - javac 是 Java 的编译器，将 Java 的源代码编译成虚拟机识别的字节码
+   - java 是 Java 的执行器，可以执行 Java 编译器编译好的字节码
 
-   下面是一个编译并执行 Java 代码的过程
+   下面是查看工具版本的方法
    #+BEGIN_SRC text
-     /tmp/java $ ls
+     $ java -version
+     java version "1.8.0_221"
+     Java(TM) SE Runtime Environment (build 1.8.0_221-b11)
+     Java HotSpot(TM) 64-Bit Server VM (build 25.221-b11, mixed mode)
+     $ javac -version
+     javac 1.8.0_221
+   #+END_SRC
+
+   也可以使用 javac 和 java 一个编译并执行 Java 代码
+   #+BEGIN_SRC text
+     $ ls
      Hello.java
-     /tmp/java $ cat Hello.java
+     $ cat Hello.java
      public class Hello {
        public static void main(String args[]) {
          System.out.println("hello");
        }
      }
-     /tmp/java $ javac Hello.java
-     /tmp/java $ ls
+     $ javac Hello.java
+     $ ls
      Hello.class  Hello.java
-     /tmp/java $ java Hello
+     $ java Hello
      hello
-     /tmp/java $
+     $
    #+END_SRC
 
+** 调试器
+   Java 自带的调试器是 =jdb= 命令，通常可以使用集成开发环境（IDE）中的调试工具来
+   调试 Java，所以 jdb 一般使用的比较少
+
+** REPL
+   Java 9 的 JDK 中就自带 JConsole, 可以用于调试一些常见的命令。Java 8 中用一个
+   民间开发的 repl，就叫 =javarepl=, 该工具可以在 [[https://github.com/albertlatacz/java-repl][github]] 中下载。
+
+* 基本用法
 ** 基本类型
    Java 中有 8 个基本类型，和 C++语言不同的是 Java 的 *基本类型的存储空间是固定的*
    ，每种类型的信息如下：
@@ -57,34 +77,6 @@
      时 =j= 为对象，对象默认值为 =null=
    - 存储位置不同, 定义的基本数据类型的变量和对象的引用变量（地址）存储在栈中，
      而实际对应的对象（value）是存储在堆中
-
-** 数组
-   不知道为什么，总是记不住 Java 的数组定义方式，这里记一下 Java 中数组定义方式
-   #+BEGIN_SRC java :classname App73 :exports both :results output
-     class App73 {
-       public static void main(String args[]) {
-         // int array
-         int[] arr = new int[10]; // => elements are initialezd to 0
-         System.out.println(arr[3]);
-         System.out.println(arr.length);
-
-         // String array
-         String[] sarr = new String[3];
-         sarr[0] = "Hello";
-         sarr[1] = "Man";
-         sarr[2] = "Welcome to Java world";
-
-         for (String w: sarr) { System.out.println(w); }
-       }
-     }
-   #+END_SRC
-
-   #+RESULTS:
-   : 0
-   : 10
-   : Hello
-   : Man
-   : Welcome to Java world
 
 ** String
    String 在 Java 中不是基本类型，对应的有一个 String 类
@@ -116,16 +108,33 @@
     于它是在单线程环境下使用的，因为它的所有方面都没有被 ~synchronized~ 修饰，因
     此它的效率也比 StringBuffer 略高。
 
-** 序列化
-   序列化就是一种用来处理对象流的机制，所谓对象流也就是将对象的内容进行流化。可
-   以对流化后的对象进行读写操作，也可将流化后的对象传输于网络之间。序列化是为了
-   解决在对对象流进行读写操作时所引发的问题。
+** 数组
+   不知道为什么，总是记不住 Java 的数组定义方式，这里记一下 Java 中数组定义方式
+   #+BEGIN_SRC java :classname App73 :exports both :results output
+     class App73 {
+       public static void main(String args[]) {
+         // int array
+         int[] arr = new int[10]; // => elements are initialezd to 0
+         System.out.println(arr[3]);
+         System.out.println(arr.length);
 
-   序列化的实现：将需要被序列化的类实现 =Serializable= 接口，该接口没有需要实现
-   的方法， ~implements Serializable~ 只是为了标注该对象是可被序列化的，然后使用
-   一个输出流 (如：FileOutputStream) 来构造一个 ObjectOutputStream(对象流) 对象，
-   接着，使用 ObjectOutputStream 对象的 ~writeObject(Object obj)~ 方法就可以将参
-   数为 obj 的对象写出(即保存其状态)，要恢复的话则用输入流。
+         // String array
+         String[] sarr = new String[3];
+         sarr[0] = "Hello";
+         sarr[1] = "Man";
+         sarr[2] = "Welcome to Java world";
+
+         for (String w: sarr) { System.out.println(w); }
+       }
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   : 0
+   : 10
+   : Hello
+   : Man
+   : Welcome to Java world
 
 ** 静态变量和实例变量
    - 在语法定义上的区别：静态变量前要加 ~static~ 关键字，而实例变量前则不加。
@@ -144,35 +153,55 @@
    - 修饰方法：表示方法不能被覆盖
    - 修饰变量：表示变量只能一次赋值以后值不能被修改（常量）
 
-** ~assert~
-   assertion (断言) 在软件开发中是一种常用的调试方式，很多开发语言中都支持这种机
-   制。一般来说，assertion 用于保证程序最基本、关键的正确性。assertion 检查通常
-   在开发和测试时开启。为了提高性能，在软件发布后， assertion 检查通常是关闭的。
-   在实现中，断言是一个包含布尔表达式的语句，在执行这个语句时假定该表达式为 true；
-   如果表达式计算为 ~false~, 那么系统会报告一个 AssertionError。
+** equals 与 ~==~ 的区别
+   ~==~ 是一个运算符。 equals 则是 String 对象的方法，可以.（点）出来。 我们比较
+   无非就是这两种:
+   1. 基本数据类型比较 ~==~ 比较两个值是否相等。相等为 true 否则为 false；equals
+      不能直接用于基本类型的比较。需要将基本类型转换为包装器进行比较。
+   2. 引用对象比较 ~==~ 和 equals 都是比较栈内存中的地址是否相等 。相等为 true
+      否则为 false。 需注意几点：
+     - String 是一个特殊的引用类型。对于两个字符串的比较，不管是 ~==~ 和 equals
+       这两者比较的都是字符串是否相同
+     - 当你创建两个 String 对象时，内存中的地址是不相同的，你可以赋相同的值。所
+       以字符串的内容相同。引用地址不一定相同，（相同内容的对象地址不一定相同），
+       但反过来却是肯定的
+     - 基本数据类型比较 (String 除外) ~==~ 和 equals 两者都是比较值
 
-   断言用于调试目的：
-   #+BEGIN_SRC java
-     assert(a > 0); // throws an AssertionError if a <= 0
+   #+BEGIN_SRC java :classname App198 :exports both :results output
+     class App198 {
+       public static void main(String args[]) {
+         String s1 = "Hello";
+         String s2 = "Hello";
+         String s3 = new String("Hello");
+         String s4 = "Hel" + "lo"; // String is immutable, it will compiles to "Hello"
+         System.out.println(s1 == s2);
+         System.out.println(s1.equals(s2));
+         System.out.println(s1 == s3);
+         System.out.println(s1.equals(s3));
+         System.out.println(s1 == s4);
+         System.out.println(s1.equals(s4));
+       }
+     }
    #+END_SRC
 
-   断言可以有两种形式：
-   #+BEGIN_SRC java
-     assert Expression1;
-     assert Expression1 : Expression2;
-   #+END_SRC
+   #+RESULTS:
+   : true
+   : true
+   : false
+   : true
+   : true
+   : true
 
-   Expression1 应该总是产生一个布尔值。 Expression2 可以是得出一个值的任意表达式；
-   这个值用于生成显示更多调试信息的字符串消息 断言在默认情况下是禁用的，要在编译
-   时启用断言，需使用 source 1.4 标记：
+** 序列化
+   序列化就是一种用来处理对象流的机制，所谓对象流也就是将对象的内容进行流化。可
+   以对流化后的对象进行读写操作，也可将流化后的对象传输于网络之间。序列化是为了
+   解决在对对象流进行读写操作时所引发的问题。
 
-   #+BEGIN_SRC sh
-     javac -source 1.4 Test.java
-   #+END_SRC
-
-   要在运行时启用断言需要开启允许断言的选项：
-   - =-ea= 或者 =-enableassertions= : 启用断言
-   - =-da= 或者 =-disableassertions= : 禁用断言
+   序列化的实现：将需要被序列化的类实现 =Serializable= 接口，该接口没有需要实现
+   的方法， ~implements Serializable~ 只是为了标注该对象是可被序列化的，然后使用
+   一个输出流 (如：FileOutputStream) 来构造一个 ObjectOutputStream(对象流) 对象，
+   接着，使用 ObjectOutputStream 对象的 ~writeObject(Object obj)~ 方法就可以将参
+   数为 obj 的对象写出(即保存其状态)，要恢复的话则用输入流。
 
 ** 错误和异常
    - =java.lang.Error= : Throwable 的子类，用于标记严重错误，表示系统级的错误和
@@ -263,75 +292,6 @@
    - 每个方法抛出的异常都要有文档
    - 保持异常的原子性
    - 不要在 catch 中忽略掉捕获到的异常
-
-** equals 与 ~==~ 的区别
-   ~==~ 是一个运算符。 equals 则是 String 对象的方法，可以.（点）出来。 我们比较
-   无非就是这两种:
-   1. 基本数据类型比较 ~==~ 比较两个值是否相等。相等为 true 否则为 false；equals
-      不能直接用于基本类型的比较。需要将基本类型转换为包装器进行比较。
-   2. 引用对象比较 ~==~ 和 equals 都是比较栈内存中的地址是否相等 。相等为 true
-      否则为 false。 需注意几点：
-     - String 是一个特殊的引用类型。对于两个字符串的比较，不管是 ~==~ 和 equals
-       这两者比较的都是字符串是否相同
-     - 当你创建两个 String 对象时，内存中的地址是不相同的，你可以赋相同的值。所
-       以字符串的内容相同。引用地址不一定相同，（相同内容的对象地址不一定相同），
-       但反过来却是肯定的
-     - 基本数据类型比较 (String 除外) ~==~ 和 equals 两者都是比较值
-
-   #+BEGIN_SRC java :classname App198 :exports both :results output
-     class App198 {
-       public static void main(String args[]) {
-         String s1 = "Hello";
-         String s2 = "Hello";
-         String s3 = new String("Hello");
-         String s4 = "Hel" + "lo"; // String is immutable, it will compiles to "Hello"
-         System.out.println(s1 == s2);
-         System.out.println(s1.equals(s2));
-         System.out.println(s1 == s3);
-         System.out.println(s1.equals(s3));
-         System.out.println(s1 == s4);
-         System.out.println(s1.equals(s4));
-       }
-     }
-   #+END_SRC
-
-   #+RESULTS:
-   : true
-   : true
-   : false
-   : true
-   : true
-   : true
-
-** 集合
-   集合是 =java.util= 包中的工具类
-
-** 格式输出字符串
-   - ~String.format(String fmt, Object... args)~ 的字符串格式和 C 语言的 printf
-     一样。
-   - ~MessageFormat.format(String fmt, Object... args)~ 使用单引号标记任意字面
-     量，使用花括号加数字来表示相应的位置的占位符，例如： ={0}= 表示第 1 个位置
-     的参数， ={1}= 表示第 2 个位置的参数，以此类推。
-
-   #+BEGIN_SRC java :classname App9 :exports both :results output
-     import java.text.MessageFormat;
-
-     class App9 {
-       public static void main(String args[]) {
-         String str1 = String.format("Hi, %s", "Jack");
-         String str2 = MessageFormat.format("Hi, {0}, I''m {1} years old.", "Tom", 18);
-         String str3 = MessageFormat.format("'Hi, {0}, I''m {1} years old.'", "Tom", 18);
-         System.out.println(str1);
-         System.out.println(str2);
-         System.out.println(str3);
-       }
-     }
-   #+END_SRC
-
-   #+RESULTS:
-   : Hi, Jack
-   : Hi, Tom, I'm 18 years old.
-   : Hi, {0}, I'm {1} years old.
 
 * 面向对象
 ** 面向对象的特征
@@ -517,6 +477,115 @@
         void sort(Collection arg1) { }
       #+END_SRC
 
+* 参考代码片段
+** ~assert~ 断言
+   assertion (断言) 在软件开发中是一种常用的调试方式，很多开发语言中都支持这种机
+   制。一般来说，assertion 用于保证程序最基本、关键的正确性。assertion 检查通常
+   在开发和测试时开启。为了提高性能，在软件发布后， assertion 检查通常是关闭的。
+   在实现中，断言是一个包含布尔表达式的语句，在执行这个语句时假定该表达式为 true；
+   如果表达式计算为 ~false~, 那么系统会报告一个 AssertionError。
+
+   断言用于调试目的：
+   #+BEGIN_SRC java
+     assert(a > 0); // throws an AssertionError if a <= 0
+   #+END_SRC
+
+   断言可以有两种形式：
+   #+BEGIN_SRC java
+     assert Expression1;
+     assert Expression1 : Expression2;
+   #+END_SRC
+
+   Expression1 应该总是产生一个布尔值。 Expression2 可以是得出一个值的任意表达式；
+   这个值用于生成显示更多调试信息的字符串消息 断言在默认情况下是禁用的，要在编译
+   时启用断言，需使用 source 1.4 标记：
+
+   #+BEGIN_SRC sh
+     javac -source 1.4 Test.java
+   #+END_SRC
+
+   要在运行时启用断言需要开启允许断言的选项：
+   - =-ea= 或者 =-enableassertions= : 启用断言
+   - =-da= 或者 =-disableassertions= : 禁用断言
+
+** 格式输出字符串
+   - ~String.format(String fmt, Object... args)~ 的字符串格式和 C 语言的 printf
+     一样。
+   - ~MessageFormat.format(String fmt, Object... args)~ 使用单引号标记任意字面
+     量，使用花括号加数字来表示相应的位置的占位符，例如： ={0}= 表示第 1 个位置
+     的参数， ={1}= 表示第 2 个位置的参数，以此类推。
+
+   #+BEGIN_SRC java :classname App9 :exports both :results output
+     import java.text.MessageFormat;
+
+     class App9 {
+       public static void main(String args[]) {
+         String str1 = String.format("Hi, %s", "Jack");
+         String str2 = MessageFormat.format("Hi, {0}, I''m {1} years old.", "Tom", 18);
+         String str3 = MessageFormat.format("'Hi, {0}, I''m {1} years old.'", "Tom", 18);
+         System.out.println(str1);
+         System.out.println(str2);
+         System.out.println(str3);
+       }
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   : Hi, Jack
+   : Hi, Tom, I'm 18 years old.
+   : Hi, {0}, I'm {1} years old.
+
+** 正则表达式
+   正则表达式（regular expression）是处理字符串的一个非常有效的工具，Java 中关于
+   正则表达式处理的相关方法在 =java.util.regex.*= 包中
+
+   一种正则表达式的方式是，新建一个 Pattern，然后通过 Matcher 来匹配
+   #+HEADERS: :classname App232
+   #+BEGIN_SRC java :results output :exports both
+     import java.util.regex.*;
+     class App232 {
+       public static void main(String args[]) {
+         String text = "823-232-232";
+         Pattern regex1 = Pattern.compile("^([0-9]*)\\s*", Pattern.CASE_INSENSITIVE);
+         Matcher matcher1 = regex1.matcher(text);
+         if (matcher1.find()) {
+           String g1 = matcher1.group(1); // => "832"
+         }
+       }
+     }
+   #+END_SRC
+
+   如果仅仅判断字符串是否符合正则表达式，可以使用 Pattern 类中的 =matches= 静态
+   方法
+   #+HEADERS: :classname App482
+   #+BEGIN_SRC java :results output :exports both
+     import java.util.*;
+     import java.util.regex.*;
+     class App482 {
+       public static void main(String args[]) {
+         String text = "Hello world";
+         if (! Pattern.matches("\\s*", text)) {
+           // find non-blank text
+         }
+       }
+     }
+   #+END_SRC
+
+   使用正则表达式替换字符串，例如 =replaceAll= 可以使用下面的方法来替换
+   #+BEGIN_SRC java :classname App575 :exports both :results output
+     import java.util.*;
+     import java.util.regex.*;
+     class App575 {
+       public static void main(String args[]) {
+         Pattern regex2 = Pattern.compile("[0-9]+", Pattern.CASE_INSENSITIVE);
+         String text = "823-232-232";
+         String res1 = regex2.matcher(text).replaceAll("#"); // => "#-#-#"
+         String res2 = text.replaceAll("[0-9]+", "#"); // same as res1
+       }
+     }
+   #+END_SRC
+
+** 线程
 * JDK
   [[https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html][JDK]] 是 Java 语言的软件开发工具包，主要用于移动设备、嵌入式设备上的 JAVA 应用程
   序。JDK 是整个 Java 开发的核心，它包含了 JAVA 的运行环境（JVM+Java 系统类库）
