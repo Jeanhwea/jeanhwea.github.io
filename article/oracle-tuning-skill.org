@@ -18,3 +18,412 @@
   #+BEGIN_SRC text
     /u01/app/oracle/product/11.2.0/dbhome_1/dbs/spfileora11g.ora
   #+END_SRC
+
+* 配置系统参数
+
+** 日期格式
+   查看时间相关的参数
+   #+BEGIN_SRC sql
+     show parameters nls;
+   #+END_SRC
+
+   #+RESULTS:
+   | NAME                    | TYPE   | VALUE                        |
+   |-------------------------+--------+------------------------------|
+   | nls_calendar            | string | GREGORIAN                    |
+   | nls_comp                | string | BINARY                       |
+   | nls_currency            | string | $                            |
+   | nls_date_format         | string | YYYY-MM-DD HH24:MI:SS        |
+   | nls_date_language       | string | AMERICAN                     |
+   | nls_dual_currency       | string | $                            |
+   | nls_iso_currency        | string | AMERICA                      |
+   | nls_language            | string | AMERICAN                     |
+   | nls_length_semantics    | string | BYTE                         |
+   | nls_nchar_conv_excp     | string | FALSE                        |
+   | nls_numeric_characters  | string | .,                           |
+   | nls_sort                | string | BINARY                       |
+   | nls_territory           | string | AMERICA                      |
+   | nls_time_format         | string | HH.MI.SSXFF AM               |
+   | nls_time_tz_format      | string | HH.MI.SSXFF AM TZR           |
+   | nls_timestamp_format    | string | DD-MON-RR HH.MI.SSXFF AM     |
+   | nls_timestamp_tz_format | string | DD-MON-RR HH.MI.SSXFF AM TZR |
+
+   Oracle 不支持直接修改底层系统的时间格式，但是默认的时间格式为 ~DD-MON-RR~ 的
+   字符串，显示得不是很友好，所以需要使用一些曲线救国的方式来修改日期时间的格式
+
+   方案一：在当前会话的启动后直接修改当前会话的时间格式
+   #+BEGIN_SRC sql
+     alter session set nls_date_format = 'YYYY-MM-DD HH24:MI:SS';
+   #+END_SRC
+
+   方案二：添加环境变量，每次启动 sqlplus 会直接读取环境变量从而达到修改日期格式
+   的目的
+   #+BEGIN_SRC sh
+     export NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'
+   #+END_SRC
+
+   方案三：在选取时间日期字段时显示使用 ~to_char~ 函数来格式化时间
+   #+BEGIN_SRC sql
+     select
+       to_char(sysdate, 'YYYY-MM-DD HH24:MI:SS') as now
+     from
+       dual;
+   #+END_SRC
+
+   #+RESULTS:
+   | NOW                 |
+   |---------------------|
+   | 2020-02-09 04:26:15 |
+
+** 时区
+   查看数据库的时区
+   #+BEGIN_SRC sql
+     select dbtimezone from dual;
+   #+END_SRC
+
+   #+RESULTS:
+   | DBTIMEZONE |
+   |------------|
+   |     +00:00 |
+
+   通过 ~tz_offset~ 转化数据库的时区和当前会话的时区
+   #+BEGIN_SRC sql
+     select
+       tz_offset (dbtimezone) as "Remote Time Zone",
+       tz_offset (sessiontimezone) as "Local Time Zone"
+     from
+       dual;
+   #+END_SRC
+
+   #+RESULTS:
+   | Remote Time Zone | Local Time Zone |
+   |------------------+-----------------|
+   |           +00:00 |          +08:00 |
+
+* 性能调优
+** 系统进程，会话和事务数目的设置
+   查看系统的进程数目，会话数目和最大事务数目分别
+   #+BEGIN_SRC sql
+     set heading off;
+     show parameter processes;
+     show parameter sessions;
+     show parameter transactions;
+   #+END_SRC
+
+   #+RESULTS:
+   | aq_tm_processes                   | integer |   0 |
+   | db_writer_processes               | integer |   2 |
+   | gcs_server_processes              | integer |   0 |
+   | global_txn_processes              | integer |   1 |
+   | job_queue_processes               | integer |   0 |
+   | log_archive_max_processes         | integer |   4 |
+   | processes                         | integer | 100 |
+   | java_max_sessionspace_size        | integer |   0 |
+   | java_soft_sessionspace_limit      | integer |   0 |
+   | license_max_sessions              | integer |   0 |
+   | license_sessions_warning          | integer |   0 |
+   | sessions                          | integer | 176 |
+   | shared_server_sessions            | integer |     |
+   | transactions                      | integer | 193 |
+   | transactions_per_rollback_segment | integer |   5 |
+
+   直接在 =v$parameter= 视图中查看进程数和会话数
+   #+BEGIN_SRC sql
+     column name format a32;
+     column value format a64;
+
+     select
+       t.name,
+       t.value
+     from
+       v$parameter t
+     where
+       name in ('sessions', 'processes', 'transactions');
+   #+END_SRC
+
+   #+RESULTS:
+   | NAME         | VALUE |
+   |--------------+-------|
+   | processes    |   512 |
+   | sessions     |   800 |
+   | transactions |   563 |
+
+   一般讲 processes 的数值根据系统的性能来设置，但是 sessions 和 transactions 和
+   processes 有一定的换算关系
+   | Oralce         | sessions                  | transactions        |
+   |----------------+---------------------------+---------------------|
+   | 11g (11.2.0.4) | 1.5 \times processes + 22 | 1.1 \times sessions |
+   | 10g            | 1.1 \times processes + 5  | 1.1 \times sessions |
+
+   Oracle 10g 设置对应参数的快速对照表
+   |-----------+----------+--------------+----------+--------------|
+   |           |      11g |          11g |      10g |          10g |
+   |-----------+----------+--------------+----------+--------------|
+   | processes | sessions | transactions | sessions | transactions |
+   |-----------+----------+--------------+----------+--------------|
+   |       100 |      172 |          110 |      115 |          110 |
+   |       128 |      214 |          141 |      146 |          141 |
+   |       200 |      322 |          220 |      225 |          220 |
+   |       256 |      406 |          282 |      287 |          282 |
+   |       300 |      472 |          330 |      335 |          330 |
+   |       512 |      790 |          563 |      568 |          563 |
+   |       800 |     1222 |          880 |      885 |          880 |
+   |      1000 |     1522 |         1100 |     1105 |         1100 |
+   |      1024 |     1558 |         1126 |     1131 |         1126 |
+   |      1200 |     1822 |         1320 |     1325 |         1320 |
+   |      1500 |     2272 |         1650 |     1655 |         1650 |
+   |-----------+----------+--------------+----------+--------------|
+   #+TBLFM: $2=round(1.5*$1 + 22)::$3=round(1.1*$1)::$4=round(1.1*$1 + 5)::$5=round(1.1*$1)
+
+   可以根据上述对应关系表格设置相应的参数
+   #+BEGIN_SRC sql
+     alter system set processes = 1024 scope = spfile;
+     alter system set sessions = 1568 scope = spfile;
+     alter system set transactions = 1126 scope = spfile;
+   #+END_SRC
+
+** CPU 数量
+   #+BEGIN_SRC sql
+     show parameters cpu;
+   #+END_SRC
+
+   #+RESULTS:
+   | NAME                            | TYPE    | VALUE |
+   |---------------------------------+---------+-------|
+   | cpu_count                       | integer |    32 |
+   | parallel_threads_per_cpu        | integer |     2 |
+   | resource_manager_cpu_allocation | integer |    32 |
+
+** 内存相关参数
+*** SGA 和 PGA 的查看
+    SGA 是 Oracle 数据库的全局内存，可以通过以下命令查看 SGA 的参数信息
+    #+BEGIN_SRC sql
+      set heading off;
+      show parameter sga;
+      show parameter pga;
+    #+END_SRC
+
+    #+RESULTS:
+    | lock_sga             | boolean     | FALSE  |
+    | pre_page_sga         | boolean     | FALSE  |
+    | sga_max_size         | big integer | 30016M |
+    | sga_target           | big integer | 21760M |
+    | pga_aggregate_target | big integer | 7244M  |
+
+    一次性查看 SGA 和 Buffer Cache 的相关参数大小
+    #+BEGIN_SRC sql
+      column name format a32;
+      column value format a64;
+
+      select
+        t.name,
+        t.value
+      from
+        v$parameter t
+      where
+        t.name in ('sga_max_size', 'sga_target', 'pga_aggregate_target', 'workarea_size_policy')
+      order by
+        t.name;
+    #+END_SRC
+
+    #+RESULTS:
+    | NAME                 |     VALUE |
+    |----------------------+-----------|
+    | pga_aggregate_target | 200540160 |
+    | sga_max_size         | 603979776 |
+    | sga_target           | 603979776 |
+    | workarea_size_policy |      AUTO |
+
+*** SGA 和 PGA 的设置
+    修改 SGA 和 PGA 参数的原则如下：一般物理内存 20% 用作操作系统保留，其他 80%
+    用于数据库，对于只作为数据库服务的机器可以加将 Oracle 的内存分配得更高。在
+    Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之间，PGA 可以分配
+    可用内存 20% ~ 40% 之间
+
+    | -   | parameter            | range                               |
+    |-----+----------------------+-------------------------------------|
+    | OS  | total_memory         |                                     |
+    | OS  | available_memory     | (60% ~ 90%) \times total_memory     |
+    | SGA | sga_max_size         | (60% ~ 80%) \times available_memory |
+    | SGA | sga_target           | (60% ~ 80%) \times available_memory |
+    | PGA | pga_aggregate_target | (40% ~ 20%) \times available_memory |
+
+    #+BEGIN_SRC sql
+      alter system set sga_max_size = 30g scope = both;
+      alter system set sga_target = 30g scope = both;
+      alter system set pga_aggregate_target = 8g scope = both;
+    #+END_SRC
+
+    修改 PGA 的自动管理方式和大小
+    #+BEGIN_SRC sql
+      alter system set workarea_size_policy = auto scope = both;
+      alter system set pga_aggregate_target = 3072m scope = both;
+    #+END_SRC
+
+** 缓冲区相关参数
+*** 查看缓冲区参数
+    #+BEGIN_SRC sql
+      column name format a32;
+      column value format a64;
+
+      select
+        t.name,
+        t.value
+      from
+        v$parameter t
+      where
+        t.name in ('db_cache_size', 'db_keep_cache_size', 'db_recycle_cache_size')
+      order by
+        t.name;
+    #+END_SRC
+
+    #+RESULTS:
+    | NAME                  | VALUE |
+    |-----------------------+-------|
+    | db_cache_size         |     0 |
+    | db_keep_cache_size    |     0 |
+    | db_recycle_cache_size |     0 |
+
+*** 查看缓冲区命中率
+    缓冲区的命中率一般要达到 98% 以上才算正常
+    #+begin_src sql
+      select
+        100 * (1 - ((physical.value - direct.value - lobs.value) / logical.value)) as
+          "Buffer Cache Hit Ratio (%)"
+      from
+        v$sysstat physical,
+        v$sysstat direct,
+        v$sysstat lobs,
+        v$sysstat logical
+      where
+        physical.name = 'physical reads'
+        and direct.name = 'physical reads direct'
+        and lobs.name = 'physical reads direct (lob)'
+        and logical.name = 'session logical reads';
+    #+end_src
+
+    #+RESULTS:
+    | Buffer Cache Hit Ratio (%) |
+    |----------------------------|
+    |                  98.775588 |
+
+*** 推荐缓冲区值
+    获取推荐的值，SIZE_FOR_ESTIMATE 以 M 为单位
+    #+begin_src sql
+      select
+        name as "Name",
+        size_for_estimate as "Adviced Size (M)",
+        v$db_cache_advice.estd_physical_reads as "Estimed Physical Reads"
+      from
+        v$db_cache_advice
+      where
+        block_size = '8192'
+        and advice_status = 'ON';
+    #+end_src
+
+    #+RESULTS:
+    | Name    | Adviced Size (M) | Estimed Physical Reads |
+    |---------+------------------+------------------------|
+    | DEFAULT |               36 |                  14196 |
+    | DEFAULT |               72 |                  10162 |
+    | DEFAULT |              108 |                   8925 |
+    | DEFAULT |              144 |                   8925 |
+    | DEFAULT |              180 |                   8925 |
+    | DEFAULT |              216 |                   8925 |
+    | DEFAULT |              252 |                   8925 |
+    | DEFAULT |              288 |                   8925 |
+    | DEFAULT |              324 |                   8925 |
+    | DEFAULT |              360 |                   8925 |
+    | DEFAULT |              372 |                   8925 |
+    | DEFAULT |              396 |                   8925 |
+    | DEFAULT |              432 |                   8925 |
+    | DEFAULT |              468 |                   8925 |
+    | DEFAULT |              504 |                   8925 |
+    | DEFAULT |              540 |                   8925 |
+    | DEFAULT |              576 |                   8925 |
+    | DEFAULT |              612 |                   8925 |
+    | DEFAULT |              648 |                   8925 |
+    | DEFAULT |              684 |                   8925 |
+    | DEFAULT |              720 |                   8897 |
+
+** 查看 SQL 执行的表
+   #+BEGIN_SRC sql
+     select
+       s.*
+     from (
+       select
+         t.runtime_mem,
+         t.executions,
+         t.sql_text
+       from
+         v$sql t
+       where
+         t.executions > 10
+       order by
+         t.runtime_mem desc,
+         t.executions desc) s
+     where
+       rownum < 10;
+   #+END_SRC
+
+   #+begin_src sql
+     select
+       s.*
+     from (
+       select
+         t.runtime_mem,
+         t.executions,
+         t.sql_text
+       from
+         v$sql t
+       where
+         t.executions < 10
+         and t.sql_text like 'select%'
+       order by
+         t.sql_text desc) s
+     where
+       rownum < 10;
+   #+end_src
+
+* 系统建议
+** 查看系统建议表
+   #+begin_src sql
+     select
+       replace(lower(table_name), 'wrh$_', 'v$') as name
+     from
+       all_tables
+     where
+       lower(table_name) like '%advice%';
+   #+end_src
+
+   #+RESULTS:
+   | NAME                   |
+   |------------------------|
+   | v$db_cache_advice      |
+   | v$mttr_target_advice   |
+   | v$java_pool_advice     |
+   | v$memory_target_advice |
+   | v$sga_target_advice    |
+   | v$pga_target_advice    |
+   | v$streams_pool_advice  |
+   | v$shared_pool_advice   |
+   | v$db_cache_advice_bl   |
+
+   #+begin_src sql
+     select t.* from v$sga_target_advice t;
+   #+end_src
+
+   #+RESULTS:
+   | SGA_SIZE | SGA_SIZE_FACTOR | ESTD_DB_TIME | ESTD_DB_TIME_FACTOR | ESTD_PHYSICAL_READS |
+   |----------+-----------------+--------------+---------------------+---------------------|
+   |      288 |              .5 |           82 |                   1 |               14194 |
+   |      432 |             .75 |           82 |                   1 |                8924 |
+   |      576 |               1 |           82 |                   1 |                8924 |
+   |      720 |            1.25 |           82 |                   1 |                8924 |
+   |      864 |             1.5 |           82 |                   1 |                8924 |
+   |     1008 |            1.75 |           82 |                   1 |                8896 |
+   |     1152 |               2 |           82 |                   1 |                8896 |
+
+   #+begin_src sql
+     select t.* from v$db_cache_advice t;
+   #+end_src

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-01-16 Thu 14:29 -->
+<!-- 2020-02-15 Sat 09:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Oracle 数据库调优</title>
@@ -238,21 +238,52 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org186319d">1. 数据库配置文件</a></li>
+<li><a href="#org2bd920a">1. 数据库配置文件</a></li>
+<li><a href="#org3df331c">2. 配置系统参数</a>
+<ul>
+<li><a href="#org2a237be">2.1. 日期格式</a></li>
+<li><a href="#org9d03224">2.2. 时区</a></li>
+</ul>
+</li>
+<li><a href="#org61ee934">3. 性能调优</a>
+<ul>
+<li><a href="#org0d44d4d">3.1. 系统进程，会话和事务数目的设置</a></li>
+<li><a href="#org6566007">3.2. CPU 数量</a></li>
+<li><a href="#org071655f">3.3. 内存相关参数</a>
+<ul>
+<li><a href="#org35bad60">3.3.1. SGA 和 PGA 的查看</a></li>
+<li><a href="#org11e83c9">3.3.2. SGA 和 PGA 的设置</a></li>
+</ul>
+</li>
+<li><a href="#orgce8673c">3.4. 缓冲区相关参数</a>
+<ul>
+<li><a href="#org23a324c">3.4.1. 查看缓冲区参数</a></li>
+<li><a href="#org325a828">3.4.2. 查看缓冲区命中率</a></li>
+<li><a href="#org380fafd">3.4.3. 推荐缓冲区值</a></li>
+</ul>
+</li>
+<li><a href="#org0ca60d0">3.5. 查看 SQL 执行的表</a></li>
+</ul>
+</li>
+<li><a href="#orgad8f58b">4. 系统建议</a>
+<ul>
+<li><a href="#org7eb86ed">4.1. 查看系统建议表</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org186319d" class="outline-2">
-<h2 id="org186319d"><span class="section-number-2">1</span> 数据库配置文件</h2>
+<div id="outline-container-org2bd920a" class="outline-2">
+<h2 id="org2bd920a"><span class="section-number-2">1</span> 数据库配置文件</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 在调优前，备份好 pfile，以防参数修改错误服务器宕机，查看 pfile 所在的位置命令
 如下
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #d33682;">show parameter pfile;</span>
+<pre class="src src-sql">show <span style="color: #859900;">parameter</span> pfile;
 </pre>
 </div>
 
@@ -265,9 +296,569 @@ for the JavaScript code in this tag.
 </div>
 </div>
 </div>
+
+<div id="outline-container-org3df331c" class="outline-2">
+<h2 id="org3df331c"><span class="section-number-2">2</span> 配置系统参数</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org2a237be" class="outline-3">
+<h3 id="org2a237be"><span class="section-number-3">2.1</span> 日期格式</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+查看时间相关的参数
+</p>
+<div class="org-src-container">
+<pre class="src src-sql">show <span style="color: #859900;">parameters</span> nls;
+</pre>
+</div>
+
+<p>
+Oracle 不支持直接修改底层系统的时间格式，但是默认的时间格式为 <code>DD-MON-RR</code> 的
+字符串，显示得不是很友好，所以需要使用一些曲线救国的方式来修改日期时间的格式
+</p>
+
+<p>
+方案一：在当前会话的启动后直接修改当前会话的时间格式
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">alter</span> <span style="color: #859900;">session</span> <span style="color: #859900;">set</span> nls_date_format = <span style="color: #2aa198;">'YYYY-MM-DD HH24:MI:SS'</span>;
+</pre>
+</div>
+
+<p>
+方案二：添加环境变量，每次启动 sqlplus 会直接读取环境变量从而达到修改日期格式
+的目的
+</p>
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">NLS_DATE_FORMAT</span>=<span style="color: #2aa198;">'YYYY-MM-DD HH24:MI:SS'</span>
+</pre>
+</div>
+
+<p>
+方案三：在选取时间日期字段时显示使用 <code>to_char</code> 函数来格式化时间
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">select</span>
+  to_char(sysdate, <span style="color: #2aa198;">'YYYY-MM-DD HH24:MI:SS'</span>) <span style="color: #859900;">as</span> now
+<span style="color: #859900;">from</span>
+  dual;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9d03224" class="outline-3">
+<h3 id="org9d03224"><span class="section-number-3">2.2</span> 时区</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+查看数据库的时区
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">select</span> dbtimezone <span style="color: #859900;">from</span> dual;
+</pre>
+</div>
+
+<p>
+通过 <code>tz_offset</code> 转化数据库的时区和当前会话的时区
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">select</span>
+  tz_offset (dbtimezone) <span style="color: #859900;">as</span> "Remote <span style="color: #268bd2;">Time</span> <span style="color: #268bd2;">Zone</span>",
+  tz_offset (sessiontimezone) <span style="color: #859900;">as</span> "<span style="color: #859900;">Local</span> <span style="color: #268bd2;">Time</span> <span style="color: #268bd2;">Zone</span>"
+<span style="color: #859900;">from</span>
+  dual;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org61ee934" class="outline-2">
+<h2 id="org61ee934"><span class="section-number-2">3</span> 性能调优</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org0d44d4d" class="outline-3">
+<h3 id="org0d44d4d"><span class="section-number-3">3.1</span> 系统进程，会话和事务数目的设置</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+查看系统的进程数目，会话数目和最大事务数目分别
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">set</span> heading <span style="color: #859900;">off</span>;
+show <span style="color: #859900;">parameter</span> processes;
+show <span style="color: #859900;">parameter</span> sessions;
+show <span style="color: #859900;">parameter</span> transactions;
+</pre>
+</div>
+
+<p>
+直接在 <code>v$parameter</code> 视图中查看进程数和会话数
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">column</span> <span style="color: #859900;">name</span> format a32;
+<span style="color: #859900;">column</span> <span style="color: #859900;">value</span> format a64;
+
+<span style="color: #859900;">select</span>
+  t.<span style="color: #859900;">name</span>,
+  t.<span style="color: #859900;">value</span>
+<span style="color: #859900;">from</span>
+  v$<span style="color: #859900;">parameter</span> t
+<span style="color: #859900;">where</span>
+  <span style="color: #859900;">name</span> <span style="color: #859900;">in</span> (<span style="color: #2aa198;">'sessions'</span>, <span style="color: #2aa198;">'processes'</span>, <span style="color: #2aa198;">'transactions'</span>);
+</pre>
+</div>
+
+<p>
+一般讲 processes 的数值根据系统的性能来设置，但是 sessions 和 transactions 和
+processes 有一定的换算关系
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Oralce</th>
+<th scope="col" class="org-left">sessions</th>
+<th scope="col" class="org-left">transactions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">11g (11.2.0.4)</td>
+<td class="org-left">1.5 &times; processes + 22</td>
+<td class="org-left">1.1 &times; sessions</td>
+</tr>
+
+<tr>
+<td class="org-left">10g</td>
+<td class="org-left">1.1 &times; processes + 5</td>
+<td class="org-left">1.1 &times; sessions</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Oracle 10g 设置对应参数的快速对照表
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">&#xa0;</th>
+<th scope="col" class="org-right">11g</th>
+<th scope="col" class="org-right">11g</th>
+<th scope="col" class="org-right">10g</th>
+<th scope="col" class="org-right">10g</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">processes</td>
+<td class="org-right">sessions</td>
+<td class="org-right">transactions</td>
+<td class="org-right">sessions</td>
+<td class="org-right">transactions</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-right">100</td>
+<td class="org-right">172</td>
+<td class="org-right">110</td>
+<td class="org-right">115</td>
+<td class="org-right">110</td>
+</tr>
+
+<tr>
+<td class="org-right">128</td>
+<td class="org-right">214</td>
+<td class="org-right">141</td>
+<td class="org-right">146</td>
+<td class="org-right">141</td>
+</tr>
+
+<tr>
+<td class="org-right">200</td>
+<td class="org-right">322</td>
+<td class="org-right">220</td>
+<td class="org-right">225</td>
+<td class="org-right">220</td>
+</tr>
+
+<tr>
+<td class="org-right">256</td>
+<td class="org-right">406</td>
+<td class="org-right">282</td>
+<td class="org-right">287</td>
+<td class="org-right">282</td>
+</tr>
+
+<tr>
+<td class="org-right">300</td>
+<td class="org-right">472</td>
+<td class="org-right">330</td>
+<td class="org-right">335</td>
+<td class="org-right">330</td>
+</tr>
+
+<tr>
+<td class="org-right">512</td>
+<td class="org-right">790</td>
+<td class="org-right">563</td>
+<td class="org-right">568</td>
+<td class="org-right">563</td>
+</tr>
+
+<tr>
+<td class="org-right">800</td>
+<td class="org-right">1222</td>
+<td class="org-right">880</td>
+<td class="org-right">885</td>
+<td class="org-right">880</td>
+</tr>
+
+<tr>
+<td class="org-right">1000</td>
+<td class="org-right">1522</td>
+<td class="org-right">1100</td>
+<td class="org-right">1105</td>
+<td class="org-right">1100</td>
+</tr>
+
+<tr>
+<td class="org-right">1024</td>
+<td class="org-right">1558</td>
+<td class="org-right">1126</td>
+<td class="org-right">1131</td>
+<td class="org-right">1126</td>
+</tr>
+
+<tr>
+<td class="org-right">1200</td>
+<td class="org-right">1822</td>
+<td class="org-right">1320</td>
+<td class="org-right">1325</td>
+<td class="org-right">1320</td>
+</tr>
+
+<tr>
+<td class="org-right">1500</td>
+<td class="org-right">2272</td>
+<td class="org-right">1650</td>
+<td class="org-right">1655</td>
+<td class="org-right">1650</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+可以根据上述对应关系表格设置相应的参数
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">alter</span> <span style="color: #859900;">system</span> <span style="color: #859900;">set</span> processes = 1024 <span style="color: #268bd2;">scope</span> = spfile;
+<span style="color: #859900;">alter</span> <span style="color: #859900;">system</span> <span style="color: #859900;">set</span> sessions = 1568 <span style="color: #268bd2;">scope</span> = spfile;
+<span style="color: #859900;">alter</span> <span style="color: #859900;">system</span> <span style="color: #859900;">set</span> transactions = 1126 <span style="color: #268bd2;">scope</span> = spfile;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6566007" class="outline-3">
+<h3 id="org6566007"><span class="section-number-3">3.2</span> CPU 数量</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+<pre class="src src-sql">show <span style="color: #859900;">parameters</span> cpu;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org071655f" class="outline-3">
+<h3 id="org071655f"><span class="section-number-3">3.3</span> 内存相关参数</h3>
+<div class="outline-text-3" id="text-3-3">
+</div>
+<div id="outline-container-org35bad60" class="outline-4">
+<h4 id="org35bad60"><span class="section-number-4">3.3.1</span> SGA 和 PGA 的查看</h4>
+<div class="outline-text-4" id="text-3-3-1">
+<p>
+SGA 是 Oracle 数据库的全局内存，可以通过以下命令查看 SGA 的参数信息
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">set</span> heading <span style="color: #859900;">off</span>;
+show <span style="color: #859900;">parameter</span> sga;
+show <span style="color: #859900;">parameter</span> pga;
+</pre>
+</div>
+
+<p>
+一次性查看 SGA 和 Buffer Cache 的相关参数大小
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">column</span> <span style="color: #859900;">name</span> format a32;
+<span style="color: #859900;">column</span> <span style="color: #859900;">value</span> format a64;
+
+<span style="color: #859900;">select</span>
+  t.<span style="color: #859900;">name</span>,
+  t.<span style="color: #859900;">value</span>
+<span style="color: #859900;">from</span>
+  v$<span style="color: #859900;">parameter</span> t
+<span style="color: #859900;">where</span>
+  t.<span style="color: #859900;">name</span> <span style="color: #859900;">in</span> (<span style="color: #2aa198;">'sga_max_size'</span>, <span style="color: #2aa198;">'sga_target'</span>, <span style="color: #2aa198;">'pga_aggregate_target'</span>, <span style="color: #2aa198;">'workarea_size_policy'</span>)
+<span style="color: #859900;">order</span> <span style="color: #859900;">by</span>
+  t.<span style="color: #859900;">name</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org11e83c9" class="outline-4">
+<h4 id="org11e83c9"><span class="section-number-4">3.3.2</span> SGA 和 PGA 的设置</h4>
+<div class="outline-text-4" id="text-3-3-2">
+<p>
+修改 SGA 和 PGA 参数的原则如下：一般物理内存 20% 用作操作系统保留，其他 80%
+用于数据库，对于只作为数据库服务的机器可以加将 Oracle 的内存分配得更高。在
+Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之间，PGA 可以分配
+可用内存 20% ~ 40% 之间
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">-</th>
+<th scope="col" class="org-left">parameter</th>
+<th scope="col" class="org-left">range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">OS</td>
+<td class="org-left">total<sub>memory</sub></td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">OS</td>
+<td class="org-left">available<sub>memory</sub></td>
+<td class="org-left">(60% ~ 90%) &times; total<sub>memory</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">SGA</td>
+<td class="org-left">sga<sub>max</sub><sub>size</sub></td>
+<td class="org-left">(60% ~ 80%) &times; available<sub>memory</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">SGA</td>
+<td class="org-left">sga<sub>target</sub></td>
+<td class="org-left">(60% ~ 80%) &times; available<sub>memory</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">PGA</td>
+<td class="org-left">pga<sub>aggregate</sub><sub>target</sub></td>
+<td class="org-left">(40% ~ 20%) &times; available<sub>memory</sub></td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">alter</span> <span style="color: #859900;">system</span> <span style="color: #859900;">set</span> sga_max_size = 30g <span style="color: #268bd2;">scope</span> = <span style="color: #859900;">both</span>;
+<span style="color: #859900;">alter</span> <span style="color: #859900;">system</span> <span style="color: #859900;">set</span> sga_target = 30g <span style="color: #268bd2;">scope</span> = <span style="color: #859900;">both</span>;
+<span style="color: #859900;">alter</span> <span style="color: #859900;">system</span> <span style="color: #859900;">set</span> pga_aggregate_target = 8g <span style="color: #268bd2;">scope</span> = <span style="color: #859900;">both</span>;
+</pre>
+</div>
+
+<p>
+修改 PGA 的自动管理方式和大小
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">alter</span> <span style="color: #859900;">system</span> <span style="color: #859900;">set</span> workarea_size_policy = auto <span style="color: #268bd2;">scope</span> = <span style="color: #859900;">both</span>;
+<span style="color: #859900;">alter</span> <span style="color: #859900;">system</span> <span style="color: #859900;">set</span> pga_aggregate_target = 3072m <span style="color: #268bd2;">scope</span> = <span style="color: #859900;">both</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgce8673c" class="outline-3">
+<h3 id="orgce8673c"><span class="section-number-3">3.4</span> 缓冲区相关参数</h3>
+<div class="outline-text-3" id="text-3-4">
+</div>
+<div id="outline-container-org23a324c" class="outline-4">
+<h4 id="org23a324c"><span class="section-number-4">3.4.1</span> 查看缓冲区参数</h4>
+<div class="outline-text-4" id="text-3-4-1">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">column</span> <span style="color: #859900;">name</span> format a32;
+<span style="color: #859900;">column</span> <span style="color: #859900;">value</span> format a64;
+
+<span style="color: #859900;">select</span>
+  t.<span style="color: #859900;">name</span>,
+  t.<span style="color: #859900;">value</span>
+<span style="color: #859900;">from</span>
+  v$<span style="color: #859900;">parameter</span> t
+<span style="color: #859900;">where</span>
+  t.<span style="color: #859900;">name</span> <span style="color: #859900;">in</span> (<span style="color: #2aa198;">'db_cache_size'</span>, <span style="color: #2aa198;">'db_keep_cache_size'</span>, <span style="color: #2aa198;">'db_recycle_cache_size'</span>)
+<span style="color: #859900;">order</span> <span style="color: #859900;">by</span>
+  t.<span style="color: #859900;">name</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org325a828" class="outline-4">
+<h4 id="org325a828"><span class="section-number-4">3.4.2</span> 查看缓冲区命中率</h4>
+<div class="outline-text-4" id="text-3-4-2">
+<p>
+缓冲区的命中率一般要达到 98% 以上才算正常
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">select</span>
+  100 * (1 - ((physical.<span style="color: #859900;">value</span> - direct.<span style="color: #859900;">value</span> - lobs.<span style="color: #859900;">value</span>) / logical.<span style="color: #859900;">value</span>)) <span style="color: #859900;">as</span>
+    "Buffer Cache Hit Ratio (%)"
+<span style="color: #859900;">from</span>
+  v$sysstat physical,
+  v$sysstat direct,
+  v$sysstat lobs,
+  v$sysstat logical
+<span style="color: #859900;">where</span>
+  physical.<span style="color: #859900;">name</span> = <span style="color: #2aa198;">'physical reads'</span>
+  <span style="color: #859900;">and</span> direct.<span style="color: #859900;">name</span> = <span style="color: #2aa198;">'physical reads direct'</span>
+  <span style="color: #859900;">and</span> lobs.<span style="color: #859900;">name</span> = <span style="color: #2aa198;">'physical reads direct (lob)'</span>
+  <span style="color: #859900;">and</span> logical.<span style="color: #859900;">name</span> = <span style="color: #2aa198;">'session logical reads'</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org380fafd" class="outline-4">
+<h4 id="org380fafd"><span class="section-number-4">3.4.3</span> 推荐缓冲区值</h4>
+<div class="outline-text-4" id="text-3-4-3">
+<p>
+获取推荐的值，SIZE<sub>FOR</sub><sub>ESTIMATE</sub> 以 M 为单位
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">select</span>
+  <span style="color: #859900;">name</span> <span style="color: #859900;">as</span> "<span style="color: #859900;">Name</span>",
+  size_for_estimate <span style="color: #859900;">as</span> "Adviced <span style="color: #859900;">Size</span> (<span style="color: #859900;">M</span>)",
+  v$db_cache_advice.estd_physical_reads <span style="color: #859900;">as</span> "Estimed Physical <span style="color: #859900;">Reads</span>"
+<span style="color: #859900;">from</span>
+  v$db_cache_advice
+<span style="color: #859900;">where</span>
+  block_size = <span style="color: #2aa198;">'8192'</span>
+  <span style="color: #859900;">and</span> advice_status = <span style="color: #2aa198;">'ON'</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0ca60d0" class="outline-3">
+<h3 id="org0ca60d0"><span class="section-number-3">3.5</span> 查看 SQL 执行的表</h3>
+<div class="outline-text-3" id="text-3-5">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">select</span>
+  s.*
+<span style="color: #859900;">from</span> (
+  <span style="color: #859900;">select</span>
+    t.runtime_mem,
+    t.executions,
+    t.sql_text
+  <span style="color: #859900;">from</span>
+    v$<span style="color: #859900;">sql</span> t
+  <span style="color: #859900;">where</span>
+    t.executions &gt; 10
+  <span style="color: #859900;">order</span> <span style="color: #859900;">by</span>
+    t.runtime_mem <span style="color: #859900;">desc</span>,
+    t.executions <span style="color: #859900;">desc</span>) s
+<span style="color: #859900;">where</span>
+  rownum &lt; 10;
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">select</span>
+  s.*
+<span style="color: #859900;">from</span> (
+  <span style="color: #859900;">select</span>
+    t.runtime_mem,
+    t.executions,
+    t.sql_text
+  <span style="color: #859900;">from</span>
+    v$<span style="color: #859900;">sql</span> t
+  <span style="color: #859900;">where</span>
+    t.executions &lt; 10
+    <span style="color: #859900;">and</span> t.sql_text <span style="color: #859900;">like</span> <span style="color: #2aa198;">'select%'</span>
+  <span style="color: #859900;">order</span> <span style="color: #859900;">by</span>
+    t.sql_text <span style="color: #859900;">desc</span>) s
+<span style="color: #859900;">where</span>
+  rownum &lt; 10;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgad8f58b" class="outline-2">
+<h2 id="orgad8f58b"><span class="section-number-2">4</span> 系统建议</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-org7eb86ed" class="outline-3">
+<h3 id="org7eb86ed"><span class="section-number-3">4.1</span> 查看系统建议表</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">select</span>
+  replace(<span style="color: #6c71c4;">lower</span>(<span style="color: #859900;">table_name</span>), <span style="color: #2aa198;">'wrh$_'</span>, <span style="color: #2aa198;">'v$'</span>) <span style="color: #859900;">as</span> <span style="color: #859900;">name</span>
+<span style="color: #859900;">from</span>
+  all_tables
+<span style="color: #859900;">where</span>
+  <span style="color: #6c71c4;">lower</span>(<span style="color: #859900;">table_name</span>) <span style="color: #859900;">like</span> <span style="color: #2aa198;">'%advice%'</span>;
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">select</span> t.* <span style="color: #859900;">from</span> v$sga_target_advice t;
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">select</span> t.* <span style="color: #859900;">from</span> v$db_cache_advice t;
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-01-16 Thu 14:29. Created by Jinghui Hu at 2020-01-13 Mon 16:03.</p>
+<p class="author">Last Updated 2020-02-15 Sat 09:20. Created by Jinghui Hu at 2020-01-13 Mon 16:03.</p>
 </div>
 </body>
 </html>
