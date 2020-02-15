@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-02-15 Sat 09:20 -->
+<!-- 2020-02-15 Sat 09:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Oracle 数据库调优</title>
@@ -238,36 +238,36 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org2bd920a">1. 数据库配置文件</a></li>
-<li><a href="#org3df331c">2. 配置系统参数</a>
+<li><a href="#org35bfeac">1. 数据库配置文件</a></li>
+<li><a href="#org58fe871">2. 配置系统参数</a>
 <ul>
-<li><a href="#org2a237be">2.1. 日期格式</a></li>
-<li><a href="#org9d03224">2.2. 时区</a></li>
+<li><a href="#orgde1444a">2.1. 日期格式</a></li>
+<li><a href="#org6073513">2.2. 时区</a></li>
 </ul>
 </li>
-<li><a href="#org61ee934">3. 性能调优</a>
+<li><a href="#orgd0ca5e1">3. 性能调优</a>
 <ul>
-<li><a href="#org0d44d4d">3.1. 系统进程，会话和事务数目的设置</a></li>
-<li><a href="#org6566007">3.2. CPU 数量</a></li>
-<li><a href="#org071655f">3.3. 内存相关参数</a>
+<li><a href="#orgb3e024a">3.1. 系统进程，会话和事务数目的设置</a></li>
+<li><a href="#orgb0a1af0">3.2. CPU 数量</a></li>
+<li><a href="#org6b135d9">3.3. 内存相关参数</a>
 <ul>
-<li><a href="#org35bad60">3.3.1. SGA 和 PGA 的查看</a></li>
-<li><a href="#org11e83c9">3.3.2. SGA 和 PGA 的设置</a></li>
+<li><a href="#org68fe83f">3.3.1. SGA 和 PGA 的查看</a></li>
+<li><a href="#orgd5f0255">3.3.2. SGA 和 PGA 的设置</a></li>
 </ul>
 </li>
-<li><a href="#orgce8673c">3.4. 缓冲区相关参数</a>
+<li><a href="#orgce83f6c">3.4. 缓冲区相关参数</a>
 <ul>
-<li><a href="#org23a324c">3.4.1. 查看缓冲区参数</a></li>
-<li><a href="#org325a828">3.4.2. 查看缓冲区命中率</a></li>
-<li><a href="#org380fafd">3.4.3. 推荐缓冲区值</a></li>
+<li><a href="#org215b1dc">3.4.1. 查看缓冲区参数</a></li>
+<li><a href="#orgaba76c2">3.4.2. 查看缓冲区命中率</a></li>
+<li><a href="#orgaed54cc">3.4.3. 推荐缓冲区值</a></li>
 </ul>
 </li>
-<li><a href="#org0ca60d0">3.5. 查看 SQL 执行的表</a></li>
+<li><a href="#orgd3f519b">3.5. 查看 SQL 执行的表</a></li>
 </ul>
 </li>
-<li><a href="#orgad8f58b">4. 系统建议</a>
+<li><a href="#orge429870">4. 系统建议</a>
 <ul>
-<li><a href="#org7eb86ed">4.1. 查看系统建议表</a></li>
+<li><a href="#org907dfb3">4.1. 查看系统建议表</a></li>
 </ul>
 </li>
 </ul>
@@ -275,15 +275,15 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-org2bd920a" class="outline-2">
-<h2 id="org2bd920a"><span class="section-number-2">1</span> 数据库配置文件</h2>
+<div id="outline-container-org35bfeac" class="outline-2">
+<h2 id="org35bfeac"><span class="section-number-2">1</span> 数据库配置文件</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 在调优前，备份好 pfile，以防参数修改错误服务器宕机，查看 pfile 所在的位置命令
 如下
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">show <span style="color: #859900;">parameter</span> pfile;
+<pre class="src src-sql">show <span style="color: #859900;">parameter</span> spfile;
 </pre>
 </div>
 
@@ -291,18 +291,26 @@ for the JavaScript code in this tag.
 如果没有修改默认应该是如下路径
 </p>
 <div class="org-src-container">
-<pre class="src src-text">/u01/app/oracle/product/11.2.0/dbhome_1/dbs/spfileora11g.ora
+<pre class="src src-text">$ORACLE_HOME/dbs/spfile&lt;sid&gt;.ora
+</pre>
+</div>
+
+<p>
+可以进到对应的路径下备份
+</p>
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #6c71c4;">cd</span> $<span style="color: #6c71c4;">ORACLE_HOME</span>/dbs
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org3df331c" class="outline-2">
-<h2 id="org3df331c"><span class="section-number-2">2</span> 配置系统参数</h2>
+<div id="outline-container-org58fe871" class="outline-2">
+<h2 id="org58fe871"><span class="section-number-2">2</span> 配置系统参数</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org2a237be" class="outline-3">
-<h3 id="org2a237be"><span class="section-number-3">2.1</span> 日期格式</h3>
+<div id="outline-container-orgde1444a" class="outline-3">
+<h3 id="orgde1444a"><span class="section-number-3">2.1</span> 日期格式</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 查看时间相关的参数
@@ -347,8 +355,8 @@ Oracle 不支持直接修改底层系统的时间格式，但是默认的时间�
 </div>
 </div>
 
-<div id="outline-container-org9d03224" class="outline-3">
-<h3 id="org9d03224"><span class="section-number-3">2.2</span> 时区</h3>
+<div id="outline-container-org6073513" class="outline-3">
+<h3 id="org6073513"><span class="section-number-3">2.2</span> 时区</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 查看数据库的时区
@@ -373,12 +381,12 @@ Oracle 不支持直接修改底层系统的时间格式，但是默认的时间�
 </div>
 </div>
 
-<div id="outline-container-org61ee934" class="outline-2">
-<h2 id="org61ee934"><span class="section-number-2">3</span> 性能调优</h2>
+<div id="outline-container-orgd0ca5e1" class="outline-2">
+<h2 id="orgd0ca5e1"><span class="section-number-2">3</span> 性能调优</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org0d44d4d" class="outline-3">
-<h3 id="org0d44d4d"><span class="section-number-3">3.1</span> 系统进程，会话和事务数目的设置</h3>
+<div id="outline-container-orgb3e024a" class="outline-3">
+<h3 id="orgb3e024a"><span class="section-number-3">3.1</span> 系统进程，会话和事务数目的设置</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 查看系统的进程数目，会话数目和最大事务数目分别
@@ -582,8 +590,8 @@ Oracle 10g 设置对应参数的快速对照表
 </div>
 </div>
 
-<div id="outline-container-org6566007" class="outline-3">
-<h3 id="org6566007"><span class="section-number-3">3.2</span> CPU 数量</h3>
+<div id="outline-container-orgb0a1af0" class="outline-3">
+<h3 id="orgb0a1af0"><span class="section-number-3">3.2</span> CPU 数量</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 <pre class="src src-sql">show <span style="color: #859900;">parameters</span> cpu;
@@ -592,12 +600,12 @@ Oracle 10g 设置对应参数的快速对照表
 </div>
 </div>
 
-<div id="outline-container-org071655f" class="outline-3">
-<h3 id="org071655f"><span class="section-number-3">3.3</span> 内存相关参数</h3>
+<div id="outline-container-org6b135d9" class="outline-3">
+<h3 id="org6b135d9"><span class="section-number-3">3.3</span> 内存相关参数</h3>
 <div class="outline-text-3" id="text-3-3">
 </div>
-<div id="outline-container-org35bad60" class="outline-4">
-<h4 id="org35bad60"><span class="section-number-4">3.3.1</span> SGA 和 PGA 的查看</h4>
+<div id="outline-container-org68fe83f" class="outline-4">
+<h4 id="org68fe83f"><span class="section-number-4">3.3.1</span> SGA 和 PGA 的查看</h4>
 <div class="outline-text-4" id="text-3-3-1">
 <p>
 SGA 是 Oracle 数据库的全局内存，可以通过以下命令查看 SGA 的参数信息
@@ -630,8 +638,8 @@ show <span style="color: #859900;">parameter</span> pga;
 </div>
 </div>
 
-<div id="outline-container-org11e83c9" class="outline-4">
-<h4 id="org11e83c9"><span class="section-number-4">3.3.2</span> SGA 和 PGA 的设置</h4>
+<div id="outline-container-orgd5f0255" class="outline-4">
+<h4 id="orgd5f0255"><span class="section-number-4">3.3.2</span> SGA 和 PGA 的设置</h4>
 <div class="outline-text-4" id="text-3-3-2">
 <p>
 修改 SGA 和 PGA 参数的原则如下：一般物理内存 20% 用作操作系统保留，其他 80%
@@ -709,12 +717,12 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 
-<div id="outline-container-orgce8673c" class="outline-3">
-<h3 id="orgce8673c"><span class="section-number-3">3.4</span> 缓冲区相关参数</h3>
+<div id="outline-container-orgce83f6c" class="outline-3">
+<h3 id="orgce83f6c"><span class="section-number-3">3.4</span> 缓冲区相关参数</h3>
 <div class="outline-text-3" id="text-3-4">
 </div>
-<div id="outline-container-org23a324c" class="outline-4">
-<h4 id="org23a324c"><span class="section-number-4">3.4.1</span> 查看缓冲区参数</h4>
+<div id="outline-container-org215b1dc" class="outline-4">
+<h4 id="org215b1dc"><span class="section-number-4">3.4.1</span> 查看缓冲区参数</h4>
 <div class="outline-text-4" id="text-3-4-1">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">column</span> <span style="color: #859900;">name</span> format a32;
@@ -734,8 +742,8 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 
-<div id="outline-container-org325a828" class="outline-4">
-<h4 id="org325a828"><span class="section-number-4">3.4.2</span> 查看缓冲区命中率</h4>
+<div id="outline-container-orgaba76c2" class="outline-4">
+<h4 id="orgaba76c2"><span class="section-number-4">3.4.2</span> 查看缓冲区命中率</h4>
 <div class="outline-text-4" id="text-3-4-2">
 <p>
 缓冲区的命中率一般要达到 98% 以上才算正常
@@ -759,8 +767,8 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 
-<div id="outline-container-org380fafd" class="outline-4">
-<h4 id="org380fafd"><span class="section-number-4">3.4.3</span> 推荐缓冲区值</h4>
+<div id="outline-container-orgaed54cc" class="outline-4">
+<h4 id="orgaed54cc"><span class="section-number-4">3.4.3</span> 推荐缓冲区值</h4>
 <div class="outline-text-4" id="text-3-4-3">
 <p>
 获取推荐的值，SIZE<sub>FOR</sub><sub>ESTIMATE</sub> 以 M 为单位
@@ -781,8 +789,8 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 
-<div id="outline-container-org0ca60d0" class="outline-3">
-<h3 id="org0ca60d0"><span class="section-number-3">3.5</span> 查看 SQL 执行的表</h3>
+<div id="outline-container-orgd3f519b" class="outline-3">
+<h3 id="orgd3f519b"><span class="section-number-3">3.5</span> 查看 SQL 执行的表</h3>
 <div class="outline-text-3" id="text-3-5">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">select</span>
@@ -827,12 +835,12 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 
-<div id="outline-container-orgad8f58b" class="outline-2">
-<h2 id="orgad8f58b"><span class="section-number-2">4</span> 系统建议</h2>
+<div id="outline-container-orge429870" class="outline-2">
+<h2 id="orge429870"><span class="section-number-2">4</span> 系统建议</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org7eb86ed" class="outline-3">
-<h3 id="org7eb86ed"><span class="section-number-3">4.1</span> 查看系统建议表</h3>
+<div id="outline-container-org907dfb3" class="outline-3">
+<h3 id="org907dfb3"><span class="section-number-3">4.1</span> 查看系统建议表</h3>
 <div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">select</span>
@@ -858,7 +866,7 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-02-15 Sat 09:20. Created by Jinghui Hu at 2020-01-13 Mon 16:03.</p>
+<p class="author">Last Updated 2020-02-15 Sat 09:30. Created by Jinghui Hu at 2020-01-13 Mon 16:03.</p>
 </div>
 </body>
 </html>
