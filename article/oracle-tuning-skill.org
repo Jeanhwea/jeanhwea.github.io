@@ -6,23 +6,36 @@
 #+HTML_LINK_HOME: ../index.html
 #+TAGS: oracle 11g tuning
 
+* 数据库配置
+  Oracle 中的参数文件是一个包含一系列参数以及参数对应值的操作系统文件，可以分为两
+  种类型。它们是在数据库实例启动时候加载的，决定了数据库的物理结构、内存、数据库
+  的限制及系统大量的默认值、数据库的各种物理属性、指定数据库控制文件名和路径等信
+  息，是进行数据库设计和性能调优的重要文件。
+** 数据库配置文件
+   在调优前，备份好 spfile，以防参数修改错误导致服务器重启不能起来，查看 spfile
+   所在的位置命令如下
+   #+BEGIN_SRC sql
+     show parameter spfile;
+   #+END_SRC
 
-* 数据库配置文件
-  在调优前，备份好 pfile，以防参数修改错误服务器宕机，查看 pfile 所在的位置命令
-  如下
-  #+BEGIN_SRC sql
-    show parameter spfile;
-  #+END_SRC
+   如果没有修改默认应该是如下路径
+   #+BEGIN_SRC text
+     $ORACLE_HOME/dbs/spfile<sid>.ora
+   #+END_SRC
 
-  如果没有修改默认应该是如下路径
-  #+BEGIN_SRC text
-    $ORACLE_HOME/dbs/spfile<sid>.ora
-  #+END_SRC
+   可以进到对应的路径下备份，并对
+   #+BEGIN_SRC sh
+     cd $ORACLE_HOME/dbs
+   #+END_SRC
 
-  可以进到对应的路径下备份
-  #+BEGIN_SRC sh
-    cd $ORACLE_HOME/dbs
-  #+END_SRC
+** pfile 和 spfile 转换
+   pfile 是文本文件的，而 spfile 是二进制格式的。pfile 文件可以用文本编辑器打开
+   手工配置、而 spfile 不行，只能通过 SQL 命令在线修改。从操作系统上可以看到这两
+   者的区别，初始化参数文件为文本文件，spfile 为数据文件
+   #+BEGIN_SRC sql
+     create pfile from spfile;
+     create spfile from pfile;
+   #+END_SRC
 
 * 配置系统参数
 
