@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-02-22 Sat 19:23 -->
+<!-- 2020-02-22 Sat 20:06 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Oracle 数据库调优</title>
@@ -180,12 +180,12 @@
   .org-svg { width: 90%; }
   /*]]>*/-->
 </style>
-<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/styles/readtheorg/css/htmlize.css"/>
-<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/styles/readtheorg/css/readtheorg.css"/>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/styles/lib/js/jquery.stickytableheaders.min.js"></script>
-<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/styles/readtheorg/js/readtheorg.js"></script>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script type="text/javascript" src="styles/lib/js/jquery.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -244,49 +244,49 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org6eb88de">1. 数据库配置</a>
+<li><a href="#org03ab384">1. 数据库配置</a>
 <ul>
-<li><a href="#org7ffe90b">1.1. 数据库配置文件</a></li>
-<li><a href="#org8ca60d5">1.2. pfile 和 spfile 转换</a></li>
+<li><a href="#orgbe9bc29">1.1. 数据库配置文件</a></li>
+<li><a href="#org9b66338">1.2. pfile 和 spfile 转换</a></li>
 </ul>
 </li>
-<li><a href="#org007490e">2. 配置系统参数</a>
+<li><a href="#org3cf0bd2">2. 配置系统参数</a>
 <ul>
-<li><a href="#orgc5e1cc0">2.1. 日期格式</a></li>
-<li><a href="#org7376dc0">2.2. 时区</a></li>
+<li><a href="#orge5a0367">2.1. 日期格式</a></li>
+<li><a href="#org41df2ee">2.2. 时区</a></li>
 </ul>
 </li>
-<li><a href="#org2c2ca13">3. 性能调优</a>
+<li><a href="#org7daa313">3. 性能调优</a>
 <ul>
-<li><a href="#orgbaf5b5d">3.1. 系统进程，会话和事务数目的设置</a></li>
-<li><a href="#org6193b19">3.2. CPU 数量</a></li>
-<li><a href="#org3101540">3.3. 内存相关参数</a>
+<li><a href="#org0a84633">3.1. 系统进程，会话和事务数目的设置</a></li>
+<li><a href="#org3118ed0">3.2. CPU 数量</a></li>
+<li><a href="#org4165007">3.3. 内存相关参数</a>
 <ul>
-<li><a href="#org7f4e5f3">3.3.1. SGA 和 PGA 的查看</a></li>
-<li><a href="#org2abcab6">3.3.2. SGA 和 PGA 的设置</a></li>
+<li><a href="#org9d80934">3.3.1. SGA 和 PGA 的查看</a></li>
+<li><a href="#orgb3b14b6">3.3.2. SGA 和 PGA 的设置</a></li>
 </ul>
 </li>
-<li><a href="#org512d070">3.4. 缓冲区相关参数</a>
+<li><a href="#org3b3084a">3.4. 缓冲区相关参数</a>
 <ul>
-<li><a href="#orgea9764b">3.4.1. 查看缓冲区参数</a></li>
-<li><a href="#org82340ec">3.4.2. 查看缓冲区命中率</a></li>
-<li><a href="#orgf355fb4">3.4.3. 推荐缓冲区值</a></li>
+<li><a href="#org084c450">3.4.1. 查看缓冲区参数</a></li>
+<li><a href="#orgf4b0c37">3.4.2. 查看缓冲区命中率</a></li>
+<li><a href="#org534cb34">3.4.3. 推荐缓冲区值</a></li>
 </ul>
 </li>
-<li><a href="#orgb6cb4b2">3.5. 查看 SQL 执行的表</a></li>
+<li><a href="#org0bf0c4e">3.5. 查看 SQL 执行的表</a></li>
 </ul>
 </li>
-<li><a href="#orgf6d19ba">4. 系统建议</a>
+<li><a href="#orgb2357e3">4. 系统建议</a>
 <ul>
-<li><a href="#orgc8b39ec">4.1. 查看系统建议表</a></li>
+<li><a href="#orgf25c7e0">4.1. 查看系统建议表</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org6eb88de" class="outline-2">
-<h2 id="org6eb88de"><span class="section-number-2">1</span> 数据库配置</h2>
+<div id="outline-container-org03ab384" class="outline-2">
+<h2 id="org03ab384"><span class="section-number-2">1</span> 数据库配置</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Oracle 中的参数文件是一个包含一系列参数以及参数对应值的操作系统文件，可以分为两
@@ -295,8 +295,8 @@ Oracle 中的参数文件是一个包含一系列参数以及参数对应值的�
 息，是进行数据库设计和性能调优的重要文件。
 </p>
 </div>
-<div id="outline-container-org7ffe90b" class="outline-3">
-<h3 id="org7ffe90b"><span class="section-number-3">1.1</span> 数据库配置文件</h3>
+<div id="outline-container-orgbe9bc29" class="outline-3">
+<h3 id="orgbe9bc29"><span class="section-number-3">1.1</span> 数据库配置文件</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 在调优前，备份好 spfile，以防参数修改错误导致服务器重启不能起来，查看 spfile
@@ -325,8 +325,8 @@ Oracle 中的参数文件是一个包含一系列参数以及参数对应值的�
 </div>
 </div>
 
-<div id="outline-container-org8ca60d5" class="outline-3">
-<h3 id="org8ca60d5"><span class="section-number-3">1.2</span> pfile 和 spfile 转换</h3>
+<div id="outline-container-org9b66338" class="outline-3">
+<h3 id="org9b66338"><span class="section-number-3">1.2</span> pfile 和 spfile 转换</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 pfile 是文本文件的，而 spfile 是二进制格式的。pfile 文件可以用文本编辑器打开
@@ -342,12 +342,12 @@ pfile 是文本文件的，而 spfile 是二进制格式的。pfile 文件可以
 </div>
 </div>
 
-<div id="outline-container-org007490e" class="outline-2">
-<h2 id="org007490e"><span class="section-number-2">2</span> 配置系统参数</h2>
+<div id="outline-container-org3cf0bd2" class="outline-2">
+<h2 id="org3cf0bd2"><span class="section-number-2">2</span> 配置系统参数</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgc5e1cc0" class="outline-3">
-<h3 id="orgc5e1cc0"><span class="section-number-3">2.1</span> 日期格式</h3>
+<div id="outline-container-orge5a0367" class="outline-3">
+<h3 id="orge5a0367"><span class="section-number-3">2.1</span> 日期格式</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 查看时间相关的参数
@@ -392,8 +392,8 @@ Oracle 不支持直接修改底层系统的时间格式，但是默认的时间�
 </div>
 </div>
 
-<div id="outline-container-org7376dc0" class="outline-3">
-<h3 id="org7376dc0"><span class="section-number-3">2.2</span> 时区</h3>
+<div id="outline-container-org41df2ee" class="outline-3">
+<h3 id="org41df2ee"><span class="section-number-3">2.2</span> 时区</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 查看数据库的时区
@@ -418,12 +418,12 @@ Oracle 不支持直接修改底层系统的时间格式，但是默认的时间�
 </div>
 </div>
 
-<div id="outline-container-org2c2ca13" class="outline-2">
-<h2 id="org2c2ca13"><span class="section-number-2">3</span> 性能调优</h2>
+<div id="outline-container-org7daa313" class="outline-2">
+<h2 id="org7daa313"><span class="section-number-2">3</span> 性能调优</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgbaf5b5d" class="outline-3">
-<h3 id="orgbaf5b5d"><span class="section-number-3">3.1</span> 系统进程，会话和事务数目的设置</h3>
+<div id="outline-container-org0a84633" class="outline-3">
+<h3 id="org0a84633"><span class="section-number-3">3.1</span> 系统进程，会话和事务数目的设置</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 查看系统的进程数目，会话数目和最大事务数目分别
@@ -627,8 +627,8 @@ Oracle 10g 设置对应参数的快速对照表
 </div>
 </div>
 
-<div id="outline-container-org6193b19" class="outline-3">
-<h3 id="org6193b19"><span class="section-number-3">3.2</span> CPU 数量</h3>
+<div id="outline-container-org3118ed0" class="outline-3">
+<h3 id="org3118ed0"><span class="section-number-3">3.2</span> CPU 数量</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 <pre class="src src-sql">show <span style="color: #859900;">parameters</span> cpu;
@@ -637,12 +637,12 @@ Oracle 10g 设置对应参数的快速对照表
 </div>
 </div>
 
-<div id="outline-container-org3101540" class="outline-3">
-<h3 id="org3101540"><span class="section-number-3">3.3</span> 内存相关参数</h3>
+<div id="outline-container-org4165007" class="outline-3">
+<h3 id="org4165007"><span class="section-number-3">3.3</span> 内存相关参数</h3>
 <div class="outline-text-3" id="text-3-3">
 </div>
-<div id="outline-container-org7f4e5f3" class="outline-4">
-<h4 id="org7f4e5f3"><span class="section-number-4">3.3.1</span> SGA 和 PGA 的查看</h4>
+<div id="outline-container-org9d80934" class="outline-4">
+<h4 id="org9d80934"><span class="section-number-4">3.3.1</span> SGA 和 PGA 的查看</h4>
 <div class="outline-text-4" id="text-3-3-1">
 <p>
 SGA 是 Oracle 数据库的全局内存，可以通过以下命令查看 SGA 的参数信息
@@ -675,8 +675,8 @@ show <span style="color: #859900;">parameter</span> pga;
 </div>
 </div>
 
-<div id="outline-container-org2abcab6" class="outline-4">
-<h4 id="org2abcab6"><span class="section-number-4">3.3.2</span> SGA 和 PGA 的设置</h4>
+<div id="outline-container-orgb3b14b6" class="outline-4">
+<h4 id="orgb3b14b6"><span class="section-number-4">3.3.2</span> SGA 和 PGA 的设置</h4>
 <div class="outline-text-4" id="text-3-3-2">
 <p>
 修改 SGA 和 PGA 参数的原则如下：一般物理内存 20% 用作操作系统保留，其他 80%
@@ -754,12 +754,12 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 
-<div id="outline-container-org512d070" class="outline-3">
-<h3 id="org512d070"><span class="section-number-3">3.4</span> 缓冲区相关参数</h3>
+<div id="outline-container-org3b3084a" class="outline-3">
+<h3 id="org3b3084a"><span class="section-number-3">3.4</span> 缓冲区相关参数</h3>
 <div class="outline-text-3" id="text-3-4">
 </div>
-<div id="outline-container-orgea9764b" class="outline-4">
-<h4 id="orgea9764b"><span class="section-number-4">3.4.1</span> 查看缓冲区参数</h4>
+<div id="outline-container-org084c450" class="outline-4">
+<h4 id="org084c450"><span class="section-number-4">3.4.1</span> 查看缓冲区参数</h4>
 <div class="outline-text-4" id="text-3-4-1">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">column</span> <span style="color: #859900;">name</span> format a32;
@@ -779,8 +779,8 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 
-<div id="outline-container-org82340ec" class="outline-4">
-<h4 id="org82340ec"><span class="section-number-4">3.4.2</span> 查看缓冲区命中率</h4>
+<div id="outline-container-orgf4b0c37" class="outline-4">
+<h4 id="orgf4b0c37"><span class="section-number-4">3.4.2</span> 查看缓冲区命中率</h4>
 <div class="outline-text-4" id="text-3-4-2">
 <p>
 缓冲区的命中率一般要达到 98% 以上才算正常
@@ -804,8 +804,8 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 
-<div id="outline-container-orgf355fb4" class="outline-4">
-<h4 id="orgf355fb4"><span class="section-number-4">3.4.3</span> 推荐缓冲区值</h4>
+<div id="outline-container-org534cb34" class="outline-4">
+<h4 id="org534cb34"><span class="section-number-4">3.4.3</span> 推荐缓冲区值</h4>
 <div class="outline-text-4" id="text-3-4-3">
 <p>
 获取推荐的值，SIZE<sub>FOR</sub><sub>ESTIMATE</sub> 以 M 为单位
@@ -826,8 +826,8 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 
-<div id="outline-container-orgb6cb4b2" class="outline-3">
-<h3 id="orgb6cb4b2"><span class="section-number-3">3.5</span> 查看 SQL 执行的表</h3>
+<div id="outline-container-org0bf0c4e" class="outline-3">
+<h3 id="org0bf0c4e"><span class="section-number-3">3.5</span> 查看 SQL 执行的表</h3>
 <div class="outline-text-3" id="text-3-5">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">select</span>
@@ -872,12 +872,12 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 
-<div id="outline-container-orgf6d19ba" class="outline-2">
-<h2 id="orgf6d19ba"><span class="section-number-2">4</span> 系统建议</h2>
+<div id="outline-container-orgb2357e3" class="outline-2">
+<h2 id="orgb2357e3"><span class="section-number-2">4</span> 系统建议</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-orgc8b39ec" class="outline-3">
-<h3 id="orgc8b39ec"><span class="section-number-3">4.1</span> 查看系统建议表</h3>
+<div id="outline-container-orgf25c7e0" class="outline-3">
+<h3 id="orgf25c7e0"><span class="section-number-3">4.1</span> 查看系统建议表</h3>
 <div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">select</span>
@@ -903,7 +903,7 @@ Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之�
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-02-22 Sat 19:23. Created by Jinghui Hu at 2020-01-13 Mon 16:03.</p>
+<p class="author">Last Updated 2020-02-22 Sat 20:06. Created by Jinghui Hu at 2020-01-13 Mon 16:03.</p>
 </div>
 </body>
 </html>
