@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-01-11 Sat 12:47 -->
+<!-- 2020-02-22 Sat 19:25 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Oracle 关系数据库</title>
@@ -161,19 +161,6 @@
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
-  .equation-container {
-    display: table;
-    text-align: center;
-    width: 100%;
-  }
-  .equation {
-    vertical-align: middle;
-  }
-  .equation-label {
-    display: table-cell;
-    text-align: right;
-    vertical-align: middle;
-  }
   .inlinetask {
     padding: 10px;
     border: 2px solid gray;
@@ -193,12 +180,18 @@
   .org-svg { width: 90%; }
   /*]]>*/-->
 </style>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/styles/readtheorg/css/readtheorg.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/styles/readtheorg/js/readtheorg.js"></script>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2020 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -251,176 +244,176 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgacbf57a">1. Oracle 数据库</a>
+<li><a href="#orgda93f92">1. Oracle 数据库</a>
 <ul>
-<li><a href="#org8b492e9">1.1. Oracle 数据库架构</a>
+<li><a href="#org56df63d">1.1. Oracle 数据库架构</a>
 <ul>
-<li><a href="#orgbcc3245">1.1.1. Database 和 Instance</a></li>
-<li><a href="#org7af27ab">1.1.2. 数据存储结构</a></li>
-<li><a href="#org9f22c4b">1.1.3. 数据库实例结构</a></li>
+<li><a href="#org56add47">1.1.1. Database 和 Instance</a></li>
+<li><a href="#org422111a">1.1.2. 数据存储结构</a></li>
+<li><a href="#org8b04a4d">1.1.3. 数据库实例结构</a></li>
 </ul>
 </li>
-<li><a href="#org45c9fb2">1.2. 数据库基本知识</a>
+<li><a href="#orgb08ce83">1.2. 数据库基本知识</a>
 <ul>
-<li><a href="#org3f5ae3d">1.2.1. SQL 语句的分类</a></li>
-<li><a href="#orgd3fe440">1.2.2. Oracle 基本常识</a></li>
+<li><a href="#org16c1e4d">1.2.1. SQL 语句的分类</a></li>
+<li><a href="#org2089499">1.2.2. Oracle 基本常识</a></li>
 </ul>
 </li>
-<li><a href="#orge3d51c8">1.3. Ubuntu 18.04 安装数据库</a></li>
-<li><a href="#org82fab20">1.4. 参考材料</a></li>
+<li><a href="#org0eb1db4">1.3. Ubuntu 18.04 安装数据库</a></li>
+<li><a href="#org9f33786">1.4. 参考材料</a></li>
 </ul>
 </li>
-<li><a href="#org64f3294">2. SQL*Plus 命令行工具</a>
+<li><a href="#org773d3c0">2. SQL*Plus 命令行工具</a>
 <ul>
-<li><a href="#org083e213">2.1. 安装 instantclient</a>
+<li><a href="#org3d8272e">2.1. 安装 instantclient</a>
 <ul>
-<li><a href="#org767e854">2.1.1. macOS</a></li>
-<li><a href="#orga038311">2.1.2. Linux</a></li>
+<li><a href="#orgb646cfd">2.1.1. macOS</a></li>
+<li><a href="#orgb684b10">2.1.2. Linux</a></li>
 </ul>
 </li>
-<li><a href="#org1aa0bf2">2.2. 从命令行中连接 SQL*Plus</a></li>
-<li><a href="#orgc79755b">2.3. SQL*Plus 启动配置</a></li>
-<li><a href="#orgbe10534">2.4. SQL*Plus 使用技巧</a>
+<li><a href="#orgf76e2e3">2.2. 从命令行中连接 SQL*Plus</a></li>
+<li><a href="#org3813578">2.3. SQL*Plus 启动配置</a></li>
+<li><a href="#orgc6a3902">2.4. SQL*Plus 使用技巧</a>
 <ul>
-<li><a href="#orgabd253b">2.4.1. 添加 readline 的支持</a></li>
-<li><a href="#org574f7df">2.4.2. 常见命令</a></li>
-<li><a href="#org62e0deb">2.4.3. 执行 sql 脚本的方法</a></li>
-<li><a href="#orgca8bf47">2.4.4. 打开/关闭终端输出</a></li>
+<li><a href="#orgd2664f9">2.4.1. 添加 readline 的支持</a></li>
+<li><a href="#org8baa6c8">2.4.2. 常见命令</a></li>
+<li><a href="#org18316c2">2.4.3. 执行 sql 脚本的方法</a></li>
+<li><a href="#org3543098">2.4.4. 打开/关闭终端输出</a></li>
 </ul>
 </li>
-<li><a href="#orgfdf6593">2.5. SQL*Plus 变量使用技巧</a>
+<li><a href="#org2e52854">2.5. SQL*Plus 变量使用技巧</a>
 <ul>
-<li><a href="#org8e87d97">2.5.1. 定义和使用变量</a></li>
-<li><a href="#org77f8478">2.5.2. 将列值赋给变量</a></li>
+<li><a href="#org423c487">2.5.1. 定义和使用变量</a></li>
+<li><a href="#org241a290">2.5.2. 将列值赋给变量</a></li>
 </ul>
 </li>
-<li><a href="#org9a83b85">2.6. 给 script.sql 中传入参数</a></li>
+<li><a href="#org9071732">2.6. 给 script.sql 中传入参数</a></li>
 </ul>
 </li>
-<li><a href="#org5e986a0">3. 数据库</a>
+<li><a href="#org8d7b9ce">3. 数据库</a>
 <ul>
-<li><a href="#org8f6d95f">3.1. 查看当前数据库</a></li>
+<li><a href="#org426ca96">3.1. 查看当前数据库</a></li>
 </ul>
 </li>
-<li><a href="#orgf69b299">4. 表</a>
+<li><a href="#org3744d6d">4. 表</a>
 <ul>
-<li><a href="#org5421f78">4.1. 查看所有表</a></li>
-<li><a href="#orgb5e3dd1">4.2. 创建表</a>
+<li><a href="#org921d4d6">4.1. 查看所有表</a></li>
+<li><a href="#org553bb38">4.2. 创建表</a>
 <ul>
-<li><a href="#org2dc6361">4.2.1. 数据类型</a></li>
+<li><a href="#orgb5005a9">4.2.1. 数据类型</a></li>
 </ul>
 </li>
-<li><a href="#org2cee86e">4.3. 修改表</a></li>
+<li><a href="#org472985a">4.3. 修改表</a></li>
 </ul>
 </li>
-<li><a href="#orgf3afbe3">5. 数据操作：增删改查</a>
+<li><a href="#org10842bf">5. 数据操作：增删改查</a>
 <ul>
-<li><a href="#org59ac8ff">5.1. 查询 SELECT</a></li>
+<li><a href="#orga8a374b">5.1. 查询 SELECT</a></li>
 </ul>
 </li>
-<li><a href="#orgc2eb646">6. 用户、角色和权限</a>
+<li><a href="#orgf9c6764">6. 用户、角色和权限</a>
 <ul>
-<li><a href="#org14ffd21">6.1. 查看当前用户</a></li>
-<li><a href="#orgc346fa2">6.2. 创建/解锁用户</a></li>
-<li><a href="#org71e711e">6.3. 删除用户</a></li>
-<li><a href="#org8297eca">6.4. 修改用户密码</a></li>
-<li><a href="#org690ae27">6.5. 角色和授权</a></li>
+<li><a href="#org6f616a8">6.1. 查看当前用户</a></li>
+<li><a href="#org68550ed">6.2. 创建/解锁用户</a></li>
+<li><a href="#orgde13349">6.3. 删除用户</a></li>
+<li><a href="#orga712e87">6.4. 修改用户密码</a></li>
+<li><a href="#orgcff98b8">6.5. 角色和授权</a></li>
 </ul>
 </li>
-<li><a href="#org8ff101a">7. 内置函数</a>
+<li><a href="#orge4924b6">7. 内置函数</a>
 <ul>
-<li><a href="#org971f3e3">7.1. 单行函数</a>
+<li><a href="#org2dd7bb6">7.1. 单行函数</a>
 <ul>
-<li><a href="#org2530dfd">7.1.1. 数值函数</a></li>
-<li><a href="#orgda340e2">7.1.2. 返回字符值的字符函数</a></li>
-<li><a href="#org4fa55fd">7.1.3. NLS 字符串函数</a></li>
-<li><a href="#org8357187">7.1.4. 返回数值的字符函数</a></li>
-<li><a href="#org67d1719">7.1.5. 时间/日期函数</a></li>
-<li><a href="#org39aa97f">7.1.6. 通用比较函数</a></li>
-<li><a href="#org26fa208">7.1.7. 类型转化函数</a></li>
-<li><a href="#org6781745">7.1.8. 大对象处理函数</a></li>
-<li><a href="#org43959c5">7.1.9. 集合函数</a></li>
-<li><a href="#orgc9130a2">7.1.10. 继承函数</a></li>
-<li><a href="#org16353bd">7.1.11. 数据挖掘函数</a></li>
-<li><a href="#org5ef510c">7.1.12. XML 函数</a></li>
-<li><a href="#orgfca6c77">7.1.13. 编码/解码函数</a></li>
-<li><a href="#org0701f31">7.1.14. NULL 相关函数</a></li>
-<li><a href="#org0f37580">7.1.15. 环境和标识符函数</a></li>
+<li><a href="#org73beb96">7.1.1. 数值函数</a></li>
+<li><a href="#orge7a8e14">7.1.2. 返回字符值的字符函数</a></li>
+<li><a href="#orgd87f716">7.1.3. NLS 字符串函数</a></li>
+<li><a href="#orgfeaabe1">7.1.4. 返回数值的字符函数</a></li>
+<li><a href="#org989d9ef">7.1.5. 时间/日期函数</a></li>
+<li><a href="#org2792896">7.1.6. 通用比较函数</a></li>
+<li><a href="#orgbad78b7">7.1.7. 类型转化函数</a></li>
+<li><a href="#orgb07878e">7.1.8. 大对象处理函数</a></li>
+<li><a href="#org6d37ee4">7.1.9. 集合函数</a></li>
+<li><a href="#orgc3443d0">7.1.10. 继承函数</a></li>
+<li><a href="#orgc34169a">7.1.11. 数据挖掘函数</a></li>
+<li><a href="#orgc327ded">7.1.12. XML 函数</a></li>
+<li><a href="#org531e454">7.1.13. 编码/解码函数</a></li>
+<li><a href="#orgda13a57">7.1.14. NULL 相关函数</a></li>
+<li><a href="#org8733a64">7.1.15. 环境和标识符函数</a></li>
 </ul>
 </li>
-<li><a href="#orgc9245ea">7.2. 聚合函数</a></li>
-<li><a href="#org7c63a57">7.3. 分析函数</a></li>
-<li><a href="#org4871582">7.4. 对象引用函数</a></li>
-<li><a href="#org37782a3">7.5. 模型函数</a></li>
+<li><a href="#org0fc41fe">7.2. 聚合函数</a></li>
+<li><a href="#org3f4e334">7.3. 分析函数</a></li>
+<li><a href="#orgabcf11a">7.4. 对象引用函数</a></li>
+<li><a href="#orge9e2dd2">7.5. 模型函数</a></li>
 </ul>
 </li>
-<li><a href="#orgc89b41e">8. 元信息</a>
+<li><a href="#org0904723">8. 元信息</a>
 <ul>
-<li><a href="#orge7a3c8d">8.1. 获取表的元信息：列的属性，唯一性约束</a>
+<li><a href="#orge1bac34">8.1. 获取表的元信息：列的属性，唯一性约束</a>
 <ul>
-<li><a href="#org68afd2b">8.1.1. 表列属性</a></li>
-<li><a href="#orgcaec2c2">8.1.2. 唯一性约束</a></li>
+<li><a href="#org5c9a8a8">8.1.1. 表列属性</a></li>
+<li><a href="#org3942878">8.1.2. 唯一性约束</a></li>
 </ul>
 </li>
-<li><a href="#orgbc3ce70">8.2. 获取注释信息</a>
+<li><a href="#orgff51162">8.2. 获取注释信息</a>
 <ul>
-<li><a href="#orga618045">8.2.1. 表注释</a></li>
-<li><a href="#orgc132ca5">8.2.2. 列注释</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orgb4f08dc">9. PL/SQL</a>
-<ul>
-<li><a href="#orgf939386">9.1. 存储过程</a></li>
-<li><a href="#org9ccf363">9.2. 变量</a>
-<ul>
-<li><a href="#org55d9fad">9.2.1. 变量类型</a></li>
-<li><a href="#org85fcc36">9.2.2. 变量赋值</a></li>
+<li><a href="#org5497107">8.2.1. 表注释</a></li>
+<li><a href="#orgc8bc0db">8.2.2. 列注释</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgec10de7">10. 一些使用场景</a>
+<li><a href="#org5a6f647">9. PL/SQL</a>
 <ul>
-<li><a href="#org4c074f9">10.1. 创建新的表空间以及用户</a>
+<li><a href="#org2541f97">9.1. 存储过程</a></li>
+<li><a href="#org5c77323">9.2. 变量</a>
 <ul>
-<li><a href="#orgf20a1c5">10.1.1. 创建数据储存的目录</a></li>
-<li><a href="#orgd8cedfd">10.1.2. 创建表空间</a></li>
-<li><a href="#org27e5e72">10.1.3. 创建用户</a></li>
-<li><a href="#org0c90c4e">10.1.4. 登录测试</a></li>
+<li><a href="#orge6672a1">9.2.1. 变量类型</a></li>
+<li><a href="#org3fe9435">9.2.2. 变量赋值</a></li>
 </ul>
 </li>
-<li><a href="#org4dd3b27">10.2. 导入/导出数据</a>
+</ul>
+</li>
+<li><a href="#orgb71dc01">10. 一些使用场景</a>
 <ul>
-<li><a href="#orgf62336d">10.2.1. 导出全部数据库</a></li>
-<li><a href="#orgd45d28f">10.2.2. 导出用户的数据库</a></li>
-</ul>
-</li>
-<li><a href="#org8c01cc2">10.3. 正则化表达式匹配</a></li>
-<li><a href="#orgb020cc4">10.4. 获取序列值</a></li>
-<li><a href="#org0b9ae36">10.5. 限制查询结果的行数</a></li>
-<li><a href="#org1a1c0b6">10.6. 删除表中重复的行数据</a></li>
-<li><a href="#org2948351">10.7. 查看数据库磁盘容量</a></li>
-<li><a href="#org7767cde">10.8. 查看 query 的执行时间</a></li>
-<li><a href="#org680a631">10.9. 字符串拼接的聚合函数</a></li>
-</ul>
-</li>
-<li><a href="#orge2820de">11. 常见问题</a>
+<li><a href="#org1a8f714">10.1. 创建新的表空间以及用户</a>
 <ul>
-<li><a href="#orgcfd0264">11.1. 客户端和服务器字符集不一致</a></li>
-<li><a href="#orga31da3f">11.2. 将服务器字符集从 UTF8 强转成 GBK</a></li>
-<li><a href="#org90abdbf">11.3. ORA-00904: "POLTYP": invalid identifier</a></li>
-<li><a href="#org2b7e86f">11.4. ORA-21561: OID generation failed</a></li>
+<li><a href="#org375e75d">10.1.1. 创建数据储存的目录</a></li>
+<li><a href="#orgc42be6d">10.1.2. 创建表空间</a></li>
+<li><a href="#org2e8f450">10.1.3. 创建用户</a></li>
+<li><a href="#orgdc88d35">10.1.4. 登录测试</a></li>
 </ul>
 </li>
-<li><a href="#org044c0d2">12. 参考链接</a></li>
+<li><a href="#orgf869184">10.2. 导入/导出数据</a>
+<ul>
+<li><a href="#org27d802d">10.2.1. 导出全部数据库</a></li>
+<li><a href="#orgf7213c8">10.2.2. 导出用户的数据库</a></li>
+</ul>
+</li>
+<li><a href="#org4113062">10.3. 正则化表达式匹配</a></li>
+<li><a href="#org9d793d3">10.4. 获取序列值</a></li>
+<li><a href="#org04b3e97">10.5. 限制查询结果的行数</a></li>
+<li><a href="#org0735953">10.6. 删除表中重复的行数据</a></li>
+<li><a href="#orgcabc771">10.7. 查看数据库磁盘容量</a></li>
+<li><a href="#orgffeb809">10.8. 查看 query 的执行时间</a></li>
+<li><a href="#orgd70800f">10.9. 字符串拼接的聚合函数</a></li>
+</ul>
+</li>
+<li><a href="#org0632866">11. 常见问题</a>
+<ul>
+<li><a href="#org5cf3583">11.1. 客户端和服务器字符集不一致</a></li>
+<li><a href="#orgacc7e11">11.2. 将服务器字符集从 UTF8 强转成 GBK</a></li>
+<li><a href="#org45d2414">11.3. ORA-00904: "POLTYP": invalid identifier</a></li>
+<li><a href="#org6375e8b">11.4. ORA-21561: OID generation failed</a></li>
+</ul>
+</li>
+<li><a href="#org3ad1a61">12. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgacbf57a" class="outline-2">
-<h2 id="orgacbf57a"><span class="section-number-2">1</span> Oracle 数据库</h2>
+<div id="outline-container-orgda93f92" class="outline-2">
+<h2 id="orgda93f92"><span class="section-number-2">1</span> Oracle 数据库</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Oracle Database，又名 Oracle RDBMS，或简称 Oracle。是甲骨文公司的一款关系数据
@@ -431,12 +424,12 @@ Oracle Database，又名 Oracle RDBMS，或简称 Oracle。是甲骨文公司的
 </p>
 </div>
 
-<div id="outline-container-org8b492e9" class="outline-3">
-<h3 id="org8b492e9"><span class="section-number-3">1.1</span> Oracle 数据库架构</h3>
+<div id="outline-container-org56df63d" class="outline-3">
+<h3 id="org56df63d"><span class="section-number-3">1.1</span> Oracle 数据库架构</h3>
 <div class="outline-text-3" id="text-1-1">
 </div>
-<div id="outline-container-orgbcc3245" class="outline-4">
-<h4 id="orgbcc3245"><span class="section-number-4">1.1.1</span> Database 和 Instance</h4>
+<div id="outline-container-org56add47" class="outline-4">
+<h4 id="org56add47"><span class="section-number-4">1.1.1</span> Database 和 Instance</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <ul class="org-ul">
 <li>Database 指的是存放于磁盘中的一系列文件，Database 是独立于 Database Instance</li>
@@ -461,8 +454,8 @@ Oracle Database，又名 Oracle RDBMS，或简称 Oracle。是甲骨文公司的
 </div>
 </div>
 
-<div id="outline-container-org7af27ab" class="outline-4">
-<h4 id="org7af27ab"><span class="section-number-4">1.1.2</span> 数据存储结构</h4>
+<div id="outline-container-org422111a" class="outline-4">
+<h4 id="org422111a"><span class="section-number-4">1.1.2</span> 数据存储结构</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <p>
 数据存可以分成物理存储好逻辑存储两个部分，两者的联系见下图
@@ -476,7 +469,7 @@ Oracle Database，又名 Oracle RDBMS，或简称 Oracle。是甲骨文公司的
 </div>
 
 <ol class="org-ol">
-<li><a id="orgf6dc470"></a>物理存储结构<br />
+<li><a id="orgc5ebf45"></a>物理存储结构<br />
 <div class="outline-text-5" id="text-1-1-2-1">
 <p>
 当执行 <code>CREATE DATABASE</code> 时，下面的文件将被创建
@@ -492,7 +485,7 @@ files, archived redo log files 等</li>
 </div>
 </li>
 
-<li><a id="org99ed639"></a>逻辑存储结构<br />
+<li><a id="org09f24d2"></a>逻辑存储结构<br />
 <div class="outline-text-5" id="text-1-1-2-2">
 <p>
 逻辑结构是存储在一系列 data blocks 中
@@ -511,8 +504,8 @@ Segments 的逻辑容器。 <b>每个 Tablespace 至少有一个 Data file 构�
 </ol>
 </div>
 
-<div id="outline-container-org9f22c4b" class="outline-4">
-<h4 id="org9f22c4b"><span class="section-number-4">1.1.3</span> 数据库实例结构</h4>
+<div id="outline-container-org8b04a4d" class="outline-4">
+<h4 id="org8b04a4d"><span class="section-number-4">1.1.3</span> 数据库实例结构</h4>
 <div class="outline-text-4" id="text-1-1-3">
 <p>
 数据库实例是使用内存数据结构和进程来管理数据库，当应用需要连接数据库时，它将
@@ -521,7 +514,7 @@ Segments 的逻辑容器。 <b>每个 Tablespace 至少有一个 Data file 构�
 </div>
 
 <ol class="org-ol">
-<li><a id="org6bf0c85"></a>Oracle 数据进程<br />
+<li><a id="orgbc1e23a"></a>Oracle 数据进程<br />
 <div class="outline-text-5" id="text-1-1-3-1">
 <p>
 Oracle 数据库在启动时会启动一系列的数据库实例
@@ -540,7 +533,7 @@ Oracle processes 包括 server processes 和 background processes。大多数情
 </div>
 </li>
 
-<li><a id="orgf1bd108"></a>实例内存结构<br />
+<li><a id="org190e09f"></a>实例内存结构<br />
 <div class="outline-text-5" id="text-1-1-3-2">
 <ul class="org-ul">
 <li>SGA 是包含一个数据库实例的数据和控制信息的一组共享内存的。例如：SGA 包含
@@ -554,12 +547,12 @@ cached data blocks 和 shared SQL area</li>
 </div>
 </div>
 
-<div id="outline-container-org45c9fb2" class="outline-3">
-<h3 id="org45c9fb2"><span class="section-number-3">1.2</span> 数据库基本知识</h3>
+<div id="outline-container-orgb08ce83" class="outline-3">
+<h3 id="orgb08ce83"><span class="section-number-3">1.2</span> 数据库基本知识</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
-<div id="outline-container-org3f5ae3d" class="outline-4">
-<h4 id="org3f5ae3d"><span class="section-number-4">1.2.1</span> SQL 语句的分类</h4>
+<div id="outline-container-org16c1e4d" class="outline-4">
+<h4 id="org16c1e4d"><span class="section-number-4">1.2.1</span> SQL 语句的分类</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <ul class="org-ul">
 <li>DML 语句（数据库操作语言）： INSERT/UPDATE/DETETE/MERGE</li>
@@ -570,8 +563,8 @@ cached data blocks 和 shared SQL area</li>
 </div>
 </div>
 
-<div id="outline-container-orgd3fe440" class="outline-4">
-<h4 id="orgd3fe440"><span class="section-number-4">1.2.2</span> Oracle 基本常识</h4>
+<div id="outline-container-org2089499" class="outline-4">
+<h4 id="org2089499"><span class="section-number-4">1.2.2</span> Oracle 基本常识</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <ul class="org-ul">
 <li>Oracle 数据库中语句不区分大小写，包括登录名的用户名和密码都是不区分大小写的</li>
@@ -582,8 +575,8 @@ cached data blocks 和 shared SQL area</li>
 </div>
 </div>
 
-<div id="outline-container-orge3d51c8" class="outline-3">
-<h3 id="orge3d51c8"><span class="section-number-3">1.3</span> Ubuntu 18.04 安装数据库</h3>
+<div id="outline-container-org0eb1db4" class="outline-3">
+<h3 id="org0eb1db4"><span class="section-number-3">1.3</span> Ubuntu 18.04 安装数据库</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 安装依赖包
@@ -603,8 +596,8 @@ cached data blocks 和 shared SQL area</li>
 </div>
 </div>
 
-<div id="outline-container-org82fab20" class="outline-3">
-<h3 id="org82fab20"><span class="section-number-3">1.4</span> 参考材料</h3>
+<div id="outline-container-org9f33786" class="outline-3">
+<h3 id="org9f33786"><span class="section-number-3">1.4</span> 参考材料</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 Oracle 家的配套文档还是很好用的，数据库方面主要有下面的文档：
@@ -625,8 +618,8 @@ Oracle 家的配套文档还是很好用的，数据库方面主要有下面的�
 </div>
 </div>
 
-<div id="outline-container-org64f3294" class="outline-2">
-<h2 id="org64f3294"><span class="section-number-2">2</span> SQL*Plus 命令行工具</h2>
+<div id="outline-container-org773d3c0" class="outline-2">
+<h2 id="org773d3c0"><span class="section-number-2">2</span> SQL*Plus 命令行工具</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Oracle 的 SQL*Plus 是与 oracle 数据库进行交互的客户端工具，借助 SQL*Plus 可以
@@ -634,8 +627,8 @@ Oracle 的 SQL*Plus 是与 oracle 数据库进行交互的客户端工具，借�
 </p>
 </div>
 
-<div id="outline-container-org083e213" class="outline-3">
-<h3 id="org083e213"><span class="section-number-3">2.1</span> 安装 instantclient</h3>
+<div id="outline-container-org3d8272e" class="outline-3">
+<h3 id="org3d8272e"><span class="section-number-3">2.1</span> 安装 instantclient</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 在 mac 和 linux 系统中如果只是想要安装一个 sqlplus 的客户端，可以直接安装
@@ -643,8 +636,8 @@ instantclient 工具
 </p>
 </div>
 
-<div id="outline-container-org767e854" class="outline-4">
-<h4 id="org767e854"><span class="section-number-4">2.1.1</span> macOS</h4>
+<div id="outline-container-orgb646cfd" class="outline-4">
+<h4 id="orgb646cfd"><span class="section-number-4">2.1.1</span> macOS</h4>
 <div class="outline-text-4" id="text-2-1-1">
 <p>
 mac 下的 Oracle 安装需要下载几个 <a href="https://www.oracle.com/database/technologies/instant-client/downloads.html">instantclient</a> 安装包
@@ -700,8 +693,8 @@ ln -s $<span style="color: #6c71c4;">PWD</span>/{libsqlplus.dylib,libsqlplusic.d
 </div>
 </div>
 
-<div id="outline-container-orga038311" class="outline-4">
-<h4 id="orga038311"><span class="section-number-4">2.1.2</span> Linux</h4>
+<div id="outline-container-orgb684b10" class="outline-4">
+<h4 id="orgb684b10"><span class="section-number-4">2.1.2</span> Linux</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <p>
 需要下载的安装文件
@@ -762,8 +755,8 @@ ln -s $<span style="color: #6c71c4;">PWD</span>/libsqlplus.so lib/
 </div>
 </div>
 
-<div id="outline-container-org1aa0bf2" class="outline-3">
-<h3 id="org1aa0bf2"><span class="section-number-3">2.2</span> 从命令行中连接 SQL*Plus</h3>
+<div id="outline-container-orgf76e2e3" class="outline-3">
+<h3 id="orgf76e2e3"><span class="section-number-3">2.2</span> 从命令行中连接 SQL*Plus</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 第一种登录方式的命令如下
@@ -820,8 +813,8 @@ hsagent  =
 </div>
 </div>
 
-<div id="outline-container-orgc79755b" class="outline-3">
-<h3 id="orgc79755b"><span class="section-number-3">2.3</span> SQL*Plus 启动配置</h3>
+<div id="outline-container-org3813578" class="outline-3">
+<h3 id="org3813578"><span class="section-number-3">2.3</span> SQL*Plus 启动配置</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 SQL*Plus 启动配置文件为 <code>$ORACLE_HOME/sqlplus/admin/glogin.sql</code> 。在启动
@@ -830,8 +823,8 @@ SQL*Plus 时需要预先设置一些启动的基本配置，例如启动的每�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- $ORACLE_HOME/sqlplus/admin/glogin.sql</span>
-<span style="color: #586e75; font-style: italic;">-- SET UNDERLINE OFF</span>
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- $ORACLE_HOME/sqlplus/admin/glogin.sql</span>
+<span style="color: #93a1a1; font-style: italic;">-- SET UNDERLINE OFF</span>
 <span style="color: #859900;">SET</span> TAB <span style="color: #859900;">OFF</span>
 <span style="color: #859900;">SET</span> VERIFY <span style="color: #859900;">OFF</span>
 <span style="color: #859900;">SET</span> WRAP <span style="color: #859900;">OFF</span>
@@ -841,29 +834,29 @@ SQL*Plus 时需要预先设置一些启动的基本配置，例如启动的每�
 <span style="color: #859900;">SET</span> TRIMSPOOL <span style="color: #859900;">ON</span>
 <span style="color: #859900;">SET</span> FEEDBACK <span style="color: #859900;">ON</span>
 
-<span style="color: #586e75; font-style: italic;">-- &#25913;&#21464;&#24403;&#21069;&#20250;&#35805;&#30340;&#26085;&#26399;&#26684;&#24335;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#25913;&#21464;&#24403;&#21069;&#20250;&#35805;&#30340;&#26085;&#26399;&#26684;&#24335;</span>
 <span style="color: #859900;">ALTER</span> <span style="color: #859900;">SESSION</span> <span style="color: #859900;">SET</span> nls_date_format = <span style="color: #2aa198;">'yyyy-mm-dd hh24:mi:ss'</span>;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgbe10534" class="outline-3">
-<h3 id="orgbe10534"><span class="section-number-3">2.4</span> SQL*Plus 使用技巧</h3>
+<div id="outline-container-orgc6a3902" class="outline-3">
+<h3 id="orgc6a3902"><span class="section-number-3">2.4</span> SQL*Plus 使用技巧</h3>
 <div class="outline-text-3" id="text-2-4">
 </div>
-<div id="outline-container-orgabd253b" class="outline-4">
-<h4 id="orgabd253b"><span class="section-number-4">2.4.1</span> 添加 readline 的支持</h4>
+<div id="outline-container-orgd2664f9" class="outline-4">
+<h4 id="orgd2664f9"><span class="section-number-4">2.4.1</span> 添加 readline 的支持</h4>
 <div class="outline-text-4" id="text-2-4-1">
 <p>
 sqlplus 本身不支持 readline 的特性，不过可以通过安装 rlwrap 来将 readline 特性添
 加到 sqlplus 中
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">mac</span>
+<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">mac</span>
 brew install rlwrap
 
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">ubuntu</span>
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">ubuntu</span>
 sudo apt-get install -y rlwrap
 </pre>
 </div>
@@ -878,8 +871,8 @@ sudo apt-get install -y rlwrap
 </div>
 </div>
 
-<div id="outline-container-org574f7df" class="outline-4">
-<h4 id="org574f7df"><span class="section-number-4">2.4.2</span> 常见命令</h4>
+<div id="outline-container-org8baa6c8" class="outline-4">
+<h4 id="org8baa6c8"><span class="section-number-4">2.4.2</span> 常见命令</h4>
 <div class="outline-text-4" id="text-2-4-2">
 <ul class="org-ul">
 <li>执行本地 SQL 脚本: <code>START filename</code> 或者 <code>@ filename</code></li>
@@ -894,20 +887,20 @@ sudo apt-get install -y rlwrap
 </div>
 </div>
 
-<div id="outline-container-org62e0deb" class="outline-4">
-<h4 id="org62e0deb"><span class="section-number-4">2.4.3</span> 执行 sql 脚本的方法</h4>
+<div id="outline-container-org18316c2" class="outline-4">
+<h4 id="org18316c2"><span class="section-number-4">2.4.3</span> 执行 sql 脚本的方法</h4>
 <div class="outline-text-4" id="text-2-4-3">
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25191;&#34892; script.sql &#33050;&#26412;&#21518;&#36864;&#20986;,</span>
+<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25191;&#34892; script.sql &#33050;&#26412;&#21518;&#36864;&#20986;,</span>
 <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">'exit'</span> | sqlplus -S user/pass@host:port/sid @script.sql
 
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20351;&#29992;&#37325;&#23450;&#21521;&#25191;&#34892; script.sql &#33050;&#26412;</span>
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20351;&#29992;&#37325;&#23450;&#21521;&#25191;&#34892; script.sql &#33050;&#26412;</span>
 sqlplus -S user/pass@host:port/sid &lt; script.sql
 
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20351;&#29992;&#37325;&#23450;&#21521;&#25191;&#34892;&#33050;&#26412;&#24182;&#36861;&#21152;&#26041;&#24335;&#36755;&#20986;&#26085;&#24535;</span>
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20351;&#29992;&#37325;&#23450;&#21521;&#25191;&#34892;&#33050;&#26412;&#24182;&#36861;&#21152;&#26041;&#24335;&#36755;&#20986;&#26085;&#24535;</span>
 sqlplus -S user/pass@host:port/sid &lt; script.sql &gt;&gt; /tmp/sqlplus.log
 
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">.sql &#25991;&#20214;&#21518;&#32512;&#21517;&#19981;&#26159;&#24517;&#39035;&#30340;&#65292;&#20363;&#22914;&#19979;&#38754;&#30340;&#20004;&#21477;&#26159;&#21516;&#26679;&#25928;&#26524;&#30340;</span>
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">.sql &#25991;&#20214;&#21518;&#32512;&#21517;&#19981;&#26159;&#24517;&#39035;&#30340;&#65292;&#20363;&#22914;&#19979;&#38754;&#30340;&#20004;&#21477;&#26159;&#21516;&#26679;&#25928;&#26524;&#30340;</span>
 <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">'exit'</span> | sqlplus -S user/pass@host:port/sid @script.sql
 <span style="color: #6c71c4;">echo</span> <span style="color: #2aa198;">'exit'</span> | sqlplus -S user/pass@host:port/sid @script
 </pre>
@@ -915,12 +908,12 @@ sqlplus -S user/pass@host:port/sid &lt; script.sql &gt;&gt; /tmp/sqlplus.log
 </div>
 </div>
 
-<div id="outline-container-orgca8bf47" class="outline-4">
-<h4 id="orgca8bf47"><span class="section-number-4">2.4.4</span> 打开/关闭终端输出</h4>
+<div id="outline-container-org3543098" class="outline-4">
+<h4 id="org3543098"><span class="section-number-4">2.4.4</span> 打开/关闭终端输出</h4>
 <div class="outline-text-4" id="text-2-4-4">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">SET</span> TERMOUT <span style="color: #859900;">OFF</span>;
-<span style="color: #586e75; font-style: italic;">-- do a lot of parepare work</span>
+<span style="color: #93a1a1; font-style: italic;">-- do a lot of parepare work</span>
 <span style="color: #859900;">SET</span> TERMOUT <span style="color: #859900;">ON</span>;
 </pre>
 </div>
@@ -928,24 +921,24 @@ sqlplus -S user/pass@host:port/sid &lt; script.sql &gt;&gt; /tmp/sqlplus.log
 </div>
 </div>
 
-<div id="outline-container-orgfdf6593" class="outline-3">
-<h3 id="orgfdf6593"><span class="section-number-3">2.5</span> SQL*Plus 变量使用技巧</h3>
+<div id="outline-container-org2e52854" class="outline-3">
+<h3 id="org2e52854"><span class="section-number-3">2.5</span> SQL*Plus 变量使用技巧</h3>
 <div class="outline-text-3" id="text-2-5">
 </div>
-<div id="outline-container-org8e87d97" class="outline-4">
-<h4 id="org8e87d97"><span class="section-number-4">2.5.1</span> 定义和使用变量</h4>
+<div id="outline-container-org423c487" class="outline-4">
+<h4 id="org423c487"><span class="section-number-4">2.5.1</span> 定义和使用变量</h4>
 <div class="outline-text-4" id="text-2-5-1">
 <p>
 定义的变量只在一个 SQL*Plus 的会话期间有效
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#23450;&#20041;&#19968;&#20010;&#21464;&#37327;</span>
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- &#23450;&#20041;&#19968;&#20010;&#21464;&#37327;</span>
 DEFINE var = text;
 
-<span style="color: #586e75; font-style: italic;">-- &#35835;&#21462;&#29992;&#25143;&#36755;&#20837;&#65292;&#23558;&#29992;&#25143;&#36755;&#20837;&#25918;&#21040;&#21464;&#37327;&#20013;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#35835;&#21462;&#29992;&#25143;&#36755;&#20837;&#65292;&#23558;&#29992;&#25143;&#36755;&#20837;&#25918;&#21040;&#21464;&#37327;&#20013;</span>
 ACCEPT var;
 
-<span style="color: #586e75; font-style: italic;">-- &#22312;&#21464;&#37327;&#21517;&#21069;&#38754;&#28155;&#21152; &amp; &#26469;&#20351;&#29992;&#21464;&#37327;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#22312;&#21464;&#37327;&#21517;&#21069;&#38754;&#28155;&#21152; &amp; &#26469;&#20351;&#29992;&#21464;&#37327;</span>
 DEFINE MYDATE = 01-FEB-98;
 <span style="color: #859900;">SELECT</span> <span style="color: #2aa198;">'&amp;MYDATE'</span> <span style="color: #859900;">FROM</span> DUAL;
 </pre>
@@ -970,8 +963,8 @@ SQL&gt;
 </div>
 </div>
 
-<div id="outline-container-org77f8478" class="outline-4">
-<h4 id="org77f8478"><span class="section-number-4">2.5.2</span> 将列值赋给变量</h4>
+<div id="outline-container-org241a290" class="outline-4">
+<h4 id="org241a290"><span class="section-number-4">2.5.2</span> 将列值赋给变量</h4>
 <div class="outline-text-4" id="text-2-5-2">
 <p>
 具体语法如下：
@@ -1005,8 +998,8 @@ SQL&gt;
 </div>
 </div>
 
-<div id="outline-container-org9a83b85" class="outline-3">
-<h3 id="org9a83b85"><span class="section-number-3">2.6</span> 给 script.sql 中传入参数</h3>
+<div id="outline-container-org9071732" class="outline-3">
+<h3 id="org9071732"><span class="section-number-3">2.6</span> 给 script.sql 中传入参数</h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 在调用脚本时直接将参数写到后面，见下面的例子
@@ -1020,7 +1013,7 @@ SQL&gt;
 然后在脚本中使用 <code>&amp;1</code> 引用第一个参数， <code>&amp;2</code> 引用第二个参数，以此类推
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- script.sql</span>
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- script.sql</span>
 DEFINE arg1 = &amp;1
 <span style="color: #859900;">SELECT</span> <span style="color: #2aa198;">'&amp;arg1'</span> <span style="color: #859900;">FROM</span> DUAL;
 </pre>
@@ -1029,12 +1022,12 @@ DEFINE arg1 = &amp;1
 </div>
 </div>
 
-<div id="outline-container-org5e986a0" class="outline-2">
-<h2 id="org5e986a0"><span class="section-number-2">3</span> 数据库</h2>
+<div id="outline-container-org8d7b9ce" class="outline-2">
+<h2 id="org8d7b9ce"><span class="section-number-2">3</span> 数据库</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org8f6d95f" class="outline-3">
-<h3 id="org8f6d95f"><span class="section-number-3">3.1</span> 查看当前数据库</h3>
+<div id="outline-container-org426ca96" class="outline-3">
+<h3 id="org426ca96"><span class="section-number-3">3.1</span> 查看当前数据库</h3>
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">SELECT</span> <span style="color: #859900;">NAME</span> <span style="color: #859900;">FROM</span> V$DATABASE;
@@ -1044,18 +1037,18 @@ DEFINE arg1 = &amp;1
 </div>
 </div>
 
-<div id="outline-container-orgf69b299" class="outline-2">
-<h2 id="orgf69b299"><span class="section-number-2">4</span> 表</h2>
+<div id="outline-container-org3744d6d" class="outline-2">
+<h2 id="org3744d6d"><span class="section-number-2">4</span> 表</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org5421f78" class="outline-3">
-<h3 id="org5421f78"><span class="section-number-3">4.1</span> 查看所有表</h3>
+<div id="outline-container-org921d4d6" class="outline-3">
+<h3 id="org921d4d6"><span class="section-number-3">4.1</span> 查看所有表</h3>
 <div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#26597;&#30475;&#25152;&#26377;&#34920;</span>
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- &#26597;&#30475;&#25152;&#26377;&#34920;</span>
 <span style="color: #859900;">SELECT</span> <span style="color: #859900;">TABLE_NAME</span> <span style="color: #859900;">FROM</span> USER_TABLES <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> <span style="color: #859900;">TABLE_NAME</span>;
 
-<span style="color: #586e75; font-style: italic;">-- &#26597;&#30475;&#25152;&#26377;&#34920;&#21644;&#35270;&#22270;&#65292;&#20197;&#21450;&#27880;&#37322;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#26597;&#30475;&#25152;&#26377;&#34920;&#21644;&#35270;&#22270;&#65292;&#20197;&#21450;&#27880;&#37322;</span>
 <span style="color: #859900;">SELECT</span> tc.<span style="color: #859900;">TABLE_NAME</span> || <span style="color: #2aa198;">' '</span> || tc.COMMENTS
   <span style="color: #859900;">FROM</span> USER_TAB_COMMENTS tc
  <span style="color: #859900;">WHERE</span> tc.TABLE_TYPE <span style="color: #859900;">in</span> (<span style="color: #2aa198;">'TABLE'</span>, <span style="color: #2aa198;">'VIEW'</span>)
@@ -1065,8 +1058,8 @@ DEFINE arg1 = &amp;1
 </div>
 </div>
 
-<div id="outline-container-orgb5e3dd1" class="outline-3">
-<h3 id="orgb5e3dd1"><span class="section-number-3">4.2</span> 创建表</h3>
+<div id="outline-container-org553bb38" class="outline-3">
+<h3 id="org553bb38"><span class="section-number-3">4.2</span> 创建表</h3>
 <div class="outline-text-3" id="text-4-2">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">CREATE</span> <span style="color: #859900;">TABLE</span> [scmname.]tabname (
@@ -1088,7 +1081,7 @@ DEFINE arg1 = &amp;1
   created_by varchar2(64) <span style="color: #859900;">DEFAULT</span> <span style="color: #2aa198;">'SYSMAN'</span> <span style="color: #859900;">NOT</span> <span style="color: #859900;">NULL</span>,
   updated_at <span style="color: #268bd2;">date</span> <span style="color: #859900;">DEFAULT</span> SYSDATE <span style="color: #859900;">NOT</span> <span style="color: #859900;">NULL</span>,
   valid <span style="color: #268bd2;">char</span>(1) <span style="color: #859900;">DEFAULT</span> <span style="color: #2aa198;">'y'</span> <span style="color: #859900;">NOT</span> <span style="color: #859900;">NULL</span>,
-  <span style="color: #586e75; font-style: italic;">-- code rule and type</span>
+  <span style="color: #93a1a1; font-style: italic;">-- code rule and type</span>
   code varchar2(32) <span style="color: #859900;">UNIQUE</span> <span style="color: #859900;">NOT</span> <span style="color: #859900;">NULL</span>,
   <span style="color: #859900;">name</span> varchar2(32)
 );
@@ -1099,12 +1092,12 @@ COMMENT <span style="color: #859900;">ON</span> <span style="color: #859900;">CO
 </div>
 </div>
 
-<div id="outline-container-org2dc6361" class="outline-4">
-<h4 id="org2dc6361"><span class="section-number-4">4.2.1</span> 数据类型</h4>
+<div id="outline-container-orgb5005a9" class="outline-4">
+<h4 id="orgb5005a9"><span class="section-number-4">4.2.1</span> 数据类型</h4>
 <div class="outline-text-4" id="text-4-2-1">
 </div>
 <ol class="org-ol">
-<li><a id="orgb3b9ddb"></a>数值型<br />
+<li><a id="orgea8ae96"></a>数值型<br />
 <div class="outline-text-5" id="text-4-2-1-1">
 <ul class="org-ul">
 <li><code>number(precision[,scale])</code> : 数值型，用于表示整数和实数。 precision 表示
@@ -1114,7 +1107,7 @@ COMMENT <span style="color: #859900;">ON</span> <span style="color: #859900;">CO
 </div>
 </li>
 
-<li><a id="orgcca9445"></a>字符串<br />
+<li><a id="org5f7ecd3"></a>字符串<br />
 <div class="outline-text-5" id="text-4-2-1-2">
 <ul class="org-ul">
 <li><code>varchar2(size[BYTE|CHAR])</code> : 变长字符串类型，size 表示字符串最大长度，单
@@ -1130,7 +1123,7 @@ size 的取值范围为 1 到 4000</li>
 </div>
 </li>
 
-<li><a id="orgf6d201b"></a>时间/日期类型<br />
+<li><a id="orgdee1e72"></a>时间/日期类型<br />
 <div class="outline-text-5" id="text-4-2-1-3">
 <ul class="org-ul">
 <li><code>date</code> : 时间和日期类型。 Oracle 的时间和日期都用 date 类型表示， 默认的
@@ -1140,7 +1133,7 @@ size 的取值范围为 1 到 4000</li>
 </div>
 </li>
 
-<li><a id="org7f7e021"></a>二进制 Lob<br />
+<li><a id="org4daabc8"></a>二进制 Lob<br />
 <div class="outline-text-5" id="text-4-2-1-4">
 <ul class="org-ul">
 <li><code>clob</code> : 最多可以存储 4GB 的数据字符的大对象（character data of large
@@ -1153,24 +1146,24 @@ object）</li>
 </div>
 </div>
 
-<div id="outline-container-org2cee86e" class="outline-3">
-<h3 id="org2cee86e"><span class="section-number-3">4.3</span> 修改表</h3>
+<div id="outline-container-org472985a" class="outline-3">
+<h3 id="org472985a"><span class="section-number-3">4.3</span> 修改表</h3>
 <div class="outline-text-3" id="text-4-3">
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#28155;&#21152;&#19968;&#21015;</span>
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- &#28155;&#21152;&#19968;&#21015;</span>
 <span style="color: #859900;">ALTER</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">tabname</span> <span style="color: #859900;">ADD</span> colname varchar2;
 COMMENT <span style="color: #859900;">ON</span> <span style="color: #859900;">COLUMN</span> tabname.colname <span style="color: #859900;">IS</span> <span style="color: #2aa198;">'comments'</span>;
 
 <span style="color: #859900;">ALTER</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">t_employee_base</span> <span style="color: #859900;">ADD</span> <span style="color: #859900;">COLUMN</span> is_active <span style="color: #268bd2;">char</span>(1) <span style="color: #859900;">DEFAULT</span> <span style="color: #2aa198;">'n'</span>;
 COMMENT <span style="color: #859900;">ON</span> <span style="color: #859900;">COLUMN</span> t_employee_base.is_active <span style="color: #859900;">IS</span> <span style="color: #2aa198;">'&#29992;&#25143;&#26159;&#21542;&#28608;&#27963;&#65292;&#40664;&#35748;&#20026; n&#65292;&#34920;&#31034;&#26410;&#28608;&#27963;'</span>;
 
-<span style="color: #586e75; font-style: italic;">-- &#21024;&#38500;&#19968;&#21015;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#21024;&#38500;&#19968;&#21015;</span>
 <span style="color: #859900;">ALTER</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">tabname</span> <span style="color: #859900;">DROP</span> <span style="color: #859900;">COLUMN</span> colname;
 
-<span style="color: #586e75; font-style: italic;">-- &#28155;&#21152;&#20027;&#38190;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#28155;&#21152;&#20027;&#38190;</span>
 <span style="color: #859900;">ALTER</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">tabname</span> <span style="color: #859900;">ADD</span> <span style="color: #859900;">PRIMARY</span> <span style="color: #859900;">KEY</span> ("pk_name");
 
-<span style="color: #586e75; font-style: italic;">-- &#37325;&#21629;&#21517;&#21015;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#37325;&#21629;&#21517;&#21015;</span>
 <span style="color: #859900;">ALTER</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">tabname</span> RENAME <span style="color: #859900;">COLUMN</span> oldcol <span style="color: #859900;">TO</span> newcol;
 </pre>
 </div>
@@ -1178,18 +1171,18 @@ COMMENT <span style="color: #859900;">ON</span> <span style="color: #859900;">CO
 </div>
 </div>
 
-<div id="outline-container-orgf3afbe3" class="outline-2">
-<h2 id="orgf3afbe3"><span class="section-number-2">5</span> 数据操作：增删改查</h2>
+<div id="outline-container-org10842bf" class="outline-2">
+<h2 id="org10842bf"><span class="section-number-2">5</span> 数据操作：增删改查</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-org59ac8ff" class="outline-3">
-<h3 id="org59ac8ff"><span class="section-number-3">5.1</span> 查询 SELECT</h3>
+<div id="outline-container-orga8a374b" class="outline-3">
+<h3 id="orga8a374b"><span class="section-number-3">5.1</span> 查询 SELECT</h3>
 <div class="outline-text-3" id="text-5-1">
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#36873;&#21462;&#20840;&#37096;&#21015;</span>
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- &#36873;&#21462;&#20840;&#37096;&#21015;</span>
 <span style="color: #859900;">SELECT</span> * <span style="color: #859900;">FROM</span> emp;
 
-<span style="color: #586e75; font-style: italic;">-- &#36873;&#21462;&#37096;&#20998;&#21015;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#36873;&#21462;&#37096;&#20998;&#21015;</span>
 <span style="color: #859900;">SELECT</span> empno, hiredate <span style="color: #859900;">FROM</span> emp;
 </pre>
 </div>
@@ -1197,12 +1190,12 @@ COMMENT <span style="color: #859900;">ON</span> <span style="color: #859900;">CO
 </div>
 </div>
 
-<div id="outline-container-orgc2eb646" class="outline-2">
-<h2 id="orgc2eb646"><span class="section-number-2">6</span> 用户、角色和权限</h2>
+<div id="outline-container-orgf9c6764" class="outline-2">
+<h2 id="orgf9c6764"><span class="section-number-2">6</span> 用户、角色和权限</h2>
 <div class="outline-text-2" id="text-6">
 </div>
-<div id="outline-container-org14ffd21" class="outline-3">
-<h3 id="org14ffd21"><span class="section-number-3">6.1</span> 查看当前用户</h3>
+<div id="outline-container-org6f616a8" class="outline-3">
+<h3 id="org6f616a8"><span class="section-number-3">6.1</span> 查看当前用户</h3>
 <div class="outline-text-3" id="text-6-1">
 <div class="org-src-container">
 <pre class="src src-sql">SHOW <span style="color: #6c71c4;">USER</span>;
@@ -1223,8 +1216,8 @@ Apple
 </div>
 </div>
 
-<div id="outline-container-orgc346fa2" class="outline-3">
-<h3 id="orgc346fa2"><span class="section-number-3">6.2</span> 创建/解锁用户</h3>
+<div id="outline-container-org68550ed" class="outline-3">
+<h3 id="org68550ed"><span class="section-number-3">6.2</span> 创建/解锁用户</h3>
 <div class="outline-text-3" id="text-6-2">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">CREATE</span> <span style="color: #6c71c4;">USER</span> &lt;username&gt; IDENTIFIED <span style="color: #859900;">BY</span> &lt;password&gt;;
@@ -1237,8 +1230,8 @@ Apple
 </div>
 </div>
 
-<div id="outline-container-org71e711e" class="outline-3">
-<h3 id="org71e711e"><span class="section-number-3">6.3</span> 删除用户</h3>
+<div id="outline-container-orgde13349" class="outline-3">
+<h3 id="orgde13349"><span class="section-number-3">6.3</span> 删除用户</h3>
 <div class="outline-text-3" id="text-6-3">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">DROP</span> <span style="color: #6c71c4;">USER</span> &lt;username&gt;;
@@ -1247,8 +1240,8 @@ Apple
 </div>
 </div>
 
-<div id="outline-container-org8297eca" class="outline-3">
-<h3 id="org8297eca"><span class="section-number-3">6.4</span> 修改用户密码</h3>
+<div id="outline-container-orga712e87" class="outline-3">
+<h3 id="orga712e87"><span class="section-number-3">6.4</span> 修改用户密码</h3>
 <div class="outline-text-3" id="text-6-4">
 <p>
 有时候修改用户密码但是不知道用户的原始密码，可以添加 <code>VALUES</code> 传入的是数据库
@@ -1262,15 +1255,15 @@ Apple
 </div>
 </div>
 
-<div id="outline-container-org690ae27" class="outline-3">
-<h3 id="org690ae27"><span class="section-number-3">6.5</span> 角色和授权</h3>
+<div id="outline-container-orgcff98b8" class="outline-3">
+<h3 id="orgcff98b8"><span class="section-number-3">6.5</span> 角色和授权</h3>
 <div class="outline-text-3" id="text-6-5">
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#21019;&#24314;&#35282;&#33394;</span>
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- &#21019;&#24314;&#35282;&#33394;</span>
 <span style="color: #859900;">CREATE</span> <span style="color: #859900;">ROLE</span> &lt;rolename&gt; IDENTIFIED <span style="color: #859900;">BY</span> &lt;password&gt;;
-<span style="color: #586e75; font-style: italic;">-- &#25480;&#26435;&#29992;&#25143;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#25480;&#26435;&#29992;&#25143;</span>
 <span style="color: #859900;">GRANT</span> <span style="color: #859900;">ALL</span> <span style="color: #859900;">ON</span> &lt;database&gt;.* <span style="color: #859900;">TO</span> &lt;username&gt;;
-<span style="color: #586e75; font-style: italic;">-- &#35299;&#38500;&#25480;&#26435;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#35299;&#38500;&#25480;&#26435;</span>
 <span style="color: #859900;">REVOKE</span> <span style="color: #859900;">ALL</span> <span style="color: #859900;">ON</span> &lt;database&gt;.* <span style="color: #859900;">FROM</span> &lt;username&gt;;
 </pre>
 </div>
@@ -1278,16 +1271,16 @@ Apple
 </div>
 </div>
 
-<div id="outline-container-org8ff101a" class="outline-2">
-<h2 id="org8ff101a"><span class="section-number-2">7</span> 内置函数</h2>
+<div id="outline-container-orge4924b6" class="outline-2">
+<h2 id="orge4924b6"><span class="section-number-2">7</span> 内置函数</h2>
 <div class="outline-text-2" id="text-7">
 </div>
-<div id="outline-container-org971f3e3" class="outline-3">
-<h3 id="org971f3e3"><span class="section-number-3">7.1</span> 单行函数</h3>
+<div id="outline-container-org2dd7bb6" class="outline-3">
+<h3 id="org2dd7bb6"><span class="section-number-3">7.1</span> 单行函数</h3>
 <div class="outline-text-3" id="text-7-1">
 </div>
-<div id="outline-container-org2530dfd" class="outline-4">
-<h4 id="org2530dfd"><span class="section-number-4">7.1.1</span> 数值函数</h4>
+<div id="outline-container-org73beb96" class="outline-4">
+<h4 id="org73beb96"><span class="section-number-4">7.1.1</span> 数值函数</h4>
 <div class="outline-text-4" id="text-7-1-1">
 <ul class="org-ul">
 <li><code>ABS(n)</code></li>
@@ -1339,18 +1332,18 @@ num<sub>buckets</sub>+1. min<sub>value</sub> 和 max<sub>value</sub> 都不能�
   <span style="color: #859900;">FROM</span> orders
  <span style="color: #859900;">WHERE</span> order_status &lt; 8;
 
-<span style="color: #586e75; font-style: italic;">--    ORDER_ID CUSTOMER_ID LOCATION   METHOD RECEIPT</span>
-<span style="color: #586e75; font-style: italic;">-- ---------- ----------- ---------- ------ ---------</span>
-<span style="color: #586e75; font-style: italic;">--       2458         101 PostOffice Air    Certified</span>
-<span style="color: #586e75; font-style: italic;">--       2397         102 Warehouse  Air    Certified</span>
-<span style="color: #586e75; font-style: italic;">--       2454         103 Warehouse  Air    Certified</span>
-<span style="color: #586e75; font-style: italic;">--       2354         104 PostOffice Air    Certified</span>
-<span style="color: #586e75; font-style: italic;">--       2358         105 PostOffice Ground Certified</span>
-<span style="color: #586e75; font-style: italic;">--       2381         106 Warehouse  Ground Certified</span>
-<span style="color: #586e75; font-style: italic;">--       2440         107 Warehouse  Ground Certified</span>
-<span style="color: #586e75; font-style: italic;">--       2357         108 Warehouse  Air    Insured</span>
-<span style="color: #586e75; font-style: italic;">--       2394         109 Warehouse  Air    Insured</span>
-<span style="color: #586e75; font-style: italic;">--       2435         144 PostOffice Ground Insured</span>
+<span style="color: #93a1a1; font-style: italic;">--    ORDER_ID CUSTOMER_ID LOCATION   METHOD RECEIPT</span>
+<span style="color: #93a1a1; font-style: italic;">-- ---------- ----------- ---------- ------ ---------</span>
+<span style="color: #93a1a1; font-style: italic;">--       2458         101 PostOffice Air    Certified</span>
+<span style="color: #93a1a1; font-style: italic;">--       2397         102 Warehouse  Air    Certified</span>
+<span style="color: #93a1a1; font-style: italic;">--       2454         103 Warehouse  Air    Certified</span>
+<span style="color: #93a1a1; font-style: italic;">--       2354         104 PostOffice Air    Certified</span>
+<span style="color: #93a1a1; font-style: italic;">--       2358         105 PostOffice Ground Certified</span>
+<span style="color: #93a1a1; font-style: italic;">--       2381         106 Warehouse  Ground Certified</span>
+<span style="color: #93a1a1; font-style: italic;">--       2440         107 Warehouse  Ground Certified</span>
+<span style="color: #93a1a1; font-style: italic;">--       2357         108 Warehouse  Air    Insured</span>
+<span style="color: #93a1a1; font-style: italic;">--       2394         109 Warehouse  Air    Insured</span>
+<span style="color: #93a1a1; font-style: italic;">--       2435         144 PostOffice Ground Insured</span>
 
 
 <span style="color: #859900;">SELECT</span> customer_id, cust_last_name, credit_limit,
@@ -1358,44 +1351,44 @@ num<sub>buckets</sub>+1. min<sub>value</sub> 和 max<sub>value</sub> 都不能�
   <span style="color: #859900;">FROM</span> customers <span style="color: #859900;">WHERE</span> nls_territory = <span style="color: #2aa198;">'SWITZERLAND'</span>
  <span style="color: #859900;">ORDER</span> <span style="color: #859900;">BY</span> "Credit <span style="color: #859900;">Group</span>";
 
-<span style="color: #586e75; font-style: italic;">-- CUSTOMER_ID CUST_LAST_NAME       CREDIT_LIMIT Credit Group</span>
-<span style="color: #586e75; font-style: italic;">-- ----------- -------------------- ------------ ------------</span>
-<span style="color: #586e75; font-style: italic;">--         825 Dreyfuss                      500            1</span>
-<span style="color: #586e75; font-style: italic;">--         826 Barkin                        500            1</span>
-<span style="color: #586e75; font-style: italic;">--         853 Palin                         400            1</span>
-<span style="color: #586e75; font-style: italic;">--         827 Siegel                        500            1</span>
-<span style="color: #586e75; font-style: italic;">--         843 Oates                         700            2</span>
-<span style="color: #586e75; font-style: italic;">--         844 Julius                        700            2</span>
-<span style="color: #586e75; font-style: italic;">--         835 Eastwood                     1200            3</span>
-<span style="color: #586e75; font-style: italic;">--         840 Elliott                      1400            3</span>
-<span style="color: #586e75; font-style: italic;">--         842 Stern                        1400            3</span>
-<span style="color: #586e75; font-style: italic;">--         841 Boyer                        1400            3</span>
-<span style="color: #586e75; font-style: italic;">--         837 Stanton                      1200            3</span>
-<span style="color: #586e75; font-style: italic;">--         836 Berenger                     1200            3</span>
-<span style="color: #586e75; font-style: italic;">--         848 Olmos                        1800            4</span>
-<span style="color: #586e75; font-style: italic;">--         849 Kaurusmdki                   1800            4</span>
-<span style="color: #586e75; font-style: italic;">--         828 Minnelli                     2300            5</span>
-<span style="color: #586e75; font-style: italic;">--         829 Hunter                       2300            5</span>
-<span style="color: #586e75; font-style: italic;">--         852 Tanner                       2300            5</span>
-<span style="color: #586e75; font-style: italic;">--         851 Brown                        2300            5</span>
-<span style="color: #586e75; font-style: italic;">--         850 Finney                       2300            5</span>
-<span style="color: #586e75; font-style: italic;">--         830 Dutt                         3500            7</span>
-<span style="color: #586e75; font-style: italic;">--         831 Bel Geddes                   3500            7</span>
-<span style="color: #586e75; font-style: italic;">--         832 Spacek                       3500            7</span>
-<span style="color: #586e75; font-style: italic;">--         838 Nicholson                    3500            7</span>
-<span style="color: #586e75; font-style: italic;">--         839 Johnson                      3500            7</span>
-<span style="color: #586e75; font-style: italic;">--         833 Moranis                      3500            7</span>
-<span style="color: #586e75; font-style: italic;">--         834 Idle                         3500            7</span>
-<span style="color: #586e75; font-style: italic;">--         845 Fawcett                      5000           11</span>
-<span style="color: #586e75; font-style: italic;">--         846 Brando                       5000           11</span>
-<span style="color: #586e75; font-style: italic;">--         847 Streep                       5000           11</span>
+<span style="color: #93a1a1; font-style: italic;">-- CUSTOMER_ID CUST_LAST_NAME       CREDIT_LIMIT Credit Group</span>
+<span style="color: #93a1a1; font-style: italic;">-- ----------- -------------------- ------------ ------------</span>
+<span style="color: #93a1a1; font-style: italic;">--         825 Dreyfuss                      500            1</span>
+<span style="color: #93a1a1; font-style: italic;">--         826 Barkin                        500            1</span>
+<span style="color: #93a1a1; font-style: italic;">--         853 Palin                         400            1</span>
+<span style="color: #93a1a1; font-style: italic;">--         827 Siegel                        500            1</span>
+<span style="color: #93a1a1; font-style: italic;">--         843 Oates                         700            2</span>
+<span style="color: #93a1a1; font-style: italic;">--         844 Julius                        700            2</span>
+<span style="color: #93a1a1; font-style: italic;">--         835 Eastwood                     1200            3</span>
+<span style="color: #93a1a1; font-style: italic;">--         840 Elliott                      1400            3</span>
+<span style="color: #93a1a1; font-style: italic;">--         842 Stern                        1400            3</span>
+<span style="color: #93a1a1; font-style: italic;">--         841 Boyer                        1400            3</span>
+<span style="color: #93a1a1; font-style: italic;">--         837 Stanton                      1200            3</span>
+<span style="color: #93a1a1; font-style: italic;">--         836 Berenger                     1200            3</span>
+<span style="color: #93a1a1; font-style: italic;">--         848 Olmos                        1800            4</span>
+<span style="color: #93a1a1; font-style: italic;">--         849 Kaurusmdki                   1800            4</span>
+<span style="color: #93a1a1; font-style: italic;">--         828 Minnelli                     2300            5</span>
+<span style="color: #93a1a1; font-style: italic;">--         829 Hunter                       2300            5</span>
+<span style="color: #93a1a1; font-style: italic;">--         852 Tanner                       2300            5</span>
+<span style="color: #93a1a1; font-style: italic;">--         851 Brown                        2300            5</span>
+<span style="color: #93a1a1; font-style: italic;">--         850 Finney                       2300            5</span>
+<span style="color: #93a1a1; font-style: italic;">--         830 Dutt                         3500            7</span>
+<span style="color: #93a1a1; font-style: italic;">--         831 Bel Geddes                   3500            7</span>
+<span style="color: #93a1a1; font-style: italic;">--         832 Spacek                       3500            7</span>
+<span style="color: #93a1a1; font-style: italic;">--         838 Nicholson                    3500            7</span>
+<span style="color: #93a1a1; font-style: italic;">--         839 Johnson                      3500            7</span>
+<span style="color: #93a1a1; font-style: italic;">--         833 Moranis                      3500            7</span>
+<span style="color: #93a1a1; font-style: italic;">--         834 Idle                         3500            7</span>
+<span style="color: #93a1a1; font-style: italic;">--         845 Fawcett                      5000           11</span>
+<span style="color: #93a1a1; font-style: italic;">--         846 Brando                       5000           11</span>
+<span style="color: #93a1a1; font-style: italic;">--         847 Streep                       5000           11</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgda340e2" class="outline-4">
-<h4 id="orgda340e2"><span class="section-number-4">7.1.2</span> 返回字符值的字符函数</h4>
+<div id="outline-container-orge7a8e14" class="outline-4">
+<h4 id="orge7a8e14"><span class="section-number-4">7.1.2</span> 返回字符值的字符函数</h4>
 <div class="outline-text-4" id="text-7-1-2">
 <ul class="org-ul">
 <li><code>CHR(n)</code></li>
@@ -1491,8 +1484,8 @@ ABCDEF
 </div>
 </div>
 
-<div id="outline-container-org4fa55fd" class="outline-4">
-<h4 id="org4fa55fd"><span class="section-number-4">7.1.3</span> NLS 字符串函数</h4>
+<div id="outline-container-orgd87f716" class="outline-4">
+<h4 id="orgd87f716"><span class="section-number-4">7.1.3</span> NLS 字符串函数</h4>
 <div class="outline-text-4" id="text-7-1-3">
 <ul class="org-ul">
 <li><code>NLS_CHARSET_DECL_LEN()</code> : <code>NLS_CHARSET_DECL_LEN (200, nls_charset_id('ja16eucfixed'))</code></li>
@@ -1502,8 +1495,8 @@ ABCDEF
 </div>
 </div>
 
-<div id="outline-container-org8357187" class="outline-4">
-<h4 id="org8357187"><span class="section-number-4">7.1.4</span> 返回数值的字符函数</h4>
+<div id="outline-container-orgfeaabe1" class="outline-4">
+<h4 id="orgfeaabe1"><span class="section-number-4">7.1.4</span> 返回数值的字符函数</h4>
 <div class="outline-text-4" id="text-7-1-4">
 <ul class="org-ul">
 <li><code>ASCII(c)</code></li>
@@ -1518,8 +1511,8 @@ ABCDEF
 </div>
 </div>
 
-<div id="outline-container-org67d1719" class="outline-4">
-<h4 id="org67d1719"><span class="section-number-4">7.1.5</span> 时间/日期函数</h4>
+<div id="outline-container-org989d9ef" class="outline-4">
+<h4 id="org989d9ef"><span class="section-number-4">7.1.5</span> 时间/日期函数</h4>
 <div class="outline-text-4" id="text-7-1-5">
 <ul class="org-ul">
 <li><code>ADD_MONTHS(date, n)</code></li>
@@ -1578,8 +1571,8 @@ TIMEZONE<sub>MINUTE</sub>, TIMEZONE<sub>REGION</sub>, TIMEZONE<sub>ABBR</sub></l
 </div>
 </div>
 
-<div id="outline-container-org39aa97f" class="outline-4">
-<h4 id="org39aa97f"><span class="section-number-4">7.1.6</span> 通用比较函数</h4>
+<div id="outline-container-org2792896" class="outline-4">
+<h4 id="org2792896"><span class="section-number-4">7.1.6</span> 通用比较函数</h4>
 <div class="outline-text-4" id="text-7-1-6">
 <ul class="org-ul">
 <li><code>GREATEST(a1, a2, ...)</code></li>
@@ -1588,8 +1581,8 @@ TIMEZONE<sub>MINUTE</sub>, TIMEZONE<sub>REGION</sub>, TIMEZONE<sub>ABBR</sub></l
 </div>
 </div>
 
-<div id="outline-container-org26fa208" class="outline-4">
-<h4 id="org26fa208"><span class="section-number-4">7.1.7</span> 类型转化函数</h4>
+<div id="outline-container-orgbad78b7" class="outline-4">
+<h4 id="orgbad78b7"><span class="section-number-4">7.1.7</span> 类型转化函数</h4>
 <div class="outline-text-4" id="text-7-1-7">
 <ul class="org-ul">
 <li><code>ASCIISTR()</code></li>
@@ -1629,8 +1622,8 @@ TIMEZONE<sub>MINUTE</sub>, TIMEZONE<sub>REGION</sub>, TIMEZONE<sub>ABBR</sub></l
 </div>
 </div>
 
-<div id="outline-container-org6781745" class="outline-4">
-<h4 id="org6781745"><span class="section-number-4">7.1.8</span> 大对象处理函数</h4>
+<div id="outline-container-orgb07878e" class="outline-4">
+<h4 id="orgb07878e"><span class="section-number-4">7.1.8</span> 大对象处理函数</h4>
 <div class="outline-text-4" id="text-7-1-8">
 <ul class="org-ul">
 <li><code>BFILENAME()</code></li>
@@ -1639,8 +1632,8 @@ TIMEZONE<sub>MINUTE</sub>, TIMEZONE<sub>REGION</sub>, TIMEZONE<sub>ABBR</sub></l
 </div>
 </div>
 
-<div id="outline-container-org43959c5" class="outline-4">
-<h4 id="org43959c5"><span class="section-number-4">7.1.9</span> 集合函数</h4>
+<div id="outline-container-org6d37ee4" class="outline-4">
+<h4 id="org6d37ee4"><span class="section-number-4">7.1.9</span> 集合函数</h4>
 <div class="outline-text-4" id="text-7-1-9">
 <ul class="org-ul">
 <li><code>CARDINALITY()</code></li>
@@ -1652,8 +1645,8 @@ TIMEZONE<sub>MINUTE</sub>, TIMEZONE<sub>REGION</sub>, TIMEZONE<sub>ABBR</sub></l
 </div>
 </div>
 
-<div id="outline-container-orgc9130a2" class="outline-4">
-<h4 id="orgc9130a2"><span class="section-number-4">7.1.10</span> 继承函数</h4>
+<div id="outline-container-orgc3443d0" class="outline-4">
+<h4 id="orgc3443d0"><span class="section-number-4">7.1.10</span> 继承函数</h4>
 <div class="outline-text-4" id="text-7-1-10">
 <ul class="org-ul">
 <li><code>SYS_CONNECT_BY_PATH()</code> : 主要用于树查询(层次查询) 以及 多列转行。其语法一般为：</li>
@@ -1666,8 +1659,8 @@ TIMEZONE<sub>MINUTE</sub>, TIMEZONE<sub>REGION</sub>, TIMEZONE<sub>ABBR</sub></l
 </div>
 </div>
 
-<div id="outline-container-org16353bd" class="outline-4">
-<h4 id="org16353bd"><span class="section-number-4">7.1.11</span> 数据挖掘函数</h4>
+<div id="outline-container-orgc34169a" class="outline-4">
+<h4 id="orgc34169a"><span class="section-number-4">7.1.11</span> 数据挖掘函数</h4>
 <div class="outline-text-4" id="text-7-1-11">
 <ul class="org-ul">
 <li><code>CLUSTER_ID()</code></li>
@@ -1685,8 +1678,8 @@ TIMEZONE<sub>MINUTE</sub>, TIMEZONE<sub>REGION</sub>, TIMEZONE<sub>ABBR</sub></l
 </div>
 </div>
 
-<div id="outline-container-org5ef510c" class="outline-4">
-<h4 id="org5ef510c"><span class="section-number-4">7.1.12</span> XML 函数</h4>
+<div id="outline-container-orgc327ded" class="outline-4">
+<h4 id="orgc327ded"><span class="section-number-4">7.1.12</span> XML 函数</h4>
 <div class="outline-text-4" id="text-7-1-12">
 <ul class="org-ul">
 <li><code>APPENDCHILDXML()</code></li>
@@ -1720,8 +1713,8 @@ TIMEZONE<sub>MINUTE</sub>, TIMEZONE<sub>REGION</sub>, TIMEZONE<sub>ABBR</sub></l
 </div>
 </div>
 
-<div id="outline-container-orgfca6c77" class="outline-4">
-<h4 id="orgfca6c77"><span class="section-number-4">7.1.13</span> 编码/解码函数</h4>
+<div id="outline-container-org531e454" class="outline-4">
+<h4 id="org531e454"><span class="section-number-4">7.1.13</span> 编码/解码函数</h4>
 <div class="outline-text-4" id="text-7-1-13">
 <ul class="org-ul">
 <li><code>DECODE()</code></li>
@@ -1745,8 +1738,8 @@ TIMEZONE<sub>MINUTE</sub>, TIMEZONE<sub>REGION</sub>, TIMEZONE<sub>ABBR</sub></l
 </div>
 </div>
 
-<div id="outline-container-org0701f31" class="outline-4">
-<h4 id="org0701f31"><span class="section-number-4">7.1.14</span> NULL 相关函数</h4>
+<div id="outline-container-orgda13a57" class="outline-4">
+<h4 id="orgda13a57"><span class="section-number-4">7.1.14</span> NULL 相关函数</h4>
 <div class="outline-text-4" id="text-7-1-14">
 <ul class="org-ul">
 <li><code>COALESCE(expr1, expr2, ...)</code> : 返回第一个非 NULL 值</li>
@@ -1765,7 +1758,7 @@ expr3。expr2 和 expr3 类型不同的话，expr3 会转换为 expr2 的类型<
 <pre class="src src-sql"><span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> nvl(<span style="color: #859900;">length</span>(PHOTO), 0) <span style="color: #859900;">AS</span> PHOTO_SIZE <span style="color: #859900;">FROM</span> T_EMPLOYEE_BASE <span style="color: #859900;">WHERE</span> rownum &lt; 10;
 
 PHOTO_SIZE
-<span style="color: #586e75; font-style: italic;">----------</span>
+<span style="color: #93a1a1; font-style: italic;">----------</span>
     103357
      12177
      84866
@@ -1779,7 +1772,7 @@ PHOTO_SIZE
 <span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> nvl(to_char(<span style="color: #859900;">length</span>(PHOTO)), <span style="color: #2aa198;">'null'</span>) <span style="color: #859900;">AS</span> PHOTO_SIZE <span style="color: #859900;">FROM</span> T_EMPLOYEE_BASE <span style="color: #859900;">WHERE</span> rownum &lt; 10;
 
 PHOTO_SIZE
-<span style="color: #586e75; font-style: italic;">----------</span>
+<span style="color: #93a1a1; font-style: italic;">----------</span>
 103357
 12177
 84866
@@ -1794,8 +1787,8 @@ PHOTO_SIZE
 </div>
 </div>
 
-<div id="outline-container-org0f37580" class="outline-4">
-<h4 id="org0f37580"><span class="section-number-4">7.1.15</span> 环境和标识符函数</h4>
+<div id="outline-container-org8733a64" class="outline-4">
+<h4 id="org8733a64"><span class="section-number-4">7.1.15</span> 环境和标识符函数</h4>
 <div class="outline-text-4" id="text-7-1-15">
 <ul class="org-ul">
 <li><code>SYS_CONTEXT()</code></li>
@@ -1836,8 +1829,8 @@ ORA-00923: <span style="color: #859900;">FROM</span> keyword <span style="color:
 </div>
 </div>
 
-<div id="outline-container-orgc9245ea" class="outline-3">
-<h3 id="orgc9245ea"><span class="section-number-3">7.2</span> 聚合函数</h3>
+<div id="outline-container-org0fc41fe" class="outline-3">
+<h3 id="org0fc41fe"><span class="section-number-3">7.2</span> 聚合函数</h3>
 <div class="outline-text-3" id="text-7-2">
 <ul class="org-ul">
 <li><code>AVG(expr)</code> : 平均值</li>
@@ -1886,27 +1879,27 @@ ORA-00923: <span style="color: #859900;">FROM</span> keyword <span style="color:
   <span style="color: #859900;">FROM</span> employees
  <span style="color: #859900;">GROUP</span> <span style="color: #859900;">BY</span> department_id;
 
-<span style="color: #586e75; font-style: italic;">-- DEPARTMENT_ID      Worst       Best</span>
-<span style="color: #586e75; font-style: italic;">-- ------------- ---------- ----------</span>
-<span style="color: #586e75; font-style: italic;">--            10       4400       4400</span>
-<span style="color: #586e75; font-style: italic;">--            20       6000      13000</span>
-<span style="color: #586e75; font-style: italic;">--            30       2500      11000</span>
-<span style="color: #586e75; font-style: italic;">--            40       6500       6500</span>
-<span style="color: #586e75; font-style: italic;">--            50       2100       8200</span>
-<span style="color: #586e75; font-style: italic;">--            60       4200       9000</span>
-<span style="color: #586e75; font-style: italic;">--            70      10000      10000</span>
-<span style="color: #586e75; font-style: italic;">--            80       6100      14000</span>
-<span style="color: #586e75; font-style: italic;">--            90      17000      24000</span>
-<span style="color: #586e75; font-style: italic;">--           100       6900      12000</span>
-<span style="color: #586e75; font-style: italic;">--           110       8300      12000</span>
-<span style="color: #586e75; font-style: italic;">--                     7000       7000</span>
+<span style="color: #93a1a1; font-style: italic;">-- DEPARTMENT_ID      Worst       Best</span>
+<span style="color: #93a1a1; font-style: italic;">-- ------------- ---------- ----------</span>
+<span style="color: #93a1a1; font-style: italic;">--            10       4400       4400</span>
+<span style="color: #93a1a1; font-style: italic;">--            20       6000      13000</span>
+<span style="color: #93a1a1; font-style: italic;">--            30       2500      11000</span>
+<span style="color: #93a1a1; font-style: italic;">--            40       6500       6500</span>
+<span style="color: #93a1a1; font-style: italic;">--            50       2100       8200</span>
+<span style="color: #93a1a1; font-style: italic;">--            60       4200       9000</span>
+<span style="color: #93a1a1; font-style: italic;">--            70      10000      10000</span>
+<span style="color: #93a1a1; font-style: italic;">--            80       6100      14000</span>
+<span style="color: #93a1a1; font-style: italic;">--            90      17000      24000</span>
+<span style="color: #93a1a1; font-style: italic;">--           100       6900      12000</span>
+<span style="color: #93a1a1; font-style: italic;">--           110       8300      12000</span>
+<span style="color: #93a1a1; font-style: italic;">--                     7000       7000</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org7c63a57" class="outline-3">
-<h3 id="org7c63a57"><span class="section-number-3">7.3</span> 分析函数</h3>
+<div id="outline-container-org3f4e334" class="outline-3">
+<h3 id="org3f4e334"><span class="section-number-3">7.3</span> 分析函数</h3>
 <div class="outline-text-3" id="text-7-3">
 <ul class="org-ul">
 <li><code>NUMTOYMINTERVAL()</code></li>
@@ -1944,8 +1937,8 @@ ORA-00923: <span style="color: #859900;">FROM</span> keyword <span style="color:
 </div>
 </div>
 
-<div id="outline-container-org4871582" class="outline-3">
-<h3 id="org4871582"><span class="section-number-3">7.4</span> 对象引用函数</h3>
+<div id="outline-container-orgabcf11a" class="outline-3">
+<h3 id="orgabcf11a"><span class="section-number-3">7.4</span> 对象引用函数</h3>
 <div class="outline-text-3" id="text-7-4">
 <ul class="org-ul">
 <li><code>DEREF()</code></li>
@@ -1957,8 +1950,8 @@ ORA-00923: <span style="color: #859900;">FROM</span> keyword <span style="color:
 </div>
 </div>
 
-<div id="outline-container-org37782a3" class="outline-3">
-<h3 id="org37782a3"><span class="section-number-3">7.5</span> 模型函数</h3>
+<div id="outline-container-orge9e2dd2" class="outline-3">
+<h3 id="orge9e2dd2"><span class="section-number-3">7.5</span> 模型函数</h3>
 <div class="outline-text-3" id="text-7-5">
 <ul class="org-ul">
 <li><code>CV()</code></li>
@@ -1971,8 +1964,8 @@ ORA-00923: <span style="color: #859900;">FROM</span> keyword <span style="color:
 </div>
 </div>
 
-<div id="outline-container-orgc89b41e" class="outline-2">
-<h2 id="orgc89b41e"><span class="section-number-2">8</span> 元信息</h2>
+<div id="outline-container-org0904723" class="outline-2">
+<h2 id="org0904723"><span class="section-number-2">8</span> 元信息</h2>
 <div class="outline-text-2" id="text-8">
 <p>
 Oracle 的数据库组织方式中所有数据库的表信息，类信息等元信息也是存放在一个对用
@@ -1994,12 +1987,12 @@ Oracle 的数据库组织方式中所有数据库的表信息，类信息等元�
 </p>
 </div>
 
-<div id="outline-container-orge7a3c8d" class="outline-3">
-<h3 id="orge7a3c8d"><span class="section-number-3">8.1</span> 获取表的元信息：列的属性，唯一性约束</h3>
+<div id="outline-container-orge1bac34" class="outline-3">
+<h3 id="orge1bac34"><span class="section-number-3">8.1</span> 获取表的元信息：列的属性，唯一性约束</h3>
 <div class="outline-text-3" id="text-8-1">
 </div>
-<div id="outline-container-org68afd2b" class="outline-4">
-<h4 id="org68afd2b"><span class="section-number-4">8.1.1</span> 表列属性</h4>
+<div id="outline-container-org5c9a8a8" class="outline-4">
+<h4 id="org5c9a8a8"><span class="section-number-4">8.1.1</span> 表列属性</h4>
 <div class="outline-text-4" id="text-8-1-1">
 <p>
 可以查看表中每列的名字，数据类型，长度等信息
@@ -2018,8 +2011,8 @@ Oracle 的数据库组织方式中所有数据库的表信息，类信息等元�
 </div>
 </div>
 
-<div id="outline-container-orgcaec2c2" class="outline-4">
-<h4 id="orgcaec2c2"><span class="section-number-4">8.1.2</span> 唯一性约束</h4>
+<div id="outline-container-org3942878" class="outline-4">
+<h4 id="org3942878"><span class="section-number-4">8.1.2</span> 唯一性约束</h4>
 <div class="outline-text-4" id="text-8-1-2">
 <p>
 获取列的约束名称
@@ -2053,12 +2046,12 @@ Oracle 的数据库组织方式中所有数据库的表信息，类信息等元�
 </div>
 </div>
 
-<div id="outline-container-orgbc3ce70" class="outline-3">
-<h3 id="orgbc3ce70"><span class="section-number-3">8.2</span> 获取注释信息</h3>
+<div id="outline-container-orgff51162" class="outline-3">
+<h3 id="orgff51162"><span class="section-number-3">8.2</span> 获取注释信息</h3>
 <div class="outline-text-3" id="text-8-2">
 </div>
-<div id="outline-container-orga618045" class="outline-4">
-<h4 id="orga618045"><span class="section-number-4">8.2.1</span> 表注释</h4>
+<div id="outline-container-org5497107" class="outline-4">
+<h4 id="org5497107"><span class="section-number-4">8.2.1</span> 表注释</h4>
 <div class="outline-text-4" id="text-8-2-1">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_TAB_COMMENTS.<span style="color: #859900;">TABLE_NAME</span> ||
@@ -2072,8 +2065,8 @@ Oracle 的数据库组织方式中所有数据库的表信息，类信息等元�
 </div>
 </div>
 
-<div id="outline-container-orgc132ca5" class="outline-4">
-<h4 id="orgc132ca5"><span class="section-number-4">8.2.2</span> 列注释</h4>
+<div id="outline-container-orgc8bc0db" class="outline-4">
+<h4 id="orgc8bc0db"><span class="section-number-4">8.2.2</span> 列注释</h4>
 <div class="outline-text-4" id="text-8-2-2">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">SELECT</span> USER_COL_COMMENTS.<span style="color: #859900;">TABLE_NAME</span> ||
@@ -2089,32 +2082,32 @@ Oracle 的数据库组织方式中所有数据库的表信息，类信息等元�
 </div>
 </div>
 
-<div id="outline-container-orgb4f08dc" class="outline-2">
-<h2 id="orgb4f08dc"><span class="section-number-2">9</span> PL/SQL</h2>
+<div id="outline-container-org5a6f647" class="outline-2">
+<h2 id="org5a6f647"><span class="section-number-2">9</span> PL/SQL</h2>
 <div class="outline-text-2" id="text-9">
 </div>
-<div id="outline-container-orgf939386" class="outline-3">
-<h3 id="orgf939386"><span class="section-number-3">9.1</span> 存储过程</h3>
+<div id="outline-container-org2541f97" class="outline-3">
+<h3 id="org2541f97"><span class="section-number-3">9.1</span> 存储过程</h3>
 <div class="outline-text-3" id="text-9-1">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">DECLARE</span>
-  <span style="color: #586e75; font-style: italic;">-- &#23450;&#20041;&#21464;&#37327;</span>
+  <span style="color: #93a1a1; font-style: italic;">-- &#23450;&#20041;&#21464;&#37327;</span>
   i <span style="color: #268bd2;">INTEGER</span>;
 <span style="color: #859900;">BEGIN</span>
-  <span style="color: #586e75; font-style: italic;">-- sqlplus &#20013;&#40664;&#35748;&#36755;&#20986;&#26159;&#20851;&#38381;&#30340;&#65292;&#21487;&#20197;&#20351;&#29992;&#19979;&#38754;&#26041;&#27861;&#24320;&#21551;&#36873;&#39033;</span>
-  <span style="color: #586e75; font-style: italic;">-- SET SERVEROUTPUT ON</span>
+  <span style="color: #93a1a1; font-style: italic;">-- sqlplus &#20013;&#40664;&#35748;&#36755;&#20986;&#26159;&#20851;&#38381;&#30340;&#65292;&#21487;&#20197;&#20351;&#29992;&#19979;&#38754;&#26041;&#27861;&#24320;&#21551;&#36873;&#39033;</span>
+  <span style="color: #93a1a1; font-style: italic;">-- SET SERVEROUTPUT ON</span>
   DBMS_OUTPUT.put_line(<span style="color: #2aa198;">'Hello world'</span>);
 <span style="color: #859900;">END</span>;
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org9ccf363" class="outline-3">
-<h3 id="org9ccf363"><span class="section-number-3">9.2</span> 变量</h3>
+<div id="outline-container-org5c77323" class="outline-3">
+<h3 id="org5c77323"><span class="section-number-3">9.2</span> 变量</h3>
 <div class="outline-text-3" id="text-9-2">
 </div>
-<div id="outline-container-org55d9fad" class="outline-4">
-<h4 id="org55d9fad"><span class="section-number-4">9.2.1</span> 变量类型</h4>
+<div id="outline-container-orge6672a1" class="outline-4">
+<h4 id="orge6672a1"><span class="section-number-4">9.2.1</span> 变量类型</h4>
 <div class="outline-text-4" id="text-9-2-1">
 <ul class="org-ul">
 <li>普通变量（CHAR, VARCHAR2, DATE, NUMBER, BOOLEAN, LONG）</li>
@@ -2128,8 +2121,8 @@ Oracle 的数据库组织方式中所有数据库的表信息，类信息等元�
 </div>
 </div>
 
-<div id="outline-container-org85fcc36" class="outline-4">
-<h4 id="org85fcc36"><span class="section-number-4">9.2.2</span> 变量赋值</h4>
+<div id="outline-container-org3fe9435" class="outline-4">
+<h4 id="org3fe9435"><span class="section-number-4">9.2.2</span> 变量赋值</h4>
 <div class="outline-text-4" id="text-9-2-2">
 <ul class="org-ul">
 <li>直接赋值 <code>:=</code></li>
@@ -2138,14 +2131,14 @@ Oracle 的数据库组织方式中所有数据库的表信息，类信息等元�
 
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">DECLARE</span>
-  v_name <span style="color: #268bd2;">varchar</span>(20) := <span style="color: #2aa198;">''</span>; <span style="color: #586e75; font-style: italic;">-- &#21021;&#22987;&#21270;&#36171;&#20540;</span>
+  v_name <span style="color: #268bd2;">varchar</span>(20) := <span style="color: #2aa198;">''</span>; <span style="color: #93a1a1; font-style: italic;">-- &#21021;&#22987;&#21270;&#36171;&#20540;</span>
   v_sal <span style="color: #859900;">number</span>;
   v_addr <span style="color: #268bd2;">varchar</span>(200);
 <span style="color: #859900;">BEGIN</span>
-  <span style="color: #586e75; font-style: italic;">-- &#30452;&#25509;&#36171;&#20540;</span>
+  <span style="color: #93a1a1; font-style: italic;">-- &#30452;&#25509;&#36171;&#20540;</span>
   v_sal := 2383;
 
-  <span style="color: #586e75; font-style: italic;">-- &#35821;&#21477;&#36171;&#20540;</span>
+  <span style="color: #93a1a1; font-style: italic;">-- &#35821;&#21477;&#36171;&#20540;</span>
   <span style="color: #859900;">SELECT</span> <span style="color: #2aa198;">'&#21271;&#20140;&#24066;&#26397;&#38451;&#21306;'</span> <span style="color: #859900;">INTO</span> v_addr <span style="color: #859900;">FROM</span> DUAL;
 
   DBMS_OUTPUT.put_line(<span style="color: #2aa198;">'&#22995;&#21517;: '</span> || v_name || <span style="color: #2aa198;">', &#34218;&#27700;: '</span> || v_sal || <span style="color: #2aa198;">', &#22320;&#22336; c: '</span> || v_addr);
@@ -2157,16 +2150,16 @@ Oracle 的数据库组织方式中所有数据库的表信息，类信息等元�
 </div>
 </div>
 
-<div id="outline-container-orgec10de7" class="outline-2">
-<h2 id="orgec10de7"><span class="section-number-2">10</span> 一些使用场景</h2>
+<div id="outline-container-orgb71dc01" class="outline-2">
+<h2 id="orgb71dc01"><span class="section-number-2">10</span> 一些使用场景</h2>
 <div class="outline-text-2" id="text-10">
 </div>
-<div id="outline-container-org4c074f9" class="outline-3">
-<h3 id="org4c074f9"><span class="section-number-3">10.1</span> 创建新的表空间以及用户</h3>
+<div id="outline-container-org1a8f714" class="outline-3">
+<h3 id="org1a8f714"><span class="section-number-3">10.1</span> 创建新的表空间以及用户</h3>
 <div class="outline-text-3" id="text-10-1">
 </div>
-<div id="outline-container-orgf20a1c5" class="outline-4">
-<h4 id="orgf20a1c5"><span class="section-number-4">10.1.1</span> 创建数据储存的目录</h4>
+<div id="outline-container-org375e75d" class="outline-4">
+<h4 id="org375e75d"><span class="section-number-4">10.1.1</span> 创建数据储存的目录</h4>
 <div class="outline-text-4" id="text-10-1-1">
 <p>
 Oracle 数据库的表空间的存储目录需要显示创建
@@ -2178,15 +2171,15 @@ Oracle 数据库的表空间的存储目录需要显示创建
 </div>
 </div>
 
-<div id="outline-container-orgd8cedfd" class="outline-4">
-<h4 id="orgd8cedfd"><span class="section-number-4">10.1.2</span> 创建表空间</h4>
+<div id="outline-container-orgc42be6d" class="outline-4">
+<h4 id="orgc42be6d"><span class="section-number-4">10.1.2</span> 创建表空间</h4>
 <div class="outline-text-4" id="text-10-1-2">
 <p>
 Oracle 在创建用户前最好为当前用户显示创建表空间，否则创建的新用户会使用默认
 的表空间。为了避免这种情况，提前创建默认表空间和临时表空间
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#21019;&#24314;&#40664;&#35748;&#34920;&#31354;&#38388;</span>
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- &#21019;&#24314;&#40664;&#35748;&#34920;&#31354;&#38388;</span>
 <span style="color: #859900;">CREATE</span> TABLESPACE PFile1
   DATAFILE <span style="color: #2aa198;">'/u01/app/oracle/oradata/XE/pfile1.dbf'</span>
   <span style="color: #859900;">SIZE</span> 128M AUTOEXTEND <span style="color: #859900;">OFF</span>
@@ -2198,7 +2191,7 @@ Oracle 在创建用户前最好为当前用户显示创建表空间，否则创�
   SEGMENT <span style="color: #859900;">SPACE</span> MANAGEMENT AUTO
   FLASHBACK <span style="color: #859900;">ON</span>;
 
-<span style="color: #586e75; font-style: italic;">-- &#21019;&#24314;&#20020;&#26102;&#34920;&#31354;&#38388;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#21019;&#24314;&#20020;&#26102;&#34920;&#31354;&#38388;</span>
 <span style="color: #859900;">CREATE</span> <span style="color: #859900;">TEMPORARY</span> TABLESPACE TFile1
   TEMPFILE <span style="color: #2aa198;">'/u01/app/oracle/oradata/XE/tfile1.dbf'</span>
   <span style="color: #859900;">SIZE</span> 2048M AUTOEXTEND <span style="color: #859900;">OFF</span>
@@ -2209,8 +2202,8 @@ Oracle 在创建用户前最好为当前用户显示创建表空间，否则创�
 </div>
 </div>
 
-<div id="outline-container-org27e5e72" class="outline-4">
-<h4 id="org27e5e72"><span class="section-number-4">10.1.3</span> 创建用户</h4>
+<div id="outline-container-org2e8f450" class="outline-4">
+<h4 id="org2e8f450"><span class="section-number-4">10.1.3</span> 创建用户</h4>
 <div class="outline-text-4" id="text-10-1-3">
 <p>
 创建新的用户
@@ -2241,8 +2234,8 @@ Oracle 在创建用户前最好为当前用户显示创建表空间，否则创�
 </div>
 </div>
 
-<div id="outline-container-org0c90c4e" class="outline-4">
-<h4 id="org0c90c4e"><span class="section-number-4">10.1.4</span> 登录测试</h4>
+<div id="outline-container-orgdc88d35" class="outline-4">
+<h4 id="orgdc88d35"><span class="section-number-4">10.1.4</span> 登录测试</h4>
 <div class="outline-text-4" id="text-10-1-4">
 <p>
 使用 sqlplus 测试一下连接是否成功
@@ -2254,12 +2247,12 @@ Oracle 在创建用户前最好为当前用户显示创建表空间，否则创�
 </div>
 </div>
 </div>
-<div id="outline-container-org4dd3b27" class="outline-3">
-<h3 id="org4dd3b27"><span class="section-number-3">10.2</span> 导入/导出数据</h3>
+<div id="outline-container-orgf869184" class="outline-3">
+<h3 id="orgf869184"><span class="section-number-3">10.2</span> 导入/导出数据</h3>
 <div class="outline-text-3" id="text-10-2">
 </div>
-<div id="outline-container-orgf62336d" class="outline-4">
-<h4 id="orgf62336d"><span class="section-number-4">10.2.1</span> 导出全部数据库</h4>
+<div id="outline-container-org27d802d" class="outline-4">
+<h4 id="org27d802d"><span class="section-number-4">10.2.1</span> 导出全部数据库</h4>
 <div class="outline-text-4" id="text-10-2-1">
 <p>
 如果两个数据库的磁盘的物理路径都是相同的，可以指定 <code>full=y</code> 的方式导入所有的
@@ -2276,8 +2269,8 @@ imp user/pass@host:port/sid <span style="color: #6c71c4;">FULL</span>=y <span st
 </div>
 </div>
 
-<div id="outline-container-orgd45d28f" class="outline-4">
-<h4 id="orgd45d28f"><span class="section-number-4">10.2.2</span> 导出用户的数据库</h4>
+<div id="outline-container-orgf7213c8" class="outline-4">
+<h4 id="orgf7213c8"><span class="section-number-4">10.2.2</span> 导出用户的数据库</h4>
 <div class="outline-text-4" id="text-10-2-2">
 <p>
 如果要导出某个特定用户的所有数据库，这种方式导出的数据库的表空间文件不会绑定
@@ -2319,8 +2312,8 @@ imp <span style="color: #6c71c4;">PARFILE</span>=options.txt <span style="color:
 </div>
 </div>
 
-<div id="outline-container-org8c01cc2" class="outline-3">
-<h3 id="org8c01cc2"><span class="section-number-3">10.3</span> 正则化表达式匹配</h3>
+<div id="outline-container-org4113062" class="outline-3">
+<h3 id="org4113062"><span class="section-number-3">10.3</span> 正则化表达式匹配</h3>
 <div class="outline-text-3" id="text-10-3">
 <p>
 Oracle 可以使用 <code>regexp_like</code> 来做正则表达式匹配
@@ -2329,7 +2322,7 @@ Oracle 可以使用 <code>regexp_like</code> 来做正则表达式匹配
 <pre class="src src-sql"><span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #859900;">TABLE_NAME</span> <span style="color: #859900;">FROM</span> USER_TAB_COMMENTS <span style="color: #859900;">WHERE</span> regexp_like(<span style="color: #859900;">TABLE_NAME</span>, <span style="color: #2aa198;">'^PRDT'</span>);
 
 <span style="color: #859900;">TABLE_NAME</span>
-<span style="color: #586e75; font-style: italic;">-----------------------------</span>
+<span style="color: #93a1a1; font-style: italic;">-----------------------------</span>
 PRDT_DIC
 PRDT_DIC_ALL_V
 PRDT_DIC_BOM
@@ -2349,8 +2342,8 @@ PRDT_PROCESS_RES_DIC
 </div>
 </div>
 
-<div id="outline-container-orgb020cc4" class="outline-3">
-<h3 id="orgb020cc4"><span class="section-number-3">10.4</span> 获取序列值</h3>
+<div id="outline-container-org9d793d3" class="outline-3">
+<h3 id="org9d793d3"><span class="section-number-3">10.4</span> 获取序列值</h3>
 <div class="outline-text-3" id="text-10-4">
 <p>
 创建序列
@@ -2388,8 +2381,8 @@ PRDT_PROCESS_RES_DIC
 </div>
 </div>
 
-<div id="outline-container-org0b9ae36" class="outline-3">
-<h3 id="org0b9ae36"><span class="section-number-3">10.5</span> 限制查询结果的行数</h3>
+<div id="outline-container-org04b3e97" class="outline-3">
+<h3 id="org04b3e97"><span class="section-number-3">10.5</span> 限制查询结果的行数</h3>
 <div class="outline-text-3" id="text-10-5">
 <p>
 使用 <code>ROWNUM</code> 在条件语句中限制
@@ -2402,8 +2395,8 @@ PRDT_PROCESS_RES_DIC
 </div>
 </div>
 
-<div id="outline-container-org1a1c0b6" class="outline-3">
-<h3 id="org1a1c0b6"><span class="section-number-3">10.6</span> 删除表中重复的行数据</h3>
+<div id="outline-container-org0735953" class="outline-3">
+<h3 id="org0735953"><span class="section-number-3">10.6</span> 删除表中重复的行数据</h3>
 <div class="outline-text-3" id="text-10-6">
 <p>
 Oracle 里面每行都有一个 <code>ROWID</code> 的伪列，即使两行的数据是相同的， <code>ROWID</code> 也是
@@ -2423,8 +2416,8 @@ Oracle 里面每行都有一个 <code>ROWID</code> 的伪列，即使两行的�
 </div>
 </div>
 
-<div id="outline-container-org2948351" class="outline-3">
-<h3 id="org2948351"><span class="section-number-3">10.7</span> 查看数据库磁盘容量</h3>
+<div id="outline-container-orgcabc771" class="outline-3">
+<h3 id="orgcabc771"><span class="section-number-3">10.7</span> 查看数据库磁盘容量</h3>
 <div class="outline-text-3" id="text-10-7">
 <p>
 通过 <code>SYS.DBA_FREE_SPACE</code> 视图可以查看磁盘可以空间，进行实时监控。
@@ -2439,8 +2432,8 @@ Oracle 里面每行都有一个 <code>ROWID</code> 的伪列，即使两行的�
 </div>
 </div>
 
-<div id="outline-container-org7767cde" class="outline-3">
-<h3 id="org7767cde"><span class="section-number-3">10.8</span> 查看 query 的执行时间</h3>
+<div id="outline-container-orgffeb809" class="outline-3">
+<h3 id="orgffeb809"><span class="section-number-3">10.8</span> 查看 query 的执行时间</h3>
 <div class="outline-text-3" id="text-10-8">
 <p>
 查看单个 query 执行计时直接开启 <code>TIMING</code> 选项就可以看到
@@ -2449,14 +2442,14 @@ Oracle 里面每行都有一个 <code>ROWID</code> 的伪列，即使两行的�
 <pre class="src src-sql"><span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">count</span>(*) <span style="color: #859900;">FROM</span> T_LOG;
 
   <span style="color: #6c71c4;">COUNT</span>(*)
-<span style="color: #586e75; font-style: italic;">----------</span>
+<span style="color: #93a1a1; font-style: italic;">----------</span>
      85718
 
 <span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SET</span> TIMING <span style="color: #859900;">ON</span>
 <span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">count</span>(*) <span style="color: #859900;">FROM</span> T_LOG;
 
   <span style="color: #6c71c4;">COUNT</span>(*)
-<span style="color: #586e75; font-style: italic;">----------</span>
+<span style="color: #93a1a1; font-style: italic;">----------</span>
      85718
 
 Elapsed: 00:00:00.04
@@ -2472,7 +2465,7 @@ Elapsed: 00:00:00.04
 <span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">count</span>(*) <span style="color: #859900;">FROM</span> T_LOG;
 
   <span style="color: #6c71c4;">COUNT</span>(*)
-<span style="color: #586e75; font-style: italic;">----------</span>
+<span style="color: #93a1a1; font-style: italic;">----------</span>
      85718
 
 <span style="color: #859900;">SQL</span>&gt; TIMING SHOW mytimer;
@@ -2482,7 +2475,7 @@ Elapsed: 00:00:00.04
 <span style="color: #859900;">SQL</span>&gt; <span style="color: #859900;">SELECT</span> <span style="color: #6c71c4;">max</span>(myid) <span style="color: #859900;">FROM</span> T_LOG;
 
  <span style="color: #6c71c4;">MAX</span>(MYID)
-<span style="color: #586e75; font-style: italic;">----------</span>
+<span style="color: #93a1a1; font-style: italic;">----------</span>
     103234
 
 
@@ -2496,8 +2489,8 @@ Elapsed: 00:00:00.07
 </div>
 </div>
 
-<div id="outline-container-org680a631" class="outline-3">
-<h3 id="org680a631"><span class="section-number-3">10.9</span> 字符串拼接的聚合函数</h3>
+<div id="outline-container-orgd70800f" class="outline-3">
+<h3 id="orgd70800f"><span class="section-number-3">10.9</span> 字符串拼接的聚合函数</h3>
 <div class="outline-text-3" id="text-10-9">
 <p>
 oracle 10g 和 11g 的字符串拼接函数不是一样的，10g 中使用 <code>WM_CONCAT()</code> 聚合函
@@ -2541,12 +2534,12 @@ oracle 10g 和 11g 的字符串拼接函数不是一样的，10g 中使用 <code
 </div>
 </div>
 
-<div id="outline-container-orge2820de" class="outline-2">
-<h2 id="orge2820de"><span class="section-number-2">11</span> 常见问题</h2>
+<div id="outline-container-org0632866" class="outline-2">
+<h2 id="org0632866"><span class="section-number-2">11</span> 常见问题</h2>
 <div class="outline-text-2" id="text-11">
 </div>
-<div id="outline-container-orgcfd0264" class="outline-3">
-<h3 id="orgcfd0264"><span class="section-number-3">11.1</span> 客户端和服务器字符集不一致</h3>
+<div id="outline-container-org5cf3583" class="outline-3">
+<h3 id="org5cf3583"><span class="section-number-3">11.1</span> 客户端和服务器字符集不一致</h3>
 <div class="outline-text-3" id="text-11-1">
 <p>
 首先查看一下服务器中的编码格式，最好设置服务器的编码格式为 Unicode
@@ -2565,44 +2558,44 @@ AMERICAN_AMERICA.AL32UTF8
 根据服务器的编码格式来修改客户端的编码格式
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23558;&#23458;&#25143;&#31471;&#20462;&#25913;&#25104;&#33521;&#25991;&#30340; Unicode &#30721;</span>
+<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#23558;&#23458;&#25143;&#31471;&#20462;&#25913;&#25104;&#33521;&#25991;&#30340; Unicode &#30721;</span>
 <span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">NLS_LANG</span>=<span style="color: #2aa198;">"AMERICAN_AMERICA.AL32UTF8"</span>
 
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25110;&#32773;&#30452;&#25509;&#20462;&#25913;&#25104;&#20013;&#25991;&#30340; Unicode &#30721;&#65292;&#35299;&#20915;&#20013;&#25991;&#20081;&#30721;</span>
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25110;&#32773;&#30452;&#25509;&#20462;&#25913;&#25104;&#20013;&#25991;&#30340; Unicode &#30721;&#65292;&#35299;&#20915;&#20013;&#25991;&#20081;&#30721;</span>
 <span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">NLS_LANG</span>=<span style="color: #2aa198;">"SIMPLIFIED CHINESE_CHINA.AL32UTF8"</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orga31da3f" class="outline-3">
-<h3 id="orga31da3f"><span class="section-number-3">11.2</span> 将服务器字符集从 UTF8 强转成 GBK</h3>
+<div id="outline-container-orgacc7e11" class="outline-3">
+<h3 id="orgacc7e11"><span class="section-number-3">11.2</span> 将服务器字符集从 UTF8 强转成 GBK</h3>
 <div class="outline-text-3" id="text-11-2">
 <p>
 修改数据库字符集最好放在在安装数据库的最初阶段，如果修改一个已经运行的数据库
 可能会发生一些不可预料的错误
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#26412;&#25805;&#20316;&#24517;&#39035;&#20351;&#29992; DBA &#26435;&#38480;</span>
+<pre class="src src-sql"><span style="color: #93a1a1; font-style: italic;">-- &#26412;&#25805;&#20316;&#24517;&#39035;&#20351;&#29992; DBA &#26435;&#38480;</span>
 <span style="color: #859900;">CONNECT</span> SYS/oracle <span style="color: #859900;">AS</span> SYSDBA;
 
-<span style="color: #586e75; font-style: italic;">-- &#20851;&#38381;&#36830;&#25509;&#26029;&#24320;&#25152;&#26377;&#24050;&#32463;&#24314;&#31435;&#30340;&#38142;&#25509;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#20851;&#38381;&#36830;&#25509;&#26029;&#24320;&#25152;&#26377;&#24050;&#32463;&#24314;&#31435;&#30340;&#38142;&#25509;</span>
 SHUTDOWN <span style="color: #859900;">IMMEDIATE</span>;
 STARTUP MOUNT;
 
-<span style="color: #586e75; font-style: italic;">-- &#39044;&#20808;&#35774;&#32622;&#22788;&#29702;&#24037;&#20316;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#39044;&#20808;&#35774;&#32622;&#22788;&#29702;&#24037;&#20316;</span>
 <span style="color: #859900;">ALTER</span> <span style="color: #859900;">SYSTEM</span> ENABLE RESTRICTED <span style="color: #859900;">SESSION</span>;
 <span style="color: #859900;">ALTER</span> <span style="color: #859900;">SYSTEM</span> <span style="color: #859900;">SET</span> JOB_QUEUE_PROCESSES=0;
 <span style="color: #859900;">ALTER</span> <span style="color: #859900;">SYSTEM</span> <span style="color: #859900;">SET</span> AQ_TM_PROCESSES=0;
 <span style="color: #859900;">ALTER</span> DATABASE <span style="color: #859900;">OPEN</span>;
 
-<span style="color: #586e75; font-style: italic;">-- ALTER DATABASE CHARACTER SET ZHS16GBK ;</span>
-<span style="color: #586e75; font-style: italic;">-- *ERROR at line 1:</span>
-<span style="color: #586e75; font-style: italic;">-- ORA-12712: new character set must be a superset of old character set</span>
-<span style="color: #586e75; font-style: italic;">-- &#25253;&#23383;&#31526;&#38598;&#19981;&#20860;&#23481;&#65292;&#27492;&#26102;&#19979; INTERNAL_USE &#25351;&#20196;&#19981;&#23545;&#23383;&#31526;&#38598;&#36229;&#38598;&#36827;&#34892;&#26816;&#26597;&#65306;</span>
+<span style="color: #93a1a1; font-style: italic;">-- ALTER DATABASE CHARACTER SET ZHS16GBK ;</span>
+<span style="color: #93a1a1; font-style: italic;">-- *ERROR at line 1:</span>
+<span style="color: #93a1a1; font-style: italic;">-- ORA-12712: new character set must be a superset of old character set</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#25253;&#23383;&#31526;&#38598;&#19981;&#20860;&#23481;&#65292;&#27492;&#26102;&#19979; INTERNAL_USE &#25351;&#20196;&#19981;&#23545;&#23383;&#31526;&#38598;&#36229;&#38598;&#36827;&#34892;&#26816;&#26597;&#65306;</span>
 <span style="color: #859900;">ALTER</span> DATABASE <span style="color: #268bd2;">CHARACTER</span> <span style="color: #859900;">SET</span> INTERNAL_USE ZHS16GBK;
 
-<span style="color: #586e75; font-style: italic;">-- &#37325;&#21551;&#25968;&#25454;&#24211;</span>
+<span style="color: #93a1a1; font-style: italic;">-- &#37325;&#21551;&#25968;&#25454;&#24211;</span>
 SHUTDOWN <span style="color: #859900;">IMMEDIATE</span>;
 STARTUP;
 </pre>
@@ -2623,8 +2616,8 @@ STARTUP;
 </div>
 </div>
 
-<div id="outline-container-org90abdbf" class="outline-3">
-<h3 id="org90abdbf"><span class="section-number-3">11.3</span> ORA-00904: "POLTYP": invalid identifier</h3>
+<div id="outline-container-org45d2414" class="outline-3">
+<h3 id="org45d2414"><span class="section-number-3">11.3</span> ORA-00904: "POLTYP": invalid identifier</h3>
 <div class="outline-text-3" id="text-11-3">
 <p>
 客户端版本如下：
@@ -2659,8 +2652,8 @@ EXP-00000: Export terminated unsuccessfully
 </div>
 </div>
 
-<div id="outline-container-org2b7e86f" class="outline-3">
-<h3 id="org2b7e86f"><span class="section-number-3">11.4</span> ORA-21561: OID generation failed</h3>
+<div id="outline-container-org6375e8b" class="outline-3">
+<h3 id="org6375e8b"><span class="section-number-3">11.4</span> ORA-21561: OID generation failed</h3>
 <div class="outline-text-3" id="text-11-4">
 <p>
 数据库的主机名解析错误
@@ -2671,12 +2664,12 @@ Jesenia.local
 $ ping Jesenia.local
 ping: cannot resolve Jesenia.local: Unknown host
 $ cat /etc/hosts
-<span style="color: #586e75; font-style: italic;">##</span>
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">Host Database</span>
-<span style="color: #586e75; font-style: italic;">#</span>
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">localhost is used to configure the loopback interface</span>
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">when the system is booting.  Do not change this entry.</span>
-<span style="color: #586e75; font-style: italic;">##</span>
+<span style="color: #93a1a1; font-style: italic;">##</span>
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">Host Database</span>
+<span style="color: #93a1a1; font-style: italic;">#</span>
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">localhost is used to configure the loopback interface</span>
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">when the system is booting.  Do not change this entry.</span>
+<span style="color: #93a1a1; font-style: italic;">##</span>
 127.0.0.1 localhost
 255.255.255.255 broadcasthost
 ::1             localhost
@@ -2694,8 +2687,8 @@ $ cat /etc/hosts
 </div>
 </div>
 
-<div id="outline-container-org044c0d2" class="outline-2">
-<h2 id="org044c0d2"><span class="section-number-2">12</span> 参考链接</h2>
+<div id="outline-container-org3ad1a61" class="outline-2">
+<h2 id="org3ad1a61"><span class="section-number-2">12</span> 参考链接</h2>
 <div class="outline-text-2" id="text-12">
 <ol class="org-ol">
 <li><a href="http://www.dbatoolz.com/">Vitaliy Mogilevskiy</a></li>
@@ -2705,7 +2698,7 @@ $ cat /etc/hosts
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-01-11 Sat 12:47. Created by Jinghui Hu at 2019-07-08 Mon 11:04.</p>
+<p class="author">Last Updated 2020-02-22 Sat 19:25. Created by Jinghui Hu at 2019-07-08 Mon 11:04.</p>
 </div>
 </body>
 </html>
