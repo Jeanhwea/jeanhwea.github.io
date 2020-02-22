@@ -41,17 +41,17 @@ def readdir(title, folder, by='name'):
         title=info['title'],
         date=time.strftime('%Y-%m-%d', info['date'])
     ))
-  res = '\n** ' + title + '\n'
+  res = '\n* ' + title + '\n'
   res += '\n'.join(items)
   return res
 
 
 if __name__ == '__main__':
-  content = '* 目录'
-  content += readdir('技术文章', 'article', by='date')
+  # content = '* 目录'
+  content = readdir('技术文章', 'article', by='date')
   content += readdir('编程语言', 'lang', by='name')
   content += readdir('开发工具', 'tool', by='name')
   content += readdir('数据库', 'database', by='name')
   content += readdir('杂文随笔', 'misc', by='date')
   content += '\n'
-  sys.stdout.buffer.write(content.encode("utf8"))
+  sys.stdout.buffer.write(content.encode("utf8").lstrip())
