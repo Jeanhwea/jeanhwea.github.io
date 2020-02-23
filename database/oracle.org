@@ -1,4 +1,5 @@
 #+TITLE: Oracle 关系数据库
+
 #+AUTHOR: Jinghui Hu
 #+EMAIL: hujinghui@buaa.edu.cn
 #+DATE: <2019-07-08 Mon 11:04:00>
@@ -8,7 +9,7 @@
 #+TAGS: oracle database 10g
 
 
-* Oracle 数据库架构
+* Oracle 数据库概述
   Oracle Database，又名 Oracle RDBMS，或简称 Oracle。是甲骨文公司的一款关系数据
   库管理系统。它是在数据库领域一直处于领先地位的产品。可以说 Oracle 数据库系统
   是目前世界上流行的关系数据库管理系统，系统可移植性好、使用方便、功能强，适用
@@ -22,14 +23,11 @@
      - SGA (system global area) 全局共享内存
      - PGA (program global area) 每个 client 都有自己私有的会话内存
      - Background Processes 后台进程
-
    下图展示了 Oracle 的数据库和 client process 交互的细节
-
    [[file:../static/image/2019/09/oracle-instance-and-database.png]]
 
 ** 数据存储结构
    数据存可以分成物理存储好逻辑存储两个部分，两者的联系见下图
-
    [[file:../static/image/2019/09/oracle-segments-tablespaces-datafiles.png]]
 
    物理存储结构当执行 ~CREATE DATABASE~ 时，下面的文件将被创建
@@ -54,421 +52,125 @@
 ** 数据库实例结构
    数据库实例是使用内存数据结构和进程来管理数据库，当应用需要连接数据库时，它将
    会首先连接到一个数据库实例中
-
 *** Oracle 数据进程
-    Oracle 数据库在启动时会启动一系列的数据库实例
-    - client processes 用来运行软件或 Oracle 工具，大部分运行环境是在不同电脑上
-    - background processes 用来处理多个 Oracle 数据库程序，可以进行异步 I/O 或
-      者监控其它 Oracle 数据库。
-    - server processes 和 client processes 与 Oracle 数据库交互，用来完成处理请
-      求
-    Oracle processes 包括 server processes 和 background processes。大多数情况
-    下， Oracle processes 和 client processes 运行在不同电脑中。
+    Oracle Processes 包括 Server Processes 和 Background Processes。大多数情况下，
+    Oracle Processes 和 Client Processes 运行在不同电脑中。 Oracle 数据库在启动
+    时会启动一系列的数据库实例
+    - Client Processes 用来运行软件或 Oracle 工具，大部分运行环境是在不同电脑上
+    - Background Processes 用来处理多个 Oracle 数据库程序，可以进行异步 I/O 或者
+      监控其它 Oracle 数据库。
+    - Server Processes 和 Client Processes 与 Oracle 数据库交互，用来完成处理请求
 
 *** 实例内存结构
     - SGA 是包含一个数据库实例的数据和控制信息的一组共享内存的。例如：SGA 包含
-      cached data blocks 和 shared SQL area
-    - PGA 是包含一个 background processes 和 server processes 实例的数据和控制
-      信息的一组内存区域
+      Cached Data Blocks 和 Shared SQL Area
+    - PGA 是包含一个 Background Processes 和 Server Processes 实例的数据和控制信
+      息的一组内存区域
 
-** 数据库基本知识
-*** SQL 语句的分类
-    - DML 语句（数据库操作语言）： INSERT/UPDATE/DETETE/MERGE
-    - DDL 语句（数据库定义语言）： CREATE/ALTER/DROP/TRUNCATE
-    - DCL 语句（数据库控制语言）： GRANT/REVOKE
-    - 事务控制语句： COMMIT/ROLLBACK/SAVEPOINT
-
-*** Oracle 基本常识
-    - Oracle 数据库中语句不区分大小写，包括登录名的用户名和密码都是不区分大小写的
-    - 一般关键字要求大小
-    - Oracle 的 SELECT 语句必须要加 FROM 语句，如果没有的话使用 dual 伪表
-
-** Ubuntu 18.04 安装数据库
-   安装依赖包
-   #+BEGIN_SRC sh
-     sudo apt-get install -y libaio1 libaio-dev net-tools
-   #+END_SRC
-
-   安装软件包
-   #+BEGIN_SRC sh
-     dpkg --install /assets/oracle-xe_11.2.0-1.0_amd64.deb
-   #+END_SRC
-
-** 参考材料
-   Oracle 家的配套文档还是很好用的，数据库方面主要有下面的文档：
-   1. [[https://docs.oracle.com/cd/E11882_01/server.112/e10897.pdf][2 Day DBA]] - 《两天数据库管理员》
-   2. [[https://docs.oracle.com/cd/E11882_01/server.112/e40540.pdf][Oracle Database Concepts]] - 《Oracle 数据库概念》
-   3. Oracle Database SQL Reference - 《Oracle 数据库 SQL 参考手册》
-   4. [[http://download.oracle.com/docs/cds/E11882_01.zip][E11882_01 离线下载]]
-
-   [[file:../static/image/2019/07/oracle-database-documentation.png]]
-
-* SQL*Plus 命令行工具
-  Oracle 的 SQL*Plus 是与 oracle 数据库进行交互的客户端工具，借助 SQL*Plus 可以
-  查看、修改数据库记录。在 SQL*Plus 中，可以运行 SQL*Plus 命令与 SQL 语句。
-
-** 安装 instantclient
-   在 mac 和 linux 系统中如果只是想要安装一个 sqlplus 的客户端，可以直接安装
-   instantclient 工具
-
-*** macOS
-    mac 下的 Oracle 安装需要下载几个 [[https://www.oracle.com/database/technologies/instant-client/downloads.html][instantclient]] 安装包
-    1. instantclient-basic-macos.x64-11.2.0.4.0.zip
-    2. instantclient-sdk-macos.x64-11.2.0.4.0.zip
-    3. instantclient-sqlplus-macos.x64-11.2.0.4.0.zip
-
-    解压安装包
-    #+BEGIN_SRC sh
-      unzip instantclient-basic-macos.x64-11.2.0.4.0.zip
-      unzip instantclient-sdk-macos.x64-11.2.0.4.0.zip
-      unzip instantclient-sqlplus-macos.x64-11.2.0.4.0.zip
-    #+END_SRC
-
-    解压后生成一个 =instantclient_11_2= 文件夹，直接拷贝到安装的文件夹中
-    #+BEGIN_SRC sh
-      sudo mkdir -p /usr/local/java
-      sudo cp -r instantclient_11_2 /usr/local/java
-    #+END_SRC
-
-    建立软连接
-    #+BEGIN_SRC sh
-      cd /usr/local/java/instantclient_11_2
-      mkdir lib
-
-      ln -s libclntsh.dylib.11.1 libclntsh.dylib
-      ln -s libocci.dylib.11.1 libocci.dylib
-
-      ln -s $PWD/{libclntsh.dylib.11.1,libnnz11.dylib,libociei.dylib} lib/
-      ln -s $PWD/{libsqlplus.dylib,libsqlplusic.dylib} lib/
-    #+END_SRC
-
-    添加环境变量到 .bashrc 中
-    #+BEGIN_SRC sh
-      export PATH="/usr/local/java/instantclient_11_2:$PATH"
-      export DYLD_LIBRARY_PATH="/usr/local/java/instantclient_11_2/lib${DYLD_LIBRARY_PATH:+:${DYLD_LIBRARY_PATH}}"
-    #+END_SRC
-
-*** Linux
-    需要下载的安装文件
-    1. instantclient-basic-linux.x64-11.2.0.4.0.zip
-    2. instantclient-sdk-linux.x64-11.2.0.4.0.zip
-    3. instantclient-sqlplus-linux.x64-11.2.0.4.0.zip
-
-    解压安装包
-    #+BEGIN_SRC sh
-      unzip instantclient-basic-linux.x64-11.2.0.4.0.zip
-      unzip instantclient-sdk-linux.x64-11.2.0.4.0.zip
-      unzip instantclient-sqlplus-linux.x64-11.2.0.4.0.zip
-    #+END_SRC
-
-    构建目录结构
-    #+BEGIN_SRC sh
-      [ ! -d /usr/local/java ] && mkdir -p /usr/local/java
-      sudo mv instantclient_11_2 /usr/local/java
-      cd /usr/local/java/instantclient_11_2
-      sudo mkdir lib
-    #+END_SRC
-
-    建立软连接
-    #+BEGIN_SRC sh
-      ln -s libclntsh.so.11.1 libclntsh.so
-      ln -s libocci.so.11.1 libocci.so
-
-      ln -s $PWD/libclntsh.so.11.1 lib/
-      ln -s $PWD/libnnz11.so lib/
-      ln -s $PWD/libocci.so.11.1 lib/
-      ln -s $PWD/libociei.so lib/
-      ln -s $PWD/libocijdbc11.so lib/
-      ln -s $PWD/libsqlplusic.so lib/
-      ln -s $PWD/libsqlplus.so lib/
-    #+END_SRC
-
-    添加环境变量
-    #+BEGIN_SRC sh
-      export LD_LIBRARY_PATH=/usr/local/java/instantclient_11_2/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-      export PATH=/usr/local/java/instantclient_11_2${PATH:+:${PATH}}
-    #+END_SRC
-
-** 从命令行中连接 SQL*Plus
-   第一种登录方式的命令如下
-
-   #+BEGIN_SRC sh
-     sqlplus username/password@hostname:port/service_id
-   #+END_SRC
-
-   登录过后可以看到成功的登录界面
-
-   [[file:../static/image/2018/11/sqlplus-login.png]]
-
-   第二种登录方式需要使用 tnsnames.ora 这种格式，下面是 Oracle Client 提供的默认
-   样本
-
-   #+BEGIN_SRC text
-     # This is a sample tnsnames.ora that contains the NET8 parameters that are
-     # needed to connect to an HS Agent
-
-     hsagent  =
-       (DESCRIPTION=
-         (ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=1521))
-         (CONNECT_DATA=(SID=hsagent))
-         (HS=)
-       )
-   #+END_SRC
-
-   熟悉了 tnsnames.org 这种格式后就可以编写相应的登录命令，具体方式如下：
-   #+BEGIN_SRC sh
-     sqlplus username/password@"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=service_id)))"
-   #+END_SRC
-
-   当命令中的密码字段中含义有 @ 字段时需要将 password 字段用双引号包起来，如下：
-   #+BEGIN_SRC sh
-     sqlplus user/\"my@password\"@hostname:port/service_id
-   #+END_SRC
-
-** SQL*Plus 启动配置
-   SQL*Plus 启动配置文件为 ~$ORACLE_HOME/sqlplus/admin/glogin.sql~ 。在启动
-   SQL*Plus 时需要预先设置一些启动的基本配置，例如启动的每行显示的字符数量，显示
-   是否折行，分页大小配置等。下面是我常用的配置。
-
+* 关系数据库结构
+** 数据库
    #+BEGIN_SRC sql
-     -- $ORACLE_HOME/sqlplus/admin/glogin.sql
-     -- SET UNDERLINE OFF
-     SET TAB OFF
-     SET VERIFY OFF
-     SET WRAP OFF
-     SET LINESIZE 32767
-     SET PAGESIZE 0
-     SET TRIMOUT ON
-     SET TRIMSPOOL ON
-     SET FEEDBACK ON
-
-     -- 改变当前会话的日期格式
-     ALTER SESSION SET nls_date_format = 'yyyy-mm-dd hh24:mi:ss';
+     select name from v$database;
    #+END_SRC
 
-** SQL*Plus 使用技巧
-*** 添加 readline 的支持
-    sqlplus 本身不支持 readline 的特性，不过可以通过安装 rlwrap 来将 readline 特性添
-    加到 sqlplus 中
-    #+BEGIN_SRC sh
-      # mac
-      brew install rlwrap
-
-      # ubuntu
-      sudo apt-get install -y rlwrap
-    #+END_SRC
-
-    通过 rlwrap 来启动 sqlplus
-    #+BEGIN_SRC sh
-      rlwrap -c sqlplus user/pass@host/sid
-    #+END_SRC
-
-*** 常见命令
-    - 执行本地 SQL 脚本: ~START filename~ 或者 ~@ filename~
-    - 在 SQL*Plus 里面执行 shell 命令: ~HOST cmd~
-    - 将 SQL*Plus 执行的命令存成本地文件: ~SAVE filename~
-    - 装载本地 SQL 脚本，但不立即执行: ~GET filename~
-    - 执行最后一条 SQL 语句: ~/~
-    - 打印最后执行的 SQL 语句: ~L~
-    - 结果输出到文件: ~SPOOL filename~
-    - 查看/修改 SQL*Plus 的环境变量: ~SHOW/SET variablename~
-
-*** 执行 sql 脚本的方法
-    #+BEGIN_SRC sh
-      # 执行 script.sql 脚本后退出,
-      echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql
-
-      # 使用重定向执行 script.sql 脚本
-      sqlplus -S user/pass@host:port/sid < script.sql
-
-      # 使用重定向执行脚本并追加方式输出日志
-      sqlplus -S user/pass@host:port/sid < script.sql >> /tmp/sqlplus.log
-
-      # .sql 文件后缀名不是必须的，例如下面的两句是同样效果的
-      echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql
-      echo 'exit' | sqlplus -S user/pass@host:port/sid @script
-    #+END_SRC
-
-*** 打开/关闭终端输出
+** 表
+*** 创建表
     #+BEGIN_SRC sql
-      SET TERMOUT OFF;
-      -- do a lot of parepare work
-      SET TERMOUT ON;
+      create table [scmname.]tabname (
+        colname dbtype [not null | null] [default default_value] [primary key]
+      );
     #+END_SRC
+    - Oracle 数据库中 =scmname=, =tabname=, 和 =colname= 不加引号默认大写，即使使
+      用小写的名称也会自动转成大写。如果非要使用小写需要使用单引号将名称包起来
+    - Oracle 一张表最多只能有 254 列
+    - dbtype 是数据类型，常见的有 number, varchar2, date，布尔型一般使用
+      ~char(1)~ 或 ~number(1)~ 来模拟
 
-** SQL*Plus 变量使用技巧
-*** 定义和使用变量
-    定义的变量只在一个 SQL*Plus 的会话期间有效
     #+BEGIN_SRC sql
-      -- 定义一个变量
-      DEFINE var = text;
+      create table users (
+        id number(16) primary key not null,
+        created_by varchar2(64) default 'sysman' not null,
+        updated_at date default sysdate not null,
+        valid char(1) default 'y' not null,
+        -- code rule and type
+        code varchar2(32) unique not null,
+        name varchar2(32)
+      );
 
-      -- 读取用户输入，将用户输入放到变量中
-      ACCEPT var;
-
-      -- 在变量名前面添加 & 来使用变量
-      DEFINE MYDATE = 01-FEB-98;
-      SELECT '&MYDATE' FROM DUAL;
+      comment on column users.code is '用户编号, 用于登录';
+      comment on column users.name is '用户名字, 用于显示';
     #+END_SRC
 
-    下面使用一个使用例子
-    #+BEGIN_SRC text
-      SQL> DEFINE MYDATE = 01-FEB-98;
-      SQL> SELECT '&MYDATE' FROM DUAL;
-      原值    1: SELECT '&MYDATE' FROM DUAL
-      新值    1: SELECT '01-FEB-98' FROM DUAL
-
-      '01-FEB-98'
-      ---------------------------
-      01-FEB-98
-
-      SQL>
-    #+END_SRC
-
-*** 将列值赋给变量
-    具体语法如下：
-    #+BEGIN_SRC sql
-      COLUMN colname NEW_VALUE var
-    #+END_SRC
-
-    使用示例
-    #+BEGIN_SRC text
-      SQL> COLUMN len1 NEW_VALUE l1
-      SQL> SELECT MAX(LENGTH(tc.TABLE_NAME)) as len1 FROM USER_TAB_COMMENTS tc;
-
-            LEN1
-      ----------
-              29
-      SQL> SELECT &l1 FROM DUAL;
-      old   1: select &l1 from dual
-      new   1: select         29 from dual
-
-              29
-      ----------
-              29
-      SQL>
-    #+END_SRC
-
-** 给 script.sql 中传入参数
-   在调用脚本时直接将参数写到后面，见下面的例子
-   #+BEGIN_SRC sh
-     echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql arg1 arg2
-   #+END_SRC
-
-   然后在脚本中使用 ~&1~ 引用第一个参数， ~&2~ 引用第二个参数，以此类推
-   #+BEGIN_SRC sql
-     -- script.sql
-     DEFINE arg1 = &1
-     SELECT '&arg1' FROM DUAL;
-   #+END_SRC
-
-* 数据库
-** 查看当前数据库
-   #+BEGIN_SRC sql
-     SELECT NAME FROM V$DATABASE;
-   #+END_SRC
-
-* 表
-** 查看所有表
-   #+BEGIN_SRC sql
-     -- 查看所有表
-     SELECT TABLE_NAME FROM USER_TABLES ORDER BY TABLE_NAME;
-
-     -- 查看所有表和视图，以及注释
-     SELECT tc.TABLE_NAME || ' ' || tc.COMMENTS
-       FROM USER_TAB_COMMENTS tc
-      WHERE tc.TABLE_TYPE in ('TABLE', 'VIEW')
-      ORDER BY tc.TABLE_NAME;
-   #+END_SRC
-
-** 创建表
-   #+BEGIN_SRC sql
-     CREATE TABLE [scmname.]tabname (
-       colname dbtype [NOT NULL | NULL] [DEFAULT DEFAULT_VALUE] [PRIMARY KEY]
-     );
-   #+END_SRC
-   - Oracle 数据库中 =scmname=, =tabname=, 和 =colname= 不加引号默认大写，即使使
-     用小写的名称也会自动转成大写。如果非要使用小写需要使用单引号将名称包起来
-   - Oracle 一张表最多只能有 254 列
-   - dbtype 是数据类型，常见的有 number, varchar2, date，布尔型一般使用
-     ~char(1)~ 或 ~number(1)~ 来模拟
-
-   #+BEGIN_SRC sql
-     CREATE TABLE users (
-       id number(16) PRIMARY KEY NOT NULL,
-       created_by varchar2(64) DEFAULT 'SYSMAN' NOT NULL,
-       updated_at date DEFAULT SYSDATE NOT NULL,
-       valid char(1) DEFAULT 'y' NOT NULL,
-       -- code rule and type
-       code varchar2(32) UNIQUE NOT NULL,
-       name varchar2(32)
-     );
-
-     COMMENT ON COLUMN users.code IS '用户编号, 用于登录';
-     COMMENT ON COLUMN users.name IS '用户名字, 用于显示';
-   #+END_SRC
-
-*** 数据类型
+*** 列数据类型
 **** 数值型
      - ~number(precision[,scale])~ : 数值型，用于表示整数和实数。 precision 表示
        精度，scale 表示数值范围。precision 的取值范围为 1 到 38，scale 的取值范
        围为 -84 到 127
 
 **** 字符串
-     - ~varchar2(size[BYTE|CHAR])~ : 变长字符串类型，size 表示字符串最大长度，单
-       位可以是 BYTE 或 CHAR。 size 的取值范围为 1 到 4000。单位 BYTE 表示所用的
-       字节数，单位 CHAR 表示所用的字符（character）数
-     - ~nvarchar2(size)~ : 边长 Unicode 编码字符串类型， =AL16UTF16= 字符编码的
-       byte 数是 =UTF8= 字符编码的三倍，所以 nvarchar2 的 size 取决于具体的编码集。
-       size 的取值范围为 1 到 4000
-     - ~char(size[BYTE|CHAR])~ : 定长字符串类型，size 的取值范围是 1 到 2000 。
-       单位 BYTE 和单位 CHAR 语义一样都是表示字符（character）数
-     - ~long~ : 2GB 的超长字符串。 _每张表只允许一列是 long 类型_
+     - ~varchar2(size[byte|char])~ : 变长字符串类型，size 表示字符串最大长度，单
+       位可以是 byte 或 char。 size 的取值范围为 1 到 4000。单位 byte 表示所用的
+       字节数，单位 char 表示所用的字符（character）数
+     - ~nvarchar2(size)~ : 边长 unicode 编码字符串类型， =al16utf16= 字符编码的
+       byte 数是 =utf8= 字符编码的三倍，所以 nvarchar2 的 size 取决于具体的编码
+       集。size 的取值范围为 1 到 4000
+     - ~char(size[byte|char])~ : 定长字符串类型，size 的取值范围是 1 到 2000 。
+       单位 byte 和单位 char 语义一样都是表示字符（character）数
+     - ~long~ : 2gb 的超长字符串。 _每张表只允许一列是 long 类型_
 
 **** 时间/日期类型
      - ~date~ : 时间和日期类型。 Oracle 的时间和日期都用 date 类型表示， 默认的
-       时间格式字符由 ~NLS_DATE_FORMAT~ 参数决定，它是 =DD-MMM-YY= 格式，例如：
-       '13-OCT-92', '07-JAN-98' 。
+       时间格式字符由 ~NLS_DATE_FORMAT~ 参数决定，它是 =DD-MMM-YY= 格式，例
+       如：'13-OCT-92', '07-JAN-98' 。
 
 **** 二进制 Lob
      - ~clob~ : 最多可以存储 4GB 的数据字符的大对象（character data of large
        object）
      - ~blob~ : 最多可以存储 4GB 数据的二进制大对象（binary large object）
 
-** 修改表
-   #+BEGIN_SRC sql
-     -- 添加一列
-     ALTER TABLE tabname ADD colname varchar2;
-     COMMENT ON COLUMN tabname.colname IS 'comments';
+*** 修改表结构
+    #+BEGIN_SRC sql
+      -- 添加一列
+      alter table tabname add colname varchar2;
+      comment on column tabname.colname is 'comments';
+      alter table t_employee_base add column is_active char(1) default 'n';
+      comment on column t_employee_base.is_active is '用户是否激活，默认为 n，表示未激活';
+      -- 删除一列
+      alter table tabname drop column colname;
+      -- 添加主键
+      alter table tabname add primary key ("pk_name");
+      -- 重命名列
+      alter table tabname rename column oldcol to newcol;
+    #+END_SRC
+*** 查看所有表
+    #+BEGIN_SRC sql
+      -- 查看所有表
+      select table_name from user_tables order by table_name;
+      -- 查看所有表和视图，以及注释
+      select
+        a.table_name || ' ' || a.comments
+      from
+        user_tab_comments a
+      where
+        a.table_type in ('table', 'view')
+      order by
+        a.table_name;
+    #+END_SRC
 
-     ALTER TABLE t_employee_base ADD COLUMN is_active char(1) DEFAULT 'n';
-     COMMENT ON COLUMN t_employee_base.is_active IS '用户是否激活，默认为 n，表示未激活';
-
-     -- 删除一列
-     ALTER TABLE tabname DROP COLUMN colname;
-
-     -- 添加主键
-     ALTER TABLE tabname ADD PRIMARY KEY ("pk_name");
-
-     -- 重命名列
-     ALTER TABLE tabname RENAME COLUMN oldcol TO newcol;
-   #+END_SRC
-
-* 数据操作：增删改查
-** 查询 SELECT
+* 数据存取
+** 简单查询语句
    #+BEGIN_SRC sql
      -- 选取全部列
-     SELECT * FROM emp;
-
+     select * from emp;
      -- 选取部分列
-     SELECT empno, hiredate FROM emp;
+     select empno, hiredate from emp;
    #+END_SRC
 
 * 用户、角色和权限
 ** 查看当前用户
    #+BEGIN_SRC sql
-     SHOW USER;
-     SELECT USER FROM DUAL;
+     show user;
+     select user from dual;
    #+END_SRC
 
    例如：
@@ -481,34 +183,32 @@
 
 ** 创建/解锁用户
    #+BEGIN_SRC sql
-     CREATE USER <username> IDENTIFIED BY <password>;
-
-     ALTER USER <username> ACCOUNT UNLOCK IDENTIFIED BY <password>;
-
-     ALTER USER hr ACCOUNT UNLOCK IDENTIFIED BY hr;
+     create user <username> identified by <password>;
+     alter user <username> account unlock identified by <password>;
+     alter user hr account unlock identified by hr;
    #+END_SRC
 
 ** 删除用户
    #+BEGIN_SRC sql
-     DROP USER <username>;
+     drop user <username>;
    #+END_SRC
 
 ** 修改用户密码
    有时候修改用户密码但是不知道用户的原始密码，可以添加 =VALUES= 传入的是数据库
    加密后的密码字符串
    #+BEGIN_SRC sql
-     ALTER USER <username> IDENTIFIED BY <password>;
-     ALTER USER <username> IDENTIFIED BY VALUES <encrypted_password>;
+     alter user <username> identified by <password>;
+     alter user <username> identified by values <encrypted_password>;
    #+END_SRC
 
 ** 角色和授权
    #+BEGIN_SRC sql
      -- 创建角色
-     CREATE ROLE <rolename> IDENTIFIED BY <password>;
+     create role <rolename> identified by <password>;
      -- 授权用户
-     GRANT ALL ON <database>.* TO <username>;
+     grant all on <schema>.* to <username>;
      -- 解除授权
-     REVOKE ALL ON <database>.* FROM <username>;
+     revoke all on <schema>.* from <username>;
    #+END_SRC
 
 * 内置函数
@@ -1170,7 +870,6 @@
     #+END_SRC
 
 * 一些使用场景
-
 ** 创建新的表空间以及用户
 *** 创建数据储存的目录
     Oracle 数据库的表空间的存储目录需要显示创建
@@ -1534,6 +1233,297 @@
    #+BEGIN_SRC sh
      sudo echo "127.0.0.1 $(hostname)" >> /etc/hosts
    #+END_SRC
+
+* SQL*Plus 命令行
+  Oracle 的 SQL*Plus 是与 Oracle 数据库进行交互的客户端工具，借助 SQL*Plus 可以
+  查看、修改数据库记录。在 SQL*Plus 中，可以运行 SQL*Plus 命令与 SQL 语句。
+** 安装 instantclient
+   在 mac 和 linux 系统中如果只是想要安装一个 sqlplus 的客户端，可以直接安装
+   instantclient 工具
+
+*** macOS
+    mac 下的 Oracle 安装需要下载几个 [[https://www.oracle.com/database/technologies/instant-client/downloads.html][instantclient]] 安装包
+    1. instantclient-basic-macos.x64-11.2.0.4.0.zip
+    2. instantclient-sdk-macos.x64-11.2.0.4.0.zip
+    3. instantclient-sqlplus-macos.x64-11.2.0.4.0.zip
+
+    解压安装包
+    #+BEGIN_SRC sh
+      unzip instantclient-basic-macos.x64-11.2.0.4.0.zip
+      unzip instantclient-sdk-macos.x64-11.2.0.4.0.zip
+      unzip instantclient-sqlplus-macos.x64-11.2.0.4.0.zip
+    #+END_SRC
+
+    解压后生成一个 =instantclient_11_2= 文件夹，直接拷贝到安装的文件夹中
+    #+BEGIN_SRC sh
+      sudo mkdir -p /usr/local/java
+      sudo cp -r instantclient_11_2 /usr/local/java
+    #+END_SRC
+
+    建立软连接
+    #+BEGIN_SRC sh
+      cd /usr/local/java/instantclient_11_2
+      mkdir lib
+
+      ln -s libclntsh.dylib.11.1 libclntsh.dylib
+      ln -s libocci.dylib.11.1 libocci.dylib
+
+      ln -s $PWD/{libclntsh.dylib.11.1,libnnz11.dylib,libociei.dylib} lib/
+      ln -s $PWD/{libsqlplus.dylib,libsqlplusic.dylib} lib/
+    #+END_SRC
+
+    添加环境变量到 .bashrc 中
+    #+BEGIN_SRC sh
+      export PATH="/usr/local/java/instantclient_11_2:$PATH"
+      export DYLD_LIBRARY_PATH="/usr/local/java/instantclient_11_2/lib${DYLD_LIBRARY_PATH:+:${DYLD_LIBRARY_PATH}}"
+    #+END_SRC
+
+*** Linux
+    需要下载的安装文件
+    1. instantclient-basic-linux.x64-11.2.0.4.0.zip
+    2. instantclient-sdk-linux.x64-11.2.0.4.0.zip
+    3. instantclient-sqlplus-linux.x64-11.2.0.4.0.zip
+
+    解压安装包
+    #+BEGIN_SRC sh
+      unzip instantclient-basic-linux.x64-11.2.0.4.0.zip
+      unzip instantclient-sdk-linux.x64-11.2.0.4.0.zip
+      unzip instantclient-sqlplus-linux.x64-11.2.0.4.0.zip
+    #+END_SRC
+
+    构建目录结构
+    #+BEGIN_SRC sh
+      [ ! -d /usr/local/java ] && mkdir -p /usr/local/java
+      sudo mv instantclient_11_2 /usr/local/java
+      cd /usr/local/java/instantclient_11_2
+      sudo mkdir lib
+    #+END_SRC
+
+    建立软连接
+    #+BEGIN_SRC sh
+      ln -s libclntsh.so.11.1 libclntsh.so
+      ln -s libocci.so.11.1 libocci.so
+
+      ln -s $PWD/libclntsh.so.11.1 lib/
+      ln -s $PWD/libnnz11.so lib/
+      ln -s $PWD/libocci.so.11.1 lib/
+      ln -s $PWD/libociei.so lib/
+      ln -s $PWD/libocijdbc11.so lib/
+      ln -s $PWD/libsqlplusic.so lib/
+      ln -s $PWD/libsqlplus.so lib/
+    #+END_SRC
+
+    添加环境变量
+    #+BEGIN_SRC sh
+      export LD_LIBRARY_PATH=/usr/local/java/instantclient_11_2/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+      export PATH=/usr/local/java/instantclient_11_2${PATH:+:${PATH}}
+    #+END_SRC
+
+** 从命令行中连接 SQL*Plus
+   第一种登录方式的命令如下
+
+   #+BEGIN_SRC sh
+     sqlplus username/password@hostname:port/service_id
+   #+END_SRC
+
+   登录过后可以看到成功的登录界面
+
+   [[file:../static/image/2018/11/sqlplus-login.png]]
+
+   第二种登录方式需要使用 tnsnames.ora 这种格式，下面是 Oracle Client 提供的默认
+   样本
+
+   #+BEGIN_SRC text
+     # This is a sample tnsnames.ora that contains the NET8 parameters that are
+     # needed to connect to an HS Agent
+
+     hsagent  =
+       (DESCRIPTION=
+         (ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=1521))
+         (CONNECT_DATA=(SID=hsagent))
+         (HS=)
+       )
+   #+END_SRC
+
+   熟悉了 tnsnames.org 这种格式后就可以编写相应的登录命令，具体方式如下：
+   #+BEGIN_SRC sh
+     sqlplus username/password@"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=service_id)))"
+   #+END_SRC
+
+   当命令中的密码字段中含义有 @ 字段时需要将 password 字段用双引号包起来，如下：
+   #+BEGIN_SRC sh
+     sqlplus user/\"my@password\"@hostname:port/service_id
+   #+END_SRC
+
+** SQL*Plus 启动配置
+   SQL*Plus 启动配置文件为 ~$ORACLE_HOME/sqlplus/admin/glogin.sql~ 。在启动
+   SQL*Plus 时需要预先设置一些启动的基本配置，例如启动的每行显示的字符数量，显示
+   是否折行，分页大小配置等。下面是我常用的配置。
+
+   #+BEGIN_SRC sql
+     -- $ORACLE_HOME/sqlplus/admin/glogin.sql
+     -- SET UNDERLINE OFF
+     SET TAB OFF
+     SET VERIFY OFF
+     SET WRAP OFF
+     SET LINESIZE 32767
+     SET PAGESIZE 0
+     SET TRIMOUT ON
+     SET TRIMSPOOL ON
+     SET FEEDBACK ON
+
+     -- 改变当前会话的日期格式
+     ALTER SESSION SET nls_date_format = 'yyyy-mm-dd hh24:mi:ss';
+   #+END_SRC
+
+** SQL*Plus 使用技巧
+*** 添加 readline 的支持
+    sqlplus 本身不支持 readline 的特性，不过可以通过安装 rlwrap 来将 readline 特性添
+    加到 sqlplus 中
+    #+BEGIN_SRC sh
+      # mac
+      brew install rlwrap
+
+      # ubuntu
+      sudo apt-get install -y rlwrap
+    #+END_SRC
+
+    通过 rlwrap 来启动 sqlplus
+    #+BEGIN_SRC sh
+      rlwrap -c sqlplus user/pass@host/sid
+    #+END_SRC
+
+*** 常见命令
+    - 执行本地 SQL 脚本: ~START filename~ 或者 ~@ filename~
+    - 在 SQL*Plus 里面执行 shell 命令: ~HOST cmd~
+    - 将 SQL*Plus 执行的命令存成本地文件: ~SAVE filename~
+    - 装载本地 SQL 脚本，但不立即执行: ~GET filename~
+    - 执行最后一条 SQL 语句: ~/~
+    - 打印最后执行的 SQL 语句: ~L~
+    - 结果输出到文件: ~SPOOL filename~
+    - 查看/修改 SQL*Plus 的环境变量: ~SHOW/SET variablename~
+
+*** 执行 sql 脚本的方法
+    #+BEGIN_SRC sh
+      # 执行 script.sql 脚本后退出,
+      echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql
+
+      # 使用重定向执行 script.sql 脚本
+      sqlplus -S user/pass@host:port/sid < script.sql
+
+      # 使用重定向执行脚本并追加方式输出日志
+      sqlplus -S user/pass@host:port/sid < script.sql >> /tmp/sqlplus.log
+
+      # .sql 文件后缀名不是必须的，例如下面的两句是同样效果的
+      echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql
+      echo 'exit' | sqlplus -S user/pass@host:port/sid @script
+    #+END_SRC
+
+*** 打开/关闭终端输出
+    #+BEGIN_SRC sql
+      SET TERMOUT OFF;
+      -- do a lot of parepare work
+      SET TERMOUT ON;
+    #+END_SRC
+
+** SQL*Plus 变量使用技巧
+*** 定义和使用变量
+    定义的变量只在一个 SQL*Plus 的会话期间有效
+    #+BEGIN_SRC sql
+      -- 定义一个变量
+      DEFINE var = text;
+
+      -- 读取用户输入，将用户输入放到变量中
+      ACCEPT var;
+
+      -- 在变量名前面添加 & 来使用变量
+      DEFINE MYDATE = 01-FEB-98;
+      SELECT '&MYDATE' FROM DUAL;
+    #+END_SRC
+
+    下面使用一个使用例子
+    #+BEGIN_SRC text
+      SQL> DEFINE MYDATE = 01-FEB-98;
+      SQL> SELECT '&MYDATE' FROM DUAL;
+      原值    1: SELECT '&MYDATE' FROM DUAL
+      新值    1: SELECT '01-FEB-98' FROM DUAL
+
+      '01-FEB-98'
+      ---------------------------
+      01-FEB-98
+
+      SQL>
+    #+END_SRC
+
+*** 将列值赋给变量
+    具体语法如下：
+    #+BEGIN_SRC sql
+      COLUMN colname NEW_VALUE var
+    #+END_SRC
+
+    使用示例
+    #+BEGIN_SRC text
+      SQL> COLUMN len1 NEW_VALUE l1
+      SQL> SELECT MAX(LENGTH(tc.TABLE_NAME)) as len1 FROM USER_TAB_COMMENTS tc;
+
+            LEN1
+      ----------
+              29
+      SQL> SELECT &l1 FROM DUAL;
+      old   1: select &l1 from dual
+      new   1: select         29 from dual
+
+              29
+      ----------
+              29
+      SQL>
+    #+END_SRC
+
+** 给 script.sql 中传入参数
+   在调用脚本时直接将参数写到后面，见下面的例子
+   #+BEGIN_SRC sh
+     echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql arg1 arg2
+   #+END_SRC
+
+   然后在脚本中使用 ~&1~ 引用第一个参数， ~&2~ 引用第二个参数，以此类推
+   #+BEGIN_SRC sql
+     -- script.sql
+     DEFINE arg1 = &1
+     SELECT '&arg1' FROM DUAL;
+   #+END_SRC
+
+* 杂项
+** 数据库基本知识
+*** SQL 语句的分类
+    - DML 语句（数据库操作语言）： INSERT/UPDATE/DETETE/MERGE
+    - DDL 语句（数据库定义语言）： CREATE/ALTER/DROP/TRUNCATE
+    - DCL 语句（数据库控制语言）： GRANT/REVOKE
+    - 事务控制语句： COMMIT/ROLLBACK/SAVEPOINT
+
+*** Oracle 基本常识
+    - Oracle 数据库中语句不区分大小写，包括登录名的用户名和密码都是不区分大小写的
+    - 一般关键字要求大小
+    - Oracle 的 SELECT 语句必须要加 FROM 语句，如果没有的话使用 dual 伪表
+
+** Ubuntu 18.04 安装数据库
+   安装依赖包
+   #+BEGIN_SRC sh
+     sudo apt-get install -y libaio1 libaio-dev net-tools
+   #+END_SRC
+
+   安装软件包
+   #+BEGIN_SRC sh
+     dpkg --install /assets/oracle-xe_11.2.0-1.0_amd64.deb
+   #+END_SRC
+
+** 参考材料
+   Oracle 家的配套文档还是很好用的，数据库方面主要有下面的文档：
+   1. [[https://docs.oracle.com/cd/E11882_01/server.112/e10897.pdf][2 Day DBA]] - 《两天数据库管理员》
+   2. [[https://docs.oracle.com/cd/E11882_01/server.112/e40540.pdf][Oracle Database Concepts]] - 《Oracle 数据库概念》
+   3. Oracle Database SQL Reference - 《Oracle 数据库 SQL 参考手册》
+   4. [[http://download.oracle.com/docs/cds/E11882_01.zip][E11882_01 离线下载]]
+
+   [[file:../static/image/2019/07/oracle-database-documentation.png]]
 
 * 参考链接
   1. [[http://www.dbatoolz.com/][Vitaliy Mogilevskiy]]
