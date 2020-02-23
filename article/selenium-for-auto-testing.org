@@ -1,0 +1,82 @@
+#+TITLE: Title
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2020-02-23 Sun 13:13:06>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: selenium auto-testing web frontend
+
+
+* 前言
+  [[https://www.selenium.dev/][Selenium]] 是一个用于 Web 应用程序测试的工具。 Selenium 测试直接运行在浏览器中，
+  就像真正的用户在操作一样。支持的浏览器包括 IE（7, 8, 9, 10, 11），Firefox，
+  Safari，Chrome，Opera 等。 使用 python 爬虫调用 selenium 来模拟正常用户访问浏
+  览器
+
+* 安装与配置
+** Chrome Driver
+   安装 Chrome Driver, 该工具供 Selenium 使用 Chrome. 下载前先查看本地环境的
+   Chrome 版本, 然后去上面的 [[http://npm.taobao.org/mirrors/chromedriver/][taobao mirror]] 中下载对应的 ChromeDriver 版本.
+
+   | ChromeDriver |     Chrome |
+   |--------------+------------|
+   | v2.37        |     v64-66 |
+   | v2.36        |     v63-65 |
+   | v2.35        |     v62-64 |
+   | v2.34        |     v61-63 |
+   | v2.33        |     v60-62 |
+   | v2.32        |     v59-61 |
+   | v2.31        |     v58-60 |
+   | v2.30        |     v58-60 |
+   | v2.29        |     v56-58 |
+   | v2.28        |     v55-57 |
+   | v2.27        |     v54-56 |
+   | v2.26        |     v53-55 |
+   | v2.25        |     v53-55 |
+   | v2.24        |     v52-54 |
+   | v2.23        |     v51-53 |
+
+   将下载的 ChromeDriver 进行解压,将解压后的文件移动到 =/usr/loacl/bin= 目录中.
+
+   #+BEGIN_SRC text
+     $ chromedriver -v
+     ChromeDriver 81.0.4044.20 (f006328e39a9769596eb506c8841c3004b24e747-refs/branch-heads/4044@{#244})
+   #+END_SRC
+
+** Firefox Driver
+   [[https://github.com/mozilla/geckodriver/releases][Firefox Driver]] 下载方式类似
+
+   #+BEGIN_SRC text
+     $ ./geckodriver --version
+     geckodriver 0.26.0 (e9783a644016 2019-10-10 13:38 +0000)
+
+     The source code of this program is available from
+     testing/geckodriver in https://hg.mozilla.org/mozilla-central.
+
+     This program is subject to the terms of the Mozilla Public License 2.0.
+     You can obtain a copy of the license at https://mozilla.org/MPL/2.0/.
+   #+END_SRC
+
+** Selenium
+   #+BEGIN_SRC sh
+     pip3 install selenium
+   #+END_SRC
+
+* 使用
+  文档详细见 [[https://www.selenium.dev/documentation/en/][doc]]
+** Chrome 有界面运行
+   #+BEGIN_SRC python
+     #!/usr/bin/env python3
+     from selenium import webdriver
+     from selenium.webdriver.common.by import By
+     from selenium.webdriver.common.keys import Keys
+     from selenium.webdriver.support.ui import WebDriverWait
+     from selenium.webdriver.support.expected_conditions import presence_of_element_located
+
+     #This example requires Selenium WebDriver 3.13 or newer
+     with webdriver.Chrome() as driver:
+       wait = WebDriverWait(driver, 10)
+       driver.get("http://www.baidu.com")
+       driver.quit()
+   #+END_SRC
