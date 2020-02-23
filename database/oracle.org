@@ -15,16 +15,16 @@
   案。
 
 ** Oracle 数据库架构
-*** Database 和 Instance
+*** 数据库和实例
     - Database 指的是存放于磁盘中的一系列文件，Database 是独立于 Database
       Instance
     - Database Instance 指定是用于管理 Database 文件的一系列内存数据结构。
       Instance 包含：
       - SGA (system global area) 全局共享内存
+      - PGA (program global area) 每个 client 都有自己私有的会话内存
       - Background Processes 后台进程
 
-    下图展示了 Oracle 的数据库和 client process 交互的细节，每个 client 都有自己
-    私有的会话内存，通常称之为 PGA (program global area)
+    下图展示了 Oracle 的数据库和 client process 交互的细节
 
     [[file:../static/image/2019/09/oracle-instance-and-database.png]]
 
@@ -34,10 +34,9 @@
     [[file:../static/image/2019/09/oracle-segments-tablespaces-datafiles.png]]
 
     物理存储结构当执行 ~CREATE DATABASE~ 时，下面的文件将被创建
-    - ** (Data files) 包含所有的数据库的数据，数据的逻辑结构例如表、索引都是存储在
-      Data files
-    - Control files 包含物理结构的一些元信息，例如：数据库名称和数据库文件的路径
-    - Online redo log files 包含 redo 的日志文件，每个 redo log 由一系列的 redo
+    - *数据文件* (Data files) 包含所有的数据库的数据，数据的逻辑结构例如表、索引都是存储在数据文件
+    - *控制文件* (Control files) 包含物理结构的一些元信息，例如：数据库名称和数据库文件的路径
+    - *重做日志* (Online Redo Log files) 包含重做的日志文件，每个重做日志由一系列的 redo
       entires (也被称为 redo records)组成
     - 还一些其他的物理文件 例如：parameter files, diagnostic files, backup
       files, archived redo log files 等
