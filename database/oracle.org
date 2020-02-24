@@ -209,12 +209,17 @@
 
 ** 分区，视图，序列，同义词等其它结构
 *** 分区
-    分区主要包含以下要点
+    分区指的是对数据量较大，访问速度较慢的表进行分成几个子区域进行管理。分区表包
+    含 *一个或多个* 分区，注意包含一个分区的分区表和不分区表是不同的，包含一个分
+    区的分区表可以添加新的分区，而不分区表却不能添加新的分区。
+
+    分区主要包含以下要素
     - 分区键 (Partition Key)
     - 分区策略 (Partition Strategies)，常见的分区有一下几种
       + 基于范围的分区 (Range Partition)
       + 基于列表的分区 (List Partition)
       + 基于哈希的分区 (Hash Partition)
+
 *** 创建分区表
     创建分区表主要是在 ~create table~ 语句后面加 ~partition by~ 来说明分区策略
 
@@ -264,6 +269,28 @@
         amount_sold number (10, 2)
       ) partition by hash (prod_id) partitions 2;
     #+END_SRC
+*** 分区索引
+    分区表和不分区表建索引也是不同的。分区表的索引包含全局索引 (Global Indexes)
+    和局部索引 (Local Indexes)。局部索引根据局部索引策略的不同又分成了 Local
+    Prefixed Indexes 和 Local NonPrefixed Indexes 两类
+
+    对于索引有以下几个注意点：
+    - 分区的列必须是主机列的一个子集
+    - 第二分区索引可以进行局部分区或者全局分区
+    - 溢出的数据会被均分到各个分区中，而不会堆积在某一个单独的分区
+
+    创建分区表的索引方法如下
+    #+BEGIN_SRC sql
+      -- 创建分区表的局部索引
+      create index hash_sales_idx on hash_sales (time_id) local;
+      -- 创建分区表的全局索引
+      create index time_channel_sales_idx on time_range_sales (channel_id) global
+        partition by range (channel_id) (
+          partition p1 values less than (3),
+          partition p2 values less than (4),
+          partition p3 values less than (maxvalue));
+    #+END_SRC
+
 * 数据存取
 ** 简单查询语句
    #+BEGIN_SRC sql
