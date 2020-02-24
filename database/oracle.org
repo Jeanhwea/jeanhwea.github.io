@@ -598,111 +598,110 @@
     #+END_SRC
 
 * 数据存取
-** SQL
-*** SQL 语句的分类
-    1. DDL (Data Definition Language) 是数据定义语言
-    2. DML (Data Manipulation Language) 是数据操作语言
-    3. TCS (Transaction Control Statements) 是事务控制语句
+** SQL 语句的分类
+   1. DDL (Data Definition Language) 是数据定义语言
+   2. DML (Data Manipulation Language) 是数据操作语言
+   3. TCS (Transaction Control Statements) 是事务控制语句
 
-*** DDL 语句
-    DDL 语句包括如下几类：
-    - 创建，修改和删除数据库对象的语句，大多数以 ~create~, ~alter~ 和 ~drop~ 开头
-    - 删除数据库对象中的所有的数据的语句， ~truncate~
-    - 授权和取消权限的语句， ~grant~, ~revoke~
-    - 修改审计相关选项， ~audit~, ~noaudit~
-    - 添加注释到数据字典的语句， ~comment~
+** DDL 语句
+   DDL 语句包括如下几类：
+   - 创建，修改和删除数据库对象的语句，大多数以 ~create~, ~alter~ 和 ~drop~ 开头
+   - 删除数据库对象中的所有的数据的语句， ~truncate~
+   - 授权和取消权限的语句， ~grant~, ~revoke~
+   - 修改审计相关选项， ~audit~, ~noaudit~
+   - 添加注释到数据字典的语句， ~comment~
 
-    *执行 DDL 语句相当于隐式提交事务*, 常见的 DDL 语句如下：
+   *执行 DDL 语句相当于隐式提交事务*, 常见的 DDL 语句如下：
+   #+BEGIN_SRC sql
+     create table plants (
+       plant_id number primary key,
+       common_name varchar2(15)
+     );
+
+     alter table plants add (latin_name varchar2(40));
+     grant select on plants to scott;
+     revoke select on plants from scott;
+     drop table plants;
+   #+END_SRC
+
+** DML 语句
+   DML 语句操作数据库已经存在的数据，主要有以下几类：
+   - 获取数据库表和视图中的数据 ~select~
+   - 将数据或子查询的数据插入表 ~insert~
+   - 修改表的数据值 ~update~
+   - 更新或插入列到表或视图中 ~merge~
+   - 删除表或视图中的列 ~delete~
+   - 查看执行计划 ~explain plan~
+   - 锁表或锁视图 ~lock table~
+   #+BEGIN_SRC sql
+     select * from employees;
+     insert into
+       employees (employee_id, last_name, email, job_id, hire_date, salary)
+       values (1234, 'Mascis', 'JMASCIS', 'IT_PROG', '14-FEB-2011', 9000);
+     update employees set salary=9100 where employee_id=1234;
+     delete from employees where employee_id=1234;
+   #+END_SRC
+
+*** 查询语句
+*** Select 语句
+    Select 查询语句是最常见的 DML，并且大多数和数据库打交道的工作就是查数据，下面
+    是一个查询的例子
     #+BEGIN_SRC sql
-      create table plants (
-        plant_id number primary key,
-        common_name varchar2(15)
-      );
-
-      alter table plants add (latin_name varchar2(40));
-      grant select on plants to scott;
-      revoke select on plants from scott;
-      drop table plants;
+      select email, department_name
+        from employees join departments
+          on employees.department_id = departments.department_id
+      where employee_id in (100,103)
+      order by email;
     #+END_SRC
 
-*** DML 语句
-    DML 语句操作数据库已经存在的数据，主要有以下几类：
-    - 获取数据库表和视图中的数据 ~select~
-    - 将数据或子查询的数据插入表 ~insert~
-    - 修改表的数据值 ~update~
-    - 更新或插入列到表或视图中 ~merge~
-    - 删除表或视图中的列 ~delete~
-    - 查看执行计划 ~explain plan~
-    - 锁表或锁视图 ~lock table~
+    Join 类型有以下几种：
+    - ~inner join~ 内连接，默认连接方法，只有满足条件的才返回
+    - ~outer join~ 外链接，外链接包括 ~left outer join~ 和 ~right outer join~ ，
+      外链接将一段的数据全量返回，如果不满足条件的补 NULL
+    - 笛卡尔积，对待处理表的所有排列，即笛卡尔积进行返回
+
     #+BEGIN_SRC sql
-      select * from employees;
-      insert into
-        employees (employee_id, last_name, email, job_id, hire_date, salary)
-        values (1234, 'Mascis', 'JMASCIS', 'IT_PROG', '14-FEB-2011', 9000);
-      update employees set salary=9100 where employee_id=1234;
-      delete from employees where employee_id=1234;
+      -- 左连接，如果有些员工没有部门 ID 对应的部门名称返回 NULL
+      select email, department_name
+        from employees left join departments
+          on employees.department_id = departments.department_id
+      where employee_id in (100,103)
+      order by email;
+
+      -- 笛卡尔积，返回所有员工和部门的排列
+      select employee_name, department_name
+        from employees, departments
+      order by employee_name, department_name;
+    #+END_SRC
+*** 子查询和隐式查询
+    如果一个查询包含在另外一个查询语句中，则该语句被称为子查询 (subquery)
+    #+BEGIN_SRC sql
+      select first_name, last_name
+      from employees
+      where department_id in
+          (select department_id -- 子查询
+           from departments
+           where location_id = 1800);
     #+END_SRC
 
-**** 查询语句
-**** Select 语句
-     Select 查询语句是最常见的 DML，并且大多数和数据库打交道的工作就是查数据，下面
-     是一个查询的例子
-     #+BEGIN_SRC sql
-       select email, department_name
-         from employees join departments
-           on employees.department_id = departments.department_id
-       where employee_id in (100,103)
-       order by email;
-     #+END_SRC
-
-     Join 类型有以下几种：
-     - ~inner join~ 内连接，默认连接方法，只有满足条件的才返回
-     - ~outer join~ 外链接，外链接包括 ~left outer join~ 和 ~right outer join~ ，
-       外链接将一段的数据全量返回，如果不满足条件的补 NULL
-     - 笛卡尔积，对待处理表的所有排列，即笛卡尔积进行返回
-
-     #+BEGIN_SRC sql
-       -- 左连接，如果有些员工没有部门 ID 对应的部门名称返回 NULL
-       select email, department_name
-         from employees left join departments
-           on employees.department_id = departments.department_id
-       where employee_id in (100,103)
-       order by email;
-
-       -- 笛卡尔积，返回所有员工和部门的排列
-       select employee_name, department_name
-         from employees, departments
-       order by employee_name, department_name;
-     #+END_SRC
-**** 子查询和隐式查询
-     如果一个查询包含在另外一个查询语句中，则该语句被称为子查询 (subquery)
-     #+BEGIN_SRC sql
-       select first_name, last_name
-       from employees
-       where department_id in
-           (select department_id -- 子查询
-            from departments
-            where location_id = 1800);
-     #+END_SRC
-
-     隐式查询指一些语句没有使用 ~select~ 关键字，但实际上执行了查询结果集
-     #+BEGIN_SRC sql
-       update employees set salary = salary * 1.1 where last_name = 'Baer';
-     #+END_SRC
-
-*** TCS 语句
+    隐式查询指一些语句没有使用 ~select~ 关键字，但实际上执行了查询结果集
     #+BEGIN_SRC sql
-      set transaction name 'Update salaries';
-      savepoint before_salary_update;
-
-      update employees set salary = 9100 where employee_id = 1234; -- DML
-      -- 这里回退了，上一句 DML 实际不会被提交
-      rollback to savepoint before_salary_update;
-
-      -- 这里提交了，上一句 DML 才会生效
-      update employees set salary = 9200 where employee_id = 1234; -- DML
-      commit comment 'Updated salaries';
+      update employees set salary = salary * 1.1 where last_name = 'Baer';
     #+END_SRC
+
+** TCS 语句
+   #+BEGIN_SRC sql
+     set transaction name 'Update salaries';
+     savepoint before_salary_update;
+
+     update employees set salary = 9100 where employee_id = 1234; -- DML
+     -- 这里回退了，上一句 DML 实际不会被提交
+     rollback to savepoint before_salary_update;
+
+     -- 这里提交了，上一句 DML 才会生效
+     update employees set salary = 9200 where employee_id = 1234; -- DML
+     commit comment 'Updated salaries';
+   #+END_SRC
 * 用户、角色和权限
 ** 查看当前用户
    #+BEGIN_SRC sql
