@@ -73,7 +73,7 @@
         colname dbtype [not null | null] [default default_value] [primary key]
       );
     #+END_SRC
-    - Oracle 数据库中 =scmname=, =tabname=, 和 =colname= 不加引号默认大写，即使
+    - Oracle 数据库中 ~scmname~, ~tabname~, 和 ~colname~ 不加引号默认大写，即使
       使用小写的名称也会自动转成大写。如果非要使用小写需要使用单引号将名称包起来
     - Oracle 一张表最多只能有 254 列
     - dbtype 是数据类型，Oracle 数据库中常见的有 number, varchar2, date，布尔型一
@@ -106,8 +106,8 @@
      - ~varchar2(size[byte|char])~ : 变长字符串类型，size 表示字符串最大长度，单
        位可以是 byte 或 char。 size 的取值范围为 1 到 4000。单位 byte 表示所用的
        字节数，单位 char 表示所用的字符（character）数
-     - ~nvarchar2(size)~ : 边长 unicode 编码字符串类型， =al16utf16= 字符编码的
-       byte 数是 =utf8= 字符编码的三倍，所以 nvarchar2 的 size 取决于具体的编码
+     - ~nvarchar2(size)~ : 边长 unicode 编码字符串类型， ~AL16UTF16~ 字符编码的
+       byte 数是 ~utf8~ 字符编码的三倍，所以 nvarchar2 的 size 取决于具体的编码
        集。size 的取值范围为 1 到 4000
      - ~char(size[byte|char])~ : 定长字符串类型，size 的取值范围是 1 到 2000 。
        单位 byte 和单位 char 语义一样都是表示字符（character）数
@@ -518,9 +518,9 @@
     典，大体上有如下几种
     | 前缀     | 用户可见性   | 内容                 |
     |----------+--------------+----------------------|
-    | =dba_*=  | 数据库管理员 | 所有的对象           |
-    | =all_*=  | 所有用户     | 当前用户可访问的对象 |
-    | =user_*= | 所有用户     | 当前用户的对象       |
+    | ~dba_*~  | 数据库管理员 | 所有的对象           |
+    | ~all_*~  | 所有用户     | 当前用户可访问的对象 |
+    | ~user_*~ | 所有用户     | 当前用户的对象       |
 
     例如： ~user_tab_comments~ 表中存放着用户表的注释， ~dba_tab_comments~ 表中
     则存放在管理员的所有表注释。
@@ -599,7 +599,7 @@
    #+END_SRC
 
 ** 修改用户密码
-   有时候修改用户密码但是不知道用户的原始密码，可以添加 =VALUES= 传入的是数据库
+   有时候修改用户密码但是不知道用户的原始密码，可以添加 ~VALUES~ 传入的是数据库
    加密后的密码字符串
    #+BEGIN_SRC sql
      alter user <username> identified by <password>;
@@ -624,8 +624,8 @@
     - ~ASIN(n)~
     - ~ATAN(n)~
     - ~ATAN2(n)~
-    - ~BITAND(expr1, expr2)~ : 计算 expr1 和 expr2 的按位与操作，通常和 DECODE
-      一起搭配使用
+    - ~BITAND(expr1, expr2)~ : 计算 ~expr1~ 和 ~expr2~ 的按位与操作，通常和
+      DECODE 一起搭配使用
     - ~CEIL(n)~
     - ~COS(n)~
     - ~COSH(n)~
@@ -633,12 +633,12 @@
     - ~FLOOR(n)~
     - ~LN(n)~
     - ~LOG(n)~
-    - ~MOD(n, m)~ : =MOD(11,4) -> 3=
+    - ~MOD(n, m)~ : ~MOD(11,4) -> 3~
     - ~NANVL(n)~
     - ~POWER(n)~
     - ~REMAINDER(n, m)~ : 求余数
-    - ~ROUND(n, precision)~ : precision 表示小数点后的精度，例如：
-      =TRUNC(15.193,1) -> 15.2=, =TRUNC(15.193, -1) -> 20=
+    - ~ROUND(n, precision)~ : ~precision~ 表示小数点后的精度，例如：
+      ~TRUNC(15.193,1) -> 15.2~, ~TRUNC(15.193, -1) -> 20~
     - ~SIGN(n)~
     - ~SIN(n)~
     - ~SINH(n)~
@@ -646,7 +646,7 @@
     - ~TAN(n)~
     - ~TANH(n)~
     - ~TRUNC(n, precision)~: precision 表示小数点后的精度， 例如：
-      =TRUNC(15.79,1) -> 15.7=, =TRUNC(15.79, -1) -> 10=
+      ~TRUNC(15.79,1) -> 15.7~, ~TRUNC(15.79, -1) -> 10~
     - ~WIDTH_BUCKET(n, min_value, max_value, num_buckets)~ : 使用 ~WIDTH_BUCKET~
       可以根据输入参数创建等长的段。范围 ~min_value~ 到 ~max_value~ 被分为
       ~num_buckets~ 节，每节有相同的大小。返回 n 所在的那一节。如果 n 小于
@@ -732,29 +732,30 @@
     - ~NLS_UPPER(s)~
     - ~REGEXP_REPLACE(str, pat, repl_str, pos, occur, match_param)~ : 正则表达式
       替换
-      + str 源字符串
-      + pat 匹配的正则表达式
-      + repl_str 待替换的字符串
-      + pos 替换的起始位置，默认为 0
-      + occur 替换的次数，默认为 0，表示全部替换
-      + match_param 匹配参数，匹配参数可以多个混合使用，例如： 'mc'
+      + ~str~ 源字符串
+      + ~pat~ 匹配的正则表达式
+      + ~repl_str~ 待替换的字符串
+      + ~pos~ 替换的起始位置，默认为 0
+      + ~occur~ 替换的次数，默认为 0，表示全部替换
+      + ~match_param~ 匹配参数，匹配参数可以多个混合使用，例如： 'mc'
         - 'i' = ignore-case
         - 'c' = case-sensitive
-        - 'n' = 点号 (=.=) 不匹配换行符号
+        - 'n' = 点号 (~.~) 不匹配换行符号
         - 'm' = mutil-line
         - 'x' = 扩展模式，忽略正则表达式中的空白字符
-    - ~REGEXP_SUBSTR(str, pat, pos, occur, match_param)~ : 和 REGEXP_REPLACE 类
-      似，只是常用于搜索字符串或者提取字串
-    - ~REPLACE(str, search_str, repl_str)~ : 将字符串 str 中的 search_str 替换成
-      repl_str
+    - ~REGEXP_SUBSTR(str, pat, pos, occur, match_param)~ : 和 ~REGEXP_REPLACE~
+      类似，只是常用于搜索字符串或者提取字串
+    - ~REPLACE(str, search_str, repl_str)~ : 将字符串 ~str~ 中的 ~search_str~ 替
+      换成 ~repl_str~
     - ~RPAD(s[, set])~
     - ~RTRIM(s[, set])~
     - ~SOUNDEX(s)~
-    - ~SUBSTR(s, pos, len)~ : 以 pos 作为起始位置，截取总长度为 len，s 的字串
+    - ~SUBSTR(s, pos, len)~ : 以 ~pos~ 作为起始位置，截取总长度为 ~len~, ~s~ 的
+      字串
     - ~TRANSLATE(s)~
     - ~TREAT(expr AS REF schema.type)~
-    - ~TRIM([LEADING|TRAILING|BOTH] trim_char FROM trim_src)~ : 删除空白符号
-      =TO_CHAR(TRIM(LEADING 0 FROM hire_date))=
+    - ~TRIM([LEADING|TRAILING|BOTH] trim_char FROM trim_src)~ : 删除空白符
+      号 ~to_char(trim(leading 0 from hire_date))~
     - ~UPPER(s)~
 
     #+BEGIN_SRC sql
@@ -801,7 +802,7 @@
     #+END_SRC
 
 *** NLS 字符串函数
-    - ~NLS_CHARSET_DECL_LEN()~ : =NLS_CHARSET_DECL_LEN (200, nls_charset_id('ja16eucfixed'))=
+    - ~NLS_CHARSET_DECL_LEN()~ : ~NLS_CHARSET_DECL_LEN (200, nls_charset_id('ja16eucfixed'))~
     - ~NLS_CHARSET_ID()~
     - ~NLS_CHARSET_NAME()~
 
@@ -818,17 +819,17 @@
     - ~CURRENT_DATE~
     - ~CURRENT_TIMESTAMP(precision)~ : precision 表示秒后面的小数位数，默认为 6
     - ~DBTIMEZONE~ : 当前时区
-    - ~EXTRACT(val FROM str)~ : =EXTRACT(month FROM order_date)=
+    - ~EXTRACT(val FROM str)~ : ~EXTRACT(month FROM order_date)~
       + val 可以是 YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, TIMEZONE_HOUR,
         TIMEZONE_MINUTE, TIMEZONE_REGION, TIMEZONE_ABBR
       + str 是时间格式的字符串
-    - ~FROM_TZ~ : =FROM_TZ(TIMESTAMP '2000-03-28 08:00:00', '3:00')=
+    - ~FROM_TZ~ : ~FROM_TZ(TIMESTAMP '2000-03-28 08:00:00', '3:00')~
     - ~LAST_DAY(date)~ : date 月的最后一天
     - ~LOCALTIMESTAMP()~ : 带区域信息的时间戳
     - ~MONTHS_BETWEEN(date1, date2)~ : date1 和 date2 相差的月份，是个浮点数
     - ~NEW_TIME(date, timezone1, timezone)~
     - ~NEXT_DAY(date, str)~ : 返回在 date 日期过后的 str 表示的星期，例如：
-      =NEXT_DAY('02-FEB-2001','TUESDAY')= 返回 2001 年 2 月 2 日后面的第一个星期二
+      ~NEXT_DAY('02-FEB-2001','TUESDAY')~ 返回 2001 年 2 月 2 日后面的第一个星期二
     - ~NUMTODSINTERVAL(n, interval_unit)~
     - ~NUMTOYMINTERVAL(n, interval_unit)~
     - ~ROUND(date, fmt)~
@@ -1062,13 +1063,13 @@
    - ~COVAR_SAMP()~
    - ~CUME_DIST()~
    - ~DENSE_RANK()~
-   - ~FIRST~ : 取首个值, 具体参考下面的例子 =aggr_func KEEP (DENSE_RANK FIRST
-     ORDER BY expr [ASC/DESC] [NULLS FIRST/LAST])=
+   - ~FIRST~ : 取首个值, 具体参考下面的例子 ~aggr_func KEEP (DENSE_RANK FIRST
+     ORDER BY expr [ASC/DESC] [NULLS FIRST/LAST])~
    - ~GROUP_ID()~
    - ~GROUPING()~
    - ~GROUPING_ID()~
-   - ~LAST~ : 取最后一个值， 语法和 FIRST 相似。 =aggr_func KEEP (DENSE_RANK
-     LAST ORDER BY expr [ASC/DESC] [NULLS FIRST/LAST])=
+   - ~LAST~ : 取最后一个值， 语法和 FIRST 相似。 ~aggr_func KEEP (DENSE_RANK
+     LAST ORDER BY expr [ASC/DESC] [NULLS FIRST/LAST])~
    - ~MAX(expr)~ : 最大值
    - ~MEDIAN()~
    - ~MIN(expr)~ : 最小值
@@ -1434,8 +1435,8 @@
    #+END_SRC
 
 ** 字符串拼接的聚合函数
-   oracle 10g 和 11g 的字符串拼接函数不是一样的，10g 中使用 =WM_CONCAT()= 聚合函
-   数，而在 11g 中需要使用 =LISTAGG()= 聚合函数。两者的语法也是不太一样的
+   oracle 10g 和 11g 的字符串拼接函数不是一样的，10g 中使用 ~WM_CONCAT()~ 聚合函
+   数，而在 11g 中需要使用 ~LISTAGG()~ 聚合函数。两者的语法也是不太一样的
 
    10g 的使用方式
    #+BEGIN_SRC sql
