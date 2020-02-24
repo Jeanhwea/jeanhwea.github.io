@@ -158,6 +158,8 @@
         a.table_type in ('table', 'view')
       order by
         a.table_name;
+      -- 查看单个表结构
+      desc tabname;
     #+END_SRC
 *** 临时表
     临时表主要作用是保存事务或者会话的中间数据，所以一般包含事务级别的和会话级别
@@ -385,6 +387,104 @@
     #+BEGIN_SRC sql
       create public synonym people hr.employees;
     #+END_SRC
+
+** 数据完整性
+   数据完整性 (Data Integrity) 保证存储在数据库中的所有数据值均正确的状态
+*** 非空约束
+    非空 (NOT NULL) 约束限制数据库表列的值不能为 NULL，那么当插入数据时，必须为
+    列提供，数据不能为 NULL。约束只能在列级定义，不能在表级定义。
+
+    建表时指定在对应列后面添加 ~not null~ 指定该列为非空
+    #+BEGIN_SRC sql
+      create table employees (
+        id number(16) primary key,
+        created_by varchar2(64) default 'sysman' not null, -- 指定当前列为非空
+        name varchar2(32)
+      );
+
+      -- 给非空约束添加名称
+      create table employees (
+        id number(16) primary key,
+        created_by varchar2(64) default 'sysman',
+        name varchar2(32),
+        constraint emp_created_by_uk(created_by) not null; -- 指定当前列为非空
+      );
+    #+END_SRC
+
+    修改列的非空属性
+    #+BEGIN_SRC sql
+      -- 添加非空约束
+      alter table tabname modify colname [constraint constraint_name] not null;
+      -- 删除非空约束
+      alter table tabname modify colname null;
+    #+END_SRC
+*** 唯一性约束
+    唯一性 (Unique) 约束表示该列值是不能重复的，但是可以为 NULL
+    #+BEGIN_SRC sql
+      create table employees (
+        email varchar2 (25),
+        constraint emp_email_nn not null,      -- 非空
+        constraint emp_email_uk unique (email) -- 唯一键
+      );
+    #+END_SRC
+
+*** 主键约束
+    用于唯一的标识表行的数据，当定义主键约束后，该列不但不能重复而且不能为 NULL。
+    一张表最多只能有一个主键，但是可以由多个 Unique 约束。创建主键或唯一约束后，
+    Oracle 会自动创建一个与约束同名的索引 (Uniquenes 为 Unique 唯一索引) 需要注
+    意的是： *每个表只能有且有一个主键约束*
+    #+BEGIN_SRC sql
+      create table employees (
+        id number(16) primary key, -- 主键约束
+        name varchar2(32)
+      );
+    #+END_SRC
+
+*** 外键约束
+    用于定义主表和从表之间的关系，外键约束要定义在从表上，主要则必须具有主键约束
+    或是 Unique 约束，当定义外键约束后，要求外键列数据必须在主表的主键列存在或是
+    为 NULL，即引用完整性 (Referential Integrity)。如果外键作用于当前表本身的列，
+    则该约束为自引用完整性 (Self-Referential Integrity)
+
+    用来维护从表 (Child Table) 和主表 (Parent Table) 之间的引用完整性。外键约束
+    是个有争议性的约束，它一方面能够维护数据库的数据一致性，数据的完整性。防止错
+    误的垃圾数据入库； 另外一方面它会增加表插入、更新等 SQL 性能的额外开销，不少
+    系统里面通过业务逻辑控制来取消外键约束。例如在数据仓库中，就推荐禁用外键约束。
+
+    修改外键时的从表行为有以下三种：
+    - No Action on Deletion and Update, 默认为删除和更新是不操作
+    - Cascading Deletion, 级联删除
+    - Deletion that Set NULL, 删除是置空
+
+    外键插入、更新或删除形容如下
+    | DML                | 主表                             | 从表                                              |
+    |--------------------+----------------------------------+---------------------------------------------------|
+    | ~insert~           | 要求主表键唯一                   | 要求外键值在从表中存在，或者包含多行，或者为 NULL |
+    | ~update no action~ | 如果从表中没有没有引用主表的的行 | 如果更新后新的外键仍然引用旧的外键                |
+    | ~delete no action~ | 如果子表中没有引用主表的行       | 任何情况都可行                                    |
+    | ~delete cascade~   | 任何情况都可行                   | 任何情况都可行                                    |
+    | ~delete set null~  | 任何情况都可行                   | 任何情况都可行                                    |
+
+*** 条件约束
+    条件约束 (check constraint) 用于强制行数据必须满足的条件
+    #+BEGIN_SRC sql
+      alter table employees add constraint max_emp_sal_ck check(salary < 10001);
+    #+END_SRC
+
+*** 约束命名规范
+     约束名称建议自己定义一套命名规则，否则使用系统生成的约束名，很难能把它和对
+     应的表、字段联系起来。
+     | 类型     | 命名                  |
+     |----------+-----------------------|
+     | 非空约束 | ~tabname_colname_nn_~ |
+     | 唯一约束 | ~tabname_colname_uk_~ |
+     | 主键约束 | ~tabname_pk~          |
+     | 外键约束 | ~tabname_colname_fk_~ |
+     | 条件约束 | ~tabname_colname_ck_~ |
+     | 默认约束 | ~tabname_colname_df_~ |
+
+     如果约束名称超过 32 位长度，建议应该缩写表名，而不应用 ~tabname_colname_nn~
+     不过具体视情况而定
 
 * 数据存取
 ** 简单查询语句
