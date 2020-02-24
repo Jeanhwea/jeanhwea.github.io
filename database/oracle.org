@@ -523,71 +523,43 @@
 
     例如： ~user_tab_comments~ 表中存放着用户表的注释， ~dba_tab_comments~ 表中
     则存放在管理员的所有表注释。
+
+*** 数据字典的使用
+    表列属性，可以查看表中每列的名字，数据类型，长度等信息
+    #+BEGIN_SRC sql
+      select c.table_name, c.column_name, c.data_type, c.data_length, c.nullable
+        from user_tab_columns c order by c.table_name;
+    #+END_SRC
+
+    唯一性约束，获取列的约束名称
+    #+BEGIN_SRC sql
+      select c.owner, c.constraint_name, c.table_name, c.column_name, c.position
+        from user_cons_columns c order by c.table_name;
+    #+END_SRC
+
+    获取列的约束类型
+    #+BEGIN_SRC sql
+      select c.constraint_name, c.constraint_type, c.status
+        from user_constraints c
+       where c.constraint_type in ('U', 'P')
+       order by c.constraint_name;
+    #+END_SRC
+
+    获取注释信息
+    #+BEGIN_SRC sql
+      -- 获取所有表注释
+      select c.table_name, c.table_type, c.comments
+        from user_tab_comments c order by c.table_name;
+      -- 获取所有表的对应列的注释
+      select c.table_name, c.column_name, c.comments
+        from user_col_comments c order by c.table_name;
+    #+END_SRC
 *** 动态性能视图
     Oracle 提供了一下可以查看当前数据库性能的视图，这些视图的统一前缀为 ~v$*~
     - ~v$instance~ 实例视图
     - ~v$bgprocess~ 后台进程视图
     - ~v$sql~ SQL 执行记录视图
     - ~v$datafile~ Data files 的视图
-
-** 获取表的元信息：列的属性，唯一性约束
-*** 表列属性
-    可以查看表中每列的名字，数据类型，长度等信息
-    #+BEGIN_SRC sql
-      SELECT USER_TAB_COLUMNS.TABLE_NAME ||
-               ',' || USER_TAB_COLUMNS.COLUMN_NAME ||
-               ',' || USER_TAB_COLUMNS.DATA_TYPE ||
-               ',' || USER_TAB_COLUMNS.DATA_LENGTH ||
-               ',' || USER_TAB_COLUMNS.NULLABLE
-        FROM USER_TAB_COLUMNS
-       WHERE ROWNUM < 100
-       ORDER BY USER_TAB_COLUMNS.TABLE_NAME;
-    #+END_SRC
-
-*** 唯一性约束
-    获取列的约束名称
-    #+BEGIN_SRC sql
-      SELECT USER_CONS_COLUMNS.OWNER ||
-               ',' || USER_CONS_COLUMNS.CONSTRAINT_NAME ||
-               ',' || USER_CONS_COLUMNS.TABLE_NAME ||
-               ',' || USER_CONS_COLUMNS.COLUMN_NAME ||
-               ',' || USER_CONS_COLUMNS.POSITION
-        FROM USER_CONS_COLUMNS
-       WHERE ROWNUM < 100
-       ORDER BY USER_CONS_COLUMNS.TABLE_NAME;
-    #+END_SRC
-
-    获取列的约束类型
-    #+BEGIN_SRC sql
-      SELECT USER_CONSTRAINTS.CONSTRAINT_NAME ||
-               ',' || USER_CONSTRAINTS.CONSTRAINT_TYPE ||
-               ',' || USER_CONSTRAINTS.STATUS
-        FROM USER_CONSTRAINTS
-       WHERE USER_CONSTRAINTS.CONSTRAINT_TYPE in ('U','P')
-         AND ROWNUM < 100
-       ORDER BY USER_CONSTRAINTS.CONSTRAINT_NAME;
-    #+END_SRC
-
-** 获取注释信息
-*** 表注释
-    #+BEGIN_SRC sql
-      SELECT USER_TAB_COMMENTS.TABLE_NAME ||
-               ',' || USER_TAB_COMMENTS.TABLE_TYPE ||
-               ',' || USER_TAB_COMMENTS.COMMENTS
-        FROM USER_TAB_COMMENTS
-       WHERE ROWNUM < 100
-       ORDER BY USER_TAB_COMMENTS.TABLE_NAME;
-    #+END_SRC
-
-*** 列注释
-    #+BEGIN_SRC sql
-      SELECT USER_COL_COMMENTS.TABLE_NAME ||
-               ',' || USER_COL_COMMENTS.COLUMN_NAME ||
-               ',' || USER_COL_COMMENTS.COMMENTS
-        FROM USER_COL_COMMENTS
-       WHERE ROWNUM < 100
-       ORDER BY USER_COL_COMMENTS.TABLE_NAME;
-    #+END_SRC
 
 * 数据存取
 ** 简单查询语句
