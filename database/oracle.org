@@ -562,6 +562,41 @@
     - ~v$sql~ SQL 执行记录视图
     - ~v$datafile~ Data files 的视图
 
+    查看所有系统性能视图名称
+    #+BEGIN_SRC sql
+      select d.table_name from dictionary d
+       where lower(d.table_name) like 'v$%' order by d.table_name;
+    #+END_SRC
+
+    查看数据库对象
+    #+BEGIN_SRC sql
+      -- 所有 ~dba_~ 开头的数据库对象信息
+      select o.owner, o.object_name, o.object_type
+        from dba_objects o order by o.owner, o.object_name;
+      -- 所有 ~all_~ 开头的数据库对象信息
+      select o.owner, o.object_name, o.object_type
+        from all_objects o order by o.owner, o.object_name;
+      -- 所有 ~user_~ 开头的数据库对象信息
+      select o.object_name, o.object_type
+        from user_objects o order by o.object_name;
+    #+END_SRC
+
+    所有用户对象的多少和用户的角色相关，见如下的例子
+    #+BEGIN_SRC sql
+      SQL> set role all;
+      Role set.
+      SQL> select count(1) from all_objects;
+        COUNT(1)
+      ----------
+           18474
+      SQL> set role none;
+      Role set.
+      SQL> select count(1) from all_objects;
+        COUNT(1)
+      ----------
+           15267
+    #+END_SRC
+
 * 数据存取
 ** 简单查询语句
    #+BEGIN_SRC sql
