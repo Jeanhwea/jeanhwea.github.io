@@ -510,6 +510,85 @@
      如果约束名称超过 32 位长度，建议应该缩写表名，而不应用 ~tabname_colname_nn~
      不过具体视情况而定
 
+** 数据字典和动态性能视图
+*** 数据字典
+    Oracle 的数据库组织方式中所有数据库的表信息，类信息等元信息也是存放在一个对
+    用户不可见的数据表中，这里称之为元表。Oracle 定义了一系列示例图来表示数据字
+    典，大体上有如下几种
+    | 前缀     | 用户可见性   | 内容                 |
+    |----------+--------------+----------------------|
+    | =dba_*=  | 数据库管理员 | 所有的对象           |
+    | =all_*=  | 所有用户     | 当前用户可访问的对象 |
+    | =user_*= | 所有用户     | 当前用户的对象       |
+
+    例如： ~user_tab_comments~ 表中存放着用户表的注释， ~dba_tab_comments~ 表中
+    则存放在管理员的所有表注释。
+*** 动态性能视图
+    Oracle 提供了一下可以查看当前数据库性能的视图，这些视图的统一前缀为 ~v$*~
+    - ~v$instance~ 实例视图
+    - ~v$bgprocess~ 后台进程视图
+    - ~v$sql~ SQL 执行记录视图
+    - ~v$datafile~ Data files 的视图
+
+** 获取表的元信息：列的属性，唯一性约束
+*** 表列属性
+    可以查看表中每列的名字，数据类型，长度等信息
+    #+BEGIN_SRC sql
+      SELECT USER_TAB_COLUMNS.TABLE_NAME ||
+               ',' || USER_TAB_COLUMNS.COLUMN_NAME ||
+               ',' || USER_TAB_COLUMNS.DATA_TYPE ||
+               ',' || USER_TAB_COLUMNS.DATA_LENGTH ||
+               ',' || USER_TAB_COLUMNS.NULLABLE
+        FROM USER_TAB_COLUMNS
+       WHERE ROWNUM < 100
+       ORDER BY USER_TAB_COLUMNS.TABLE_NAME;
+    #+END_SRC
+
+*** 唯一性约束
+    获取列的约束名称
+    #+BEGIN_SRC sql
+      SELECT USER_CONS_COLUMNS.OWNER ||
+               ',' || USER_CONS_COLUMNS.CONSTRAINT_NAME ||
+               ',' || USER_CONS_COLUMNS.TABLE_NAME ||
+               ',' || USER_CONS_COLUMNS.COLUMN_NAME ||
+               ',' || USER_CONS_COLUMNS.POSITION
+        FROM USER_CONS_COLUMNS
+       WHERE ROWNUM < 100
+       ORDER BY USER_CONS_COLUMNS.TABLE_NAME;
+    #+END_SRC
+
+    获取列的约束类型
+    #+BEGIN_SRC sql
+      SELECT USER_CONSTRAINTS.CONSTRAINT_NAME ||
+               ',' || USER_CONSTRAINTS.CONSTRAINT_TYPE ||
+               ',' || USER_CONSTRAINTS.STATUS
+        FROM USER_CONSTRAINTS
+       WHERE USER_CONSTRAINTS.CONSTRAINT_TYPE in ('U','P')
+         AND ROWNUM < 100
+       ORDER BY USER_CONSTRAINTS.CONSTRAINT_NAME;
+    #+END_SRC
+
+** 获取注释信息
+*** 表注释
+    #+BEGIN_SRC sql
+      SELECT USER_TAB_COMMENTS.TABLE_NAME ||
+               ',' || USER_TAB_COMMENTS.TABLE_TYPE ||
+               ',' || USER_TAB_COMMENTS.COMMENTS
+        FROM USER_TAB_COMMENTS
+       WHERE ROWNUM < 100
+       ORDER BY USER_TAB_COMMENTS.TABLE_NAME;
+    #+END_SRC
+
+*** 列注释
+    #+BEGIN_SRC sql
+      SELECT USER_COL_COMMENTS.TABLE_NAME ||
+               ',' || USER_COL_COMMENTS.COLUMN_NAME ||
+               ',' || USER_COL_COMMENTS.COMMENTS
+        FROM USER_COL_COMMENTS
+       WHERE ROWNUM < 100
+       ORDER BY USER_COL_COMMENTS.TABLE_NAME;
+    #+END_SRC
+
 * 数据存取
 ** 简单查询语句
    #+BEGIN_SRC sql
@@ -1109,77 +1188,6 @@
    - ~PRESENTNNV()~
    - ~PRESENTV()~
    - ~PREVIOUS()~
-
-* 元信息
-  Oracle 的数据库组织方式中所有数据库的表信息，类信息等元信息也是存放在一个对用
-  户不可见的数据表中，这里称之为元表。
-
-  表更加功能不同分成了不同的级别，不同级别对于的表名称开头不一样：
-  - =USER_*=: 用户表信息
-  - =DBA_*=: 数据库管理员表信息
-  - =ALL_*=: 所有的表信息，包括：DBA 和 USER
-
-  例如： =USER_TAB_COMMENTS= 表中存放着用户表的注释， =DBA_TAB_COMMENTS= 表中则
-  存放在管理员的所有表注释。
-
-** 获取表的元信息：列的属性，唯一性约束
-*** 表列属性
-    可以查看表中每列的名字，数据类型，长度等信息
-    #+BEGIN_SRC sql
-      SELECT USER_TAB_COLUMNS.TABLE_NAME ||
-               ',' || USER_TAB_COLUMNS.COLUMN_NAME ||
-               ',' || USER_TAB_COLUMNS.DATA_TYPE ||
-               ',' || USER_TAB_COLUMNS.DATA_LENGTH ||
-               ',' || USER_TAB_COLUMNS.NULLABLE
-        FROM USER_TAB_COLUMNS
-       WHERE ROWNUM < 100
-       ORDER BY USER_TAB_COLUMNS.TABLE_NAME;
-    #+END_SRC
-
-*** 唯一性约束
-    获取列的约束名称
-    #+BEGIN_SRC sql
-      SELECT USER_CONS_COLUMNS.OWNER ||
-               ',' || USER_CONS_COLUMNS.CONSTRAINT_NAME ||
-               ',' || USER_CONS_COLUMNS.TABLE_NAME ||
-               ',' || USER_CONS_COLUMNS.COLUMN_NAME ||
-               ',' || USER_CONS_COLUMNS.POSITION
-        FROM USER_CONS_COLUMNS
-       WHERE ROWNUM < 100
-       ORDER BY USER_CONS_COLUMNS.TABLE_NAME;
-    #+END_SRC
-
-    获取列的约束类型
-    #+BEGIN_SRC sql
-      SELECT USER_CONSTRAINTS.CONSTRAINT_NAME ||
-               ',' || USER_CONSTRAINTS.CONSTRAINT_TYPE ||
-               ',' || USER_CONSTRAINTS.STATUS
-        FROM USER_CONSTRAINTS
-       WHERE USER_CONSTRAINTS.CONSTRAINT_TYPE in ('U','P')
-         AND ROWNUM < 100
-       ORDER BY USER_CONSTRAINTS.CONSTRAINT_NAME;
-    #+END_SRC
-
-** 获取注释信息
-*** 表注释
-    #+BEGIN_SRC sql
-      SELECT USER_TAB_COMMENTS.TABLE_NAME ||
-               ',' || USER_TAB_COMMENTS.TABLE_TYPE ||
-               ',' || USER_TAB_COMMENTS.COMMENTS
-        FROM USER_TAB_COMMENTS
-       WHERE ROWNUM < 100
-       ORDER BY USER_TAB_COMMENTS.TABLE_NAME;
-    #+END_SRC
-
-*** 列注释
-    #+BEGIN_SRC sql
-      SELECT USER_COL_COMMENTS.TABLE_NAME ||
-               ',' || USER_COL_COMMENTS.COLUMN_NAME ||
-               ',' || USER_COL_COMMENTS.COMMENTS
-        FROM USER_COL_COMMENTS
-       WHERE ROWNUM < 100
-       ORDER BY USER_COL_COMMENTS.TABLE_NAME;
-    #+END_SRC
 
 * PL/SQL
 ** 存储过程
