@@ -1568,13 +1568,12 @@
      sudo echo "127.0.0.1 $(hostname)" >> /etc/hosts
    #+END_SRC
 
-* SQL*Plus 命令行
-  Oracle 的 SQL*Plus 是与 Oracle 数据库进行交互的客户端工具，借助 SQL*Plus 可以
-  查看、修改数据库记录。在 SQL*Plus 中，可以运行 SQL*Plus 命令与 SQL 语句。
-** 安装 instantclient
-   在 mac 和 linux 系统中如果只是想要安装一个 sqlplus 的客户端，可以直接安装
+* sqlplus
+  Oracle 的 sqlplus 是与 Oracle 数据库进行交互的客户端工具，借助 sqlplus 可以查
+  看、修改数据库记录。在 sqlplus 中，可以运行 sqlplus 命令与 SQL 语句。
+** instantclient 安装
+   在 mac 和 linux 系统中如果只是想要安装 sqlplus 命令行工具，需要安装
    instantclient 工具
-
 *** macOS
     mac 下的 Oracle 安装需要下载几个 [[https://www.oracle.com/database/technologies/instant-client/downloads.html][instantclient]] 安装包
     1. instantclient-basic-macos.x64-11.2.0.4.0.zip
@@ -1598,10 +1597,8 @@
     #+BEGIN_SRC sh
       cd /usr/local/java/instantclient_11_2
       mkdir lib
-
       ln -s libclntsh.dylib.11.1 libclntsh.dylib
       ln -s libocci.dylib.11.1 libocci.dylib
-
       ln -s $PWD/{libclntsh.dylib.11.1,libnnz11.dylib,libociei.dylib} lib/
       ln -s $PWD/{libsqlplus.dylib,libsqlplusic.dylib} lib/
     #+END_SRC
@@ -1653,71 +1650,69 @@
       export PATH=/usr/local/java/instantclient_11_2${PATH:+:${PATH}}
     #+END_SRC
 
-** 从命令行中连接 SQL*Plus
-   第一种登录方式的命令如下
+** 使用技巧
+*** 启动 sqlplus
+    第一种登录方式的命令如下
 
-   #+BEGIN_SRC sh
-     sqlplus username/password@hostname:port/service_id
-   #+END_SRC
+    #+BEGIN_SRC sh
+      sqlplus username/password@hostname:port/service_id
+    #+END_SRC
 
-   登录过后可以看到成功的登录界面
+    登录过后可以看到成功的登录界面
 
-   [[file:../static/image/2018/11/sqlplus-login.png]]
+    [[file:../static/image/2018/11/sqlplus-login.png]]
 
-   第二种登录方式需要使用 tnsnames.ora 这种格式，下面是 Oracle Client 提供的默认
-   样本
+    第二种登录方式需要使用 tnsnames.ora 这种格式，下面是 Oracle Client 提供的默认
+    样本
 
-   #+BEGIN_SRC text
-     # This is a sample tnsnames.ora that contains the NET8 parameters that are
-     # needed to connect to an HS Agent
+    #+BEGIN_SRC text
+      # This is a sample tnsnames.ora that contains the NET8 parameters that are
+      # needed to connect to an HS Agent
 
-     hsagent  =
-       (DESCRIPTION=
-         (ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=1521))
-         (CONNECT_DATA=(SID=hsagent))
-         (HS=)
-       )
-   #+END_SRC
+      hsagent  =
+        (DESCRIPTION=
+          (ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=1521))
+          (CONNECT_DATA=(SID=hsagent))
+          (HS=)
+        )
+    #+END_SRC
 
-   熟悉了 tnsnames.org 这种格式后就可以编写相应的登录命令，具体方式如下：
-   #+BEGIN_SRC sh
-     sqlplus username/password@"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=service_id)))"
-   #+END_SRC
+    熟悉了 tnsnames.org 这种格式后就可以编写相应的登录命令，具体方式如下：
+    #+BEGIN_SRC sh
+      sqlplus username/password@"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=service_id)))"
+    #+END_SRC
 
-   当命令中的密码字段中含义有 @ 字段时需要将 password 字段用双引号包起来，如下：
-   #+BEGIN_SRC sh
-     sqlplus user/\"my@password\"@hostname:port/service_id
-   #+END_SRC
+    当命令中的密码字段中含义有 @ 字段时需要将 password 字段用双引号包起来，如下：
+    #+BEGIN_SRC sh
+      sqlplus user/\"my@password\"@hostname:port/service_id
+    #+END_SRC
 
-** SQL*Plus 启动配置
-   SQL*Plus 启动配置文件为 ~$ORACLE_HOME/sqlplus/admin/glogin.sql~ 。在启动
-   SQL*Plus 时需要预先设置一些启动的基本配置，例如启动的每行显示的字符数量，显示
-   是否折行，分页大小配置等。下面是我常用的配置。
+*** 启动配置
+    sqlplus 启动配置文件为 ~$ORACLE_HOME/sqlplus/admin/glogin.sql~ 。在启动
+    sqlplus 时需要预先设置一些启动的基本配置，例如启动的每行显示的字符数量，显示
+    是否折行，分页大小配置等。下面是我常用的配置。
 
-   #+BEGIN_SRC sql
-     -- $ORACLE_HOME/sqlplus/admin/glogin.sql
-     -- SET UNDERLINE OFF
-     SET TAB OFF
-     SET VERIFY OFF
-     SET WRAP OFF
-     SET LINESIZE 32767
-     SET PAGESIZE 0
-     SET TRIMOUT ON
-     SET TRIMSPOOL ON
-     SET FEEDBACK ON
+    #+BEGIN_SRC sql
+      -- $ORACLE_HOME/sqlplus/admin/glogin.sql
+      -- set underline off
+      set tab off
+      set verify off
+      set wrap off
+      set linesize 32767
+      set pagesize 0
+      set trimout on
+      set trimspool on
+      set feedback on
+      -- 改变当前会话的日期格式
+      alter session set nls_date_format = 'yyyy-mm-dd hh24:mi:ss';
+    #+END_SRC
 
-     -- 改变当前会话的日期格式
-     ALTER SESSION SET nls_date_format = 'yyyy-mm-dd hh24:mi:ss';
-   #+END_SRC
-
-** SQL*Plus 使用技巧
 *** 添加 readline 的支持
-    sqlplus 本身不支持 readline 的特性，不过可以通过安装 rlwrap 来将 readline 特性添
-    加到 sqlplus 中
+    sqlplus 本身不支持 readline 的特性，但可以通过安装 [[https://github.com/hanslub42/rlwrap/releases][rlwrap]] 来将 readline 特性
+    添加到 sqlplus 中
     #+BEGIN_SRC sh
       # mac
       brew install rlwrap
-
       # ubuntu
       sudo apt-get install -y rlwrap
     #+END_SRC
@@ -1729,25 +1724,22 @@
 
 *** 常见命令
     - 执行本地 SQL 脚本: ~START filename~ 或者 ~@ filename~
-    - 在 SQL*Plus 里面执行 shell 命令: ~HOST cmd~
-    - 将 SQL*Plus 执行的命令存成本地文件: ~SAVE filename~
+    - 在 sqlplus 里面执行 shell 命令: ~HOST cmd~
+    - 将 sqlplus 执行的命令存成本地文件: ~SAVE filename~
     - 装载本地 SQL 脚本，但不立即执行: ~GET filename~
     - 执行最后一条 SQL 语句: ~/~
     - 打印最后执行的 SQL 语句: ~L~
     - 结果输出到文件: ~SPOOL filename~
-    - 查看/修改 SQL*Plus 的环境变量: ~SHOW/SET variablename~
+    - 查看/修改 sqlplus 的环境变量: ~SHOW/SET variablename~
 
-*** 执行 sql 脚本的方法
+*** 执行 SQL 脚本的方法
     #+BEGIN_SRC sh
       # 执行 script.sql 脚本后退出,
       echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql
-
       # 使用重定向执行 script.sql 脚本
       sqlplus -S user/pass@host:port/sid < script.sql
-
       # 使用重定向执行脚本并追加方式输出日志
       sqlplus -S user/pass@host:port/sid < script.sql >> /tmp/sqlplus.log
-
       # .sql 文件后缀名不是必须的，例如下面的两句是同样效果的
       echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql
       echo 'exit' | sqlplus -S user/pass@host:port/sid @script
@@ -1755,24 +1747,22 @@
 
 *** 打开/关闭终端输出
     #+BEGIN_SRC sql
-      SET TERMOUT OFF;
+      set termout off;
       -- do a lot of parepare work
-      SET TERMOUT ON;
+      set termout on;
     #+END_SRC
 
-** SQL*Plus 变量使用技巧
+** 变量
 *** 定义和使用变量
-    定义的变量只在一个 SQL*Plus 的会话期间有效
+    定义的变量只在一个 sqlplus 的会话期间有效
     #+BEGIN_SRC sql
       -- 定义一个变量
-      DEFINE var = text;
-
+      define var = text;
       -- 读取用户输入，将用户输入放到变量中
-      ACCEPT var;
-
+      accept var;
       -- 在变量名前面添加 & 来使用变量
-      DEFINE MYDATE = 01-FEB-98;
-      SELECT '&MYDATE' FROM DUAL;
+      define mydate = 01-FEB-98;
+      select '&mydate' from dual;
     #+END_SRC
 
     下面使用一个使用例子
@@ -1792,7 +1782,7 @@
 *** 将列值赋给变量
     具体语法如下：
     #+BEGIN_SRC sql
-      COLUMN colname NEW_VALUE var
+      column colname new_value var
     #+END_SRC
 
     使用示例
@@ -1813,7 +1803,7 @@
       SQL>
     #+END_SRC
 
-** 给 script.sql 中传入参数
+** 将参数传入 script.sql 脚本
    在调用脚本时直接将参数写到后面，见下面的例子
    #+BEGIN_SRC sh
      echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql arg1 arg2
@@ -1821,9 +1811,8 @@
 
    然后在脚本中使用 ~&1~ 引用第一个参数， ~&2~ 引用第二个参数，以此类推
    #+BEGIN_SRC sql
-     -- script.sql
-     DEFINE arg1 = &1
-     SELECT '&arg1' FROM DUAL;
+     define arg1 = &1
+     select '&arg1' from dual;
    #+END_SRC
 
 * 杂项
@@ -1852,7 +1841,6 @@
      # 安装软件包
      dpkg --install /assets/oracle-xe_11.2.0-1.0_amd64.deb
    #+END_SRC
-
 
 * 参考链接
   1. [[http://download.oracle.com/docs/cds/E11882_01.zip][Oracle 11g 文档离线下载]] - Oracle 11g 的配套文档
