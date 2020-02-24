@@ -207,7 +207,7 @@
       #+END_SRC
     - Application Domain Indexes
 
-** 分区，视图，序列，同义词等其它结构
+** 其它结构：分区，视图，序列等
 *** 分区
     分区指的是对数据量较大，访问速度较慢的表进行分成几个子区域进行管理。分区表包
     含 *一个或多个* 分区，注意包含一个分区的分区表和不分区表是不同的，包含一个分
@@ -289,6 +289,101 @@
           partition p1 values less than (3),
           partition p2 values less than (4),
           partition p3 values less than (maxvalue));
+    #+END_SRC
+*** 视图
+    视图 (View) 也称虚表， 不占用物理空间，这个也是相对概念，因为视图本身的定义
+    语句还是要存储在数据字典里的。视图只有逻辑定义。每次使用的时候，只是重新执行
+    SQL，视图的好处如下：
+    1. 提供各种数据表现形式， 可以使用各种不同的方式将基表的数据展现在用户面前，
+       以便符合用户的使用习惯 (主要手段: 使用别名)；
+    2. 隐藏数据的逻辑复杂性并简化查询语句， 多表查询语句一般是比较复杂的， 而且
+       用户需要了解表之间的关系， 否则容易写错; 如果基于这样的查询语句创建一个视
+       图， 用户就可以直接对这个视图进行"简单查询"而获得结果. 这样就隐藏了数据的
+       复杂
+    3. 执行某些必须使用视图的查询. 某些查询必须借助视图的帮助才能完成. 比如， 有
+       些查询需要连接一个分组统计后的表和另一表， 这时就可以先基于分组统计的结果
+       创建一个视图， 然后在查询中连接这个视图和另一个表就可以了
+    4. 提供某些安全性保证. 视图提供了一种可以控制的方式， 即可以让不同的用户看见
+       不同的列， 而不允许访问那些敏感的列， 这样就可以保证敏感数据不被用户看见；
+    5. 简化用户权限的管理. 可以将视图的权限授予用户， 而不必将基表中某些列的权限
+       授予用户， 这样就简化了用户权限的定义。
+*** 创建视图
+    简单的创建视图可以暴露源表的某些字段
+    #+BEGIN_SRC sql
+      create view staff as
+      select
+        employee_id,
+        last_name,
+        job_id
+      from
+        employees;
+    #+END_SRC
+
+    视图可以封装做一些对源表的数据处理
+    #+BEGIN_SRC sql
+      create view staff_dept_10 as
+      select
+        employee_id,
+        last_name,
+        job_id
+      from
+        employees
+      where
+        department_id = 10 with check option constraint staff_dept_10_cnst;
+    #+END_SRC
+
+    合并多个表，给用户暴露一个单一的表
+    #+BEGIN_SRC sql
+      create view staff_dept_10_30 as
+      select
+        e.employee_id,
+        e.last_name,
+        e.job_id,
+        d.department_name
+      from
+        employee e,
+        department d
+      where
+        e.department_id in (10, 30)
+        and e.department_id = d.department_id;
+    #+END_SRC
+*** 物化视图
+    物化视图 (Materialized View) 将视图选取的数据进行存储，目的是减少构建视图时
+    的计算时间，用空间换时间
+    #+BEGIN_SRC sql
+      create materialized view sales_mv as
+      select
+        t.calendar_year,
+        p.prod_id,
+        sum(s.amount_sold) as sum_sales
+      from
+        times t,
+        products p,
+        sales s
+      where
+        t.time_id = s.time_id
+        and p.prod_id = s.prod_id
+      group by
+        t.calendar_year,
+        p.prod_id;
+    #+END_SRC
+*** 序列
+    序列可以生成连续的数，主要用于解决数据库并发访问时 ID 值生成策略
+    #+BEGIN_SRC sql
+      -- 创建一个序列
+      create sequence cust_seq
+        start with 1000
+        increment by 1 nocache nocycle;
+      -- 使用方法
+      select cust_seq.nextval from dual;
+      -- 查看当前序列值
+      select cust_seq.currval from dual;
+    #+END_SRC
+*** 同义词
+    同义词定义了数据库结构的别名，可以方便访问。同义词分为 public 和 private 的
+    两种， public 对所有用户公开， private 针对特定用户
+    #+BEGIN_SRC sql
+      create public synonym people hr.employees;
     #+END_SRC
 
 * 数据存取
