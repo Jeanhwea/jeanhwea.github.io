@@ -285,13 +285,17 @@
     创建分区表的索引方法如下
     #+BEGIN_SRC sql
       -- 创建分区表的局部索引
-      create index hash_sales_idx on hash_sales (time_id) local;
+      create index hash_sales_idx
+        on hash_sales (time_id) local;
+
       -- 创建分区表的全局索引
-      create index time_channel_sales_idx on time_range_sales (channel_id) global
+      create index time_channel_sales_idx
+        on time_range_sales (channel_id) global
         partition by range (channel_id) (
           partition p1 values less than (3),
           partition p2 values less than (4),
-          partition p3 values less than (maxvalue));
+          partition p3 values less than (maxvalue)
+        );
     #+END_SRC
 *** 视图
     视图 (View) 也称虚表， 不占用物理空间，这个也是相对概念，因为视图本身的定义
