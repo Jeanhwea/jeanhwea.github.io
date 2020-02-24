@@ -418,6 +418,7 @@
       -- 删除非空约束
       alter table tabname modify colname null;
     #+END_SRC
+
 *** 唯一性约束
     唯一性 (Unique) 约束表示该列值是不能重复的，但是可以为 NULL
     #+BEGIN_SRC sql
@@ -435,8 +436,14 @@
     意的是： *每个表只能有且有一个主键约束*
     #+BEGIN_SRC sql
       create table employees (
-        id number(16) primary key, -- 主键约束
-        name varchar2(32)
+        id number (16) primary key, -- 主键约束
+        name varchar2 (32)
+      );
+
+      create table employees (
+        id number (16),
+        name varchar2 (32),
+        constraint employee_pk primary key (id) -- 主键约束
       );
     #+END_SRC
 
@@ -464,6 +471,23 @@
     | ~delete no action~ | 如果子表中没有引用主表的行       | 任何情况都可行                                    |
     | ~delete cascade~   | 任何情况都可行                   | 任何情况都可行                                    |
     | ~delete set null~  | 任何情况都可行                   | 任何情况都可行                                    |
+
+    #+BEGIN_SRC sql
+      create table departments (
+        id number (16) primary key
+      );
+
+      create table employees (
+        id number (16),
+        dept_id number (16),
+        -- 添加外键
+        constraint emp_dept_fk foreign key (dept_id) references departments (id)
+      );
+
+      -- 修改表，添加外键
+      alter table employees
+        add constraint emp_dept_fk foreign key (dept_id) references departments (id);
+    #+END_SRC
 
 *** 条件约束
     条件约束 (check constraint) 用于强制行数据必须满足的条件
