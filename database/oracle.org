@@ -8,7 +8,7 @@
 #+TAGS: oracle database 10g
 
 
-* Oracle 数据库概述
+* 数据库概述
   Oracle Database，又名 Oracle RDBMS，或简称 Oracle。是甲骨文公司的一款关系数据
   库管理系统。它是在数据库领域一直处于领先地位的产品。可以说 Oracle 数据库系统是
   目前世界上流行的关系数据库管理系统，系统可移植性好、使用方便、功能强，适用于各
@@ -66,24 +66,20 @@
       息的一组内存区域
 
 * 关系数据库结构
-** 数据库
-   #+BEGIN_SRC sql
-     select name from v$database;
-   #+END_SRC
-
-** 表
+** 数据库和表
 *** 创建表
     #+BEGIN_SRC sql
       create table [scmname.]tabname (
         colname dbtype [not null | null] [default default_value] [primary key]
       );
     #+END_SRC
-    - Oracle 数据库中 =scmname=, =tabname=, 和 =colname= 不加引号默认大写，即使使
-      用小写的名称也会自动转成大写。如果非要使用小写需要使用单引号将名称包起来
+    - Oracle 数据库中 =scmname=, =tabname=, 和 =colname= 不加引号默认大写，即使
+      使用小写的名称也会自动转成大写。如果非要使用小写需要使用单引号将名称包起来
     - Oracle 一张表最多只能有 254 列
-    - dbtype 是数据类型，常见的有 number, varchar2, date，布尔型一般使用
-      ~char(1)~ 或 ~number(1)~ 来模拟
+    - dbtype 是数据类型，Oracle 数据库中常见的有 number, varchar2, date，布尔型一
+      般使用 ~char(1)~ 或 ~number(1)~ 来模拟
 
+    简单的用户表创建
     #+BEGIN_SRC sql
       create table users (
         id number(16) primary key not null,
@@ -99,11 +95,12 @@
       comment on column users.name is '用户名字, 用于显示';
     #+END_SRC
 
-*** 列数据类型
+*** 数据类型
 **** 数值型
      - ~number(precision[,scale])~ : 数值型，用于表示整数和实数。 precision 表示
        精度，scale 表示数值范围。precision 的取值范围为 1 到 38，scale 的取值范
-       围为 -84 到 127
+       围为 -84 到 127。一句话： precision 是总的数字位数， scale 是小数点后的数
+       字个数
 
 **** 字符串
      - ~varchar2(size[byte|char])~ : 变长字符串类型，size 表示字符串最大长度，单
@@ -116,10 +113,16 @@
        单位 byte 和单位 char 语义一样都是表示字符（character）数
      - ~long~ : 2gb 的超长字符串。 _每张表只允许一列是 long 类型_
 
+     *注意* 数据库中的 ~char~ 存储时每个字段大小占用的字节数是固定的, ~varchar2~
+     存储时暂用的字节是变化的。两者使用的场景不同，对于使用字符串固定长度的，例
+     如：valid 字段, ~'y'~ 表示合法, ~'n'~ 表示不合法，可以使用 ~char~ 来存储，
+     这样访问速度快；大部分的场景：字符串长度是不确定的，而且变化比较大，这时最
+     好使用 ~varchar2~ 来存储，这样节约存储空间
+
 **** 时间/日期类型
      - ~date~ : 时间和日期类型。 Oracle 的时间和日期都用 date 类型表示， 默认的
-       时间格式字符由 ~NLS_DATE_FORMAT~ 参数决定，它是 =DD-MMM-YY= 格式，例
-       如：'13-OCT-92', '07-JAN-98' 。
+       时间格式字符由 ~NLS_DATE_FORMAT~ 参数决定，它是 ~'DD-MMM-YY'~ 格式，例如:
+       ~'13-OCT-92'~, ~'07-JAN-98'~
 
 **** 二进制 Lob
      - ~clob~ : 最多可以存储 4GB 的数据字符的大对象（Character Data of Large
@@ -142,6 +145,8 @@
     #+END_SRC
 *** 查看所有表
     #+BEGIN_SRC sql
+      -- 查看当前数据库
+      select name from v$database;
       -- 查看所有表
       select table_name from user_tables order by table_name;
       -- 查看所有表和视图，以及注释
@@ -154,7 +159,111 @@
       order by
         a.table_name;
     #+END_SRC
+*** 临时表
+    临时表主要作用是保存事务或者会话的中间数据，所以一般包含事务级别的和会话级别
+    的临时表
+    1. 事务级临时表 ~on commit delete rows~ 当 COMMIT 的时候删除数据（默认情况）
+    2. 会话级临时表 ~on commit preserve rows~ 当 COMMIT 的时候保留数据，当会话结
+       束删除数据
+    #+BEGIN_SRC sql
+      create global temporary table tabname (
+        id number
+      ) on commit delete rows;
+    #+END_SRC
+    Oracle 的临时表创建完就是真实存在的，无需每次都创建。 删除临时表和删除普通表
+    一样
+    #+BEGIN_SRC sql
+      drop table tabname;
+      truncate table tabname;
+    #+END_SRC
+*** 其它
+    - Oracle 表默认存储结构是队 (Heap)
+    - Oracle 的空值 NULL 不同于字符串，空值在数据库中的存储方式有以下两种：
+      1. 如果 NULL 在两列之间，需要一字节来存储，一般是 ASCII 码 Zero 值
+      2. 如果 NULL 位于行末端，一般默认不存
 
+** 索引
+   索引 (Index) 是数据库的可选的一种数据结构，主要用处是加速数据存取
+*** 创建索引
+    #+BEGIN_SRC sql
+      -- 单行索引
+      create index idxname on tabname(colname);
+      -- 组合索引
+      create index idxname on tabname(colname1, colname2);
+    #+END_SRC
+*** 修改和删除索引
+    #+BEGIN_SRC sql
+      -- 重建索引：如果经常在索引列上执行 dml 操作，需要定期重建索引
+      alter index idxname rebuild;
+      -- 删除索引
+      drop index idxname;
+    #+END_SRC
+*** 索引类型
+    - B-tree Indexes
+    - Bitmap and Bitmap Join Indexes
+    - Funtion-based Indexes
+      #+BEGIN_SRC sql
+        create index emp_name_upper_ix on emp (upper(name));
+      #+END_SRC
+    - Application Domain Indexes
+
+** 分区，视图，序列，同义词等其它结构
+*** 分区
+    分区主要包含以下要点
+    - 分区键 (Partition Key)
+    - 分区策略 (Partition Strategies)，常见的分区有一下几种
+      + 基于范围的分区 (Range Partition)
+      + 基于列表的分区 (List Partition)
+      + 基于哈希的分区 (Hash Partition)
+*** 创建分区表
+    创建分区表主要是在 ~create table~ 语句后面加 ~partition by~ 来说明分区策略
+
+    基于范围的分区表
+    #+BEGIN_SRC sql
+      create table time_range_sales (
+        prod_id number (6), -- 产品 ID
+        cust_id number,     -- 顾客 ID
+        time_id date,       -- 时间 ID
+        channel_id char(1), -- 渠道 ID
+        promo_id number(6),
+        quantity_sold number (3),
+        amount_sold number (10, 2)
+      ) partition by range (time_id) (
+        partition sales_1998 values less than (to_date('1999-01-01', 'YYYY-MM-DD')),
+        partition sales_1999 values less than (to_date('2000-01-01', 'YYYY-MM-DD')),
+        partition sales_2000 values less than (to_date('2001-01-01', 'YYYY-MM-DD')),
+        partition sales_2001 values less than (maxvalue)
+      );
+    #+END_SRC
+
+    基于列表的分区表
+    #+BEGIN_SRC sql
+      create table list_sales (
+        prod_id number (6), -- 产品 ID
+        cust_id number,     -- 顾客 ID
+        time_id date,       -- 时间 ID
+        channel_id char(1), -- 渠道 ID
+        promo_id number(6),
+        quantity_sold number (3),
+        amount_sold number (10, 2)
+      ) partition by list (channel_id) (
+        partition even_channels values (2, 4),
+        partition odd_channels values (3, 9)
+      );
+    #+END_SRC
+
+    基于哈希的分区表
+    #+BEGIN_SRC sql
+      create table hash_sales (
+        prod_id number (6), -- 产品 ID
+        cust_id number,     -- 顾客 ID
+        time_id date,       -- 时间 ID
+        channel_id char(1), -- 渠道 ID
+        promo_id number(6),
+        quantity_sold number (3),
+        amount_sold number (10, 2)
+      ) partition by hash (prod_id) partitions 2;
+    #+END_SRC
 * 数据存取
 ** 简单查询语句
    #+BEGIN_SRC sql
