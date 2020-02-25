@@ -814,6 +814,22 @@
        d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
        gadbmhc20xhx8 | select /* hashtag */ sysdate from dual
        -- library cache 命中，这里发生了软解析
+
+       SQL> select /* hashtag new */ sysdate from dual;
+
+       SYSDATE
+       -------------------
+       2020-02-25 04:00:29
+
+       SQL> select sql_id, sql_text from v$sql where sql_text like '%hashtag%';
+
+       SQL_ID        | SQL_TEXT
+       --------------+-----------------------------------------------------------------
+       d3k0qy7gmnz75 | select /* hashtag new */ sysdate from dual
+       d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
+       gadbmhc20xhx8 | select /* hashtag */ sysdate from dual
+       -- 注意，SQL 的哈希值是根据字符串计算的
+       -- 如果 SQL 的语义一样，但字符串不一样导致哈希值不一样也会发生硬解析
      #+END_SRC
 
 ** PL/SQL
