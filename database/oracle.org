@@ -759,10 +759,10 @@
    | off           | Disable auto trace                  |
 
 ** SQL 处理
-    DDL 语句用来创建数据库中的对象， DML 语句用来获取数据库中的数据。这些 SQL 语句在执行
-    前都要进行处理，处理时，Oracle 创建一个 parse call 来准备执行，这个 parse call 打开或
-    创建一个 cursor，cursor 的作用是处理特定会话的私有 SQL 区域，以上的处理都是需要消耗 PGA。
-    解析流程如下图所示
+    DDL 语句用来创建数据库中的对象， DML 语句用来获取数据库中的数据。这些 SQL 语
+    句在执行前都要进行处理，处理时，Oracle 创建一个 parse call 来准备执行，这个
+    parse call 打开或创建一个 cursor，cursor 的作用是处理特定会话的私有 SQL 区域，
+    以上的处理都是需要消耗 PGA。解析流程如下图所示
     [[file:../static/image/2020/02/oracle-sql-processing.png]]
 
     根据上面的图，解析大体上包含下面几个步骤：
@@ -771,8 +771,9 @@
     - Shared Pool 检查
     [[file:../static/image/2020/02/oracle-shared-pool-check.png]]
 
-    通过检查的 SQL 在执行前需要根据对应的哈希值来查找，对于已经执行过的 SQL 一般会放到
-    Library Cache 中缓存，如果没有命中，则执行硬解析，否则执行软解析
+    已经执行过的 SQL 语句会放到 Library Cache 中缓存。在解析 SQL 语句前，Oracle
+    会通过哈希值在 Library Cache 中查找缓存的 SQL 语句，如果没有命中，则执行硬解析，
+    否则执行软解析
 
 ** PL/SQL
 *** 存储过程
