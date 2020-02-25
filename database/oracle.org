@@ -984,38 +984,156 @@
    - Thin 纯 Java 实现的数据库连接库
 
 * 事务管理
-  在数据库中事务是工作的逻辑单元，一个事务是由一个或多个完成一组的相关行为的 SQL
-  语句组成，通过事务机制确保这一组 SQL 语句所作的操作要么完全成功执行，完成整个
-  工作单元操作，要么一点也不执行。
-  - *事务开始* 在 Oracle 数据库中，没有提供开始事务处理语句，所有的事务都是隐式
-    开始的，也就是说在 Oracle 中，用户不可以显示使用命令来开始一个事务。Oracle
-    任务第一条修改数据库的语句， 或者一些要求事务处理的场合都是事务的隐式开始。
-    但是当用户想要终止一个事务处理时， 必须显示使用 ~commit~ 和 ~rollback~ 语句
-    结束。
+** 事务隔离级别
+   对于并发读数据会出现以下 3 种情况
+   1. *Dirty Read* 事务 Tx1 更新了一行记录，还未提交所做的修改，这个 Tx2 读取了
+      更新后的数据，然后 Tx1 执行回滚操作，取消刚才的修改，所以 Tx2 所读取的行就
+      无效，也就是脏数据
+   2. *Nonrepeatable Read* 事务 Tx1 读取一行记录，紧接着事务 Tx2 修改了 Tx1 刚刚
+      读取的记录并 commit，然后 Tx1 再次查询，发现与第一次读取的记录不同，这称为
+      不可重复读
+   3. *Phantom Read* 事务 Tx1 读取一条指定 where 条件的语句，返回结果集。此时事
+      务 Tx2 插入一行新记录并 commit，恰好满足 Tx1 的 where 条件。然后 Tx1 使用
+      相同的条件再次查询，结果集中可以看到 Tx2 插入的记录，这条新纪录就是幻想
+
+   标准 SQL 针对上述读问题设计 4 中隔离级别：
+   |                  | Dirty Read   | Nonrepeatable Read | Phantom Read |
+   |------------------+--------------+--------------------+--------------|
+   | Read Uncommitted | Possible     | Possible           | Possible     |
+   | Read Committed   | Not Possible | Possible           | Possible     |
+   | Repeatable Read  | Not Possible | Not Possible       | Possible     |
+   | Serializable     | Not Possible | Not Possible       | Not Possible |
+
+   Oracle 事务包含以下三个隔离级别
+   1. *Read Committed* 是 Oracle 默认的事务隔离级别，事务内只能读到事务开始时间
+      点的数据 ，事务执行过程中改变的数据对当前事务不可见
+   2. *Serializable* 事务内不仅读到事务开始时间点的数据，事务执行中的修改也能读
+      到，所以这种事务隔离级别可以读到最新数据，相当于串行操作，所以并发性不是很
+      好，该类事务常用于以下几种场合
+      - 数据规模大但事务时间短并且更新行数少
+      - 两个事务竞争方式修改的行，并且这些行是不相关的
+      - 执行时间比较长，但是是只读的事务
+   3. Read-Only 只读级别的事务
+
+   事务的隔离级别可以使用以下的 SQL 来设置
+   #+BEGIN_SRC sql
+     set transaction isolation level read committed;   -- 提交可读
+     set transaction isolation level serializable;     -- Serializable 级别
+     set transaction isolation level read uncommitted; -- 标准 SQL 支持，Oracle 不支持
+   #+END_SRC
+
+** 数据库锁机制
+   数据库锁是模式包含两种： *共享* (Share) 和 *互斥* (Exclusive)。如果两个用户在
+   同时等待的资源同时被对方锁住了就会出现 *死锁* (Deak lock)
+*** DML 锁
+    DML 锁在 Oracle 中被称为数据所，主要分成以下两类
+    1. *TX* lock 即行锁 (Row Lock) 在 Oracle 表中锁住表的一行
+    2. *TM* lock 即表所 (Table Lock) 在 Oracle 中对表操作进行锁
+       - *RS*  (Row Share)
+       - *RX*  (Row Exclusive Table)
+       - *S*   (Share Table)
+       - *SRX* (Share Row Exclusive Table)
+       - *X*   (Exclusive Table)
+
+    TM 锁可以的锁模式见下表
+    | Share / eXclusive | Table | Row |
+    |-------------------+-------+-----|
+    | RS                |       | S   |
+    | RX                |       | X   |
+    | S                 | S     |     |
+    | SRX               | X     | S   |
+    | X                 | X     |     |
+
+    #+BEGIN_SRC sql
+      -- 请求TX 出现条件的一些语句
+      select /* bla */ for update;
+      insert /* bla */;
+      update /* bla */;
+      delete /* bla */;
+      merge /* bla*/;
+    #+END_SRC
+
+    #+BEGIN_SRC sql
+      -- 请求TM 出现条件的一些语句
+      lock table /* bla */;
+      select /* bla */ for update;
+      insert /* bla */;
+      update /* bla */;
+      delete /* bla */;
+      merge /* bla*/;
+    #+END_SRC
+*** DDL 锁
+    DDL 锁主要是保护数据字典，用户一般不会直接获取 DDL 锁，但是在创建数据库对象
+    是会隐式获取改锁，例如：创建存储过程是会获取 DDL 锁
+*** 系统锁
+    - *Latch* 是 Oracle 数据库中的低级别的系统锁，用来保护数据库对象，数据结构，
+      对象和文件等。数据库内部的后台进程，共享池，写进程都是使用 Latch 来完成同
+      步的。
+    - *Mutex* 是另一个低级别的系统锁，与 Latch 相似，不同之处是 Latch 通常保护一
+      组数据库对象，而 Mutex 保护单个数据库对象
+    - *Internal Locks* 系统还有其它的锁
+      - Dictionary cache locks
+      - File and log management locks
+      - Tablespace and undo segment locks
+** 事务概述
+   在数据库中事务是工作的逻辑单元，一个事务是由一个或多个完成一组的相关行为的
+   SQL 语句组成，通过事务机制确保这一组 SQL 语句所作的操作要么完全成功执行，完成
+   整个工作单元操作，要么一点也不执行。
+
+   事务的四个特性 *ACID* 见如下描述
+   1. *原子性* (Atomicity) 事务中 SQL 语句不可分割，要么都做，要么都不做
+   2. *一致性* (Consistency) 指事务操作前后，数据库中数据是一致的，数据满足业务
+      规则约束 (例如账户金额的转出和转入)，与原子性对应。
+   3. *隔离性* (Isolation) 多个并发事务可以独立运行，而不能相互干扰，一个事务修
+      改数据未提交前，其他事务看不到它所做的更改。
+   4. *持久性* (Durability) 事务提交后，数据的修改是永久的
+
+** 事务开始和结束
+   *事务开始* 在 Oracle 数据库中，没有提供开始事务处理语句，所有的事务都是隐式开
+   始的，也就是说在 Oracle 中，用户不可以显示使用命令来开始一个事务。Oracle 任务
+   第一条修改数据库的语句， 或者一些要求事务处理的场合都是事务的隐式开始。
+
+   *事务结束* 主要发生在以下几种情况下：
+   1. 执行 DDL 语句时，系统自动执行 ~commit~ 语句，相当于隐式提交事务
+   2. 显示执行 ~commit~ 和 ~rollback~
+   3. 退出/断开数据库的连接自动执行 ~commit~ 语句
+   4. 进程意外终止，事务自动 ~rollback~
+   5. 事务 ~commit~ 时会生成一个唯一的系统变化号保存到事务表，这个系统变化号被称
+      为 SCN (System Check Number) 号
+
+   开始的事务都可以在 =v$transaction= 视图中看到
+   #+BEGIN_SRC sql
+     SQL> select xid from v$transaction;
+
+     XID
+     ----------------
+     02001700A8010000
+   #+END_SRC
+
+** 事务属性和约束模式
   - *事务属性* 主要包括:
-    1. 指定事务的隔离层
-    2. 规定回滚事务所使用的存储空间；
-    3. 命名事务。
-    注意：在使用 set transaction 语句设置属性时，对于规定回滚事务所使用的存储空
-    间的设置很少使用。对于命名事务也非常简单，只有在分布式事务处理中才会体现出命
-    名事务的用途。
+    1. 指定事务的隔离级别，默认为 ~read committed~
+    2. 规定回滚事务所使用的存储空间，存储空间的设置很少使用
+    3. 命名事务，即事务的名称。对于命名事务也非常简单，只有在分布式事务处理中才
+       会体现出命名事务的用途
   - *约束模式* 在事务中修改数据时，数据库中的约束立即应用于数据，还是将约束推迟
     到当前事务结束后应用。
 
   #+BEGIN_SRC sql
     -- 设置事物属性 只对当前事务有效，事务终止，事务当前的设置将会失效。
-    set transaction ;
+    set transaction <options>;
     -- 设置事物的约束模式
-    set constrains;
+    set constrains <options>;
 
     -- 在事务中建立一个存储的点.当事务处理发生异常而回滚事务时，
     -- 可指定事务回滚到某存储点.然后从该存储点重新执行。
     savepoint spname;
-    --> 删除存储点
-    release savepoint;
+    -- 删除存储点
+    release savepoint spname;
 
     -- 回滚事务
     rollback;
+    rollback to savepoint spname;
     -- 提交事务
     commit;
   #+END_SRC
