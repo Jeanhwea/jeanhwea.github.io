@@ -776,47 +776,155 @@
     否则执行软解析
 
 ** PL/SQL
-*** 存储过程
-    #+BEGIN_SRC sql
-      DECLARE
-        -- 定义变量
-        i INTEGER;
-      BEGIN
-        -- sqlplus 中默认输出是关闭的，可以使用下面方法开启选项
-        -- SET SERVEROUTPUT ON
-        DBMS_OUTPUT.put_line('Hello world');
-      END;
-    #+END_SRC
+   服务器端编程的一些语言 PL/SQL 是直接存在 Oracle 数据库内存中的，获取和解析 SQL 的消耗
+   可以有效地提高执行效率
 *** 变量
-**** 变量类型
-     - 普通变量（CHAR, VARCHAR2, DATE, NUMBER, BOOLEAN, LONG）
-     - 特殊变量（引用型变量，记录型变量）
+    变量类型
+    - 普通变量（char, varchar2, date, number, boolean, long）
+    - 特殊变量（引用型变量，记录型变量）
+    #+BEGIN_SRC sql
+      varname varchar2(20);
+    #+END_SRC
 
-     #+BEGIN_SRC sql
-       varname varchar2(20);
-     #+END_SRC
+    变量赋值
+    - 直接赋值 ~:=~
+    - 语句赋值，使用 ~SELECT ... INTO ...~
 
-**** 变量赋值
-     - 直接赋值 ~:=~
-     - 语句赋值，使用 ~SELECT ... INTO ...~
+    #+BEGIN_SRC sql
+      declare
+        v_name varchar(20) := ''; -- 初始化赋值
+        v_sal number;
+        v_addr varchar(200);
+      begin
+        -- 直接赋值
+        v_sal := 2383;
 
-     #+BEGIN_SRC sql
-       DECLARE
-         v_name varchar(20) := ''; -- 初始化赋值
-         v_sal number;
-         v_addr varchar(200);
-       BEGIN
-         -- 直接赋值
-         v_sal := 2383;
+        -- 语句赋值
+        select '北京市朝阳区' into v_addr from dual;
 
-         -- 语句赋值
-         SELECT '北京市朝阳区' INTO v_addr FROM DUAL;
+        dbms_output.put_line('姓名: ' || v_name || ', 薪水: ' || v_sal || ', 地址 c: ' || v_addr);
+      end;
+    #+END_SRC
+*** 子程序 Subprogram
+   子程序包括： procedure 和 function 两类，其中 function 有返回值， procedure
+   没有返回值
+   #+BEGIN_SRC sql
+     create procedure hire_employees (
+       p_last_name varchar2,
+       p_job_id varchar2,
+       p_manager_id number,
+       p_hire_date date,
+       p_salary number,
+       p_commission_pct number,
+       p_department_id number
+     ) is
+     begin
+       -- bla bla
+       insert into employees
+           (employee_id, last_name, job_id, manager_id,
+               hire_date, salary, commission_pct, department_id)
+       values (emp_sequence.nextval, p_last_name, p_job_id,
+               p_manager_id, p_hire_date, p_salary, p_commission_pct, p_department_id);
+       -- bla bla
+     end;
+   #+END_SRC
 
-         DBMS_OUTPUT.put_line('姓名: ' || v_name || ', 薪水: ' || v_sal || ', 地址 c: ' || v_addr);
-       END;
-     #+END_SRC
+   执行子程序的方法如下：
+   #+BEGIN_SRC sql
+     execute hire_employees ('TSMITH', 'CLERK', 1037, sysdate, 500, null, 20);
+   #+END_SRC
 
-* 用户、角色和权限
+*** 包 Package
+    PL/SQL 的包和 Java 的很相似，提供封装性
+    #+BEGIN_SRC sql
+      create package employees_management as
+        function hire_employees
+            (last_name varchar2, job_id varchar2, manager_id number, salary number,
+                commission_pct number, department_id number) return number;
+        procedure fire_employees(employee_id NUMBER);
+        procedure salary_raise(employee_id NUMBER, salary_incr NUMBER);
+        -- bla bla
+        no_sal exception;
+      end employees_management;
+    #+END_SRC
+
+    调用包中函数的方法
+    #+BEGIN_SRC sql
+      execute employees_management.hire_employees
+          ('tsmith', 'clerk', 1037, sysdate, 500, null, 20);
+    #+END_SRC
+
+*** 匿名块 Anonymous Block
+    匿名块是没有名字的过程，使用 =/= 来执行
+    #+BEGIN_SRC sql
+      declare
+        v_lname varchar2(25);
+      begin
+        select last_name into v_lname
+            from employees where employee_id = 101;
+        -- sqlplus 中默认输出是关闭的，可以使用下面方法开启选项
+        -- set serveroutput on
+        dbms_output.put_line('Employee last name is ' || v_lname);
+      end;
+    #+END_SRC
+
+** 触发器 Trigger
+   触发器定义了 Oracle 表操作的一些自动使用的行为，和 Hook 机制很像
+*** 创建触发器
+    #+BEGIN_SRC sql
+      create trigger trigger_name
+        triggering_statement
+        [trigger_restriction]
+      begin
+       triggered_action;
+      end;
+    #+END_SRC
+
+*** 触发器使用
+    创建示例表
+    #+BEGIN_SRC sql
+      create table orders (
+        order_id number primary key,
+        /* other attributes */
+        line_items_count number default 0
+      );
+
+      create table lineitems (
+        order_id references orders,
+        seq_no number,
+        /* other attributes */
+        constraint lineitems primary key(order_id, seq_no)
+      );
+    #+END_SRC
+
+    创建一个触发器，自动适配上述两张表对应操作的行为
+    #+BEGIN_SRC sql
+      create or replace trigger lineitems_trigger
+        after insert or update or delete on lineitems
+        for each row
+      begin
+        if (inserting or updating)
+        then
+          update orders set line_items_count = nvl(line_items_count,0)+1
+          where order_id = :new.order_id;
+        end if;
+        if (deleting or updating)
+        then
+          update orders set line_items_count = nvl(line_items_count,0)-1
+          where order_id = :old.order_id;
+        end if;
+      end;
+      /
+    #+END_SRC
+
+** Java
+   Oracle 支持服务器端使用 Java 编程的存储过程 (Java stored procedure)，但是目前
+   很少使用，因为与 Oracle 数据库紧耦合，一般还是使用 JDBC 连接数据库来操作，
+   JDBC 主要分以下几种连接方式：
+   - OCI (Oracle Call Interface) 包含了 Oracle 内置的代码，Java 代码等一般不能直
+     接使用 Java 连
+   - Thin 纯 Java 实现的数据库连接库
+* 用户
 ** 查看当前用户
    #+BEGIN_SRC sql
      show user;
