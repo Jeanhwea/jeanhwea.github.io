@@ -709,9 +709,10 @@
      commit comment 'Updated salaries';
    #+END_SRC
 ** SQL 优化器
-   Oracle 在执行 DML 语句时，不是直接将语句解析出来执行，而是生成相应的执行计划 (Execution Plan)，
-   根据生成的执行计划后，优化器就可以获取语句涉及到的执行信息，包括 query 条件，对应的存取
-   路径 (Access Path)，优化器最后生成一个高效的查询计划 (Query Plan)，最后执行查询
+   Oracle 在执行 DML 语句时，不是直接将语句解析出来执行，而是生成相应的执行计划
+   (Execution Plan)，根据生成的执行计划后，优化器就可以获取语句涉及到的执行信息，
+   包括 query 条件，对应的存取路径 (Access Path)，优化器最后生成一个高效的查询计
+   划 (Query Plan)，最后执行查询
    [[file:../static/image/2020/02/oracle-optimizer-components.png]]
 
    下面是一个查看语句执行计划的示例
@@ -763,21 +764,23 @@
     句在执行前都要进行处理，处理时，Oracle 创建一个 parse call 来准备执行，这个
     parse call 打开或创建一个 cursor，cursor 的作用是处理特定会话的私有 SQL 区域，
     以上的处理都是需要消耗 PGA。解析流程如下图所示
+
     [[file:../static/image/2020/02/oracle-sql-processing.png]]
 
     根据上面的图，解析大体上包含下面几个步骤：
     - 词法检查
     - 语法检查
     - Shared Pool 检查
+
     [[file:../static/image/2020/02/oracle-shared-pool-check.png]]
 
     已经执行过的 SQL 语句会放到 Library Cache 中缓存。在解析 SQL 语句前，Oracle
-    会通过哈希值在 Library Cache 中查找缓存的 SQL 语句，如果没有命中，则执行硬解析，
-    否则执行软解析
+    会通过哈希值在 Library Cache 中查找缓存的 SQL 语句，如果没有命中，则执行硬解
+    析，否则执行软解析
 
 ** PL/SQL
-   服务器端编程的一些语言 PL/SQL 是直接存在 Oracle 数据库内存中的，获取和解析 SQL 的消耗
-   可以有效地提高执行效率
+   服务器端编程的一些语言 PL/SQL 是直接存在 Oracle 数据库内存中的，获取和解析
+   SQL 的消耗可以有效地提高执行效率
 *** 变量
     变量类型
     - 普通变量（char, varchar2, date, number, boolean, long）
@@ -806,8 +809,8 @@
       end;
     #+END_SRC
 *** 子程序 Subprogram
-   子程序包括： procedure 和 function 两类，其中 function 有返回值， procedure
-   没有返回值
+   子程序包括： procedure 和 function 两类，其中 function 有返回值， procedure 没
+   有返回值
    #+BEGIN_SRC sql
      create procedure hire_employees (
        p_last_name varchar2,
