@@ -708,112 +708,113 @@
      update employees set salary = 9200 where employee_id = 1234; -- DML
      commit comment 'Updated salaries';
    #+END_SRC
-** SQL 优化器
-   Oracle 在执行 DML 语句时，不是直接将语句解析出来执行，而是生成相应的执行计划
-   (Execution Plan)，根据生成的执行计划后，优化器就可以获取语句涉及到的执行信息，
-   包括 query 条件，对应的存取路径 (Access Path)，优化器最后生成一个高效的查询计
-   划 (Query Plan)，最后执行查询
-   [[file:../static/image/2020/02/oracle-optimizer-components.png]]
+** SQL 优化与解析
+*** 优化器
+    Oracle 在执行 DML 语句时，不是直接将语句解析出来执行，而是生成相应的执行计划
+    (Execution Plan)，根据生成的执行计划后，优化器就可以获取语句涉及到的执行信息，
+    包括 query 条件，对应的存取路径 (Access Path)，优化器最后生成一个高效的查询
+    计划 (Query Plan)，最后执行查询
+    [[file:../static/image/2020/02/oracle-optimizer-components.png]]
 
-   下面是一个查看语句执行计划的示例
-   #+BEGIN_SRC sql
-     SQL> set autotrace on
-     SQL> select count(1) from t_department;
-
-       COUNT(1)
-     ----------
-             26
-
-     Execution Plan
-     ----------------------------------------------------------
-     Plan hash value: 3597430146
-
-     ----------------------------------------------------------------------------
-     | Id  | Operation        | Name            | Rows  | Cost (%CPU)| Time     |
-     ----------------------------------------------------------------------------
-     |   0 | SELECT STATEMENT |                 |     1 |     1   (0)| 00:00:01 |
-     |   1 |  SORT AGGREGATE  |                 |     1 |            |          |
-     |   2 |   INDEX FULL SCAN| T_DEPARTMENT_PK |    24 |     1   (0)| 00:00:01 |
-     ----------------------------------------------------------------------------
-
-     Statistics
-     ----------------------------------------------------------
-               0  recursive calls
-               0  db block gets
-               1  consistent gets
-               0  physical reads
-               0  redo size
-             526  bytes sent via SQL*Net to client
-             524  bytes received via SQL*Net from client
-               2  SQL*Net roundtrips to/from client
-               0  sorts (memory)
-               0  sorts (disk)
-               1  rows processed
-   #+END_SRC
-
-   | autotrace     | Note                                |
-   |---------------+-------------------------------------|
-   | on            | Display both explain and statistics |
-   | on explain    | Display explain only                |
-   | on statistics | Display statistics only             |
-   | traceonly     | Disable print result set            |
-   | off           | Disable auto trace                  |
-
-** SQL 处理
-    DDL 语句用来创建数据库中的对象， DML 语句用来获取数据库中的数据。这些 SQL 语
-    句在执行前都要进行处理，处理时，Oracle 创建一个 parse call 来准备执行，这个
-    parse call 打开或创建一个 cursor，cursor 的作用是处理特定会话的私有 SQL 区域，
-    以上的处理都是需要消耗 PGA。解析流程如下图所示
-
-    [[file:../static/image/2020/02/oracle-sql-processing.png]]
-
-    根据上面的图，解析大体上包含下面几个步骤：
-    - 词法检查
-    - 语法检查
-    - Shared Pool 检查
-
-    [[file:../static/image/2020/02/oracle-shared-pool-check.png]]
-
-    已经执行过的 SQL 语句会放到 Library Cache 中缓存。在解析 SQL 语句前，Oracle
-    会通过哈希值在 Library Cache 中查找缓存的 SQL 语句，如果没有命中，则执行硬解
-    析，否则执行软解析
-
-    查看 SQL 的哈希值就是， =v$sql= 视图中的 ~sql_id~, 下面是一个查看哈希值的例子
+    下面是一个查看语句执行计划的示例
     #+BEGIN_SRC sql
-      SQL> select sql_id, sql_text from v$sql where sql_text like '%hashtag%';
+      SQL> set autotrace on
+      SQL> select count(1) from t_department;
 
-      SQL_ID        | SQL_TEXT
-      --------------+-----------------------------------------------------------------
-      d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
+        COUNT(1)
+      ----------
+              26
 
-      SQL> select /* hashtag */ sysdate from dual;
+      Execution Plan
+      ----------------------------------------------------------
+      Plan hash value: 3597430146
 
-      SYSDATE
-      -------------------
-      2020-02-25 03:42:29
+      ----------------------------------------------------------------------------
+      | Id  | Operation        | Name            | Rows  | Cost (%CPU)| Time     |
+      ----------------------------------------------------------------------------
+      |   0 | SELECT STATEMENT |                 |     1 |     1   (0)| 00:00:01 |
+      |   1 |  SORT AGGREGATE  |                 |     1 |            |          |
+      |   2 |   INDEX FULL SCAN| T_DEPARTMENT_PK |    24 |     1   (0)| 00:00:01 |
+      ----------------------------------------------------------------------------
 
-      SQL> select sql_id, sql_text from v$sql where sql_text like '%hashtag%';
-
-      SQL_ID        | SQL_TEXT
-      --------------+-----------------------------------------------------------------
-      d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
-      gadbmhc20xhx8 | select /* hashtag */ sysdate from dual
-      -- 这里发生了硬解析
-
-      SQL> select /* hashtag */ sysdate from dual;
-
-      SYSDATE
-      -------------------
-      2020-02-25 03:51:54
-
-      SQL> select sql_id, sql_text from v$sql where sql_text like '%hashtag%';
-
-      SQL_ID        | SQL_TEXT
-      --------------+-----------------------------------------------------------------
-      d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
-      gadbmhc20xhx8 | select /* hashtag */ sysdate from dual
-      -- library cache 命中，这里发生了软解析
+      Statistics
+      ----------------------------------------------------------
+                0  recursive calls
+                0  db block gets
+                1  consistent gets
+                0  physical reads
+                0  redo size
+              526  bytes sent via SQL*Net to client
+              524  bytes received via SQL*Net from client
+                2  SQL*Net roundtrips to/from client
+                0  sorts (memory)
+                0  sorts (disk)
+                1  rows processed
     #+END_SRC
+
+    | autotrace     | Note                                |
+    |---------------+-------------------------------------|
+    | on            | Display both explain and statistics |
+    | on explain    | Display explain only                |
+    | on statistics | Display statistics only             |
+    | traceonly     | Disable print result set            |
+    | off           | Disable auto trace                  |
+
+*** SQL 处理机制
+     DDL 语句用来创建数据库中的对象， DML 语句用来获取数据库中的数据。这些 SQL
+     语句在执行前都要进行处理，处理时，Oracle 创建一个 parse call 来准备执行，这
+     个 parse call 打开或创建一个 cursor，cursor 的作用是处理特定会话的私有 SQL
+     区域，以上的处理都是需要消耗 PGA。解析流程如下图所示
+
+     [[file:../static/image/2020/02/oracle-sql-processing.png]]
+
+     根据上面的图，解析大体上包含下面几个步骤：
+     - 词法检查
+     - 语法检查
+     - Shared Pool 检查
+
+     [[file:../static/image/2020/02/oracle-shared-pool-check.png]]
+
+     已经执行过的 SQL 语句会放到 Library Cache 中缓存。在解析 SQL 语句前，Oracle
+     会通过哈希值在 Library Cache 中查找缓存的 SQL 语句，如果没有命中，则执行硬解
+     析，否则执行软解析
+
+     查看 SQL 的哈希值就是， =v$sql= 视图中的 ~sql_id~, 下面是一个查看哈希值的例子
+     #+BEGIN_SRC sql
+       SQL> select sql_id, sql_text from v$sql where sql_text like '%hashtag%';
+
+       SQL_ID        | SQL_TEXT
+       --------------+-----------------------------------------------------------------
+       d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
+
+       SQL> select /* hashtag */ sysdate from dual;
+
+       SYSDATE
+       -------------------
+       2020-02-25 03:42:29
+
+       SQL> select sql_id, sql_text from v$sql where sql_text like '%hashtag%';
+
+       SQL_ID        | SQL_TEXT
+       --------------+-----------------------------------------------------------------
+       d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
+       gadbmhc20xhx8 | select /* hashtag */ sysdate from dual
+       -- 这里发生了硬解析
+
+       SQL> select /* hashtag */ sysdate from dual;
+
+       SYSDATE
+       -------------------
+       2020-02-25 03:51:54
+
+       SQL> select sql_id, sql_text from v$sql where sql_text like '%hashtag%';
+
+       SQL_ID        | SQL_TEXT
+       --------------+-----------------------------------------------------------------
+       d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
+       gadbmhc20xhx8 | select /* hashtag */ sysdate from dual
+       -- library cache 命中，这里发生了软解析
+     #+END_SRC
 
 ** PL/SQL
    PL/SQL 是直接存在 Oracle 数据库内存中的，减少了获取和解析 SQL 计算的资源消耗，
