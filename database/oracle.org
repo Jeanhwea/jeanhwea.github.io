@@ -783,9 +783,9 @@
      #+BEGIN_SRC sql
        SQL> select sql_id, sql_text from v$sql where sql_text like '%hashtag%';
 
-       SQL_ID        | SQL_TEXT
-       --------------+-----------------------------------------------------------------
-       d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
+       SQL_ID        SQL_TEXT
+       ------------- ----------------------------------------------------------------
+       d6a6j07p0jfu3 select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
 
        SQL> select /* hashtag */ sysdate from dual;
 
@@ -795,10 +795,10 @@
 
        SQL> select sql_id, sql_text from v$sql where sql_text like '%hashtag%';
 
-       SQL_ID        | SQL_TEXT
-       --------------+-----------------------------------------------------------------
-       d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
-       gadbmhc20xhx8 | select /* hashtag */ sysdate from dual
+       SQL_ID        SQL_TEXT
+       ------------- -----------------------------------------------------------------
+       d6a6j07p0jfu3 select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
+       gadbmhc20xhx8 select /* hashtag */ sysdate from dual
        -- 这里发生了硬解析
 
        SQL> select /* hashtag */ sysdate from dual;
@@ -809,10 +809,10 @@
 
        SQL> select sql_id, sql_text from v$sql where sql_text like '%hashtag%';
 
-       SQL_ID        | SQL_TEXT
-       --------------+-----------------------------------------------------------------
-       d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
-       gadbmhc20xhx8 | select /* hashtag */ sysdate from dual
+       SQL_ID        SQL_TEXT
+       ------------- -----------------------------------------------------------------
+       d6a6j07p0jfu3 select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
+       gadbmhc20xhx8 select /* hashtag */ sysdate from dual
        -- library cache 命中，这里发生了软解析
 
        SQL> select /* hashtag new */ sysdate from dual;
@@ -823,11 +823,11 @@
 
        SQL> select sql_id, sql_text from v$sql where sql_text like '%hashtag%';
 
-       SQL_ID        | SQL_TEXT
-       --------------+-----------------------------------------------------------------
-       d3k0qy7gmnz75 | select /* hashtag new */ sysdate from dual
-       d6a6j07p0jfu3 | select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
-       gadbmhc20xhx8 | select /* hashtag */ sysdate from dual
+       SQL_ID        SQL_TEXT
+       ------------- -----------------------------------------------------------------
+       d3k0qy7gmnz75 select /* hashtag new */ sysdate from dual
+       d6a6j07p0jfu3 select sql_id, sql_text from v$sql where sql_text like '%hashtag%'
+       gadbmhc20xhx8 select /* hashtag */ sysdate from dual
        -- 注意，SQL 的哈希值是根据字符串计算的
        -- 如果 SQL 的语义一样，但字符串不一样导致哈希值不一样也会发生硬解析
      #+END_SRC
@@ -1520,17 +1520,33 @@
     是否折行，分页大小配置等。下面是我常用的配置。
 
     #+BEGIN_SRC sql
+      -- add SQLHOME env to sqlplus executable
       -- $ORACLE_HOME/sqlplus/admin/glogin.sql
       -- set underline off
+      -- set verify off
+      -- set trimout on
+      -- set trimspool on
+
       set tab off
-      set verify off
       set wrap off
       set linesize 32767
-      set pagesize 0
-      set trimout on
-      set trimspool on
-      set feedback on
-      -- 改变当前会话的日期格式
+      set pagesize 9999
+
+      -- responsive linesize
+      host echo "set linesize $(stty -a | head -n 1 | cut -d';' -f3 | cut -d' ' -f3)" > .tmp.sql
+      @.tmp.sql
+      host rm .tmp.sql
+
+      -- add user and sid to prompt
+      column global_name new_value gname
+      set termout off
+      select '('|| lower(user || '@' || global_name) || ')' || chr(10) || 'SQL> '
+        as global_name
+        from global_name;
+        set sqlprompt '&gname'
+      set termout on
+
+      -- change date format
       alter session set nls_date_format = 'yyyy-mm-dd hh24:mi:ss';
     #+END_SRC
 
