@@ -1147,11 +1147,11 @@
     #+END_SRC
 
     例如：
-    #+BEGIN_SRC text
-      SQL> SHOW USER;
+    #+BEGIN_SRC sql
+      SQL> show user;
       USER is "APPLE"
-      SQL> SELECT USER FROM DUAL;
-      Apple
+      SQL> select user from dual;
+      APPLE
     #+END_SRC
 
 *** 创建/解锁用户
@@ -1197,48 +1197,48 @@
     的表空间。为了避免这种情况，提前创建默认表空间和临时表空间
     #+BEGIN_SRC sql
       -- 创建默认表空间
-      CREATE TABLESPACE PFile1
-        DATAFILE '/u01/app/oracle/oradata/XE/pfile1.dbf'
-        SIZE 128M AUTOEXTEND OFF
-        LOGGING
-        ONLINE
-        PERMANENT
-        EXTENT MANAGEMENT LOCAL AUTOALLOCATE
-        BLOCKSIZE 8K
-        SEGMENT SPACE MANAGEMENT AUTO
-        FLASHBACK ON;
+      create tablespace pfile1
+        datafile '/u01/app/oracle/oradata/xe/pfile1.dbf'
+        size 128m autoextend off
+        logging
+        online
+        permanent
+        extent management local autoallocate
+        blocksize 8k
+        segment space management auto
+        flashback on;
 
       -- 创建临时表空间
-      CREATE TEMPORARY TABLESPACE TFile1
-        TEMPFILE '/u01/app/oracle/oradata/XE/tfile1.dbf'
-        SIZE 2048M AUTOEXTEND OFF
-        TABLESPACE GROUP ''
-        EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M;
+      create temporary tablespace tfile1
+        tempfile '/u01/app/oracle/oradata/xe/tfile1.dbf'
+        size 2048m autoextend off
+        tablespace group ''
+        extent management local uniform size 1m;
     #+END_SRC
 
 *** 创建用户
     创建新的用户
     #+BEGIN_SRC sql
-      DROP USER AVICTOR CASCADE;
+      drop user avictor cascade;
 
-      CREATE USER AVICTOR
-        IDENTIFIED BY secret
-        DEFAULT TABLESPACE PFile1
-        TEMPORARY TABLESPACE TFile1
-        PROFILE DEFAULT
-        ACCOUNT UNLOCK;
+      create user avictor
+        identified by secret
+        default tablespace pfile1
+        temporary tablespace tfile1
+        profile default
+        account unlock;
 
-      GRANT CONNECT TO AVICTOR;
-      GRANT DBA TO AVICTOR;
-      ALTER USER AVICTOR DEFAULT ROLE ALL;
+      grant connect to avictor;
+      grant dba to avictor;
+      alter user avictor default role all;
 
-      GRANT SELECT ANY DICTIONARY TO AVICTOR;
-      GRANT SELECT ANY SEQUENCE TO AVICTOR;
-      GRANT SELECT ANY TABLE TO AVICTOR;
-      GRANT SELECT ANY TRANSACTION TO AVICTOR;
-      GRANT UNLIMITED TABLESPACE TO AVICTOR;
+      grant select any dictionary to avictor;
+      grant select any sequence to avictor;
+      grant select any table to avictor;
+      grant select any transaction to avictor;
+      grant unlimited tablespace to avictor;
 
-      ALTER USER AVICTOR IDENTIFIED BY secret;
+      alter user avictor identified by secret;
     #+END_SRC
 
 *** 登录测试
@@ -1263,8 +1263,8 @@
     到磁盘存储的物理位置，使用下面命令可以查看所有的帮忙选项
     #+BEGIN_SRC sh
       -- 查看帮助和可选的参数
-      exp HELP=y
-      imp HELP=y
+      exp help=y
+      imp help=y
     #+END_SRC
 
     最后新建一个保存参数是文件，这样使用 exp 和 imp 文件时就可以少敲一些命令，这
@@ -1313,9 +1313,9 @@
 ** 获取序列值
    创建序列
    #+BEGIN_SRC sql
-     CREATE SEQUENCE SEQ_GLOBAL_ID
-       START WITH 10000
-       INCREMENT BY 1;
+     create sequence seq_global_id
+       start with 10000
+       increment by 1;
    #+END_SRC
    ~NEXTVAL~ 获取下一个序列值，同时自增， ~CURRVAL~ 获取当前序列值，单不自增。
    #+BEGIN_SRC sql
@@ -1342,18 +1342,17 @@
 ** 限制查询结果的行数
    使用 ~ROWNUM~ 在条件语句中限制
    #+BEGIN_SRC sql
-     SELECT ID FROM EMPLOYEE
-      WHERE ROWNUM < 100;
+     select id from employee where rownum < 100;
    #+END_SRC
 
 ** 删除表中重复的行数据
    Oracle 里面每行都有一个 ~ROWID~ 的伪列，即使两行的数据是相同的， ~ROWID~ 也是
    唯一的。
    #+BEGIN_SRC sql
-     SELECT DISTINCT MYID FROM T_EMPLOYEE_BASE E1
-      WHERE ROWID != (
-        SELECT max(ROWID) FROM T_EMPLOYEE_BASE E2
-         WHERE E1.MYID = E2.MYID
+     select distinct myid from t_employee_base e1
+      where rowid != (
+        select max(rowid) from t_employee_base e2
+         where e1.myid = e2.myid
       );
    #+END_SRC
    将 SELECT 修改成 DELETE 即可删除重复行。
@@ -1361,10 +1360,10 @@
 ** 查看数据库磁盘容量
    通过 ~SYS.DBA_FREE_SPACE~ 视图可以查看磁盘可以空间，进行实时监控。
    #+BEGIN_SRC sql
-     SELECT TABLESPACE_NAME, sum(BLOCKS), sum(BYTES)
-       FROM SYS.DBA_FREE_SPACE
-      GROUP BY TABLESPACE_NAME
-      ORDER BY TABLESPACE_NAME;
+     select tablespace_name, sum(blocks), sum(bytes)
+       from sys.dba_free_space
+      group by tablespace_name
+      order by tablespace_name;
    #+END_SRC
 
 ** 查看 query 的执行时间
@@ -1420,30 +1419,34 @@
 
    10g 的使用方式
    #+BEGIN_SRC sql
-     SELECT
-       USER_CONS_COLUMNS.CONSTRAINT_NAME,
-       WM_CONCAT(TO_CHAR(USER_CONS_COLUMNS.COLUMN_NAME))
-         AS colnames
-       FROM USER_CONS_COLUMNS, USER_CONSTRAINTS
-      WHERE USER_CONS_COLUMNS.CONSTRAINT_NAME = USER_CONSTRAINTS.CONSTRAINT_NAME AND
-            USER_CONSTRAINTS.CONSTRAINT_TYPE = 'U' AND
-            UPPER(USER_CONS_COLUMNS.TABLE_NAME) = UPPER('tabname')
-      GROUP BY USER_CONS_COLUMNS.CONSTRAINT_NAME;
-
+     select
+       a.constraint_name,
+       wm_concat (to_char(a.column_name)) as colnames
+     from
+       user_cons_columns a,
+       user_constraints b
+     where
+       a.constraint_name = b.constraint_name
+       and lower(b.constraint_type) = 'u'
+       and lower(a.table_name) = lower('tabname')
+     group by
+       a.constraint_name;
    #+END_SRC
 
    11g 的使用方式
    #+BEGIN_SRC sql
-     SELECT
-       USER_CONS_COLUMNS.CONSTRAINT_NAME,
-       LISTAGG(USER_CONS_COLUMNS.COLUMN_NAME, ',')
-         WITHIN GROUP(ORDER BY USER_CONS_COLUMNS.POSITION)
-         AS colnames
-       FROM USER_CONS_COLUMNS, USER_CONSTRAINTS
-      WHERE USER_CONS_COLUMNS.CONSTRAINT_NAME = USER_CONSTRAINTS.CONSTRAINT_NAME AND
-            USER_CONSTRAINTS.CONSTRAINT_TYPE = 'U' AND
-            UPPER(USER_CONS_COLUMNS.TABLE_NAME) = UPPER('tabname')
-      GROUP BY USER_CONS_COLUMNS.CONSTRAINT_NAME;
+     select
+       a.constraint_name,
+       listagg (a.column_name, ',') within group (order by a.position) as colnames
+     from
+       user_cons_columns a,
+       user_constraints b
+     where
+       a.constraint_name = b.constraint_name
+       and lower(b.constraint_type) = 'u'
+       and lower(a.table_name) = lower('tabname')
+     group by
+       a.constraint_name;
    #+END_SRC
 
 * 常见问题
