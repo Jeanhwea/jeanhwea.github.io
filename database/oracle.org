@@ -1351,53 +1351,136 @@
         extent management local uniform size 1m;
     #+END_SRC
 ** 数据库实例
-*** 单实例和 RAC
-    Oracle 常见的实例包含单实例和 RAC 两种模式，他们的物理结构如下：
+   Oracle 常见的实例包含单实例和 RAC 两种模式，他们的物理结构如下：
 
-    [[file:../static/image/2020/02/oracle-single-rac.png]]
+   [[file:../static/image/2020/02/oracle-single-rac.png]]
 
-    实例有以下几个知识点：
-    1. 实例是运行在内存中，它包含多种内存结构：SGA，PGA，Buffer Cache 等
-    2. SID 是 Oracle 数据库实例在一个主机上的唯一标识
-    3. 数据库启动需要读一个二进制的配置文件 Server Parameter File，一般称为
-       ~spfile~, ~spfile~ 记录着数据库实例的启动参数，示例启动后 ~spfile~ 就没有
-       作用了。另外，Oracle 数据库还有一个文本的参数文件，一般称之为 ~pfile~,
-       ~pfile~ 可以和 ~spfile~ 相互转换。 *修改数据库参数前要备份 spfile*, 这样
-       的话如果参数修改错误可以替换文件来解决 Oracle 宕机无法启动的文件
-       #+BEGIN_SRC sql
-         -- pfile 和 spfile 的转化
-         create pfile from spfile;
-         create spfile from pfile;
-       #+END_SRC
-    4. 实例启动分为：Shutdown -> NoMount -> Mount -> Open 四个阶段
-       #+BEGIN_SRC sql
-         -- 启动到 NoMount 阶段
-         startup nomount;
-         -- 直接启动到 Open 阶段
-         startup;
-         -- 在 NoMount 阶段将数据库开启到 Open 阶段
-         ALTER DATABASE OPEN;
-       #+END_SRC
-    5. 实例关闭有以下四种模式，一般使用 ~shutdown immediate~
-       #+BEGIN_SRC sql
-         -- 异常关闭，和断点是一样的
-         shutdown abort;
-         -- 立即关闭，不等待事务提交，不等待会话断开
-         shutdown immediate;
-         -- 事务性关闭，等待事务提交，不等待会话断开
-         shutdown transactional;
-         -- 正常关闭，等待事务提交，等待会话断开
-         shutdown normal;
-       #+END_SRC
-    6. 数据库异常关闭后，示例重启可能会出现 SCN 不一致，这时 Oracle 会更加记录的
-       Checkpoint 以及 Redo Log 等文件来 Roll Forward 或 Roll Back，确保 SCN 号
-       同步。这个过程叫 *实例恢复*
-    7. 数据库初始化参数分 Static 和 Dynamic 两种。 ~db_block_size~ 和 ~db_name~
-       等是静态参数，不允许用户修改。动态参数根据作用域不同有分为如下三种：
-       - ~scope=memory~ 正在运行的实例生效，重启后失效
-       - ~scope=spfile~ 正在运行的实例不生效，重启后失效
-       - ~scope=both~ 正在运行的实例生效，重启后也生效
+   实例有以下几个知识点：
+   1. 实例是运行在内存中，它包含多种内存结构：SGA，PGA，Buffer Cache 等
+   2. SID 是 Oracle 数据库实例在一个主机上的唯一标识
+   3. 数据库启动需要读一个二进制的配置文件 Server Parameter File，一般称为
+      ~spfile~, ~spfile~ 记录着数据库实例的启动参数，示例启动后 ~spfile~ 就没有
+      作用了。另外，Oracle 数据库还有一个文本的参数文件，一般称之为 ~pfile~,
+      ~pfile~ 可以和 ~spfile~ 相互转换。 *修改数据库参数前要备份 spfile*, 这样的
+      话如果参数修改错误可以替换文件来解决 Oracle 宕机无法启动的问题
+      #+BEGIN_SRC sql
+        -- pfile 和 spfile 的转化
+        create pfile from spfile;
+        create spfile from pfile;
+      #+END_SRC
+   4. 实例启动分为：Shutdown -> NoMount -> Mount -> Open 四个阶段
+      #+BEGIN_SRC sql
+        -- 启动到 NoMount 阶段
+        startup nomount;
+        -- 直接启动到 Open 阶段
+        startup;
+        -- 在 NoMount 阶段将数据库开启到 Open 阶段
+        ALTER DATABASE OPEN;
+      #+END_SRC
+   5. 实例关闭有以下四种模式，一般使用 ~shutdown immediate~
+      #+BEGIN_SRC sql
+        -- 异常关闭，和断点是一样的
+        shutdown abort;
+        -- 立即关闭，不等待事务提交，不等待会话断开
+        shutdown immediate;
+        -- 事务性关闭，等待事务提交，不等待会话断开
+        shutdown transactional;
+        -- 正常关闭，等待事务提交，等待会话断开
+        shutdown normal;
+      #+END_SRC
+   6. 数据库异常关闭后，示例重启可能会出现 SCN 不一致，这时 Oracle 会更加记录的
+      Checkpoint 以及 Redo Log 等文件来 Roll Forward 或 Roll Back，确保 SCN 号同
+      步。这个过程叫 *实例恢复*
+   7. 数据库初始化参数分 Static 和 Dynamic 两种。 ~db_block_size~ 和 ~db_name~
+      等是静态参数，不允许用户修改。动态参数根据作用域不同有分为如下三种：
+      - ~scope=memory~ 正在运行的实例生效，重启后失效
+      - ~scope=spfile~ 正在运行的实例不生效，重启后失效
+      - ~scope=both~ 正在运行的实例生效，重启后也生效
 
+** 数据库内存和进程
+*** 数据库内存
+**** SGA 和 PGA
+     数据库内存包含 SGA 和 PGA 两个主要部分，所有 SGA 和 PGA 管理在 Oracle 数据库调优中
+     是至关重要的。可以通过下面参数查看 Oracle 内存参数值
+     #+BEGIN_SRC sql
+       -- 查看 sga 和 pga 相关参数
+       show parameter sga;
+       show parameter pga;
+     #+END_SRC
+
+     修改 SGA 和 PGA 参数的原则如下：一般物理内存 20% 用作操作系统保留，其他 80%
+     用于数据库，对于只作为数据库服务的机器可以加将 Oracle 的内存分配得更高。在
+     Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之间，PGA 可以分配
+     可用内存 20% ~ 40% 之间
+
+     | -   | parameter              | range                                 |
+     |-----+------------------------+---------------------------------------|
+     | OS  | ~total_memory~         |                                       |
+     | OS  | ~available_memory~     | (60% ~ 90%) \times ~total_memory~     |
+     | SGA | ~sga_max_size~         | (60% ~ 80%) \times ~available_memory~ |
+     | SGA | ~sga_target~           | (60% ~ 80%) \times ~available_memory~ |
+     | PGA | ~pga_aggregate_target~ | (40% ~ 20%) \times ~available_memory~ |
+
+     #+BEGIN_SRC sql
+       alter system set sga_max_size = 20g scope = both;
+       alter system set sga_target = 20g scope = both;
+       alter system set pga_aggregate_target = 8g scope = both;
+     #+END_SRC
+
+     修改 PGA 的自动管理方式和大小
+     #+BEGIN_SRC sql
+       alter system set workarea_size_policy = auto scope = both;
+       alter system set pga_aggregate_target = 3072m scope = both;
+     #+END_SRC
+**** Buffered Cache
+     缓存区是缓存了 Oracle 数据库中大部分比较重要的对象，下面的命令可以查看缓冲
+     区的参数值，如果是 0 表示让 Oracle 自动管理
+     #+BEGIN_SRC sql
+       -- 查看 Buffered Cache 参数
+       column "Name" format a32;
+       column "Value" format a64;
+
+       select
+         t.name as "Name",
+         t.value as "Value"
+       from
+         v$parameter t
+       where
+         t.name in ('db_cache_size', 'db_keep_cache_size', 'db_recycle_cache_size');
+     #+END_SRC
+
+     缓冲区的命中率一般要达到 98% 以上才算正常
+     #+BEGIN_SRC sql
+       -- 查看缓冲区命中率
+       select
+         100 * (1 - ((physical.value - direct.value - lobs.value) / logical.value)) as
+           "Buffer Cache Hit Ratio (%)"
+       from
+         v$sysstat physical,
+         v$sysstat direct,
+         v$sysstat lobs,
+         v$sysstat logical
+       where
+         physical.name = 'physical reads'
+         and direct.name = 'physical reads direct'
+         and lobs.name = 'physical reads direct (lob)'
+         and logical.name = 'session logical reads';
+     #+END_SRC
+
+     获取推荐的缓冲区值
+     #+BEGIN_SRC sql
+       -- 获取推荐缓冲区值
+       column "Name" format a12;
+       select
+         a.name as "Name",
+         a.size_for_estimate as "Adviced Size (M)",
+         a.estd_physical_reads as "Estimed Physical Reads"
+       from
+         v$db_cache_advice a
+       where
+         block_size = '8192'
+         and advice_status = 'ON';
+     #+END_SRC
 
 * 数据库管理
 ** 用户和角色
@@ -1446,6 +1529,85 @@
     #+END_SRC
 
 * 工作流
+** 日期格式
+   查看时间相关的参数
+   #+BEGIN_SRC sql
+     show parameters nls;
+   #+END_SRC
+
+   #+RESULTS:
+   | NAME                    | TYPE   | VALUE                        |
+   |-------------------------+--------+------------------------------|
+   | nls_calendar            | string | GREGORIAN                    |
+   | nls_comp                | string | BINARY                       |
+   | nls_currency            | string | $                            |
+   | nls_date_format         | string | YYYY-MM-DD HH24:MI:SS        |
+   | nls_date_language       | string | AMERICAN                     |
+   | nls_dual_currency       | string | $                            |
+   | nls_iso_currency        | string | AMERICA                      |
+   | nls_language            | string | AMERICAN                     |
+   | nls_length_semantics    | string | BYTE                         |
+   | nls_nchar_conv_excp     | string | FALSE                        |
+   | nls_numeric_characters  | string | .,                           |
+   | nls_sort                | string | BINARY                       |
+   | nls_territory           | string | AMERICA                      |
+   | nls_time_format         | string | HH.MI.SSXFF AM               |
+   | nls_time_tz_format      | string | HH.MI.SSXFF AM TZR           |
+   | nls_timestamp_format    | string | DD-MON-RR HH.MI.SSXFF AM     |
+   | nls_timestamp_tz_format | string | DD-MON-RR HH.MI.SSXFF AM TZR |
+
+   Oracle 不支持直接修改底层系统的时间格式，但是默认的时间格式为 ~DD-MON-RR~ 的
+   字符串，显示得不是很友好，所以需要使用一些曲线救国的方式来修改日期时间的格式
+
+   方案一：在当前会话的启动后直接修改当前会话的时间格式
+   #+BEGIN_SRC sql
+     alter session set nls_date_format = 'YYYY-MM-DD HH24:MI:SS';
+   #+END_SRC
+
+   方案二：添加环境变量，每次启动 sqlplus 会直接读取环境变量从而达到修改日期格式
+   的目的
+   #+BEGIN_SRC sh
+     export NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'
+   #+END_SRC
+
+   方案三：在选取时间日期字段时显示使用 ~to_char~ 函数来格式化时间
+   #+BEGIN_SRC sql
+     select
+       to_char(sysdate, 'YYYY-MM-DD HH24:MI:SS') as now
+     from
+       dual;
+   #+END_SRC
+
+   #+RESULTS:
+   | NOW                 |
+   |---------------------|
+   | 2020-02-09 04:26:15 |
+
+** 时区
+   查看数据库的时区
+   #+BEGIN_SRC sql
+     select dbtimezone from dual;
+   #+END_SRC
+
+   #+RESULTS:
+   | DBTIMEZONE |
+   |------------|
+   |     +00:00 |
+
+   通过 ~tz_offset~ 转化数据库的时区和当前会话的时区
+   #+BEGIN_SRC sql
+     select
+       tz_offset (dbtimezone) as "Remote Time Zone",
+       tz_offset (sessiontimezone) as "Local Time Zone"
+     from
+       dual;
+   #+END_SRC
+
+   #+RESULTS:
+   | Remote Time Zone | Local Time Zone |
+   |------------------+-----------------|
+   |           +00:00 |          +08:00 |
+
 ** 创建新的表空间以及用户
 *** 创建数据储存的目录
     Oracle 数据库的表空间的存储目录需要手工创建，注意创建的文件夹要求
