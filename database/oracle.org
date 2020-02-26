@@ -1143,7 +1143,10 @@
    在使用 ~create database~ 建立数据库后，数据库会创建数据文件、控制文件和重做日
    志这三个文件。在实际生产环境，我们一般使用 ~dbca~ 图形化工具来创建数据库，而
    不直接使用 SQL 语句来创建
-*** 数据文件 Data files
+
+   [[file:../static/image/2020/02/oracle-logical-data-structure.png]]
+
+*** 数据文件 Data Files
     Oracle 数据库中的数据文件包含永久数据文件和临时数据文件
     1. 数据库中的永久存储对象，例如表，不会放在临时数据文件中
     2. 临时数据文件没有 ~NOLOGGING~ 模式
@@ -1193,7 +1196,7 @@
          where
            lower(t.status) = 'offline';
        #+END_SRC
-*** 控制文件 Control files
+*** 控制文件 Control Files
     控制文件是一个很小的二进制记录文件，数据库启动是通过控制文件查找数据库的数据
     文件的位置，大小以及其他的信息。控制文件中包含数据关闭或宕机时的 SCN 号，数
     据库进行实例恢复是需要控制文件提供必要的信息。
@@ -1205,7 +1208,7 @@
     点的操作日志会被重用。归档重做日志和数据的 ~ARCHIVELOG~ 模式有关系，开启归档
     模式的话，数据库会按照一定规则生成归档重做日志，用于备份和恢复。
 
-    重做日志记录了一下信息
+    重做日志记录了以下信息
     - SCN 号，时间戳
     - 事务 ID，记录重做日志完成的事务
     - SCN 时间点，事务 ID 对应的事务是否提交的信息
@@ -1213,7 +1216,140 @@
     - 修改段的名称和类型
 ** 逻辑存储结构
    数据库的逻辑存储结构和物理储存有点区别，具体见下图
+
    [[file:../static/image/2020/02/oracle-physical-data-structure.png]]
+
+*** 块 Block
+    块是数据库中最小的数据管理单元，可以通过下面启动参数指定大小
+    #+BEGIN_SRC sql
+      show parameter db_block_size;
+    #+END_SRC
+    注意：数据库块大小一但启动后不要轻易修改，11g 中默认的块大小为 8K。在创建新
+    的表空间是可以通过参数指定表空间的块大小，一旦表空间创建，块大小不要修改
+
+    数据库表的数据是存在块上的，通过列的相对位置来寻找到 Row Data，然后在 Row
+    Data 中查找 Column Data
+    - Oracle 会将 LONG 类型的数据放在 Row Data 的最后面。
+    - Oracle 的 ~rowid~ 伪列满足下面的结构
+      #+BEGIN_SRC sql
+        SQL> select rowid from employees where employee_id = 100;
+
+        ROWID
+        ------------------
+        AAAPecAAFAAAABSAAA
+      #+END_SRC
+
+      [[file:../static/image/2020/02/oracle-rowid-format.png]]
+
+    Oracle 运行手工管理表分配块的大小，一旦指定 ~pctfree~ 参数，Oracle 在创建块
+    是要是的为分配的块不低于 ~pctfree~ 的值
+    #+BEGIN_SRC sql
+      -- Percentage of Free Space in Data Blocks
+      create table test_table (n number) pctfree 20;
+    #+END_SRC
+
+*** 区 Extent
+    区是数据库管理数据的一个单位，主要记住一个区只能放在一个 Datafile 中，而段是
+    可以跨 Datafile 的，所以段在扩展时，新扩展的分区可能会放在不同的 Datafile 中。
+
+    区的管理可以是手动的，也可以是自动的。如果需要统一管理在创建表空间是指定扩展
+    区大小为 1M
+*** 段 Segment
+    Oracle 的段一般对应与一张表
+
+    [[file:../static/image/2020/02/oracle-1-table-1-segment.png]]
+
+    对于包含主键、索引和 Lob 字段的表，可能会包含多个段
+
+    [[file:../static/image/2020/02/oracle-1-table-many-segments.png]]
+
+    段主要有以下几个点：
+    1. Oracle 为临时表分配临时段
+    2. Undo 段是采用循环回收机制
+    3. 段存在高水位线 HWM (High water mark)，高水位线会对全表扫描效率产生影响
+
+*** 表空间 Tablespace
+    表空间是管理数据库的逻辑单元
+    - 一个表空间可以对应与多个数据文件
+    - SYSTEM 和 SYSAUX 是系统的表空间，Oracle 启动时必须要有这两个表空间
+    - Undo 表空间是循环管理的，对于循环空间的保鲜时间通过 ~undo_retention~ 启动
+      参数配置
+    - Oracle 建立用户前必须先建立表空间，因为建立用户是一般会指定该用户的默认表
+      空间和默认临时表空间
+
+    #+BEGIN_SRC sql
+      -- 查看表空间和数据文件的对应关系
+      column "Tablespace" format a20;
+      column "Datafile" format a60;
+
+      select
+        a.tablespace_name as "Tablespace",
+        a.file_name as "Datafile"
+      from
+        dba_data_files a
+      order by
+        a.tablespace_name,
+        a.file_name;
+    #+END_SRC
+
+    #+BEGIN_SRC sql
+      -- 查看表空间使用量
+      column "Tablespace" format a20;
+
+      select
+        substr(a.tablespace_name, 1, 20) as "Tablespace",
+        round(a.bytes / 1024 / 1024, 2) as "Size (M)",
+        decode(b.used_bytes, null, 0, round(b.used_bytes / 1024 / 1024, 2)) as "Current (M)",
+        decode(c.free_bytes, null, 0, round(c.free_bytes / 1024 / 1024, 2)) as "Free (M)",
+        decode(b.used_bytes, null, 0, round((b.used_bytes / a.bytes) * 100, 2)) as "Used (%)"
+      from
+        dba_data_files a,
+        (select file_id, sum(bytes) used_bytes from dba_extents group by file_id) b,
+        (select sum(bytes) free_bytes, file_id from dba_free_space group by file_id) c
+      where
+        b.file_id(+) = a.file_id and c.file_id(+) = a.file_id
+      order by
+        a.tablespace_name,
+        a.file_name;
+    #+END_SRC
+
+    #+BEGIN_SRC sql
+      -- 查看表空间对应数据文件数量
+      column "Tablespace" format a20;
+      column "Datafile" format a60;
+
+      select
+        a.tablespace_name as "Tablespace",
+        count(*) as "Count",
+        round(sum(bytes) / 1024 / 1024, 2) as "Current (M)",
+        round(sum(maxbytes) / 1024 / 1024, 2) as "Maximum (M)",
+        round(sum(bytes) / sum(maxbytes), 2) as "Used (%)"
+      from
+        dba_data_files a
+      group by
+        a.tablespace_name
+      order by
+        a.tablespace_name;
+    #+END_SRC
+
+    #+BEGIN_SRC sql
+      -- 创建默认表空间
+      create tablespace pfile1
+        datafile '/oradata/xe/part1.dbf'
+        size 128m autoextend off
+        logging online permanent
+        extent management local autoallocate
+        blocksize 8k
+        segment space management auto
+        flashback on;
+
+      -- 创建临时表空间
+      create temporary tablespace tfile1
+        tempfile '/oradata/xe/temp1.dbf'
+        size 2048m autoextend off
+        tablespace group ''
+        extent management local uniform size 1m;
+    #+END_SRC
 
 * 数据库管理
 ** 用户和角色
