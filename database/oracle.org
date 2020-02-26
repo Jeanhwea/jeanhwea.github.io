@@ -1399,88 +1399,242 @@
 
 ** 数据库内存和进程
 *** 数据库内存
-**** SGA 和 PGA
-     数据库内存包含 SGA 和 PGA 两个主要部分，所有 SGA 和 PGA 管理在 Oracle 数据库调优中
-     是至关重要的。可以通过下面参数查看 Oracle 内存参数值
-     #+BEGIN_SRC sql
-       -- 查看 sga 和 pga 相关参数
-       show parameter sga;
-       show parameter pga;
-     #+END_SRC
+    数据库内存包含 SGA 和 PGA 两个主要部分，所有 SGA 和 PGA 管理在 Oracle 数据库调优中
+    是至关重要的。可以通过下面参数查看 Oracle 内存参数值
+    #+BEGIN_SRC sql
+      -- 查看 sga 和 pga 相关参数
+      show parameter sga;
+      show parameter pga;
+    #+END_SRC
 
-     修改 SGA 和 PGA 参数的原则如下：一般物理内存 20% 用作操作系统保留，其他 80%
-     用于数据库，对于只作为数据库服务的机器可以加将 Oracle 的内存分配得更高。在
-     Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之间，PGA 可以分配
-     可用内存 20% ~ 40% 之间
+    修改 SGA 和 PGA 参数的原则如下：一般物理内存 20% 用作操作系统保留，其他 80%
+    用于数据库，对于只作为数据库服务的机器可以加将 Oracle 的内存分配得更高。在
+    Oracle 数据库的内存确定后，SGA 可以分配可用内存 40% ~ 60% 之间，PGA 可以分配
+    可用内存 20% ~ 40% 之间
 
-     | -   | parameter              | range                                 |
-     |-----+------------------------+---------------------------------------|
-     | OS  | ~total_memory~         |                                       |
-     | OS  | ~available_memory~     | (60% ~ 90%) \times ~total_memory~     |
-     | SGA | ~sga_max_size~         | (60% ~ 80%) \times ~available_memory~ |
-     | SGA | ~sga_target~           | (60% ~ 80%) \times ~available_memory~ |
-     | PGA | ~pga_aggregate_target~ | (40% ~ 20%) \times ~available_memory~ |
+    | -   | parameter              | range                                 |
+    |-----+------------------------+---------------------------------------|
+    | OS  | ~total_memory~         |                                       |
+    | OS  | ~available_memory~     | (60% ~ 90%) \times ~total_memory~     |
+    | SGA | ~sga_max_size~         | (60% ~ 80%) \times ~available_memory~ |
+    | SGA | ~sga_target~           | (60% ~ 80%) \times ~available_memory~ |
+    | PGA | ~pga_aggregate_target~ | (40% ~ 20%) \times ~available_memory~ |
 
-     #+BEGIN_SRC sql
-       alter system set sga_max_size = 20g scope = both;
-       alter system set sga_target = 20g scope = both;
-       alter system set pga_aggregate_target = 8g scope = both;
-     #+END_SRC
+    #+BEGIN_SRC sql
+      alter system set sga_max_size = 20g scope = both;
+      alter system set sga_target = 20g scope = both;
+      alter system set pga_aggregate_target = 8g scope = both;
+    #+END_SRC
 
-     修改 PGA 的自动管理方式和大小
-     #+BEGIN_SRC sql
-       alter system set workarea_size_policy = auto scope = both;
-       alter system set pga_aggregate_target = 3072m scope = both;
-     #+END_SRC
-**** Buffered Cache
-     缓存区是缓存了 Oracle 数据库中大部分比较重要的对象，下面的命令可以查看缓冲
-     区的参数值，如果是 0 表示让 Oracle 自动管理
-     #+BEGIN_SRC sql
-       -- 查看 Buffered Cache 参数
-       column "Name" format a32;
-       column "Value" format a64;
+    修改 PGA 的自动管理方式和大小
+    #+BEGIN_SRC sql
+      alter system set workarea_size_policy = auto scope = both;
+      alter system set pga_aggregate_target = 3072m scope = both;
+    #+END_SRC
 
-       select
-         t.name as "Name",
-         t.value as "Value"
-       from
-         v$parameter t
-       where
-         t.name in ('db_cache_size', 'db_keep_cache_size', 'db_recycle_cache_size');
-     #+END_SRC
+    缓存区 (Buffer Cache) 是 SGA 内部的一个重要的结构，Buffer Cache 缓存了
+    Oracle 数据库中数据表的 CR 块。下面的命令可以查看缓冲区的参数值，如果是 0 表
+    示让 Oracle 自动管理
+    #+BEGIN_SRC sql
+      -- 查看 Buffer Cache 参数
+      column "Name" format a32;
+      column "Value" format a64;
 
-     缓冲区的命中率一般要达到 98% 以上才算正常
-     #+BEGIN_SRC sql
-       -- 查看缓冲区命中率
-       select
-         100 * (1 - ((physical.value - direct.value - lobs.value) / logical.value)) as
-           "Buffer Cache Hit Ratio (%)"
-       from
-         v$sysstat physical,
-         v$sysstat direct,
-         v$sysstat lobs,
-         v$sysstat logical
-       where
-         physical.name = 'physical reads'
-         and direct.name = 'physical reads direct'
-         and lobs.name = 'physical reads direct (lob)'
-         and logical.name = 'session logical reads';
-     #+END_SRC
+      select
+        t.name as "Name",
+        t.value as "Value"
+      from
+        v$parameter t
+      where
+        t.name in ('db_cache_size', 'db_keep_cache_size', 'db_recycle_cache_size');
+    #+END_SRC
 
-     获取推荐的缓冲区值
-     #+BEGIN_SRC sql
-       -- 获取推荐缓冲区值
-       column "Name" format a12;
-       select
-         a.name as "Name",
-         a.size_for_estimate as "Adviced Size (M)",
-         a.estd_physical_reads as "Estimed Physical Reads"
-       from
-         v$db_cache_advice a
-       where
-         block_size = '8192'
-         and advice_status = 'ON';
-     #+END_SRC
+    缓冲区的命中率一般要达到 98% 以上才算正常
+    #+BEGIN_SRC sql
+      -- 查看缓冲区命中率
+      select
+        100 * (1 - ((physical.value - direct.value - lobs.value) / logical.value)) as
+          "Buffer Cache Hit Ratio (%)"
+      from
+        v$sysstat physical,
+        v$sysstat direct,
+        v$sysstat lobs,
+        v$sysstat logical
+      where
+        physical.name = 'physical reads'
+        and direct.name = 'physical reads direct'
+        and lobs.name = 'physical reads direct (lob)'
+        and logical.name = 'session logical reads';
+    #+END_SRC
+
+    获取推荐的缓冲区值
+    #+BEGIN_SRC sql
+      -- 获取推荐缓冲区值
+      column "Name" format a12;
+      select
+        a.name as "Name",
+        a.size_for_estimate as "Adviced Size (M)",
+        a.estd_physical_reads as "Estimed Physical Reads"
+      from
+        v$db_cache_advice a
+      where
+        block_size = '8192'
+        and advice_status = 'ON';
+    #+END_SRC
+
+    游标 (Cursor) 是在 PLSQL 编程中操作数据集的句柄，相当于一个指针变量。他的形
+    成原因如下，由于存储过程是放在 Shared Pool 里的，当 Client Process 和 Server
+    Process 建立连接后，待操作的结构集在 Buffer Cache 中，因此需要提供 Client
+    Process 一个游标来寻找结果集
+
+    [[file:../static/image/2020/02/oracle-cursor.png]]
+
+    对应存储过程比较多的系统，如果代码中没有释放游标会照成 Oracle 数据库出现问题，
+    所以一般需要设置可使用的游标数。
+
+    #+BEGIN_SRC sql
+      alter system set open_cursors = 500 scope = both;
+    #+END_SRC
+
+*** 数据库进程
+    Oracle 的进程包括 Server Process 和 Background Process, 当客户端建立会话后，
+    客户端还会出现 Client Process, Background Process 主要处理 Oracle 数据库内部
+    的事务，下面一些常见的后台进程
+    - Process Monitor Process (PMON)
+    - System Monitor Process (SMON)
+    - Database Writer Process (DBWn)
+    - Log Writer Process (LGWR)
+    - Checkpoint Process (CKPT)
+    - Manageability Monitor Processes (MMON and MMNL)
+    - Recoverer Process (RECO)
+
+   对于进程参数的调整确保以下参数是正确的
+   #+BEGIN_SRC sql
+     -- cpu 数量要和物理主机的线程数一致
+     show parameters cpu_count;
+   #+END_SRC
+
+   查看系统的进程数目，会话数目和最大事务数目分别
+   #+BEGIN_SRC sql
+     set heading off;
+     show parameter processes;
+     show parameter sessions;
+     show parameter transactions;
+   #+END_SRC
+
+
+   直接在 ~v$parameter~ 视图中查看进程数和会话数
+   #+BEGIN_SRC sql
+     column name format a32;
+     column value format a64;
+
+     select
+       t.name,
+       t.value
+     from
+       v$parameter t
+     where
+       name in ('sessions', 'processes', 'transactions');
+   #+END_SRC
+
+   #+RESULTS:
+   | NAME         | VALUE |
+   |--------------+-------|
+   | processes    |   512 |
+   | sessions     |   800 |
+   | transactions |   563 |
+
+   一般讲 processes 的数值根据系统的性能来设置，但是 sessions 和 transactions 和
+   processes 有一定的换算关系
+   | Oralce         | sessions                  | transactions        |
+   |----------------+---------------------------+---------------------|
+   | 11g (11.2.0.4) | 1.5 \times processes + 22 | 1.1 \times sessions |
+   | 10g            | 1.1 \times processes + 5  | 1.1 \times sessions |
+
+   Oracle 设置对应参数的快速对照表
+   |           |      11g |          11g |      10g |          10g |
+   | processes | sessions | transactions | sessions | transactions |
+   |-----------+----------+--------------+----------+--------------|
+   |       100 |      172 |          110 |      115 |          110 |
+   |       128 |      214 |          141 |      146 |          141 |
+   |       200 |      322 |          220 |      225 |          220 |
+   |       256 |      406 |          282 |      287 |          282 |
+   |       300 |      472 |          330 |      335 |          330 |
+   |       512 |      790 |          563 |      568 |          563 |
+   |       800 |     1222 |          880 |      885 |          880 |
+   |      1000 |     1522 |         1100 |     1105 |         1100 |
+   |      1024 |     1558 |         1126 |     1131 |         1126 |
+   |      1200 |     1822 |         1320 |     1325 |         1320 |
+   |      1500 |     2272 |         1650 |     1655 |         1650 |
+   #+TBLFM: $2=round(1.5*$1 + 22)::$3=round(1.1*$1)::$4=round(1.1*$1 + 5)::$5=round(1.1*$1)
+
+   可以根据上述对应关系表格设置相应的参数
+   #+BEGIN_SRC sql
+     alter system set processes = 1024 scope = both;
+     alter system set sessions = 1568 scope = both;
+     alter system set transactions = 1126 scope = both;
+   #+END_SRC
+
+*** 数据库网络架构
+    Oracle 的网络采取监听模式，客户端可以通过 HTTP 或者 TNS 等协议连接 Oracle 的服务
+    器本地启动的监听器，通过监听代理来完成和数据库的交互
+
+    [[file:../static/image/2020/02/oracle-network-arch.png]]
+
+    Oracle 监听的工具主要有以下两个
+    #+BEGIN_SRC text
+      $ tnsping localhost  -- tnsping 工具
+
+      TNS Ping Utility for Linux: Version 11.2.0.4.0 - Production on 26-FEB-2020 17:22:33
+
+      Copyright (c) 1997, 2013, Oracle.  All rights reserved.
+
+      Used parameter files:
+      /u01/app/oracle/product/11.2.0/dbhome_1/network/admin/sqlnet.ora
+
+      Used EZCONNECT adapter to resolve the alias
+      Attempting to contact (DESCRIPTION=(CONNECT_DATA=(SERVICE_NAME=))(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521)))
+      OK (10 msec)
+
+      $ lsnrctl status -- lsnrctl 工具
+
+      LSNRCTL for Linux: Version 11.2.0.4.0 - Production on 26-FEB-2020 17:22:45
+
+      Copyright (c) 1991, 2013, Oracle.  All rights reserved.
+
+      Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=IPC)(KEY=EXTPROC1521)))
+      STATUS of the LISTENER
+      ------------------------
+      Alias                     LISTENER
+      Version                   TNSLSNR for Linux: Version 11.2.0.4.0 - Production
+      Start Date                26-FEB-2020 12:36:36
+      Uptime                    0 days 4 hr. 46 min. 9 sec
+      Trace Level               off
+      Security                  ON: Local OS Authentication
+      SNMP                      OFF
+      Listener Parameter File   /u01/app/oracle/product/11.2.0/dbhome_1/network/admin/listener.ora
+      Listener Log File         /u01/app/oracle/diag/tnslsnr/ol64-52/listener/alert/log.xml
+      Listening Endpoints Summary...
+        (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(KEY=EXTPROC1521)))
+        (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=ol64-52.localdomain)(PORT=1521)))
+      Services Summary...
+      Service "ora11g" has 1 instance(s).
+        Instance "ora11g", status READY, has 1 handler(s) for this service...
+      Service "ora11gXDB" has 1 instance(s).
+        Instance "ora11g", status READY, has 1 handler(s) for this service...
+      The command completed successfully
+    #+END_SRC
+
+    Oracle 数据库实例的动态监听注册细节
+    1. 如果是先启动监听，后启动数据库实例，则动态监听会自动识别到启动的数据库实
+       例；
+    2. 在数据库实例正常运行的情况下重启监听，则数据库实例会等很长时间才能在动态
+       监听中注册成功，大约需要 1 分钟的等待时间
+    3. 如果是先启动数据库实例，后启动监听，效果和 2 一样
+    4. 如果不希望长时间等待动态监听注册的过程，下面命令加速
+    #+BEGIN_SRC sql
+      alter system register;
+    #+END_SRC
 
 * 数据库管理
 ** 用户和角色
