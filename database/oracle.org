@@ -1138,6 +1138,83 @@
     commit;
   #+END_SRC
 
+* 数据库底层结构
+** 物理存储结构
+   在使用 ~create database~ 建立数据库后，数据库会创建数据文件、控制文件和重做日
+   志这三个文件。在实际生产环境，我们一般使用 ~dbca~ 图形化工具来创建数据库，而
+   不直接使用 SQL 语句来创建
+*** 数据文件 Data files
+    Oracle 数据库中的数据文件包含永久数据文件和临时数据文件
+    1. 数据库中的永久存储对象，例如表，不会放在临时数据文件中
+    2. 临时数据文件没有 ~NOLOGGING~ 模式
+    3. 临时数据文件不再设置成只读模式
+    4. 临时数据文件信息存放在 ~dba_temp_files~ 和 ~v$tempfile~ 视图中，而永久数
+       据文件信息存放在 ~dba_data_files~ 和 ~v$datafile~ 视图中
+       #+BEGIN_SRC sql
+         -- 查看临时数据文件
+         select
+           t.creation_time as "Creation Time",
+           round(t.bytes / 1024 / 1024, 2) as "Size (M)",
+           substr(t.name, 1, 60) as "File Name"
+         from
+           v$tempfile t
+         order by
+           t.name;
+
+         -- 查看永久数据文件
+         select
+           t.creation_time as "Creation Time",
+           round(t.bytes / 1024 / 1024, 2) as "Size (M)",
+           substr(t.name, 1, 60) as "File Name"
+         from
+           v$datafile t
+         order by
+           t.name;
+       #+END_SRC
+    5. 数据文件的状态分为 ONLINE 和 OFFLINE，备份文件、重命名文件等操作会使得数
+       据文件离线
+       #+BEGIN_SRC sql
+         -- 查看离线的数据文件
+         select
+           t.creation_time as "Creation Time",
+           round(t.bytes / 1024 / 1024, 2) as "Size (M)",
+           substr(t.name, 1, 60) as "File Name"
+         from
+           v$tempfile t
+         where
+           lower(t.status) = 'offline'
+         union
+         select
+           t.creation_time as "Creation Time",
+           round(t.bytes / 1024 / 1024, 2) as "Size (M)",
+           substr(t.name, 1, 60) as "File Name"
+         from
+           v$datafile t
+         where
+           lower(t.status) = 'offline';
+       #+END_SRC
+*** 控制文件 Control files
+    控制文件是一个很小的二进制记录文件，数据库启动是通过控制文件查找数据库的数据
+    文件的位置，大小以及其他的信息。控制文件中包含数据关闭或宕机时的 SCN 号，数
+    据库进行实例恢复是需要控制文件提供必要的信息。
+*** 重做日志 Redo Log Files
+    重做日志记录着数据库的操作，如果数据库发送宕机，可以通过控制文件和重做日志将
+    数据从一个比较老的检查点 (Checkpoint) 上恢复回来。
+
+    重做日志包含：在线重做日志和归档重做日志。重做日志是 *循环* 使用的，过了检查
+    点的操作日志会被重用。归档重做日志和数据的 ~ARCHIVELOG~ 模式有关系，开启归档
+    模式的话，数据库会按照一定规则生成归档重做日志，用于备份和恢复。
+
+    重做日志记录了一下信息
+    - SCN 号，时间戳
+    - 事务 ID，记录重做日志完成的事务
+    - SCN 时间点，事务 ID 对应的事务是否提交的信息
+    - 修改的类型
+    - 修改段的名称和类型
+** 逻辑存储结构
+   数据库的逻辑存储结构和物理储存有点区别，具体见下图
+   [[file:../static/image/2020/02/oracle-physical-data-structure.png]]
+
 * 数据库管理
 ** 用户和角色
 *** 查看当前用户
