@@ -45,12 +45,12 @@
     IoC 也被称为 DI (dependency injection)，是实现 bean 的依赖关系，即在初始化一
     个 IoC 容器时，先将其依赖的容器一并初始化，并注入的新的容器中。
 
-* Spring MVC
-  [[https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc][Spring MVC]] 提供了开发 MVC 页面的框架，它期初是建立在 Servlet API 基础上。
+* Spring Web MVC
+  [[https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc][Spring Web MVC]] 提供了开发 MVC 页面的框架，它期初是建立在 Servlet API 基础上。
 
-** Spring MVC 项目包结构
+** Spring Web MVC 项目包结构
 
-   [[file:../static/image/2019/07/Spring-mvc-module.png]]
+   [[file:../static/image/2019/07/spring-mvc-module.png]]
 
 * Spring Boot
   [[https://spring.io/projects/spring-boot/#overview][Spring Boot]] 是由 Pivotal 团队提供的全新框架，其设计目的是用来简化新 Spring 应
@@ -790,9 +790,8 @@
 
 
 ***** 配置引导类
-      如果是 Spring Boot 项目的话，添加了
-      ~spring-cloud-starter-netflix-eureka-client~ 的依赖项后会自动注册到 Eureka
-      Server 上
+      ~spring-cloud-starter-netflix-eureka-client~ 依赖项后会将当前项目自动注册
+      到 Eureka Server 上
       #+BEGIN_SRC java
         @SpringBootApplication
         @RestController
@@ -813,7 +812,7 @@
 
 **** Eureka Server
 ***** 配置相关文件
-      =pom.xml= 添加 ~spring-cloud-starter-netflix-eureka-server~ 的依赖项
+      ~pom.xml~ 添加 ~spring-cloud-starter-netflix-eureka-server~ 的依赖项
       #+BEGIN_SRC xml
         <!-- pom.xml -->
         <project>
@@ -826,7 +825,7 @@
         </project>
       #+END_SRC
 
-      =application.yml= 添加配置项，下面是 Standalone 模式的配置方法
+      ~application.yml~ 添加配置项，下面是 Standalone 模式的配置方法
       #+BEGIN_SRC yaml
         eureka:
           instance:
@@ -881,12 +880,12 @@
     Hystrix 是 SOA 微服务架构中提供服务隔离、熔断、降级机制的工具/框架。Hystrix
     是断路器的一种实现，用于高微服务架构的可用性，是防止服务出现雪崩的利器。
     Hystrix 实现了 Martin Fowler 的 [[https://martinfowler.com/bliki/CircuitBreaker.html][Circuit Breaker]] 模式，熔断器的机制的思想很简
-    单直白，即在 client 和 supplier 之间实现一个 circuit breaker 层，当 supplier
-    出现错误或超时，就对 client 的请求进行截断
+    单直白，即在 Client 和 Supplier 之间实现一个 Circuit Breaker 层，当 Supplier
+    出现错误或超时，就对 Client 的请求进行截断
 
 **** Hystrix Client
 ***** 配置相关文件
-      =pom.xml= 添加 ~spring-cloud-starter-netflix-hystrix~ 的依赖项
+      ~pom.xml~ 添加 ~spring-cloud-starter-netflix-hystrix~ 的依赖项
       #+BEGIN_SRC xml
         <!-- pom.xml -->
         <project>
@@ -940,10 +939,10 @@
         户端的所有资源
 
 **** Hystrix Dashboard
-     Hystrix 监控除了隔离依赖服务的调用以外，Hystrix 还提供了近实时的监控，Hystrix
-     会实时、累加地记录所有关于 HystrixCommand 的执行信息，包括每秒执行多少请求多
-     少成功，多少失败等。Netflix 通过 hystrix-metrics-event-stream 项目实现了对以上
-     指标的监控。
+     Hystrix 监控除了隔离依赖服务的调用以外，Hystrix 还提供了近实时的监控，
+     Hystrix 会实时、累加地记录所有关于 HystrixCommand 的执行信息，包括每秒执行多
+     少请求多少成功，多少失败等。Netflix 通过 ~hystrix-metrics-event-stream~ 项
+     目实现了对以上指标的监控。
 
 *** Zuul
     Zuul 是在云平台上提供动态路由,监控,弹性,安全等边缘服务的框架。Zuul 相当于是
@@ -952,7 +951,7 @@
     [[file:../static/image/2019/07/netflix-zuul.png]]
 
 ***** 配置相关文件
-      =pom.xml= 添加 ~spring-cloud-starter-netflix-zuul~ 的依赖项将 Zuul 引入项目
+      ~pom.xml~ 添加 ~spring-cloud-starter-netflix-zuul~ 的依赖项将 Zuul 引入项目
       #+BEGIN_SRC xml
         <!-- pom.xml -->
         <project>
@@ -987,12 +986,12 @@
 
       使用 ~@EnableZuulProxy~ 开启 Zuul 服务后，如果正确地配置了 Eureka Client
       服务的话，不需要进行其它的配置就可以自动映射路由。根据惯例，Zuul 会自动给
-      反向代理的微服务添加前缀，例如： 如果微服务的名字是 =users= ，则 Zuul 会将
-      =/users/**= 的请求全部映射到 =users= 微服务中
+      反向代理的微服务添加前缀，例如： 如果微服务的名字是 ~users~ ，则 Zuul 会将
+      ~/users/**~ 的请求全部映射到 ~users~ 微服务中
 
 
-      手动配置反向代理需要修改 =application.yml= 配置文件，例如下面的配置将
-      =/myusers/**= 请求传递到 =users= 微服务中
+      手动配置反向代理需要修改 ~application.yml~ 配置文件，例如下面的配置将
+      ~/myusers/**~ 请求传递到 ~users~ 微服务中
       #+BEGIN_SRC yaml
         zuul:
          routes:
@@ -1040,7 +1039,7 @@
       #+END_SRC
 
 ***** 头部的设置选项
-      将 =Cookies=, =Set-Cookie=, =Authorization= 设置成敏感的头部，忽略一些头部
+      将 ~Cookies~, ~Set-Cookie~, ~Authorization~ 设置成敏感的头部，忽略一些头部
       #+BEGIN_SRC yaml
         zuul:
           routes:
@@ -1057,10 +1056,10 @@
 
 ***** 管理端点 Endpoint
       Zuul 提供了一些管理路由的 RESTful 接口
-      - =GET /routes= 获取所有解析的路由
-      - =GET /routes/detail= 获取详细路由信息
-      - =POST /routes= 强制刷新路由
-      - =GET /filter= 获取所有的过滤器
+      - ~GET /routes~ 获取所有解析的路由
+      - ~GET /routes/detail~ 获取详细路由信息
+      - ~POST /routes~ 强制刷新路由
+      - ~GET /filter~ 获取所有的过滤器
 
       下面是一些示例
       #+BEGIN_SRC sh
@@ -1233,7 +1232,7 @@
         }
       #+END_SRC
 
-      后置路由器（Post Filter）主要处理回复，下面是一个添加 =UUID= 和 =X-Sample=
+      后置路由器（Post Filter）主要处理回复，下面是一个添加 ~UUID~ 和 ~X-Sample~
       头的例子
       #+BEGIN_SRC java
         public class AddResponseHeaderFilter extends ZuulFilter {
@@ -1271,7 +1270,7 @@
 
 **** Ribbon Client
 ***** 配置相关文件
-      =pom.xml= 添加 ~spring-cloud-starter-netflix-ribbon~ 的依赖项
+      ~pom.xml~ 添加 ~spring-cloud-starter-netflix-ribbon~ 的依赖项
       #+BEGIN_SRC xml
         <!-- pom.xml -->
         <project>
@@ -1328,21 +1327,22 @@
       #+END_SRC
 
       Ribbon 客户端的配置, 如果不指定会使用默认的实现:
-      - ~IClientConfig~ 客户端相关配置
-      - ~IRule~ 定义负载均衡策略
-      - ~IPing~ 定义如何 ping 目标服务实例来判断是否存活, ribbon 使用单独的线程
-        每隔一段时间(默认 10s)对本地缓存的 =ServerList= 做一次检查
-      - ~ServerList~ 定义如何获取服务实例列表. 两种实现基于配置的
-        =ConfigurationBasedServerList= 和基于 Eureka 服务发现的
-        =DiscoveryEnabledNIWSServerList=
-      - ~ServerListFilter~ 用来使用期望的特征过滤静态配置动态获得的候选服务实例
-        列表. 若未提供, 默认使用 =ZoneAffinityServerListFilter=
-      - ~ILoadBalancer~ 定义了软负载均衡器的操作的接口. 一个典型的负载均衡器至少需
-        要一组用来做负载均衡的服务实例, 一个标记某个服务实例不在旋转中的方法, 和
-        对应的方法调用从实例列表中选出某一个服务实例.
-      - ~ServerListUpdater~ =DynamicServerListLoadBalancer= 用来更新实例列表的策
-        略 (推 -> =EurekaNotificationServerListUpdater=; 拉 ->
-        =PollingServerListUpdater=, 默认是拉)
+      1. ~IClientConfig~ 客户端相关配置
+      2. ~IRule~ 定义负载均衡策略
+      3. ~IPing~ 定义如何 ping 目标服务实例来判断是否存活, ribbon 使用单独的线程
+         每隔一段时间(默认 10s)对本地缓存的 ~ServerList~ 做一次检查
+      4. ~ServerList~ 定义如何获取服务实例列表. 两种实现基于配置的
+         ~ConfigurationBasedServerList~ 和基于 Eureka 服务发现的
+         ~DiscoveryEnabledNIWSServerList~
+      5. ~ServerListFilter~ 用来使用期望的特征过滤静态配置动态获得的候选服务实例
+         列表. 若未提供, 默认使用 ~ZoneAffinityServerListFilter~
+      6. ~ILoadBalancer~ 定义了软负载均衡器的操作的接口. 一个典型的负载均衡器至少需
+         要一组用来做负载均衡的服务实例, 一个标记某个服务实例不在旋转中的方法, 和
+         对应的方法调用从实例列表中选出某一个服务实例.
+      7. ~ServerListUpdater~ ~DynamicServerListLoadBalancer~ 用来更新实例列表的
+         策略
+         - 推 -> ~EurekaNotificationServerListUpdater~
+         - 拉 -> ~PollingServerListUpdater~ 默认是拉
 
 ** Spring Cloud Gateway
    [[https://spring.io/projects/spring-cloud-gateway][Spring Cloud Gateway]] 是 Spring 官方基于 Spring 5.0，Spring Boot 2.0 和 Project
@@ -1351,3 +1351,5 @@
 
 * 参考链接
   1. [[https://docs.spring.io/spring/docs/current/spring-framework-reference/][Spring Framework 文档]]
+  2. [[https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html][Spring Web MVC文档]]
+  3. [[https://docs.spring.io/spring-boot/docs/current/reference/html/][Spring Boot 文档]]
