@@ -1295,6 +1295,22 @@
     #+END_SRC
 
     #+BEGIN_SRC sql
+      -- 看表空间剩余的容量
+      column "Tablespace" format a20;
+
+      select
+        a.tablespace_name as "Tablespace",
+        sum(blocks) as "Blocks",
+        round(sum(bytes) / 1024 / 1024, 2) as "Free (M)"
+      from
+        dba_free_space a
+      group by
+        a.tablespace_name
+      order by
+        a.tablespace_name;
+    #+END_SRC
+
+    #+BEGIN_SRC sql
       -- 查看表空间使用量
       column "Tablespace" format a20;
 
@@ -1937,55 +1953,48 @@
    将 SELECT 修改成 DELETE 即可删除重复行。
 
 ** 查看数据库磁盘容量
-   通过 ~SYS.DBA_FREE_SPACE~ 视图可以查看磁盘可以空间，进行实时监控。
-   #+BEGIN_SRC sql
-     select tablespace_name, sum(blocks), sum(bytes)
-       from sys.dba_free_space
-      group by tablespace_name
-      order by tablespace_name;
-   #+END_SRC
 
-** 查看 query 的执行时间
-   查看单个 query 执行计时直接开启 ~TIMING~ 选项就可以看到
+** 查看 Query 的执行时间
+   查看单个 Query 执行计时直接开启 ~set timing on~ 选项就可以看到
    #+BEGIN_SRC sql
-     SQL> SELECT count(*) FROM T_LOG;
+     SQL> select count(*) from t_log;
 
        COUNT(*)
      ----------
           85718
 
-     SQL> SET TIMING ON
-     SQL> SELECT count(*) FROM T_LOG;
+     SQL> set timing on
+     SQL> select count(*) from t_log;
 
        COUNT(*)
      ----------
           85718
 
      Elapsed: 00:00:00.04
-     SQL> SET TIMING OFF
+     SQL> set timing off
    #+END_SRC
    查询多条 query 语句的计时需要借助计时器
    #+BEGIN_SRC sql
-     SQL> TIMING START mytimer;
+     SQL> timing start mytimer;
 
-     SQL> SELECT count(*) FROM T_LOG;
+     SQL> select count(*) from t_log;
 
        COUNT(*)
      ----------
           85718
 
-     SQL> TIMING SHOW mytimer;
+     SQL> timing show mytimer;
 
      timing for: mytimer
      Elapsed: 00:00:00.04
-     SQL> SELECT max(myid) FROM T_LOG;
+     SQL> select max(myid) from t_log;
 
       MAX(MYID)
      ----------
          103234
 
 
-     SQL> TIMING STOP mytimer;
+     SQL> timing stop mytimer;
 
      timing for: mytimer
      Elapsed: 00:00:00.07
