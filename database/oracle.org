@@ -1350,6 +1350,54 @@
         tablespace group ''
         extent management local uniform size 1m;
     #+END_SRC
+** 数据库实例
+*** 单实例和 RAC
+    Oracle 常见的实例包含单实例和 RAC 两种模式，他们的物理结构如下：
+
+    [[file:../static/image/2020/02/oracle-single-rac.png]]
+
+    实例有以下几个知识点：
+    1. 实例是运行在内存中，它包含多种内存结构：SGA，PGA，Buffer Cache 等
+    2. SID 是 Oracle 数据库实例在一个主机上的唯一标识
+    3. 数据库启动需要读一个二进制的配置文件 Server Parameter File，一般称为
+       ~spfile~, ~spfile~ 记录着数据库实例的启动参数，示例启动后 ~spfile~ 就没有
+       作用了。另外，Oracle 数据库还有一个文本的参数文件，一般称之为 ~pfile~,
+       ~pfile~ 可以和 ~spfile~ 相互转换。 *修改数据库参数前要备份 spfile*, 这样
+       的话如果参数修改错误可以替换文件来解决 Oracle 宕机无法启动的文件
+       #+BEGIN_SRC sql
+         -- pfile 和 spfile 的转化
+         create pfile from spfile;
+         create spfile from pfile;
+       #+END_SRC
+    4. 实例启动分为：Shutdown -> NoMount -> Mount -> Open 四个阶段
+       #+BEGIN_SRC sql
+         -- 启动到 NoMount 阶段
+         startup nomount;
+         -- 直接启动到 Open 阶段
+         startup;
+         -- 在 NoMount 阶段将数据库开启到 Open 阶段
+         ALTER DATABASE OPEN;
+       #+END_SRC
+    5. 实例关闭有以下四种模式，一般使用 ~shutdown immediate~
+       #+BEGIN_SRC sql
+         -- 异常关闭，和断点是一样的
+         shutdown abort;
+         -- 立即关闭，不等待事务提交，不等待会话断开
+         shutdown immediate;
+         -- 事务性关闭，等待事务提交，不等待会话断开
+         shutdown transactional;
+         -- 正常关闭，等待事务提交，等待会话断开
+         shutdown normal;
+       #+END_SRC
+    6. 数据库异常关闭后，示例重启可能会出现 SCN 不一致，这时 Oracle 会更加记录的
+       Checkpoint 以及 Redo Log 等文件来 Roll Forward 或 Roll Back，确保 SCN 号
+       同步。这个过程叫 *实例恢复*
+    7. 数据库初始化参数分 Static 和 Dynamic 两种。 ~db_block_size~ 和 ~db_name~
+       等是静态参数，不允许用户修改。动态参数根据作用域不同有分为如下三种：
+       - ~scope=memory~ 正在运行的实例生效，重启后失效
+       - ~scope=spfile~ 正在运行的实例不生效，重启后失效
+       - ~scope=both~ 正在运行的实例生效，重启后也生效
+
 
 * 数据库管理
 ** 用户和角色
