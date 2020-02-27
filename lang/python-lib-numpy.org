@@ -1,4 +1,4 @@
-#+TITLE: numpy 科学计算数组工具集
+#+TITLE: Numpy 科学计算数组工具集
 #+AUTHOR: Jinghui Hu
 #+EMAIL: hujinghui@buaa.edu.cn
 #+DATE: <2018-10-26 Fri 11:04:00>
@@ -8,8 +8,8 @@
 #+TAGS: python numpy tensorflow machine-learning data-processing
 
 
-* numpy
-  numpy 是 Python 科学计算的基础包，主要有以下一些功能：
+* Numpy
+  Numpy 是 Python 科学计算的基础包，主要有以下一些功能：
   1. N 维数组
   2. 线性代数，傅里叶变换等
 
@@ -20,10 +20,10 @@
    #+END_SRC
 
 ** 基本用法
-   numpy 的数组类是 =ndarray= ，它的别名是 =array= 。主要 =numpy.array= 和
-   Python 自带的 =array.array= 是不同的。
+   Numpy 的数组类是 ~ndarray~ ，它的别名是 ~array~ 。主要 ~numpy.array~ 和
+   Python 自带的 ~array.array~ 是不同的。
 
-   #+BEGIN_SRC python :exports code
+   #+BEGIN_SRC python
      >>> import numpy as np
      a = np.arange(15).reshape(3, 5)
      >>> a = np.arange(15).reshape(3, 5)
@@ -51,10 +51,9 @@
    #+END_SRC
 
 ** 创建数组
-
-   #+BEGIN_SRC python :exports code
-     >>> # a = np.array(1, 2, 3, 4)    # WRONG
-     ... np.array([1, 2, 3, 4])  # RIGHT
+   #+BEGIN_SRC python
+     >>> # a = np.array(1, 2, 3, 4)    # 错误创建方式
+     ... np.array([1, 2, 3, 4])        # 正确创建方式
      array([1, 2, 3, 4])
      >>> np.array([(1.5,2,3), (4,5,6)])
      array([[1.5, 2. , 3. ],
@@ -65,7 +64,7 @@
    #+END_SRC
 
 ** 初始化数组
-   #+BEGIN_SRC python :exports code
+   #+BEGIN_SRC python
      >>> np.zeros((3,4))
      array([[0., 0., 0., 0.],
             [0., 0., 0., 0.],
@@ -100,9 +99,9 @@
             -6.42787610e-01, -2.44929360e-16])
    #+END_SRC
 
-** 修改数组维度 reshape
-
-   #+BEGIN_SRC python :exports code
+** 修改数组维度 Reshape
+   可以通过 Reshape 快速地修改 Python 数组的维度，这个方法非常有用
+   #+BEGIN_SRC python
      >>> np.arange(6)
      array([0, 1, 2, 3, 4, 5])
      >>> np.arange(12).reshape(4,3)
@@ -122,23 +121,22 @@
    #+END_SRC
 
 ** 数学操作
-   numpy 重载了 Python 的数学操作符，基本操作如下
+   Numpy 重载了 Python 的数学操作符，基本操作如下
 
-   #+BEGIN_SRC python :exports code
+   #+BEGIN_SRC python
      >>> a = np.array( [20,30,40,50] )
      >>> b = np.arange(4)
      >>> c = a-b
-     >>> b**2
+     >>> b**2  # 幂运算
      array([0, 1, 4, 9])
      >>> 10*np.sin(a)
      array([ 9.12945251, -9.88031624,  7.4511316 , -2.62374854])
-     >>> a<35
+     >>> a<35  # 对 a 中每个元素应用条件表达式
      array([ True,  True, False, False])
    #+END_SRC
 
    矩阵的乘法和矩阵里面每个元素相乘
-
-   #+BEGIN_SRC python :exports code
+   #+BEGIN_SRC python
      >>> A = np.array([[1,1],
      ...               [0,1]] )
      >>> B = np.array([[2,0],
@@ -155,7 +153,7 @@
      >>>
    #+END_SRC
 
-   #+BEGIN_SRC python :exports code
+   #+BEGIN_SRC python
      >>> a = np.random.random((2,3))
      >>> a
      array([[0.54468729, 0.03709586, 0.65467565],
@@ -170,7 +168,7 @@
    #+END_SRC
 
 ** 深度复制
-   #+BEGIN_SRC python :exports code
+   #+BEGIN_SRC python
      >>> a
      array([[0.54468729, 0.03709586, 0.65467565],
             [0.56025666, 0.39270547, 0.51565504]])
@@ -191,7 +189,7 @@
 
 ** 索引
 *** 使用 Indices 索引
-    #+BEGIN_SRC python :exports code
+    #+BEGIN_SRC python
       >>> a = np.arange(12)**2                       # the first 12 square numbers
       >>> a
       array([  0,   1,   4,   9,  16,  25,  36,  49,  64,  81, 100, 121])
@@ -206,7 +204,7 @@
     #+END_SRC
 
     使用下标来掩码
-    #+BEGIN_SRC python :exports code
+    #+BEGIN_SRC python
       >>> palette = np.array( [ [0,0,0],            # black
       ...                       [255,0,0],          # red
       ...                       [0,255,0],          # green
@@ -227,7 +225,7 @@
       >>>
     #+END_SRC
 
-    #+BEGIN_SRC python :exports code
+    #+BEGIN_SRC python
       >>> a = np.arange(12).reshape(3,4)
       >>> i = np.array([ [0,1],                  # indices for the first dim of a
       ...                [1,2] ] )
@@ -253,7 +251,7 @@
 
 *** 使用布尔值索引
 
-    #+BEGIN_SRC python :exports code
+    #+BEGIN_SRC python
       >>> a = np.arange(12).reshape(3,4)
       >>> b = a > 4
       >>> b                        # b is a boolean with a's shape
@@ -271,7 +269,7 @@
     #+END_SRC
 
     多个维度的索引
-    #+BEGIN_SRC python :exports code
+    #+BEGIN_SRC python
       >>> a = np.arange(12).reshape(3,4)
       >>> a
       array([[ 0,  1,  2,  3],
@@ -296,22 +294,22 @@
 
 ** 线性代数
 
-   #+BEGIN_SRC python :exports code
-  a = np.array([[1.0, 2.0], [3.0, 4.0]])
-  a.transpose()
-  np.linalg.inv(a)
-  u = np.eye(2) # unit 2x2 matrix; "eye" represents "I"
-  j = np.array([[0.0, -1.0], [1.0, 0.0]])
-  j @ j        # matrix product
-  np.trace(u)  # trace
-  y = np.array([[5.], [7.]])
-  np.linalg.solve(a, y)
-  np.linalg.eig(j)
+   #+BEGIN_SRC python
+     a = np.array([[1.0, 2.0], [3.0, 4.0]])
+     a.transpose()
+     np.linalg.inv(a)
+     u = np.eye(2) # unit 2x2 matrix; "eye" represents "I"
+     j = np.array([[0.0, -1.0], [1.0, 0.0]])
+     j @ j        # matrix product
+     np.trace(u)  # trace
+     y = np.array([[5.], [7.]])
+     np.linalg.solve(a, y)
+     np.linalg.eig(j)
    #+END_SRC
 
 ** 直方图
 
-   #+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :results file
+   #+BEGIN_SRC python
      import numpy as np
      import matplotlib.pyplot as plt
      filename = '../static/image/2018/10/numpy1.png'
@@ -329,7 +327,7 @@
    [[file:../static/image/2018/10/numpy1.png]]
 
 
-   #+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :exports both :results file
+   #+BEGIN_SRC python
      import numpy as np
      import matplotlib.pyplot as plt
      filename = '../static/image/2018/10/numpy2.png'
@@ -347,10 +345,10 @@
    #+RESULTS:
    [[file:../static/image/2018/10/numpy2.png]]
 
-* 小技巧: 自动 reshape
-
+* 小技巧: 自动 Reshape
   当给出数组的维度为 -1 时，代表需要自推导维度大小
-  #+BEGIN_SRC python :exports code
+
+  #+BEGIN_SRC python
     >>> a = np.arange(30)
     >>> a
     array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
@@ -374,7 +372,7 @@
   #+END_SRC
 
 * 参考链接
-  1. [[http://www.numpy.org/][numpy]]
-  2. [[https://github.com/numpy/numpy.git][numpy on github]]
-  3. [[https://docs.scipy.org/doc/numpy-1.15.1/user/quickstart.html][quickstart]]
-  4. [[https://docs.scipy.org/doc/numpy-1.15.1/reference/index.html#reference][reference]]
+  1. [[http://www.numpy.org/][Numpy]]
+  2. [[https://github.com/numpy/numpy.git][Numpy on Github]]
+  3. [[https://docs.scipy.org/doc/numpy-1.15.1/user/quickstart.html][Quickstart]]
+  4. [[https://docs.scipy.org/doc/numpy-1.15.1/reference/index.html#reference][Reference]]
