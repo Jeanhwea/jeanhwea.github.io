@@ -214,56 +214,107 @@
      \dt *.*
    #+END_SRC
 
-** 创建表
-   #+BEGIN_SRC sql
-     CREATE TABLE <table_name> (
-       <column_name> <column_type>,
-       <column_name> <column_type>,
-       <column_name> <column_type>
-     );
-     -- 删除表
-     DROP TABLE IF EXISTS <table_name> CASCADE;
+   #+BEGIN_SRC text
+     avic=# \d
+                      List of relations
+      Schema |         Name          |   Type   | Owner
+     --------+-----------------------+----------+-------
+      public | tb_departments        | table    | avic
+      public | tb_departments_id_seq | sequence | avic
+      public | tb_users              | table    | avic
+      public | tb_users_id_seq       | sequence | avic
+     (4 rows)
+
+     avic=# \d tb_users
+                                            Table "public.tb_users"
+         Column     |            Type             |                       Modifiers
+     ---------------+-----------------------------+-------------------------------------------------------
+      id            | integer                     | not null default nextval('tb_users_id_seq'::regclass)
+      available     | boolean                     | not null default true
+      created_at    | timestamp without time zone | not null default now()
+      updated_at    | timestamp without time zone | not null default now()
+      department_id | integer                     | not null
+      tag           | character varying(64)       | not null
+      name          | character varying(64)       | not null
+      info          | json                        |
+     Indexes:
+         "tb_users_pk" PRIMARY KEY, btree (id)
+     Foreign-key constraints:
+         "tb_users_department_id_fk" FOREIGN KEY (department_id) REFERENCES tb_departments(id)
+
+     avic=# \d+ tb_users
+                                                                Table "public.tb_users"
+         Column     |            Type             |                       Modifiers                       | Storage  | Stats target | Description
+     ---------------+-----------------------------+-------------------------------------------------------+----------+--------------+-------------
+      id            | integer                     | not null default nextval('tb_users_id_seq'::regclass) | plain    |              |
+      available     | boolean                     | not null default true                                 | plain    |              |
+      created_at    | timestamp without time zone | not null default now()                                | plain    |              |
+      updated_at    | timestamp without time zone | not null default now()                                | plain    |              |
+      department_id | integer                     | not null                                              | plain    |              |
+      tag           | character varying(64)       | not null                                              | extended |              |
+      name          | character varying(64)       | not null                                              | extended |              | Username
+      info          | json                        |                                                       | extended |              |
+     Indexes:
+         "tb_users_pk" PRIMARY KEY, btree (id)
+     Foreign-key constraints:
+         "tb_users_department_id_fk" FOREIGN KEY (department_id) REFERENCES tb_departments(id)
+
+     avic=#
    #+END_SRC
 
+** 创建/删除表
    #+BEGIN_SRC sql
-     -- 创建用户表的例子
-     create sequence global_id
-       increment by 1
-       minvalue 1 no maxvalue
-       start with 9999;
-
-     create table users (
-       id int primary key not null default nextval('global_id'),
-       code varchar(32), -- data is invalid when code is null
-       created_at timestamp without time zone not null default current_timestamp,
-       updated_at timestamp without time zone not null default current_timestamp,
-       username varchar(64) not null,
-       nickname varchar(64),
-       password varchar(128),
-
-       birthday date,
-       constraint unique_username unique (username)
+     create table if not exists tb_departments (
+       id serial not null,
+       available boolean not null default true,
+       created_at timestamp not null default current_timestamp,
+       updated_at timestamp not null default current_timestamp,
+       tag varchar(64) not null,
+       name varchar(64) not null,
+       constraint tb_departments_pk primary key (id)
      );
-     alter table users owner to <tabowner_name>;
-     comment on table users is '用户表';
-     comment on column users.username is '用户登录的用户名';
-     comment on column users.nickname is '用户昵称';
-   #+END_SRC
 
-   #+BEGIN_SRC sql
      drop table if exists tb_users;
 
      create table if not exists tb_users (
-       id serial not null, -- serial 表示 pg 会自动创建一个自增的序列
-       available boolean not null default true, -- available 表示当前数据是否可用
+       id serial not null,
+       available boolean not null default true,
        created_at timestamp not null default current_timestamp,
        updated_at timestamp not null default current_timestamp,
-       tag varchar(64) not null, -- tag 一般是人能看懂的标签
+       department_id integer not null,
+       tag varchar(64) not null,
        name varchar(64) not null,
-       info json, -- pg 支持 json 类型的字段
-       constraint tb_users_pk primary key (id)
+       info json,
+       constraint tb_users_pk primary key (id),
+       constraint tb_users_department_id_fk
+         foreign key (department_id) references tb_departments (id)
      );
+
+     comment on column tb_users.name is 'Username';
    #+END_SRC
+
+   1. ~serial~ 表示 pg 会自动创建一个自增的序列
+   2. pg 支持 ~json~ 类型的字段
+
+   #+BEGIN_SRC sql
+     drop table if exists tb_users cascade;
+   #+END_SRC
+
+   #+BEGIN_SRC sql
+     create sequence global_id
+       increment by 1
+       minvalue 1
+       no maxvalue start with 9999;
+
+     create table tb_users (
+       id int not null default nextval('global_id'),
+       -- more columns
+       constraint tb_users_pk primary key(id)
+     );
+
+     alter table tb_users owner to username;
+   #+END_SRC
+
 
 * 用户/权限
 ** 查看用户基本信息
