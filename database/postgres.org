@@ -341,11 +341,11 @@
      -- 查看所有用户
      select rolname from pg_roles;
      -- 创建用户
-     create user username with password '<password>';
+     create user username with password 'password';
      -- 删除用户
      drop user if exists username;
      -- 修改用户密码
-     alter role username with password '<password>';
+     alter role username with password 'password';
      alter user postgres with password 'postgres';
    #+END_SRC
 
@@ -416,6 +416,13 @@
    一顿操作过后，再用类似于下面的语句导入目标表
    #+BEGIN_SRC sql
      insert into tb_names(id, tag) select c2::integer, c1 from imp;
+   #+END_SRC
+** 使用 pgAdmin4 的 Docker 版本
+   #+BEGIN_SRC sh
+     docker run --name pgadmin4 -p 8888:80 \
+      -e 'PGADMIN_DEFAULT_EMAIL=pgadmin@example.com' \
+      -e 'PGADMIN_DEFAULT_PASSWORD=pgadmin' \
+      -d dpage/pgadmin4:4.18
    #+END_SRC
 * 参考链接
   1. [[https://www.postgresql.org/docs/current/index.html][Postgres Docs]]
