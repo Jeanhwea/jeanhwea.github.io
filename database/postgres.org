@@ -315,7 +315,6 @@
      alter table tb_users owner to username;
    #+END_SRC
 
-
 * 用户/权限
 ** 查看用户基本信息
    #+BEGIN_SRC sql
@@ -391,5 +390,26 @@
      psql -U user -h host -d database -f dump.sql
    #+END_SRC
 
+** Import table
+   #+BEGIN_SRC sql
+     database=# create table imp(c1 varchar, c2 varchar, c3 varchar, c4 varchar);
+     CREATE TABLE
+     database=# \copy imp(c1, c2, c3) from '/tmp/w.csv' delimiter ',' csv header encoding 'GBK';
+     COPY 10
+     database=# select * from imp;
+          c1     | c2 | c3 | c4
+     ------------+----+----+----
+      WF0031S002 | 20 | 16 |
+      WF0031S003 | 16 | 25 |
+      WF0031S004 | 25 | 2  |
+      WF0031S005 | 2  | 24 |
+      WF0031S006 | 24 | 26 |
+      WF0031S007 | 26 | 27 |
+      WF0031S008 | 27 | 28 |
+      WF0031S009 | 28 | 3  |
+      WF0031S010 | 3  | 32 |
+      WF0031S011 | 32 | 33 |
+     (10 rows)
+   #+END_SRC
 * 参考链接
   1. [[https://www.postgresql.org/docs/current/index.html][postgres docs]]
