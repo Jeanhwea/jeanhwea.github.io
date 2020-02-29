@@ -8,15 +8,14 @@
 #+TAGS: postgresql install setup database
 
 * PostgreSQL
-  PostgreSQL 是一种特性非常齐全的自由软件的对象-关系型数据库管理系统（ORDBMS），
-  是以加州大学计算机系开发的 POSTGRES，4.2 版本为基础的对象关系型数据库管理系统。
-  POSTGRES 的许多领先概念只是在比较迟的时候才出现在商业网站数据库中。PostgreSQL
-  支持大部分的 SQL 标准并且提供了很多其他现代特性，如复杂查询、外键、触发器、视
-  图、事务完整性、多版本并发控制等。同样，PostgreSQL 也可以用许多方法扩展，例如
-  通过增加新的数据类型、函数、操作符、聚集函数、索引方法、过程语言等。另外，因为
-  许可证的灵活，任何人都可以以任何目的免费使用、修改和分发 PostgreSQL
-
-* 安装
+** 简介
+   PostgreSQL 是一种特性非常齐全的自由软件的对象-关系型数据库管理系统（ORDBMS），
+   是以加州大学计算机系开发的 POSTGRES，4.2 版本为基础的对象关系型数据库管理系统。
+   POSTGRES 的许多领先概念只是在比较迟的时候才出现在商业网站数据库中。PostgreSQL
+   支持大部分的 SQL 标准并且提供了很多其他现代特性，如复杂查询、外键、触发器、视
+   图、事务完整性、多版本并发控制等。同样，PostgreSQL 也可以用许多方法扩展，例如
+   通过增加新的数据类型、函数、操作符、聚集函数、索引方法、过程语言等。另外，因
+   为许可证的灵活，任何人都可以以任何目的免费使用、修改和分发 PostgreSQL
 ** Windows
    首先去官网上[[https://www.enterprisedb.com/downloads/postgres-postgresql-downloads][下载]]所需的安装文件
 
@@ -92,7 +91,7 @@
      psql -U user -d database -h hostname
    #+END_SRC
 
-** Ubuntu 下登录 PostgreSQL
+** Ubuntu 下登录数据库
    Ubuntu 操作系统中默认可以通过 postgres 用户直接进入数据库
    #+BEGIN_SRC sh
      sudo -u postgres psql
@@ -190,22 +189,33 @@
      birthday   | 1992-06-15
    #+END_SRC
 
-* 数据库
+* 数据库和表操作
+
 ** 查看数据库基本信息
    #+BEGIN_SRC sql
      -- 查看所有数据库列表
      \l
      -- 查看当前数据库
-     SELECT current_database();
+     select current_database();
+   #+END_SRC
+** 数据库操作命令
+   #+BEGIN_SRC sql
+      -- 连接数据库
+      \c <database_name>
+      -- 创建数据库
+      create database <database_name> with owner <username>;
+      -- 删除数据库
+      drop database if exists <database_name>;
+      -- 重命名数据库
+      alter database <old_name> rename to <new_name>;
    #+END_SRC
 
 ** 创建用户及数据库
    #+BEGIN_SRC sql
-     CREATE DATABASE dbname OWNER username;
-     GRANT ALL PRIVILEGES ON DATABASE dbname TO username;
+     create database dbname owner username;
+     grant all privileges on database dbname to username;
    #+END_SRC
 
-* 表
 ** 查看表基本信息
    #+BEGIN_SRC sql
      -- 查看当前数据库的所有表
@@ -319,38 +329,45 @@
 ** 查看用户基本信息
    #+BEGIN_SRC sql
      -- 查看所有用户列表:
-     SELECT rolname FROM pg_roles;
+     select rolname from pg_roles;
      -- 查看当前用户:
-     SELECT current_user;
+     select current_user;
      -- 查看当前用户权限
      \du
    #+END_SRC
 
-** 创建用户
+** 用户信息相关的操作命令
    #+BEGIN_SRC sql
-     CREATE USER username WITH PASSWORD password_string;
-   #+END_SRC
-
-** 修改用户密码
-   #+BEGIN_SRC sql
-     ALTER USER postgres WITH PASSWORD 'postgres';
+     -- 查看所有用户
+     select rolname from pg_roles;
+     -- 创建用户
+     create user username with password '<password>';
+     -- 删除用户
+     drop user if exists username;
+     -- 修改用户密码
+     alter role username with password '<password>';
+     alter user postgres with password 'postgres';
    #+END_SRC
 
 * 工作流
-
 ** 数据备份与还原
+   pg 提供两个操作命名
    #+BEGIN_SRC sh
-     # 备份数据库
+     # 备份数据库： -s 选项只导出 schema， -O 选项不导出表所属用户信息
      pg_dump <database_name>
      # 还原数据库
      pg_restore -d <database_name> -a <file_pathway>
    #+END_SRC
 
+   psql 中复制有 ~\copy~ 和 ~copy~ 两种，其中 ~\copy~ 处理的 csv 文件在客户机端，
+   ~copy~ 处理的在服务器端
    #+BEGIN_SRC sql
      -- 导出 csv 文件
-     \copy <table_name> to '<file_path>' csv;
-     -- 导入 csv 文件
-     \copy <table_name> from '<file_path>' csv;
+     \copy tablename to 'filepath' csv;
+     -- 导入 csv 文件, Excel 默认识别中文编码是GBK, 可加 encoding 'GBK' 解决编码问题
+     \copy tablename from 'filepath' csv;
+     -- Excel 默认识别中文编码是GBK, 可加 encoding 'GBK' 解决编码问题
+     \copy tablename to 'filepath' csv encoding 'GBK';
    #+END_SRC
 
 ** 导出数据库表
@@ -400,28 +417,5 @@
    #+BEGIN_SRC sql
      insert into tb_names(id, tag) select c2::integer, c1 from imp;
    #+END_SRC
-** 用户信息相关的操作命令
-   #+BEGIN_SRC sql
-     -- 查看所有用户
-     select rolname from pg_roles;
-     -- 创建用户
-     create user < user_name > with password '<password>';
-     -- 删除用户
-     drop user if exists < user_name >;
-     -- 修改用户密码
-     alter role < user_name > with password '<password>';
-   #+END_SRC
-** 数据库相关的操作命令
-   #+BEGIN_SRC sql
-      -- 连接数据库
-      \c <database_name>
-      -- 创建数据库
-      create database <database_name> with owner <username>;
-      -- 删除数据库
-      drop database if exists <database_name>;
-      -- 重命名数据库
-      alter database <old_name> rename to <new_name>;
-   #+END_SRC
-
 * 参考链接
-  1. [[https://www.postgresql.org/docs/current/index.html][postgres docs]]
+  1. [[https://www.postgresql.org/docs/current/index.html][Postgres Docs]]
