@@ -336,30 +336,7 @@
      ALTER USER postgres WITH PASSWORD 'postgres';
    #+END_SRC
 
-* 常用命令速查
-** 数据库相关的操作命令
-   #+BEGIN_SRC sql
-      -- 连接数据库
-      \c <database_name>
-      -- 创建数据库
-      CREATE DATABASE <database_name> WITH OWNER <username>;
-      -- 删除数据库
-      DROP DATABASE IF EXISTS <database_name>;
-      -- 重命名数据库
-      ALTER DATABASE <old_name> RENAME TO <new_name>;
-   #+END_SRC
-
-** 用户信息相关的操作命令
-   #+BEGIN_SRC sql
-     -- 查看所有用户
-     select rolname from pg_roles;
-     -- 创建用户
-     create user < user_name > with password '<password>';
-     -- 删除用户
-     drop user if exists < user_name >;
-     -- 修改用户密码
-     alter role < user_name > with password '<password>';
-   #+END_SRC
+* 工作流
 
 ** 数据备份与还原
    #+BEGIN_SRC sh
@@ -390,8 +367,15 @@
      psql -U user -h host -d database -f dump.sql
    #+END_SRC
 
-** Import table
+** 导入本地 CSV 文件的数据库表
+   整理出 CSV 文件过后，导入一个临时表中
    #+BEGIN_SRC sql
+     create table imp(c1 varchar, c2 varchar, c3 varchar, c4 varchar);
+     \copy imp(c1, c2, c3) from '/tmp/w.csv' delimiter ',' csv header encoding 'GBK';
+   #+END_SRC
+
+   在 psql 命令行中使用如下方式导入
+   #+BEGIN_SRC text
      database=# create table imp(c1 varchar, c2 varchar, c3 varchar, c4 varchar);
      CREATE TABLE
      database=# \copy imp(c1, c2, c3) from '/tmp/w.csv' delimiter ',' csv header encoding 'GBK';
@@ -411,5 +395,33 @@
       WF0031S011 | 32 | 33 |
      (10 rows)
    #+END_SRC
+
+   一顿操作过后，再用类似于下面的语句导入目标表
+   #+BEGIN_SRC sql
+     insert into tb_names(id, tag) select c2::integer, c1 from imp;
+   #+END_SRC
+** 用户信息相关的操作命令
+   #+BEGIN_SRC sql
+     -- 查看所有用户
+     select rolname from pg_roles;
+     -- 创建用户
+     create user < user_name > with password '<password>';
+     -- 删除用户
+     drop user if exists < user_name >;
+     -- 修改用户密码
+     alter role < user_name > with password '<password>';
+   #+END_SRC
+** 数据库相关的操作命令
+   #+BEGIN_SRC sql
+      -- 连接数据库
+      \c <database_name>
+      -- 创建数据库
+      create database <database_name> with owner <username>;
+      -- 删除数据库
+      drop database if exists <database_name>;
+      -- 重命名数据库
+      alter database <old_name> rename to <new_name>;
+   #+END_SRC
+
 * 参考链接
   1. [[https://www.postgresql.org/docs/current/index.html][postgres docs]]
