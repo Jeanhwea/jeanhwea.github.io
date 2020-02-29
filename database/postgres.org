@@ -320,13 +320,12 @@
      comment on column tb_users.name is 'Username';
    #+END_SRC
 
-   1. ~serial~ 表示 pg 会自动创建一个自增的序列
-   2. pg 支持 ~json~ 类型的字段
-
+   如果表存在的话，删除表
    #+BEGIN_SRC sql
      drop table if exists tb_users cascade;
    #+END_SRC
 
+   另外，如果需要创建全局数据库的序列，可以参考如下方式
    #+BEGIN_SRC sql
      create sequence global_id_seq
        increment by 1
@@ -335,7 +334,6 @@
 
      create table tb_users (
        id int not null default nextval('global_id_seq'),
-       -- more columns
        constraint pk_users primary key(id)
      );
 
