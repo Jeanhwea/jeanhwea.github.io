@@ -440,5 +440,20 @@
       -e 'PGADMIN_DEFAULT_PASSWORD=pgadmin' \
       -d dpage/pgadmin4:4.18
    #+END_SRC
+
+   如果使用 Nginx 做反向代理可以参考如下配置
+   #+BEGIN_SRC conf
+     server {
+         listen 80;
+         server_name _;
+
+         location /pgadmin4/ {
+             proxy_set_header X-Script-Name /pgadmin4;
+             proxy_set_header Host $host;
+             proxy_pass http://localhost:5050/;
+             proxy_redirect off;
+         }
+     }
+   #+END_SRC
 * 参考链接
   1. [[https://www.postgresql.org/docs/current/index.html][Postgres Docs]]
