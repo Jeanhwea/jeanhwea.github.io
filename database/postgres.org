@@ -273,6 +273,23 @@
    #+END_SRC
 
 ** 创建/删除表
+   1. 记得遵循命名规范， 表名 ~tb_tabnames~, 主键 ~pk_tabnames~, 外键
+      ~fk_tabnames_fieldname~
+   2. ~serial~ 表创建对应在自增序列，另外还有 ~smallserial~ 和 ~bigserial~
+      #+BEGIN_SRC sql
+        create table tb_products (id serial);
+        -- 相当于创建了一个序列，并将对于字段默认赋值成序列的 nextval
+        create sequence tb_products_id_seq increment by 1 minvalue 1 no maxvalue start with 1;
+        create table tb_products (id default default nextval('tb_products_id_seq'));
+      #+END_SRC
+   3. JSON 字段也是 pg 默认支持的，pg 中的 JSON 有两种：
+      - ~json~ 写入快，读取慢
+      - ~jsonb~ 写入慢，读取快
+      #+BEGIN_SRC sql
+        select info from name_age where info @> '{"id":1}'::jsonb;
+        select info -> 'name' from name_age where (info ->> 'age')::int4 > 16;
+      #+END_SRC
+
    #+BEGIN_SRC sql
      create table if not exists tb_departments (
        id serial not null,
@@ -281,7 +298,7 @@
        updated_at timestamp not null default current_timestamp,
        tag varchar(64) not null,
        name varchar(64) not null,
-       constraint tb_departments_pk primary key (id)
+       constraint pk_departments primary key (id)
      );
 
      drop table if exists tb_users;
@@ -292,11 +309,11 @@
        created_at timestamp not null default current_timestamp,
        updated_at timestamp not null default current_timestamp,
        department_id integer not null,
-       tag varchar(64) not null,
+       tag varchar(64
        name varchar(64) not null,
        info json,
-       constraint tb_users_pk primary key (id),
-       constraint tb_users_department_id_fk
+       constraint pk_users primary key (id),
+       constraint pk_users_department_id
          foreign key (department_id) references tb_departments (id)
      );
 
@@ -311,15 +328,15 @@
    #+END_SRC
 
    #+BEGIN_SRC sql
-     create sequence global_id
+     create sequence global_id_seq
        increment by 1
        minvalue 1
        no maxvalue start with 9999;
 
      create table tb_users (
-       id int not null default nextval('global_id'),
+       id int not null default nextval('global_id_seq'),
        -- more columns
-       constraint tb_users_pk primary key(id)
+       constraint pk_users primary key(id)
      );
 
      alter table tb_users owner to username;
@@ -418,6 +435,7 @@
      insert into tb_names(id, tag) select c2::integer, c1 from imp;
    #+END_SRC
 ** 使用 pgAdmin4 的 Docker 版本
+   一些细节参考 [[https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html][pgAdmin4 Docker Manual]] 中的描述
    #+BEGIN_SRC sh
      docker run --name pgadmin4 -p 8888:80 \
       -e 'PGADMIN_DEFAULT_EMAIL=pgadmin@example.com' \
