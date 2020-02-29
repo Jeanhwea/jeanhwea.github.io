@@ -2433,6 +2433,110 @@
      dpkg --install /assets/oracle-xe_11.2.0-1.0_amd64.deb
    #+END_SRC
 
+** 判断回滚段竞争的 SQL 语句
+   当 Ratio 大于 2 时存在回滚段竞争，需要增加更多的 回滚段
+   #+BEGIN_SRC sql
+     select
+       rn.name as "Name",
+       rs.gets as "Gets",
+       rs.waits as "Waits",
+       (rs.waits / rs.gets) * 100 as "Ratio (%)"
+     from
+       v$rollstat rs,
+       v$rollname rn
+     where
+       rs.usn = rn.usn;
+   #+END_SRC
+** 判断恢复日志竞争的 SQL 语句
+   Immediate Contention 或 Wait Contention 的值大于 1 时存在竞争
+   #+BEGIN_SRC sql
+     column name format a20;
+
+     select
+       name,
+       round(100 * decode(sign(t.immediate_gets - t.immediate_misses), 1,
+         t.immediate_misses / (t.immediate_gets - t.immediate_misses), 0), 2) as
+         "Immediate Contention (%)",
+       round(100 * decode(sign(t.gets - t.misses), 1, t.misses / (t.gets -
+         t.misses), 0), 2) as "Wait Contention (%)"
+     from
+       v$latch t
+     where
+       lower(name) in ('redo copy', 'redo allocation');
+   #+END_SRC
+** 判断表空间碎片
+   如果最大空闲空间占总空间很大比例则可能不存在碎片，如果比例较小，且有许多空闲
+   空间，则可能碎片很多
+   #+BEGIN_SRC sql
+     select
+       t.tablespace_name,
+       sum(t.bytes),
+       max(t.bytes),
+       count(*),
+       max(t.bytes) / sum(t.bytes) radio
+     from
+       dba_free_space t
+     group by
+       t.tablespace_name
+     order by
+       t.tablespace_name;
+   #+END_SRC
+** 确定命中排序域的次数
+   #+BEGIN_SRC sql
+     select t.name, t.value from v$sysstat t where lower(t.name) like 'sort%';
+   #+END_SRC
+** 查看当前 SGA 值
+   #+BEGIN_SRC sql
+     select * from v$sga;
+   #+END_SRC
+** 确定高速缓冲区命中率
+   如果命中率低于 70％，则应该加大 init.ora 参数中的 ~db_block_buffer~ 的值
+   #+BEGIN_SRC sql
+     select
+       100 * (1 - ((physical.value - direct.value - lobs.value) / logical.value)) as
+         "Buffer Cache Hit Ratio (%)"
+     from
+       v$sysstat physical,
+       v$sysstat direct,
+       v$sysstat lobs,
+       v$sysstat logical
+     where
+       physical.name = 'physical reads'
+       and direct.name = 'physical reads direct'
+       and lobs.name = 'physical reads direct (lob)'
+       and logical.name = 'session logical reads';
+   #+END_SRC
+** 确定共享池中的命中率
+   如果 ratio1 大于 1 时，需要加大共享池，如果 ratio2 大于 10％时，需要加大共享
+   池 ~shared_pool_size~
+   #+BEGIN_SRC sql
+     select
+       sum(pins) as pins,
+       sum(reloads) as reloads,
+       (sum(reloads) / sum(pins)) * 100 as ratio1
+     from
+       v$librarycache;
+
+     select
+       sum(gets) as gets,
+       sum(getmisses) as getmisses,
+       (sum(getmisses) / sum(gets)) * 100 as ratio2
+     from
+       v$rowcache;
+   #+END_SRC
+** 数据库参数属性
+   #+BEGIN_SRC sql
+     column property_name format a25;
+     column property_value format a30;
+     column description format a100;
+     select * from database_properties;
+     select * from v$version;
+   #+END_SRC
+** 求当前会话的 ~SID~, ~SERIAL#~
+   #+BEGIN_SRC sql
+     select sid, serial# from v$session
+       where audsid = sys_context('userenv', 'sessionid');
+   #+END_SRC
 * 参考链接
   1. [[https://docs.oracle.com/cd/E11882_01/index.htm][Oracle Database 11g Release 2 在线文档]]
   2. [[http://download.oracle.com/docs/cds/E11882_01.zip][Oracle 11g Release 2 文档离线]] - 点击后下载得到 Zip 包
