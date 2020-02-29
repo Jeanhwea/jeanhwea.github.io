@@ -42,44 +42,125 @@
    7. 异常处理：Spring 提供一个方便的 API 将特定技术的异常(由 JDBC, Hibernate,或
       JDO 抛出)转化为一致的、Unchecked 异常
 
-** 核心技术摘要
-*** IoC (Inversion of Control)
-    - IoC 也被称为 DI (dependency injection)，是实现 bean 的依赖关系，即在初始化
-      一个 IoC 容器时，先将其依赖的容器一并初始化，并注入的新的容器中。
-    - IoC 的好处是可以自动管理 Java 类的示例，提升开发速度
-    - Spring 管类的实例叫 Bean，Spring 提供了一系列方法来管理 Bean，其中包括：
-      - BeanFactory Bean 的工厂
-      - ApplicationContext 应用运行的上下文
-      - 还有一些 XML 配置类的解析，XML 配置相当于 Spring 构建 Bean 的蓝图，早期
-        Spring 都用 XML 来配置类，但是由于太复杂，现在已经被 Java 的注解所代替
+** IoC (Inversion of Control)
+   - IoC 也被称为 DI (dependency injection)，是实现 bean 的依赖关系，即在初始化
+     一个 IoC 容器时，先将其依赖的容器一并初始化，并注入的新的容器中。
+   - IoC 的好处是可以自动管理 Java 类的示例，提升开发速度
+   - Spring 管类的实例叫 Bean，Spring 提供了一系列方法来管理 Bean，其中包括：
+     - BeanFactory Bean 的工厂，ApplicationContext 应用运行的上下文。注意：
+       ApplicationContext 和 BeanFactory 都能实例化 Bean，但是一般尽量使用
+       ApplicationContext，因为 ApplicationContext 还额外提供了一些其他功能，如：
+       继承生命周期管理，BeanPostProcessor 自动注册，BeanFactoryPostProcessor 等
+     - 还有一些 XML 配置类的解析，XML 配置相当于 Spring 构建 Bean 的蓝图，早期
+       Spring 都用 XML 来配置类，但是由于太复杂，现在已经被 Java 的注解所代替
 
-*** 容器 Container 和 Bean
-    Spring Framework 提供了管理 Bean 的接口 ApplicationContext，也就是说 Bean 的
-    初始化都是在 ApplicationContext 的实现中处理的，比如：
-    ClassPathXmlApplicationContext 和 FileSystemXmlApplicationContext 都对
-    ApplicationContext 进行实现，这些 ApplicationContext 是装在 Bean 的，所以被
-    称为容器。
+** 容器 Container 和 Bean
+   Spring Framework 提供了管理 Bean 的接口 ApplicationContext，也就是说 Bean 的
+   初始化都是在 ApplicationContext 的实现中处理的，比如：
+   ClassPathXmlApplicationContext 和 FileSystemXmlApplicationContext 都对
+   ApplicationContext 进行实现，这些 ApplicationContext 是装在 Bean 的，所以被称
+   为容器。
 
-    Bean 其实是一种 Java 的对象，在 Spring 中，Bean 除了普通定义的 Java 代码以外，
-    还需要一些其他的元信息，例如：定义的 XML，或者 ~@Component~ 注解。所以 Spring
-    中的对象和普通 Java 对象是不一样的，为了体现 Spring 的高贵性，就将 Spring 中
-    的对象称为 Bean。Bean 的 XML 配置非常恶心且繁琐，不需要记的，用的时候去[[https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#beans-basics][官网]]
-    上查就行。
+   Bean 其实是一种 Java 的对象，在 Spring 中，Bean 除了普通定义的 Java 代码以外，
+   还需要一些其他的元信息，例如：定义的 XML，或者 ~@Component~ 注解。所以 Spring
+   中的对象和普通 Java 对象是不一样的，为了体现 Spring 的高贵性，就将 Spring 中
+   的对象称为 Bean。Bean 的 XML 配置非常恶心且繁琐，不需要记的，用的时候去[[https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#beans-basics][官网]]上
+   查就行。
 
-    关于 Bean 的使用需要掌握以下几个要点
-    - Bean Class, Name, Alias, Constructor arguments, Properties
-    - Bean Scope: singlenton, prototype, request, session, application,
-      websocket
-    - Reference: ~ref~ / ~refid~
-    - Collections ~<list/>~, ~<set/>~, ~<map/>~
-    - Autowiring: ~no~, ~byName~, ~byType~, constructor
-    - ~*Aware~ Interfaces: ApplicationContextAware, ResourceLoaderAware,
-      BeanFactoryAware
-    - Bean Definition Inheritance: ~<parent/>~
-    - Lazy initialization mode
-    - Initialization method
-    - Initialization/Destruction method
-    - Annotation: ~@Required~, ~@Autowired~
+   关于 Bean 的使用需要掌握以下几个要点
+   - Bean Class, Name, Alias, Constructor arguments, Properties
+   - Bean Scope: singlenton, prototype, request, session, application,
+     websocket
+   - Reference: ~ref~ / ~refid~
+   - Collections ~<list/>~, ~<set/>~, ~<map/>~
+   - Autowiring: ~no~, ~byName~, ~byType~, constructor
+   - ~*Aware~ Interfaces: ApplicationContextAware, ResourceLoaderAware,
+     BeanFactoryAware
+   - Bean Definition Inheritance: ~<parent/>~
+   - Lazy initialization mode
+   - Initialization method
+   - Initialization/Destruction method
+   - Annotation: ~@Required~, ~@Autowired~
+
+** 资源 Resource
+   Spring 秉承着一切皆资源，将可以被访问的东西都囊括在 Resource 接口中。并提供了
+   以下一些实现，用户可以直接通过 URL 来获取: ~classpath:config.xml~,
+   ~file:///data/config.xml~, ~http://myservice/logo.png~, ~/path/to/file.txt~
+   - UrlResource
+   - ClassPathResource
+   - FileSystemResource
+   - ServletContextResource
+   - InputStreamResource
+   - ByteArrayResource
+
+** 面向切面编程 AOP
+   AOP 框架创建的对象，代理就是目标对象的加强。Spring 中的 AOP 代理可以使 JDK 动态代理，
+   也可以是 CGLIB 代理，前者基于接口，后者基于子类。
+   - Aspect 通常是一个类，里面可以定义切入点和通知
+   - Join Point 程序执行过程中明确的点，一般是方法的调用
+   - Advice 在特定的切入点上执行的增强处理
+   - Pointcut 带有通知的连接点，在程序中主要体现为书写切入点表达式
+
+   #+BEGIN_SRC java
+     package com.xyz.someapp;
+
+     import org.aspectj.lang.annotation.Aspect;
+     import org.aspectj.lang.annotation.Pointcut;
+
+     @Aspect
+     public class SystemArchitecture {
+
+         /
+          ,* A join point is in the web layer if the method is defined
+          ,* in a type in the com.xyz.someapp.web package or any sub-package
+          ,* under that.
+          /
+         @Pointcut("within(com.xyz.someapp.web..)")
+         public void inWebLayer() {}
+
+         /
+          ,* A join point is in the service layer if the method is defined
+          ,* in a type in the com.xyz.someapp.service package or any sub-package
+          ,* under that.
+          /
+         @Pointcut("within(com.xyz.someapp.service..)")
+         public void inServiceLayer() {}
+
+         /
+          ,* A join point is in the data access layer if the method is defined
+          ,* in a type in the com.xyz.someapp.dao package or any sub-package
+          ,* under that.
+          /
+         @Pointcut("within(com.xyz.someapp.dao..)")
+         public void inDataAccessLayer() {}
+
+         /
+          ,* A business service is the execution of any method defined on a service
+          ,* interface. This definition assumes that interfaces are placed in the
+          ,* "service" package, and that implementation types are in sub-packages.
+          ,*
+          ,* If you group service interfaces by functional area (for example,
+          ,* in packages com.xyz.someapp.abc.service and com.xyz.someapp.def.service) then
+          ,* the pointcut expression "execution(* com.xyz.someapp..service..(..))"
+          ,* could be used instead.
+          ,*
+          ,* Alternatively, you can write the expression using the 'bean'
+          ,* PCD, like so "bean(Service)". (This assumes that you have
+          ,* named your Spring service beans in a consistent fashion.)
+          ,*/
+         @Pointcut("execution( com.xyz.someapp..service..(..))")
+         public void businessService() {}
+
+         /*
+          ,* A data access operation is the execution of any method defined on a
+          ,* dao interface. This definition assumes that interfaces are placed in the
+          ,* "dao" package, and that implementation types are in sub-packages.
+          ,*/
+         @Pointcut("execution( com.xyz.someapp.dao..(..))")
+         public void dataAccessOperation() {}
+
+     }
+   #+END_SRC
 
 * Spring Web MVC
   [[https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc][Spring Web MVC]] 提供了开发 MVC 页面的框架，它期初是建立在 Servlet API 基础上。
