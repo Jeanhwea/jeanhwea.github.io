@@ -1,0 +1,42 @@
+#+TITLE: 在Ubuntu上安装字体
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2020-03-01 Sun 13:30:06>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: fonts linux ubuntu fc-cache fc-list
+
+
+* 安装寻找
+  首先需要准备字体，可以去开源网站上找 ttf 格式的字体文件，如果需要 Windows 系统字
+  体应该在 ~C:\Windows\Fonts~ 文件夹底下
+
+* 准备和安装
+  将需要安装的文件复制到字体文件夹中
+  #+BEGIN_SRC sh
+    # 准备字体文件
+    mkdir /usr/share/fonts/my/
+    cp fonts/* /usr/share/fonts/my/
+    cd /usr/share/fonts/my
+    # 创建字体缓存
+    fc-cache
+  #+END_SRC
+
+* 查看字体
+  查看安装好的字体
+  #+BEGIN_SRC sh
+    fc-list
+  #+END_SRC
+
+  可以使用 grep 配合查看是否存在某一字体
+  #+BEGIN_SRC sh
+    fc-list | grep -i wenquan
+  #+END_SRC
+
+  #+BEGIN_SRC text
+    $ fc-list | grep -i wenquan
+    /usr/share/fonts/truetype/wqy/wqy-microhei.ttc: WenQuanYi Micro Hei,文泉驛微米黑,文泉驿微米黑:style=Regular
+    /home/hujinghui/.local/share/fonts/WenQuanYi Micro Hei Mono.ttf: WenQuanYi Micro Hei Mono,文泉驛等寬微米黑,文泉驿等宽微米黑:style=Regular
+    /usr/share/fonts/truetype/wqy/wqy-microhei.ttc: WenQuanYi Micro Hei Mono,文泉驛等寬微米黑,文泉驿等宽微米黑:style=Regular
+  #+END_SRC
