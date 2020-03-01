@@ -365,9 +365,9 @@
    #+END_SRC
 
 * 工作流
-** 调整列顺序
+** 调整表中的列顺序
    pg 中建好的表是不能轻易调整顺序的，不过可以通过重命名，导数据的方式曲线救国。
-   主要，该方法都大表慎用。 *改表有风险，建表需谨慎*
+   该方法对数据量大表慎用。 *改表有风险，建表需谨慎*
    #+BEGIN_SRC sql
      alter table tabname rename to oldtbl;
 
@@ -378,6 +378,11 @@
      insert into tabname (col1, col2, col3)
        select col1, col2, col3 from oldtblk;
    #+END_SRC
+
+   延伸讨论一下，数据库表的作为计算机底层结构，一般不需要用人来看，在看表时最好
+   建一个视图来看，视图的优点是可以将一些人看不到的 ID 直接转换成名称, *不要懒*,
+   要学会用视图来处理此类问题。
+
 ** 数据备份与还原
    pg 提供两个操作命名
    #+BEGIN_SRC sh
