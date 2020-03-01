@@ -365,6 +365,19 @@
    #+END_SRC
 
 * 工作流
+** 调整列顺序
+   pg 中建好的表是不能轻易调整顺序的，不过可以通过重命名，导数据的方式曲线救国。
+   主要，该方法都大表慎用。 *改表有风险，建表需谨慎*
+   #+BEGIN_SRC sql
+     alter table tabname rename to oldtbl;
+
+     create table tabname (
+       -- column defs go here
+     );
+
+     insert into tabname (col1, col2, col3)
+       select col1, col2, col3 from oldtblk;
+   #+END_SRC
 ** 数据备份与还原
    pg 提供两个操作命名
    #+BEGIN_SRC sh
