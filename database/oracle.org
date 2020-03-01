@@ -1780,6 +1780,36 @@
    |------------------+-----------------|
    |           +00:00 |          +08:00 |
 
+** 创建带自增 ID 的表
+   Oracle 创建自增 ID 分为三个步骤
+   1. 创建表
+   2. 创建自增序列
+   3. 添加更新 ID 值的触发器
+   #+BEGIN_SRC sql
+     create table tb_users (
+       id number not null,
+       available char(1) not null default 'y',
+       created_at date not null default sysdate,
+       updated_at date not null default sysdate,
+       constraint tb_users_pk primary key (id)
+     );
+
+     create sequence tb_users_id_seq
+       increment by 1
+       start with 1
+       minvalue 1
+       maxvalue 999999999;
+
+     create or replace trigger tb_users_id_tgr
+       before insert on tb_users
+       for each row
+     begin
+       select
+         tb_users_id_seq.nextval into :new.id
+       from
+         dual;
+     end;
+   #+END_SRC
 ** 创建新的表空间以及用户
 *** 创建数据储存的目录
     Oracle 数据库的表空间的存储目录需要手工创建，注意创建的文件夹要求
