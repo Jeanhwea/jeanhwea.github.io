@@ -418,11 +418,124 @@
      }
    #+END_SRC
 
+** 响应函数参数和返回值
    [[https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc-ann-methods][Method Handler]] 包括方法参数和返回值注解。其中请求的方法输入参数包括：
    常用注解 ~@RequestParam~, ~@RequestHeader~, ~@RequestBody~ 。还包括一些类
    ~javax.servlet.ServletRequest~, ~javax.servlet.ServletResponse~, ~HttpMethod~
 
    返回值也支持好多种注解已经类，列表等： ~@ResponseBody~, ~HttpEntity<B>~
+
+   矩阵变量
+   #+BEGIN_SRC java
+     // GET /pets/42;q=11;r=22
+     @GetMapping("/pets/{petId}")
+     public void findPet(@PathVariable String petId, @MatrixVariable int q) {
+       // petId == 42
+       // q == 11
+     }
+
+     // GET /owners/42;q=11/pets/21;q=22
+     @GetMapping("/owners/{ownerId}/pets/{petId}")
+     public void findPet(@MatrixVariable(name="q", pathVar="ownerId") int q1,
+                    @MatrixVariable(name="q", pathVar="petId") int q2) {
+       // q1 == 11
+       // q2 == 22
+     }
+
+     // GET /pets/42
+     @GetMapping("/pets/{petId}")
+     public void findPet(@MatrixVariable(required=false, defaultValue="1") int q) {
+       // q == 1
+     }
+
+     // GET /owners/42;q=11;r=12/pets/21;q=22;s=23
+     @GetMapping("/owners/{ownerId}/pets/{petId}")
+     public void findPet(@MatrixVariable MultiValueMap<String, String> matrixVars,
+                    @MatrixVariable(pathVar="petId") MultiValueMap<String, String> petMatrixVars) {
+       // matrixVars: ["q" : [11,22], "r" : 12, "s" : 23]
+       // petMatrixVars: ["q" : 22, "s" : 23]
+     }
+   #+END_SRC
+
+   请求参数
+   #+BEGIN_SRC java
+     @Controller
+     @RequestMapping("/pets")
+     public class EditPetForm {
+       @GetMapping
+       public String setupForm(@RequestParam("petId") int petId, Model model) {
+         Pet pet = this.clinic.loadPet(petId);
+         model.addAttribute("pet", pet);
+         return "petForm";
+       }
+     }
+   #+END_SRC
+
+   请求头参数
+   #+BEGIN_SRC java
+     @GetMapping("/demo")
+     public void handle(@RequestHeader("Accept-Encoding") String encoding,
+                   @RequestHeader("Keep-Alive") long keepAlive) {
+     }
+   #+END_SRC
+
+   Cookie 值
+   #+BEGIN_SRC java
+     @GetMapping("/demo")
+     public void handle(@CookieValue("JSESSIONID") String cookie) {
+     }
+   #+END_SRC
+
+   上传文件
+   #+BEGIN_SRC java
+     @Controller
+     public class FileUploadController {
+
+       @PostMapping("/form")
+       public String handleFormUpload(@RequestParam("name") String name,
+                                 @RequestParam("file") MultipartFile file) {
+         if (!file.isEmpty()) {
+           byte[] bytes = file.getBytes();
+           // store the bytes somewhere
+           return "redirect:uploadSuccess";
+         }
+         return "redirect:uploadFailure";
+       }
+     }
+   #+END_SRC
+
+   异常处理
+   #+BEGIN_SRC java
+     @Controller
+     public class SimpleController {
+       @ExceptionHandler
+       public ResponseEntity<String> handle01(IOException ex) { /* ... */ }
+
+       @ExceptionHandler({FileSystemException.class, RemoteException.class})
+       public ResponseEntity<String> handle02(IOException ex) { /* ... */ }
+
+       @ExceptionHandler({FileSystemException.class, RemoteException.class})
+       public ResponseEntity<String> handle(Exception ex) { /* ... */ }
+     }
+   #+END_SRC
+
+   全局控制器异常处理，在 RESTFul API 设计中需要优雅的异常处理方式，Spring 建议
+   可以通过 ~@ExceptionHandler~和 ~ResponseEntity~ 来将返回消息方法返回体中，并
+   在 ~@ControllerAdvice~ 中集中处理。在定义异常实体类时，可以继承
+   ~ResponseEntityExceptionHandler~ 类。
+   #+BEGIN_SRC java
+     // Target all Controllers annotated with @RestController
+     @ControllerAdvice(annotations = RestController.class)
+     public class ExampleAdvice1 {}
+
+     // Target all Controllers within specific packages
+     @ControllerAdvice("org.example.controllers")
+     public class ExampleAdvice2 {}
+
+     // Target all Controllers assignable to specific classes
+     @ControllerAdvice(assignableTypes = {ControllerInterface.class, AbstractController.class})
+     public class ExampleAdvice3 {}
+   #+END_SRC
 
 * Spring Boot
   用的初始搭建以及开发过程。该框架使用了特定的方式来进行配置，从而使开发人员不再
