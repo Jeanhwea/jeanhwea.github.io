@@ -168,79 +168,105 @@
    测试时默认开启事务，如果测试中修改或删除了数据，在测试后要求修改回来。
 
 ** 事务
-   事务不仅仅是 Spring 特有的特性，在数据库并发中普遍存在，具体事务的特性我在
-   [[file:../database/oracle.org][Oracle]] 中事务一节中有详细地讨论，这里着重记录 Spring 中 ~@Transactional~ 标注的使
-   用
+*** ~@Transactional~
+    事务不仅仅是 Spring 特有的特性，在数据库并发中普遍存在，具体事务的特性我在
+    [[file:../database/oracle.org][Oracle]] 中事务一节中有详细地讨论，这里着重记录 Spring 中 ~@Transactional~ 标注的使
+    用
 
-   在 Spring 中，事务使用操作的相关讨论出现在 [[https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html][Data Access]] 一节中，
-   ~@Transactional~ 开启一个事务，例如下面的 FooService 开启了事务管理，虽然
-   Spring 也支持 XML 方式配置事务，但是比较麻烦，尽量避免使用
-   #+BEGIN_SRC java
-     @Transactional
-     public class DefaultFooService implements FooService {
+    在 Spring 中，事务使用操作的相关讨论出现在 [[https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html][Data Access]] 一节中，
+    ~@Transactional~ 开启一个事务，例如下面的 FooService 开启了事务管理，虽然
+    Spring 也支持 XML 方式配置事务，但是比较麻烦，尽量避免使用
+    #+BEGIN_SRC java
+      @Transactional
+      public class DefaultFooService implements FooService {
 
-       Foo getFoo(String fooName) { /* ... */ }
-       Foo getFoo(String fooName, String barName) { /* ... */ }
-       void insertFoo(Foo foo) { /* ... */ }
-       void updateFoo(Foo foo) { /* ... */ }
+        Foo getFoo(String fooName) { /* ... */ }
+        Foo getFoo(String fooName, String barName) { /* ... */ }
+        void insertFoo(Foo foo) { /* ... */ }
+        void updateFoo(Foo foo) { /* ... */ }
 
-     }
-   #+END_SRC
+      }
+    #+END_SRC
 
-   事务显然有很多属性可以配置，例如：是否只读，是否传播，隔离级别，超时的时长，
-   以及为何中异常回滚，因为属性多，所以需移步官网文档 [[https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction-declarative-attransactional-settings][Transactional Settings]]
-   #+BEGIN_SRC java
-     @Transactional(readOnly = true)
-     public class DefaultFooService implements FooService {
-       public Foo getFoo(String fooName) { /* ... */ }
+    事务显然有很多属性可以配置，例如：是否只读，是否传播，隔离级别，超时的时长，
+    以及为何中异常回滚，因为属性多，所以需移步官网文档 [[https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction-declarative-attransactional-settings][Transactional Settings]]
+    #+BEGIN_SRC java
+      @Transactional(readOnly = true)
+      public class DefaultFooService implements FooService {
+        public Foo getFoo(String fooName) { /* ... */ }
 
-       // these settings have precedence for this method
-       @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-       public void updateFoo(Foo foo) { /* ... */ }
-     }
-   #+END_SRC
+        // these settings have precedence for this method
+        @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+        public void updateFoo(Foo foo) { /* ... */ }
+      }
+    #+END_SRC
 
-   在 Spring 中，事务包含一个传播方式，大体上有如下几种：
-   - ~PROPAGATION_REQUIRED~ 所有方法串在一个事务中执行
-   - ~PROPAGATION_REQUIRES_NEW~ 每次进入子方法时，新开一个事务
-   - ~PROPAGATION_NESTED~ 所有方法串在一个事务中，但是进入子方法时记录保存点
-     (Save Point)
+    在 Spring 中，事务包含一个传播方式，大体上有如下几种：
+    - ~PROPAGATION_REQUIRED~ 所有方法串在一个事务中执行
+    - ~PROPAGATION_REQUIRES_NEW~ 每次进入子方法时，新开一个事务
+    - ~PROPAGATION_NESTED~ 所有方法串在一个事务中，但是进入子方法时记录保存点
+      (Save Point)
 
-   Spring 也支持多事务管理员角色的注解，使用方法参考下面例子
-   #+BEGIN_SRC java
-     public class TransactionalService {
+    Spring 也支持多事务管理员角色的注解，使用方法参考下面例子
+    #+BEGIN_SRC java
+      public class TransactionalService {
 
-       @Transactional("order")
-       public void setSomething(String name) { /* ... */ }
+        @Transactional("order")
+        public void setSomething(String name) { /* ... */ }
 
-       @Transactional("account")
-       public void doSomething() { /* ... */ }
-     }
-   #+END_SRC
+        @Transactional("account")
+        public void doSomething() { /* ... */ }
+      }
+    #+END_SRC
 
-   也可以自己定制的方式定义属于业务逻辑的事务管理注解，参考如下的例子
-   #+BEGIN_SRC java
-     @Target({ElementType.METHOD, ElementType.TYPE})
-     @Retention(RetentionPolicy.RUNTIME)
-     @Transactional("order")
-     public @interface OrderTx {
-     }
+    也可以自己定制的方式定义属于业务逻辑的事务管理注解，参考如下的例子
+    #+BEGIN_SRC java
+      @Target({ElementType.METHOD, ElementType.TYPE})
+      @Retention(RetentionPolicy.RUNTIME)
+      @Transactional("order")
+      public @interface OrderTx {
+      }
 
-     @Target({ElementType.METHOD, ElementType.TYPE})
-     @Retention(RetentionPolicy.RUNTIME)
-     @Transactional("account")
-     public @interface AccountTx {
-     }
-   #+END_SRC
+      @Target({ElementType.METHOD, ElementType.TYPE})
+      @Retention(RetentionPolicy.RUNTIME)
+      @Transactional("account")
+      public @interface AccountTx {
+      }
+    #+END_SRC
 
-   #+BEGIN_SRC java
-     public class TransactionalService {
-       @OrderTx
-       public void setSomething(String name) { /* ... */ }
-       @AccountTx
-       public void doSomething() { /* ... */ }
-     }
-   #+END_SRC
+    #+BEGIN_SRC java
+      public class TransactionalService {
+        @OrderTx
+        public void setSomething(String name) { /* ... */ }
+        @AccountTx
+        public void doSomething() { /* ... */ }
+      }
+    #+END_SRC
+
+*** ~TransactionTemplate~
+    Spring 实现了 TransactionTemplate 模版类，也可以很方便的操纵事务相关的业务
+    #+BEGIN_SRC java
+      public class SimpleService implements Service {
+
+        // single TransactionTemplate shared amongst all methods in this instance
+        private final TransactionTemplate transactionTemplate;
+
+        // use constructor-injection to supply the PlatformTransactionManager
+        public SimpleService(PlatformTransactionManager transactionManager) {
+          this.transactionTemplate = new TransactionTemplate(transactionManager);
+        }
+
+        public Object someServiceMethod() {
+          return transactionTemplate.execute(new TransactionCallback() {
+              // the code in this method executes in a transactional context
+              public Object doInTransaction(TransactionStatus status) {
+                updateOperation1();
+                return resultOfUpdateOperation2();
+              }
+            });
+        }
+      }
+    #+END_SRC
 
 ** 创建 Spring 项目
    创建一个 Maven 项目项目工程
