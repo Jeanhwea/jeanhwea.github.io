@@ -290,11 +290,139 @@
       }
     #+END_SRC
 ** Spring MVC
-   [[https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc][Spring MVC]] 提供了开发 MVC 页面的框架，它期初是建立在 Servlet API 基础上。
+*** 简介
+    [[https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc][Spring MVC]] 是 Spring Web MVC 通用叫法，由于 ~spring-webmvc~ 包的缘故，之前才被
+    称为 Spring Web MVC。 他提供了开发 MVC 页面的框架，它期初是建立在 Servlet API 基
+    础上。 我一般讲 Spring MVC 项目组织成如下结构：
 
-   Spring MVC 项目包结构
+    [[file:../static/image/2019/07/spring-mvc-module.png]]
 
-   [[file:../static/image/2019/07/spring-mvc-module.png]]
+*** 核心组件
+    Spring MVC 是对通用 Servlet 的一个代理，其实现的 DispatcherServlet 提供对请
+    求预处理的共享算法。WebApplicationContext 是 ApplicationContext 的子类，他除
+    了继承 Spring 的 IoC 功能以外，提供了许多对 Web 操作的功能。
+
+*** Servlet 配置
+    Spring MVC 提供了配置 Servlet 的方法。实现 WebApplicationinitializer 接口的
+    类都可以在 Web 应用程序启动时被加载。具体操作如下：
+    #+BEGIN_SRC java
+      import org.springframework.web.WebApplicationInitializer;
+      public class MyWebApplicationInitializer implements WebApplicationInitializer {
+        @Override
+        public void onStartup(ServletContext container) {
+          XmlWebApplicationContext appContext = new XmlWebApplicationContext();
+          appContext.setConfigLocation("/WEB-INF/spring/dispatcher-config.xml");
+
+          ServletRegistration.Dynamic registration =
+            container.addServlet("dispatcher", new DispatcherServlet(appContext));
+          registration.setLoadOnStartup(1);
+          registration.addMapping("/");
+        }
+      }
+    #+END_SRC
+
+*** 控制器
+    Spring MVC 默认使用 ~@Controller~ 来表示控制器，如果后台开发的大部分返回
+    Json 的话，我们可以使用 ~@RestController~ 来注解，他相当于 ~@Controller~ 和
+    ~@ResponseBody~ 这两个的组合。
+
+    #+BEGIN_SRC java
+      @Controller
+      public class HelloController {
+
+        @GetMapping("/hello")
+        public String handle(Model model) {
+          model.addAttribute("message", "Hello World!");
+          return "index";
+        }
+      }
+    #+END_SRC
+
+** HTTP 请求映射
+   通常，可以通过二级路由的方法管理控制器类，详见如下例子：
+   #+BEGIN_SRC java
+     @RestController
+     @RequestMapping("/persons")
+     class PersonController {
+
+       @GetMapping("/{id}")
+       public Person getPerson(@PathVariable Long id) { /* ... */ }
+
+       @PostMapping
+       @ResponseStatus(HttpStatus.CREATED)
+       public void add(@RequestBody Person person) { /* ... */ }
+
+     }
+   #+END_SRC
+
+   路径参数中包含如下三种通配符：
+   - ~?~ 匹配一个字符
+   - ~*~ 匹配零个或多个路径中的字符
+   - ~**~ 匹配零个或多个路径
+   #+BEGIN_SRC java
+     @GetMapping("/owners/{ownerId}/pets/{petId}")
+     public Pet findPet(@PathVariable Long ownerId, @PathVariable Long petId) { /* ... */ }
+
+     @GetMapping("/pets/{petId}")
+     public Pet findPet(@PathVariable("petId") id) { /* ... */ }
+
+     @GetMapping("/{name:[a-z-]+}-{version:\\d\\.\\d\\.\\d}{ext:\\.[a-z]+}")
+     public void handle(@PathVariable String version, @PathVariable String ext) { /* ... */ }
+
+     @GetMapping("/pets/{petId}")
+     // same as
+     @RequestMapping("/pets/{petId}", method=HttpMethod.GET)
+   #+END_SRC
+
+   匹配 Content-Type 字段的值，将控制器局限到对应的类型的文件处理
+   #+BEGIN_SRC java
+     @PostMapping(path = "/pets", consumes = "application/json")
+     public void addPet(@RequestBody Pet pet) { /* ... */ }
+
+     @PostMapping(path = "/pets", consumes = "!text/plain")
+     public void addPet(@RequestBody Pet pet) { /* ... */ }
+   #+END_SRC
+
+   返回多媒体类型的流，参考 Accept 请求头
+   #+BEGIN_SRC java
+     @GetMapping(path = "/pets/{petId}", produces = "application/json")
+     @ResponseBody
+     public Pet getPet(@PathVariable String petId) { /* ... */ }
+   #+END_SRC
+
+   根据请求的添加来部分匹配
+   #+BEGIN_SRC java
+     @GetMapping(path = "/pets/{petId}", params = "myParam=myValue")
+     public void findPet(@PathVariable String petId) { /* ... */ }
+
+     @GetMapping(path = "/pets", headers = "myHeader=myValue")
+     public void findPet(@PathVariable String petId) { /* ... */}
+   #+END_SRC
+
+   还可以通过以下的方式来动态注册请求 URL 到处理方法
+   #+BEGIN_SRC java
+     @Configuration
+     public class MyConfig {
+
+       @Autowired
+       public void setHandlerMapping(RequestMappingHandlerMapping mapping, UserHandler handler)
+         throws NoSuchMethodException {
+
+         RequestMappingInfo info = RequestMappingInfo
+           .paths("/user/{id}").methods(RequestMethod.GET).build();
+
+         Method method = UserHandler.class.getMethod("getUser", Long.class);
+
+         mapping.registerMapping(info, handler, method);
+       }
+     }
+   #+END_SRC
+
+   [[https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc-ann-methods][Method Handler]] 包括方法参数和返回值注解。其中请求的方法输入参数包括：
+   常用注解 ~@RequestParam~, ~@RequestHeader~, ~@RequestBody~ 。还包括一些类
+   ~javax.servlet.ServletRequest~, ~javax.servlet.ServletResponse~, ~HttpMethod~
+
+   返回值也支持好多种注解已经类，列表等： ~@ResponseBody~, ~HttpEntity<B>~
 
 * Spring Boot
   用的初始搭建以及开发过程。该框架使用了特定的方式来进行配置，从而使开发人员不再
