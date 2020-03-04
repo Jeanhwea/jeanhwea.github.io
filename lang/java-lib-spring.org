@@ -9,11 +9,12 @@
 
 
 * Spring Framework
-  [[https://spring.io/projects/spring-framework][Spring Framework]] 是一个开源框架，是为了解决企业应用程序开发复杂性而创建的。框
-  架的主要优势之一就是其分层架构，分层架构允许您选择使用哪一个组件，同时为 J2EE
-  应用程序开发提供集成的框架。
+** 简介
+   [[https://spring.io/projects/spring-framework][Spring Framework]] 是一个开源框架，是为了解决企业应用程序开发复杂性而创建的。框
+   架的主要优势之一就是其分层架构，分层架构允许您选择使用哪一个组件，同时为 J2EE
+   应用程序开发提供集成的框架。
 
-  [[file:../static/image/2019/07/spring-projects.png]]
+   [[file:../static/image/2019/07/spring-projects.png]]
 
 ** Spring 的技术点和优点
    作为 Java Web 开发的龙头老大， Spring 的优点是不需要打广告了，Spring
@@ -537,6 +538,165 @@
      public class ExampleAdvice3 {}
    #+END_SRC
 
+** 跨越 CORS
+   允许单个 URL 和处理函数跨越可以直接使用 ~@CrossOrigin~ 来解决
+   #+BEGIN_SRC java
+     @RestController
+     @RequestMapping("/account")
+     public class AccountController {
+
+       @CrossOrigin
+       @GetMapping("/{id}")
+       public Account retrieve(@PathVariable Long id) { /* ... */ }
+
+       @DeleteMapping("/{id}")
+       public void remove(@PathVariable Long id) { /* ... */ }
+     }
+   #+END_SRC
+
+   允许类跨域将注解写类头上
+   #+BEGIN_SRC java
+     @CrossOrigin(origins = "https://domain2.com", maxAge = 3600)
+     @RestController
+     @RequestMapping("/account")
+     public class AccountController {
+
+       @GetMapping("/{id}")
+       public Account retrieve(@PathVariable Long id) { /* ... */ }
+
+       @DeleteMapping("/{id}")
+       public void remove(@PathVariable Long id) { /* ... */ }
+     }
+   #+END_SRC
+
+   或者混合注解方法
+   #+BEGIN_SRC java
+     @CrossOrigin(maxAge = 3600)
+     @RestController
+     @RequestMapping("/account")
+     public class AccountController {
+
+       @CrossOrigin("https://domain2.com")
+       @GetMapping("/{id}")
+       public Account retrieve(@PathVariable Long id) { /* ... */ }
+
+       @DeleteMapping("/{id}")
+       public void remove(@PathVariable Long id) { /* ... */ }
+     }
+   #+END_SRC
+
+   允许全栈跨域需要实现配置类
+   #+BEGIN_SRC java
+     @Configuration
+     @EnableWebMvc
+     public class WebConfig implements WebMvcConfigurer {
+
+       @Override
+       public void addCorsMappings(CorsRegistry registry) {
+
+         registry.addMapping("/api/**")
+           .allowedOrigins("https://domain2.com")
+           .allowedMethods("PUT", "DELETE")
+           .allowedHeaders("header1", "header2", "header3")
+           .exposedHeaders("header1", "header2")
+           .allowCredentials(true).maxAge(3600);
+
+         // Add more mappings...
+       }
+     }
+   #+END_SRC
+
+** MVC 配置
+*** 类型转换配置
+    #+BEGIN_SRC java
+      @Configuration
+      @EnableWebMvc
+      public class WebConfig implements WebMvcConfigurer {
+
+        @Override
+        public void addFormatters(FormatterRegistry registry) {
+          DateTimeFormatterRegistrar registrar = new DateTimeFormatterRegistrar();
+          registrar.setUseIsoFormat(true);
+          registrar.registerFormatters(registry);
+        }
+      }
+    #+END_SRC
+*** 静态资源配置
+    #+BEGIN_SRC java
+      @Configuration
+      @EnableWebMvc
+      public class WebConfig implements WebMvcConfigurer {
+
+        @Override
+        public void addResourceHandlers(ResourceHandlerRegistry registry) {
+          registry.addResourceHandler("/resources/**")
+            .addResourceLocations("/public", "classpath:/static/")
+            .setCachePeriod(31556926);
+        }
+      }
+    #+END_SRC
+** URI 连接
+*** UriComponents 构造 URI 对象
+    UriComponentsBuilder 可以新建一个 UriComponents 的实例，示例程序如下
+    #+BEGIN_SRC java
+      URI uri = UriComponentsBuilder
+        .fromUriString("https://example.com/hotels/{hotel}")
+        .queryParam("q", "{q}")
+        .encode()
+        .buildAndExpand("Westin", "123")
+        .toUri();
+
+      URI uri = UriComponentsBuilder
+        .fromUriString("https://example.com/hotels/{hotel}")
+        .queryParam("q", "{q}")
+        .build("Westin", "123");
+    #+END_SRC
+*** URI 编码
+    #+BEGIN_SRC java
+      URI uri = UriComponentsBuilder.fromPath("/hotel list/{city}")
+        .queryParam("q", "{q}")
+        .encode()
+        .buildAndExpand("New York", "foo+bar")
+        .toUri();
+      // Result is "/hotel%20list/New%20York?q=foo%2Bbar"
+
+      URI uri = UriComponentsBuilder.fromPath("/hotel list/{city}")
+        .queryParam("q", "{q}")
+        .build("New York", "foo+bar");
+
+      URI uri = UriComponentsBuilder.fromPath("/hotel list/{city}?q={q}")
+        .build("New York", "foo+bar")
+    #+END_SRC
+** 异步请求
+*** DeferredResult
+    #+BEGIN_SRC java
+      @GetMapping("/quotes")
+      @ResponseBody
+      public DeferredResult<String> quotes() {
+        DeferredResult<String> deferredResult = new DeferredResult<String>();
+        // Save the deferredResult somewhere..
+        return deferredResult;
+      }
+
+      // From some other thread...
+      deferredResult.setResult(result);
+    #+END_SRC
+*** Callable
+    #+BEGIN_SRC java
+      @PostMapping
+      public Callable<String> processUpload(final MultipartFile file) {
+
+        return new Callable<String>() {
+          public String call() throws Exception {
+            // ...
+            return "someView";
+          }
+        };
+      }
+    #+END_SRC
+** Rest 客户端
+   REST 客户端主要用 RestTemplate 和 WebClient。在日常工作中使用 RestTemplate 比
+   较多，具体可查阅集成一节中的详细叙述 [[https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#rest-client-access][REST Endpoints]]
 * Spring Boot
   用的初始搭建以及开发过程。该框架使用了特定的方式来进行配置，从而使开发人员不再
   需要定义样板化的配置。通过这种方式，Spring Boot 致力于在蓬勃发展的快速应用开发
