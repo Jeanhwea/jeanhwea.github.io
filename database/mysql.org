@@ -1720,7 +1720,7 @@
    #+END_SRC
 
 * 导入/导出数据
-** SELECT 方法导入/导出
+** Select 方法导入/导出 CSV 文件
    #+BEGIN_SRC sql
      -- 导出表数据
      SELECT * INTO OUTFILE filename [export_option] FROM tabname;
@@ -1740,24 +1740,43 @@
        - 起始: STARTING BY 'string'
        - 终止: TERMINATED BY 'string'
 
-     #+BEGIN_SRC sql
-       SELECT A, B, A+B
-         INTO OUTFILE '/tmp/result.text'
-              FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
-              LINES TERMINATED BY '\n'
-         FROM TEST_TABLE;
-     #+END_SRC
+   下面是一个导出的示例
+   #+BEGIN_SRC sql
+     select a, b, a+b
+       into outfile '/tmp/result.csv'
+            fields terminated by ','
+            optionally enclosed by '"'
+            lines terminated by '\n'
+       from test_table;
+   #+END_SRC
 
 ** 使用 mysqldump 工具
 *** 备份数据
-    - 如果远程导入的本地需要指定使用 =-h= 选项指定主机名
-    - 导出后生成一个 sql 脚本
+    1. ~--single-transaction~ 选型在备份时尽量添加，可以保证数据的一致性
+    2. 如果远程导入的本地需要指定使用 ~-h~ 选项指定主机名
+    3. 本地数据库可以使用 ~-S~ 指定 socket 文件
+    4. 导出后生成一个 SQL 脚本
+
+    操作多个数据库
     #+BEGIN_SRC sh
-      mysqldump -u user -p pass dbname tabname > /tmp/out.sql # 导出一张表
-      mysqldump -u user -p pass dbname tabname1 tabname1 > /tmp/out.sql # 导出多张表
-      mysqldump -u user -p pass dbname > /tmp/out.sql # 导出数据库所有表
-      mysqldump -u user -p pass -B dbname1 dbname2 > /tmp/out.sql # 导出多数据库
+      # 导出所有数据库
+      mysqldump --single-transaction -u user -p -A > /tmp/all-databases.sql
+      mysqldump --single-transaction -u user -p -S /tmp/mysql.sock -A > /tmp/all-databases.sql
+      mysqldump --single-transaction -u user -p --all-databases > /tmp/all-databases.sql
+      # 导出多数据库，指定待导出数据库的名称，例如导出 db01 和 db02
+      mysqldump --single-transaction -u user -p -B db01 db02 > /tmp/db01-and-db02.sql
     #+END_SRC
+
+    操作单个数据库
+    #+BEGIN_SRC sh
+      # 导出 db01 数据库的所有表及数据
+      mysqldump --single-transaction -u user -p db01 > /tmp/db01.sql
+      # 导出一张或多张表，例如：导出 db01 数据库的 tb01 和 tb02 两张数据库表
+      mysqldump --single-transaction -u user -p db01 tb01 tb02 > /tmp/tbs-of-db01.sql
+      # 导出数据库时不导出数据，仅仅导出表结构
+      mysqldump --single-transaction -u user -p -d db01 > /tmp/db01-schema.sql
+    #+END_SRC
+
 *** 导入数据
     导入数据时先建用户和数据库
     #+BEGIN_SRC sql
