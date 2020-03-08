@@ -185,12 +185,7 @@
      }
    #+END_SRC
 
-** 测试
-   Spring 框架的一个特色就是提供测试 [[https://docs.spring.io/spring/docs/current/spring-framework-reference/testing.html][Spring Testing]] 的功能，对于日常工作测试，主
-   要了解 ~@Transactional~, ~@Rollback~ 以及 ~@Commit~ 这样三个注解功能。Spring
-   测试时默认开启事务，如果测试中修改或删除了数据，在测试后要求修改回来。
-
-** 事务
+** 事务 ~@Transactional~
 *** ~@Transactional~
     事务不仅仅是 Spring 特有的特性，在数据库并发中普遍存在，具体事务的特性我在
     [[file:../database/oracle.org][Oracle]] 中事务一节中有详细地讨论，这里着重记录 Spring 中 ~@Transactional~ 标注的使
@@ -290,6 +285,11 @@
         }
       }
     #+END_SRC
+
+** 测试
+   Spring 框架的一个特色就是提供测试 [[https://docs.spring.io/spring/docs/current/spring-framework-reference/testing.html][Spring Testing]] 的功能，对于日常工作测试，主
+   要了解 ~@Transactional~, ~@Rollback~ 以及 ~@Commit~ 这样三个注解功能。Spring
+   测试时默认开启事务，如果测试中修改或删除了数据，在测试后要求修改回来。
 ** Spring MVC
 *** 简介
     [[https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc][Spring MVC]] 是 Spring Web MVC 通用叫法，由于 ~spring-webmvc~ 包的缘故，之前才被
@@ -538,7 +538,7 @@
      public class ExampleAdvice3 {}
    #+END_SRC
 
-** 跨越 CORS
+** 跨越 CORS ~@CrossOrigin~
    [[https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS][CORS]] 在 MDN 中有详细的介绍，下面只展示 Spring 中如何配置 CORS。允许单个 URL 和处
    理函数跨越可以直接使用 ~@CrossOrigin~ 来解决
    #+BEGIN_SRC java
@@ -607,7 +607,7 @@
      }
    #+END_SRC
 
-** MVC 配置
+** MVC 配置 ~@EnableWebMvc~
 *** 类型转换配置
     #+BEGIN_SRC java
       @Configuration
@@ -636,7 +636,7 @@
         }
       }
     #+END_SRC
-** URI 连接
+** URI 连接 UriComponents
 *** UriComponents 构造 URI 对象
     UriComponentsBuilder 可以新建一个 UriComponents 的实例，示例程序如下
     #+BEGIN_SRC java
@@ -703,12 +703,87 @@
    - Hessian 这是工业界调用比较有名的一种远端过程调用的协议
    - JMS
 
-** 客户端请求
+** 客户端请求 RestTemplate
    Spring 提供了两种 Rest 客户端来进行客户端请求， RestTemplate 和 WebClient。在
    日常工作中使用 RestTemplate 比较多，具体可查阅集成一节中的详细叙述 [[https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#rest-client-access][endpoints]]
    - RestTemplate 是 Spring 自带的调用客户端，支持自带的模板类和同步的 HTTP 调用
    - WebClient 处理异步调用
+*** 初始化
+    直接使用 Apache HttpComponents 来作为 Spring 的代理来初始化一个 RestTemplate
+    对象
+    #+BEGIN_SRC java
+      RestTemplate template = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
+    #+END_SRC
+*** URI
+    restTemplate 支持多种请求模式，例如 GET 请求可以使用下面的方式来出来发送
+    HTTP 请求来获取数据
+    #+BEGIN_SRC java
+      // 直接传递参数
+      String result = restTemplate.getForObject(
+          "https://example.com/hotels/{hotel}/bookings/{booking}", String.class, "42", "21");
+      // 把参数封装在 Map 对象中
+      Map<String, String> vars = Collections.singletonMap("hotel", "42");
+      String result = restTemplate.getForObject(
+          "https://example.com/hotels/{hotel}/rooms/{hotel}", String.class, vars);
+      // 自动编码空格
+      restTemplate.getForObject("https://example.com/hotel list", String.class);
+      // Results in request to "https://example.com/hotel%20list"
+    #+END_SRC
+*** 请求头
+    使用 ~exchange()~ 可以在请求中添加请求头，参考如下示例
+    #+BEGIN_SRC java
+      String uriTemplate = "https://example.com/hotels/{hotel}";
+      URI uri = UriComponentsBuilder.fromUriString(uriTemplate).build(42);
 
+      RequestEntity<Void> requestEntity = RequestEntity.get(uri)
+          .header(("MyRequestHeader", "MyValue")
+          .build();
+
+      ResponseEntity<String> response = template.exchange(requestEntity, String.class);
+
+      String responseHeader = response.getHeaders().getFirst("MyResponseHeader");
+      String body = response.getBody();
+    #+END_SRC
+*** 请求体
+    直接传递第一个参数作为请求体，在 POST 请求中，输入对象直接被序列化成请求体
+    #+BEGIN_SRC java
+      URI location = template.postForLocation("https://example.com/people", person);
+    #+END_SRC
+
+    在 GET 请求中，请求返回的消息体会被反序列化成对应对象
+    #+BEGIN_SRC java
+      Person person = restTemplate.getForObject("https://example.com/people/{id}", Person.class, 42);
+    #+END_SRC
+*** Jackson JSON
+    有时候需要修改一下默认请求的序列化方式，例如我们序列化用户是不希望将用户的密
+    码暴露出来，可以通过下面的方式实现
+    #+BEGIN_SRC java
+      MappingJacksonValue value = new MappingJacksonValue(new User("eric", "7!jd#h23"));
+      value.setSerializationView(User.WithoutPasswordView.class);
+      // 构造请求实体
+      RequestEntity<MappingJacksonValue> requestEntity =
+          RequestEntity.post(new URI("https://example.com/user")).body(value);
+      // 发送请求，获取回复
+      ResponseEntity<String> response = template.exchange(requestEntity, String.class);
+    #+END_SRC
+*** Multipart
+    Spring 还提供了发送多部分请求的方法，使用 ~MultiValueMap~ 对象可以构造请求参数
+    #+BEGIN_SRC java
+      MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+      // 构造请求的多部分的请求参数
+      parts.add("fieldPart", "fieldValue");
+      parts.add("filePart", new FileSystemResource("...logo.png"));
+      parts.add("jsonPart", new Person("Jason"));
+      // 构造请求头和添加另外的参数
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_XML);
+      parts.add("xmlPart", new HttpEntity<>(myBean, headers));
+    #+END_SRC
+    一旦多部分的请求参数构造好了，就可以使用如下方法来发送请求
+    #+BEGIN_SRC java
+      MultiValueMap<String, Object> parts = ...;
+      template.postForObject("https://example.com/upload", parts, Void.class);
+    #+END_SRC
 * Spring Boot
   用的初始搭建以及开发过程。该框架使用了特定的方式来进行配置，从而使开发人员不再
   需要定义样板化的配置。通过这种方式，Spring Boot 致力于在蓬勃发展的快速应用开发
