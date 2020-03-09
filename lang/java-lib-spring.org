@@ -636,38 +636,6 @@
         }
       }
     #+END_SRC
-** URI 连接 UriComponents
-*** UriComponents 构造 URI 对象
-    UriComponentsBuilder 可以新建一个 UriComponents 的实例，示例程序如下
-    #+BEGIN_SRC java
-      URI uri = UriComponentsBuilder
-        .fromUriString("https://example.com/hotels/{hotel}")
-        .queryParam("q", "{q}")
-        .encode()
-        .buildAndExpand("Westin", "123")
-        .toUri();
-
-      URI uri = UriComponentsBuilder
-        .fromUriString("https://example.com/hotels/{hotel}")
-        .queryParam("q", "{q}")
-        .build("Westin", "123");
-    #+END_SRC
-*** URI 编码
-    #+BEGIN_SRC java
-      URI uri = UriComponentsBuilder.fromPath("/hotel list/{city}")
-        .queryParam("q", "{q}")
-        .encode()
-        .buildAndExpand("New York", "foo+bar")
-        .toUri();
-      // Result is "/hotel%20list/New%20York?q=foo%2Bbar"
-
-      URI uri = UriComponentsBuilder.fromPath("/hotel list/{city}")
-        .queryParam("q", "{q}")
-        .build("New York", "foo+bar");
-
-      URI uri = UriComponentsBuilder.fromPath("/hotel list/{city}?q={q}")
-        .build("New York", "foo+bar")
-    #+END_SRC
 ** 异步请求
 *** DeferredResult
     #+BEGIN_SRC java
@@ -704,7 +672,6 @@
    - JMS (Java Message Service) 具体使用方法参考官方文档 [[https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#jms][doc]]
    - JMX (Java Management Extensions) 是一个为应用程序植入管理功能的框架。用户可
      以在任何 Java 应用程序中使用这些代理和服务实现管理
-
 ** 客户端请求 RestTemplate
    Spring 提供了两种 Rest 客户端来进行客户端请求， RestTemplate 和 WebClient。在
    日常工作中使用 RestTemplate 比较多，具体可查阅集成一节中的详细叙述 [[https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#rest-client-access][endpoints]]
@@ -716,6 +683,46 @@
     #+BEGIN_SRC java
       RestTemplate template = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
     #+END_SRC
+*** UriComponents 构造 URI 对象
+    UriComponentsBuilder 可以新建一个 UriComponents 的实例，示例程序如下
+    #+BEGIN_SRC java
+      URI uri = UriComponentsBuilder
+        .fromUriString("https://example.com/hotels/{hotel}")
+        .queryParam("q", "{q}")
+        .encode()
+        .buildAndExpand("Westin", "123")
+        .toUri();
+
+      URI uri = UriComponentsBuilder
+        .fromUriString("https://example.com/hotels/{hotel}")
+        .queryParam("q", "{q}")
+        .build("Westin", "123");
+    #+END_SRC
+
+*** URI 编码
+    Spring 的 UriComponentsBuilder 自带 encode 方法，方便对 URL 编码
+    #+BEGIN_SRC java
+      URI uri = UriComponentsBuilder.fromPath("/hotel list/{city}")
+        .queryParam("q", "{q}")
+        .encode()
+        .buildAndExpand("New York", "foo+bar")
+        .toUri();
+      // Result is "/hotel%20list/New%20York?q=foo%2Bbar"
+
+      // queryParam 可以处理 query string
+      URI uri = UriComponentsBuilder.fromPath("/hotel list/{city}")
+        .queryParam("q", "{q}")
+        .build("New York", "foo+bar");
+
+      URI uri = UriComponentsBuilder.fromPath("/hotel list/{city}?q={q}")
+        .build("New York", "foo+bar");
+
+      // 传递 Map<String, Object> params 对象的 query string
+      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(uriTemplate);
+      params.forEach((k, v) -> { builder.queryParam(k, "{" + k + "}"); });
+      builder.encode().buildAndExpand(params).toUri(); // 获取到 URI
+    #+END_SRC
+
 *** URI
     restTemplate 支持多种请求模式，例如 GET 请求可以使用下面的方式来出来发送
     HTTP 请求来获取数据
@@ -902,7 +909,6 @@
    - ~@CachePut~: 标注更新缓存
    - ~@Caching~: 重新组合和定义缓存，一般适用于定义组合式的缓存策略
    - ~@CacheConfig~: 标注在类上，定义类级别共享的缓存
-
 *** 开启缓存
     通过配置类的方式开启缓存
     #+BEGIN_SRC java
