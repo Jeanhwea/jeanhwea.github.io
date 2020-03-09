@@ -1018,12 +1018,12 @@
 *** 继承父 Starter
     Spring Boot 项目需要继承的父级 Starter，配置如下：
     #+BEGIN_SRC xml
-    <!-- Inherit defaults from Spring Boot -->
-    <parent>
-     <groupId>org.springframework.boot</groupId>
-     <artifactId>spring-boot-starter-parent</artifactId>
-     <version>2.1.0.RELEASE</version>
-    </parent>
+      <!-- Inherit defaults from Spring Boot -->
+      <parent>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-parent</artifactId>
+       <version>2.1.0.RELEASE</version>
+      </parent>
     #+END_SRC
 
 *** Starters
@@ -1087,34 +1087,34 @@
 
    下面是依赖注入的示例
    #+BEGIN_SRC java
-   package com.example.service;
-   import org.springframework.beans.factory.annotation.Autowired;
-   import org.springframework.stereotype.Service;
+     package com.example.service;
+     import org.springframework.beans.factory.annotation.Autowired;
+     import org.springframework.stereotype.Service;
 
-   @Service
-   public class DatabaseAccountService implements AccountService {
-     private final RiskAssessor riskAssessor;
+     @Service
+     public class DatabaseAccountService implements AccountService {
+       private final RiskAssessor riskAssessor;
 
-     @Autowired
-     public DatabaseAccountService(RiskAssessor riskAssessor) {
-       this.riskAssessor = riskAssessor;
+       @Autowired
+       public DatabaseAccountService(RiskAssessor riskAssessor) {
+         this.riskAssessor = riskAssessor;
+       }
+
+       // ...
      }
-
-     // ...
-   }
    #+END_SRC
 
    #+BEGIN_SRC java
-   @Service
-   public class DatabaseAccountService implements AccountService {
-     private final RiskAssessor riskAssessor;
+     @Service
+     public class DatabaseAccountService implements AccountService {
+       private final RiskAssessor riskAssessor;
 
-     public DatabaseAccountService(RiskAssessor riskAssessor) {
-       this.riskAssessor = riskAssessor;
+       public DatabaseAccountService(RiskAssessor riskAssessor) {
+         this.riskAssessor = riskAssessor;
+       }
+
+       // ...
      }
-
-     // ...
-   }
    #+END_SRC
 
 ** ~@SpringBootApplication~ 标注
@@ -1125,19 +1125,19 @@
 
    ~@SpringBootApplication~ 相当于同时开启了上面三项配置
    #+BEGIN_SRC java
-   package com.example.myapplication;
-   import org.springframework.boot.SpringApplication;
-   import org.springframework.boot.autoconfigure.SpringBootApplication;
+     package com.example.myapplication;
+     import org.springframework.boot.SpringApplication;
+     import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
-   @SpringBootApplication // same as @Configuration @EnableAutoConfiguration @ComponentScan
-   public class Application {
+     @SpringBootApplication // same as @Configuration @EnableAutoConfiguration @ComponentScan
+     public class Application {
 
-     public static void main(String[] args) {
-       SpringApplication.run(Application.class, args);
+       public static void main(String[] args) {
+         SpringApplication.run(Application.class, args);
+       }
+
      }
-
-   }
    #+END_SRC
 
 ** 外部配置
@@ -1153,14 +1153,14 @@
 *** ~@Value~ 方式配置
     直接使用注释的方式即可将配置的值读入 Java Bean 中，示例如下：
     #+BEGIN_SRC java
-    @Component
-    public class MyBean {
+      @Component
+      public class MyBean {
 
-      @Value("${name}")
-      private String name;
+        @Value("${name}")
+        private String name;
 
-      // ...
-    }
+        // ...
+      }
     #+END_SRC
 
 *** ~@ConfigurationProperties~ 方式配置
@@ -1168,45 +1168,45 @@
 
     先定义配置项的 Java Bean
     #+BEGIN_SRC java
-    package com.example;
+      package com.example;
 
-    import java.net.InetAddress;
-    import java.util.ArrayList;
-    import java.util.Collections;
-    import java.util.List;
+      import java.net.InetAddress;
+      import java.util.ArrayList;
+      import java.util.Collections;
+      import java.util.List;
 
-    import org.springframework.boot.context.properties.ConfigurationProperties;
+      import org.springframework.boot.context.properties.ConfigurationProperties;
 
-    @ConfigurationProperties("acme")
-    public class AcmeProperties {
+      @ConfigurationProperties("acme")
+      public class AcmeProperties {
 
-      private boolean enabled;
-      private InetAddress remoteAddress;
-      private final Security security = new Security();
+        private boolean enabled;
+        private InetAddress remoteAddress;
+        private final Security security = new Security();
 
-      public boolean isEnabled() { /* ... */ }
-      public void setEnabled(boolean enabled) { /* ... */ }
+        public boolean isEnabled() { /* ... */ }
+        public void setEnabled(boolean enabled) { /* ... */ }
 
-      public InetAddress getRemoteAddress() { /* ... */ }
-      public void setRemoteAddress(InetAddress remoteAddress) { /* ... */ }
+        public InetAddress getRemoteAddress() { /* ... */ }
+        public void setRemoteAddress(InetAddress remoteAddress) { /* ... */ }
 
-      public Security getSecurity() { /* ... */ }
+        public Security getSecurity() { /* ... */ }
 
-      public static class Security {
-        private String username;
-        private String password;
-        private List<String> roles = new ArrayList<>(Collections.singleton("USER"));
+        public static class Security {
+          private String username;
+          private String password;
+          private List<String> roles = new ArrayList<>(Collections.singleton("USER"));
 
-        public String getUsername() { /* ... */ }
-        public void setUsername(String username) { /* ... */ }
+          public String getUsername() { /* ... */ }
+          public void setUsername(String username) { /* ... */ }
 
-        public String getPassword() { /* ... */ }
-        public void setPassword(String password) { /* ... */ }
+          public String getPassword() { /* ... */ }
+          public void setPassword(String password) { /* ... */ }
 
-        public List<String> getRoles() { /* ... */ }
-        public void setRoles(List<String> roles) { /* ... */ }
+          public List<String> getRoles() { /* ... */ }
+          public void setRoles(List<String> roles) { /* ... */ }
+        }
       }
-    }
     #+END_SRC
 
     上述的配置类对应于配置文件中的这些配置项
@@ -1218,90 +1218,90 @@
 
     添加配置项，通过 ~@EnableConfigurationProperties~ 标注来扫描配置的 Java Bean
     #+BEGIN_SRC java
-    @Configuration
-    @EnableConfigurationProperties(AcmeProperties.class)
-    public class MyConfiguration {
-      // ...
-    }
+      @Configuration
+      @EnableConfigurationProperties(AcmeProperties.class)
+      public class MyConfiguration {
+        // ...
+      }
     #+END_SRC
 
     并且需要添加 ~@Configuration~ 到 Java Bean 中
     #+BEGIN_SRC java
-    @Component
-    @ConfigurationProperties(prefix="acme")
-    public class AcmeProperties {
-      // ... see the preceding example
-    }
+      @Component
+      @ConfigurationProperties(prefix="acme")
+      public class AcmeProperties {
+        // ... see the preceding example
+      }
     #+END_SRC
 
     最后就可以将定义的 Java Bean 配置项注入到其它组件中
     #+BEGIN_SRC java
-    @Service
-    public class MyService {
+      @Service
+      public class MyService {
 
-      private final AcmeProperties properties;
+        private final AcmeProperties properties;
 
-      @Autowired
-      public MyService(AcmeProperties properties) {
-        this.properties = properties;
+        @Autowired
+        public MyService(AcmeProperties properties) {
+          this.properties = properties;
+        }
+
+        //...
+
+        @PostConstruct
+        public void openConnection() {
+          Server server = new Server(this.properties.getRemoteAddress());
+          // ...
+        }
+
       }
-
-      //...
-
-      @PostConstruct
-      public void openConnection() {
-        Server server = new Server(this.properties.getRemoteAddress());
-        // ...
-      }
-
-    }
     #+END_SRC
 
 ** 允许跨域
    Spring Boot 可以通过添加配置类的方法来启用跨域设置，具体参考下面的代码
    #+BEGIN_SRC java
-   import org.springframework.context.annotation.Configuration;
-   import org.springframework.web.servlet.config.annotation.CorsRegistry;
-   import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-   import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+     import org.springframework.context.annotation.Configuration;
+     import org.springframework.web.servlet.config.annotation.CorsRegistry;
+     import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+     import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-   @Configuration
-   @EnableWebMvc
-   public class CorsConfiguration implements WebMvcConfigurer {
+     @Configuration
+     @EnableWebMvc
+     public class CorsConfiguration implements WebMvcConfigurer {
 
-     private static final String[] CORS_METHODS =
-         new String[] {"GET", "OPTIONS", "POST", "PUT", "DELETE"};
+       private static final String[] CORS_METHODS =
+           new String[] {"GET", "OPTIONS", "POST", "PUT", "DELETE"};
 
-     private static final String[] CORS_HEADERS =
-         new String[] {
-           "Access-Control-Request-Headers",
-           "Access-Control-Request-Method",
-           "Accept",
-           "Authorization",
-           "Cache-Control",
-           "Content-Type",
-           "DNT",
-           "If-Modified-Since",
-           "Keep-Alive",
-           "Origin",
-           "Referer",
-           "User-Agent",
-           "X-Mx-ReqToken",
-           "X-Requested-With"
-         };
+       private static final String[] CORS_HEADERS =
+           new String[] {
+             "Access-Control-Request-Headers",
+             "Access-Control-Request-Method",
+             "Accept",
+             "Authorization",
+             "Cache-Control",
+             "Content-Type",
+             "DNT",
+             "If-Modified-Since",
+             "Keep-Alive",
+             "Origin",
+             "Referer",
+             "User-Agent",
+             "X-Mx-ReqToken",
+             "X-Requested-With"
+           };
 
-     @Override
-     public void addCorsMappings(CorsRegistry registry) {
-       registry
-           .addMapping("/**")
-           .allowedOrigins("*")
-           .allowedMethods(CORS_METHODS)
-           .allowedHeaders(CORS_HEADERS)
-           .exposedHeaders(CORS_HEADERS)
-           .allowCredentials(true)
-           .maxAge(3600);
+       @Override
+       public void addCorsMappings(CorsRegistry registry) {
+         registry
+             .addMapping("/**")
+             .allowedOrigins("*")
+             .allowedMethods(CORS_METHODS)
+             .allowedHeaders(CORS_HEADERS)
+             .exposedHeaders(CORS_HEADERS)
+             .allowCredentials(true)
+             .maxAge(3600);
+       }
      }
-   }
 
    #+END_SRC
 
@@ -1312,11 +1312,11 @@
 *** 日志样式
     默认的输出样式如下：
     #+BEGIN_SRC text
-    2014-03-05 10:57:51.112  INFO 45469 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet Engine: Apache Tomcat/7.0.52
-    2014-03-05 10:57:51.253  INFO 45469 --- [ost-startStop-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-    2014-03-05 10:57:51.253  INFO 45469 --- [ost-startStop-1] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 1358 ms
-    2014-03-05 10:57:51.698  INFO 45469 --- [ost-startStop-1] o.s.b.c.e.ServletRegistrationBean        : Mapping servlet: 'dispatcherServlet' to [/]
-    2014-03-05 10:57:51.702  INFO 45469 --- [ost-startStop-1] o.s.b.c.embedded.FilterRegistrationBean  : Mapping filter: 'hiddenHttpMethodFilter' to: [/*]
+      2014-03-05 10:57:51.112  INFO 45469 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet Engine: Apache Tomcat/7.0.52
+      2014-03-05 10:57:51.253  INFO 45469 --- [ost-startStop-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+      2014-03-05 10:57:51.253  INFO 45469 --- [ost-startStop-1] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 1358 ms
+      2014-03-05 10:57:51.698  INFO 45469 --- [ost-startStop-1] o.s.b.c.e.ServletRegistrationBean        : Mapping servlet: 'dispatcherServlet' to [/]
+      2014-03-05 10:57:51.702  INFO 45469 --- [ost-startStop-1] o.s.b.c.embedded.FilterRegistrationBean  : Mapping filter: 'hiddenHttpMethodFilter' to: [/*]
     #+END_SRC
     包括以下几个部分：
     1. Date and Time: Millisecond precision and easily sortable
@@ -1332,7 +1332,7 @@
     控制台输出默认记录 ERROR, WARN 和 INFO 基本的日志，可以使用 ~--debug~ 开启调
     试级别的输出。
     #+BEGIN_SRC sh
-    java -jar myapp.jar --debug
+      java -jar myapp.jar --debug
     #+END_SRC
 
     也可以在配置文件 ~application.yml~ 中设置 ~debug=true~
@@ -1360,15 +1360,15 @@
     日志级别可以通过 ~logging.level.<logger-name>=<level>~ 来设置，
     ~logging.level.root~ 是设置默认级别
     #+BEGIN_SRC conf
-    logging.level.root=WARN
-    logging.level.org.springframework.web=DEBUG
-    logging.level.org.hibernate=ERROR
+      logging.level.root=WARN
+      logging.level.org.springframework.web=DEBUG
+      logging.level.org.hibernate=ERROR
     #+END_SRC
 
 *** 日志分组
     日志基本可以通过分组来设置，例如
     #+BEGIN_SRC conf
-    logging.group.tomcat=org.apache.catalina, org.apache.coyote, org.apache.tomcat
+      logging.group.tomcat=org.apache.catalina, org.apache.coyote, org.apache.tomcat
     #+END_SRC
 
     Spring Boot 的默认分组有下面几个：
@@ -1379,104 +1379,104 @@
 *** MySQL
     ~application.yml~ 配置文件中添加用户名、密码等相关信息
     #+BEGIN_SRC yaml
-    spring:
-      jpa:
-        database-platform: org.hibernate.dialect.MySQL5Dialect
-      datasource:
-        platform: mysql
-        username: username
-        password: password
-        url: jdbc:mysql://localhost:3306/database?useUnicode=true&characterEncoding=utf-8&useSSL=false
-        driver-class-name: com.mysql.jdbc.Driver
+      spring:
+        jpa:
+          database-platform: org.hibernate.dialect.MySQL5Dialect
+        datasource:
+          platform: mysql
+          username: username
+          password: password
+          url: jdbc:mysql://localhost:3306/database?useUnicode=true&characterEncoding=utf-8&useSSL=false
+          driver-class-name: com.mysql.jdbc.Driver
     #+END_SRC
 
     ~pom.xml~ 文件中添加 MySQL 依赖
     #+BEGIN_SRC xml
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.38</version>
-    </dependency>
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.38</version>
+      </dependency>
     #+END_SRC
 
 *** PostgreSQL
     ~application.yml~ 配置文件中添加用户名、密码等相关信息
     #+BEGIN_SRC yaml
-    spring:
-      jpa:
-        database-platform: org.hibernate.dialect.PostgreSQL9Dialect
-      datasource:
-        platform: postgres
-        username: username
-        password: password
-        url: jdbc:postgresql://localhost:5432/database
-        driver-class-name: org.postgresql.Driver
+      spring:
+        jpa:
+          database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+        datasource:
+          platform: postgres
+          username: username
+          password: password
+          url: jdbc:postgresql://localhost:5432/database
+          driver-class-name: org.postgresql.Driver
     #+END_SRC
 
     ~pom.xml~ 文件中添加 PostgreSQL 依赖
     #+BEGIN_SRC xml
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>42.2.5</version>
-    </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.2.5</version>
+      </dependency>
     #+END_SRC
 
 *** Oracle
     ~application.yml~ 配置文件中添加用户名、密码等相关信息
     #+BEGIN_SRC yaml
-    spring:
-      jpa:
-        database-platform: org.hibernate.dialect.Oracle10gDialect
-      datasource:
-        username: username
-        password: password
-        url: jdbc:oracle:thin:@//localhost:1521/database
-        driver-class-name: oracle.jdbc.OracleDriver
+      spring:
+        jpa:
+          database-platform: org.hibernate.dialect.Oracle10gDialect
+        datasource:
+          username: username
+          password: password
+          url: jdbc:oracle:thin:@//localhost:1521/database
+          driver-class-name: oracle.jdbc.OracleDriver
     #+END_SRC
 
     ~pom.xml~ 文件中添加 PostgreSQL 依赖
     #+BEGIN_SRC xml
-    <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>ojdbc6</artifactId>
-      <version>11.2.0.4.0</version>
-      <scope>provided</scope>
-    </dependency>
+      <dependency>
+        <groupId>com.oracle</groupId>
+        <artifactId>ojdbc6</artifactId>
+        <version>11.2.0.4.0</version>
+        <scope>provided</scope>
+      </dependency>
     #+END_SRC
 
     Oracle 的驱动是收费的，需要手工安装，默认在 ~$ORACLE_HOME/jdbc/lib/~ 文件夹
     中， 安装适配你项目的 jar 文件即可
     #+BEGIN_SRC sh
-    mvn install:install-file -Dpackaging=jar \
-      -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.4.0 \
-      -Dfile=<path-to-jar>
+      mvn install:install-file -Dpackaging=jar \
+        -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.4.0 \
+        -Dfile=<path-to-jar>
     #+END_SRC
 
 *** Tomcat 连接池配置
     如果你在项目中使用 [[https://tomcat.apache.org/tomcat-8.0-doc/jdbc-pool.html#Common_Attributes][Tomcat 连接池]] 作为数据库连接，可能还需要设置的相关参数
     #+BEGIN_SRC conf
-    # Number of ms to wait before throwing an exception if no connection is available.
-    spring.datasource.tomcat.max-wait=10000
+      # Number of ms to wait before throwing an exception if no connection is available.
+      spring.datasource.tomcat.max-wait=10000
 
-    # Maximum number of active connections that can be allocated from this pool at the same time.
-    spring.datasource.tomcat.max-active=50
+      # Maximum number of active connections that can be allocated from this pool at the same time.
+      spring.datasource.tomcat.max-active=50
 
-    # Validate the connection before borrowing it from the pool.
-    spring.datasource.tomcat.test-on-borrow=true
+      # Validate the connection before borrowing it from the pool.
+      spring.datasource.tomcat.test-on-borrow=true
     #+END_SRC
 
 ** 开发工具
    Spring Boot 的提供了开发工具套件，可以实现自动加载，仅仅需要在 ~pom.xml~ 文件
    中加入下面依赖即可自动添加
    #+BEGIN_SRC xml
-   <dependencies>
-    <dependency>
-     <groupId>org.springframework.boot</groupId>
-     <artifactId>spring-boot-devtools</artifactId>
-     <optional>true</optional>
-    </dependency>
-   </dependencies>
+     <dependencies>
+      <dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-devtools</artifactId>
+       <optional>true</optional>
+      </dependency>
+     </dependencies>
    #+END_SRC
 
 * Spring Data
@@ -1499,24 +1499,24 @@
 *** 格式化 JSON 的时间字符串
     使用 JsonFormat 标注可以设置 JSON 字段序列化的格式
     #+BEGIN_SRC java
-    import com.fasterxml.jackson.annotation.JsonFormat;
-    import com.fasterxml.jackson.annotation.JsonProperty;
+      import com.fasterxml.jackson.annotation.JsonFormat;
+      import com.fasterxml.jackson.annotation.JsonProperty;
 
-    class ExampleEntity {
+      class ExampleEntity {
 
-      @Column(name = "BIRTHDAY")
-      @JsonFormat(pattern = "yyyy-MM-dd")
-      private Timestamp birthday; // 出生日期
+        @Column(name = "BIRTHDAY")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private Timestamp birthday; // 出生日期
 
-      @JsonProperty("birthday")
-      public Timestamp birthday() {
-        return this.birthday;
+        @JsonProperty("birthday")
+        public Timestamp birthday() {
+          return this.birthday;
+        }
+
+        public void birthday(Timestamp birthday) {
+          this.birthday = birthday;
+        }
       }
-
-      public void birthday(Timestamp birthday) {
-        this.birthday = birthday;
-      }
-    }
     #+END_SRC
 
 * Spring Cloud
@@ -1550,141 +1550,141 @@
 **** 项目依赖
      在 =pom.xml= 文件中添加如下的依赖项
      #+BEGIN_SRC xml
-     <project>
-       <dependencies>
-         <dependency>
-           <groupId>org.springframework.cloud</groupId>
-           <artifactId>spring-cloud-config-server</artifactId>
-         </dependency>
-       </dependencies>
-
-       <dependencyManagement>
+       <project>
          <dependencies>
            <dependency>
              <groupId>org.springframework.cloud</groupId>
-             <artifactId>spring-cloud-dependencies</artifactId>
-             <version>Greenwich.SR2</version>
-             <type>pom</type>
-             <scope>import</scope>
+             <artifactId>spring-cloud-config-server</artifactId>
            </dependency>
          </dependencies>
-       </dependencyManagement>
-     </project>
+
+         <dependencyManagement>
+           <dependencies>
+             <dependency>
+               <groupId>org.springframework.cloud</groupId>
+               <artifactId>spring-cloud-dependencies</artifactId>
+               <version>Greenwich.SR2</version>
+               <type>pom</type>
+               <scope>import</scope>
+             </dependency>
+           </dependencies>
+         </dependencyManagement>
+       </project>
      #+END_SRC
 
 **** 引导类
      中心服务器的引导累着需要添加 ~@EnableConfigServer~ 来启用配置服务器
      #+BEGIN_SRC java
-     import org.springframework.boot.SpringApplication;
-     import org.springframework.boot.autoconfigure.SpringBootApplication;
-     import org.springframework.cloud.config.server.EnableConfigServer;
+       import org.springframework.boot.SpringApplication;
+       import org.springframework.boot.autoconfigure.SpringBootApplication;
+       import org.springframework.cloud.config.server.EnableConfigServer;
 
-     @SpringBootApplication
-     @EnableConfigServer
-     public class Application {
+       @SpringBootApplication
+       @EnableConfigServer
+       public class Application {
 
-       public static void main(String[] args) {
-         SpringApplication.run(Application.class, args);
+         public static void main(String[] args) {
+           SpringApplication.run(Application.class, args);
+         }
+
        }
-
-     }
      #+END_SRC
 
 **** Git 远端配置项
      在中心配置服务器中的 =application.yml= 中添加相应的配置
      #+BEGIN_SRC yaml
-     spring:
-       profiles:
-         active: default
-       cloud:
-         config:
-           server:
-             git:
-               uri: http://github.com/avic/configfiles.git
-               searchPaths:
-                 - path1
-                 - path2
-               username: user
-               password: pass
+       spring:
+         profiles:
+           active: default
+         cloud:
+           config:
+             server:
+               git:
+                 uri: http://github.com/avic/configfiles.git
+                 searchPaths:
+                   - path1
+                   - path2
+                 username: user
+                 password: pass
      #+END_SRC
 
 *** Config Client
 **** 配置相关文件
      首先修改 *pom.xml*, *application.yml* 和 *bootstrap.yml* 这三项配置文件
      #+BEGIN_SRC xml
-     <!-- pom.xml -->
-     <project>
-       <!-- 1. 添加下面四个依赖项 -->
-       <dependencies>
-         <dependency>
-           <groupId>org.springframework.cloud</groupId>
-           <artifactId>spring-cloud-starter-config</artifactId>
-         </dependency>
-         <dependency>
-           <groupId>org.springframework.boot</groupId>
-           <artifactId>spring-boot-starter-actuator</artifactId>
-         </dependency>
-         <dependency>
-           <groupId>org.springframework.boot</groupId>
-           <artifactId>spring-boot-starter-web</artifactId>
-         </dependency>
-         <dependency>
-           <groupId>org.springframework.boot</groupId>
-           <artifactId>spring-boot-starter-test</artifactId>
-           <scope>test</scope>
-         </dependency>
-       </dependencies>
-
-       <!-- 2. 设置依赖管理 -->
-       <dependencyManagement>
+       <!-- pom.xml -->
+       <project>
+         <!-- 1. 添加下面四个依赖项 -->
          <dependencies>
            <dependency>
              <groupId>org.springframework.cloud</groupId>
-             <artifactId>spring-cloud-dependencies</artifactId>
-             <!-- 这个 version 需要和你使用的 spring boot 版本适配，否则应用起不来 -->
-             <version>Greenwich.SR2</version>
-             <!-- 我的项目中 spring boot 版本是 2.1.0.RELEASE, 所以 cloud 的版本使用 Greenwich -->
-             <type>pom</type>
-             <scope>import</scope>
+             <artifactId>spring-cloud-starter-config</artifactId>
+           </dependency>
+           <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-actuator</artifactId>
+           </dependency>
+           <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-web</artifactId>
+           </dependency>
+           <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-test</artifactId>
+             <scope>test</scope>
            </dependency>
          </dependencies>
-       </dependencyManagement>
 
-     </project>
+         <!-- 2. 设置依赖管理 -->
+         <dependencyManagement>
+           <dependencies>
+             <dependency>
+               <groupId>org.springframework.cloud</groupId>
+               <artifactId>spring-cloud-dependencies</artifactId>
+               <!-- 这个 version 需要和你使用的 spring boot 版本适配，否则应用起不来 -->
+               <version>Greenwich.SR2</version>
+               <!-- 我的项目中 spring boot 版本是 2.1.0.RELEASE, 所以 cloud 的版本使用 Greenwich -->
+               <type>pom</type>
+               <scope>import</scope>
+             </dependency>
+           </dependencies>
+         </dependencyManagement>
+
+       </project>
      #+END_SRC
      #+BEGIN_SRC yaml
-     # src/main/resources/application.yml
-     management:
-       endpoints:
-         web:
-           exposure:
-             include: '*'
+       # src/main/resources/application.yml
+       management:
+         endpoints:
+           web:
+             exposure:
+               include: '*'
      #+END_SRC
      #+BEGIN_SRC yaml
-     # src/main/resources/bootstrap.yml
-     spring:
-       application:
-         name: appname # 这里写你项目的名称
-       profiles:
-         active: dev   # 这里配置你需要的 profile
-       cloud:
-         config:
-           uri: http://192.168.0.231/peizhi
+       # src/main/resources/bootstrap.yml
+       spring:
+         application:
+           name: appname # 这里写你项目的名称
+         profiles:
+           active: dev   # 这里配置你需要的 profile
+         cloud:
+           config:
+             uri: http://192.168.0.231/peizhi
      #+END_SRC
 
 **** 引导类
      在系统启动的引导类中添加 ~@RefreshScope~ 注解
      #+BEGIN_SRC java
-     import org.springframework.boot.autoconfigure.SpringBootApplication;
-     import org.springframework.cloud.context.config.annotation.RefreshScope;
+       import org.springframework.boot.autoconfigure.SpringBootApplication;
+       import org.springframework.cloud.context.config.annotation.RefreshScope;
 
-     @SpringBootApplication
-     @RefreshScope
-     public class Application {
-       public static void main(String[] args) {
-         SpringApplication.run(Application.class, args);
+       @SpringBootApplication
+       @RefreshScope
+       public class Application {
+         public static void main(String[] args) {
+           SpringApplication.run(Application.class, args);
+         }
        }
-     }
      #+END_SRC
 
 ** Spring Cloud Netflix
@@ -1707,38 +1707,38 @@
 ***** 配置相关文件
       =pom.xml= 添加 ~spring-cloud-starter-netflix-eureka-client~ 的依赖项
       #+BEGIN_SRC xml
-      <!-- pom.xml -->
-      <project>
-        <dependencies>
-          <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-          </dependency>
-        </dependencies>
-      </project>
+        <!-- pom.xml -->
+        <project>
+          <dependencies>
+            <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            </dependency>
+          </dependencies>
+        </project>
       #+END_SRC
 
       =application.yml= 添加配置项
       #+BEGIN_SRC yaml
-      eureka:
-        instance:
-          instanceId: app-instance-id
-          hostname: my.app.host
-          nonSecurePort: 8080 # http 请求的端口号
-        client:
-          fetchRegistry: true
-          registerWithEureka: true
-          serviceUrl:
-            defaultZone: http://localhost:8761/eureka/
+        eureka:
+          instance:
+            instanceId: app-instance-id
+            hostname: my.app.host
+            nonSecurePort: 8080 # http 请求的端口号
+          client:
+            fetchRegistry: true
+            registerWithEureka: true
+            serviceUrl:
+              defaultZone: http://localhost:8761/eureka/
       #+END_SRC
 
       如果开启 ~preferIpAddress~ 就会忽略 ~hostname~ ，因为有的时候微服务被部署
       到 docker 容器中，主机名可能是随机分配的，不好管理可以考虑建立个 docker 的
       内网，使用 IP 直接注册。
       #+BEGIN_SRC yaml
-      eureka:
-        instance:
-          preferIpAddress: true       # 使用 IP 地址注册，而不是使用主机名注册
+        eureka:
+          instance:
+            preferIpAddress: true       # 使用 IP 地址注册，而不是使用主机名注册
       #+END_SRC
 
 
@@ -1746,19 +1746,19 @@
       ~spring-cloud-starter-netflix-eureka-client~ 依赖项后会将当前项目自动注册
       到 Eureka Server 上
       #+BEGIN_SRC java
-      @SpringBootApplication
-      @RestController
-      public class Application {
+        @SpringBootApplication
+        @RestController
+        public class Application {
 
-        @RequestMapping("/")
-        public String home() {
-          return "Hello world";
-        }
+          @RequestMapping("/")
+          public String home() {
+            return "Hello world";
+          }
 
-        public static void main(String[] args) {
-          new SpringApplicationBuilder(Application.class).web(true).run(args);
+          public static void main(String[] args) {
+            new SpringApplicationBuilder(Application.class).web(true).run(args);
+          }
         }
-      }
       #+END_SRC
 
       也可以使用 ~@EnableDiscoveryClient~ 的注解来显示激活
@@ -1767,66 +1767,66 @@
 ***** 配置相关文件
       ~pom.xml~ 添加 ~spring-cloud-starter-netflix-eureka-server~ 的依赖项
       #+BEGIN_SRC xml
-      <!-- pom.xml -->
-      <project>
-        <dependencies>
-          <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
-          </dependency>
-        </dependencies>
-      </project>
+        <!-- pom.xml -->
+        <project>
+          <dependencies>
+            <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+            </dependency>
+          </dependencies>
+        </project>
       #+END_SRC
 
       ~application.yml~ 添加配置项，下面是 Standalone 模式的配置方法
       #+BEGIN_SRC yaml
-      eureka:
-        instance:
-          hostname: localhost
-        client:
-          fetchRegistry: false                # 不要在本地缓存注册表信息
-          registerWithEureka: false
-          serverUrl:
-            defaultZone: http://localhost:8761/eureka/
-        server:
-          waitTimeInMsWhenSyncEmpty: 5      # 在服务器接收请求之前的等待时间
+        eureka:
+          instance:
+            hostname: localhost
+          client:
+            fetchRegistry: false                # 不要在本地缓存注册表信息
+            registerWithEureka: false
+            serverUrl:
+              defaultZone: http://localhost:8761/eureka/
+          server:
+            waitTimeInMsWhenSyncEmpty: 5      # 在服务器接收请求之前的等待时间
       #+END_SRC
 
       Peer Awareness 模式配置方法如下：
       #+BEGIN_SRC yaml
-      ---
-      spring:
-        profiles: peer1
-      eureka:
-        instance:
-          hostname: peer1
-        client:
-          serviceUrl:
-            defaultZone: https://peer2/eureka/
+        ---
+        spring:
+          profiles: peer1
+        eureka:
+          instance:
+            hostname: peer1
+          client:
+            serviceUrl:
+              defaultZone: https://peer2/eureka/
 
-      ---
-      spring:
-        profiles: peer2
-      eureka:
-        instance:
-          hostname: peer2
-        client:
-          serviceUrl:
-            defaultZone: https://peer1/eureka/
+        ---
+        spring:
+          profiles: peer2
+        eureka:
+          instance:
+            hostname: peer2
+          client:
+            serviceUrl:
+              defaultZone: https://peer1/eureka/
       #+END_SRC
 
 ***** 配置引导类
       使用 ~@EnableEurekaServer~ 来开启 Eureka Server
       #+BEGIN_SRC java
-      @SpringBootApplication
-      @EnableEurekaServer
-      public class Application {
+        @SpringBootApplication
+        @EnableEurekaServer
+        public class Application {
 
-        public static void main(String[] args) {
-          new SpringApplicationBuilder(Application.class).web(true).run(args);
+          public static void main(String[] args) {
+            new SpringApplicationBuilder(Application.class).web(true).run(args);
+          }
+
         }
-
-      }
       #+END_SRC
 
 *** Hystrix
@@ -1840,46 +1840,46 @@
 ***** 配置相关文件
       ~pom.xml~ 添加 ~spring-cloud-starter-netflix-hystrix~ 的依赖项
       #+BEGIN_SRC xml
-      <!-- pom.xml -->
-      <project>
-        <dependencies>
-          <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-          </dependency>
-          <dependency>
-            <groupId>com.netflix.hystrix</groupId>
-            <artifactId>hystrix-javanica</artifactId>
-            <!-- <version>x.y.z</version> -->
-          </dependency>
-        </dependencies>
-      </project>
+        <!-- pom.xml -->
+        <project>
+          <dependencies>
+            <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+            </dependency>
+            <dependency>
+              <groupId>com.netflix.hystrix</groupId>
+              <artifactId>hystrix-javanica</artifactId>
+              <!-- <version>x.y.z</version> -->
+            </dependency>
+          </dependencies>
+        </project>
       #+END_SRC
 
 ***** 配置引导类
       #+BEGIN_SRC java
-      @SpringBootApplication
-      @EnableCircuitBreaker
-      public class Application {
+        @SpringBootApplication
+        @EnableCircuitBreaker
+        public class Application {
 
-        public static void main(String[] args) {
-          new SpringApplicationBuilder(Application.class).web(true).run(args);
+          public static void main(String[] args) {
+            new SpringApplicationBuilder(Application.class).web(true).run(args);
+          }
+
         }
 
-      }
+        @Component
+        public class StoreIntegration {
 
-      @Component
-      public class StoreIntegration {
+          @HystrixCommand(fallbackMethod = "defaultStores")
+          public Object getStores(Map<String, Object> parameters) {
+            //do stuff that might fail
+          }
 
-        @HystrixCommand(fallbackMethod = "defaultStores")
-        public Object getStores(Map<String, Object> parameters) {
-          //do stuff that might fail
+          public Object defaultStores(Map<String, Object> parameters) {
+            return /* something useful */;
+          }
         }
-
-        public Object defaultStores(Map<String, Object> parameters) {
-          return /* something useful */;
-        }
-      }
       #+END_SRC
       ~@HystrixCommand~ 由 [[https://github.com/Netflix/Hystrix/tree/master/hystrix-contrib/hystrix-javanica][javanica]] 库提供，该库可以自动代理一些熔断处理。
       ~@EnableCircuitBreaker~ 开启熔断器
@@ -1906,28 +1906,28 @@
 ***** 配置相关文件
       ~pom.xml~ 添加 ~spring-cloud-starter-netflix-zuul~ 的依赖项将 Zuul 引入项目
       #+BEGIN_SRC xml
-      <!-- pom.xml -->
-      <project>
-        <dependencies>
-          <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
-          </dependency>
-        </dependencies>
-      </project>
+        <!-- pom.xml -->
+        <project>
+          <dependencies>
+            <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+            </dependency>
+          </dependencies>
+        </project>
       #+END_SRC
 
 ***** 配置引导类
       #+BEGIN_SRC java
-      @SpringBootApplication
-      @EnableZuulProxy
-      public class Application {
+        @SpringBootApplication
+        @EnableZuulProxy
+        public class Application {
 
-        public static void main(String[] args) {
-          new SpringApplicationBuilder(Application.class).web(true).run(args);
+          public static void main(String[] args) {
+            new SpringApplicationBuilder(Application.class).web(true).run(args);
+          }
+
         }
-
-      }
       #+END_SRC
       ~@EnableZuulProxy~ 来开启 Zuul 服务
 
@@ -1946,65 +1946,65 @@
       手动配置反向代理需要修改 ~application.yml~ 配置文件，例如下面的配置将
       ~/myusers/**~ 请求传递到 ~users~ 微服务中
       #+BEGIN_SRC yaml
-      zuul:
-       routes:
-         users:
-           path: /myusers/**
-           serviceId: users_service
+        zuul:
+         routes:
+           users:
+             path: /myusers/**
+             serviceId: users_service
       #+END_SRC
 
       使用静态 URL 手动映射路由
       #+BEGIN_SRC yaml
-      zuul:
-       routes:
-         users:
-           path: /myusers/**
-           url: https://example.com/users_service
+        zuul:
+         routes:
+           users:
+             path: /myusers/**
+             url: https://example.com/users_service
       #+END_SRC
 
 ***** 忽略某些微服务
       Zuul 允许配置对一些微服务的忽略项
       #+BEGIN_SRC yaml
-      # 忽略所有微服务
-      zuul:
-        ignoredServices: '*'
-        routes:
-          users: /myusers/**
+        # 忽略所有微服务
+        zuul:
+          ignoredServices: '*'
+          routes:
+            users: /myusers/**
 
-      # 忽略某个微服务，微服务的名字为 appname
-      zuul:
-        ignoredServices: 'appname'
-        routes:
-          users: /myusers/**
+        # 忽略某个微服务，微服务的名字为 appname
+        zuul:
+          ignoredServices: 'appname'
+          routes:
+            users: /myusers/**
 
-      # 添加统一的前缀 /api
-      zuul:
-        ignoredServices: '*'
-        prefix: /api
-        routes:
-          users: /myusers/**
+        # 添加统一的前缀 /api
+        zuul:
+          ignoredServices: '*'
+          prefix: /api
+          routes:
+            users: /myusers/**
 
-      # 忽略所有带有 /admin/ 路由的调用接口
-      zuul:
-        ignoredPatterns: /**/admin/**
-        routes:
-          users: /myusers/**
+        # 忽略所有带有 /admin/ 路由的调用接口
+        zuul:
+          ignoredPatterns: /**/admin/**
+          routes:
+            users: /myusers/**
       #+END_SRC
 
 ***** 头部的设置选项
       将 ~Cookies~, ~Set-Cookie~, ~Authorization~ 设置成敏感的头部，忽略一些头部
       #+BEGIN_SRC yaml
-      zuul:
-        routes:
-          users:
-            path: /myusers/**
-            # Cookies 和敏感的头部
-            sensitiveHeaders: Cookie,Set-Cookie,Authorization
-            # 忽略的头部
-            ignoredHeaders: Header1
-            # 是否忽略安全头部
-            ignoreSecurityHeaders: true
-            url: https://downstream
+        zuul:
+          routes:
+            users:
+              path: /myusers/**
+              # Cookies 和敏感的头部
+              sensitiveHeaders: Cookie,Set-Cookie,Authorization
+              # 忽略的头部
+              ignoredHeaders: Header1
+              # 是否忽略安全头部
+              ignoreSecurityHeaders: true
+              url: https://downstream
       #+END_SRC
 
 ***** 管理端点 Endpoint
@@ -2016,30 +2016,30 @@
 
       下面是一些示例
       #+BEGIN_SRC sh
-      curl http://localhost/routes
+        curl http://localhost/routes
       #+END_SRC
       #+BEGIN_SRC json
-      {
-        "/stores/**": "http://localhost:8081"
-      }
+        {
+          "/stores/**": "http://localhost:8081"
+        }
       #+END_SRC
 
       #+BEGIN_SRC sh
-      curl http://localhost/routes/detail
+        curl http://localhost/routes/detail
       #+END_SRC
       #+BEGIN_SRC json
-      {
-        "/stores/**": {
-          "id": "stores",
-          "fullPath": "/stores/**",
-          "location": "http://localhost:8081",
-          "path": "/**",
-          "prefix": "/stores",
-          "retryable": false,
-          "customSensitiveHeaders": false,
-          "prefixStripped": true
+        {
+          "/stores/**": {
+            "id": "stores",
+            "fullPath": "/stores/**",
+            "location": "http://localhost:8081",
+            "path": "/**",
+            "prefix": "/stores",
+            "retryable": false,
+            "customSensitiveHeaders": false,
+            "prefixStripped": true
+          }
         }
-      }
       #+END_SRC
 
 ***** 基本使用场景
@@ -2053,20 +2053,20 @@
       | /no       | https://legacy.example.com/no |
 
       #+BEGIN_SRC yaml
-      zuul:
-       routes:
-         first:
-           path: /first/**
-           url: https://first.example.com
-         second:
-           path: /second/**
-           url: forward:/second
-         third:
-           path: /third/**
-           url: forward:/3rd
-         legacy:
-           path: /**
-           url: https://legacy.example.com
+        zuul:
+         routes:
+           first:
+             path: /first/**
+             url: https://first.example.com
+           second:
+             path: /second/**
+             url: forward:/second
+           third:
+             path: /third/**
+             url: forward:/3rd
+           legacy:
+             path: /**
+             url: https://legacy.example.com
       #+END_SRC
 
       Zuul 的详细配置见 [[https://github.com/Netflix/zuul/wiki/How-it-Works][Zuul wiki]]
@@ -2075,143 +2075,143 @@
       前置过滤器（Pre Filter）的在请求之前先进行处理，设置 ~RequestContext~ 的相
       关参数提供后面的处理
       #+BEGIN_SRC java
-      public class QueryParamPreFilter extends ZuulFilter {
-        @Override
-        public int filterOrder() {
-          return PRE_DECORATION_FILTER_ORDER - 1; // run before PreDecoration
-        }
-
-        @Override
-        public String filterType() {
-          return PRE_TYPE;
-        }
-
-        @Override
-        public boolean shouldFilter() {
-          RequestContext ctx = RequestContext.getCurrentContext();
-          return !ctx.containsKey(FORWARD_TO_KEY) // a filter has already forwarded
-            && !ctx.containsKey(SERVICE_ID_KEY); // a filter has already determined serviceId
-        }
-
-        @Override
-        public Object run() {
-          RequestContext ctx = RequestContext.getCurrentContext();
-          HttpServletRequest request = ctx.getRequest();
-          if (request.getParameter("sample") != null) {
-            // put the serviceId in `RequestContext`
-            ctx.put(SERVICE_ID_KEY, request.getParameter("foo"));
+        public class QueryParamPreFilter extends ZuulFilter {
+          @Override
+          public int filterOrder() {
+            return PRE_DECORATION_FILTER_ORDER - 1; // run before PreDecoration
           }
-          return null;
+
+          @Override
+          public String filterType() {
+            return PRE_TYPE;
+          }
+
+          @Override
+          public boolean shouldFilter() {
+            RequestContext ctx = RequestContext.getCurrentContext();
+            return !ctx.containsKey(FORWARD_TO_KEY) // a filter has already forwarded
+              && !ctx.containsKey(SERVICE_ID_KEY); // a filter has already determined serviceId
+          }
+
+          @Override
+          public Object run() {
+            RequestContext ctx = RequestContext.getCurrentContext();
+            HttpServletRequest request = ctx.getRequest();
+            if (request.getParameter("sample") != null) {
+              // put the serviceId in `RequestContext`
+              ctx.put(SERVICE_ID_KEY, request.getParameter("foo"));
+            }
+            return null;
+          }
         }
-      }
       #+END_SRC
 
       路由过滤器（Route Filter）在前置过滤器之后，请求其它服务之前。通常路由过滤
       器用来转义请求和回复的数据，下面是一个例子
       #+BEGIN_SRC java
-      public class OkHttpRoutingFilter extends ZuulFilter {
-        @Autowired
-        private ProxyRequestHelper helper;
+        public class OkHttpRoutingFilter extends ZuulFilter {
+          @Autowired
+          private ProxyRequestHelper helper;
 
-        @Override
-        public String filterType() {
-          return ROUTE_TYPE;
-        }
+          @Override
+          public String filterType() {
+            return ROUTE_TYPE;
+          }
 
-        @Override
-        public int filterOrder() {
-          return SIMPLE_HOST_ROUTING_FILTER_ORDER - 1;
-        }
+          @Override
+          public int filterOrder() {
+            return SIMPLE_HOST_ROUTING_FILTER_ORDER - 1;
+          }
 
-        @Override
-        public boolean shouldFilter() {
-          return RequestContext.getCurrentContext().getRouteHost() != null
-            && RequestContext.getCurrentContext().sendZuulResponse();
-        }
+          @Override
+          public boolean shouldFilter() {
+            return RequestContext.getCurrentContext().getRouteHost() != null
+              && RequestContext.getCurrentContext().sendZuulResponse();
+          }
 
-        @Override
-        public Object run() {
-          OkHttpClient httpClient = new OkHttpClient.Builder()
-            // customize
-            .build();
+          @Override
+          public Object run() {
+            OkHttpClient httpClient = new OkHttpClient.Builder()
+              // customize
+              .build();
 
-          RequestContext context = RequestContext.getCurrentContext();
-          HttpServletRequest request = context.getRequest();
+            RequestContext context = RequestContext.getCurrentContext();
+            HttpServletRequest request = context.getRequest();
 
-          String method = request.getMethod();
+            String method = request.getMethod();
 
-          String uri = this.helper.buildZuulRequestURI(request);
+            String uri = this.helper.buildZuulRequestURI(request);
 
-          Headers.Builder headers = new Headers.Builder();
-          Enumeration<String> headerNames = request.getHeaderNames();
-          while (headerNames.hasMoreElements()) {
-            String name = headerNames.nextElement();
-            Enumeration<String> values = request.getHeaders(name);
+            Headers.Builder headers = new Headers.Builder();
+            Enumeration<String> headerNames = request.getHeaderNames();
+            while (headerNames.hasMoreElements()) {
+              String name = headerNames.nextElement();
+              Enumeration<String> values = request.getHeaders(name);
 
-            while (values.hasMoreElements()) {
-              String value = values.nextElement();
-              headers.add(name, value);
+              while (values.hasMoreElements()) {
+                String value = values.nextElement();
+                headers.add(name, value);
+              }
             }
-          }
 
-          InputStream inputStream = request.getInputStream();
+            InputStream inputStream = request.getInputStream();
 
-          RequestBody requestBody = null;
-          if (inputStream != null && HttpMethod.permitsRequestBody(method)) {
-            MediaType mediaType = null;
-            if (headers.get("Content-Type") != null) {
-              mediaType = MediaType.parse(headers.get("Content-Type"));
+            RequestBody requestBody = null;
+            if (inputStream != null && HttpMethod.permitsRequestBody(method)) {
+              MediaType mediaType = null;
+              if (headers.get("Content-Type") != null) {
+                mediaType = MediaType.parse(headers.get("Content-Type"));
+              }
+              requestBody = RequestBody.create(mediaType, StreamUtils.copyToByteArray(inputStream));
             }
-            requestBody = RequestBody.create(mediaType, StreamUtils.copyToByteArray(inputStream));
+
+            Request.Builder builder = new Request.Builder()
+              .headers(headers.build())
+              .url(uri)
+              .method(method, requestBody);
+
+            Response response = httpClient.newCall(builder.build()).execute();
+
+            LinkedMultiValueMap<String, String> responseHeaders = new LinkedMultiValueMap<>();
+
+            for (Map.Entry<String, List<String>> entry : response.headers().toMultimap().entrySet()) {
+              responseHeaders.put(entry.getKey(), entry.getValue());
+            }
+
+            this.helper.setResponse(response.code(), response.body().byteStream(), responseHeaders);
+            context.setRouteHost(null); // prevent SimpleHostRoutingFilter from running
+            return null;
           }
-
-          Request.Builder builder = new Request.Builder()
-            .headers(headers.build())
-            .url(uri)
-            .method(method, requestBody);
-
-          Response response = httpClient.newCall(builder.build()).execute();
-
-          LinkedMultiValueMap<String, String> responseHeaders = new LinkedMultiValueMap<>();
-
-          for (Map.Entry<String, List<String>> entry : response.headers().toMultimap().entrySet()) {
-            responseHeaders.put(entry.getKey(), entry.getValue());
-          }
-
-          this.helper.setResponse(response.code(), response.body().byteStream(), responseHeaders);
-          context.setRouteHost(null); // prevent SimpleHostRoutingFilter from running
-          return null;
         }
-      }
       #+END_SRC
 
       后置路由器（Post Filter）主要处理回复，下面是一个添加 ~UUID~ 和 ~X-Sample~
       头的例子
       #+BEGIN_SRC java
-      public class AddResponseHeaderFilter extends ZuulFilter {
-        @Override
-        public String filterType() {
-          return POST_TYPE;
-        }
+        public class AddResponseHeaderFilter extends ZuulFilter {
+          @Override
+          public String filterType() {
+            return POST_TYPE;
+          }
 
-        @Override
-        public int filterOrder() {
-          return SEND_RESPONSE_FILTER_ORDER - 1;
-        }
+          @Override
+          public int filterOrder() {
+            return SEND_RESPONSE_FILTER_ORDER - 1;
+          }
 
-        @Override
-        public boolean shouldFilter() {
-          return true;
-        }
+          @Override
+          public boolean shouldFilter() {
+            return true;
+          }
 
-        @Override
-        public Object run() {
-          RequestContext context = RequestContext.getCurrentContext();
-          HttpServletResponse servletResponse = context.getResponse();
-          servletResponse.addHeader("X-Sample", UUID.randomUUID().toString());
-          return null;
+          @Override
+          public Object run() {
+            RequestContext context = RequestContext.getCurrentContext();
+            HttpServletResponse servletResponse = context.getResponse();
+            servletResponse.addHeader("X-Sample", UUID.randomUUID().toString());
+            return null;
+          }
         }
-      }
       #+END_SRC
 
 *** Ribbon
@@ -2225,58 +2225,58 @@
 ***** 配置相关文件
       ~pom.xml~ 添加 ~spring-cloud-starter-netflix-ribbon~ 的依赖项
       #+BEGIN_SRC xml
-      <!-- pom.xml -->
-      <project>
-        <dependencies>
-          <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
-          </dependency>
-        </dependencies>
-      </project>
+        <!-- pom.xml -->
+        <project>
+          <dependencies>
+            <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+            </dependency>
+          </dependencies>
+        </project>
       #+END_SRC
 
       #+BEGIN_SRC yaml
-      users:
-        ribbon:
-          NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
-          NFLoadBalancerRuleClassName: com.netflix.loadbalancer.WeightedResponseTimeRule
+        users:
+          ribbon:
+            NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
+            NFLoadBalancerRuleClassName: com.netflix.loadbalancer.WeightedResponseTimeRule
       #+END_SRC
 
 ***** 使用配置类来进行配置
       Ribbon 支持使用配置类来配置，使用 ~@RibbonClient~ 注解进行相关配置
       #+BEGIN_SRC java
-      // 设置默认调用的配置类
-      @RibbonClients(defaultConfiguration = DefaultRibbonConfig.class)
-      public class RibbonClientDefaultConfigurationTestsConfig {
-        public static class BazServiceList extends ConfigurationBasedServerList {
-          public BazServiceList(IClientConfig config) {
-            super.initWithNiwsConfig(config);
+        // 设置默认调用的配置类
+        @RibbonClients(defaultConfiguration = DefaultRibbonConfig.class)
+        public class RibbonClientDefaultConfigurationTestsConfig {
+          public static class BazServiceList extends ConfigurationBasedServerList {
+            public BazServiceList(IClientConfig config) {
+              super.initWithNiwsConfig(config);
+            }
           }
         }
-      }
 
-      // 客户端配置实现类
-      @Configuration
-      class DefaultRibbonConfig {
+        // 客户端配置实现类
+        @Configuration
+        class DefaultRibbonConfig {
 
-        @Bean
-        public IRule ribbonRule() { return new BestAvailableRule(); }
+          @Bean
+          public IRule ribbonRule() { return new BestAvailableRule(); }
 
-        @Bean
-        public IPing ribbonPing() { return new PingUrl(); }
+          @Bean
+          public IPing ribbonPing() { return new PingUrl(); }
 
-        @Bean
-        public ServerList<Server> ribbonServerList(IClientConfig config) {
-          return new RibbonClientDefaultConfigurationTestsConfig.BazServiceList(config);
+          @Bean
+          public ServerList<Server> ribbonServerList(IClientConfig config) {
+            return new RibbonClientDefaultConfigurationTestsConfig.BazServiceList(config);
+          }
+
+          @Bean
+          public ServerListSubsetFilter serverListFilter() {
+            ServerListSubsetFilter filter = new ServerListSubsetFilter();
+            return filter;
+          }
         }
-
-        @Bean
-        public ServerListSubsetFilter serverListFilter() {
-          ServerListSubsetFilter filter = new ServerListSubsetFilter();
-          return filter;
-        }
-      }
       #+END_SRC
 
       Ribbon 客户端的配置, 如果不指定会使用默认的实现:
