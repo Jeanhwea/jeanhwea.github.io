@@ -834,15 +834,13 @@
          // 3. 复制模板，使用线程安全的模板进入发送队列
          SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
          msg.setTo(order.getCustomer().getEmailAddress());
-         msg.setText(
-                     "Dear " + order.getCustomer().getFirstName()
+         msg.setText("Dear " + order.getCustomer().getFirstName()
                      + order.getCustomer().getLastName()
                      + ", thank you for placing order. Your order number is "
                      + order.getOrderNumber());
          try{
            this.mailSender.send(msg);
-         }
-         catch (MailException ex) {
+         } catch (MailException ex) {
            // simply log it and go on...
            System.err.println(ex.getMessage());
          }
