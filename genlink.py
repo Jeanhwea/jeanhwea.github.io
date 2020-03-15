@@ -52,8 +52,8 @@ if __name__ == '__main__':
   content += readdir('编程语言', 'lang', by='name')
   content += readdir('前端技术', 'frontend', by='name')
   content += readdir('后端技术', 'backend', by='name')
-  content += readdir('开发工具', 'tool', by='name')
   content += readdir('数据库', 'database', by='name')
+  content += readdir('必备工具', 'tool', by='name')
   content += readdir('杂文随笔', 'misc', by='date')
   content += '\n'
   sys.stdout.buffer.write(content.encode("utf8").lstrip())
