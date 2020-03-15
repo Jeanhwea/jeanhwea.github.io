@@ -1,0 +1,1420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2020-03-15 Sun 22:34 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spring Cloud</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script type="text/javascript" src="styles/lib/js/jquery.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="../readme.html"> UP </a>
+ |
+ <a accesskey="H" href="../index.html"> HOME </a>
+</div><div id="content">
+<h1 class="title">Spring Cloud</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org81bfe7c">1. 简介</a></li>
+<li><a href="#org7f288be">2. Spring Cloud Config</a>
+<ul>
+<li><a href="#org7b96a54">2.1. 配置文件命名格式</a></li>
+<li><a href="#orgd6db298">2.2. Config Server</a>
+<ul>
+<li><a href="#orgcacaef3">2.2.1. 项目依赖</a></li>
+<li><a href="#org53c351e">2.2.2. 引导类</a></li>
+<li><a href="#orgf4c9f91">2.2.3. Git 远端配置项</a></li>
+</ul>
+</li>
+<li><a href="#org36b05eb">2.3. Config Client</a>
+<ul>
+<li><a href="#orge3228f2">2.3.1. 配置相关文件</a></li>
+<li><a href="#org2d5af3e">2.3.2. 引导类</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orga532145">3. Spring Cloud Netflix</a>
+<ul>
+<li><a href="#org5cb7668">3.1. Eureka</a>
+<ul>
+<li><a href="#org3f2e02d">3.1.1. Eureka Client</a></li>
+<li><a href="#orgbf5ac9f">3.1.2. Eureka Server</a></li>
+</ul>
+</li>
+<li><a href="#org9ac4e12">3.2. Hystrix</a>
+<ul>
+<li><a href="#org21fdd1a">3.2.1. Hystrix Client</a></li>
+<li><a href="#org754f77a">3.2.2. Hystrix Dashboard</a></li>
+</ul>
+</li>
+<li><a href="#orgc044238">3.3. Zuul</a></li>
+<li><a href="#orgb809919">3.4. Ribbon</a>
+<ul>
+<li><a href="#orgacf5b9c">3.4.1. Ribbon Client</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org18e3e74">4. Spring Cloud Gateway</a></li>
+<li><a href="#orgf569cef">5. 参考链接</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org81bfe7c" class="outline-2">
+<h2 id="org81bfe7c"><span class="section-number-2">1</span> 简介</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+<a href="https://spring.io/projects/spring-cloud">Spring Cloud</a> 是一系列框架的有序集合。它利用 Spring Boot 的开发便利性巧妙地简化
+了分布式系统基础设施的开发，如服务发现注册、配置中心、消息总线、负载均衡、断路
+器、数据监控等，都可以用 Spring Boot 的开发风格做到一键启动和部署。Spring
+Cloud 并没有重复制造轮子，它只是将目前各家公司开发的比较成熟、经得起实际考验的
+服务框架组合起来，通过 Spring Boot 风格进行再封装屏蔽掉了复杂的配置和实现原理，
+最终给开发者留出了一套简单易懂、易部署和易维护的分布式系统开发工具包。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7f288be" class="outline-2">
+<h2 id="org7f288be"><span class="section-number-2">2</span> Spring Cloud Config</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+<a href="https://spring.io/projects/spring-cloud-config">Spring Cloud Config</a> 项目是一个解决分布式系统的配置管理方案。它包含了 Client
+和 Server 两个部分，Server 提供配置文件的存储、以接口的形式将配置文件的内容提
+供出去，Client 通过接口获取数据、并依据此数据初始化自己的应用。
+</p>
+
+
+<div class="figure">
+<p><img src="../static/image/2019/07/spring-cloud-config.png" alt="spring-cloud-config.png" />
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7b96a54" class="outline-3">
+<h3 id="org7b96a54"><span class="section-number-3">2.1</span> 配置文件命名格式</h3>
+<div class="outline-text-3" id="text-2-1">
+<ul class="org-ul">
+<li>配置文件命名方式为: <b>{appname}-{profile}.yml</b>
+<ul class="org-ul">
+<li>appname 是微服务的名称</li>
+<li>profile 是不同的环境，建议用: <code>dev</code> 表示开发环境， <code>prod</code> 表示线
+上运行环境</li>
+</ul></li>
+<li>对应请求的 URI 有以下几种格式
+<ul class="org-ul">
+<li><code>/{application}/{profile}[/{label}]</code></li>
+<li><code>/{application}-{profile}.yml</code></li>
+<li><code>/{label}/{application}-{profile}.yml</code></li>
+<li><code>/{application}-{profile}.properties</code></li>
+<li><code>/{label}/{application}-{profile}.properties</code></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgd6db298" class="outline-3">
+<h3 id="orgd6db298"><span class="section-number-3">2.2</span> Config Server</h3>
+<div class="outline-text-3" id="text-2-2">
+</div>
+<div id="outline-container-orgcacaef3" class="outline-4">
+<h4 id="orgcacaef3"><span class="section-number-4">2.2.1</span> 项目依赖</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+在 <code>pom.xml</code> 文件中添加如下的依赖项
+</p>
+<div class="org-src-container">
+<pre class="src src-xml">&lt;<span style="color: #b58900;">project</span>&gt;
+  &lt;<span style="color: #b58900;">dependencies</span>&gt;
+    &lt;<span style="color: #b58900;">dependency</span>&gt;
+      &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.cloud&lt;/<span style="color: #b58900;">groupId</span>&gt;
+      &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-cloud-config-server&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+    &lt;/<span style="color: #b58900;">dependency</span>&gt;
+  &lt;/<span style="color: #b58900;">dependencies</span>&gt;
+
+  &lt;<span style="color: #b58900;">dependencyManagement</span>&gt;
+    &lt;<span style="color: #b58900;">dependencies</span>&gt;
+      &lt;<span style="color: #b58900;">dependency</span>&gt;
+        &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.cloud&lt;/<span style="color: #b58900;">groupId</span>&gt;
+        &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-cloud-dependencies&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+        &lt;<span style="color: #b58900;">version</span>&gt;Greenwich.SR2&lt;/<span style="color: #b58900;">version</span>&gt;
+        &lt;<span style="color: #b58900;">type</span>&gt;pom&lt;/<span style="color: #b58900;">type</span>&gt;
+        &lt;<span style="color: #b58900;">scope</span>&gt;import&lt;/<span style="color: #b58900;">scope</span>&gt;
+      &lt;/<span style="color: #b58900;">dependency</span>&gt;
+    &lt;/<span style="color: #b58900;">dependencies</span>&gt;
+  &lt;/<span style="color: #b58900;">dependencyManagement</span>&gt;
+&lt;/<span style="color: #b58900;">project</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org53c351e" class="outline-4">
+<h4 id="org53c351e"><span class="section-number-4">2.2.2</span> 引导类</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+中心服务器的引导累着需要添加 <code>@EnableConfigServer</code> 来启用配置服务器
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">import</span> <span style="color: #268bd2;">org</span>.<span style="color: #268bd2;">springframework</span>.<span style="color: #268bd2;">boot</span>.<span style="color: #268bd2;">SpringApplication</span>;
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">org</span>.<span style="color: #268bd2;">springframework</span>.<span style="color: #268bd2;">boot</span>.<span style="color: #268bd2;">autoconfigure</span>.<span style="color: #268bd2;">SpringBootApplication</span>;
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">org</span>.<span style="color: #268bd2;">springframework</span>.<span style="color: #268bd2;">cloud</span>.<span style="color: #268bd2;">config</span>.<span style="color: #268bd2;">server</span>.<span style="color: #268bd2;">EnableConfigServer</span>;
+
+<span style="color: #268bd2;">@SpringBootApplication</span>
+<span style="color: #268bd2;">@EnableConfigServer</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Application</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    SpringApplication.run<span style="color: #9564bf;">(</span>Application.<span style="color: #859900;">class</span>, args<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf4c9f91" class="outline-4">
+<h4 id="orgf4c9f91"><span class="section-number-4">2.2.3</span> Git 远端配置项</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<p>
+在中心配置服务器中的 <code>application.yml</code> 中添加相应的配置
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #6c71c4;">spring</span>:
+  <span style="color: #6c71c4;">profiles</span>:
+    <span style="color: #6c71c4;">active</span>: default
+  <span style="color: #6c71c4;">cloud</span>:
+    <span style="color: #6c71c4;">config</span>:
+      <span style="color: #6c71c4;">server</span>:
+        <span style="color: #6c71c4;">git</span>:
+          <span style="color: #6c71c4;">uri</span>: http://github.com/avic/configfiles.git
+          <span style="color: #6c71c4;">searchPaths</span>:
+            - path1
+            - path2
+          <span style="color: #6c71c4;">username</span>: user
+          <span style="color: #6c71c4;">password</span>: pass
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org36b05eb" class="outline-3">
+<h3 id="org36b05eb"><span class="section-number-3">2.3</span> Config Client</h3>
+<div class="outline-text-3" id="text-2-3">
+</div>
+<div id="outline-container-orge3228f2" class="outline-4">
+<h4 id="orge3228f2"><span class="section-number-4">2.3.1</span> 配置相关文件</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<p>
+首先修改 <b>pom.xml</b>, <b>application.yml</b> 和 <b>bootstrap.yml</b> 这三项配置文件
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">pom.xml </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+&lt;<span style="color: #b58900;">project</span>&gt;
+  <span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">1. &#28155;&#21152;&#19979;&#38754;&#22235;&#20010;&#20381;&#36182;&#39033; </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+  &lt;<span style="color: #b58900;">dependencies</span>&gt;
+    &lt;<span style="color: #b58900;">dependency</span>&gt;
+      &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.cloud&lt;/<span style="color: #b58900;">groupId</span>&gt;
+      &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-cloud-starter-config&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+    &lt;/<span style="color: #b58900;">dependency</span>&gt;
+    &lt;<span style="color: #b58900;">dependency</span>&gt;
+      &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.boot&lt;/<span style="color: #b58900;">groupId</span>&gt;
+      &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-boot-starter-actuator&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+    &lt;/<span style="color: #b58900;">dependency</span>&gt;
+    &lt;<span style="color: #b58900;">dependency</span>&gt;
+      &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.boot&lt;/<span style="color: #b58900;">groupId</span>&gt;
+      &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-boot-starter-web&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+    &lt;/<span style="color: #b58900;">dependency</span>&gt;
+    &lt;<span style="color: #b58900;">dependency</span>&gt;
+      &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.boot&lt;/<span style="color: #b58900;">groupId</span>&gt;
+      &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-boot-starter-test&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+      &lt;<span style="color: #b58900;">scope</span>&gt;test&lt;/<span style="color: #b58900;">scope</span>&gt;
+    &lt;/<span style="color: #b58900;">dependency</span>&gt;
+  &lt;/<span style="color: #b58900;">dependencies</span>&gt;
+
+  <span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">2. &#35774;&#32622;&#20381;&#36182;&#31649;&#29702; </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+  &lt;<span style="color: #b58900;">dependencyManagement</span>&gt;
+    &lt;<span style="color: #b58900;">dependencies</span>&gt;
+      &lt;<span style="color: #b58900;">dependency</span>&gt;
+        &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.cloud&lt;/<span style="color: #b58900;">groupId</span>&gt;
+        &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-cloud-dependencies&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+        <span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">&#36825;&#20010; version &#38656;&#35201;&#21644;&#20320;&#20351;&#29992;&#30340; spring boot &#29256;&#26412;&#36866;&#37197;&#65292;&#21542;&#21017;&#24212;&#29992;&#36215;&#19981;&#26469; </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+        &lt;<span style="color: #b58900;">version</span>&gt;Greenwich.SR2&lt;/<span style="color: #b58900;">version</span>&gt;
+        <span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">&#25105;&#30340;&#39033;&#30446;&#20013; spring boot &#29256;&#26412;&#26159; 2.1.0.RELEASE, &#25152;&#20197; cloud &#30340;&#29256;&#26412;&#20351;&#29992; Greenwich </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+        &lt;<span style="color: #b58900;">type</span>&gt;pom&lt;/<span style="color: #b58900;">type</span>&gt;
+        &lt;<span style="color: #b58900;">scope</span>&gt;import&lt;/<span style="color: #b58900;">scope</span>&gt;
+      &lt;/<span style="color: #b58900;">dependency</span>&gt;
+    &lt;/<span style="color: #b58900;">dependencies</span>&gt;
+  &lt;/<span style="color: #b58900;">dependencyManagement</span>&gt;
+
+&lt;/<span style="color: #b58900;">project</span>&gt;
+</pre>
+</div>
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">src/main/resources/application.yml</span>
+<span style="color: #6c71c4;">management</span>:
+  <span style="color: #6c71c4;">endpoints</span>:
+    <span style="color: #6c71c4;">web</span>:
+      <span style="color: #6c71c4;">exposure</span>:
+        <span style="color: #6c71c4;">include</span>: <span style="color: #2aa198;">'*'</span>
+</pre>
+</div>
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">src/main/resources/bootstrap.yml</span>
+<span style="color: #6c71c4;">spring</span>:
+  <span style="color: #6c71c4;">application</span>:
+    <span style="color: #6c71c4;">name</span>: appname <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#36825;&#37324;&#20889;&#20320;&#39033;&#30446;&#30340;&#21517;&#31216;</span>
+  <span style="color: #6c71c4;">profiles</span>:
+    <span style="color: #6c71c4;">active</span>: dev   <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#36825;&#37324;&#37197;&#32622;&#20320;&#38656;&#35201;&#30340; profile</span>
+  <span style="color: #6c71c4;">cloud</span>:
+    <span style="color: #6c71c4;">config</span>:
+      <span style="color: #6c71c4;">uri</span>: http://192.168.0.231/peizhi
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2d5af3e" class="outline-4">
+<h4 id="org2d5af3e"><span class="section-number-4">2.3.2</span> 引导类</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<p>
+在系统启动的引导类中添加 <code>@RefreshScope</code> 注解
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">import</span> <span style="color: #268bd2;">org</span>.<span style="color: #268bd2;">springframework</span>.<span style="color: #268bd2;">boot</span>.<span style="color: #268bd2;">autoconfigure</span>.<span style="color: #268bd2;">SpringBootApplication</span>;
+<span style="color: #859900;">import</span> <span style="color: #268bd2;">org</span>.<span style="color: #268bd2;">springframework</span>.<span style="color: #268bd2;">cloud</span>.<span style="color: #268bd2;">context</span>.<span style="color: #268bd2;">config</span>.<span style="color: #268bd2;">annotation</span>.<span style="color: #268bd2;">RefreshScope</span>;
+
+<span style="color: #268bd2;">@SpringBootApplication</span>
+<span style="color: #268bd2;">@RefreshScope</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Application</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    SpringApplication.run<span style="color: #9564bf;">(</span>Application.<span style="color: #859900;">class</span>, args<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga532145" class="outline-2">
+<h2 id="orga532145"><span class="section-number-2">3</span> Spring Cloud Netflix</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+<a href="https://spring.io/projects/spring-cloud-netflix">Spring Cloud Netflix</a> 是通过自动配置和绑定提供为 spring boot 应用提供 OSS 集成
+功能，它的子项目包括：
+</p>
+<ul class="org-ul">
+<li>Eureka: 服务发现 (Service Discovery)</li>
+<li>Hystrix : 断路器 (Circuit Breaker)</li>
+<li>Zuul : 智能路由 (Intelligent Routing)</li>
+<li>Ribbon : 客户端的负载均衡 (Client Side Load Balancing)</li>
+</ul>
+
+<p>
+官方是参考手册见 <a href="https://cloud.spring.io/spring-cloud-static/spring-cloud-netflix/2.2.0.M1/">2.2.0.M1</a>
+</p>
+</div>
+
+<div id="outline-container-org5cb7668" class="outline-3">
+<h3 id="org5cb7668"><span class="section-number-3">3.1</span> Eureka</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Eureka 是 <a href="https://spring.io/projects/spring-cloud-netflix">Spring Cloud Netflix</a> 开发的服务发现框架，本身是一个基于 REST 的服
+务。Spring Cloud 将它集成在其子项目 spring-cloud-netflix 中，以实现 Spring
+Cloud 的服务发现功能。 Eureka 项目本身包括客户端和服务器两个子项目，具体配置
+如下：
+</p>
+</div>
+
+<div id="outline-container-org3f2e02d" class="outline-4">
+<h4 id="org3f2e02d"><span class="section-number-4">3.1.1</span> Eureka Client</h4>
+<div class="outline-text-4" id="text-3-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="org3d43f55"></a>配置相关文件<br />
+<div class="outline-text-5" id="text-3-1-1-1">
+<p>
+<code>pom.xml</code> 添加 <code>spring-cloud-starter-netflix-eureka-client</code> 的依赖项
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">pom.xml </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+&lt;<span style="color: #b58900;">project</span>&gt;
+  &lt;<span style="color: #b58900;">dependencies</span>&gt;
+    &lt;<span style="color: #b58900;">dependency</span>&gt;
+      &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.cloud&lt;/<span style="color: #b58900;">groupId</span>&gt;
+      &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-cloud-starter-netflix-eureka-client&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+    &lt;/<span style="color: #b58900;">dependency</span>&gt;
+  &lt;/<span style="color: #b58900;">dependencies</span>&gt;
+&lt;/<span style="color: #b58900;">project</span>&gt;
+</pre>
+</div>
+
+<p>
+<code>application.yml</code> 添加配置项
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #6c71c4;">eureka</span>:
+  <span style="color: #6c71c4;">instance</span>:
+    <span style="color: #6c71c4;">instanceId</span>: app-instance-id
+    <span style="color: #6c71c4;">hostname</span>: my.app.host
+    <span style="color: #6c71c4;">nonSecurePort</span>: 8080 <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">http &#35831;&#27714;&#30340;&#31471;&#21475;&#21495;</span>
+  <span style="color: #6c71c4;">client</span>:
+    <span style="color: #6c71c4;">fetchRegistry</span>: <span style="color: #268bd2;">true</span>
+    <span style="color: #6c71c4;">registerWithEureka</span>: <span style="color: #268bd2;">true</span>
+    <span style="color: #6c71c4;">serviceUrl</span>:
+      <span style="color: #6c71c4;">defaultZone</span>: http://localhost:8761/eureka/
+</pre>
+</div>
+
+<p>
+如果开启 <code>preferIpAddress</code> 就会忽略 <code>hostname</code> ，因为有的时候微服务被部署
+到 docker 容器中，主机名可能是随机分配的，不好管理可以考虑建立个 docker 的
+内网，使用 IP 直接注册。
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #6c71c4;">eureka</span>:
+  <span style="color: #6c71c4;">instance</span>:
+    <span style="color: #6c71c4;">preferIpAddress</span>: true       <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20351;&#29992; IP &#22320;&#22336;&#27880;&#20876;&#65292;&#32780;&#19981;&#26159;&#20351;&#29992;&#20027;&#26426;&#21517;&#27880;&#20876;</span>
+</pre>
+</div>
+</div>
+</li>
+
+
+<li><a id="orgfe05798"></a>配置引导类<br />
+<div class="outline-text-5" id="text-3-1-1-2">
+<p>
+<code>spring-cloud-starter-netflix-eureka-client</code> 依赖项后会将当前项目自动注册
+到 Eureka Server 上
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@SpringBootApplication</span>
+<span style="color: #268bd2;">@RestController</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Application</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #268bd2;">@RequestMapping</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"/"</span><span style="color: #d8241f;">)</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">String</span> <span style="color: #b58900;">home</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">return</span> <span style="color: #2aa198;">"Hello world"</span>;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">new</span> <span style="color: #268bd2;">SpringApplicationBuilder</span><span style="color: #9564bf;">(</span>Application.<span style="color: #859900;">class</span><span style="color: #9564bf;">)</span>.web<span style="color: #9564bf;">(</span><span style="color: #268bd2;">true</span><span style="color: #9564bf;">)</span>.run<span style="color: #9564bf;">(</span>args<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+也可以使用 <code>@EnableDiscoveryClient</code> 的注解来显示激活
+</p>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-orgbf5ac9f" class="outline-4">
+<h4 id="orgbf5ac9f"><span class="section-number-4">3.1.2</span> Eureka Server</h4>
+<div class="outline-text-4" id="text-3-1-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgdc268cc"></a>配置相关文件<br />
+<div class="outline-text-5" id="text-3-1-2-1">
+<p>
+<code>pom.xml</code> 添加 <code>spring-cloud-starter-netflix-eureka-server</code> 的依赖项
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">pom.xml </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+&lt;<span style="color: #b58900;">project</span>&gt;
+  &lt;<span style="color: #b58900;">dependencies</span>&gt;
+    &lt;<span style="color: #b58900;">dependency</span>&gt;
+      &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.cloud&lt;/<span style="color: #b58900;">groupId</span>&gt;
+      &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-cloud-starter-netflix-eureka-server&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+    &lt;/<span style="color: #b58900;">dependency</span>&gt;
+  &lt;/<span style="color: #b58900;">dependencies</span>&gt;
+&lt;/<span style="color: #b58900;">project</span>&gt;
+</pre>
+</div>
+
+<p>
+<code>application.yml</code> 添加配置项，下面是 Standalone 模式的配置方法
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #6c71c4;">eureka</span>:
+  <span style="color: #6c71c4;">instance</span>:
+    <span style="color: #6c71c4;">hostname</span>: localhost
+  <span style="color: #6c71c4;">client</span>:
+    <span style="color: #6c71c4;">fetchRegistry</span>: false                <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#19981;&#35201;&#22312;&#26412;&#22320;&#32531;&#23384;&#27880;&#20876;&#34920;&#20449;&#24687;</span>
+    <span style="color: #6c71c4;">registerWithEureka</span>: <span style="color: #268bd2;">false</span>
+    <span style="color: #6c71c4;">serverUrl</span>:
+      <span style="color: #6c71c4;">defaultZone</span>: http://localhost:8761/eureka/
+  <span style="color: #6c71c4;">server</span>:
+    <span style="color: #6c71c4;">waitTimeInMsWhenSyncEmpty</span>: 5      <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22312;&#26381;&#21153;&#22120;&#25509;&#25910;&#35831;&#27714;&#20043;&#21069;&#30340;&#31561;&#24453;&#26102;&#38388;</span>
+</pre>
+</div>
+
+<p>
+Peer Awareness 模式配置方法如下：
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #93a1a1; font-style: italic;">---</span>
+<span style="color: #6c71c4;">spring</span>:
+  <span style="color: #6c71c4;">profiles</span>: peer1
+<span style="color: #6c71c4;">eureka</span>:
+  <span style="color: #6c71c4;">instance</span>:
+    <span style="color: #6c71c4;">hostname</span>: peer1
+  <span style="color: #6c71c4;">client</span>:
+    <span style="color: #6c71c4;">serviceUrl</span>:
+      <span style="color: #6c71c4;">defaultZone</span>: https://peer2/eureka/
+
+<span style="color: #93a1a1; font-style: italic;">---</span>
+<span style="color: #6c71c4;">spring</span>:
+  <span style="color: #6c71c4;">profiles</span>: peer2
+<span style="color: #6c71c4;">eureka</span>:
+  <span style="color: #6c71c4;">instance</span>:
+    <span style="color: #6c71c4;">hostname</span>: peer2
+  <span style="color: #6c71c4;">client</span>:
+    <span style="color: #6c71c4;">serviceUrl</span>:
+      <span style="color: #6c71c4;">defaultZone</span>: https://peer1/eureka/
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="orgc21494d"></a>配置引导类<br />
+<div class="outline-text-5" id="text-3-1-2-2">
+<p>
+使用 <code>@EnableEurekaServer</code> 来开启 Eureka Server
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@SpringBootApplication</span>
+<span style="color: #268bd2;">@EnableEurekaServer</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Application</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">new</span> <span style="color: #268bd2;">SpringApplicationBuilder</span><span style="color: #9564bf;">(</span>Application.<span style="color: #859900;">class</span><span style="color: #9564bf;">)</span>.web<span style="color: #9564bf;">(</span><span style="color: #268bd2;">true</span><span style="color: #9564bf;">)</span>.run<span style="color: #9564bf;">(</span>args<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org9ac4e12" class="outline-3">
+<h3 id="org9ac4e12"><span class="section-number-3">3.2</span> Hystrix</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Hystrix 是 SOA 微服务架构中提供服务隔离、熔断、降级机制的工具/框架。Hystrix
+是断路器的一种实现，用于高微服务架构的可用性，是防止服务出现雪崩的利器。
+Hystrix 实现了 Martin Fowler 的 <a href="https://martinfowler.com/bliki/CircuitBreaker.html">Circuit Breaker</a> 模式，熔断器的机制的思想很简
+单直白，即在 Client 和 Supplier 之间实现一个 Circuit Breaker 层，当 Supplier
+出现错误或超时，就对 Client 的请求进行截断
+</p>
+</div>
+
+<div id="outline-container-org21fdd1a" class="outline-4">
+<h4 id="org21fdd1a"><span class="section-number-4">3.2.1</span> Hystrix Client</h4>
+<div class="outline-text-4" id="text-3-2-1">
+</div>
+<ol class="org-ol">
+<li><a id="org04b92c1"></a>配置相关文件<br />
+<div class="outline-text-5" id="text-3-2-1-1">
+<p>
+<code>pom.xml</code> 添加 <code>spring-cloud-starter-netflix-hystrix</code> 的依赖项
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">pom.xml </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+&lt;<span style="color: #b58900;">project</span>&gt;
+  &lt;<span style="color: #b58900;">dependencies</span>&gt;
+    &lt;<span style="color: #b58900;">dependency</span>&gt;
+      &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.cloud&lt;/<span style="color: #b58900;">groupId</span>&gt;
+      &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-cloud-starter-netflix-hystrix&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+    &lt;/<span style="color: #b58900;">dependency</span>&gt;
+    &lt;<span style="color: #b58900;">dependency</span>&gt;
+      &lt;<span style="color: #b58900;">groupId</span>&gt;com.netflix.hystrix&lt;/<span style="color: #b58900;">groupId</span>&gt;
+      &lt;<span style="color: #b58900;">artifactId</span>&gt;hystrix-javanica&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+      <span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">&lt;version&gt;x.y.z&lt;/version&gt; </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+    &lt;/<span style="color: #b58900;">dependency</span>&gt;
+  &lt;/<span style="color: #b58900;">dependencies</span>&gt;
+&lt;/<span style="color: #b58900;">project</span>&gt;
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="orgdcfe4a6"></a>配置引导类<br />
+<div class="outline-text-5" id="text-3-2-1-2">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@SpringBootApplication</span>
+<span style="color: #268bd2;">@EnableCircuitBreaker</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Application</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">new</span> <span style="color: #268bd2;">SpringApplicationBuilder</span><span style="color: #9564bf;">(</span>Application.<span style="color: #859900;">class</span><span style="color: #9564bf;">)</span>.web<span style="color: #9564bf;">(</span><span style="color: #268bd2;">true</span><span style="color: #9564bf;">)</span>.run<span style="color: #9564bf;">(</span>args<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #268bd2;">@Component</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">StoreIntegration</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #268bd2;">@HystrixCommand</span><span style="color: #d8241f;">(</span>fallbackMethod = <span style="color: #2aa198;">"defaultStores"</span><span style="color: #d8241f;">)</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">getStores</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Map</span><span style="color: #9564bf;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">Object</span><span style="color: #9564bf;">&gt;</span> <span style="color: #6c71c4;">parameters</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #93a1a1; font-style: italic;">//</span><span style="color: #93a1a1; font-style: italic;">do stuff that might fail</span>
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">defaultStores</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Map</span><span style="color: #9564bf;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">Object</span><span style="color: #9564bf;">&gt;</span> <span style="color: #6c71c4;">parameters</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">return</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">something useful */</span>;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+<p>
+<code>@HystrixCommand</code> 由 <a href="https://github.com/Netflix/Hystrix/tree/master/hystrix-contrib/hystrix-javanica">javanica</a> 库提供，该库可以自动代理一些熔断处理。
+<code>@EnableCircuitBreaker</code> 开启熔断器
+</p>
+</div>
+</li>
+
+<li><a id="orgbb7e446"></a>弹性模式<br />
+<div class="outline-text-5" id="text-3-2-1-3">
+<p>
+Hystrix 的常见弹性模式有以下几种：
+</p>
+<ul class="org-ul">
+<li>断路器模式：确保客户端不会重复调用失败的服务</li>
+<li>后备模式：调用失败后，询问是否有可以执行的替代方案</li>
+<li>舱壁模式：隔断服务客户端上的不同服务调用，以确保表现不佳的服务不会耗尽客
+户端的所有资源</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-org754f77a" class="outline-4">
+<h4 id="org754f77a"><span class="section-number-4">3.2.2</span> Hystrix Dashboard</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<p>
+Hystrix 监控除了隔离依赖服务的调用以外，Hystrix 还提供了近实时的监控，
+Hystrix 会实时、累加地记录所有关于 HystrixCommand 的执行信息，包括每秒执行多
+少请求多少成功，多少失败等。Netflix 通过 <code>hystrix-metrics-event-stream</code> 项
+目实现了对以上指标的监控。
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc044238" class="outline-3">
+<h3 id="orgc044238"><span class="section-number-3">3.3</span> Zuul</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+Zuul 是在云平台上提供动态路由,监控,弹性,安全等边缘服务的框架。Zuul 相当于是
+设备和 Netflix 流应用的 Web 网站后端所有请求的前门
+</p>
+
+
+<div class="figure">
+<p><img src="../static/image/2019/07/netflix-zuul.png" alt="netflix-zuul.png" />
+</p>
+</div>
+</div>
+
+<ol class="org-ol">
+<li><a id="orgae56112"></a>配置相关文件<br />
+<div class="outline-text-5" id="text-3-3-0-1">
+<p>
+<code>pom.xml</code> 添加 <code>spring-cloud-starter-netflix-zuul</code> 的依赖项将 Zuul 引入项目
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">pom.xml </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+&lt;<span style="color: #b58900;">project</span>&gt;
+  &lt;<span style="color: #b58900;">dependencies</span>&gt;
+    &lt;<span style="color: #b58900;">dependency</span>&gt;
+      &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.cloud&lt;/<span style="color: #b58900;">groupId</span>&gt;
+      &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-cloud-starter-netflix-zuul&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+    &lt;/<span style="color: #b58900;">dependency</span>&gt;
+  &lt;/<span style="color: #b58900;">dependencies</span>&gt;
+&lt;/<span style="color: #b58900;">project</span>&gt;
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="orgb1ae1e3"></a>配置引导类<br />
+<div class="outline-text-5" id="text-3-3-0-2">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@SpringBootApplication</span>
+<span style="color: #268bd2;">@EnableZuulProxy</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Application</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">new</span> <span style="color: #268bd2;">SpringApplicationBuilder</span><span style="color: #9564bf;">(</span>Application.<span style="color: #859900;">class</span><span style="color: #9564bf;">)</span>.web<span style="color: #9564bf;">(</span><span style="color: #268bd2;">true</span><span style="color: #9564bf;">)</span>.run<span style="color: #9564bf;">(</span>args<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+<p>
+<code>@EnableZuulProxy</code> 来开启 Zuul 服务
+</p>
+</div>
+</li>
+
+<li><a id="orgac246bb"></a>配置反向代理<br />
+<div class="outline-text-5" id="text-3-3-0-3">
+<p>
+Zuul 的反向代理使用的是以下几种方式进行设置
+</p>
+<ul class="org-ul">
+<li>通过服务发现自动映射路由</li>
+<li>通过服务发现手动映射路由</li>
+<li>通过静态 URL 手动映射路由</li>
+</ul>
+
+<p>
+使用 <code>@EnableZuulProxy</code> 开启 Zuul 服务后，如果正确地配置了 Eureka Client
+服务的话，不需要进行其它的配置就可以自动映射路由。根据惯例，Zuul 会自动给
+反向代理的微服务添加前缀，例如： 如果微服务的名字是 <code>users</code> ，则 Zuul 会将
+<code>/users/**</code> 的请求全部映射到 <code>users</code> 微服务中
+</p>
+
+
+<p>
+手动配置反向代理需要修改 <code>application.yml</code> 配置文件，例如下面的配置将
+<code>/myusers/**</code> 请求传递到 <code>users</code> 微服务中
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #6c71c4;">zuul</span>:
+ <span style="color: #6c71c4;">routes</span>:
+   <span style="color: #6c71c4;">users</span>:
+     <span style="color: #6c71c4;">path</span>: /myusers/**
+     <span style="color: #6c71c4;">serviceId</span>: users_service
+</pre>
+</div>
+
+<p>
+使用静态 URL 手动映射路由
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #6c71c4;">zuul</span>:
+ <span style="color: #6c71c4;">routes</span>:
+   <span style="color: #6c71c4;">users</span>:
+     <span style="color: #6c71c4;">path</span>: /myusers/**
+     <span style="color: #6c71c4;">url</span>: https://example.com/users_service
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="org836e9fe"></a>忽略某些微服务<br />
+<div class="outline-text-5" id="text-3-3-0-4">
+<p>
+Zuul 允许配置对一些微服务的忽略项
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24573;&#30053;&#25152;&#26377;&#24494;&#26381;&#21153;</span>
+<span style="color: #6c71c4;">zuul</span>:
+  <span style="color: #6c71c4;">ignoredServices</span>: <span style="color: #2aa198;">'*'</span>
+  <span style="color: #6c71c4;">routes</span>:
+    <span style="color: #6c71c4;">users</span>: /myusers/**
+
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24573;&#30053;&#26576;&#20010;&#24494;&#26381;&#21153;&#65292;&#24494;&#26381;&#21153;&#30340;&#21517;&#23383;&#20026; appname</span>
+<span style="color: #6c71c4;">zuul</span>:
+  <span style="color: #6c71c4;">ignoredServices</span>: <span style="color: #2aa198;">'appname'</span>
+  <span style="color: #6c71c4;">routes</span>:
+    <span style="color: #6c71c4;">users</span>: /myusers/**
+
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#28155;&#21152;&#32479;&#19968;&#30340;&#21069;&#32512; /api</span>
+<span style="color: #6c71c4;">zuul</span>:
+  <span style="color: #6c71c4;">ignoredServices</span>: <span style="color: #2aa198;">'*'</span>
+  <span style="color: #6c71c4;">prefix</span>: /api
+  <span style="color: #6c71c4;">routes</span>:
+    <span style="color: #6c71c4;">users</span>: /myusers/**
+
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24573;&#30053;&#25152;&#26377;&#24102;&#26377; /admin/ &#36335;&#30001;&#30340;&#35843;&#29992;&#25509;&#21475;</span>
+<span style="color: #6c71c4;">zuul</span>:
+  <span style="color: #6c71c4;">ignoredPatterns</span>: /**/admin/**
+  <span style="color: #6c71c4;">routes</span>:
+    <span style="color: #6c71c4;">users</span>: /myusers/**
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="orgeb7b1a1"></a>头部的设置选项<br />
+<div class="outline-text-5" id="text-3-3-0-5">
+<p>
+将 <code>Cookies</code>, <code>Set-Cookie</code>, <code>Authorization</code> 设置成敏感的头部，忽略一些头部
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #6c71c4;">zuul</span>:
+  <span style="color: #6c71c4;">routes</span>:
+    <span style="color: #6c71c4;">users</span>:
+      <span style="color: #6c71c4;">path</span>: /myusers/**
+      <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">Cookies &#21644;&#25935;&#24863;&#30340;&#22836;&#37096;</span>
+      <span style="color: #6c71c4;">sensitiveHeaders</span>: Cookie,Set-Cookie,Authorization
+      <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24573;&#30053;&#30340;&#22836;&#37096;</span>
+      <span style="color: #6c71c4;">ignoredHeaders</span>: Header1
+      <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26159;&#21542;&#24573;&#30053;&#23433;&#20840;&#22836;&#37096;</span>
+      <span style="color: #6c71c4;">ignoreSecurityHeaders</span>: <span style="color: #268bd2;">true</span>
+      <span style="color: #6c71c4;">url</span>: https://downstream
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="org44981e0"></a>管理端点 Endpoint<br />
+<div class="outline-text-5" id="text-3-3-0-6">
+<p>
+Zuul 提供了一些管理路由的 RESTful 接口
+</p>
+<ul class="org-ul">
+<li><code>GET /routes</code> 获取所有解析的路由</li>
+<li><code>GET /routes/detail</code> 获取详细路由信息</li>
+<li><code>POST /routes</code> 强制刷新路由</li>
+<li><code>GET /filter</code> 获取所有的过滤器</li>
+</ul>
+
+<p>
+下面是一些示例
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">curl http://localhost/routes
+</pre>
+</div>
+<div class="org-src-container">
+<pre class="src src-json">{
+  <span style="color: #859900;">"/stores/**"</span>: <span style="color: #2aa198;">"http://localhost:8081"</span>
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-sh">curl http://localhost/routes/detail
+</pre>
+</div>
+<div class="org-src-container">
+<pre class="src src-json">{
+  <span style="color: #859900;">"/stores/**"</span>: {
+    <span style="color: #859900;">"id"</span>: <span style="color: #2aa198;">"stores"</span>,
+    <span style="color: #859900;">"fullPath"</span>: <span style="color: #2aa198;">"/stores/**"</span>,
+    <span style="color: #859900;">"location"</span>: <span style="color: #2aa198;">"http://localhost:8081"</span>,
+    <span style="color: #859900;">"path"</span>: <span style="color: #2aa198;">"/**"</span>,
+    <span style="color: #859900;">"prefix"</span>: <span style="color: #2aa198;">"/stores"</span>,
+    <span style="color: #859900;">"retryable"</span>: <span style="color: #268bd2;">false</span>,
+    <span style="color: #859900;">"customSensitiveHeaders"</span>: <span style="color: #268bd2;">false</span>,
+    <span style="color: #859900;">"prefixStripped"</span>: <span style="color: #268bd2;">true</span>
+  }
+}
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="org821fd19"></a>基本使用场景<br />
+<div class="outline-text-5" id="text-3-3-0-7">
+<p>
+如下所示将相关路由反向代理到对应的 URL
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">原始请求</th>
+<th scope="col" class="org-left">代理后的请求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">/fisrt/1</td>
+<td class="org-left"><a href="https://first.exmple.com/1">https://first.exmple.com/1</a></td>
+</tr>
+
+<tr>
+<td class="org-left">/second/2</td>
+<td class="org-left">/second/2</td>
+</tr>
+
+<tr>
+<td class="org-left">/third/3</td>
+<td class="org-left">/3rd/3</td>
+</tr>
+
+<tr>
+<td class="org-left">/no</td>
+<td class="org-left"><a href="https://legacy.example.com/no">https://legacy.example.com/no</a></td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #6c71c4;">zuul</span>:
+ <span style="color: #6c71c4;">routes</span>:
+   <span style="color: #6c71c4;">first</span>:
+     <span style="color: #6c71c4;">path</span>: /first/**
+     <span style="color: #6c71c4;">url</span>: https://first.example.com
+   <span style="color: #6c71c4;">second</span>:
+     <span style="color: #6c71c4;">path</span>: /second/**
+     <span style="color: #6c71c4;">url</span>: forward:/second
+   <span style="color: #6c71c4;">third</span>:
+     <span style="color: #6c71c4;">path</span>: /third/**
+     <span style="color: #6c71c4;">url</span>: forward:/3rd
+   <span style="color: #6c71c4;">legacy</span>:
+     <span style="color: #6c71c4;">path</span>: /**
+     <span style="color: #6c71c4;">url</span>: https://legacy.example.com
+</pre>
+</div>
+
+<p>
+Zuul 的详细配置见 <a href="https://github.com/Netflix/zuul/wiki/How-it-Works">Zuul wiki</a>
+</p>
+</div>
+</li>
+
+<li><a id="org30abe7d"></a>过滤器<br />
+<div class="outline-text-5" id="text-3-3-0-8">
+<p>
+前置过滤器（Pre Filter）的在请求之前先进行处理，设置 <code>RequestContext</code> 的相
+关参数提供后面的处理
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">QueryParamPreFilter</span> <span style="color: #859900;">extends</span> <span style="color: #268bd2;">ZuulFilter</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">int</span> <span style="color: #b58900;">filterOrder</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">return</span> PRE_DECORATION_FILTER_ORDER - 1; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">run before PreDecoration</span>
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">String</span> <span style="color: #b58900;">filterType</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">return</span> PRE_TYPE;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">boolean</span> <span style="color: #b58900;">shouldFilter</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #268bd2;">RequestContext</span> <span style="color: #6c71c4;">ctx</span> = RequestContext.getCurrentContext<span style="color: #9564bf;">()</span>;
+    <span style="color: #859900;">return</span> <span style="color: #268bd2;">!</span>ctx.containsKey<span style="color: #9564bf;">(</span>FORWARD_TO_KEY<span style="color: #9564bf;">)</span> <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">a filter has already forwarded</span>
+      &amp;&amp; <span style="color: #268bd2;">!</span>ctx.containsKey<span style="color: #9564bf;">(</span>SERVICE_ID_KEY<span style="color: #9564bf;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">a filter has already determined serviceId</span>
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">run</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #268bd2;">RequestContext</span> <span style="color: #6c71c4;">ctx</span> = RequestContext.getCurrentContext<span style="color: #9564bf;">()</span>;
+    <span style="color: #268bd2;">HttpServletRequest</span> <span style="color: #6c71c4;">request</span> = ctx.getRequest<span style="color: #9564bf;">()</span>;
+    <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>request.getParameter<span style="color: #24a222;">(</span><span style="color: #2aa198;">"sample"</span><span style="color: #24a222;">)</span> != <span style="color: #268bd2;">null</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">put the serviceId in `RequestContext`</span>
+      ctx.put<span style="color: #24a222;">(</span>SERVICE_ID_KEY, request.getParameter<span style="color: #ff7f00;">(</span><span style="color: #2aa198;">"foo"</span><span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span>;
+    <span style="color: #9564bf;">}</span>
+    <span style="color: #859900;">return</span> <span style="color: #268bd2;">null</span>;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+路由过滤器（Route Filter）在前置过滤器之后，请求其它服务之前。通常路由过滤
+器用来转义请求和回复的数据，下面是一个例子
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">OkHttpRoutingFilter</span> <span style="color: #859900;">extends</span> <span style="color: #268bd2;">ZuulFilter</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #268bd2;">@Autowired</span>
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">ProxyRequestHelper</span> <span style="color: #6c71c4;">helper</span>;
+
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">String</span> <span style="color: #b58900;">filterType</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">return</span> ROUTE_TYPE;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">int</span> <span style="color: #b58900;">filterOrder</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">return</span> SIMPLE_HOST_ROUTING_FILTER_ORDER - 1;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">boolean</span> <span style="color: #b58900;">shouldFilter</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">return</span> RequestContext.getCurrentContext<span style="color: #9564bf;">()</span>.getRouteHost<span style="color: #9564bf;">()</span> != <span style="color: #268bd2;">null</span>
+      &amp;&amp; RequestContext.getCurrentContext<span style="color: #9564bf;">()</span>.sendZuulResponse<span style="color: #9564bf;">()</span>;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">run</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #268bd2;">OkHttpClient</span> <span style="color: #6c71c4;">httpClient</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">OkHttpClient</span>.<span style="color: #268bd2;">Builder</span><span style="color: #9564bf;">()</span>
+      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">customize</span>
+      .build<span style="color: #9564bf;">()</span>;
+
+    <span style="color: #268bd2;">RequestContext</span> <span style="color: #6c71c4;">context</span> = RequestContext.getCurrentContext<span style="color: #9564bf;">()</span>;
+    <span style="color: #268bd2;">HttpServletRequest</span> <span style="color: #6c71c4;">request</span> = context.getRequest<span style="color: #9564bf;">()</span>;
+
+    <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">method</span> = request.getMethod<span style="color: #9564bf;">()</span>;
+
+    <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">uri</span> = <span style="color: #859900;">this</span>.helper.buildZuulRequestURI<span style="color: #9564bf;">(</span>request<span style="color: #9564bf;">)</span>;
+
+    <span style="color: #268bd2;">Headers</span>.<span style="color: #268bd2;">Builder</span> <span style="color: #6c71c4;">headers</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Headers</span>.<span style="color: #268bd2;">Builder</span><span style="color: #9564bf;">()</span>;
+    <span style="color: #268bd2;">Enumeration</span><span style="color: #9564bf;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">&gt;</span> <span style="color: #6c71c4;">headerNames</span> = request.getHeaderNames<span style="color: #9564bf;">()</span>;
+    <span style="color: #859900;">while</span> <span style="color: #9564bf;">(</span>headerNames.hasMoreElements<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+      <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span> = headerNames.nextElement<span style="color: #24a222;">()</span>;
+      <span style="color: #268bd2;">Enumeration</span><span style="color: #24a222;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #24a222;">&gt;</span> <span style="color: #6c71c4;">values</span> = request.getHeaders<span style="color: #24a222;">(</span>name<span style="color: #24a222;">)</span>;
+
+      <span style="color: #859900;">while</span> <span style="color: #24a222;">(</span>values.hasMoreElements<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+        <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">value</span> = values.nextElement<span style="color: #ff7f00;">()</span>;
+        headers.add<span style="color: #ff7f00;">(</span>name, value<span style="color: #ff7f00;">)</span>;
+      <span style="color: #24a222;">}</span>
+    <span style="color: #9564bf;">}</span>
+
+    <span style="color: #268bd2;">InputStream</span> <span style="color: #6c71c4;">inputStream</span> = request.getInputStream<span style="color: #9564bf;">()</span>;
+
+    <span style="color: #268bd2;">RequestBody</span> <span style="color: #6c71c4;">requestBody</span> = <span style="color: #268bd2;">null</span>;
+    <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>inputStream != <span style="color: #268bd2;">null</span> &amp;&amp; HttpMethod.permitsRequestBody<span style="color: #24a222;">(</span>method<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+      <span style="color: #268bd2;">MediaType</span> <span style="color: #6c71c4;">mediaType</span> = <span style="color: #268bd2;">null</span>;
+      <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>headers.get<span style="color: #ff7f00;">(</span><span style="color: #2aa198;">"Content-Type"</span><span style="color: #ff7f00;">)</span> != <span style="color: #268bd2;">null</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+        mediaType = MediaType.parse<span style="color: #ff7f00;">(</span>headers.get<span style="color: #1776b6;">(</span><span style="color: #2aa198;">"Content-Type"</span><span style="color: #1776b6;">)</span><span style="color: #ff7f00;">)</span>;
+      <span style="color: #24a222;">}</span>
+      requestBody = RequestBody.create<span style="color: #24a222;">(</span>mediaType, StreamUtils.copyToByteArray<span style="color: #ff7f00;">(</span>inputStream<span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span>;
+    <span style="color: #9564bf;">}</span>
+
+    <span style="color: #268bd2;">Request</span>.<span style="color: #268bd2;">Builder</span> <span style="color: #6c71c4;">builder</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Request</span>.<span style="color: #268bd2;">Builder</span><span style="color: #9564bf;">()</span>
+      .headers<span style="color: #9564bf;">(</span>headers.build<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>
+      .url<span style="color: #9564bf;">(</span>uri<span style="color: #9564bf;">)</span>
+      .method<span style="color: #9564bf;">(</span>method, requestBody<span style="color: #9564bf;">)</span>;
+
+    <span style="color: #268bd2;">Response</span> <span style="color: #6c71c4;">response</span> = httpClient.newCall<span style="color: #9564bf;">(</span>builder.build<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>.execute<span style="color: #9564bf;">()</span>;
+
+    <span style="color: #268bd2;">LinkedMultiValueMap</span><span style="color: #9564bf;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">String</span><span style="color: #9564bf;">&gt;</span> <span style="color: #6c71c4;">responseHeaders</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedMultiValueMap</span><span style="color: #9564bf;">&lt;&gt;()</span>;
+
+    <span style="color: #859900;">for</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">Map</span>.<span style="color: #268bd2;">Entry</span><span style="color: #24a222;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">List</span><span style="color: #ff7f00;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #ff7f00;">&gt;</span><span style="color: #24a222;">&gt;</span> <span style="color: #b58900;">entry</span> : response.headers<span style="color: #24a222;">()</span>.toMultimap<span style="color: #24a222;">()</span>.entrySet<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+      responseHeaders.put<span style="color: #24a222;">(</span>entry.getKey<span style="color: #ff7f00;">()</span>, entry.getValue<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span>;
+    <span style="color: #9564bf;">}</span>
+
+    <span style="color: #859900;">this</span>.helper.setResponse<span style="color: #9564bf;">(</span>response.code<span style="color: #24a222;">()</span>, response.body<span style="color: #24a222;">()</span>.byteStream<span style="color: #24a222;">()</span>, responseHeaders<span style="color: #9564bf;">)</span>;
+    context.setRouteHost<span style="color: #9564bf;">(</span><span style="color: #268bd2;">null</span><span style="color: #9564bf;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">prevent SimpleHostRoutingFilter from running</span>
+    <span style="color: #859900;">return</span> <span style="color: #268bd2;">null</span>;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+后置路由器（Post Filter）主要处理回复，下面是一个添加 <code>UUID</code> 和 <code>X-Sample</code>
+头的例子
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">AddResponseHeaderFilter</span> <span style="color: #859900;">extends</span> <span style="color: #268bd2;">ZuulFilter</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">String</span> <span style="color: #b58900;">filterType</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">return</span> POST_TYPE;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">int</span> <span style="color: #b58900;">filterOrder</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">return</span> SEND_RESPONSE_FILTER_ORDER - 1;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">boolean</span> <span style="color: #b58900;">shouldFilter</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">return</span> <span style="color: #268bd2;">true</span>;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">run</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #268bd2;">RequestContext</span> <span style="color: #6c71c4;">context</span> = RequestContext.getCurrentContext<span style="color: #9564bf;">()</span>;
+    <span style="color: #268bd2;">HttpServletResponse</span> <span style="color: #6c71c4;">servletResponse</span> = context.getResponse<span style="color: #9564bf;">()</span>;
+    servletResponse.addHeader<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"X-Sample"</span>, UUID.randomUUID<span style="color: #24a222;">()</span>.toString<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #859900;">return</span> <span style="color: #268bd2;">null</span>;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-orgb809919" class="outline-3">
+<h3 id="orgb809919"><span class="section-number-3">3.4</span> Ribbon</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+Ribbon 是 Netflix 发布的开源项目，主要功能是提供客户端的软件负载均衡算法，将
+Netflix 的中间层服务连接在一起。Ribbon 客户端组件提供一系列完善的配置项如连
+接超时，重试等。简单的说，就是在配置文件中列出 Load Balancer（简称 LB）后面
+所有的机器，Ribbon 会自动的帮助你基于某种规则（如简单轮询，随即连接等）去连
+接这些机器。我们也很容易使用 Ribbon 实现自定义的负载均衡算法。
+</p>
+</div>
+
+<div id="outline-container-orgacf5b9c" class="outline-4">
+<h4 id="orgacf5b9c"><span class="section-number-4">3.4.1</span> Ribbon Client</h4>
+<div class="outline-text-4" id="text-3-4-1">
+</div>
+<ol class="org-ol">
+<li><a id="org7cfcca2"></a>配置相关文件<br />
+<div class="outline-text-5" id="text-3-4-1-1">
+<p>
+<code>pom.xml</code> 添加 <code>spring-cloud-starter-netflix-ribbon</code> 的依赖项
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span style="color: #93a1a1; font-style: italic;">&lt;!-- </span><span style="color: #93a1a1; font-style: italic;">pom.xml </span><span style="color: #93a1a1; font-style: italic;">--&gt;</span>
+&lt;<span style="color: #b58900;">project</span>&gt;
+  &lt;<span style="color: #b58900;">dependencies</span>&gt;
+    &lt;<span style="color: #b58900;">dependency</span>&gt;
+      &lt;<span style="color: #b58900;">groupId</span>&gt;org.springframework.cloud&lt;/<span style="color: #b58900;">groupId</span>&gt;
+      &lt;<span style="color: #b58900;">artifactId</span>&gt;spring-cloud-starter-netflix-ribbon&lt;/<span style="color: #b58900;">artifactId</span>&gt;
+    &lt;/<span style="color: #b58900;">dependency</span>&gt;
+  &lt;/<span style="color: #b58900;">dependencies</span>&gt;
+&lt;/<span style="color: #b58900;">project</span>&gt;
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #6c71c4;">users</span>:
+  <span style="color: #6c71c4;">ribbon</span>:
+    <span style="color: #6c71c4;">NIWSServerListClassName</span>: com.netflix.loadbalancer.ConfigurationBasedServerList
+    <span style="color: #6c71c4;">NFLoadBalancerRuleClassName</span>: com.netflix.loadbalancer.WeightedResponseTimeRule
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="orge2d784b"></a>使用配置类来进行配置<br />
+<div class="outline-text-5" id="text-3-4-1-2">
+<p>
+Ribbon 支持使用配置类来配置，使用 <code>@RibbonClient</code> 注解进行相关配置
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#35774;&#32622;&#40664;&#35748;&#35843;&#29992;&#30340;&#37197;&#32622;&#31867;</span>
+<span style="color: #268bd2;">@RibbonClients</span><span style="color: #8d5649;">(</span>defaultConfiguration = DefaultRibbonConfig.<span style="color: #859900;">class</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">RibbonClientDefaultConfigurationTestsConfig</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">BazServiceList</span> <span style="color: #859900;">extends</span> <span style="color: #268bd2;">ConfigurationBasedServerList</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">public</span> <span style="color: #b58900;">BazServiceList</span><span style="color: #9564bf;">(</span><span style="color: #268bd2;">IClientConfig</span> <span style="color: #6c71c4;">config</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+      <span style="color: #859900;">super</span>.initWithNiwsConfig<span style="color: #24a222;">(</span>config<span style="color: #24a222;">)</span>;
+    <span style="color: #9564bf;">}</span>
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#23458;&#25143;&#31471;&#37197;&#32622;&#23454;&#29616;&#31867;</span>
+<span style="color: #268bd2;">@Configuration</span>
+<span style="color: #859900;">class</span> <span style="color: #268bd2;">DefaultRibbonConfig</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #268bd2;">@Bean</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">IRule</span> <span style="color: #b58900;">ribbonRule</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> <span style="color: #859900;">return</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BestAvailableRule</span><span style="color: #9564bf;">()</span>; <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Bean</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">IPing</span> <span style="color: #b58900;">ribbonPing</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> <span style="color: #859900;">return</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">PingUrl</span><span style="color: #9564bf;">()</span>; <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Bean</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">ServerList</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">Server</span><span style="color: #d8241f;">&gt;</span> <span style="color: #b58900;">ribbonServerList</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">IClientConfig</span> <span style="color: #6c71c4;">config</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">return</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">RibbonClientDefaultConfigurationTestsConfig</span>.<span style="color: #268bd2;">BazServiceList</span><span style="color: #9564bf;">(</span>config<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #268bd2;">@Bean</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">ServerListSubsetFilter</span> <span style="color: #b58900;">serverListFilter</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #268bd2;">ServerListSubsetFilter</span> <span style="color: #6c71c4;">filter</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ServerListSubsetFilter</span><span style="color: #9564bf;">()</span>;
+    <span style="color: #859900;">return</span> filter;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+Ribbon 客户端的配置, 如果不指定会使用默认的实现:
+</p>
+<ol class="org-ol">
+<li><code>IClientConfig</code> 客户端相关配置</li>
+<li><code>IRule</code> 定义负载均衡策略</li>
+<li><code>IPing</code> 定义如何 ping 目标服务实例来判断是否存活, ribbon 使用单独的线程
+每隔一段时间(默认 10s)对本地缓存的 <code>ServerList</code> 做一次检查</li>
+<li><code>ServerList</code> 定义如何获取服务实例列表. 两种实现基于配置的
+<code>ConfigurationBasedServerList</code> 和基于 Eureka 服务发现的
+<code>DiscoveryEnabledNIWSServerList</code></li>
+<li><code>ServerListFilter</code> 用来使用期望的特征过滤静态配置动态获得的候选服务实例
+列表. 若未提供, 默认使用 <code>ZoneAffinityServerListFilter</code></li>
+<li><code>ILoadBalancer</code> 定义了软负载均衡器的操作的接口. 一个典型的负载均衡器至少需
+要一组用来做负载均衡的服务实例, 一个标记某个服务实例不在旋转中的方法, 和
+对应的方法调用从实例列表中选出某一个服务实例.</li>
+<li><code>ServerListUpdater</code> <code>DynamicServerListLoadBalancer</code> 用来更新实例列表的
+策略
+<ul class="org-ul">
+<li>推 -&gt; <code>EurekaNotificationServerListUpdater</code></li>
+<li>拉 -&gt; <code>PollingServerListUpdater</code> 默认是拉</li>
+</ul></li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org18e3e74" class="outline-2">
+<h2 id="org18e3e74"><span class="section-number-2">4</span> Spring Cloud Gateway</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+<a href="https://spring.io/projects/spring-cloud-gateway">Spring Cloud Gateway</a> 是 Spring 官方基于 Spring 5.0，Spring Boot 2.0 和 Project
+Reactor 等技术开发的网关，Spring Cloud Gateway 旨在为微服务架构提供一种简单而有
+效的统一的 API 路由管理方式，官方的手册见 <a href="https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.0.M1/">2.2.0.M1</a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf569cef" class="outline-2">
+<h2 id="orgf569cef"><span class="section-number-2">5</span> 参考链接</h2>
+<div class="outline-text-2" id="text-5">
+<ol class="org-ol">
+<li><a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/">Spring Framework 文档</a></li>
+<li><a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html">Spring Web MVC文档</a></li>
+<li><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/">Spring Boot 文档</a></li>
+<li><a href="https://start.spring.io/">start.spring.io</a></li>
+<li><a href="https://spring.io/guides">"Getting Started" Guides</a></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Last Updated 2020-03-15 Sun 22:34. Created by Jinghui Hu at 2019-07-10 Wed 11:04.</p>
+</div>
+</body>
+</html>

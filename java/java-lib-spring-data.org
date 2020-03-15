@@ -1,0 +1,48 @@
+#+TITLE: Spring Data
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2020-03-15 Sun 22:31:40>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: java spring springdata
+
+
+* Spring Data JPA
+  JPA(Java Persistence API)意即 Java 持久化 API，是 Sun 官方在 JDK5.0 后提出的
+  Java 持久化规范。JPA 的出现主要是为了简化持久层开发以及整合 ORM 技术，结束
+  Hibernate、TopLink、JDO 等 ORM 框架各自为营的局面。JPA 是在吸收现有 ORM 框架
+  的基础上发展而来，易于使用，伸缩性强。总的来说，JPA 包括以下 3 方面的技术：
+
+  - ORM 映射元数据： 支持 XML 和注解两种元数据的形式，元数据描述对象和表之间的
+    映射关系
+  - API： 操作实体对象来执行 CRUD 操作
+  - 查询语言： 通过面向对象而非面向数据库的查询语言（JPQL）查询数据，避免程序的
+    SQL 语句紧密耦合
+
+  [[https://spring.io/projects/spring-data-jpa#overview][Spring Data JPA ]]是 Spring Data 家族的一部分，可以轻松实现基于 JPA 的存储库。
+  此模块处理对基于 JPA 的数据访问层的增强支持。 它使构建使用数据访问技术的
+  Spring 驱动应用程序变得更加容易。其代码托管于 [[https://github.com/spring-projects/spring-data-jpa][GitHub]] ， 文档见 [[https://docs.spring.io/spring-data/jpa/docs/current/reference/html/][reference]] 。
+
+* 格式化 JSON 的时间字符串
+  使用 JsonFormat 标注可以设置 JSON 字段序列化的格式
+  #+BEGIN_SRC java
+    import com.fasterxml.jackson.annotation.JsonFormat;
+    import com.fasterxml.jackson.annotation.JsonProperty;
+
+    class ExampleEntity {
+
+      @Column(name = "BIRTHDAY")
+      @JsonFormat(pattern = "yyyy-MM-dd")
+      private Timestamp birthday; // 出生日期
+
+      @JsonProperty("birthday")
+      public Timestamp birthday() {
+        return this.birthday;
+      }
+
+      public void birthday(Timestamp birthday) {
+        this.birthday = birthday;
+      }
+    }
+  #+END_SRC

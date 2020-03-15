@@ -1,0 +1,611 @@
+#+TITLE: Spring Boot
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2020-03-15 Sun 22:25:23>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: java spring springboot
+
+
+* Spring Boot 命令行
+** 简介
+   [[http://spring.io/projects/spring-boot][spring-boot-cli]]（Spring Boot CLI）是一种快速开发 [[https://spring.io/projects/spring-boot][spring]] 应用的命令行界面， CLI
+   利用了 Spring Boot 的起步依赖和自动配置，可以让人们专注于代码本身，而不用完成
+   繁琐的配置。实际上 Spring Boot 的本质就是用来简化繁琐的 Spring 配置，不过 CLI
+   的使用真的是让开发 Spring 程序变得非常快速。
+
+   CLI 可以检测到代码中使用的类，知道需要给 classpath 中添加的哪些起步依赖才能让
+   程序运行起来。而且当添加完依赖之后就会完成自动配置，确保启用后
+   DispatcherServlet 和 Spring MVC，这样就可以响应 HTTP 请求了。所以说想要用 CLI 来
+   编写一个 Spring 的“HelloWorld” 是非常快速的。
+
+** 下载和安装
+   下载二进制文件，解压到软件目录，并将 bin 目录添加到 *PATH* 环境变量中
+   #+BEGIN_SRC sh
+     curl -O https://repo.spring.io/release/org/springframework/boot/spring-boot-cli/2.0.5.RELEASE/spring-boot-cli-2.0.5.RELEASE-bin.tar.gz
+   #+END_SRC
+
+   也可以直接通过网页链接[[https://repo.spring.io/release/org/springframework/boot/spring-boot-cli][下载]]，MacOS 可以还可以通过 Homebrow 来安装。
+   #+BEGIN_SRC sh
+     brew tap pivotal/tap
+     brew install springboot
+   #+END_SRC
+
+** 新建项目 spring init
+   Spring Boot 提供了一个基于 web 的新建项目工具 [[http://start.spring.io/][start-spring-io]] 。当然，也可以
+   通过命令行工具来创建。
+
+   #+BEGIN_SRC sh
+     # 新建项目
+     spring init --dependencies=web springapp
+
+     # 新建项目，同时设置 groupId 和 artifactId
+     spring init --artifactId=demo --groupId=com.avic.mti --dependencies=web,jpa appname
+     spring init -a demo -g io.github.jeanhwea -d=web,data-jpa appname
+   #+END_SRC
+
+** 列出所有的依赖列表
+   #+BEGIN_SRC sh
+     spring init --list
+     # OUTPUT:
+     #   .   ____          _            __ _ _
+     #  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+     # ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     #  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+     #   '  |____| .__|_| |_|_| |_\__, | / / / /
+     #  =========|_|==============|___/=/_/_/_/
+     # :: Service capabilities ::  https://start.spring.io
+     #
+     # Supported dependencies
+     # +---------------+------------------------------------------------------------------+------------------+
+     # | Id            | Description                                                      | Required version |
+     # |---------------+------------------------------------------------------------------+------------------|
+     # | activemq      | Java Message Service API via Apache ActiveMQ                     | >=1.4.0.RC1      |
+     # ...
+     # | validation    | JSR-303 validation infrastructure (already included with web)    | >=1.3.0.RELEASE  |
+     # | web           | Full-stack web development with Tomcat and Spring MVC            |                  |
+     # | web-services  | Contract-first SOAP service development with Spring Web Services |                  |
+     # +---------------+------------------------------------------------------------------+------------------+
+     #
+   #+END_SRC
+
+** 启动项目
+   启动项目前先修改 DemoApplication.java 文件中，添加一个控制器。
+   #+BEGIN_SRC java
+     // src/main/java/com/example/springapp/DemoApplication.java
+     package com.example.springapp;
+
+     import org.springframework.boot.SpringApplication;
+     import org.springframework.boot.autoconfigure.SpringBootApplication;
+     import org.springframework.web.bind.annotation.RestController;
+     import org.springframework.web.bind.annotation.RequestMapping;
+
+     @SpringBootApplication
+     @RestController
+     public class DemoApplication {
+
+       public static void main(String[] args) {
+         SpringApplication.run(DemoApplication.class, args);
+       }
+
+       @RequestMapping("/")
+       public String index() {
+         return "<p>Hello World!</p>";
+       }
+     }
+   #+END_SRC
+
+   使用 spring 自带的工具来运行代码
+   #+BEGIN_SRC sh
+     spring run src/main/java/com/example/springapp/DemoApplication.java
+   #+END_SRC
+
+   使用 maven 工具启动 spring-boot 项目
+   #+BEGIN_SRC sh
+     mvn spring-boot:run
+     # debug 模式运行
+     mvn spring-boot:run --debug
+   #+END_SRC
+
+   在浏览器中打开 =http://localhost:8080= 链接应该可以访问到相应的页面。
+
+** 项目打包和运行
+   这里可以使用 maven 默认的打包命令来生成 jar 包，运行可运行的 jar 文件。
+   #+BEGIN_SRC sh
+     mvn package
+     java -jar target/springapp-0.0.1-SNAPSHOT.jar
+   #+END_SRC
+
+* Spring Boot
+** 简介
+   用的初始搭建以及开发过程。该框架使用了特定的方式来进行配置，从而使开发人员不
+   再需要定义样板化的配置。通过这种方式，Spring Boot 致力于在蓬勃发展的快速应用
+   开发 [[https://spring.io/projects/spring-boot/#overview][Spring Boot]] 是由 Pivotal 团队提供的全新框架，其设计目的是用来简化新
+   Spring 应领域成为领导者。Spring Boot 的文档见 [[https://docs.spring.io/spring-boot/docs/current/reference/html/][HTML]] ，源代码托管于 [[https://github.com/spring-projects/spring-boot][GitHub]]
+
+** 创建项目
+   可以直接通过 Spring Start 网站进行创建，创建一个 Spring Boot 模板工程
+   #+BEGIN_SRC sh
+     curl -s https://start.spring.io/starter.tgz \
+            -d dependencies=mybatis,web \
+            -d groupId=io.github.jeanhwea \
+            -d artifactId=myapp -d name=myapp -d baseDir=myapp \
+            | tar -xzvf -
+   #+END_SRC
+
+** 命令行工具
+   Spring Boot 命令行工具参考 [[file:../tool/springboot-cli.org][Spring Boot CLI Tool]]
+
+** 编译系统
+*** 继承父 Starter
+    Spring Boot 项目需要继承的父级 Starter，配置如下：
+    #+BEGIN_SRC xml
+      <!-- Inherit defaults from Spring Boot -->
+      <parent>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-parent</artifactId>
+       <version>2.1.0.RELEASE</version>
+      </parent>
+    #+END_SRC
+
+*** Starters
+    Starters 是 Spring Boot 对其依赖的再打包，官方的 Starter 都是以
+    =spring-boot-starter= 开头，并且存放在 [[https://github.com/spring-projects/spring-boot/tree/master/spring-boot-project/spring-boot-starters][spring-boot-starters]] 中
+
+    [[file:../static/image/2019/07/spring-boot-starters.png]]
+
+    - ~spring-boot-starter~ : Core starter, including auto-configuration support,
+      logging and YAML
+    - ~spring-boot-starter-activemq~ : Starter for JMS messaging using Apache
+      ActiveMQ
+    - ~spring-boot-starter-amqp~ : Starter for using Spring AMQP and Rabbit MQ
+    - ~spring-boot-starter-aop~ : Starter for aspect-oriented programming with
+      Spring AOP and AspectJ
+    - ~spring-boot-starter-cloud-connectors~ : Starter for using Spring Cloud
+      Connectors which simplifies connecting to services in cloud platforms like
+      Cloud Foundry and Heroku
+    - ~spring-boot-starter-data-elasticsearch~ : Starter for using Elasticsearch
+      search and analytics engine and Spring Data Elasticsearch
+    - ~spring-boot-starter-data-jpa~ : Starter for using Spring Data JPA with
+      Hibernate
+    - ~spring-boot-starter-data-ldap~ : Starter for using Spring Data LDAP
+    - ~spring-boot-starter-data-mongodb~ : Starter for using MongoDB
+      document-oriented database and Spring Data MongoDB
+    - ~spring-boot-starter-data-mongodb-reactive~ : Starter for using MongoDB
+      document-oriented database and Spring Data MongoDB Reactive
+    - ~spring-boot-starter-data-neo4j~ : Starter for using Neo4j graph database
+      and Spring Data Neo4j
+    - ~spring-boot-starter-data-redis~ : Starter for using Redis key-value data
+      store with Spring Data Redis and the Lettuce client
+    - ~spring-boot-starter-data-redis-reactive~ : Starter for using Redis
+      key-value data store with Spring Data Redis reactive and the Lettuce client
+    - ~spring-boot-starter-integration~ : Starter for using Spring Integration
+    - ~spring-boot-starter-json~ : Starter for reading and writing json
+    - ~spring-boot-starter-oauth2-client~ : Starter for using Spring Security's
+      OAuth2/OpenID Connect client features
+    - ~spring-boot-starter-oauth2-resource-server~ : Starter for using Spring
+      Security's OAuth2 resource server features
+    - ~spring-boot-starter-quartz~ : Starter for using the Quartz scheduler
+    - ~spring-boot-starter-security~ : Starter for using Spring Security
+    - ~spring-boot-starter-test~ : Starter for testing Spring Boot applications
+      with libraries including JUnit, Hamcrest and Mockito
+    - ~spring-boot-starter-web~ : Starter for building web, including RESTful,
+      applications using Spring MVC. Uses Tomcat as the default embedded
+      container
+    - ~spring-boot-starter-web-services~ : Starter for using Spring Web Services
+    - ~spring-boot-starter-webflux~ : Starter for building WebFlux applications
+      using Spring Framework's Reactive Web support
+    - ~spring-boot-starter-websocket~ : Starter for building WebSocket
+      applications using Spring Framework's WebSocket support
+
+** Spring Beans 和依赖注入
+   Spring Framework 的相关技术在 Spring Boot 工程中都是支持的，常见的标注如下：
+   - ~@ComponentScan~ : 查找 Beans
+   - ~@Autowired~ : 注入的构造器
+   - ~@Component~ : 组件
+   - ~@Repository~ : 仓库
+   - ~@Service~ : 服务
+   - ~@Controller~ : 控制器
+
+   下面是依赖注入的示例
+   #+BEGIN_SRC java
+     package com.example.service;
+     import org.springframework.beans.factory.annotation.Autowired;
+     import org.springframework.stereotype.Service;
+
+     @Service
+     public class DatabaseAccountService implements AccountService {
+       private final RiskAssessor riskAssessor;
+
+       @Autowired
+       public DatabaseAccountService(RiskAssessor riskAssessor) {
+         this.riskAssessor = riskAssessor;
+       }
+
+       // ...
+     }
+   #+END_SRC
+
+   #+BEGIN_SRC java
+     @Service
+     public class DatabaseAccountService implements AccountService {
+       private final RiskAssessor riskAssessor;
+
+       public DatabaseAccountService(RiskAssessor riskAssessor) {
+         this.riskAssessor = riskAssessor;
+       }
+
+       // ...
+     }
+   #+END_SRC
+
+** ~@SpringBootApplication~ 标注
+   Spring Framework 提供了下面的基本标注
+   - ~@EnableAutoConfiguration~ : 开启自动配置
+   - ~@ComponentScan~ : 开启自动扫描组件
+   - ~@Configuration~ : 允许在上下文中注册其它的 Bean 或导入其它的配置类
+
+   ~@SpringBootApplication~ 相当于同时开启了上面三项配置
+   #+BEGIN_SRC java
+     package com.example.myapplication;
+     import org.springframework.boot.SpringApplication;
+     import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+
+     @SpringBootApplication // same as @Configuration @EnableAutoConfiguration @ComponentScan
+     public class Application {
+
+       public static void main(String[] args) {
+         SpringApplication.run(Application.class, args);
+       }
+
+     }
+   #+END_SRC
+
+** 外部配置
+   Spring Boot 允许在 Web 应用中读取外部配置，方便程序在不同的环境下产生不同行为。
+   常见的有两种配置方式，两种配置方式对比如下：
+
+   | Feature           | ~@ConfigurationProperties~ | ~@Value~ |
+   |-------------------+----------------------------+----------|
+   | Relaxed binding   | Yes                        | No       |
+   | Meta-data support | Yes                        | No       |
+   | SpEL evaluation   | No                         | Yes      |
+
+*** ~@Value~ 方式配置
+    直接使用注释的方式即可将配置的值读入 Java Bean 中，示例如下：
+    #+BEGIN_SRC java
+      @Component
+      public class MyBean {
+
+        @Value("${name}")
+        private String name;
+
+        // ...
+      }
+    #+END_SRC
+
+*** ~@ConfigurationProperties~ 方式配置
+    该种配置方法比 ~@Value~ 更加安全
+
+    先定义配置项的 Java Bean
+    #+BEGIN_SRC java
+      package com.example;
+
+      import java.net.InetAddress;
+      import java.util.ArrayList;
+      import java.util.Collections;
+      import java.util.List;
+
+      import org.springframework.boot.context.properties.ConfigurationProperties;
+
+      @ConfigurationProperties("acme")
+      public class AcmeProperties {
+
+        private boolean enabled;
+        private InetAddress remoteAddress;
+        private final Security security = new Security();
+
+        public boolean isEnabled() { /* ... */ }
+        public void setEnabled(boolean enabled) { /* ... */ }
+
+        public InetAddress getRemoteAddress() { /* ... */ }
+        public void setRemoteAddress(InetAddress remoteAddress) { /* ... */ }
+
+        public Security getSecurity() { /* ... */ }
+
+        public static class Security {
+          private String username;
+          private String password;
+          private List<String> roles = new ArrayList<>(Collections.singleton("USER"));
+
+          public String getUsername() { /* ... */ }
+          public void setUsername(String username) { /* ... */ }
+
+          public String getPassword() { /* ... */ }
+          public void setPassword(String password) { /* ... */ }
+
+          public List<String> getRoles() { /* ... */ }
+          public void setRoles(List<String> roles) { /* ... */ }
+        }
+      }
+    #+END_SRC
+
+    上述的配置类对应于配置文件中的这些配置项
+    - ~acme.enabled~ 定义一个值，默认为空
+    - ~acme.remote-address~ 能通过字符串强制转换的类型
+    - ~acme.security.username~ 自带 Security 对象，用户名
+    - ~acme.security.password~
+    - ~acme.security.roles~ 字符串集合
+
+    添加配置项，通过 ~@EnableConfigurationProperties~ 标注来扫描配置的 Java Bean
+    #+BEGIN_SRC java
+      @Configuration
+      @EnableConfigurationProperties(AcmeProperties.class)
+      public class MyConfiguration {
+        // ...
+      }
+    #+END_SRC
+
+    并且需要添加 ~@Configuration~ 到 Java Bean 中
+    #+BEGIN_SRC java
+      @Component
+      @ConfigurationProperties(prefix="acme")
+      public class AcmeProperties {
+        // ... see the preceding example
+      }
+    #+END_SRC
+
+    最后就可以将定义的 Java Bean 配置项注入到其它组件中
+    #+BEGIN_SRC java
+      @Service
+      public class MyService {
+
+        private final AcmeProperties properties;
+
+        @Autowired
+        public MyService(AcmeProperties properties) {
+          this.properties = properties;
+        }
+
+        //...
+
+        @PostConstruct
+        public void openConnection() {
+          Server server = new Server(this.properties.getRemoteAddress());
+          // ...
+        }
+
+      }
+    #+END_SRC
+
+** 允许跨域
+   Spring Boot 可以通过添加配置类的方法来启用跨域设置，具体参考下面的代码
+   #+BEGIN_SRC java
+     import org.springframework.context.annotation.Configuration;
+     import org.springframework.web.servlet.config.annotation.CorsRegistry;
+     import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+     import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+     @Configuration
+     @EnableWebMvc
+     public class CorsConfiguration implements WebMvcConfigurer {
+
+       private static final String[] CORS_METHODS =
+           new String[] {"GET", "OPTIONS", "POST", "PUT", "DELETE"};
+
+       private static final String[] CORS_HEADERS =
+           new String[] {
+             "Access-Control-Request-Headers",
+             "Access-Control-Request-Method",
+             "Accept",
+             "Authorization",
+             "Cache-Control",
+             "Content-Type",
+             "DNT",
+             "If-Modified-Since",
+             "Keep-Alive",
+             "Origin",
+             "Referer",
+             "User-Agent",
+             "X-Mx-ReqToken",
+             "X-Requested-With"
+           };
+
+       @Override
+       public void addCorsMappings(CorsRegistry registry) {
+         registry
+             .addMapping("/**")
+             .allowedOrigins("*")
+             .allowedMethods(CORS_METHODS)
+             .allowedHeaders(CORS_HEADERS)
+             .exposedHeaders(CORS_HEADERS)
+             .allowCredentials(true)
+             .maxAge(3600);
+       }
+     }
+
+   #+END_SRC
+
+** 日志
+   Spring Boot 提供了一个统一的日志配置，可以兼容 Java Util Logging、Log4J2 和
+   Logback 等日志系统作为后端。
+
+*** 日志样式
+    默认的输出样式如下：
+    #+BEGIN_SRC text
+      2014-03-05 10:57:51.112  INFO 45469 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet Engine: Apache Tomcat/7.0.52
+      2014-03-05 10:57:51.253  INFO 45469 --- [ost-startStop-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+      2014-03-05 10:57:51.253  INFO 45469 --- [ost-startStop-1] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 1358 ms
+      2014-03-05 10:57:51.698  INFO 45469 --- [ost-startStop-1] o.s.b.c.e.ServletRegistrationBean        : Mapping servlet: 'dispatcherServlet' to [/]
+      2014-03-05 10:57:51.702  INFO 45469 --- [ost-startStop-1] o.s.b.c.embedded.FilterRegistrationBean  : Mapping filter: 'hiddenHttpMethodFilter' to: [/*]
+    #+END_SRC
+    包括以下几个部分：
+    1. Date and Time: Millisecond precision and easily sortable
+    2. Log Level: ERROR, WARN, INFO, DEBUG, or TRACE
+    3. Process ID
+    4. A --- separator to distinguish the start of actual log messages
+    5. Thread name: Enclosed in square brackets (may be truncated for console
+       output)
+    6. Logger name: This is usually the source class name (often abbreviated)
+    7. The log message
+
+*** 控制台输出
+    控制台输出默认记录 ERROR, WARN 和 INFO 基本的日志，可以使用 ~--debug~ 开启调
+    试级别的输出。
+    #+BEGIN_SRC sh
+      java -jar myapp.jar --debug
+    #+END_SRC
+
+    也可以在配置文件 ~application.yml~ 中设置 ~debug=true~
+
+    如果控制台支持彩色输出，那么还可以配置彩色输出日志
+    - 开启配置文件中的 ~spring.output.ansi.enabled~ 选项
+    - 使用 ~%clr(%5p)~ 可以根据日志基本来变换颜色。各级别对应的颜色： 红色
+      (FATAL, ERROR)，黄色（INFO），绿色（INFO, DEBUG）
+    - 设置日期的颜色 ~%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){yellow}~ ，默认支持以下几
+      种色彩： blue cyan faint green magenta red yellow
+
+*** 文件输出
+    文件输出通过 ~logging.file~ 和 ~logging.path~ 来控制
+
+    | logging.file  | logging.path       | Example  | Description                                  |
+    |---------------+--------------------+----------+----------------------------------------------|
+    | (none)        | (none)             |          | 仅开启控制台输出                             |
+    | Specific file | (none)             | my.log   | 输出到文件，文件路径是当前文件夹的相对路径   |
+    | (none)        | Specific directory | /var/log | 输出到文件，文件路径可以是相对路径或绝对路径 |
+
+    - ~logging.file.max-size~ 设置文件的最大存储大小
+    - ~logging.file.max-history~ 设置最大的历史文件数量
+
+*** 日志级别
+    日志级别可以通过 ~logging.level.<logger-name>=<level>~ 来设置，
+    ~logging.level.root~ 是设置默认级别
+    #+BEGIN_SRC conf
+      logging.level.root=WARN
+      logging.level.org.springframework.web=DEBUG
+      logging.level.org.hibernate=ERROR
+    #+END_SRC
+
+*** 日志分组
+    日志基本可以通过分组来设置，例如
+    #+BEGIN_SRC conf
+      logging.group.tomcat=org.apache.catalina, org.apache.coyote, org.apache.tomcat
+    #+END_SRC
+
+    Spring Boot 的默认分组有下面几个：
+    - web : ~org.springframework.core.codec, org.springframework.http, org.springframework.web~
+    - sql : ~org.springframework.jdbc.core, org.hibernate.SQL~
+
+** 配置数据库
+*** MySQL
+    ~application.yml~ 配置文件中添加用户名、密码等相关信息
+    #+BEGIN_SRC yaml
+      spring:
+        jpa:
+          database-platform: org.hibernate.dialect.MySQL5Dialect
+        datasource:
+          platform: mysql
+          username: username
+          password: password
+          url: jdbc:mysql://localhost:3306/database?useUnicode=true&characterEncoding=utf-8&useSSL=false
+          driver-class-name: com.mysql.jdbc.Driver
+    #+END_SRC
+
+    ~pom.xml~ 文件中添加 MySQL 依赖
+    #+BEGIN_SRC xml
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.38</version>
+      </dependency>
+    #+END_SRC
+
+*** PostgreSQL
+    ~application.yml~ 配置文件中添加用户名、密码等相关信息
+    #+BEGIN_SRC yaml
+      spring:
+        jpa:
+          database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+        datasource:
+          platform: postgres
+          username: username
+          password: password
+          url: jdbc:postgresql://localhost:5432/database
+          driver-class-name: org.postgresql.Driver
+    #+END_SRC
+
+    ~pom.xml~ 文件中添加 PostgreSQL 依赖
+    #+BEGIN_SRC xml
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.2.5</version>
+      </dependency>
+    #+END_SRC
+
+*** Oracle
+    ~application.yml~ 配置文件中添加用户名、密码等相关信息
+    #+BEGIN_SRC yaml
+      spring:
+        jpa:
+          database-platform: org.hibernate.dialect.Oracle10gDialect
+        datasource:
+          username: username
+          password: password
+          url: jdbc:oracle:thin:@//localhost:1521/database
+          driver-class-name: oracle.jdbc.OracleDriver
+    #+END_SRC
+
+    ~pom.xml~ 文件中添加 PostgreSQL 依赖
+    #+BEGIN_SRC xml
+      <dependency>
+        <groupId>com.oracle</groupId>
+        <artifactId>ojdbc6</artifactId>
+        <version>11.2.0.4.0</version>
+        <scope>provided</scope>
+      </dependency>
+    #+END_SRC
+
+    Oracle 的驱动是收费的，需要手工安装，默认在 ~$ORACLE_HOME/jdbc/lib/~ 文件夹
+    中， 安装适配你项目的 jar 文件即可
+    #+BEGIN_SRC sh
+      mvn install:install-file -Dpackaging=jar \
+        -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.4.0 \
+        -Dfile=<path-to-jar>
+    #+END_SRC
+
+*** Tomcat 连接池配置
+    如果你在项目中使用 [[https://tomcat.apache.org/tomcat-8.0-doc/jdbc-pool.html#Common_Attributes][Tomcat 连接池]] 作为数据库连接，可能还需要设置的相关参数
+    #+BEGIN_SRC conf
+      # Number of ms to wait before throwing an exception if no connection is available.
+      spring.datasource.tomcat.max-wait=10000
+
+      # Maximum number of active connections that can be allocated from this pool at the same time.
+      spring.datasource.tomcat.max-active=50
+
+      # Validate the connection before borrowing it from the pool.
+      spring.datasource.tomcat.test-on-borrow=true
+    #+END_SRC
+
+** 开发工具
+   Spring Boot 的提供了开发工具套件，可以实现自动加载，仅仅需要在 ~pom.xml~ 文件
+   中加入下面依赖即可自动添加
+   #+BEGIN_SRC xml
+     <dependencies>
+      <dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-devtools</artifactId>
+       <optional>true</optional>
+      </dependency>
+     </dependencies>
+   #+END_SRC
+
+* 参考链接
+  1. [[https://docs.spring.io/spring-boot/docs/current/reference/html/cli-using-the-cli.html][Using Spring Boot CLI]]
+  2. [[https://spring.io/projects/spring-boot][Spring Boot Project Homepage]]
+  3. [[https://spring.io/guides/gs/rest-service/][RESTful Service]]
+  4. [[https://spring.io/guides/gs/consuming-rest-angularjs/][Consuming a RESTful Web Service with AngularJS]]
+  5. [[https://github.com/spring-guides/tut-rest.git][Spring Tutorial Github Repo]]
+  6. [[https://www.imooc.com/learn/1058][Spring Boot 2.0 深度实践之系列总览]]
