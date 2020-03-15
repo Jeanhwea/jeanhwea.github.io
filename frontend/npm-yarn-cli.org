@@ -1,4 +1,4 @@
-#+TITLE: npm 和 yarn - NodeJs 包管理工具
+#+TITLE: Node.js npm 和 yarn
 #+AUTHOR: Jinghui Hu
 #+EMAIL: hujinghui@buaa.edu.cn
 #+DATE: <2018-10-08 Mon 11:04:00>
@@ -8,24 +8,28 @@
 #+TAGS: npm yarn taobao
 
 
-* npm 和 yarn
+* 简介
+  在目前前后端分离的大环境下，基本上前端技术都跑不掉需要使用 nodejs。在使用
+  nodejs 时就会接触到 nodejs 的包管理工具，也就是 [[https://www.npmjs.com/][npm]] ， npm 是 nodejs 默认的包
+  管理工具，如果没有大量使用的需求，直接 npm 就可以面对日常工作中的包管理。关键
+  是除了 npm，nodejs 还有一个叫做 [[http://www.yarnpkg.com][yarn]] 的包管理工具，yarn 与 npm 基本上功能类似，
+  只是 yarn 下载包时会缓存下载过的包，所以再次使用时无需重复下载，优化用户体验。
 
-  [[https://www.npmjs.com/][npm]] 是 nodejs 默认的包管理工具，[[http://www.yarnpkg.com][yarn]] 是 npm 的一个改进版，它缓存存了每个下载过
-  的包,所以再次使用时无需重复下载。
-
-** Ubuntu 上安装 npm 和 yarn
+* 安装
+** Windows
+   Windows 操作系统安装 node 非常简单，直接去 [[https://nodejs.org/en/][nodejs]] 官网上下载安装包运行安装即
+   可。安装好后，如果将对应的 bin 文件夹添加到 PATH 环境变量中后，就会出现 node
+   和 npm 命令，这样就可以使用。
+** Ubuntu
+   使用包管理器可以安装默认源中的工具
    #+BEGIN_SRC sh
-     sudo apt-get install nodejs
-     sudo apt-get install npm
+     sudo apt install nodejs npm
    #+END_SRC
 
-   升级 npm 命令如下：
+   不过一般默认的 npm 版本比较老，为了使用最新版本的 node，并且便捷地切换 node
+   版本。建议安装 =n= 这个 npm 包，可以动态切换 node 的版本，参考命令如下：
    #+BEGIN_SRC sh
-     sudo npm install npm -g
-   #+END_SRC
-
-   升级 node.js 命令如下：
-   #+BEGIN_SRC sh
+     # 全局安装 n
      npm install -g n
      # 升级 nodejs 到最新版
      n latest
@@ -35,7 +39,17 @@
      n 10.11.0
    #+END_SRC
 
-** 使用淘宝镜像源
+* 用户级别全局安装
+  在 Linux 系统中，普通用户不一定能将 npm 包全局安装到系统中。为解决这样的权限问
+  题，可以配置 ~prefix~ 参数，来改变 npm 包的全局仓库的存储路径
+  #+BEGIN_SRC sh
+    mkdir -p ~/.npm/node_modules
+    npm config set prefix=~/.npm/node_modules
+
+    echo 'export PATH=$HOME/.npm/node_modules/bin:$PATH' >> ~/.bashrc
+  #+END_SRC
+
+* 使用淘宝镜像源
   npm 和 yarn 在配置国内 [[https://npm.taobao.org/][淘宝镜像源]] 的时候需要配置以下文件：
   #+BEGIN_SRC conf
     # ~/.npmrc
@@ -60,8 +74,7 @@
     yarn config list
   #+END_SRC
 
-
-  一些包需要添加淘宝 [[https://npm.taobao.org/mirrors][加速器]]
+  一些包需要添加淘宝[[https://npm.taobao.org/mirrors][加速器]]
   #+BEGIN_SRC sh
     export NVM_NODEJS_ORG_MIRROR=http://npm.taobao.org/mirrors/node
     export SASS_BINARY_SITE=http://npm.taobao.org/mirrors/node-sass
@@ -69,57 +82,49 @@
     export SQLITE3_BINARY_SITE=http://npm.taobao.org/mirrors/sqlite3
   #+END_SRC
 
-** 全局安装
-   配置本地仓库的存储路径
-   #+BEGIN_SRC sh
-     mkdir -p ~/.npm/node_modules
-     npm config set prefix=~/.npm/node_modules
+* 下载项目包
+  根据 =package.json= 文件中的引用记录将镜像源中的包下载到本地 =node_modules=文
+  件夹中。
+  #+BEGIN_SRC sh
+    npm install
+    yarn install
+  #+END_SRC
 
-     echo 'export PATH=$HOME/.npm/node_modules/bin:$PATH' >> ~/.bashrc
-   #+END_SRC
+* 全局安装包
+  将一些命令行工具安装到全局包仓库中
+  #+BEGIN_SRC sh
+    npm install -g package-name
+    yarn global add package-name
+  #+END_SRC
 
-* 常用命令
-  npm 和 yarn 都有相似功能的命令 ，官方文档很详细，请参考 [[https://docs.npmjs.com/][npm cli]] 和 [[https://yarnpkg.com/en/docs/cli/][yarn cli]]。
+* 安装项目模块
+  给当前项目添加一个包，并将引用信息添加的 =package.json= 文件中。
+  #+BEGIN_SRC sh
+    npm install --save package-name
+    npm install --save-dev package-name
+    yarn add package-name
+    yarn add package-name@1.2.3 # 制定安装版本
+    yarn add --dev package-name
+  #+END_SRC
 
-** 下载项目包
-   根据 =package.json= 文件中的引用记录将镜像源中的包下载到本地 =node_modules=
-   文件夹中。
-   #+BEGIN_SRC sh
-     npm install
-     yarn install
-   #+END_SRC
+* 卸载项目模块
+  卸载将当前项目中的制定模块，并且更新 =package.json= 文件中的相关信息。
+  #+BEGIN_SRC sh
+    npm uninstall package-name
+    npm uninstall package-name --save-dev
+    yarn remove package-name
+    yarn remove package-name --dev
+  #+END_SRC
 
-** 全局安装包
-   将一些命令行工具安装到全局包仓库中
-   #+BEGIN_SRC sh
-     npm install -g package-name
-     yarn global add package-name
-   #+END_SRC
+* 升级项目模块
+  基于 =package.json= 和 =yarn.lock= 中的信息来升级一个特点项目模块。
+  #+BEGIN_SRC sh
+    npm update package-name
+    npm upgrade package-name # upgrade is an alias of update
+    yarn upgrade package-name
+    yarn upgrade --latest package-name
+  #+END_SRC
 
-** 安装项目模块
-   给当前项目添加一个包，并将引用信息添加的 =package.json= 文件中。
-   #+BEGIN_SRC sh
-     npm install --save package-name
-     npm install --save-dev package-name
-     yarn add package-name
-     yarn add package-name@1.2.3 # 制定安装版本
-     yarn add --dev package-name
-   #+END_SRC
-
-** 卸载项目模块
-   卸载将当前项目中的制定模块，并且更新 =package.json= 文件中的相关信息。
-   #+BEGIN_SRC sh
-     npm uninstall package-name
-     npm uninstall package-name --save-dev
-     yarn remove package-name
-     yarn remove package-name --dev
-   #+END_SRC
-
-** 升级项目模块
-   基于 =package.json= 和 =yarn.lock= 中的信息来升级一个特点项目模块。
-   #+BEGIN_SRC sh
-     npm update package-name
-     npm upgrade package-name # upgrade is an alias of update
-     yarn upgrade package-name
-     yarn upgrade --latest package-name
-   #+END_SRC
+* 参考链接
+  1. [[https://docs.npmjs.com/][npm]]
+  2. [[https://yarnpkg.com/en/docs/cli/][yarn]]
