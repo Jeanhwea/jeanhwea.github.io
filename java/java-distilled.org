@@ -9,8 +9,23 @@
 
 
 * 开发工具
-** 编译器和虚拟机
-   Java 的两个基本工具是 =javac= 和 =java=, 其中这两个工具功能如下：
+** JDK 的安装和环境变量配置
+   JDK 可以直接在 Oracle 网站上下载，链接是 [[https://www.oracle.com/java/technologies/javase-jdk8-downloads.html][JDK 1.8 Download]] ，将 JDK 直接解压放
+   到一个文件夹里就可以使用 JDK，Java 一般会配置 ~JAVA_HOME~ 环境变量，
+   ~JAVA_HOME~ 环境变量是指向 Java 的安装文件夹，具体配置如下所示
+   #+BEGIN_SRC sh
+     mkdir -p /usr/local/java && cd /usr/local/java
+     tar xzvf jdk-8u231-linux-x64.tar.gz
+   #+END_SRC
+
+   配置环境变量如下
+   #+BEGIN_SRC sh
+     export JAVA_HOME='/usr/local/java/jdk1.8.0_231'
+     export PATH=$JAVA_HOME/bin:$PATH
+   #+END_SRC
+
+** 编译器 javac 和虚拟机 java
+   Java 的两个基本工具是 ~javac~ 和 ~java~, 其中这两个工具功能如下：
    - javac 是 Java 的编译器，将 Java 的源代码编译成虚拟机识别的字节码
    - java 是 Java 的执行器，可以执行 Java 编译器编译好的字节码
 
@@ -42,13 +57,29 @@
      $
    #+END_SRC
 
-** 调试器
-   Java 自带的调试器是 =jdb= 命令，通常可以使用集成开发环境（IDE）中的调试工具来
+** 调试器 jdb
+   Java 自带的调试器是 ~jdb~ 命令，通常可以使用集成开发环境（IDE）中的调试工具来
    调试 Java，所以 jdb 一般使用的比较少
 
-** REPL
+** 解释器 jrepl
    Java 9 的 JDK 中就自带 JConsole, 可以用于调试一些常见的命令。Java 8 中用一个
-   民间开发的 repl，就叫 =javarepl=, 该工具可以在 [[https://github.com/albertlatacz/java-repl][github]] 中下载。
+   民间开发的 repl，就叫 ~java-repl~, 该工具可以在 [[https://github.com/albertlatacz/java-repl][github]] 中下载 jar 包，然后直
+   接执行
+   #+BEGIN_SRC sh
+     java -jar $JAVA_HOME/lib/javarepl-dev.jar
+   #+END_SRC
+
+   我一般直接建一个别名，这样运行 java 的解释器效果如下
+   #+BEGIN_SRC text
+     $ jrepl
+     [INFO] Unable to bind key for unsupported operation: edit-and-execute-command
+     Welcome to JavaREPL version dev (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_231)
+     Type expression to evaluate, :help for more options or press tab to auto-complete.
+     Connected to local instance at http://localhost:40173
+     java> "hello world"
+     java.lang.String res0 = "hello world"
+     java>
+   #+END_SRC
 
 * 基本用法
 ** 基本类型
@@ -74,7 +105,7 @@
    - 封装类有方法和属性，可以利用这些方法和属性来处理数据，例如
      ~Integer.parseInt(String str);~ 基本数据类型都是 final 修饰的，不能被继承和
      扩展新的类、方法
-   - 默认值不同，如 ~int i;~ 默认值为 0，而 ~Integer j;~ 默认值为 =null=, 因为此
+   - 默认值不同，如 ~int i;~ 默认值为 0，而 ~Integer j;~ 默认值为 ~null~, 因为此
      时 =j= 为对象，对象默认值为 =null=
    - 存储位置不同, 定义的基本数据类型的变量和对象的引用变量（地址）存储在栈中，
      而实际对应的对象（value）是存储在堆中
@@ -111,7 +142,7 @@
 
 ** 数组
    不知道为什么，总是记不住 Java 的数组定义方式，这里记一下 Java 中数组定义方式
-   #+BEGIN_SRC java :classname App73 :exports both :results output
+   #+BEGIN_SRC java :classname App73 :exports code
      class App73 {
        public static void main(String args[]) {
          // int array
@@ -129,13 +160,6 @@
        }
      }
    #+END_SRC
-
-   #+RESULTS:
-   : 0
-   : 10
-   : Hello
-   : Man
-   : Welcome to Java world
 
 ** 静态变量和实例变量
    - 在语法定义上的区别：静态变量前要加 ~static~ 关键字，而实例变量前则不加。
@@ -168,30 +192,22 @@
        但反过来却是肯定的
      - 基本数据类型比较 (String 除外) ~==~ 和 equals 两者都是比较值
 
-   #+BEGIN_SRC java :classname App198 :exports both :results output
+   #+BEGIN_SRC java :classname App198 :exports code
      class App198 {
        public static void main(String args[]) {
          String s1 = "Hello";
          String s2 = "Hello";
          String s3 = new String("Hello");
          String s4 = "Hel" + "lo"; // String is immutable, it will compiles to "Hello"
-         System.out.println(s1 == s2);
-         System.out.println(s1.equals(s2));
-         System.out.println(s1 == s3);
-         System.out.println(s1.equals(s3));
-         System.out.println(s1 == s4);
-         System.out.println(s1.equals(s4));
+         System.out.println(s1 == s2); // => true
+         System.out.println(s1.equals(s2)); // => ture
+         System.out.println(s1 == s3); // => false
+         System.out.println(s1.equals(s3)); // => ture
+         System.out.println(s1 == s4); // => true
+         System.out.println(s1.equals(s4)); // => true
        }
      }
    #+END_SRC
-
-   #+RESULTS:
-   : true
-   : true
-   : false
-   : true
-   : true
-   : true
 
 ** 序列化
    序列化就是一种用来处理对象流的机制，所谓对象流也就是将对象的内容进行流化。可
@@ -214,7 +230,7 @@
      的情况。并且鼓励用户程序去 ~catch~ 它。
 
    处理异常的一种方式是在类方法的定义中 ~throws~ 相应的异常
-   #+BEGIN_SRC java :classname App148 :exports both :results output
+   #+BEGIN_SRC java :classname App148 :exports code
      class App148 {
        public static void main(String args[]) throws MyException {
          MyException myecpt = new MyException("Ops!");
@@ -231,7 +247,7 @@
    #+END_SRC
 
    或者使用 ~try/catch~ 块来捕获异常进行处理
-   #+BEGIN_SRC java :classname App166 :exports both :results output
+   #+BEGIN_SRC java :classname App166 :exports code
      class App166 {
 
        public static void main(String args[]) {
@@ -588,7 +604,7 @@
    #+END_SRC
 
    使用正则表达式替换字符串，例如 =replaceAll= 可以使用下面的方法来替换
-   #+BEGIN_SRC java :classname App575 :exports both :results output
+   #+BEGIN_SRC java :classname App575 :exports code
      import java.util.*;
      import java.util.regex.*;
      class App575 {
