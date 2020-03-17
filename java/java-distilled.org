@@ -540,28 +540,6 @@
    - 不要在 catch 中忽略掉捕获到的异常
 
 * 面向对象
-** 面向对象的特征
-*** 多态
-    - 概念：多态（Polymorphism）按字面的意思就是“多种状态，即同一个实体同时具有
-      多种形式"。一般表现形式是程序在运行的过程中，同一种类型在不同的条件下表现
-      不同的结果。多态也称为动态绑定，一般是在运行时刻才能确定方法的具体执行对象，
-      这个过程也称为动态委派
-    - 好处：
-      + 将接口和实现分开，改善代码的组织结构和可读性，还能创建可拓展的程序
-      + 消除类型之间的耦合关系。允许将多个类型视为同一个类型
-      + 一个多态方法的调用允许有多种表现形式
-
-*** 继承
-    - 概念：继承是从已有的类中派生出新的类，新的类能吸收已有类的数据属性和行为，
-      并能扩展新的能力
-    - 好处：提高代码的复用，缩短开发周期
-
-*** 封装
-    - 概念：就是把对象的属性和行为（或服务）结合为一个独立的整体，并尽可能隐藏对
-      象的内部实现细节
-    - 好处：
-      + 隐藏信息，实现细节。让客户端程序员无法触及他们不应该触及的部分
-      + 允许可设计者可以改变类内部的工作方式而不用担心会影响到客户端程序员
 ** 对象初始化和消亡
    一般类的初始化工具有以下几种方式：
    #+BEGIN_SRC java
@@ -614,6 +592,63 @@
    Java 有自己的垃圾回收机制 (GC)，一般 ~finalize()~ 只会在对象内存回收前被调用
    一次，所以我们不需要显示让对象消亡，而是让 GC 来自动处理对象的析构，并且当需
    要阻止对象消亡时，就需要显示将保护的对象通过 ~finalize()~ 挂载到 GCRoot 上
+** 面向对象的特征
+*** 继承
+    - 概念：继承是从已有的类中派生出新的类，新的类能吸收已有类的数据属性和行为，
+      并能扩展新的能力
+    - 好处：提高代码的复用，缩短开发周期
+    #+BEGIN_SRC java
+      class Employee {
+        private String name;
+        private double salary;
+
+        public getName() { }
+        public getSalary() { }
+      }
+
+      class Manager extends Employee {
+        private double bonus;
+
+        public getSalary() { }
+        public setBonus(double bonus) { }
+      }
+    #+END_SRC
+    - final 类不允许继承，final 方法不允许 Override
+    #+BEGIN_SRC java
+      final class Executive extends Manager {
+        // ...
+      }
+
+      class Employee {
+        private String name;
+        public final String getName() { return this.name; }
+      }
+    #+END_SRC
+*** 多态
+    - 概念：多态（Polymorphism）按字面的意思就是“多种状态，即同一个实体同时具有
+      多种形式"。一般表现形式是程序在运行的过程中，同一种类型在不同的条件下表现
+      不同的结果。多态也称为动态绑定，一般是在运行时刻才能确定方法的具体执行对象，
+      这个过程也称为动态委派
+    - 好处：
+      + 将接口和实现分开，改善代码的组织结构和可读性，还能创建可拓展的程序
+      + 消除类型之间的耦合关系。允许将多个类型视为同一个类型
+      + 一个多态方法的调用允许有多种表现形式
+    #+BEGIN_SRC java
+      Employee e = new Employee();
+      e.getName();   // => Employee.getName()
+      e.getSalary(); // => Employee.getSalary()
+
+      Manager m = new Manager();
+      m.getName();        // => Employee.getName()
+      m.getSalary();      // => Manager.getSalary()
+      m.setBonus(1000.0); // Manager.setBonus(...)
+    #+END_SRC
+*** 封装
+    - 概念：就是把对象的属性和行为（或服务）结合为一个独立的整体，并尽可能隐藏对
+      象的内部实现细节
+    - 好处：
+      + 隐藏信息，实现细节。让客户端程序员无法触及他们不应该触及的部分
+      + 允许可设计者可以改变类内部的工作方式而不用担心会影响到客户端程序员
 
 ** Overload 和 Override
    Overload 是 *重载* 的意思，Override 是 *覆盖* 的意思，也就是 *重写*
@@ -775,6 +810,49 @@
       #+END_SRC
 
 * 参考代码片段
+** List 和数组互转
+   #+BEGIN_SRC java
+     // List 转 Array
+     List<Employee> list = new ArrayList<>();
+     while (...) {
+       x = ...;
+       list.add(x);
+     }
+
+     // Array 转 List
+     Employee[] arr = new Employee[list.size()];
+     list.toArray(arr);
+   #+END_SRC
+
+   注意 ~Arrays.asList(...)~ 将数组转 List 时需要传对象。
+   #+BEGIN_SRC java
+     Integer[] primes1 = {2,3,5};
+     List list1 = Arrays.asList(primes1);
+     list1.size();
+
+     int[] primes2 = {2,3,5};
+     List list2 = Arrays.asList(primes2);
+     list2.size();
+   #+END_SRC
+
+   在 ~Arrays.asList(...)~ 中，该方法接受一个变长参数，一般可看做数组参数，但是
+   因为 ~int[]~ 本身就是一个类型，所以 primes2 变量作为参数传递时，编译器认为只
+   传了一个变量，这个变量的类型是 int 数组
+   #+BEGIN_SRC text
+     java> Integer[] primes1 = {2,3,5};
+     java.lang.Integer[] primes1 = [2, 3, 5]
+     java> List list1 = Arrays.asList(primes1);
+     java.util.List list1 = [2, 3, 5]
+     java> list1.size();
+     java.lang.Integer res7 = 3
+     java> int[] primes2 = {2,3,5};
+     int[] primes2 = [2, 3, 5]
+     java> List list2 = Arrays.asList(primes2);
+     java.util.List list2 = [[I@4ed8ff]
+     java> list2.size();
+     java.lang.Integer res10 = 1
+     java>
+   #+END_SRC
 ** ~assert~ 断言
    assertion (断言) 在软件开发中是一种常用的调试方式，很多开发语言中都支持这种机
    制。一般来说，assertion 用于保证程序最基本、关键的正确性。assertion 检查通常
