@@ -541,7 +541,6 @@
 
 * 面向对象
 ** 面向对象的特征
-
 *** 多态
     - 概念：多态（Polymorphism）按字面的意思就是“多种状态，即同一个实体同时具有
       多种形式"。一般表现形式是程序在运行的过程中，同一种类型在不同的条件下表现
@@ -563,6 +562,54 @@
     - 好处：
       + 隐藏信息，实现细节。让客户端程序员无法触及他们不应该触及的部分
       + 允许可设计者可以改变类内部的工作方式而不用担心会影响到客户端程序员
+** 对象初始化
+   一般类的初始化工具有以下几种方式：
+   #+BEGIN_SRC java
+     import java.util.Random;
+
+     class Employee {
+       private static int nextId;
+
+       private int id;
+       private String name;
+       private double salary;
+
+       // 静态初始化块: 初始化静态变量
+       static {
+         System.out.println("Static Initialezation Block");
+         Random gen = new Random();
+         nextId = gen.nextInt(1000);
+       }
+
+       // 对象初始化块: 当对象实例化时调用
+       {
+         System.out.println("Object Initialezation Block");
+         id = nextId;
+         nextId++;
+       }
+
+       // 默认构造器
+       public Employee() {
+         System.out.println("Default Constructor");
+       }
+
+       public static void main(String[] args) {
+         Employee e1 = new Employee();
+         Employee e2 = new Employee();
+       }
+     }
+   #+END_SRC
+
+   由下面运行结果可以得知，静态初始化块只在类第一次实例化才调用一次，对象初始化
+   块每次对象实例化都调用一次，并且是中构造器调用前调用
+   #+BEGIN_SRC text
+     $ java Employee
+     Static Initialezation Block
+     Object Initialezation Block
+     Default Constructor
+     Object Initialezation Block
+     Default Constructor
+   #+END_SRC
 
 ** Overload 和 Override
    Overload 是 *重载* 的意思，Override 是 *覆盖* 的意思，也就是 *重写*
