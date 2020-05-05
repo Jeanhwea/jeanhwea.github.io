@@ -1,0 +1,47 @@
+#+TITLE: Elisp 函数
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2020-05-05 Tue 18:17:23>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: tag1 tag2 tag3
+
+
+* 定义和使用函数
+  下面是几个使用函数的例子
+  #+BEGIN_SRC elisp
+    (setq currdir (expand-file-name "."))
+
+    (message "hello world from %s" currdir)
+
+    (defun func1 ()
+      (message "I'm func1"))
+
+    (defun func2 (str)
+      (message "I'm func2: with args = %s" str))
+
+    (func1)
+    (func2 "hee")
+
+    (funcall 'func1)
+    (apply #'func1 nil)
+    (apply #'func2 '("ees"))
+  #+END_SRC
+
+* 使用 Emacs 启动
+  直接在 shell 脚本中启动
+  #+BEGIN_SRC sh
+    emacs --script hello.el
+  #+END_SRC
+
+  运行结果如下
+  #+BEGIN_SRC text
+    ➜  Public emacs --script hello.el
+    hello world from /Users/hujinghui/Public
+    I’m func1
+    I’m func2: with args = hee
+    I’m func1
+    I’m func1
+    I’m func2: with args = ees
+  #+END_SRC
