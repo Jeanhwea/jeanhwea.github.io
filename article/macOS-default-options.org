@@ -1,0 +1,99 @@
+#+TITLE: macOS 的一些默认选型设置
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2020-08-23 Sun 09:21:48>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: tag1 tag2 tag3
+
+
+* 基本设置
+  #+BEGIN_SRC sh
+    # 保持活跃状态，直到完成
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+    # 打开关闭窗口时禁用动画
+    defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool false
+
+    # 打开 Quick Look 窗口时禁用动画
+    defaults write -g QLPanelAnimationDuration -float 0
+  #+END_SRC
+
+
+* 屏幕设置
+  #+BEGIN_SRC sh
+    # 睡眠或屏幕保护程序开始后立即需要密码
+    defaults write com.apple.screensaver askForPassword -int 1
+    defaults write com.apple.screensaver askForPasswordDelay -int 0
+
+    # 屏幕截屏保存到桌面
+    defaults write com.apple.screencapture location -string "${HOME}/Desktop"
+
+    # 保存格式为 JPG
+    defaults write com.apple.screencapture type -string "jpg"
+
+    # 截图禁用阴影
+    defaults write com.apple.screencapture disable-shadow -bool true
+
+    # 在非 Apple LCD 上启用亚像素字体渲染
+    defaults write NSGlobalDomain AppleFontSmoothing -int 2
+  #+END_SRC
+
+
+* Finder
+  #+BEGIN_SRC sh
+    # 禁用窗口动画和获取信息动画
+    defaults write com.apple.finder DisableAllAnimations -bool true
+
+    # 不显示文件的扩展名
+    defaults write NSGlobalDomain AppleShowAllExtensions -bool false
+
+    # 显示状态栏
+    defaults write com.apple.finder ShowStatusBar -bool true
+
+    # 显示路径栏
+    defaults write com.apple.finder ShowPathbar -bool true
+
+    # 更改文件名时不警告
+    defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+
+    # 避免在网络卷上创建.DS_Store 文件
+    defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+
+    # 清空垃圾箱前不显示警告
+    defaults write com.apple.finder WarnOnEmptyTrash -bool false
+
+    # 显示隐藏文件
+    defaults write com.apple.finder AppleShowAllFiles -bool true;
+  #+END_SRC
+
+* Software update
+  #+BEGIN_SRC sh
+    # 禁用软件自动更新检查
+    defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool false
+  #+END_SRC
+
+* Dock
+  #+BEGIN_SRC sh
+    # Dock 项目图标大小设置
+    defaults write com.apple.dock tilesize -int 48
+
+    # 最小化/最大化窗口效果
+    defaults write com.apple.dock mineffect -string "scale"
+
+    # Dock 打开应用时禁用动画
+    defaults write com.apple.dock launchanim -bool false
+
+    # 不显示最近应用
+    defaults write com.apple.dock show-recents -bool false
+
+    # 重新整理 Dock
+    dockutil --no-restart --remove all
+    dockutil --no-restart --add "/Applications/WeChat.app"
+    dockutil --no-restart --add "/Applications/QQ.app"
+    dockutil --no-restart --add "/Applications/iTerm.app"
+    dockutil --no-restart --add "/System/Applications/System Preferences.app"
+
+    killall Dock
+  #+END_SRC
