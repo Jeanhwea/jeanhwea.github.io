@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-09-06 Sun 17:36 -->
+<!-- 2020-09-06 Sun 18:05 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>安装 postgres 数据库</title>
@@ -244,25 +244,26 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgc2add3d">1. Linux 平台编译安装的快捷参考(Centos 平台)：</a>
+<li><a href="#org7e821bb">1. Linux 平台编译安装的快捷参考(Centos 平台)：</a>
 <ul>
-<li><a href="#org4762c3c">1.1. 下载源代码</a></li>
-<li><a href="#orgb349f4b">1.2. 解压编译安装</a></li>
-<li><a href="#org6ba3bb5">1.3. 添加用户和相关配置</a></li>
+<li><a href="#org09790cd">1.1. 下载源代码</a></li>
+<li><a href="#orge5f3ce5">1.2. 解压编译安装</a></li>
+<li><a href="#org19152c3">1.3. 添加用户和相关配置</a></li>
 </ul>
 </li>
-<li><a href="#org8296863">2. 参考链接</a></li>
+<li><a href="#orgfba78f7">2. 配置相关的环境变量</a></li>
+<li><a href="#org9d017cf">3. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgc2add3d" class="outline-2">
-<h2 id="orgc2add3d"><span class="section-number-2">1</span> Linux 平台编译安装的快捷参考(Centos 平台)：</h2>
+<div id="outline-container-org7e821bb" class="outline-2">
+<h2 id="org7e821bb"><span class="section-number-2">1</span> Linux 平台编译安装的快捷参考(Centos 平台)：</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org4762c3c" class="outline-3">
-<h3 id="org4762c3c"><span class="section-number-3">1.1</span> 下载源代码</h3>
+<div id="outline-container-org09790cd" class="outline-3">
+<h3 id="org09790cd"><span class="section-number-3">1.1</span> 下载源代码</h3>
 <div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
 <pre class="src src-sh">wget https://ftp.postgresql.org/pub/source/v12.2/postgresql-12.2.tar.bz2
@@ -271,8 +272,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orgb349f4b" class="outline-3">
-<h3 id="orgb349f4b"><span class="section-number-3">1.2</span> 解压编译安装</h3>
+<div id="outline-container-orge5f3ce5" class="outline-3">
+<h3 id="orge5f3ce5"><span class="section-number-3">1.2</span> 解压编译安装</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 这里将数据库相关软件安装到 <code>/usr/local/pgsql</code> 文件夹中
@@ -288,8 +289,8 @@ make install-world
 </div>
 </div>
 
-<div id="outline-container-org6ba3bb5" class="outline-3">
-<h3 id="org6ba3bb5"><span class="section-number-3">1.3</span> 添加用户和相关配置</h3>
+<div id="outline-container-org19152c3" class="outline-3">
+<h3 id="org19152c3"><span class="section-number-3">1.3</span> 添加用户和相关配置</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 为 postgres 数据创建管理用户，并初始化数据库的存储目录
@@ -311,17 +312,34 @@ chown -R postgres:postgres /usr/local/pgsql/data
 <pre class="src src-sh">su - postgres <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20351;&#29992; postgres &#24080;&#21495;&#25805;&#20316;</span>
 /usr/local/pgsql/bin/initdb -E UTF8 -D /usr/local/pgsql/data <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21021;&#22987;&#21270;&#25968;&#25454;&#24211;</span>
 /usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21551;&#21160;&#25968;&#25454;&#24211;</span>
-/usr/local/pgsql/bin/createdb -E UTF8 genericdb <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20551;&#23450;&#25968;&#25454;&#24211;&#21517;&#20026; gerericdb</span>
-/usr/local/pgsql/bin/psql genericdb <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#36827;&#20837;&#25968;&#25454;&#24211;&#20869;&#37096;</span>
+/usr/local/pgsql/bin/createdb -E UTF8 demo <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20551;&#23450;&#25968;&#25454;&#24211;&#21517;&#20026; demo</span>
+/usr/local/pgsql/bin/psql demo <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#36827;&#20837;&#25968;&#25454;&#24211;&#20869;&#37096;</span>
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org8296863" class="outline-2">
-<h2 id="org8296863"><span class="section-number-2">2</span> 参考链接</h2>
+<div id="outline-container-orgfba78f7" class="outline-2">
+<h2 id="orgfba78f7"><span class="section-number-2">2</span> 配置相关的环境变量</h2>
 <div class="outline-text-2" id="text-2">
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">basic envs</span>
+<span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">PGHOME</span>=/usr/local/pgsql
+<span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">PGDATA</span>=/usr/local/pgsql/data
+<span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">PATH</span>=$<span style="color: #6c71c4;">PGHOME</span>/bin:$<span style="color: #6c71c4;">PATH</span>
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">user and port</span>
+<span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">PGUSER</span>=postgres
+<span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">PGPORT</span>=5432
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9d017cf" class="outline-2">
+<h2 id="org9d017cf"><span class="section-number-2">3</span> 参考链接</h2>
+<div class="outline-text-2" id="text-3">
 <ol class="org-ol">
 <li><a href="https://www.postgresql.org">PostgreSQL 官网</a></li>
 <li><a href="http://www.postgres.cn/v2/home">PostgreSQL 中文社区</a></li>
@@ -331,7 +349,7 @@ chown -R postgres:postgres /usr/local/pgsql/data
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-09-06 Sun 17:36. Created by Jinghui Hu at 2020-09-06 Sun 08:16.</p>
+<p class="author">Last Updated 2020-09-06 Sun 18:05. Created by Jinghui Hu at 2020-09-06 Sun 08:16.</p>
 </div>
 </body>
 </html>
