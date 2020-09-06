@@ -1,0 +1,45 @@
+#+TITLE: 安装 postgres 数据库
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2020-09-06 Sun 08:16:10>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: install database postgres pg
+
+
+* Linux 平台编译安装的快捷参考(Centos 平台)：
+** 下载源代码
+   #+BEGIN_SRC sh
+     wget https://ftp.postgresql.org/pub/source/v12.2/postgresql-12.2.tar.bz2
+   #+END_SRC
+
+** 解压编译安装
+   这里将数据库相关软件安装到 =/usr/local/postgres= 文件夹中
+   #+BEGIN_SRC sh
+     tar xjvf postgresql*.bz2
+     cd potgresql-12.2
+     ./configure --prefix=/usr/local/postgres
+     make world
+     make install-world
+   #+END_SRC
+
+** 添加用户和相关配置
+   为 postgres 数据创建管理用户，并初始化数据库的存储目录
+   #+BEGIN_SRC sh
+     # 增加新用户，系统提示要给定新用户密码
+     adduser postgres
+
+     # 创建数据库目录
+     mkdir /opt/pgsql/data
+     chown -R postgres:postgres /opt/pgsql/data
+   #+END_SRC
+
+   并初始化数据库
+   #+BEGIN_SRC sh
+     su - postgres # 使用 postgres 帐号操作
+     /opt/pgsql/bin/initdb -D /opt/pgsql/data # 初始化数据库
+     /opt/pgsql/bin/pg_ctl -D /opt/pgsql/data -l logfile start # 启动数据库
+     /opt/pgsql/bin/createdb genericdb # 假定数据库名为 gerericdb
+     /opt/pgsql/bin/psql genericdb # 进入数据库内部
+   #+END_SRC
