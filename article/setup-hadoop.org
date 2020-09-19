@@ -1,0 +1,73 @@
+#+TITLE: 配置Hadoop环境
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2020-09-19 Sat 13:57:34>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: hdfs hadoop bigdata
+
+
+* 下载和并解压 Hadoop
+  可以直接在[[https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/core/][清华镜像源]]下载，解压到对应目录
+  #+BEGIN_SRC sh
+    wget https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/core/hadoop-2.7.7/hadoop-2.7.7.tar.gz
+    mkdir -p /usr/local/java
+    tar xzvf hadoop-2.7.7.tar.gz
+  #+END_SRC
+
+* 配置好相关的环境变量
+  #+BEGIN_SRC sh
+    export HADOOP_HOME=${HADOOP_HOME:/usr/local/java/hadoop-2.7.7}
+    export HADOOP_DATA="$HADOOP_HOME/data"
+    export PATH="$HADOOP_HOME/bin:$PATH"
+    alias h0="$HADOOP_HOME/sbin/stop-all.sh"
+    alias h1="$HADOOP_HOME/sbin/start-all.sh"
+  #+END_SRC
+
+* 配置 core-site.xml
+  添加 HDFS 的端口为 9600
+  #+BEGIN_SRC xml
+    <configuration>
+      <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9600</value>
+      </property>
+    </configuration>
+  #+END_SRC
+
+* 配置 hdfs-site.xml
+  添加 HDFS 的 NameNode 和 DataNode 的路径，并将备份副本数量设置为 1
+  #+BEGIN_SRC xml
+    <configuration>
+      <property>
+        <name>dfs.name.dir</name>
+        <value>/usr/local/java/hadoop-2.7.7/data/name</value>
+      </property>
+      <property>
+        <name>dfs.data.dir</name>
+        <value>/usr/local/java/hadoop-2.7.7/data/data</value>
+      </property>
+      <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+      </property>
+    </configuration>
+  #+END_SRC
+
+* 格式化 HDFS 文件系统
+  #+BEGIN_SRC sh
+    hdfs namenode -format
+  #+END_SRC
+
+* 启动关闭 Hadoop 相关服务
+  #+BEGIN_SRC sh
+    $HADOOP_HOME/sbin/startk-all.sh
+    $HADOOP_HOME/sbin/stop-all.sh
+  #+END_SRC
+
+* 网页浏览工具
+  1. NameNode 属性查看 http://localhost:50070
+
+* 参考链接
+  1. [[http://hadoop.apache.org/docs/r2.7.7/][Hadoop 文档]]
