@@ -25,59 +25,61 @@
     alias h1="$HADOOP_HOME/sbin/start-all.sh"
   #+END_SRC
 
-* 配置 core-site.xml
-  添加 HDFS 的端口为 9600
-  #+BEGIN_SRC xml
-    <configuration>
-      <property>
-        <name>fs.defaultFS</name>
-        <value>hdfs://localhost:9600</value>
-      </property>
-    </configuration>
-  #+END_SRC
+* 配置 Hadoop
+** 配置 core-site.xml
+   添加 HDFS 的端口为 9600
+   #+BEGIN_SRC xml
+     <configuration>
+       <property>
+         <name>fs.defaultFS</name>
+         <value>hdfs://localhost:9600</value>
+       </property>
+     </configuration>
+   #+END_SRC
 
-* 配置 hdfs-site.xml
-  添加 HDFS 的 NameNode 和 DataNode 的路径，并将备份副本数量设置为 1
-  #+BEGIN_SRC xml
-    <configuration>
-      <property>
-        <name>dfs.name.dir</name>
-        <value>/usr/local/java/hadoop-2.7.7/data/name</value>
-      </property>
-      <property>
-        <name>dfs.data.dir</name>
-        <value>/usr/local/java/hadoop-2.7.7/data/data</value>
-      </property>
-      <property>
-        <name>dfs.replication</name>
-        <value>1</value>
-      </property>
-    </configuration>
-  #+END_SRC
+** 配置 hdfs-site.xml
+   添加 HDFS 的 NameNode 和 DataNode 的路径，并将备份副本数量设置为 1
+   #+BEGIN_SRC xml
+     <configuration>
+       <property>
+         <name>dfs.name.dir</name>
+         <value>/usr/local/java/hadoop-2.7.7/data/name</value>
+       </property>
+       <property>
+         <name>dfs.data.dir</name>
+         <value>/usr/local/java/hadoop-2.7.7/data/data</value>
+       </property>
+       <property>
+         <name>dfs.replication</name>
+         <value>1</value>
+       </property>
+     </configuration>
+   #+END_SRC
 
-* 配置 mapred-site.xml
-  #+BEGIN_SRC sh
-    cp mapred-site.xml.template mapred-site.xml
-  #+END_SRC
+* 配置 Yarn
+** 配置 mapred-site.xml
+   #+BEGIN_SRC sh
+     cp mapred-site.xml.template mapred-site.xml
+   #+END_SRC
 
-  #+BEGIN_SRC xml
-    <configuration>
-      <property>
-        <name>mapreduce.framework.name</name>
-        <value>yarn</value>
-      </property>
-    </configuration>
-  #+END_SRC
+   #+BEGIN_SRC xml
+     <configuration>
+       <property>
+         <name>mapreduce.framework.name</name>
+         <value>yarn</value>
+       </property>
+     </configuration>
+   #+END_SRC
 
-* 配置 yarn-site.xml
-  #+BEGIN_SRC xml
-    <configuration>
-      <property>
-        <name>yarn.nodemanager.aux-services</name>
-        <value>mapreduce_shuffle</value>
-      </property>
-    </configuration>
-  #+END_SRC
+** 配置 yarn-site.xml
+   #+BEGIN_SRC xml
+     <configuration>
+       <property>
+         <name>yarn.nodemanager.aux-services</name>
+         <value>mapreduce_shuffle</value>
+       </property>
+     </configuration>
+   #+END_SRC
 
 * 格式化 HDFS 文件系统
   #+BEGIN_SRC sh
