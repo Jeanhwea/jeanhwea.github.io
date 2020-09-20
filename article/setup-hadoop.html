@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-09-20 Sun 12:30 -->
+<!-- 2020-09-20 Sun 17:25 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>配置Hadoop环境</title>
@@ -244,22 +244,32 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org1f6ec1b">1. 下载和并解压 Hadoop</a></li>
-<li><a href="#org17edddb">2. 配置好相关的环境变量</a></li>
-<li><a href="#org6943dd7">3. 配置 core-site.xml</a></li>
-<li><a href="#org91631ae">4. 配置 hdfs-site.xml</a></li>
-<li><a href="#orgd6a6428">5. 格式化 HDFS 文件系统</a></li>
-<li><a href="#orgec62f08">6. 启动关闭 Hadoop 相关服务</a></li>
-<li><a href="#org592115d">7. 网页浏览工具</a></li>
-<li><a href="#org7a14463">8. 使用自带的示例程序测试</a></li>
-<li><a href="#orga64f23b">9. 参考链接</a></li>
+<li><a href="#org2ffc77f">1. 下载和并解压 Hadoop</a></li>
+<li><a href="#org993c2d2">2. 配置好相关的环境变量</a></li>
+<li><a href="#orgc358847">3. 配置 Hadoop</a>
+<ul>
+<li><a href="#org6c87d65">3.1. 配置 core-site.xml</a></li>
+<li><a href="#org6dd9671">3.2. 配置 hdfs-site.xml</a></li>
+</ul>
+</li>
+<li><a href="#org322811d">4. 配置 Yarn</a>
+<ul>
+<li><a href="#org3278fe0">4.1. 配置 mapred-site.xml</a></li>
+<li><a href="#orgc333aca">4.2. 配置 yarn-site.xml</a></li>
+</ul>
+</li>
+<li><a href="#org7740158">5. 格式化 HDFS 文件系统</a></li>
+<li><a href="#orgb50042c">6. 启动关闭 Hadoop 相关服务</a></li>
+<li><a href="#orga2ba823">7. 网页浏览工具</a></li>
+<li><a href="#org4b1289b">8. 使用自带的示例程序测试</a></li>
+<li><a href="#orgc6e7b41">9. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org1f6ec1b" class="outline-2">
-<h2 id="org1f6ec1b"><span class="section-number-2">1</span> 下载和并解压 Hadoop</h2>
+<div id="outline-container-org2ffc77f" class="outline-2">
+<h2 id="org2ffc77f"><span class="section-number-2">1</span> 下载和并解压 Hadoop</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 可以直接在<a href="https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/core/">清华镜像源</a>下载，解压到对应目录
@@ -273,8 +283,8 @@ tar xzvf hadoop-2.7.7.tar.gz
 </div>
 </div>
 
-<div id="outline-container-org17edddb" class="outline-2">
-<h2 id="org17edddb"><span class="section-number-2">2</span> 配置好相关的环境变量</h2>
+<div id="outline-container-org993c2d2" class="outline-2">
+<h2 id="org993c2d2"><span class="section-number-2">2</span> 配置好相关的环境变量</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">HADOOP_HOME</span>=${<span style="color: #6c71c4;">HADOOP_HOME</span>:/usr/local/java/hadoop-2.7.7}
@@ -287,9 +297,13 @@ tar xzvf hadoop-2.7.7.tar.gz
 </div>
 </div>
 
-<div id="outline-container-org6943dd7" class="outline-2">
-<h2 id="org6943dd7"><span class="section-number-2">3</span> 配置 core-site.xml</h2>
+<div id="outline-container-orgc358847" class="outline-2">
+<h2 id="orgc358847"><span class="section-number-2">3</span> 配置 Hadoop</h2>
 <div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org6c87d65" class="outline-3">
+<h3 id="org6c87d65"><span class="section-number-3">3.1</span> 配置 core-site.xml</h3>
+<div class="outline-text-3" id="text-3-1">
 <p>
 添加 HDFS 的端口为 9600
 </p>
@@ -305,9 +319,9 @@ tar xzvf hadoop-2.7.7.tar.gz
 </div>
 </div>
 
-<div id="outline-container-org91631ae" class="outline-2">
-<h2 id="org91631ae"><span class="section-number-2">4</span> 配置 hdfs-site.xml</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-org6dd9671" class="outline-3">
+<h3 id="org6dd9671"><span class="section-number-3">3.2</span> 配置 hdfs-site.xml</h3>
+<div class="outline-text-3" id="text-3-2">
 <p>
 添加 HDFS 的 NameNode 和 DataNode 的路径，并将备份副本数量设置为 1
 </p>
@@ -330,9 +344,50 @@ tar xzvf hadoop-2.7.7.tar.gz
 </div>
 </div>
 </div>
+</div>
 
-<div id="outline-container-orgd6a6428" class="outline-2">
-<h2 id="orgd6a6428"><span class="section-number-2">5</span> 格式化 HDFS 文件系统</h2>
+<div id="outline-container-org322811d" class="outline-2">
+<h2 id="org322811d"><span class="section-number-2">4</span> 配置 Yarn</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-org3278fe0" class="outline-3">
+<h3 id="org3278fe0"><span class="section-number-3">4.1</span> 配置 mapred-site.xml</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+<pre class="src src-sh">cp mapred-site.xml.template mapred-site.xml
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-xml">&lt;<span style="color: #b58900;">configuration</span>&gt;
+  &lt;<span style="color: #b58900;">property</span>&gt;
+    &lt;<span style="color: #b58900;">name</span>&gt;mapreduce.framework.name&lt;/<span style="color: #b58900;">name</span>&gt;
+    &lt;<span style="color: #b58900;">value</span>&gt;yarn&lt;/<span style="color: #b58900;">value</span>&gt;
+  &lt;/<span style="color: #b58900;">property</span>&gt;
+&lt;/<span style="color: #b58900;">configuration</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc333aca" class="outline-3">
+<h3 id="orgc333aca"><span class="section-number-3">4.2</span> 配置 yarn-site.xml</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+<pre class="src src-xml">&lt;<span style="color: #b58900;">configuration</span>&gt;
+  &lt;<span style="color: #b58900;">property</span>&gt;
+    &lt;<span style="color: #b58900;">name</span>&gt;yarn.nodemanager.aux-services&lt;/<span style="color: #b58900;">name</span>&gt;
+    &lt;<span style="color: #b58900;">value</span>&gt;mapreduce_shuffle&lt;/<span style="color: #b58900;">value</span>&gt;
+  &lt;/<span style="color: #b58900;">property</span>&gt;
+&lt;/<span style="color: #b58900;">configuration</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7740158" class="outline-2">
+<h2 id="org7740158"><span class="section-number-2">5</span> 格式化 HDFS 文件系统</h2>
 <div class="outline-text-2" id="text-5">
 <div class="org-src-container">
 <pre class="src src-sh">hdfs namenode -format
@@ -341,8 +396,8 @@ tar xzvf hadoop-2.7.7.tar.gz
 </div>
 </div>
 
-<div id="outline-container-orgec62f08" class="outline-2">
-<h2 id="orgec62f08"><span class="section-number-2">6</span> 启动关闭 Hadoop 相关服务</h2>
+<div id="outline-container-orgb50042c" class="outline-2">
+<h2 id="orgb50042c"><span class="section-number-2">6</span> 启动关闭 Hadoop 相关服务</h2>
 <div class="outline-text-2" id="text-6">
 <div class="org-src-container">
 <pre class="src src-sh">$<span style="color: #6c71c4;">HADOOP_HOME</span>/sbin/startk-all.sh
@@ -352,17 +407,18 @@ $<span style="color: #6c71c4;">HADOOP_HOME</span>/sbin/stop-all.sh
 </div>
 </div>
 
-<div id="outline-container-org592115d" class="outline-2">
-<h2 id="org592115d"><span class="section-number-2">7</span> 网页浏览工具</h2>
+<div id="outline-container-orga2ba823" class="outline-2">
+<h2 id="orga2ba823"><span class="section-number-2">7</span> 网页浏览工具</h2>
 <div class="outline-text-2" id="text-7">
 <ol class="org-ol">
 <li>NameNode 属性查看 <a href="http://localhost:50070">http://localhost:50070</a></li>
+<li>ResourceManager 属性查看 <a href="http://localhost:8088">http://localhost:8088</a></li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-org7a14463" class="outline-2">
-<h2 id="org7a14463"><span class="section-number-2">8</span> 使用自带的示例程序测试</h2>
+<div id="outline-container-org4b1289b" class="outline-2">
+<h2 id="org4b1289b"><span class="section-number-2">8</span> 使用自带的示例程序测试</h2>
 <div class="outline-text-2" id="text-8">
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #6c71c4;">cd</span> $<span style="color: #6c71c4;">HADOOP_HOME</span>
@@ -388,8 +444,8 @@ Found 2 items
 </div>
 </div>
 
-<div id="outline-container-orga64f23b" class="outline-2">
-<h2 id="orga64f23b"><span class="section-number-2">9</span> 参考链接</h2>
+<div id="outline-container-orgc6e7b41" class="outline-2">
+<h2 id="orgc6e7b41"><span class="section-number-2">9</span> 参考链接</h2>
 <div class="outline-text-2" id="text-9">
 <ol class="org-ol">
 <li><a href="http://hadoop.apache.org/docs/r2.7.7/">Hadoop 文档</a></li>
@@ -398,7 +454,7 @@ Found 2 items
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-09-20 Sun 12:30. Created by Jinghui Hu at 2020-09-19 Sat 13:57.</p>
+<p class="author">Last Updated 2020-09-20 Sun 17:25. Created by Jinghui Hu at 2020-09-19 Sat 13:57.</p>
 </div>
 </body>
 </html>
