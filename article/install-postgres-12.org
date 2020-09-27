@@ -60,6 +60,22 @@
     alias p1="$PGHOME/bin/pg_ctl -D $PGDATA -l $PGDATA/logfile start"
   #+END_SRC
 
+* 配置允许远程连接数据库
+  postgres 默认只能通过 localhost 连接，如果需要建立远程连接则需要进行配置。找到
+  postgres 配置文件所在目录，这里位于数据目录 =$PGDATA=
+
+  修改 =postgresql.conf=: 配置监听任意 IP
+  #+BEGIN_SRC conf
+   listen_addresses = '*'
+  #+END_SRC
+
+  修改 =pg_hba.conf=: 配置服务端允许 MD5 认证方式，即使用用户名和密码登录
+  #+BEGIN_SRC conf
+   host all all 0.0.0.0/0 md5
+  #+END_SRC
+
+  修改过后需要重启才能生效
+
 * 参考链接
   1. [[https://www.postgresql.org][PostgreSQL 官网]]
   2. [[http://www.postgres.cn/v2/home][PostgreSQL 中文社区]]
