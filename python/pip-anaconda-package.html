@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-09-27 Sun 11:53 -->
+<!-- 2020-09-27 Sun 21:13 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>pip 包管理工具</title>
+<title>pip 包管理和 Anaconda发行包</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="Jinghui Hu" />
 <style type="text/css">
@@ -180,6 +180,12 @@
   .org-svg { width: 90%; }
   /*]]>*/-->
 </style>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script type="text/javascript" src="styles/lib/js/jquery.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -233,36 +239,36 @@ for the JavaScript code in this tag.
  |
  <a accesskey="H" href="../index.html"> HOME </a>
 </div><div id="content">
-<h1 class="title">pip 包管理工具</h1>
+<h1 class="title">pip 包管理和 Anaconda发行包</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgbdd0594">1. Pip 介绍</a></li>
-<li><a href="#org2194b2b">2. 常用命令</a>
+<li><a href="#org9241264">1. Pip 介绍</a></li>
+<li><a href="#org14c69b2">2. 常用命令</a>
 <ul>
-<li><a href="#org1f087c7">2.1. 列出当前所有包</a></li>
-<li><a href="#org2b725de">2.2. 更新所有包到最新版本</a></li>
-<li><a href="#orgd34c055">2.3. 批量导出/安装包 <code>requirements.txt</code></a></li>
-<li><a href="#org7370348">2.4. 离线下载/安装 wheel 包</a>
+<li><a href="#org27d69c5">2.1. 列出当前所有包</a></li>
+<li><a href="#orgc35a481">2.2. 更新所有包到最新版本</a></li>
+<li><a href="#org6d74f95">2.3. 批量导出/安装包 <code>requirements.txt</code></a></li>
+<li><a href="#org2eab37a">2.4. 离线下载/安装 wheel 包</a>
 <ul>
-<li><a href="#org1aecf10">2.4.1. 下载 wheel 包</a></li>
-<li><a href="#org9a0e594">2.4.2. 安装 wheel 包</a></li>
-<li><a href="#org999bd9a">2.4.3. 最佳实践</a></li>
+<li><a href="#orgcfd5200">2.4.1. 下载 wheel 包</a></li>
+<li><a href="#orge19a1cd">2.4.2. 安装 wheel 包</a></li>
+<li><a href="#orgb9ed9a7">2.4.3. 最佳实践</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org980dcc6">3. 虚拟环境</a>
+<li><a href="#org22f00d4">3. 虚拟环境</a>
 <ul>
-<li><a href="#orgdca12ce">3.1. 建立虚拟环境</a></li>
-<li><a href="#org1cdd43d">3.2. 激活/取消虚拟环境</a></li>
-<li><a href="#orgd06fe6f">3.3. 在 Windows 下使用虚拟环境</a></li>
+<li><a href="#orgd122202">3.1. 建立虚拟环境</a></li>
+<li><a href="#orgf581dea">3.2. 激活/取消虚拟环境</a></li>
+<li><a href="#orgbe05204">3.3. 在 Windows 下使用虚拟环境</a></li>
 </ul>
 </li>
-<li><a href="#org619a933">4. Anaconda3 相关命令</a>
+<li><a href="#org469fa0c">4. Anaconda3 相关命令</a>
 <ul>
-<li><a href="#org4bdb264">4.1. 创建虚拟环境</a></li>
+<li><a href="#org255df96">4.1. 创建虚拟环境</a></li>
 </ul>
 </li>
 </ul>
@@ -270,8 +276,8 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-orgbdd0594" class="outline-2">
-<h2 id="orgbdd0594"><span class="section-number-2">1</span> Pip 介绍</h2>
+<div id="outline-container-org9241264" class="outline-2">
+<h2 id="org9241264"><span class="section-number-2">1</span> Pip 介绍</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 <a href="https://pypi.org/project/pip/">pip</a> 是 python 的包管理工具，在国内可以替换 <a href="https://mirrors.tuna.tsinghua.edu.cn/help/pypi/">清华 pypi 镜像</a> 下载源来加快下载速度。
@@ -287,11 +293,11 @@ pip 工具在 Windows 和 Unix 环境下的配置文件位置如下
 需要配置项的内容如下：
 </p>
 <div class="org-src-container">
-<pre class="src src-conf">[<span style="color: #7aa6da;">global</span>]
-<span style="color: #e7c547;">index-url</span> = https://pypi.tuna.tsinghua.edu.cn/simple
+<pre class="src src-conf">[<span style="color: #268bd2;">global</span>]
+<span style="color: #6c71c4;">index-url</span> = https://pypi.tuna.tsinghua.edu.cn/simple
 
-[<span style="color: #7aa6da;">list</span>]
-<span style="color: #e7c547;">format</span> = columns
+[<span style="color: #268bd2;">list</span>]
+<span style="color: #6c71c4;">format</span> = columns
 </pre>
 </div>
 
@@ -307,8 +313,8 @@ pip config set install.trusted-host pypi.tuna.tsinghua.edu.cn
 </div>
 </div>
 
-<div id="outline-container-org2194b2b" class="outline-2">
-<h2 id="org2194b2b"><span class="section-number-2">2</span> 常用命令</h2>
+<div id="outline-container-org14c69b2" class="outline-2">
+<h2 id="org14c69b2"><span class="section-number-2">2</span> 常用命令</h2>
 <div class="outline-text-2" id="text-2">
 <ul class="org-ul">
 <li><code>pip install -U &lt;package&gt;</code> : 升级包</li>
@@ -324,8 +330,8 @@ pip config set install.trusted-host pypi.tuna.tsinghua.edu.cn
 </ul>
 </div>
 
-<div id="outline-container-org1f087c7" class="outline-3">
-<h3 id="org1f087c7"><span class="section-number-3">2.1</span> 列出当前所有包</h3>
+<div id="outline-container-org27d69c5" class="outline-3">
+<h3 id="org27d69c5"><span class="section-number-3">2.1</span> 列出当前所有包</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-sh">~ $ pip list
@@ -347,18 +353,18 @@ ipython                7.6.0
 </div>
 </div>
 
-<div id="outline-container-org2b725de" class="outline-3">
-<h3 id="org2b725de"><span class="section-number-3">2.2</span> 更新所有包到最新版本</h3>
+<div id="outline-container-orgc35a481" class="outline-3">
+<h3 id="orgc35a481"><span class="section-number-3">2.2</span> 更新所有包到最新版本</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
-<pre class="src src-sh">pip freeze --local | grep -v <span style="color: #70c0b1;">'^\-e'</span> | cut -d = -f 1  | xargs -n1 pip install -U
+<pre class="src src-sh">pip freeze --local | grep -v <span style="color: #2aa198;">'^\-e'</span> | cut -d = -f 1  | xargs -n1 pip install -U
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgd34c055" class="outline-3">
-<h3 id="orgd34c055"><span class="section-number-3">2.3</span> 批量导出/安装包 <code>requirements.txt</code></h3>
+<div id="outline-container-org6d74f95" class="outline-3">
+<h3 id="org6d74f95"><span class="section-number-3">2.3</span> 批量导出/安装包 <code>requirements.txt</code></h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 在 Python 项目中通常有一个 <code>requirements.txt</code> 文件，该文件记录项目所需的包和相
@@ -372,50 +378,50 @@ pip install -r requirements.txt
 </div>
 </div>
 
-<div id="outline-container-org7370348" class="outline-3">
-<h3 id="org7370348"><span class="section-number-3">2.4</span> 离线下载/安装 wheel 包</h3>
+<div id="outline-container-org2eab37a" class="outline-3">
+<h3 id="org2eab37a"><span class="section-number-3">2.4</span> 离线下载/安装 wheel 包</h3>
 <div class="outline-text-3" id="text-2-4">
 </div>
-<div id="outline-container-org1aecf10" class="outline-4">
-<h4 id="org1aecf10"><span class="section-number-4">2.4.1</span> 下载 wheel 包</h4>
+<div id="outline-container-orgcfd5200" class="outline-4">
+<h4 id="orgcfd5200"><span class="section-number-4">2.4.1</span> 下载 wheel 包</h4>
 <div class="outline-text-4" id="text-2-4-1">
 <p>
 将 <code>requirements.txt</code> 中的所有依赖的 wheel 包下载到 wheels 文件夹中
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">pip download -r requirements.txt -d wheels
+<pre class="src src-sh">pip download -d wheels -r requirements.txt
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org9a0e594" class="outline-4">
-<h4 id="org9a0e594"><span class="section-number-4">2.4.2</span> 安装 wheel 包</h4>
+<div id="outline-container-orge19a1cd" class="outline-4">
+<h4 id="orge19a1cd"><span class="section-number-4">2.4.2</span> 安装 wheel 包</h4>
 <div class="outline-text-4" id="text-2-4-2">
 <p>
 将 wheels 文件夹中的包安装到环境中
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">pip install -r requirements.txt --no-index --find-link=wheels
+<pre class="src src-sh">pip install --no-index --find-link=wheels -r requirements.txt
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org999bd9a" class="outline-4">
-<h4 id="org999bd9a"><span class="section-number-4">2.4.3</span> 最佳实践</h4>
+<div id="outline-container-orgb9ed9a7" class="outline-4">
+<h4 id="orgb9ed9a7"><span class="section-number-4">2.4.3</span> 最佳实践</h4>
 <div class="outline-text-4" id="text-2-4-3">
 <p>
 一般可以将下载的 wheel 包放在摆渡机的 <code>~/.pip/cache</code> 文件夹中
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">download and save packages to ~/.pip/cache</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">download and save packages to ~/.pip/cache</span>
 pip download -d ~/.pip/cache &lt;name&gt;
 
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">upload packages to remote machine</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">upload packages to remote machine</span>
 rsync -av ~/.pip/cache/ user@host:~/.pip/cache
 
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">install on remote machine</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">install on remote machine</span>
 pip install --no-index --find-link=~/.pip/cache &lt;name&gt;
 </pre>
 </div>
@@ -424,7 +430,7 @@ pip install --no-index --find-link=~/.pip/cache &lt;name&gt;
 也可以添加环境变量来指定 pip 工具的缓存目录
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #c397d8;">export</span> <span style="color: #e7c547;">PIP_DOWNLOAD_CACHE</span>=$<span style="color: #e7c547;">HOME</span>/.pip/cache
+<pre class="src src-sh"><span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">PIP_DOWNLOAD_CACHE</span>=$<span style="color: #6c71c4;">HOME</span>/.pip/cache
 </pre>
 </div>
 </div>
@@ -432,52 +438,52 @@ pip install --no-index --find-link=~/.pip/cache &lt;name&gt;
 </div>
 </div>
 
-<div id="outline-container-org980dcc6" class="outline-2">
-<h2 id="org980dcc6"><span class="section-number-2">3</span> 虚拟环境</h2>
+<div id="outline-container-org22f00d4" class="outline-2">
+<h2 id="org22f00d4"><span class="section-number-2">3</span> 虚拟环境</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgdca12ce" class="outline-3">
-<h3 id="orgdca12ce"><span class="section-number-3">3.1</span> 建立虚拟环境</h3>
+<div id="outline-container-orgd122202" class="outline-3">
+<h3 id="orgd122202"><span class="section-number-3">3.1</span> 建立虚拟环境</h3>
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
-<pre class="src src-sh">mkdir ~/.venv &amp;&amp; <span style="color: #c397d8;">cd</span> ~/.venv
+<pre class="src src-sh">mkdir ~/.venv &amp;&amp; <span style="color: #6c71c4;">cd</span> ~/.venv
 
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#23433;&#35013; virtualenv &#20381;&#36182;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23433;&#35013; virtualenv &#20381;&#36182;</span>
 pip3 install virtualenv
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#22914;&#26524;&#27809;&#26377;&#31995;&#32479;&#30340; root &#26435;&#38480;&#30340;&#35805;&#21152; --user &#22312;&#29992;&#25143;&#32423;&#21035;&#23433;&#35013;&#21363;&#21487;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#22914;&#26524;&#27809;&#26377;&#31995;&#32479;&#30340; root &#26435;&#38480;&#30340;&#35805;&#21152; --user &#22312;&#29992;&#25143;&#32423;&#21035;&#23433;&#35013;&#21363;&#21487;</span>
 pip3 install --user virtualenv
 
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#26032;&#24314;&#34394;&#25311;&#29615;&#22659;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26032;&#24314;&#34394;&#25311;&#29615;&#22659;</span>
 virtualenv dev --python=python3
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#21478;&#22806;&#19968;&#31181;&#24314;&#34394;&#25311;&#29615;&#22659;&#30340;&#26041;&#24335;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21478;&#22806;&#19968;&#31181;&#24314;&#34394;&#25311;&#29615;&#22659;&#30340;&#26041;&#24335;</span>
 python3 -m virtualenv dev
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org1cdd43d" class="outline-3">
-<h3 id="org1cdd43d"><span class="section-number-3">3.2</span> 激活/取消虚拟环境</h3>
+<div id="outline-container-orgf581dea" class="outline-3">
+<h3 id="orgf581dea"><span class="section-number-3">3.2</span> 激活/取消虚拟环境</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#28608;&#27963;&#34394;&#25311;&#29615;&#22659;</span>
-source path/to/bin/activate
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#28608;&#27963;&#34394;&#25311;&#29615;&#22659;</span>
+<span style="color: #6c71c4;">source</span> path/to/bin/activate
 
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#21462;&#28040;&#34394;&#25311;&#29615;&#22659;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21462;&#28040;&#34394;&#25311;&#29615;&#22659;</span>
 deactivate
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgd06fe6f" class="outline-3">
-<h3 id="orgd06fe6f"><span class="section-number-3">3.3</span> 在 Windows 下使用虚拟环境</h3>
+<div id="outline-container-orgbe05204" class="outline-3">
+<h3 id="orgbe05204"><span class="section-number-3">3.3</span> 在 Windows 下使用虚拟环境</h3>
 <div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#19979;&#36733; virtualenv &#21253;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#19979;&#36733; virtualenv &#21253;</span>
 pip install virtualenv
 
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#24314;&#31435;&#21644;&#28608;&#27963;&#34394;&#25311;&#29615;&#22659;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24314;&#31435;&#21644;&#28608;&#27963;&#34394;&#25311;&#29615;&#22659;</span>
 python3 -m virtualenv .venv
 .venv\Scripts\activate
 </pre>
@@ -487,10 +493,10 @@ python3 -m virtualenv .venv
 使用 virtualenvwrapper 工具
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#19979;&#36733; virtualenvwrapper-win</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#19979;&#36733; virtualenvwrapper-win</span>
 pip install virtualenvwrapper-win
 
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">WORKON_HOME &#26159; %USERPROFILE%\Envs</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">WORKON_HOME &#26159; %USERPROFILE%\Envs</span>
 mkvirtualenv myenv
 workon myenv
 </pre>
@@ -499,25 +505,25 @@ workon myenv
 </div>
 </div>
 
-<div id="outline-container-org619a933" class="outline-2">
-<h2 id="org619a933"><span class="section-number-2">4</span> Anaconda3 相关命令</h2>
+<div id="outline-container-org469fa0c" class="outline-2">
+<h2 id="org469fa0c"><span class="section-number-2">4</span> Anaconda3 相关命令</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org4bdb264" class="outline-3">
-<h3 id="org4bdb264"><span class="section-number-3">4.1</span> 创建虚拟环境</h3>
+<div id="outline-container-org255df96" class="outline-3">
+<h3 id="org255df96"><span class="section-number-3">4.1</span> 创建虚拟环境</h3>
 <div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#21019;&#24314;&#21644;&#20351;&#29992; anaconda &#30340;&#34394;&#25311;&#29615;&#22659;</span>
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#21019;&#24314;&#21644;&#20351;&#29992; anaconda &#30340;&#34394;&#25311;&#29615;&#22659;</span>
 conda create --offline -n tf113
 
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#20811;&#38534;&#34394;&#25311;&#29615;&#22659;</span>
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#20811;&#38534;&#34394;&#25311;&#29615;&#22659;</span>
 conda create -n tf113 --clone base --offline
 
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#28608;&#27963;&#34394;&#25311;&#29615;&#22659;</span>
-source activate tf113
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#28608;&#27963;&#34394;&#25311;&#29615;&#22659;</span>
+<span style="color: #6c71c4;">source</span> activate tf113
 
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#19979;&#36733; tensorflow &#30340;&#23433;&#35013;&#21253;</span>
-pip download -i https://pypi.tuna.tsinghua.edu.cn/simple -d wheels_tf113_cpu <span style="color: #e7c547;">tensorflow</span>==1.13.1
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#19979;&#36733; tensorflow &#30340;&#23433;&#35013;&#21253;</span>
+pip download -i https://pypi.tuna.tsinghua.edu.cn/simple -d wheels_tf113_cpu <span style="color: #6c71c4;">tensorflow</span>==1.13.1
 </pre>
 </div>
 </div>
@@ -525,7 +531,7 @@ pip download -i https://pypi.tuna.tsinghua.edu.cn/simple -d wheels_tf113_cpu <sp
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-09-27 Sun 11:53. Created by Jinghui Hu at 2018-10-08 Mon 11:04.</p>
+<p class="author">Last Updated 2020-09-27 Sun 21:13. Created by Jinghui Hu at 2018-10-08 Mon 11:04.</p>
 </div>
 </body>
 </html>
