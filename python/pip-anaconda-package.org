@@ -32,15 +32,6 @@
   #+END_SRC
 
 * 常用命令
-  - ~pip install -U <package>~ : 升级包
-  - ~pip install <package>~ : 安装包
-    + ~name~ : 最新版本
-    + ~name==1.0.3~ : 制定版本
-    + ~name>=1.0.3~ : 最小版本
-  - ~pip uninstall <package>~ : 卸载包
-  - ~pip search <package>~ : 搜索包
-  - ~pip show <package>~ : 显示安装包信息
-
 ** 列出当前所有包
    #+BEGIN_SRC sh
      ~ $ pip list
@@ -160,6 +151,15 @@
      # 激活虚拟环境
      source activate tf113
 
-     # 下载 tensorflow 的安装包
-     pip download -i https://pypi.tuna.tsinghua.edu.cn/simple -d wheels_tf113_cpu tensorflow==1.13.1
+     # 删除虚拟环境
+     conda remove -n tf113
+   #+END_SRC
+
+** 处理额外的安装包
+   #+BEGIN_SRC sh
+     # 下载 tensorflow 的安装包, 缓存文件夹为 wheels
+     pip download -i https://pypi.tuna.tsinghua.edu.cn/simple -d wheels tensorflow==1.13.1
+
+     # 安装 wheels 文件夹下的包
+     pip install --no-index --find-link=wheels -r requirements.txt
    #+END_SRC
