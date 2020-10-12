@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-12 Mon 20:03 -->
+<!-- 2020-10-12 Mon 20:47 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>PyTorch</title>
@@ -244,17 +244,22 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org03ad9cb">1. PyTorch</a></li>
-<li><a href="#org8f68de1">2. 基础运算</a></li>
-<li><a href="#org68a6fc4">3. 附录</a></li>
-<li><a href="#org00be412">4. 参考链接</a></li>
+<li><a href="#org7e9841a">1. PyTorch</a></li>
+<li><a href="#org4819289">2. 基础运算</a>
+<ul>
+<li><a href="#org858034f">2.1. 初始化 tensor</a></li>
+<li><a href="#org2c4f456">2.2. tensor 和 ndarray 数据类型互转</a></li>
+</ul>
+</li>
+<li><a href="#org74aba9a">3. 附录</a></li>
+<li><a href="#orgf43034c">4. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org03ad9cb" class="outline-2">
-<h2 id="org03ad9cb"><span class="section-number-2">1</span> PyTorch</h2>
+<div id="outline-container-org7e9841a" class="outline-2">
+<h2 id="org7e9841a"><span class="section-number-2">1</span> PyTorch</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 PyTorch 和 Numpy 的数组和相似，PyTorch 的数据类型大多数是叫 Tensor，并且 Tensor
@@ -262,24 +267,27 @@ PyTorch 和 Numpy 的数组和相似，PyTorch 的数据类型大多数是叫 Te
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #b9ca4a;">import</span> torch
-<span style="color: #b9ca4a;">import</span> numpy <span style="color: #b9ca4a;">as</span> np
+<pre class="src src-python"><span style="color: #859900;">import</span> torch
+<span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org8f68de1" class="outline-2">
-<h2 id="org8f68de1"><span class="section-number-2">2</span> 基础运算</h2>
+<div id="outline-container-org4819289" class="outline-2">
+<h2 id="org4819289"><span class="section-number-2">2</span> 基础运算</h2>
 <div class="outline-text-2" id="text-2">
-<p>
-初始化 Tensor
-</p>
+</div>
+<div id="outline-container-org858034f" class="outline-3">
+<h3 id="org858034f"><span class="section-number-3">2.1</span> 初始化 tensor</h3>
+<div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #e7c547;">x0</span> = torch.zeros<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>2, 3<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
-<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>x0<span style="color: #8d5649;">)</span>
-<span style="color: #e7c547;">x1</span> = torch.ones<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>3, 2<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
-<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>x1<span style="color: #8d5649;">)</span>
+<pre class="src src-python"><span style="color: #6c71c4;">x0</span> = torch.zeros<span style="color: #8d5649;">(</span>2, 3<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x0<span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">x1</span> = torch.ones<span style="color: #8d5649;">(</span>3, 2<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x1<span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">x2</span> = torch.zeros<span style="color: #8d5649;">(</span>2, 3, dtype=torch.<span style="color: #6c71c4;">long</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x2<span style="color: #8d5649;">)</span>
 </pre>
 </div>
 
@@ -289,42 +297,46 @@ tensor([[0., 0., 0.],
 tensor([[1., 1.],
         [1., 1.],
         [1., 1.]])
+tensor([[0, 0, 0],
+        [0, 0, 0]])
 
 </pre>
+</div>
+</div>
 
-<p>
-Tensor 和 Numpy 互转
-</p>
+<div id="outline-container-org2c4f456" class="outline-3">
+<h3 id="org2c4f456"><span class="section-number-3">2.2</span> tensor 和 ndarray 数据类型互转</h3>
+<div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #e7c547;">t1</span> = torch.randn<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>2, 3<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span> <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">normal distribution with shape (2,3)</span>
-<span style="color: #e7c547;">a1</span> = t1.numpy<span style="color: #8d5649;">()</span>
-<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>t1<span style="color: #8d5649;">)</span>
-<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>a1<span style="color: #8d5649;">)</span>
+<pre class="src src-python"><span style="color: #6c71c4;">t1</span> = torch.randn<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>2, 3<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">normal distribution with shape (2,3)</span>
+<span style="color: #6c71c4;">a1</span> = t1.numpy<span style="color: #8d5649;">()</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>t1<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>a1<span style="color: #8d5649;">)</span>
 
-<span style="color: #e7c547;">a2</span> = np.random.normal<span style="color: #8d5649;">(</span>0, 0.01, 10<span style="color: #8d5649;">)</span>
-<span style="color: #e7c547;">t2</span> = torch.from_numpy<span style="color: #8d5649;">(</span>a2<span style="color: #8d5649;">)</span>
-<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>a2<span style="color: #8d5649;">)</span>
-<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>t2<span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">a2</span> = np.random.normal<span style="color: #8d5649;">(</span>0, 0.01, 10<span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">t2</span> = torch.from_numpy<span style="color: #8d5649;">(</span>a2<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>a2<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>t2<span style="color: #8d5649;">)</span>
 </pre>
 </div>
 
 <pre class="example">
-tensor([[-0.3331,  0.0084, -0.4687],
-        [-0.4646, -0.1299,  1.1564]])
-[[-0.3331359   0.00838602 -0.46865815]
- [-0.46462378 -0.12988698  1.1563787 ]]
-[-0.00755375 -0.01072683  0.00846834  0.00661998  0.02485086 -0.00411912
- -0.00583092  0.0151132   0.01220346  0.00567898]
-tensor([-0.0076, -0.0107,  0.0085,  0.0066,  0.0249, -0.0041, -0.0058,  0.0151,
-         0.0122,  0.0057], dtype=torch.float64)
+tensor([[ 2.0561,  1.1593,  2.7883],
+        [-0.7887,  0.3536,  1.7694]])
+[[ 2.0561314   1.1592966   2.7883365 ]
+ [-0.7886873   0.35360292  1.7694149 ]]
+[-0.00119581 -0.0058083  -0.02654656  0.00712973 -0.01919779 -0.01425222
+  0.0085908   0.00619372 -0.00130839 -0.0010277 ]
+tensor([-0.0012, -0.0058, -0.0265,  0.0071, -0.0192, -0.0143,  0.0086,  0.0062,
+        -0.0013, -0.0010], dtype=torch.float64)
 
 </pre>
 </div>
 </div>
+</div>
 
-
-<div id="outline-container-org68a6fc4" class="outline-2">
-<h2 id="org68a6fc4"><span class="section-number-2">3</span> 附录</h2>
+<div id="outline-container-org74aba9a" class="outline-2">
+<h2 id="org74aba9a"><span class="section-number-2">3</span> 附录</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 安装 PyTorch 之前最好是配合 Anaconda3 发行版一起安装，安装好 Anaconda 过后直接
@@ -345,8 +357,8 @@ tensor([-0.0076, -0.0107,  0.0085,  0.0066,  0.0249, -0.0041, -0.0058,  0.0151,
 </div>
 </div>
 
-<div id="outline-container-org00be412" class="outline-2">
-<h2 id="org00be412"><span class="section-number-2">4</span> 参考链接</h2>
+<div id="outline-container-orgf43034c" class="outline-2">
+<h2 id="orgf43034c"><span class="section-number-2">4</span> 参考链接</h2>
 <div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li><a href="https://pytorch.org/">PyTorch</a></li>
@@ -358,7 +370,7 @@ tensor([-0.0076, -0.0107,  0.0085,  0.0066,  0.0249, -0.0041, -0.0058,  0.0151,
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-10-12 Mon 20:03. Created by Jinghui Hu at 2020-10-12 Mon 10:48.</p>
+<p class="author">Last Updated 2020-10-12 Mon 20:47. Created by Jinghui Hu at 2020-10-12 Mon 10:48.</p>
 </div>
 </body>
 </html>
