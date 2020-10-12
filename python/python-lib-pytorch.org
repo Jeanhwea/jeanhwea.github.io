@@ -21,21 +21,65 @@
 ** 初始化 tensor
    #+BEGIN_SRC python :session cpython :exports both :results output
      x0 = torch.zeros(2, 3)
-     print(x0)
      x1 = torch.ones(3, 2)
-     print(x1)
      x2 = torch.zeros(2, 3, dtype=torch.long)
+     x3 = torch.Tensor([1.1, 3.0])
+     print(x1)
      print(x2)
+     print(x3)
    #+END_SRC
 
    #+RESULTS:
-   : tensor([[0., 0., 0.],
-   :         [0., 0., 0.]])
    : tensor([[1., 1.],
    :         [1., 1.],
    :         [1., 1.]])
    : tensor([[0, 0, 0],
    :         [0, 0, 0]])
+   : tensor([1.1000, 3.0000])
+
+** tensor 的一些操作
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     x1 = torch.Tensor([1.1, 3.0])
+     print(x1.size())
+   #+END_SRC
+
+   #+RESULTS:
+   : torch.Size([2])
+
+   如果想要 resize 或 reshape 一个 tensor，可以使用 view 方法
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     x1 = torch.randn(24)
+     x2 = x1.view(2, 3, 4)
+     x3 = x1.view(4, -1)
+     print(x2)
+     print(x3)
+   #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+   tensor([[[ 0.6087, -0.4306,  0.4264,  0.3135],
+            [ 0.0280,  0.4296, -0.2920, -0.1361],
+            [-0.1012, -1.0939,  0.8483, -0.8315]],
+
+           [[-0.9144, -0.8749, -0.7776,  0.1115],
+            [ 0.7739,  0.9523, -0.4147, -1.0364],
+            [-0.3476, -0.2074,  0.6170,  0.3816]]])
+   tensor([[ 0.6087, -0.4306,  0.4264,  0.3135,  0.0280,  0.4296],
+           [-0.2920, -0.1361, -0.1012, -1.0939,  0.8483, -0.8315],
+           [-0.9144, -0.8749, -0.7776,  0.1115,  0.7739,  0.9523],
+           [-0.4147, -1.0364, -0.3476, -0.2074,  0.6170,  0.3816]])
+   #+end_example
+
+   如果 tensor 里只有一个数字，item 方法可以把里面的 value 变成 Python 数值
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     x = torch.randn(1)
+     print(x)
+     print(x.item())
+   #+END_SRC
+
+   #+RESULTS:
+   : tensor([0.1705])
+   : 0.1705346405506134
 
 ** tensor 和 ndarray 数据类型互转
    #+BEGIN_SRC python :session cpython :exports both :results output pp
@@ -59,6 +103,23 @@
    :   0.0085908   0.00619372 -0.00130839 -0.0010277 ]
    : tensor([-0.0012, -0.0058, -0.0265,  0.0071, -0.0192, -0.0143,  0.0086,  0.0062,
    :         -0.0013, -0.0010], dtype=torch.float64)
+
+* CUDA Tensor 技术
+  Tensor 可以放在 CUDA 显卡上进行计算
+  #+BEGIN_SRC python :session cpython :exports both :results output pp
+    if torch.cuda.is_available():
+      device = torch.device("cuda")  # a CUDA device object
+      y = torch.ones_like(x, device=device)  # directly create a tensor on GPU
+      x = x.to(device)  # or just use strings ``.to("cuda")``
+      z = x + y
+      print(z)
+      print(z.to("cpu", torch.double))  # ``.to`` can also change dtype together!
+    else:
+      print("gpu is not available")
+  #+END_SRC
+
+  #+RESULTS:
+  : gpu is not available
 
 * 附录
   安装 PyTorch 之前最好是配合 Anaconda3 发行版一起安装，安装好 Anaconda 过后直接
