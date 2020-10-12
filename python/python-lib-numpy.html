@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-09-21 Mon 21:13 -->
+<!-- 2020-10-12 Mon 16:08 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Numpy 科学计算数组工具集</title>
+<title>Numpy</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="Jinghui Hu" />
 <style type="text/css">
@@ -239,40 +239,36 @@ for the JavaScript code in this tag.
  |
  <a accesskey="H" href="../index.html"> HOME </a>
 </div><div id="content">
-<h1 class="title">Numpy 科学计算数组工具集</h1>
+<h1 class="title">Numpy</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org1fb94e2">1. Numpy</a>
+<li><a href="#orgbcf0a3f">1. Numpy</a></li>
+<li><a href="#orga6147be">2. 基本用法</a></li>
+<li><a href="#orgcbdf167">3. 创建数组</a></li>
+<li><a href="#org54711ad">4. 初始化数组</a></li>
+<li><a href="#org8009abb">5. 修改数组维度 Reshape</a></li>
+<li><a href="#orgf911040">6. 拼接数组</a></li>
+<li><a href="#org229aad7">7. 数学操作</a></li>
+<li><a href="#org97a2204">8. 深度复制</a></li>
+<li><a href="#org6832be7">9. 索引</a>
 <ul>
-<li><a href="#org514ccd9">1.1. 安装测试</a></li>
-<li><a href="#org294bcb5">1.2. 基本用法</a></li>
-<li><a href="#org23025e3">1.3. 创建数组</a></li>
-<li><a href="#orge95a39a">1.4. 初始化数组</a></li>
-<li><a href="#orged74f0f">1.5. 修改数组维度 Reshape</a></li>
-<li><a href="#org645e90f">1.6. 拼接数组</a></li>
-<li><a href="#orgdf2900d">1.7. 数学操作</a></li>
-<li><a href="#orgf355867">1.8. 深度复制</a></li>
-<li><a href="#orge99b142">1.9. 索引</a>
-<ul>
-<li><a href="#org3e88ada">1.9.1. 使用 Indices 索引</a></li>
-<li><a href="#org901c724">1.9.2. 使用布尔值索引</a></li>
+<li><a href="#orgb670a59">9.1. 使用 Indices 索引</a></li>
+<li><a href="#org65fc6f1">9.2. 使用布尔值索引</a></li>
 </ul>
 </li>
-<li><a href="#org97f5fbf">1.10. 线性代数</a></li>
-<li><a href="#orgc151ec5">1.11. 直方图</a></li>
-</ul>
-</li>
-<li><a href="#orgd856466">2. 小技巧: 自动 Reshape</a></li>
-<li><a href="#orgc12a18e">3. 参考链接</a></li>
+<li><a href="#org02dabde">10. 线性代数</a></li>
+<li><a href="#org542bf72">11. 直方图</a></li>
+<li><a href="#org3e7b2f3">12. 小技巧: 自动 Reshape</a></li>
+<li><a href="#org18b9c19">13. 安装测试</a></li>
+<li><a href="#orgab76c81">14. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
-
-<div id="outline-container-org1fb94e2" class="outline-2">
-<h2 id="org1fb94e2"><span class="section-number-2">1</span> Numpy</h2>
+<div id="outline-container-orgbcf0a3f" class="outline-2">
+<h2 id="orgbcf0a3f"><span class="section-number-2">1</span> Numpy</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Numpy 是 Python 科学计算的基础包，主要有以下一些功能：
@@ -281,68 +277,132 @@ Numpy 是 Python 科学计算的基础包，主要有以下一些功能：
 <li>N 维数组</li>
 <li>线性代数，傅里叶变换等</li>
 </ol>
-</div>
 
-<div id="outline-container-org514ccd9" class="outline-3">
-<h3 id="org514ccd9"><span class="section-number-3">1.1</span> 安装测试</h3>
-<div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
-<pre class="src src-sh">pip install numpy
-python -c <span style="color: #2aa198;">'import numpy; numpy.test()'</span>
+<pre class="src src-python"><span style="color: #b9ca4a;">import</span> numpy <span style="color: #b9ca4a;">as</span> np
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org294bcb5" class="outline-3">
-<h3 id="org294bcb5"><span class="section-number-3">1.2</span> 基本用法</h3>
-<div class="outline-text-3" id="text-1-2">
+<div id="outline-container-orga6147be" class="outline-2">
+<h2 id="orga6147be"><span class="section-number-2">2</span> 基本用法</h2>
+<div class="outline-text-2" id="text-2">
 <p>
-Numpy 的数组类是 <code>ndarray</code> ，它的别名是 <code>array</code> 。主要 <code>numpy.array</code> 和
-Python 自带的 <code>array.array</code> 是不同的。
+Numpy 的数组类是 <code>ndarray</code> ，它的别名是 <code>array</code> 。主要 <code>numpy.array</code> 和 Python
+自带的 <code>array.array</code> 是不同的。
 </p>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">属性</th>
+<th scope="col" class="org-left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">arr.ndim</td>
+<td class="org-left">维度</td>
+</tr>
+
+<tr>
+<td class="org-left">arr.shape</td>
+<td class="org-left">每个维度的大小</td>
+</tr>
+
+<tr>
+<td class="org-left">arr.size</td>
+<td class="org-left">数组的所有元素个数</td>
+</tr>
+
+<tr>
+<td class="org-left">arr.dtype</td>
+<td class="org-left">元素的数据类型</td>
+</tr>
+
+<tr>
+<td class="org-left">arr.itemsize</td>
+<td class="org-left">每个元素的字节数</td>
+</tr>
+
+<tr>
+<td class="org-left">arr.data</td>
+<td class="org-left">实际数据的引用</td>
+</tr>
+</tbody>
+</table>
+
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
-<span style="color: #6c71c4;">a</span> = np.arange<span style="color: #8d5649;">(</span>15<span style="color: #8d5649;">)</span>.reshape<span style="color: #8d5649;">(</span>3, 5<span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">a</span> = np.arange<span style="color: #8d5649;">(</span>15<span style="color: #8d5649;">)</span>.reshape<span style="color: #8d5649;">(</span>3, 5<span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a
-array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span> 0,  1,  2,  3,  4<span style="color: #9564bf;">]</span>,
-       <span style="color: #9564bf;">[</span> 5,  6,  7,  8,  9<span style="color: #9564bf;">]</span>,
-       <span style="color: #9564bf;">[</span>10, 11, 12, 13, 14<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a.shape
-<span style="color: #8d5649;">(</span>3, 5<span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a.ndim
-2
-&gt;&gt;&gt; a.size
-15
-&gt;&gt;&gt; a.dtype
-dtype<span style="color: #8d5649;">(</span><span style="color: #2aa198;">'int64'</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a.itemsize
-8
-&gt;&gt;&gt;
-&gt;&gt;&gt; <span style="color: #6c71c4;">b</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>6, 7, 8<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">type</span><span style="color: #8d5649;">(</span>a<span style="color: #8d5649;">)</span>
-&lt;<span style="color: #859900;">class</span> <span style="color: #2aa198;">'numpy.ndarray'</span>&gt;
-&gt;&gt;&gt; <span style="color: #6c71c4;">type</span><span style="color: #8d5649;">(</span>b<span style="color: #8d5649;">)</span>
-&lt;<span style="color: #859900;">class</span> <span style="color: #2aa198;">'numpy.ndarray'</span>&gt;
-&gt;&gt;&gt;
+<pre class="src src-python"><span style="color: #e7c547;">a0</span> = np.arange<span style="color: #8d5649;">(</span>24<span style="color: #8d5649;">)</span>.reshape<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>2, 3, 4<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>a0<span style="color: #8d5649;">)</span>
+<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>a0.ndim<span style="color: #8d5649;">)</span>
+<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>a0.shape<span style="color: #8d5649;">)</span>
+<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>a0.size<span style="color: #8d5649;">)</span>
+<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>a0.dtype<span style="color: #8d5649;">)</span>
+<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>a0.itemsize<span style="color: #8d5649;">)</span>
+<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>a0.data<span style="color: #8d5649;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+[[[ 0  1  2  3]
+  [ 4  5  6  7]
+  [ 8  9 10 11]]
+
+ [[12 13 14 15]
+  [16 17 18 19]
+  [20 21 22 23]]]
+3
+(2, 3, 4)
+24
+int32
+4
+&lt;memory at 0x0000021786B458B8&gt;
+</pre>
+
+
+<p>
+np 数组和普通数组的区别
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #e7c547;">a0</span> = <span style="color: #8d5649;">[</span>1, 2, 3<span style="color: #8d5649;">]</span>
+<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>a0<span style="color: #8d5649;">)</span>
+<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span><span style="color: #c397d8;">type</span><span style="color: #d8241f;">(</span>a0<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+<span style="color: #e7c547;">b0</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>6, 7, 8<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span>b0<span style="color: #8d5649;">)</span>
+<span style="color: #b9ca4a;">print</span><span style="color: #8d5649;">(</span><span style="color: #c397d8;">type</span><span style="color: #d8241f;">(</span>b0<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+[1, 2, 3]
+&lt;class 'list'&gt;
+[6 7 8]
+&lt;class 'numpy.ndarray'&gt;
+
 </pre>
 </div>
 </div>
-</div>
 
-<div id="outline-container-org23025e3" class="outline-3">
-<h3 id="org23025e3"><span class="section-number-3">1.3</span> 创建数组</h3>
-<div class="outline-text-3" id="text-1-3">
+<div id="outline-container-orgcbdf167" class="outline-2">
+<h2 id="orgcbdf167"><span class="section-number-2">3</span> 创建数组</h2>
+<div class="outline-text-2" id="text-3">
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">a = np.array(1, 2, 3, 4)    # &#38169;&#35823;&#21019;&#24314;&#26041;&#24335;</span>
-... np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1, 2, 3, 4<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>        <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#27491;&#30830;&#21019;&#24314;&#26041;&#24335;</span>
+<pre class="src src-python">&gt;&gt;&gt; <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">a = np.array(1, 2, 3, 4)    # &#38169;&#35823;&#21019;&#24314;&#26041;&#24335;</span>
+... np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1, 2, 3, 4<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>        <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#27491;&#30830;&#21019;&#24314;&#26041;&#24335;</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1, 2, 3, 4<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 &gt;&gt;&gt; np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">(</span>1.5,2,3<span style="color: #9564bf;">)</span>, <span style="color: #9564bf;">(</span>4,5,6<span style="color: #9564bf;">)</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>1.5, 2. , 3. <span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>4. , 5. , 6. <span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span>1,2<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span>3,4<span style="color: #9564bf;">]</span> <span style="color: #d8241f;">]</span>, dtype=<span style="color: #6c71c4;">complex</span><span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span>1,2<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span>3,4<span style="color: #9564bf;">]</span> <span style="color: #d8241f;">]</span>, dtype=<span style="color: #c397d8;">complex</span><span style="color: #8d5649;">)</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>1.+0.j, 2.+0.j<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>3.+0.j, 4.+0.j<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 </pre>
@@ -350,9 +410,9 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 </div>
 
-<div id="outline-container-orge95a39a" class="outline-3">
-<h3 id="orge95a39a"><span class="section-number-3">1.4</span> 初始化数组</h3>
-<div class="outline-text-3" id="text-1-4">
+<div id="outline-container-org54711ad" class="outline-2">
+<h2 id="org54711ad"><span class="section-number-2">4</span> 初始化数组</h2>
+<div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-python">&gt;&gt;&gt; np.zeros<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>3,4<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>0., 0., 0., 0.<span style="color: #9564bf;">]</span>,
@@ -369,16 +429,16 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 &gt;&gt;&gt; np.empty<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>2,3<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>1.5, 2. , 3. <span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>4. , 5. , 6. <span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; np.arange<span style="color: #8d5649;">(</span>10, 30, 5<span style="color: #8d5649;">)</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">samillar to range()</span>
+&gt;&gt;&gt; np.arange<span style="color: #8d5649;">(</span>10, 30, 5<span style="color: #8d5649;">)</span> <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">samillar to range()</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>10, 15, 20, 25<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; np.arange<span style="color: #8d5649;">(</span>1, 2, 0.3<span style="color: #8d5649;">)</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">but accept float</span>
+&gt;&gt;&gt; np.arange<span style="color: #8d5649;">(</span>1, 2, 0.3<span style="color: #8d5649;">)</span> <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">but accept float</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1. , 1.3, 1.6, 1.9<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 &gt;&gt;&gt;
-&gt;&gt;&gt; <span style="color: #859900;">from</span> numpy <span style="color: #859900;">import</span> pi
+&gt;&gt;&gt; <span style="color: #b9ca4a;">from</span> numpy <span style="color: #b9ca4a;">import</span> pi
 &gt;&gt;&gt; np.linspace<span style="color: #8d5649;">(</span>0, 2, 9<span style="color: #8d5649;">)</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>0.  , 0.25, 0.5 , 0.75, 1.  , 1.25, 1.5 , 1.75, 2.  <span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">x</span> = np.linspace<span style="color: #8d5649;">(</span>0, 2*pi, 10<span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">y</span> = np.sin<span style="color: #8d5649;">(</span>x<span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">x</span> = np.linspace<span style="color: #8d5649;">(</span>0, 2*pi, 10<span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">y</span> = np.sin<span style="color: #8d5649;">(</span>x<span style="color: #8d5649;">)</span>
 &gt;&gt;&gt; x
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>0.        , 0.6981317 , 1.3962634 , 2.0943951 , 2.7925268 ,
        3.4906585 , 4.1887902 , 4.88692191, 5.58505361, 6.28318531<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
@@ -391,9 +451,9 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 </div>
 
-<div id="outline-container-orged74f0f" class="outline-3">
-<h3 id="orged74f0f"><span class="section-number-3">1.5</span> 修改数组维度 Reshape</h3>
-<div class="outline-text-3" id="text-1-5">
+<div id="outline-container-org8009abb" class="outline-2">
+<h2 id="org8009abb"><span class="section-number-2">5</span> 修改数组维度 Reshape</h2>
+<div class="outline-text-2" id="text-5">
 <p>
 可以通过 Reshape 快速地修改 Python 数组的维度，这个方法非常有用
 </p>
@@ -419,23 +479,23 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 </div>
 
-<div id="outline-container-org645e90f" class="outline-3">
-<h3 id="org645e90f"><span class="section-number-3">1.6</span> 拼接数组</h3>
-<div class="outline-text-3" id="text-1-6">
+<div id="outline-container-orgf911040" class="outline-2">
+<h2 id="orgf911040"><span class="section-number-2">6</span> 拼接数组</h2>
+<div class="outline-text-2" id="text-6">
 <p>
 可以使用 vstack 或者 hstack 来拼接数组，不过这样的效率比较低，一般建议直接初始化
 对应大小的数组，然后使用 reshape
 </p>
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #6c71c4;">a2</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1,2,3,4<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+<pre class="src src-python">&gt;&gt;&gt; <span style="color: #e7c547;">a2</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1,2,3,4<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 &gt;&gt;&gt; a2
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1, 2, 3, 4<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">a3</span> = a2.reshape<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>2,-1<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">a3</span> = a2.reshape<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>2,-1<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
 &gt;&gt;&gt; a3
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>1, 2<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>3, 4<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">a4</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>8, 9<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">a5</span> = np.vstack<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>a3, a4<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">a4</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>8, 9<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">a5</span> = np.vstack<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>a3, a4<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
 &gt;&gt;&gt; a5
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>1, 2<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>3, 4<span style="color: #9564bf;">]</span>,
@@ -450,23 +510,23 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 </div>
 
-<div id="outline-container-orgdf2900d" class="outline-3">
-<h3 id="orgdf2900d"><span class="section-number-3">1.7</span> 数学操作</h3>
-<div class="outline-text-3" id="text-1-7">
+<div id="outline-container-org229aad7" class="outline-2">
+<h2 id="org229aad7"><span class="section-number-2">7</span> 数学操作</h2>
+<div class="outline-text-2" id="text-7">
 <p>
 Numpy 重载了 Python 的数学操作符，基本操作如下
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #6c71c4;">a</span> = np.array<span style="color: #8d5649;">(</span> <span style="color: #d8241f;">[</span>20,30,40,50<span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">b</span> = np.arange<span style="color: #8d5649;">(</span>4<span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">c</span> = a-b
-&gt;&gt;&gt; b**2  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#24130;&#36816;&#31639;</span>
+<pre class="src src-python">&gt;&gt;&gt; <span style="color: #e7c547;">a</span> = np.array<span style="color: #8d5649;">(</span> <span style="color: #d8241f;">[</span>20,30,40,50<span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">b</span> = np.arange<span style="color: #8d5649;">(</span>4<span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">c</span> = a-b
+&gt;&gt;&gt; b**2  <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#24130;&#36816;&#31639;</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>0, 1, 4, 9<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 &gt;&gt;&gt; 10*np.sin<span style="color: #8d5649;">(</span>a<span style="color: #8d5649;">)</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> 9.12945251, -9.88031624,  7.4511316 , -2.62374854<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a&lt;35  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#23545; a &#20013;&#27599;&#20010;&#20803;&#32032;&#24212;&#29992;&#26465;&#20214;&#34920;&#36798;&#24335;</span>
-array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> <span style="color: #268bd2;">True</span>,  <span style="color: #268bd2;">True</span>, <span style="color: #268bd2;">False</span>, <span style="color: #268bd2;">False</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; a&lt;35  <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">&#23545; a &#20013;&#27599;&#20010;&#20803;&#32032;&#24212;&#29992;&#26465;&#20214;&#34920;&#36798;&#24335;</span>
+array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> <span style="color: #7aa6da;">True</span>,  <span style="color: #7aa6da;">True</span>, <span style="color: #7aa6da;">False</span>, <span style="color: #7aa6da;">False</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 </pre>
 </div>
 
@@ -474,17 +534,17 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 矩阵的乘法和矩阵里面每个元素相乘
 </p>
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #6c71c4;">A</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>1,1<span style="color: #9564bf;">]</span>,
+<pre class="src src-python">&gt;&gt;&gt; <span style="color: #e7c547;">A</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>1,1<span style="color: #9564bf;">]</span>,
 ...               <span style="color: #9564bf;">[</span>0,1<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">B</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>2,0<span style="color: #9564bf;">]</span>,
+&gt;&gt;&gt; <span style="color: #e7c547;">B</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>2,0<span style="color: #9564bf;">]</span>,
 ...               <span style="color: #9564bf;">[</span>3,4<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; A * B                       <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">elementwise product</span>
+&gt;&gt;&gt; A * B                       <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">elementwise product</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>2, 0<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>0, 4<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; A @ B                       <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">matrix product</span>
+&gt;&gt;&gt; A @ B                       <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">matrix product</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>5, 4<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>3, 4<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; A.dot<span style="color: #8d5649;">(</span>B<span style="color: #8d5649;">)</span>                    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">another matrix product</span>
+&gt;&gt;&gt; A.dot<span style="color: #8d5649;">(</span>B<span style="color: #8d5649;">)</span>                    <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">another matrix product</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>5, 4<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>3, 4<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 &gt;&gt;&gt;
@@ -492,15 +552,15 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #6c71c4;">a</span> = np.random.random<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>2,3<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+<pre class="src src-python">&gt;&gt;&gt; <span style="color: #e7c547;">a</span> = np.random.random<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>2,3<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
 &gt;&gt;&gt; a
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>0.54468729, 0.03709586, 0.65467565<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>0.56025666, 0.39270547, 0.51565504<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a.<span style="color: #6c71c4;">sum</span><span style="color: #8d5649;">()</span>
+&gt;&gt;&gt; a.<span style="color: #c397d8;">sum</span><span style="color: #8d5649;">()</span>
 2.705075965630731
-&gt;&gt;&gt; a.<span style="color: #6c71c4;">min</span><span style="color: #8d5649;">()</span>
+&gt;&gt;&gt; a.<span style="color: #c397d8;">min</span><span style="color: #8d5649;">()</span>
 0.037095859583547
-&gt;&gt;&gt; a.<span style="color: #6c71c4;">max</span><span style="color: #8d5649;">()</span>
+&gt;&gt;&gt; a.<span style="color: #c397d8;">max</span><span style="color: #8d5649;">()</span>
 0.6546756487343482
 &gt;&gt;&gt;
 </pre>
@@ -508,19 +568,19 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 </div>
 
-<div id="outline-container-orgf355867" class="outline-3">
-<h3 id="orgf355867"><span class="section-number-3">1.8</span> 深度复制</h3>
-<div class="outline-text-3" id="text-1-8">
+<div id="outline-container-org97a2204" class="outline-2">
+<h2 id="org97a2204"><span class="section-number-2">8</span> 深度复制</h2>
+<div class="outline-text-2" id="text-8">
 <div class="org-src-container">
 <pre class="src src-python">&gt;&gt;&gt; a
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>0.54468729, 0.03709586, 0.65467565<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>0.56025666, 0.39270547, 0.51565504<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">d</span> = a.copy<span style="color: #8d5649;">()</span>                          <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">a new array object with new data is created</span>
-&gt;&gt;&gt; d <span style="color: #859900;">is</span> a
-<span style="color: #268bd2;">False</span>
-&gt;&gt;&gt; d.base <span style="color: #859900;">is</span> a                           <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">d doesn't share anything with a</span>
-<span style="color: #268bd2;">False</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">d</span><span style="color: #8d5649;">[</span>0,0<span style="color: #8d5649;">]</span> = 9999
+&gt;&gt;&gt; <span style="color: #e7c547;">d</span> = a.copy<span style="color: #8d5649;">()</span>                          <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">a new array object with new data is created</span>
+&gt;&gt;&gt; d <span style="color: #b9ca4a;">is</span> a
+<span style="color: #7aa6da;">False</span>
+&gt;&gt;&gt; d.base <span style="color: #b9ca4a;">is</span> a                           <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">d doesn't share anything with a</span>
+<span style="color: #7aa6da;">False</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">d</span><span style="color: #8d5649;">[</span>0,0<span style="color: #8d5649;">]</span> = 9999
 &gt;&gt;&gt; d
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>9.99900000e+03, 3.70958596e-02, 6.54675649e-01<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>5.60256661e-01, 3.92705465e-01, 5.15655039e-01<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
@@ -533,22 +593,22 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 </div>
 
-<div id="outline-container-orge99b142" class="outline-3">
-<h3 id="orge99b142"><span class="section-number-3">1.9</span> 索引</h3>
-<div class="outline-text-3" id="text-1-9">
+<div id="outline-container-org6832be7" class="outline-2">
+<h2 id="org6832be7"><span class="section-number-2">9</span> 索引</h2>
+<div class="outline-text-2" id="text-9">
 </div>
-<div id="outline-container-org3e88ada" class="outline-4">
-<h4 id="org3e88ada"><span class="section-number-4">1.9.1</span> 使用 Indices 索引</h4>
-<div class="outline-text-4" id="text-1-9-1">
+<div id="outline-container-orgb670a59" class="outline-3">
+<h3 id="orgb670a59"><span class="section-number-3">9.1</span> 使用 Indices 索引</h3>
+<div class="outline-text-3" id="text-9-1">
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #6c71c4;">a</span> = np.arange<span style="color: #8d5649;">(</span>12<span style="color: #8d5649;">)</span>**2                       <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">the first 12 square numbers</span>
+<pre class="src src-python">&gt;&gt;&gt; <span style="color: #e7c547;">a</span> = np.arange<span style="color: #8d5649;">(</span>12<span style="color: #8d5649;">)</span>**2                       <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">the first 12 square numbers</span>
 &gt;&gt;&gt; a
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>  0,   1,   4,   9,  16,  25,  36,  49,  64,  81, 100, 121<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">i</span> = np.array<span style="color: #8d5649;">(</span> <span style="color: #d8241f;">[</span> 1,1,3,8,5 <span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>              <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">an array of indices</span>
-&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>i<span style="color: #8d5649;">]</span>                                <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">the elements of a at the positions i</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">i</span> = np.array<span style="color: #8d5649;">(</span> <span style="color: #d8241f;">[</span> 1,1,3,8,5 <span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>              <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">an array of indices</span>
+&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>i<span style="color: #8d5649;">]</span>                                <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">the elements of a at the positions i</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> 1,  1,  9, 64, 25<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">j</span> = np.array<span style="color: #8d5649;">(</span> <span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span> 3, 4<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span> 9, 7 <span style="color: #9564bf;">]</span> <span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>      <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">a bidimensional array of indices</span>
-&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>j<span style="color: #8d5649;">]</span>                                <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">the same shape as j</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">j</span> = np.array<span style="color: #8d5649;">(</span> <span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span> 3, 4<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span> 9, 7 <span style="color: #9564bf;">]</span> <span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>      <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">a bidimensional array of indices</span>
+&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>j<span style="color: #8d5649;">]</span>                                <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">the same shape as j</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span> 9, 16<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>81, 49<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 &gt;&gt;&gt;
@@ -559,14 +619,14 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 使用下标来掩码
 </p>
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #6c71c4;">palette</span> = np.array<span style="color: #8d5649;">(</span> <span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span>0,0,0<span style="color: #9564bf;">]</span>,            <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">black</span>
-...                       <span style="color: #9564bf;">[</span>255,0,0<span style="color: #9564bf;">]</span>,          <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">red</span>
-...                       <span style="color: #9564bf;">[</span>0,255,0<span style="color: #9564bf;">]</span>,          <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">green</span>
-...                       <span style="color: #9564bf;">[</span>0,0,255<span style="color: #9564bf;">]</span>,          <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">blue</span>
-...                       <span style="color: #9564bf;">[</span>255,255,255<span style="color: #9564bf;">]</span> <span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>   <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">white</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">image</span> = np.array<span style="color: #8d5649;">(</span> <span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span> 0, 1, 2, 0 <span style="color: #9564bf;">]</span>,       <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">each value corresponds to a color in the palette</span>
+<pre class="src src-python">&gt;&gt;&gt; <span style="color: #e7c547;">palette</span> = np.array<span style="color: #8d5649;">(</span> <span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span>0,0,0<span style="color: #9564bf;">]</span>,            <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">black</span>
+...                       <span style="color: #9564bf;">[</span>255,0,0<span style="color: #9564bf;">]</span>,          <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">red</span>
+...                       <span style="color: #9564bf;">[</span>0,255,0<span style="color: #9564bf;">]</span>,          <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">green</span>
+...                       <span style="color: #9564bf;">[</span>0,0,255<span style="color: #9564bf;">]</span>,          <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">blue</span>
+...                       <span style="color: #9564bf;">[</span>255,255,255<span style="color: #9564bf;">]</span> <span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>   <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">white</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">image</span> = np.array<span style="color: #8d5649;">(</span> <span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span> 0, 1, 2, 0 <span style="color: #9564bf;">]</span>,       <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">each value corresponds to a color in the palette</span>
 ...                     <span style="color: #9564bf;">[</span> 0, 3, 4, 0 <span style="color: #9564bf;">]</span>  <span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; palette<span style="color: #8d5649;">[</span>image<span style="color: #8d5649;">]</span>                            <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">the (2,4,3) color image</span>
+&gt;&gt;&gt; palette<span style="color: #8d5649;">[</span>image<span style="color: #8d5649;">]</span>                            <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">the (2,4,3) color image</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span><span style="color: #24a222;">[</span>  0,   0,   0<span style="color: #24a222;">]</span>,
         <span style="color: #24a222;">[</span>255,   0,   0<span style="color: #24a222;">]</span>,
         <span style="color: #24a222;">[</span>  0, 255,   0<span style="color: #24a222;">]</span>,
@@ -581,18 +641,18 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #6c71c4;">a</span> = np.arange<span style="color: #8d5649;">(</span>12<span style="color: #8d5649;">)</span>.reshape<span style="color: #8d5649;">(</span>3,4<span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">i</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span>0,1<span style="color: #9564bf;">]</span>,                  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">indices for the first dim of a</span>
+<pre class="src src-python">&gt;&gt;&gt; <span style="color: #e7c547;">a</span> = np.arange<span style="color: #8d5649;">(</span>12<span style="color: #8d5649;">)</span>.reshape<span style="color: #8d5649;">(</span>3,4<span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">i</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span>0,1<span style="color: #9564bf;">]</span>,                  <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">indices for the first dim of a</span>
 ...                <span style="color: #9564bf;">[</span>1,2<span style="color: #9564bf;">]</span> <span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">j</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span>2,1<span style="color: #9564bf;">]</span>,                  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">indices for the second dim</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">j</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> <span style="color: #9564bf;">[</span>2,1<span style="color: #9564bf;">]</span>,                  <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">indices for the second dim</span>
 ...                <span style="color: #9564bf;">[</span>3,3<span style="color: #9564bf;">]</span> <span style="color: #d8241f;">]</span> <span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>i,j<span style="color: #8d5649;">]</span>                                 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">i and j must have equal shape</span>
+&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>i,j<span style="color: #8d5649;">]</span>                                 <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">i and j must have equal shape</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span> 2,  5<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span> 7, 11<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 &gt;&gt;&gt; a<span style="color: #8d5649;">[</span>i,2<span style="color: #8d5649;">]</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span> 2,  6<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span> 6, 10<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>:,j<span style="color: #8d5649;">]</span>                                 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">i.e., a[ : , j]</span>
+&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>:,j<span style="color: #8d5649;">]</span>                                 <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">i.e., a[ : , j]</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span><span style="color: #24a222;">[</span> 2,  1<span style="color: #24a222;">]</span>,
         <span style="color: #24a222;">[</span> 3,  3<span style="color: #24a222;">]</span><span style="color: #9564bf;">]</span>,
 
@@ -607,19 +667,19 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 </div>
 
-<div id="outline-container-org901c724" class="outline-4">
-<h4 id="org901c724"><span class="section-number-4">1.9.2</span> 使用布尔值索引</h4>
-<div class="outline-text-4" id="text-1-9-2">
+<div id="outline-container-org65fc6f1" class="outline-3">
+<h3 id="org65fc6f1"><span class="section-number-3">9.2</span> 使用布尔值索引</h3>
+<div class="outline-text-3" id="text-9-2">
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #6c71c4;">a</span> = np.arange<span style="color: #8d5649;">(</span>12<span style="color: #8d5649;">)</span>.reshape<span style="color: #8d5649;">(</span>3,4<span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">b</span> = a &gt; 4
-&gt;&gt;&gt; b                        <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">b is a boolean with a's shape</span>
-array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span><span style="color: #268bd2;">False</span>, <span style="color: #268bd2;">False</span>, <span style="color: #268bd2;">False</span>, <span style="color: #268bd2;">False</span><span style="color: #9564bf;">]</span>,
-       <span style="color: #9564bf;">[</span><span style="color: #268bd2;">False</span>,  <span style="color: #268bd2;">True</span>,  <span style="color: #268bd2;">True</span>,  <span style="color: #268bd2;">True</span><span style="color: #9564bf;">]</span>,
-       <span style="color: #9564bf;">[</span> <span style="color: #268bd2;">True</span>,  <span style="color: #268bd2;">True</span>,  <span style="color: #268bd2;">True</span>,  <span style="color: #268bd2;">True</span><span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>b<span style="color: #8d5649;">]</span>                     <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">1d array with the selected elements</span>
+<pre class="src src-python">&gt;&gt;&gt; <span style="color: #e7c547;">a</span> = np.arange<span style="color: #8d5649;">(</span>12<span style="color: #8d5649;">)</span>.reshape<span style="color: #8d5649;">(</span>3,4<span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">b</span> = a &gt; 4
+&gt;&gt;&gt; b                        <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">b is a boolean with a's shape</span>
+array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span><span style="color: #7aa6da;">False</span>, <span style="color: #7aa6da;">False</span>, <span style="color: #7aa6da;">False</span>, <span style="color: #7aa6da;">False</span><span style="color: #9564bf;">]</span>,
+       <span style="color: #9564bf;">[</span><span style="color: #7aa6da;">False</span>,  <span style="color: #7aa6da;">True</span>,  <span style="color: #7aa6da;">True</span>,  <span style="color: #7aa6da;">True</span><span style="color: #9564bf;">]</span>,
+       <span style="color: #9564bf;">[</span> <span style="color: #7aa6da;">True</span>,  <span style="color: #7aa6da;">True</span>,  <span style="color: #7aa6da;">True</span>,  <span style="color: #7aa6da;">True</span><span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>b<span style="color: #8d5649;">]</span>                     <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">1d array with the selected elements</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> 5,  6,  7,  8,  9, 10, 11<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">a</span><span style="color: #8d5649;">[</span>b<span style="color: #8d5649;">]</span> = 0                 <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">All elements of 'a' higher than 4 become 0</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">a</span><span style="color: #8d5649;">[</span>b<span style="color: #8d5649;">]</span> = 0                 <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">All elements of 'a' higher than 4 become 0</span>
 &gt;&gt;&gt; a
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>0, 1, 2, 3<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span>4, 0, 0, 0<span style="color: #9564bf;">]</span>,
@@ -632,24 +692,24 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 多个维度的索引
 </p>
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #6c71c4;">a</span> = np.arange<span style="color: #8d5649;">(</span>12<span style="color: #8d5649;">)</span>.reshape<span style="color: #8d5649;">(</span>3,4<span style="color: #8d5649;">)</span>
+<pre class="src src-python">&gt;&gt;&gt; <span style="color: #e7c547;">a</span> = np.arange<span style="color: #8d5649;">(</span>12<span style="color: #8d5649;">)</span>.reshape<span style="color: #8d5649;">(</span>3,4<span style="color: #8d5649;">)</span>
 &gt;&gt;&gt; a
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span> 0,  1,  2,  3<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span> 4,  5,  6,  7<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span> 8,  9, 10, 11<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">b1</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #268bd2;">False</span>,<span style="color: #268bd2;">True</span>,<span style="color: #268bd2;">True</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>          <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">first dim selection</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">b2</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #268bd2;">True</span>,<span style="color: #268bd2;">False</span>,<span style="color: #268bd2;">True</span>,<span style="color: #268bd2;">False</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>    <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">second dim selection</span>
-&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>b1,:<span style="color: #8d5649;">]</span>                                   <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">selecting rows</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">b1</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #7aa6da;">False</span>,<span style="color: #7aa6da;">True</span>,<span style="color: #7aa6da;">True</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>          <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">first dim selection</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">b2</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #7aa6da;">True</span>,<span style="color: #7aa6da;">False</span>,<span style="color: #7aa6da;">True</span>,<span style="color: #7aa6da;">False</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>    <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">second dim selection</span>
+&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>b1,:<span style="color: #8d5649;">]</span>                                   <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">selecting rows</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span> 4,  5,  6,  7<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span> 8,  9, 10, 11<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>b1<span style="color: #8d5649;">]</span>                                     <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">same thing</span>
+&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>b1<span style="color: #8d5649;">]</span>                                     <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">same thing</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span> 4,  5,  6,  7<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span> 8,  9, 10, 11<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>:,b2<span style="color: #8d5649;">]</span>                                   <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">selecting columns</span>
+&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>:,b2<span style="color: #8d5649;">]</span>                                   <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">selecting columns</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span> 0,  2<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span> 4,  6<span style="color: #9564bf;">]</span>,
        <span style="color: #9564bf;">[</span> 8, 10<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>b1,b2<span style="color: #8d5649;">]</span>                                  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">a weird thing to do</span>
+&gt;&gt;&gt; a<span style="color: #8d5649;">[</span>b1,b2<span style="color: #8d5649;">]</span>                                  <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">a weird thing to do</span>
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> 4, 10<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 &gt;&gt;&gt;
 </pre>
@@ -658,18 +718,18 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 </div>
 
-<div id="outline-container-org97f5fbf" class="outline-3">
-<h3 id="org97f5fbf"><span class="section-number-3">1.10</span> 线性代数</h3>
-<div class="outline-text-3" id="text-1-10">
+<div id="outline-container-org02dabde" class="outline-2">
+<h2 id="org02dabde"><span class="section-number-2">10</span> 线性代数</h2>
+<div class="outline-text-2" id="text-10">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #6c71c4;">a</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>1.0, 2.0<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span>3.0, 4.0<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+<pre class="src src-python"><span style="color: #e7c547;">a</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>1.0, 2.0<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span>3.0, 4.0<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 a.transpose<span style="color: #8d5649;">()</span>
 np.linalg.inv<span style="color: #8d5649;">(</span>a<span style="color: #8d5649;">)</span>
-<span style="color: #6c71c4;">u</span> = np.eye<span style="color: #8d5649;">(</span>2<span style="color: #8d5649;">)</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">unit 2x2 matrix; "eye" represents "I"</span>
-<span style="color: #6c71c4;">j</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>0.0, -1.0<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span>1.0, 0.0<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-j @ j        <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">matrix product</span>
-np.trace<span style="color: #8d5649;">(</span>u<span style="color: #8d5649;">)</span>  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">trace</span>
-<span style="color: #6c71c4;">y</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>5.<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span>7.<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+<span style="color: #e7c547;">u</span> = np.eye<span style="color: #8d5649;">(</span>2<span style="color: #8d5649;">)</span> <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">unit 2x2 matrix; "eye" represents "I"</span>
+<span style="color: #e7c547;">j</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>0.0, -1.0<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span>1.0, 0.0<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+j @ j        <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">matrix product</span>
+np.trace<span style="color: #8d5649;">(</span>u<span style="color: #8d5649;">)</span>  <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">trace</span>
+<span style="color: #e7c547;">y</span> = np.array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>5.<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span>7.<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 np.linalg.solve<span style="color: #8d5649;">(</span>a, y<span style="color: #8d5649;">)</span>
 np.linalg.eig<span style="color: #8d5649;">(</span>j<span style="color: #8d5649;">)</span>
 </pre>
@@ -677,57 +737,56 @@ np.linalg.eig<span style="color: #8d5649;">(</span>j<span style="color: #8d5649;
 </div>
 </div>
 
-<div id="outline-container-orgc151ec5" class="outline-3">
-<h3 id="orgc151ec5"><span class="section-number-3">1.11</span> 直方图</h3>
-<div class="outline-text-3" id="text-1-11">
+<div id="outline-container-org542bf72" class="outline-2">
+<h2 id="org542bf72"><span class="section-number-2">11</span> 直方图</h2>
+<div class="outline-text-2" id="text-11">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
-<span style="color: #859900;">import</span> matplotlib.pyplot <span style="color: #859900;">as</span> plt
-<span style="color: #6c71c4;">filename</span> = <span style="color: #2aa198;">'../static/image/2018/10/numpy1.png'</span>
+<pre class="src src-python"><span style="color: #b9ca4a;">import</span> numpy <span style="color: #b9ca4a;">as</span> np
+<span style="color: #b9ca4a;">import</span> matplotlib.pyplot <span style="color: #b9ca4a;">as</span> plt
+<span style="color: #e7c547;">filename</span> = <span style="color: #70c0b1;">'../static/image/2018/10/numpy1.png'</span>
 
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">Build a vector of 10000 normal deviates with variance 0.5^2 and mean 2</span>
-<span style="color: #6c71c4;">mu</span>, <span style="color: #6c71c4;">sigma</span> = 2, 0.5
-<span style="color: #6c71c4;">v</span> = np.random.normal<span style="color: #8d5649;">(</span>mu,sigma,10000<span style="color: #8d5649;">)</span>
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">Plot a normalized histogram with 50 bins</span>
-plt.hist<span style="color: #8d5649;">(</span>v, bins=50, density=1<span style="color: #8d5649;">)</span>       <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">matplotlib version (plot)</span>
+<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">Build a vector of 10000 normal deviates with variance 0.5^2 and mean 2</span>
+<span style="color: #e7c547;">mu</span>, <span style="color: #e7c547;">sigma</span> = 2, 0.5
+<span style="color: #e7c547;">v</span> = np.random.normal<span style="color: #8d5649;">(</span>mu,sigma,10000<span style="color: #8d5649;">)</span>
+<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">Plot a normalized histogram with 50 bins</span>
+plt.hist<span style="color: #8d5649;">(</span>v, bins=50, density=1<span style="color: #8d5649;">)</span>       <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">matplotlib version (plot)</span>
 plt.savefig<span style="color: #8d5649;">(</span>filename<span style="color: #8d5649;">)</span>
-<span style="color: #859900;">return</span> filename
+<span style="color: #b9ca4a;">return</span> filename
 </pre>
 </div>
 
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
-<span style="color: #859900;">import</span> matplotlib.pyplot <span style="color: #859900;">as</span> plt
-<span style="color: #6c71c4;">filename</span> = <span style="color: #2aa198;">'../static/image/2018/10/numpy2.png'</span>
+<pre class="src src-python"><span style="color: #b9ca4a;">import</span> numpy <span style="color: #b9ca4a;">as</span> np
+<span style="color: #b9ca4a;">import</span> matplotlib.pyplot <span style="color: #b9ca4a;">as</span> plt
+<span style="color: #e7c547;">filename</span> = <span style="color: #70c0b1;">'../static/image/2018/10/numpy2.png'</span>
 
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">Build a vector of 10000 normal deviates with variance 0.5^2 and mean 2</span>
-<span style="color: #6c71c4;">mu</span>, <span style="color: #6c71c4;">sigma</span> = 2, 0.5
-<span style="color: #6c71c4;">v</span> = np.random.normal<span style="color: #8d5649;">(</span>mu,sigma,10000<span style="color: #8d5649;">)</span>
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">Compute the histogram with numpy and then plot it</span>
-<span style="color: #8d5649;">(</span>n, bins<span style="color: #8d5649;">)</span> = np.histogram<span style="color: #8d5649;">(</span>v, bins=50, density=<span style="color: #268bd2;">True</span><span style="color: #8d5649;">)</span>  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">NumPy version (no plot)</span>
+<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">Build a vector of 10000 normal deviates with variance 0.5^2 and mean 2</span>
+<span style="color: #e7c547;">mu</span>, <span style="color: #e7c547;">sigma</span> = 2, 0.5
+<span style="color: #e7c547;">v</span> = np.random.normal<span style="color: #8d5649;">(</span>mu,sigma,10000<span style="color: #8d5649;">)</span>
+<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">Compute the histogram with numpy and then plot it</span>
+<span style="color: #8d5649;">(</span>n, bins<span style="color: #8d5649;">)</span> = np.histogram<span style="color: #8d5649;">(</span>v, bins=50, density=<span style="color: #7aa6da;">True</span><span style="color: #8d5649;">)</span>  <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">NumPy version (no plot)</span>
 plt.plot<span style="color: #8d5649;">(</span>.5*<span style="color: #d8241f;">(</span>bins<span style="color: #9564bf;">[</span>1:<span style="color: #9564bf;">]</span>+bins<span style="color: #9564bf;">[</span>:-1<span style="color: #9564bf;">]</span><span style="color: #d8241f;">)</span>, n<span style="color: #8d5649;">)</span>
 plt.savefig<span style="color: #8d5649;">(</span>filename<span style="color: #8d5649;">)</span>
-<span style="color: #859900;">return</span> filename
+<span style="color: #b9ca4a;">return</span> filename
 </pre>
 </div>
 </div>
 </div>
-</div>
 
-<div id="outline-container-orgd856466" class="outline-2">
-<h2 id="orgd856466"><span class="section-number-2">2</span> 小技巧: 自动 Reshape</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-org3e7b2f3" class="outline-2">
+<h2 id="org3e7b2f3"><span class="section-number-2">12</span> 小技巧: 自动 Reshape</h2>
+<div class="outline-text-2" id="text-12">
 <p>
 当给出数组的维度为 -1 时，代表需要自推导维度大小
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python">&gt;&gt;&gt; <span style="color: #6c71c4;">a</span> = np.arange<span style="color: #8d5649;">(</span>30<span style="color: #8d5649;">)</span>
+<pre class="src src-python">&gt;&gt;&gt; <span style="color: #e7c547;">a</span> = np.arange<span style="color: #8d5649;">(</span>30<span style="color: #8d5649;">)</span>
 &gt;&gt;&gt; a
 array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span> 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
        17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
-&gt;&gt;&gt; <span style="color: #6c71c4;">a.shape</span> = 2,-1,3  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">-1 means "whatever is needed"</span>
+&gt;&gt;&gt; <span style="color: #e7c547;">a.shape</span> = 2,-1,3  <span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">-1 means "whatever is needed"</span>
 &gt;&gt;&gt; a.shape
 <span style="color: #8d5649;">(</span>2, 5, 3<span style="color: #8d5649;">)</span>
 &gt;&gt;&gt; a
@@ -748,9 +807,20 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 </div>
 
-<div id="outline-container-orgc12a18e" class="outline-2">
-<h2 id="orgc12a18e"><span class="section-number-2">3</span> 参考链接</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-org18b9c19" class="outline-2">
+<h2 id="org18b9c19"><span class="section-number-2">13</span> 安装测试</h2>
+<div class="outline-text-2" id="text-13">
+<div class="org-src-container">
+<pre class="src src-sh">pip install numpy
+python -c <span style="color: #70c0b1;">'import numpy; numpy.test()'</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgab76c81" class="outline-2">
+<h2 id="orgab76c81"><span class="section-number-2">14</span> 参考链接</h2>
+<div class="outline-text-2" id="text-14">
 <ol class="org-ol">
 <li><a href="http://www.numpy.org/">Numpy</a></li>
 <li><a href="https://github.com/numpy/numpy.git">Numpy on Github</a></li>
@@ -761,7 +831,7 @@ array<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-09-21 Mon 21:13. Created by Jinghui Hu at 2018-10-26 Fri 11:04.</p>
+<p class="author">Last Updated 2020-10-12 Mon 16:08. Created by Jinghui Hu at 2018-10-26 Fri 11:04.</p>
 </div>
 </body>
 </html>
