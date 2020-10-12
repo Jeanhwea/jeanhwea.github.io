@@ -114,6 +114,28 @@
   #+RESULTS:
   : [(0.0, 0.0), (0.6981317007977318, 0.6427876096865393), (1.3962634015954636, 0.984807753012208), (2.0943951023931953, 0.8660254037844387), (2.792526803190927, 0.3420201433256689), (3.490658503988659, -0.34202014332566866), (4.1887902047863905, -0.8660254037844385), (4.886921905584122, -0.9848077530122081), (5.585053606381854, -0.6427876096865396), (6.283185307179586, -2.4492935982947064e-16)]
 
+  随机生成数组
+  #+BEGIN_SRC python :session cpython :exports both :results output pp
+    a0 = np.random.random((2, 3))
+    print(a0)
+    print(a0.min(), a0.max())
+    print(a0.sum())
+    print(a0.mean())
+
+    a1 = np.random.normal(0, 0.1, 10)  # mu, sigma, count
+    print(a1[a1 > 0])
+    print(a1.mean())
+  #+END_SRC
+
+  #+RESULTS:
+  : [[0.9252851  0.7129627  0.40223125]
+  :  [0.90696639 0.43173784 0.03253335]]
+  : 0.0325333525900483 0.9252851004000952
+  : 3.4117166388143234
+  : 0.5686194398023873
+  : [0.11057307 0.07345595 0.06929216 0.13555647]
+  : -0.03848054532856991
+
   可以通过 Reshape 快速地修改 Python 数组的维度，这个方法非常有用
   #+BEGIN_SRC python :session cpython :exports both :results output pp
     a1 = np.arange(12)
@@ -150,26 +172,22 @@
   化对应大小的数组，然后使用 reshape
   #+BEGIN_SRC python :session cpython :exports both :results output pp
     a1 = np.arange(4).reshape((2, -1))
-    print(a1)
+    a2 = a1 + 20
 
-    a2 = np.array([8, 9])
     a3 = np.vstack((a1, a2))
     print(a3)
 
-    a4 = np.vstack((a2, a3 * 2))
+    a4 = np.hstack((a1, a2))
     print(a4)
   #+END_SRC
 
   #+RESULTS:
-  : [[0 1]
-  :  [2 3]]
-  : [[0 1]
-  :  [2 3]
-  :  [8 9]]
-  : [[ 8  9]
-  :  [ 0  2]
-  :  [ 4  6]
-  :  [16 18]]
+  : [[ 0  1]
+  :  [ 2  3]
+  :  [20 21]
+  :  [22 23]]
+  : [[ 0  1 20 21]
+  :  [ 2  3 22 23]]
 
 * 基本运算和矩阵相关算法
   Numpy 重载了 Python 的数学操作符，基本操作如下
@@ -220,7 +238,7 @@
   基本线性代数的操作
   #+BEGIN_SRC python :session cpython :exports both :results output pp
     a0 = np.array([[1.0, 2.0], [3.0, 4.0]])
-    a1 = a0.transpose()
+    a1 = a0.T # same as a0.transpose()
     print(a1)
 
     a2 = np.linalg.inv(a0)
@@ -413,7 +431,6 @@
 
   #+RESULTS:
   [[file:../static/image/2018/10/numpy2.png]]
-
 
 * 安装 Numpy 和测试
   使用 pip 安装
