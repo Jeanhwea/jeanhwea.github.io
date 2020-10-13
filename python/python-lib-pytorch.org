@@ -107,8 +107,10 @@
 * CUDA Tensor 技术
   Tensor 可以放在 CUDA 显卡上进行计算
   #+BEGIN_SRC python :session cpython :exports both :results output pp
+    x = torch.randn(2, 3)
+    print(x)
     if torch.cuda.is_available():
-      device = torch.device("cuda")  # a CUDA device object
+      device = torch.device("cuda:0")  # a CUDA device object
       y = torch.ones_like(x, device=device)  # directly create a tensor on GPU
       x = x.to(device)  # or just use strings ``.to("cuda")``
       z = x + y
@@ -119,7 +121,13 @@
   #+END_SRC
 
   #+RESULTS:
-  : gpu is not available
+  : tensor([[ 1.2142,  0.8536, -1.6339],
+  :         [ 0.8418,  0.5016, -1.7826]])
+  : Traceback (most recent call last):
+  :   File "<stdin>", line 1, in <module>
+  :   File "c:/Users/admin/AppData/Local/Temp/babel-IzNpoW/python-VuciIy", line 5, in <module>
+  :     y = torch.ones_like(x, device=device)  # directly create a tensor on GPU
+  : RuntimeError: CUDA error: no kernel image is available for execution on the device
 
 * 附录
   安装 PyTorch 之前最好是配合 Anaconda3 发行版一起安装，安装好 Anaconda 过后直接
