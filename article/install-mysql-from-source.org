@@ -71,6 +71,11 @@
       chmod +x /etc/init.d/mysqld
   #+END_SRC
 
+  启动 MySQL 服务器进程
+  #+BEGIN_SRC sh
+    service mysqld start
+  #+END_SRC
+
   登录进去重置密码
   #+BEGIN_SRC text
     [root@sr650 mysql]# mysql -uroot -p
@@ -93,19 +98,19 @@
     mysql>
   #+END_SRC
 
+** 配置数据库
   添加配置文件 =/etc/my.cnf=
   #+BEGIN_SRC conf
     [mysqld]
-    datadir        = /usr/local/mysql
-    socket         = /usr/local/mysql/mysql.sock
-    pid-file       = /usr/local/mysql/mysqld.pid
-    log-error      = /usr/local/mysql/error.log
+    datadir   = /usr/local/mysql
+    socket    = /usr/local/mysql/mysql.sock
+    pid-file  = /usr/local/mysql/mysqld.pid
+    log-error = /usr/local/mysql/error.log
 
     # Disabling symbolic-links is recommended to prevent assorted security risks
     symbolic-links = 0
-  #+END_SRC
 
-  启动 MySQL 服务器进程
-  #+BEGIN_SRC sh
-    service mysqld start
+    character_set_server = utf8mb4
+    init_connect         = 'SET NAMES utf8mb4'
+    user                 = mysql
   #+END_SRC
