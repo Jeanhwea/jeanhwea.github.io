@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-15 Thu 11:46 -->
+<!-- 2020-10-15 Thu 15:50 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>源码安装 MySQL 5.7 数据库</title>
@@ -180,6 +180,12 @@
   .org-svg { width: 90%; }
   /*]]>*/-->
 </style>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script type="text/javascript" src="styles/lib/js/jquery.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -238,31 +244,35 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgb260d9a">1. 准备工作</a>
+<li><a href="#org7ace848">1. 准备工作</a>
 <ul>
-<li><a href="#org34810c8">1.1. 下载安装文件</a></li>
-<li><a href="#orgd262f6d">1.2. 安装依赖包</a></li>
-<li><a href="#orgcd17d16">1.3. 新建用户及目录</a></li>
+<li><a href="#org4715868">1.1. 下载安装文件</a></li>
+<li><a href="#org1c92fb8">1.2. 安装依赖包</a></li>
+<li><a href="#orgd5100f8">1.3. 新建用户及目录</a></li>
 </ul>
 </li>
-<li><a href="#org0801437">2. 编译安装</a>
+<li><a href="#org3a07292">2. 编译安装</a>
 <ul>
-<li><a href="#orgf492e73">2.1. 配置</a></li>
-<li><a href="#org1d77b5a">2.2. 编译和安装</a></li>
+<li><a href="#org3b53e99">2.1. 配置</a></li>
+<li><a href="#org8a799ec">2.2. 编译和安装</a></li>
 </ul>
 </li>
-<li><a href="#orgb5ee808">3. 建库配置</a></li>
+<li><a href="#orgcd371fb">3. 建库配置</a>
+<ul>
+<li><a href="#org04613e4">3.1. 配置数据库</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgb260d9a" class="outline-2">
-<h2 id="orgb260d9a"><span class="section-number-2">1</span> 准备工作</h2>
+<div id="outline-container-org7ace848" class="outline-2">
+<h2 id="org7ace848"><span class="section-number-2">1</span> 准备工作</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org34810c8" class="outline-3">
-<h3 id="org34810c8"><span class="section-number-3">1.1</span> 下载安装文件</h3>
+<div id="outline-container-org4715868" class="outline-3">
+<h3 id="org4715868"><span class="section-number-3">1.1</span> 下载安装文件</h3>
 <div class="outline-text-3" id="text-1-1">
 <ol class="org-ol">
 <li>mysql-5.7.30.tar.gz</li>
@@ -271,8 +281,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orgd262f6d" class="outline-3">
-<h3 id="orgd262f6d"><span class="section-number-3">1.2</span> 安装依赖包</h3>
+<div id="outline-container-org1c92fb8" class="outline-3">
+<h3 id="org1c92fb8"><span class="section-number-3">1.2</span> 安装依赖包</h3>
 <div class="outline-text-3" id="text-1-2">
 <div class="org-src-container">
 <pre class="src src-sh">yum install -y gcc gcc-c++ cmake ncurses ncurses-devel bison bison-devel
@@ -281,8 +291,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orgcd17d16" class="outline-3">
-<h3 id="orgcd17d16"><span class="section-number-3">1.3</span> 新建用户及目录</h3>
+<div id="outline-container-orgd5100f8" class="outline-3">
+<h3 id="orgd5100f8"><span class="section-number-3">1.3</span> 新建用户及目录</h3>
 <div class="outline-text-3" id="text-1-3">
 <div class="org-src-container">
 <pre class="src src-sh">groupadd mysql &amp;&amp; <span style="color: #70c0b1;">\</span>
@@ -296,12 +306,12 @@ mkdir -p /usr/local/mysql/data &amp;&amp; <span style="color: #70c0b1;">\</span>
 </div>
 </div>
 
-<div id="outline-container-org0801437" class="outline-2">
-<h2 id="org0801437"><span class="section-number-2">2</span> 编译安装</h2>
+<div id="outline-container-org3a07292" class="outline-2">
+<h2 id="org3a07292"><span class="section-number-2">2</span> 编译安装</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgf492e73" class="outline-3">
-<h3 id="orgf492e73"><span class="section-number-3">2.1</span> 配置</h3>
+<div id="outline-container-org3b53e99" class="outline-3">
+<h3 id="org3b53e99"><span class="section-number-3">2.1</span> 配置</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-sh">cmake . <span style="color: #70c0b1;">\</span>
@@ -328,8 +338,8 @@ mkdir -p /usr/local/mysql/data &amp;&amp; <span style="color: #70c0b1;">\</span>
 </div>
 </div>
 
-<div id="outline-container-org1d77b5a" class="outline-3">
-<h3 id="org1d77b5a"><span class="section-number-3">2.2</span> 编译和安装</h3>
+<div id="outline-container-org8a799ec" class="outline-3">
+<h3 id="org8a799ec"><span class="section-number-3">2.2</span> 编译和安装</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 <pre class="src src-sh">make &amp;&amp; make install
@@ -339,17 +349,16 @@ mkdir -p /usr/local/mysql/data &amp;&amp; <span style="color: #70c0b1;">\</span>
 </div>
 </div>
 
-<div id="outline-container-orgb5ee808" class="outline-2">
-<h2 id="orgb5ee808"><span class="section-number-2">3</span> 建库配置</h2>
+<div id="outline-container-orgcd371fb" class="outline-2">
+<h2 id="orgcd371fb"><span class="section-number-2">3</span> 建库配置</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 初始化数据库目录
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">./bin/mysqld --initialize <span style="color: #70c0b1;">\</span>
+<pre class="src src-sh">./bin/mysqld --initialize-insecure --user=mysql <span style="color: #70c0b1;">\</span>
              --basedir=/usr/local/mysql <span style="color: #70c0b1;">\</span>
-             --datadir=/usr/local/mysql/data <span style="color: #70c0b1;">\</span>
-             --user=mysql
+             --datadir=/usr/local/mysql/data
 </pre>
 </div>
 
@@ -359,6 +368,14 @@ mkdir -p /usr/local/mysql/data &amp;&amp; <span style="color: #70c0b1;">\</span>
 <div class="org-src-container">
 <pre class="src src-sh">cp support-files/mysql.server /etc/init.d/mysqld &amp;&amp;
   chmod +x /etc/init.d/mysqld
+</pre>
+</div>
+
+<p>
+启动 MySQL 服务器进程
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">service mysqld start
 </pre>
 </div>
 
@@ -386,34 +403,42 @@ Query OK, 0 rows affected, 1 warning (0.00 sec)
 mysql&gt;
 </pre>
 </div>
+</div>
 
+<div id="outline-container-org04613e4" class="outline-3">
+<h3 id="org04613e4"><span class="section-number-3">3.1</span> 配置数据库</h3>
+<div class="outline-text-3" id="text-3-1">
 <p>
 添加配置文件 <code>/etc/my.cnf</code>
 </p>
 <div class="org-src-container">
 <pre class="src src-conf">[<span style="color: #7aa6da;">mysqld</span>]
-<span style="color: #e7c547;">datadir</span>        = /usr/local/mysql
-<span style="color: #e7c547;">socket</span>         = /usr/local/mysql/mysql.sock
-<span style="color: #e7c547;">pid-file</span>       = /usr/local/mysql/mysqld.pid
-<span style="color: #e7c547;">log-error</span>      = /usr/local/mysql/error.log
+<span style="color: #e7c547;">basedir</span>   = /usr/local/mysql
+<span style="color: #e7c547;">datadir</span>   = /usr/local/mysql/data
+<span style="color: #e7c547;">socket</span>    = /usr/local/mysql/mysql.sock
+<span style="color: #e7c547;">pid-file</span>  = /usr/local/mysql/mysqld.pid
+<span style="color: #e7c547;">log-error</span> = /usr/local/mysql/error.log
 
 # Disabling symbolic-links is recommended to prevent assorted security risks
-<span style="color: #e7c547;">symbolic-links</span> = 0
+<span style="color: #e7c547;">symbolic-links</span>       = 0
+
+<span style="color: #e7c547;">user</span>                 = mysql
+<span style="color: #e7c547;">init_connect</span>         = <span style="color: #70c0b1;">'SET NAMES utf8mb4'</span>
+<span style="color: #e7c547;">character_set_server</span> = utf8mb4
+<span style="color: #e7c547;">bind-address</span>         = 0.0.0.0
+
+# skip-grant-tables
+
+[<span style="color: #7aa6da;">mysql</span>]
+<span style="color: #e7c547;">socket</span>    = /usr/local/mysql/mysql.sock
 </pre>
 </div>
-
-<p>
-启动 MySQL 服务器进程
-</p>
-<div class="org-src-container">
-<pre class="src src-sh">service mysqld start
-</pre>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-10-15 Thu 11:46. Created by Jinghui Hu at 2020-10-15 Thu 07:41.</p>
+<p class="author">Last Updated 2020-10-15 Thu 15:50. Created by Jinghui Hu at 2020-10-15 Thu 07:41.</p>
 </div>
 </body>
 </html>
