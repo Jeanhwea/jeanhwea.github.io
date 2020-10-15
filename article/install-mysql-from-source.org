@@ -1,0 +1,52 @@
+#+TITLE: 源码安装 MySQL 5.7
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2020-10-15 Thu 07:41:52>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: mysql install database
+
+
+* 准备工作
+** 下载安装文件
+   1. mysql-5.7.26.tar.gz
+   2. mysql-boost-5.7.26.tar.gz
+
+** 安装依赖包
+   #+BEGIN_SRC sh
+     yum install -y  gcc gcc-c++ cmake ncurses ncurses-devel bison
+   #+END_SRC
+
+** 新建用户及目录
+   #+BEGIN_SRC sh
+     groupadd mysql && \
+       useradd -r -g mysql -s /bin/false mysql
+
+     mkdir -p /usr/local/mysql/data && \
+       chown -R mysql:mysql /usr/local/mysql/data
+   #+END_SRC
+
+* 编译安装
+** 配置
+   #+BEGIN_SRC sh
+     cmake \
+       -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+       -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock \
+       -DSYSCONFDIR=/etc \
+       -DSYSTEMD_PID_DIR=/usr/local/mysql \
+       -DDEFAULT_CHARSET=utf8mb4  \
+       -DDEFAULT_COLLATION=utf8mb4_general_ci \
+       -DWITH_INNOBASE_STORAGE_ENGINE=1 \
+       -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
+       -DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+       -DWITH_PERFSCHEMA_STORAGE_ENGINE=1 \
+       -DMYSQL_DATADIR=/usr/local/mysql/data \
+       -DWITH_BOOST=/usr/local/mysql/mysql-5.7.26/boost \
+       -DWITH_SYSTEMD=1
+   #+END_SRC
+
+** 编译和安装
+   #+BEGIN_SRC sh
+     make && make install
+   #+END_SRC
