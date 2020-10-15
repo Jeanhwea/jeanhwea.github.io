@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-15 Thu 08:50 -->
+<!-- 2020-10-15 Thu 11:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>源码安装 MySQL 5.7 数据库</title>
@@ -238,51 +238,51 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org4ec8cbe">1. 准备工作</a>
+<li><a href="#org3582bb9">1. 准备工作</a>
 <ul>
-<li><a href="#orga6fe2f1">1.1. 下载安装文件</a></li>
-<li><a href="#org5806a18">1.2. 安装依赖包</a></li>
-<li><a href="#orgcaec949">1.3. 新建用户及目录</a></li>
+<li><a href="#org5528f6b">1.1. 下载安装文件</a></li>
+<li><a href="#org602dff7">1.2. 安装依赖包</a></li>
+<li><a href="#org34a77a1">1.3. 新建用户及目录</a></li>
 </ul>
 </li>
-<li><a href="#orge29e66a">2. 编译安装</a>
+<li><a href="#orgf285346">2. 编译安装</a>
 <ul>
-<li><a href="#org06f029a">2.1. 配置</a></li>
-<li><a href="#orge71f21a">2.2. 编译和安装</a></li>
+<li><a href="#orga9961f5">2.1. 配置</a></li>
+<li><a href="#org90016b6">2.2. 编译和安装</a></li>
 </ul>
 </li>
-<li><a href="#orgf65d630">3. 建库配置</a></li>
+<li><a href="#org8292a0e">3. 建库配置</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org4ec8cbe" class="outline-2">
-<h2 id="org4ec8cbe"><span class="section-number-2">1</span> 准备工作</h2>
+<div id="outline-container-org3582bb9" class="outline-2">
+<h2 id="org3582bb9"><span class="section-number-2">1</span> 准备工作</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orga6fe2f1" class="outline-3">
-<h3 id="orga6fe2f1"><span class="section-number-3">1.1</span> 下载安装文件</h3>
+<div id="outline-container-org5528f6b" class="outline-3">
+<h3 id="org5528f6b"><span class="section-number-3">1.1</span> 下载安装文件</h3>
 <div class="outline-text-3" id="text-1-1">
 <ol class="org-ol">
-<li>mysql-5.7.26.tar.gz</li>
-<li>mysql-boost-5.7.26.tar.gz</li>
+<li>mysql-5.7.30.tar.gz</li>
+<li>mysql-boost-5.7.30.tar.gz</li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-org5806a18" class="outline-3">
-<h3 id="org5806a18"><span class="section-number-3">1.2</span> 安装依赖包</h3>
+<div id="outline-container-org602dff7" class="outline-3">
+<h3 id="org602dff7"><span class="section-number-3">1.2</span> 安装依赖包</h3>
 <div class="outline-text-3" id="text-1-2">
 <div class="org-src-container">
-<pre class="src src-sh">yum install -y  gcc gcc-c++ cmake ncurses ncurses-devel bison
+<pre class="src src-sh">yum install -y gcc gcc-c++ cmake ncurses ncurses-devel bison bison-devel
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgcaec949" class="outline-3">
-<h3 id="orgcaec949"><span class="section-number-3">1.3</span> 新建用户及目录</h3>
+<div id="outline-container-org34a77a1" class="outline-3">
+<h3 id="org34a77a1"><span class="section-number-3">1.3</span> 新建用户及目录</h3>
 <div class="outline-text-3" id="text-1-3">
 <div class="org-src-container">
 <pre class="src src-sh">groupadd mysql &amp;&amp; <span style="color: #70c0b1;">\</span>
@@ -296,35 +296,40 @@ mkdir -p /usr/local/mysql/data &amp;&amp; <span style="color: #70c0b1;">\</span>
 </div>
 </div>
 
-<div id="outline-container-orge29e66a" class="outline-2">
-<h2 id="orge29e66a"><span class="section-number-2">2</span> 编译安装</h2>
+<div id="outline-container-orgf285346" class="outline-2">
+<h2 id="orgf285346"><span class="section-number-2">2</span> 编译安装</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org06f029a" class="outline-3">
-<h3 id="org06f029a"><span class="section-number-3">2.1</span> 配置</h3>
+<div id="outline-container-orga9961f5" class="outline-3">
+<h3 id="orga9961f5"><span class="section-number-3">2.1</span> 配置</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
-<pre class="src src-sh">cmake <span style="color: #70c0b1;">\</span>
-  -DCMAKE_INSTALL_PREFIX=/usr/local/mysql <span style="color: #70c0b1;">\</span>
-  -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock <span style="color: #70c0b1;">\</span>
-  -DSYSCONFDIR=/etc <span style="color: #70c0b1;">\</span>
-  -DSYSTEMD_PID_DIR=/usr/local/mysql <span style="color: #70c0b1;">\</span>
-  -DDEFAULT_CHARSET=utf8mb4  <span style="color: #70c0b1;">\</span>
-  -DDEFAULT_COLLATION=utf8mb4_general_ci <span style="color: #70c0b1;">\</span>
-  -DWITH_INNOBASE_STORAGE_ENGINE=1 <span style="color: #70c0b1;">\</span>
-  -DWITH_ARCHIVE_STORAGE_ENGINE=1 <span style="color: #70c0b1;">\</span>
-  -DWITH_BLACKHOLE_STORAGE_ENGINE=1 <span style="color: #70c0b1;">\</span>
-  -DWITH_PERFSCHEMA_STORAGE_ENGINE=1 <span style="color: #70c0b1;">\</span>
-  -DMYSQL_DATADIR=/usr/local/mysql/data <span style="color: #70c0b1;">\</span>
-  -DWITH_BOOST=/usr/local/mysql/mysql-5.7.26/boost <span style="color: #70c0b1;">\</span>
-  -DWITH_SYSTEMD=1
+<pre class="src src-sh">cmake . <span style="color: #70c0b1;">\</span>
+      -DCMAKE_INSTALL_PREFIX=/usr/local/mysql <span style="color: #70c0b1;">\</span>
+      -DMYSQL_DATADIR=/usr/local/mysql/data <span style="color: #70c0b1;">\</span>
+      -DMYSQL_UNIX_ADDR=/tmp/mysql.sock <span style="color: #70c0b1;">\</span>
+      -DSYSCONFDIR=/etc <span style="color: #70c0b1;">\</span>
+      -DEXTRA_CHARSETS=all <span style="color: #70c0b1;">\</span>
+      -DDEFAULT_CHARSET=utf8mb4 <span style="color: #70c0b1;">\</span>
+      -DDEFAULT_COLLATION=utf8mb4_general_ci <span style="color: #70c0b1;">\</span>
+      -DWITH_MYISAM_STORAGE_ENGINE=1 <span style="color: #70c0b1;">\</span>
+      -DWITH_INNOBASE_STORAGE_ENGINE=1 <span style="color: #70c0b1;">\</span>
+      -DWITH_MEMORY_STORAGE_ENGINE=1 <span style="color: #70c0b1;">\</span>
+      -DWITH_PARTITION_STORAGE_ENGINE=1 <span style="color: #70c0b1;">\</span>
+      -DDOWNLOAD_BOOST=0 <span style="color: #70c0b1;">\</span>
+      -DWITH_BOOST=/usr/local/mysql/mysql-5.7.26/boost/boost_1_59_0 <span style="color: #70c0b1;">\</span>
+      -DENABLED_LOCAL_INFILE=1 <span style="color: #70c0b1;">\</span>
+      -DMYSQL_TCP_PORT=3306 <span style="color: #70c0b1;">\</span>
+      -DWITH_READLINE=1 <span style="color: #70c0b1;">\</span>
+      -DMYSQL_USER=mysql <span style="color: #70c0b1;">\</span>
+      -DWITH_SSL=yes
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orge71f21a" class="outline-3">
-<h3 id="orge71f21a"><span class="section-number-3">2.2</span> 编译和安装</h3>
+<div id="outline-container-org90016b6" class="outline-3">
+<h3 id="org90016b6"><span class="section-number-3">2.2</span> 编译和安装</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 <pre class="src src-sh">make &amp;&amp; make install
@@ -334,14 +339,17 @@ mkdir -p /usr/local/mysql/data &amp;&amp; <span style="color: #70c0b1;">\</span>
 </div>
 </div>
 
-<div id="outline-container-orgf65d630" class="outline-2">
-<h2 id="orgf65d630"><span class="section-number-2">3</span> 建库配置</h2>
+<div id="outline-container-org8292a0e" class="outline-2">
+<h2 id="org8292a0e"><span class="section-number-2">3</span> 建库配置</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 初始化数据库目录
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">./mysqld --initialize-insecure --user=mysql --basedir=/usr/local/mysql --datadir=/data/mysql/data
+<pre class="src src-sh">./bin/mysqld --initialize-insecure <span style="color: #70c0b1;">\</span>
+             --basedir=/usr/local/mysql <span style="color: #70c0b1;">\</span>
+             --datadir=/usr/local/mysql/data <span style="color: #70c0b1;">\</span>
+             --user=mysql
 </pre>
 </div>
 
@@ -349,10 +357,23 @@ mkdir -p /usr/local/mysql/data &amp;&amp; <span style="color: #70c0b1;">\</span>
 添加系统服务
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #c397d8;">cd</span> support-files
-
-cp mysql.server /etc/init.d/mysqld &amp;&amp;
+<pre class="src src-sh">cp support-files/mysql.server /etc/init.d/mysqld &amp;&amp;
   chmod +x /etc/init.d/mysqld
+</pre>
+</div>
+
+<p>
+添加配置文件 <code>/etc/my.cnf</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-conf">[<span style="color: #7aa6da;">mysqld</span>]
+<span style="color: #e7c547;">datadir</span>        = /usr/local/mysql
+<span style="color: #e7c547;">socket</span>         = /usr/local/mysql/mysql.sock
+<span style="color: #e7c547;">pid-file</span>       = /usr/local/mysql/mysqld.pid
+<span style="color: #e7c547;">log-error</span>      = /usr/local/mysql/error.log
+
+# Disabling symbolic-links is recommended to prevent assorted security risks
+<span style="color: #e7c547;">symbolic-links</span> = 0
 </pre>
 </div>
 
@@ -367,7 +388,7 @@ cp mysql.server /etc/init.d/mysqld &amp;&amp;
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-10-15 Thu 08:50. Created by Jinghui Hu at 2020-10-15 Thu 07:41.</p>
+<p class="author">Last Updated 2020-10-15 Thu 11:22. Created by Jinghui Hu at 2020-10-15 Thu 07:41.</p>
 </div>
 </body>
 </html>

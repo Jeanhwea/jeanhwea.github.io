@@ -10,12 +10,12 @@
 
 * 准备工作
 ** 下载安装文件
-   1. mysql-5.7.26.tar.gz
-   2. mysql-boost-5.7.26.tar.gz
+   1. mysql-5.7.30.tar.gz
+   2. mysql-boost-5.7.30.tar.gz
 
 ** 安装依赖包
    #+BEGIN_SRC sh
-     yum install -y  gcc gcc-c++ cmake ncurses ncurses-devel bison
+     yum install -y gcc gcc-c++ cmake ncurses ncurses-devel bison bison-devel
    #+END_SRC
 
 ** 新建用户及目录
@@ -30,20 +30,25 @@
 * 编译安装
 ** 配置
    #+BEGIN_SRC sh
-     cmake \
-       -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
-       -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock \
-       -DSYSCONFDIR=/etc \
-       -DSYSTEMD_PID_DIR=/usr/local/mysql \
-       -DDEFAULT_CHARSET=utf8mb4  \
-       -DDEFAULT_COLLATION=utf8mb4_general_ci \
-       -DWITH_INNOBASE_STORAGE_ENGINE=1 \
-       -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
-       -DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
-       -DWITH_PERFSCHEMA_STORAGE_ENGINE=1 \
-       -DMYSQL_DATADIR=/usr/local/mysql/data \
-       -DWITH_BOOST=/usr/local/mysql/mysql-5.7.26/boost \
-       -DWITH_SYSTEMD=1
+     cmake . \
+           -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+           -DMYSQL_DATADIR=/usr/local/mysql/data \
+           -DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
+           -DSYSCONFDIR=/etc \
+           -DEXTRA_CHARSETS=all \
+           -DDEFAULT_CHARSET=utf8mb4 \
+           -DDEFAULT_COLLATION=utf8mb4_general_ci \
+           -DWITH_MYISAM_STORAGE_ENGINE=1 \
+           -DWITH_INNOBASE_STORAGE_ENGINE=1 \
+           -DWITH_MEMORY_STORAGE_ENGINE=1 \
+           -DWITH_PARTITION_STORAGE_ENGINE=1 \
+           -DDOWNLOAD_BOOST=0 \
+           -DWITH_BOOST=/usr/local/mysql/mysql-5.7.26/boost/boost_1_59_0 \
+           -DENABLED_LOCAL_INFILE=1 \
+           -DMYSQL_TCP_PORT=3306 \
+           -DWITH_READLINE=1 \
+           -DMYSQL_USER=mysql \
+           -DWITH_SSL=yes
    #+END_SRC
 
 ** 编译和安装
@@ -54,15 +59,28 @@
 * 建库配置
   初始化数据库目录
   #+BEGIN_SRC sh
-    ./mysqld --initialize-insecure --user=mysql --basedir=/usr/local/mysql --datadir=/data/mysql/data
+    ./bin/mysqld --initialize-insecure \
+                 --basedir=/usr/local/mysql \
+                 --datadir=/usr/local/mysql/data \
+                 --user=mysql
   #+END_SRC
 
   添加系统服务
   #+BEGIN_SRC sh
-    cd support-files
-
-    cp mysql.server /etc/init.d/mysqld &&
+    cp support-files/mysql.server /etc/init.d/mysqld &&
       chmod +x /etc/init.d/mysqld
+  #+END_SRC
+
+  添加配置文件 =/etc/my.cnf=
+  #+BEGIN_SRC conf
+    [mysqld]
+    datadir        = /usr/local/mysql
+    socket         = /usr/local/mysql/mysql.sock
+    pid-file       = /usr/local/mysql/mysqld.pid
+    log-error      = /usr/local/mysql/error.log
+
+    # Disabling symbolic-links is recommended to prevent assorted security risks
+    symbolic-links = 0
   #+END_SRC
 
   启动 MySQL 服务器进程
