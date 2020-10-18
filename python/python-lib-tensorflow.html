@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-18 Sun 11:26 -->
+<!-- 2020-10-18 Sun 11:51 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>TensorFlow</title>
@@ -244,23 +244,31 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9d7a90d">1. 初始配置</a></li>
-<li><a href="#org3b3997e">2. 启动会话</a></li>
-<li><a href="#orgd2ecf7c">3. 附录</a></li>
-<li><a href="#orgb68710c">4. 连接</a></li>
+<li><a href="#org7e4cdb6">1. 初始配置</a></li>
+<li><a href="#org6701b37">2. 会话管理</a></li>
+<li><a href="#orgc9be644">3. 数据：常量、变量和占位符</a>
+<ul>
+<li><a href="#org41e7db5">3.1. 常量</a></li>
+<li><a href="#orge2aa827">3.2. 变量</a></li>
+<li><a href="#org400eb7a">3.3. 占位符</a></li>
+</ul>
+</li>
+<li><a href="#org9cae5b6">4. 附录</a></li>
+<li><a href="#org8ce6edf">5. 连接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org9d7a90d" class="outline-2">
-<h2 id="org9d7a90d"><span class="section-number-2">1</span> 初始配置</h2>
+<div id="outline-container-org7e4cdb6" class="outline-2">
+<h2 id="org7e4cdb6"><span class="section-number-2">1</span> 初始配置</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 导入 TensorFlow 包
 </p>
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #859900;">import</span> tensorflow <span style="color: #859900;">as</span> tf
+<span style="color: #859900;">import</span> numpy <span style="color: #859900;">as</span> np
 <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>tf.version.VERSION<span style="color: #8d5649;">)</span>
 </pre>
 </div>
@@ -282,8 +290,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org3b3997e" class="outline-2">
-<h2 id="org3b3997e"><span class="section-number-2">2</span> 启动会话</h2>
+<div id="outline-container-org6701b37" class="outline-2">
+<h2 id="org6701b37"><span class="section-number-2">2</span> 会话管理</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 定义一个常量，然后直接在 TensorFlow 上运行，测试环境配置成功
@@ -292,7 +300,7 @@ for the JavaScript code in this tag.
 <pre class="src src-python"><span style="color: #6c71c4;">four</span> = tf.constant<span style="color: #8d5649;">(</span>4<span style="color: #8d5649;">)</span>
 
 <span style="color: #859900;">with</span> tf.Session<span style="color: #8d5649;">()</span> <span style="color: #859900;">as</span> sess:
-  <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>sess.run<span style="color: #d8241f;">(</span>four<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>sess.run<span style="color: #d8241f;">(</span>four<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
 </pre>
 </div>
 
@@ -327,9 +335,127 @@ sess.close<span style="color: #8d5649;">()</span>
 </div>
 </div>
 
-<div id="outline-container-orgd2ecf7c" class="outline-2">
-<h2 id="orgd2ecf7c"><span class="section-number-2">3</span> 附录</h2>
+<div id="outline-container-orgc9be644" class="outline-2">
+<h2 id="orgc9be644"><span class="section-number-2">3</span> 数据：常量、变量和占位符</h2>
 <div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org41e7db5" class="outline-3">
+<h3 id="org41e7db5"><span class="section-number-3">3.1</span> 常量</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+初始化常量操作如下
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6c71c4;">t0</span> = tf.zeros<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>2, 3<span style="color: #d8241f;">]</span>, tf.int32<span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">t1</span> = tf.ones<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>2, 3<span style="color: #d8241f;">]</span>, tf.float32<span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">t2</span> = tf.random_normal<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>2, 3<span style="color: #d8241f;">]</span>, mean=2.0, stddev=4, seed=15<span style="color: #8d5649;">)</span>
+
+<span style="color: #859900;">with</span> tf.Session<span style="color: #8d5649;">()</span> <span style="color: #859900;">as</span> sess:
+    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>sess.run<span style="color: #d8241f;">(</span>t1<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>sess.run<span style="color: #d8241f;">(</span>t2<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+[[1. 1. 1.]
+ [1. 1. 1.]]
+[[ 4.818309    2.509685    6.23806   ]
+ [ 3.6950598   0.98155856 -1.4288127 ]]
+
+</pre>
+</div>
+</div>
+<div id="outline-container-orge2aa827" class="outline-3">
+<h3 id="orge2aa827"><span class="section-number-3">3.2</span> 变量</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+它们通过使用变量类来创建。变量的定义还包括应该初始化的常量/随机值。
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6c71c4;">w</span> = tf.Variable<span style="color: #8d5649;">(</span>tf.random_normal<span style="color: #d8241f;">(</span><span style="color: #9564bf;">[</span>100, 100<span style="color: #9564bf;">]</span>, stddev=2<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">b</span> = tf.Variable<span style="color: #8d5649;">(</span>tf.zeros<span style="color: #d8241f;">(</span><span style="color: #9564bf;">[</span>100<span style="color: #9564bf;">]</span><span style="color: #d8241f;">)</span>, name=<span style="color: #2aa198;">'biases'</span><span style="color: #8d5649;">)</span>
+</pre>
+</div>
+
+<p>
+初始化所有全局变量
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6c71c4;">init_op</span> = tf.global_variables_initializer<span style="color: #8d5649;">()</span>
+</pre>
+</div>
+
+<p>
+常见的变量的初始器
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6c71c4;">t1</span> = tf.random_normal<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>6<span style="color: #d8241f;">]</span>, mean=2.0, stddev=4, seed=15<span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">t2</span> = tf.truncated_normal<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>6<span style="color: #d8241f;">]</span>, stddev=3<span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">t3</span> = tf.random_uniform<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>6<span style="color: #d8241f;">]</span>, maxval=5, seed=15<span style="color: #8d5649;">)</span>
+
+<span style="color: #859900;">with</span> tf.Session<span style="color: #8d5649;">()</span> <span style="color: #859900;">as</span> sess:
+    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>sess.run<span style="color: #d8241f;">(</span>t1<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>sess.run<span style="color: #d8241f;">(</span>t2<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>sess.run<span style="color: #d8241f;">(</span>t3<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+[ 4.818309    2.509685    6.23806     3.6950598   0.98155856 -1.4288127 ]
+[-1.0413994  -0.81441045  1.2691923  -1.5810761  -0.39769304 -1.6723714 ]
+[3.8694227  1.1076248  2.6074262  0.94722927 3.3522308  2.7297597 ]
+
+</pre>
+
+<p>
+保存变量
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6c71c4;">saver</span> = tf.train.Saver<span style="color: #8d5649;">()</span>
+</pre>
+</div>
+
+<p>
+很多时候需要大规模的常量张量对象；在这种情况下，为了优化内存，最好将它们声明
+为一个可训练标志设置为 False 的变量：
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6c71c4;">t_large</span> = tf.Varible<span style="color: #8d5649;">(</span>large_array, trainable=<span style="color: #268bd2;">False</span><span style="color: #8d5649;">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org400eb7a" class="outline-3">
+<h3 id="org400eb7a"><span class="section-number-3">3.3</span> 占位符</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+占位符，它们用于将数据提供给计算图。
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6c71c4;">x</span> = tf.placeholder<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"float"</span><span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">y</span> = 2 * x
+
+<span style="color: #6c71c4;">din</span> = np.random.normal<span style="color: #8d5649;">(</span>0, 0.1, 4<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>din<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">with</span> tf.Session<span style="color: #8d5649;">()</span> <span style="color: #859900;">as</span> sess:
+    <span style="color: #6c71c4;">res</span> = sess.run<span style="color: #8d5649;">(</span>y, feed_dict=<span style="color: #d8241f;">{</span>x: din<span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>
+    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>res<span style="color: #8d5649;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+[-0.06331706 -0.02488422  0.00218056 -0.06788603]
+[-0.12663412 -0.04976845  0.00436112 -0.13577206]
+
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9cae5b6" class="outline-2">
+<h2 id="org9cae5b6"><span class="section-number-2">4</span> 附录</h2>
+<div class="outline-text-2" id="text-4">
 <p>
 安装 TensorFlow 之前最好是配合 Anaconda3 发行版一起安装，安装好 Anaconda 过后直接
 使用下面命令安装
@@ -349,9 +475,9 @@ sess.close<span style="color: #8d5649;">()</span>
 </div>
 </div>
 
-<div id="outline-container-orgb68710c" class="outline-2">
-<h2 id="orgb68710c"><span class="section-number-2">4</span> 连接</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-org8ce6edf" class="outline-2">
+<h2 id="org8ce6edf"><span class="section-number-2">5</span> 连接</h2>
+<div class="outline-text-2" id="text-5">
 <ol class="org-ol">
 <li><a href="https://tensorflow.google.cn/">Tensorflow</a></li>
 </ol>
@@ -359,7 +485,7 @@ sess.close<span style="color: #8d5649;">()</span>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-10-18 Sun 11:26. Created by Jinghui Hu at 2020-10-18 Sun 10:31.</p>
+<p class="author">Last Updated 2020-10-18 Sun 11:51. Created by Jinghui Hu at 2020-10-18 Sun 10:31.</p>
 </div>
 </body>
 </html>

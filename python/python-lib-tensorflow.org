@@ -12,6 +12,7 @@
   导入 TensorFlow 包
   #+BEGIN_SRC python :session cpython :exports both :results output pp
     import tensorflow as tf
+    import numpy as np
     print(tf.version.VERSION)
   #+END_SRC
 
@@ -25,13 +26,13 @@
     os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
   #+END_SRC
 
-* 启动会话
+* 会话管理
   定义一个常量，然后直接在 TensorFlow 上运行，测试环境配置成功
   #+BEGIN_SRC python :session cpython :exports both :results output pp
     four = tf.constant(4)
 
     with tf.Session() as sess:
-      print(sess.run(four))
+        print(sess.run(four))
   #+END_SRC
 
   #+RESULTS:
@@ -55,6 +56,81 @@
   #+RESULTS:
   : [3 4 5 6]
   : [2 4 6 8]
+
+* 数据：常量、变量和占位符
+** 常量
+   初始化常量操作如下
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     t0 = tf.zeros([2, 3], tf.int32)
+     t1 = tf.ones([2, 3], tf.float32)
+     t2 = tf.random_normal([2, 3], mean=2.0, stddev=4, seed=15)
+
+     with tf.Session() as sess:
+         print(sess.run(t1))
+         print(sess.run(t2))
+   #+END_SRC
+
+   #+RESULTS:
+   : [[1. 1. 1.]
+   :  [1. 1. 1.]]
+   : [[ 4.818309    2.509685    6.23806   ]
+   :  [ 3.6950598   0.98155856 -1.4288127 ]]
+** 变量
+   它们通过使用变量类来创建。变量的定义还包括应该初始化的常量/随机值。
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     w = tf.Variable(tf.random_normal([100, 100], stddev=2))
+     b = tf.Variable(tf.zeros([100]), name='biases')
+   #+END_SRC
+
+   初始化所有全局变量
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     init_op = tf.global_variables_initializer()
+   #+END_SRC
+
+   常见的变量的初始器
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     t1 = tf.random_normal([6], mean=2.0, stddev=4, seed=15)
+     t2 = tf.truncated_normal([6], stddev=3)
+     t3 = tf.random_uniform([6], maxval=5, seed=15)
+
+     with tf.Session() as sess:
+         print(sess.run(t1))
+         print(sess.run(t2))
+         print(sess.run(t3))
+   #+END_SRC
+
+   #+RESULTS:
+   : [ 4.818309    2.509685    6.23806     3.6950598   0.98155856 -1.4288127 ]
+   : [-1.0413994  -0.81441045  1.2691923  -1.5810761  -0.39769304 -1.6723714 ]
+   : [3.8694227  1.1076248  2.6074262  0.94722927 3.3522308  2.7297597 ]
+
+   保存变量
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     saver = tf.train.Saver()
+   #+END_SRC
+
+   很多时候需要大规模的常量张量对象；在这种情况下，为了优化内存，最好将它们声明
+   为一个可训练标志设置为 False 的变量：
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     t_large = tf.Varible(large_array, trainable=False)
+   #+END_SRC
+
+** 占位符
+   占位符，它们用于将数据提供给计算图。
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     x = tf.placeholder("float")
+     y = 2 * x
+
+     din = np.random.normal(0, 0.1, 4)
+     print(din)
+     with tf.Session() as sess:
+         res = sess.run(y, feed_dict={x: din})
+         print(res)
+   #+END_SRC
+
+   #+RESULTS:
+   : [-0.06331706 -0.02488422  0.00218056 -0.06788603]
+   : [-0.12663412 -0.04976845  0.00436112 -0.13577206]
 
 * 附录
   安装 TensorFlow 之前最好是配合 Anaconda3 发行版一起安装，安装好 Anaconda 过后直接
