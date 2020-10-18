@@ -1,0 +1,152 @@
+#+TITLE: 源码安装 MySQL 5.7 数据库
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2020-10-15 Thu 07:41:52>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: mysql install database
+
+
+* 准备工作
+** 下载安装文件
+   MySQL 5.7 版本依赖于 boost 库，需要在官网上下载并安装对应的 mysql 源代码包和
+   boost 库
+
+   1. [[https://cdn.mysql.com/archives/mysql-5.7/mysql-5.7.26.tar.gz][mysql-5.7.26.tar.gz]]
+   2. [[https://cdn.mysql.com/archives/mysql-5.7/mysql-boost-5.7.26.tar.gz][mysql-boost-5.7.26.tar.gz]]
+
+   #+BEGIN_SRC sh
+     wget https://cdn.mysql.com/archives/mysql-5.7/mysql-5.7.26.tar.gz
+     wget https://cdn.mysql.com/archives/mysql-5.7/mysql-boost-5.7.26.tar.gz
+   #+END_SRC
+
+   安装包校验码如下
+   #+BEGIN_SRC sh
+     mysql57 $ md5sum.exe mysql-5.7.26.tar.gz
+     5756a63d37d343a39e8e2cf8b13378ba *mysql-5.7.26.tar.gz
+     mysql57 $ md5sum.exe mysql-boost-5.7.26.tar.gz
+     0fb4db48959b0e05a7dba0bbfbb4f8ca *mysql-boost-5.7.26.tar.gz
+   #+END_SRC
+
+** 安装依赖包
+   #+BEGIN_SRC sh
+     yum install -y gcc gcc-c++ cmake ncurses ncurses-devel bison bison-devel
+   #+END_SRC
+
+** 新建用户及目录
+   #+BEGIN_SRC sh
+     groupadd mysql && \
+       useradd -r -g mysql -s /bin/false mysql
+
+     mkdir -p /usr/local/mysql/data && \
+       chown -R mysql:mysql /usr/local/mysql/data
+   #+END_SRC
+
+* 编译安装
+** 配置 cmake 的编译参数
+   #+BEGIN_SRC sh
+     cmake . \
+           -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+           -DMYSQL_DATADIR=/usr/local/mysql/data \
+           -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock \
+           -DSYSCONFDIR=/etc \
+           -DEXTRA_CHARSETS=all \
+           -DDEFAULT_CHARSET=utf8mb4 \
+           -DDEFAULT_COLLATION=utf8mb4_general_ci \
+           -DWITH_MYISAM_STORAGE_ENGINE=1 \
+           -DWITH_INNOBASE_STORAGE_ENGINE=1 \
+           -DWITH_MEMORY_STORAGE_ENGINE=1 \
+           -DWITH_PARTITION_STORAGE_ENGINE=1 \
+           -DDOWNLOAD_BOOST=0 \
+           -DWITH_BOOST=/usr/local/mysql/mysql-5.7.26/boost/boost_1_59_0 \
+           -DENABLED_LOCAL_INFILE=1 \
+           -DMYSQL_TCP_PORT=3306 \
+           -DWITH_READLINE=1 \
+           -DMYSQL_USER=mysql \
+           -DWITH_SSL=yes
+   #+END_SRC
+
+** 编译和安装
+   #+BEGIN_SRC sh
+     make && make install
+   #+END_SRC
+
+* 配置和建库
+** 初始化和建库
+   初始化数据库目录
+   #+BEGIN_SRC sh
+     chown mysql:mysql -R /usr/local/mysql
+
+     ./bin/mysqld --initialize-insecure --user=mysql \
+                  --basedir=/usr/local/mysql \
+                  --datadir=/usr/local/mysql/data
+
+     ./bin/mysql_ssl_rsa_setup --datadir=/usr/local/mysql/data
+   #+END_SRC
+
+   添加系统服务
+   #+BEGIN_SRC sh
+     cp support-files/mysql.server /etc/init.d/mysql.server &&
+       chmod +x /etc/init.d/mysql.server
+   #+END_SRC
+
+   启动 MySQL 服务器进程
+   #+BEGIN_SRC sh
+     service mysql.server start
+   #+END_SRC
+
+   登录进去重置密码
+   #+BEGIN_SRC text
+     [root@sr650 mysql]# mysql -uroot -p
+     Enter password:
+     Welcome to the MySQL monitor.  Commands end with ; or \g.
+     Your MySQL connection id is 3
+     Server version: 5.7.26
+
+     Copyright (c) 2000, 2019, Oracle and/or its affiliates. All rights reserved.
+
+     Oracle is a registered trademark of Oracle Corporation and/or its
+     affiliates. Other names may be trademarks of their respective
+     owners.
+
+     Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+     mysql> set password=password('123456');
+     Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+     mysql>
+   #+END_SRC
+
+** 配置数据库
+  添加配置文件 =/etc/my.cnf=
+  #+BEGIN_SRC conf
+    [mysqld]
+    basedir   = /usr/local/mysql
+    datadir   = /usr/local/mysql/data
+    socket    = /usr/local/mysql/mysql.sock
+    pid-file  = /usr/local/mysql/mysqld.pid
+    log-error = /usr/local/mysql/error.log
+
+    # Disabling symbolic-links is recommended to prevent assorted security risks
+    symbolic-links       = 0
+    user                 = mysql
+    bind-address         = 0.0.0.0
+    character-set-server = utf8mb4
+    collation-server     = utf8mb4_unicode_ci
+    init-connect         = 'SET NAMES utf8mb4'
+
+    # skip-grant-tables to reset root password
+    # skip-grant-tables
+    skip-character-set-client-handshake = true
+
+    [mysql]
+    socket    = /usr/local/mysql/mysql.sock
+    default-character-set = utf8mb4
+
+    [client]
+    default-character-set=utf8mb4
+  #+END_SRC
+
+* 相关连接
+  1. [[https://dev.mysql.com/doc/refman/5.7/en/source-installation.html][MySQL 官方安装文档]]

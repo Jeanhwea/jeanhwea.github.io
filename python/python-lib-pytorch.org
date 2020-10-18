@@ -57,17 +57,17 @@
 
    #+RESULTS:
    #+begin_example
-   tensor([[[ 0.6087, -0.4306,  0.4264,  0.3135],
-            [ 0.0280,  0.4296, -0.2920, -0.1361],
-            [-0.1012, -1.0939,  0.8483, -0.8315]],
+   tensor([[[-0.1641, -0.2935,  1.0093,  0.5002],
+            [-0.9807,  0.4791, -0.3171, -0.8985],
+            [-1.0155, -0.6139, -0.4744,  1.0637]],
 
-           [[-0.9144, -0.8749, -0.7776,  0.1115],
-            [ 0.7739,  0.9523, -0.4147, -1.0364],
-            [-0.3476, -0.2074,  0.6170,  0.3816]]])
-   tensor([[ 0.6087, -0.4306,  0.4264,  0.3135,  0.0280,  0.4296],
-           [-0.2920, -0.1361, -0.1012, -1.0939,  0.8483, -0.8315],
-           [-0.9144, -0.8749, -0.7776,  0.1115,  0.7739,  0.9523],
-           [-0.4147, -1.0364, -0.3476, -0.2074,  0.6170,  0.3816]])
+           [[ 2.1102, -0.5365,  0.7032, -0.1529],
+            [-0.3487, -0.9573,  0.5081, -0.2366],
+            [ 1.0415,  0.3548,  0.5515, -0.2949]]])
+   tensor([[-0.1641, -0.2935,  1.0093,  0.5002, -0.9807,  0.4791],
+           [-0.3171, -0.8985, -1.0155, -0.6139, -0.4744,  1.0637],
+           [ 2.1102, -0.5365,  0.7032, -0.1529, -0.3487, -0.9573],
+           [ 0.5081, -0.2366,  1.0415,  0.3548,  0.5515, -0.2949]])
    #+end_example
 
    如果 tensor 里只有一个数字，item 方法可以把里面的 value 变成 Python 数值
@@ -107,19 +107,80 @@
 * CUDA Tensor 技术
   Tensor 可以放在 CUDA 显卡上进行计算
   #+BEGIN_SRC python :session cpython :exports both :results output pp
+    x = torch.randn(2, 3)
     if torch.cuda.is_available():
-      device = torch.device("cuda")  # a CUDA device object
-      y = torch.ones_like(x, device=device)  # directly create a tensor on GPU
-      x = x.to(device)  # or just use strings ``.to("cuda")``
-      z = x + y
-      print(z)
-      print(z.to("cpu", torch.double))  # ``.to`` can also change dtype together!
+        device = torch.device("cuda:0")  # a CUDA device object
+        y = torch.ones_like(x, device=device)  # directly create a tensor on GPU
+        x = x.to(device)  # or just use strings ``.to("cuda")``
+        z = x + y
+        print(z)
+        print(z.to("cpu", torch.double))  # ``.to`` can also change dtype together!
     else:
-      print("gpu is not available")
+        print("gpu is not available")
   #+END_SRC
 
   #+RESULTS:
   : gpu is not available
+
+* 张量形状变换
+  修改矩阵的形状，转置，交换维度等操作
+  #+BEGIN_SRC python :session cpython :exports both :results output pp
+    x = torch.arange(12).view(2, 3, 2)
+    print(x)
+    print(x.transpose(1, 0))
+    print(x.permute(1, 0, 2))
+  #+END_SRC
+
+  #+RESULTS:
+  #+begin_example
+  tensor([[[ 0,  1],
+           [ 2,  3],
+           [ 4,  5]],
+
+          [[ 6,  7],
+           [ 8,  9],
+           [10, 11]]])
+  tensor([[[ 0,  1],
+           [ 6,  7]],
+
+          [[ 2,  3],
+           [ 8,  9]],
+
+          [[ 4,  5],
+           [10, 11]]])
+  tensor([[[ 0,  1],
+           [ 6,  7]],
+
+          [[ 2,  3],
+           [ 8,  9]],
+
+          [[ 4,  5],
+           [10, 11]]])
+  #+end_example
+
+  # \begin{matrix}
+  #   0 & 1 \\
+  #   2 & 3
+  # \end{matrix}
+
+  压扁给定的维度为 1  的维度值
+  #+BEGIN_SRC python :session cpython :exports both :results output pp
+    x = torch.arange(6).view(1, -1)
+    print(x.shape)
+    print(x)
+    a1 = x.squeeze(0)
+    print(a1.shape)
+    print(a1)
+    a2 = a1.unsqueeze(0)
+    print(a2)
+  #+END_SRC
+
+  #+RESULTS:
+  : torch.Size([1, 6])
+  : tensor([[0, 1, 2, 3, 4, 5]])
+  : torch.Size([6])
+  : tensor([0, 1, 2, 3, 4, 5])
+  : tensor([[0, 1, 2, 3, 4, 5]])
 
 * 附录
   安装 PyTorch 之前最好是配合 Anaconda3 发行版一起安装，安装好 Anaconda 过后直接
