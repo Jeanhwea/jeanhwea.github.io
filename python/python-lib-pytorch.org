@@ -22,7 +22,7 @@
    #+BEGIN_SRC python :session cpython :exports both :results output
      x0 = torch.zeros(2, 3)
      x1 = torch.ones(3, 2)
-     x2 = torch.zeros(2, 3, dtype=torch.long)
+     x2 = torch.zeros(2, 3, dtype=torch.long) # dtype: int32 int64 float32 float64
      x3 = torch.Tensor([1.1, 3.0])
      print(x1)
      print(x2)
@@ -36,6 +36,14 @@
    : tensor([[0, 0, 0],
    :         [0, 0, 0]])
    : tensor([1.1000, 3.0000])
+
+   获取默认创建的数据类型
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     print(torch.get_default_dtype())
+   #+END_SRC
+
+   #+RESULTS:
+   : torch.float32
 
 ** tensor 的一些操作
    #+BEGIN_SRC python :session cpython :exports both :results output pp
@@ -103,6 +111,30 @@
    :   0.0085908   0.00619372 -0.00130839 -0.0010277 ]
    : tensor([-0.0012, -0.0058, -0.0265,  0.0071, -0.0192, -0.0143,  0.0086,  0.0062,
    :         -0.0013, -0.0010], dtype=torch.float64)
+
+   pytorch 和 numpy 数据关系包含两种关系：share vs. copy
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     a = np.array([1, 2, 3])
+     print(a)
+
+     t1 = torch.Tensor(a)
+     t2 = torch.tensor(a)
+     t3 = torch.as_tensor(a)
+     t4 = torch.from_numpy(a)
+
+     a[0] = 0
+     print(t1)
+     print(t2)
+     print(t3)
+     print(t4)
+   #+END_SRC
+
+   #+RESULTS:
+   : [1 2 3]
+   : tensor([1., 2., 3.])
+   : tensor([1, 2, 3])
+   : tensor([0, 2, 3])
+   : tensor([0, 2, 3])
 
 * CUDA Tensor 技术
   Tensor 可以放在 CUDA 显卡上进行计算
