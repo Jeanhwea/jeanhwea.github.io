@@ -277,6 +277,64 @@
             return out_data
   #+END_SRC
 
+** 实验代码
+   完整的定义网络模型的代码参考如下代码
+   #+BEGIN_SRC python :session cpython :exports both :results output pp
+     import torch
+     import torch.nn as nn
+     import torch.nn.functional as F
+
+     import torchvision
+     import torchvision.transforms as transforms
+
+     torch.set_printoptions(linewidth=200)
+
+     class Network(nn.Module):
+       def __init__(self):
+         super().__init__()
+         self.conv1 = nn.Conv2d(in_channels=1, out_channels=6, kernel_size=5)
+         self.conv2 = nn.Conv2d(in_channels=6, out_channels=12, kernel_size=5)
+
+         self.fc1 = nn.Linear(in_features=12 * 4 * 4, out_features=120)
+         self.fc2 = nn.Linear(in_features=120, out_features=60)
+         self.out = nn.Linear(in_features=60, out_features=10)
+
+       def forward(self, t):
+         t = F.relu(self.conv1(t))
+         t = F.max_pool2d(t, kernel_size=2, stride=2)
+
+         t = F.relu(self.conv2(t))
+         t = F.max_pool2d(t, kernel_size=2, stride=2)
+
+         t = F.relu(self.fc1(t.view(-1, 12 * 4 * 4)))
+         t = F.relu(self.fc2(t))
+         t = self.out(t)
+
+         return t
+
+
+     train_set = torchvision.datasets.FashionMNIST(
+       root='./data',
+       train=True,
+       download=True,
+       transform=transforms.Compose([transforms.ToTensor()])
+     )
+
+
+     network = Network()
+     sample = next(iter(train_set))
+     image, label = sample
+
+     image.unsqueeze(0).shape
+     pred = network(image.unsqueeze(0))
+     print(pred)
+     print(pred.argmax(dim=1))
+   #+END_SRC
+
+   #+RESULTS:
+   : tensor([[ 0.0885,  0.1149,  0.0712,  0.0994, -0.0972,  0.0525, -0.0515,  0.0867,  0.1027,  0.0180]], grad_fn=<AddmmBackward>)
+   : tensor([1])
+
 * 附录
   安装 PyTorch 之前最好是配合 Anaconda3 发行版一起安装，安装好 Anaconda 过后直接
   使用下面命令安装
