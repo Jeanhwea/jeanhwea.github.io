@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-31 Sat 11:42 -->
+<!-- 2020-10-31 Sat 12:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>PyTorch</title>
@@ -244,25 +244,30 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orga2a17e9">1. PyTorch</a></li>
-<li><a href="#orgc651a21">2. 基础运算</a>
+<li><a href="#orgcc18df9">1. PyTorch</a></li>
+<li><a href="#orgff6cafa">2. 基础运算</a>
 <ul>
-<li><a href="#org2dec61f">2.1. 初始化 tensor</a></li>
-<li><a href="#orga44ad39">2.2. tensor 的一些操作</a></li>
-<li><a href="#orgb966198">2.3. tensor 和 ndarray 数据类型互转</a></li>
+<li><a href="#orgb40b2da">2.1. 初始化、数据类型</a></li>
+<li><a href="#org11d07ab">2.2. 获取形状</a></li>
+<li><a href="#orga7da053">2.3. Tensor 和 ndarray 数据类型互转</a></li>
 </ul>
 </li>
-<li><a href="#org223a71f">3. CUDA Tensor 技术</a></li>
-<li><a href="#orgcf3f8c3">4. 张量形状变换</a></li>
-<li><a href="#org79a909c">5. 附录</a></li>
-<li><a href="#org07618a6">6. 参考链接</a></li>
+<li><a href="#orgcf6a5e4">3. 形状变换</a>
+<ul>
+<li><a href="#org2452c49">3.1. 变形</a></li>
+<li><a href="#orgbe8869a">3.2. 拼接</a></li>
+</ul>
+</li>
+<li><a href="#orgf9a0dd1">4. CUDA 技术</a></li>
+<li><a href="#orge0a08fa">5. 附录</a></li>
+<li><a href="#org5bdb615">6. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orga2a17e9" class="outline-2">
-<h2 id="orga2a17e9"><span class="section-number-2">1</span> PyTorch</h2>
+<div id="outline-container-orgcc18df9" class="outline-2">
+<h2 id="orgcc18df9"><span class="section-number-2">1</span> PyTorch</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 PyTorch 和 Numpy 的数组和相似，PyTorch 的数据类型大多数是叫 Tensor，并且 Tensor
@@ -277,18 +282,18 @@ PyTorch 和 Numpy 的数组和相似，PyTorch 的数据类型大多数是叫 Te
 </div>
 </div>
 
-<div id="outline-container-orgc651a21" class="outline-2">
-<h2 id="orgc651a21"><span class="section-number-2">2</span> 基础运算</h2>
+<div id="outline-container-orgff6cafa" class="outline-2">
+<h2 id="orgff6cafa"><span class="section-number-2">2</span> 基础运算</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org2dec61f" class="outline-3">
-<h3 id="org2dec61f"><span class="section-number-3">2.1</span> 初始化 tensor</h3>
+<div id="outline-container-orgb40b2da" class="outline-3">
+<h3 id="orgb40b2da"><span class="section-number-3">2.1</span> 初始化、数据类型</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #6c71c4;">x0</span> = torch.zeros<span style="color: #8d5649;">(</span>2, 3<span style="color: #8d5649;">)</span>
 <span style="color: #6c71c4;">x1</span> = torch.ones<span style="color: #8d5649;">(</span>3, 2<span style="color: #8d5649;">)</span>
 <span style="color: #6c71c4;">x2</span> = torch.zeros<span style="color: #8d5649;">(</span>2, 3, dtype=torch.<span style="color: #6c71c4;">long</span><span style="color: #8d5649;">)</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">dtype: int32 int64 float32 float64</span>
-<span style="color: #6c71c4;">x3</span> = torch.Tensor<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1.1, 3.0<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">x3</span> = torch.tensor<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1.1, 3.0<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x1<span style="color: #8d5649;">)</span>
 <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x2<span style="color: #8d5649;">)</span>
 <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x3<span style="color: #8d5649;">)</span>
@@ -320,66 +325,35 @@ torch.float32
 </div>
 </div>
 
-<div id="outline-container-orga44ad39" class="outline-3">
-<h3 id="orga44ad39"><span class="section-number-3">2.2</span> tensor 的一些操作</h3>
+<div id="outline-container-org11d07ab" class="outline-3">
+<h3 id="org11d07ab"><span class="section-number-3">2.2</span> 获取形状</h3>
 <div class="outline-text-3" id="text-2-2">
+<p>
+获取 Tensor 的形状和元素数量
+</p>
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #6c71c4;">x1</span> = torch.Tensor<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1.1, 3.0<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+<pre class="src src-python"><span style="color: #6c71c4;">x1</span> = torch.tensor<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1.1, 3.0<span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x1.size<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x1.numel<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">number of elements</span>
+
+<span style="color: #6c71c4;">x2</span> = torch.tensor<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>1.1, 3.0, 3.3<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span>3, 4, 5<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x2.size<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x2.numel<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span>
 </pre>
 </div>
 
 <pre class="example">
 torch.Size([2])
-
-</pre>
-
-<p>
-如果想要 resize 或 reshape 一个 tensor，可以使用 view 方法
-</p>
-<div class="org-src-container">
-<pre class="src src-python"><span style="color: #6c71c4;">x1</span> = torch.randn<span style="color: #8d5649;">(</span>24<span style="color: #8d5649;">)</span>
-<span style="color: #6c71c4;">x2</span> = x1.view<span style="color: #8d5649;">(</span>2, 3, 4<span style="color: #8d5649;">)</span>
-<span style="color: #6c71c4;">x3</span> = x1.view<span style="color: #8d5649;">(</span>4, -1<span style="color: #8d5649;">)</span>
-<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x2<span style="color: #8d5649;">)</span>
-<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x3<span style="color: #8d5649;">)</span>
-</pre>
-</div>
-
-<pre class="example">
-tensor([[[-0.1641, -0.2935,  1.0093,  0.5002],
-         [-0.9807,  0.4791, -0.3171, -0.8985],
-         [-1.0155, -0.6139, -0.4744,  1.0637]],
-
-        [[ 2.1102, -0.5365,  0.7032, -0.1529],
-         [-0.3487, -0.9573,  0.5081, -0.2366],
-         [ 1.0415,  0.3548,  0.5515, -0.2949]]])
-tensor([[-0.1641, -0.2935,  1.0093,  0.5002, -0.9807,  0.4791],
-        [-0.3171, -0.8985, -1.0155, -0.6139, -0.4744,  1.0637],
-        [ 2.1102, -0.5365,  0.7032, -0.1529, -0.3487, -0.9573],
-        [ 0.5081, -0.2366,  1.0415,  0.3548,  0.5515, -0.2949]])
-</pre>
-
-<p>
-如果 tensor 里只有一个数字，item 方法可以把里面的 value 变成 Python 数值
-</p>
-<div class="org-src-container">
-<pre class="src src-python"><span style="color: #6c71c4;">x</span> = torch.randn<span style="color: #8d5649;">(</span>1<span style="color: #8d5649;">)</span>
-<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x<span style="color: #8d5649;">)</span>
-<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x.item<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span>
-</pre>
-</div>
-
-<pre class="example">
-tensor([0.1705])
-0.1705346405506134
+2
+torch.Size([2, 3])
+6
 
 </pre>
 </div>
 </div>
 
-<div id="outline-container-orgb966198" class="outline-3">
-<h3 id="orgb966198"><span class="section-number-3">2.3</span> tensor 和 ndarray 数据类型互转</h3>
+<div id="outline-container-orga7da053" class="outline-3">
+<h3 id="orga7da053"><span class="section-number-3">2.3</span> Tensor 和 ndarray 数据类型互转</h3>
 <div class="outline-text-3" id="text-2-3">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #6c71c4;">t1</span> = torch.randn<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>2, 3<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span> <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">normal distribution with shape (2,3)</span>
@@ -439,36 +413,57 @@ tensor([0, 0, 3])
 </div>
 </div>
 
-<div id="outline-container-org223a71f" class="outline-2">
-<h2 id="org223a71f"><span class="section-number-2">3</span> CUDA Tensor 技术</h2>
+<div id="outline-container-orgcf6a5e4" class="outline-2">
+<h2 id="orgcf6a5e4"><span class="section-number-2">3</span> 形状变换</h2>
 <div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org2452c49" class="outline-3">
+<h3 id="org2452c49"><span class="section-number-3">3.1</span> 变形</h3>
+<div class="outline-text-3" id="text-3-1">
 <p>
-Tensor 可以放在 CUDA 显卡上进行计算
+如果想要 resize 或 reshape 一个 tensor，可以使用 view 方法。如果需要 copy，用
+clone, 如果需要源数据，用 view, reshape 这玩意不好控制，则没那么可控，他的执
+行结果可能是源数据的一个 copy，也可能不是，最好少用
 </p>
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #6c71c4;">x</span> = torch.randn<span style="color: #8d5649;">(</span>2, 3<span style="color: #8d5649;">)</span>
-<span style="color: #859900;">if</span> torch.cuda.is_available<span style="color: #8d5649;">()</span>:
-    <span style="color: #6c71c4;">device</span> = torch.device<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"cuda:0"</span><span style="color: #8d5649;">)</span>  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">a CUDA device object</span>
-    <span style="color: #6c71c4;">y</span> = torch.ones_like<span style="color: #8d5649;">(</span>x, device=device<span style="color: #8d5649;">)</span>  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">directly create a tensor on GPU</span>
-    <span style="color: #6c71c4;">x</span> = x.to<span style="color: #8d5649;">(</span>device<span style="color: #8d5649;">)</span>  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">or just use strings ``.to("cuda")``</span>
-    <span style="color: #6c71c4;">z</span> = x + y
-    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>z<span style="color: #8d5649;">)</span>
-    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>z.to<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"cpu"</span>, torch.double<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">``.to`` can also change dtype together!</span>
-<span style="color: #859900;">else</span>:
-    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"gpu is not available"</span><span style="color: #8d5649;">)</span>
+<pre class="src src-python"><span style="color: #6c71c4;">x1</span> = torch.randn<span style="color: #8d5649;">(</span>24<span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">x2</span> = x1.view<span style="color: #8d5649;">(</span>2, 3, 4<span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">x3</span> = x1.view<span style="color: #8d5649;">(</span>4, -1<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x2<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x3<span style="color: #8d5649;">)</span>
 </pre>
 </div>
 
 <pre class="example">
-gpu is not available
+tensor([[[-0.0513,  1.5727,  1.4737,  0.3913],
+         [ 2.2639,  0.4963,  0.3401, -0.2731],
+         [-1.4023,  1.7182,  0.9297,  0.1243]],
 
+        [[-0.4909, -0.5568,  1.9808,  0.7490],
+         [ 0.1885,  0.4245,  0.0027, -0.8911],
+         [-0.7410,  1.0522, -0.8816, -2.5483]]])
+tensor([[-0.0513,  1.5727,  1.4737,  0.3913,  2.2639,  0.4963],
+        [ 0.3401, -0.2731, -1.4023,  1.7182,  0.9297,  0.1243],
+        [-0.4909, -0.5568,  1.9808,  0.7490,  0.1885,  0.4245],
+        [ 0.0027, -0.8911, -0.7410,  1.0522, -0.8816, -2.5483]])
+</pre>
+
+<p>
+如果 tensor 里只有一个数字，item 方法可以把里面的 value 变成 Python 数值
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6c71c4;">x</span> = torch.randn<span style="color: #8d5649;">(</span>1<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x.item<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span>
 </pre>
 </div>
-</div>
 
-<div id="outline-container-orgcf3f8c3" class="outline-2">
-<h2 id="orgcf3f8c3"><span class="section-number-2">4</span> 张量形状变换</h2>
-<div class="outline-text-2" id="text-4">
+<pre class="example">
+tensor([-0.4755])
+-0.47550874948501587
+
+</pre>
+
 <p>
 修改矩阵的形状，转置，交换维度等操作
 </p>
@@ -529,11 +524,90 @@ tensor([0, 1, 2, 3, 4, 5])
 tensor([[0, 1, 2, 3, 4, 5]])
 
 </pre>
+
+<p>
+定义一个 flatten 函数，将输入数据扁平化
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #859900;">def</span> <span style="color: #b58900;">flatten</span><span style="color: #8d5649;">(</span>t<span style="color: #8d5649;">)</span>:
+    <span style="color: #6c71c4;">t</span> = t.view<span style="color: #8d5649;">(</span>1, -1<span style="color: #8d5649;">)</span>
+    <span style="color: #6c71c4;">t</span> = t.squeeze<span style="color: #8d5649;">()</span>
+    <span style="color: #859900;">return</span> t
+
+<span style="color: #6c71c4;">x1</span> = torch.tensor<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span>1, 2, 3, 4, 5, 6<span style="color: #d8241f;">]</span>, dtype=torch.float32<span style="color: #8d5649;">)</span>.reshape<span style="color: #8d5649;">(</span>2, 3<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x1<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>flatten<span style="color: #d8241f;">(</span>x1<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+tensor([[1., 2., 3.],
+        [4., 5., 6.]])
+tensor([1., 2., 3., 4., 5., 6.])
+
+</pre>
 </div>
 </div>
 
-<div id="outline-container-org79a909c" class="outline-2">
-<h2 id="org79a909c"><span class="section-number-2">5</span> 附录</h2>
+<div id="outline-container-orgbe8869a" class="outline-3">
+<h3 id="orgbe8869a"><span class="section-number-3">3.2</span> 拼接</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+将多个张量合并拼接成一个向量
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6c71c4;">t1</span> = torch.tensor<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>1, 2<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span>3, 4<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">t2</span> = torch.tensor<span style="color: #8d5649;">(</span><span style="color: #d8241f;">[</span><span style="color: #9564bf;">[</span>5, 6<span style="color: #9564bf;">]</span>, <span style="color: #9564bf;">[</span>7, 8<span style="color: #9564bf;">]</span><span style="color: #d8241f;">]</span><span style="color: #8d5649;">)</span>
+
+<span style="color: #6c71c4;">x1</span> = torch.cat<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>t1, t2<span style="color: #d8241f;">)</span>, dim=0<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x1<span style="color: #8d5649;">)</span>
+<span style="color: #6c71c4;">x2</span> = torch.cat<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>t1, t2<span style="color: #d8241f;">)</span>, dim=1<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>x2<span style="color: #8d5649;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+tensor([[1, 2],
+        [3, 4],
+        [5, 6],
+        [7, 8]])
+tensor([[1, 2, 5, 6],
+        [3, 4, 7, 8]])
+
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf9a0dd1" class="outline-2">
+<h2 id="orgf9a0dd1"><span class="section-number-2">4</span> CUDA 技术</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Tensor 可以放在 CUDA 显卡上进行计算
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6c71c4;">x</span> = torch.randn<span style="color: #8d5649;">(</span>2, 3<span style="color: #8d5649;">)</span>
+<span style="color: #859900;">if</span> torch.cuda.is_available<span style="color: #8d5649;">()</span>:
+    <span style="color: #6c71c4;">device</span> = torch.device<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"cuda:0"</span><span style="color: #8d5649;">)</span>  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">a CUDA device object</span>
+    <span style="color: #6c71c4;">y</span> = torch.ones_like<span style="color: #8d5649;">(</span>x, device=device<span style="color: #8d5649;">)</span>  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">directly create a tensor on GPU</span>
+    <span style="color: #6c71c4;">x</span> = x.to<span style="color: #8d5649;">(</span>device<span style="color: #8d5649;">)</span>  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">or just use strings ``.to("cuda")``</span>
+    <span style="color: #6c71c4;">z</span> = x + y
+    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>z<span style="color: #8d5649;">)</span>
+    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span>z.to<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"cpu"</span>, torch.double<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>  <span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">``.to`` can also change dtype together!</span>
+<span style="color: #859900;">else</span>:
+    <span style="color: #859900;">print</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"gpu is not available"</span><span style="color: #8d5649;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+gpu is not available
+
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orge0a08fa" class="outline-2">
+<h2 id="orge0a08fa"><span class="section-number-2">5</span> 附录</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 安装 PyTorch 之前最好是配合 Anaconda3 发行版一起安装，安装好 Anaconda 过后直接
@@ -554,8 +628,8 @@ tensor([[0, 1, 2, 3, 4, 5]])
 </div>
 </div>
 
-<div id="outline-container-org07618a6" class="outline-2">
-<h2 id="org07618a6"><span class="section-number-2">6</span> 参考链接</h2>
+<div id="outline-container-org5bdb615" class="outline-2">
+<h2 id="org5bdb615"><span class="section-number-2">6</span> 参考链接</h2>
 <div class="outline-text-2" id="text-6">
 <ol class="org-ol">
 <li><a href="https://pytorch.org/">PyTorch</a></li>
@@ -567,7 +641,7 @@ tensor([[0, 1, 2, 3, 4, 5]])
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-10-31 Sat 11:42. Created by Jinghui Hu at 2020-10-12 Mon 10:48.</p>
+<p class="author">Last Updated 2020-10-31 Sat 12:20. Created by Jinghui Hu at 2020-10-12 Mon 10:48.</p>
 </div>
 </body>
 </html>
