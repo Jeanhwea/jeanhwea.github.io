@@ -14,7 +14,15 @@
 
   #+BEGIN_SRC python :session cpython :exports both :results none
     import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+
+    import torchvision
+    import torchvision.transforms as transforms
+
     import numpy as np
+
+    torch.set_printoptions(linewidth=200)
   #+END_SRC
 
 * 基础运算
@@ -70,21 +78,19 @@
      print(t1)
      print(a1)
 
-     a2 = np.random.normal(0, 0.01, 10)
+     a2 = np.random.normal(0, 0.01, 6)
      t2 = torch.from_numpy(a2)
      print(a2)
      print(t2)
    #+END_SRC
 
    #+RESULTS:
-   : tensor([[ 2.0561,  1.1593,  2.7883],
-   :         [-0.7887,  0.3536,  1.7694]])
-   : [[ 2.0561314   1.1592966   2.7883365 ]
-   :  [-0.7886873   0.35360292  1.7694149 ]]
-   : [-0.00119581 -0.0058083  -0.02654656  0.00712973 -0.01919779 -0.01425222
-   :   0.0085908   0.00619372 -0.00130839 -0.0010277 ]
-   : tensor([-0.0012, -0.0058, -0.0265,  0.0071, -0.0192, -0.0143,  0.0086,  0.0062,
-   :         -0.0013, -0.0010], dtype=torch.float64)
+   : tensor([[-0.0652, -0.3537,  1.3550],
+   :         [-0.6979, -0.7713, -0.5261]])
+   : [[-0.0652356  -0.35367048  1.3549587 ]
+   :  [-0.6978578  -0.7712709  -0.5261264 ]]
+   : [-0.0092347  -0.00012146 -0.00581832 -0.00620685 -0.00119326 -0.00189925]
+   : tensor([-0.0092, -0.0001, -0.0058, -0.0062, -0.0012, -0.0019], dtype=torch.float64)
 
    PyTorch 和 Numpy 数据关系包含两种关系：share vs. copy
    #+BEGIN_SRC python :session cpython :exports both :results output pp
