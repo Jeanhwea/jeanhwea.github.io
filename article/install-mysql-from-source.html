@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-12-11 Fri 15:31 -->
+<!-- 2020-12-11 Fri 15:41 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>源码安装 MySQL 5.7 数据库</title>
@@ -180,6 +180,12 @@
   .org-svg { width: 90%; }
   /*]]>*/-->
 </style>
+<link rel="stylesheet" type="text/css" href="src/readtheorg_theme/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="src/readtheorg_theme/css/readtheorg.css"/>
+<script type="text/javascript" src="src/lib/js/jquery.min.js"></script>
+<script type="text/javascript" src="src/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="src/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="src/readtheorg_theme/js/readtheorg.js"></script>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -238,37 +244,37 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org186e026">1. 准备工作</a>
+<li><a href="#org6d63dc9">1. 准备工作</a>
 <ul>
-<li><a href="#org35de3ef">1.1. 下载安装文件</a></li>
-<li><a href="#org3e9ed9d">1.2. 安装依赖包</a></li>
-<li><a href="#orgf2f016e">1.3. 新建用户及目录</a></li>
+<li><a href="#org05257aa">1.1. 下载安装文件</a></li>
+<li><a href="#org1077909">1.2. 安装依赖包</a></li>
+<li><a href="#orgae06740">1.3. 新建用户及目录</a></li>
 </ul>
 </li>
-<li><a href="#orgc5328ab">2. 编译安装</a>
+<li><a href="#org59141ea">2. 编译安装</a>
 <ul>
-<li><a href="#orgcc33d1b">2.1. 配置 cmake 的编译参数</a></li>
-<li><a href="#orgb630c7c">2.2. 编译和安装</a></li>
+<li><a href="#orgc7c3da2">2.1. 配置 cmake 的编译参数</a></li>
+<li><a href="#org9b9a377">2.2. 编译和安装</a></li>
 </ul>
 </li>
-<li><a href="#org03f8a04">3. 配置和建库</a>
+<li><a href="#org0923947">3. 配置和建库</a>
 <ul>
-<li><a href="#org20f5765">3.1. 初始化和建库</a></li>
-<li><a href="#org72518ac">3.2. 配置数据库</a></li>
+<li><a href="#orge0aec21">3.1. 初始化和建库</a></li>
+<li><a href="#orga4fb6c9">3.2. 配置数据库</a></li>
 </ul>
 </li>
-<li><a href="#org6f54649">4. 相关连接</a></li>
+<li><a href="#orgb064c16">4. 相关连接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org186e026" class="outline-2">
-<h2 id="org186e026"><span class="section-number-2">1</span> 准备工作</h2>
+<div id="outline-container-org6d63dc9" class="outline-2">
+<h2 id="org6d63dc9"><span class="section-number-2">1</span> 准备工作</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org35de3ef" class="outline-3">
-<h3 id="org35de3ef"><span class="section-number-3">1.1</span> 下载安装文件</h3>
+<div id="outline-container-org05257aa" class="outline-3">
+<h3 id="org05257aa"><span class="section-number-3">1.1</span> 下载安装文件</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 MySQL 5.7 版本依赖于 boost 库，需要在官网上下载并安装对应的 mysql 源代码包和
@@ -299,9 +305,12 @@ mysql57 $ md5sum mysql-boost-5.7.26.tar.gz
 </div>
 </div>
 
-<div id="outline-container-org3e9ed9d" class="outline-3">
-<h3 id="org3e9ed9d"><span class="section-number-3">1.2</span> 安装依赖包</h3>
+<div id="outline-container-org1077909" class="outline-3">
+<h3 id="org1077909"><span class="section-number-3">1.2</span> 安装依赖包</h3>
 <div class="outline-text-3" id="text-1-2">
+<p>
+直接使用 yum 安装下面对应的依赖包
+</p>
 <div class="org-src-container">
 <pre class="src src-sh">yum install -y gcc gcc-c++ cmake ncurses ncurses-devel bison bison-devel
 </pre>
@@ -309,8 +318,8 @@ mysql57 $ md5sum mysql-boost-5.7.26.tar.gz
 </div>
 </div>
 
-<div id="outline-container-orgf2f016e" class="outline-3">
-<h3 id="orgf2f016e"><span class="section-number-3">1.3</span> 新建用户及目录</h3>
+<div id="outline-container-orgae06740" class="outline-3">
+<h3 id="orgae06740"><span class="section-number-3">1.3</span> 新建用户及目录</h3>
 <div class="outline-text-3" id="text-1-3">
 <div class="org-src-container">
 <pre class="src src-sh">groupadd mysql &amp;&amp; <span style="color: #2aa198;">\</span>
@@ -324,12 +333,12 @@ mkdir -p /usr/local/mysql/data &amp;&amp; <span style="color: #2aa198;">\</span>
 </div>
 </div>
 
-<div id="outline-container-orgc5328ab" class="outline-2">
-<h2 id="orgc5328ab"><span class="section-number-2">2</span> 编译安装</h2>
+<div id="outline-container-org59141ea" class="outline-2">
+<h2 id="org59141ea"><span class="section-number-2">2</span> 编译安装</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgcc33d1b" class="outline-3">
-<h3 id="orgcc33d1b"><span class="section-number-3">2.1</span> 配置 cmake 的编译参数</h3>
+<div id="outline-container-orgc7c3da2" class="outline-3">
+<h3 id="orgc7c3da2"><span class="section-number-3">2.1</span> 配置 cmake 的编译参数</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-sh">cmake . <span style="color: #2aa198;">\</span>
@@ -356,8 +365,8 @@ mkdir -p /usr/local/mysql/data &amp;&amp; <span style="color: #2aa198;">\</span>
 </div>
 </div>
 
-<div id="outline-container-orgb630c7c" class="outline-3">
-<h3 id="orgb630c7c"><span class="section-number-3">2.2</span> 编译和安装</h3>
+<div id="outline-container-org9b9a377" class="outline-3">
+<h3 id="org9b9a377"><span class="section-number-3">2.2</span> 编译和安装</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 <pre class="src src-sh">make &amp;&amp; make install
@@ -367,12 +376,12 @@ mkdir -p /usr/local/mysql/data &amp;&amp; <span style="color: #2aa198;">\</span>
 </div>
 </div>
 
-<div id="outline-container-org03f8a04" class="outline-2">
-<h2 id="org03f8a04"><span class="section-number-2">3</span> 配置和建库</h2>
+<div id="outline-container-org0923947" class="outline-2">
+<h2 id="org0923947"><span class="section-number-2">3</span> 配置和建库</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org20f5765" class="outline-3">
-<h3 id="org20f5765"><span class="section-number-3">3.1</span> 初始化和建库</h3>
+<div id="outline-container-orge0aec21" class="outline-3">
+<h3 id="orge0aec21"><span class="section-number-3">3.1</span> 初始化和建库</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 初始化数据库目录
@@ -432,8 +441,8 @@ mysql&gt;
 </div>
 </div>
 
-<div id="outline-container-org72518ac" class="outline-3">
-<h3 id="org72518ac"><span class="section-number-3">3.2</span> 配置数据库</h3>
+<div id="outline-container-orga4fb6c9" class="outline-3">
+<h3 id="orga4fb6c9"><span class="section-number-3">3.2</span> 配置数据库</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 添加配置文件 <code>/etc/my.cnf</code>
@@ -470,8 +479,8 @@ mysql&gt;
 </div>
 </div>
 
-<div id="outline-container-org6f54649" class="outline-2">
-<h2 id="org6f54649"><span class="section-number-2">4</span> 相关连接</h2>
+<div id="outline-container-orgb064c16" class="outline-2">
+<h2 id="orgb064c16"><span class="section-number-2">4</span> 相关连接</h2>
 <div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li><a href="https://dev.mysql.com/doc/refman/5.7/en/source-installation.html">MySQL 官方安装文档</a></li>
@@ -480,7 +489,7 @@ mysql&gt;
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-12-11 Fri 15:31. Created by Jinghui Hu at 2020-10-15 Thu 07:41.</p>
+<p class="author">Last Updated 2020-12-11 Fri 15:41. Created by Jinghui Hu at 2020-10-15 Thu 07:41.</p>
 </div>
 </body>
 </html>
