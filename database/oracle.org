@@ -2571,6 +2571,33 @@
      select sid, serial# from v$session
        where audsid = sys_context('userenv', 'sessionid');
    #+END_SRC
+** 闪回表
+   闪回表需要数据库和表空间都开启了闪回模式
+   #+BEGIN_SRC sql
+     SQL> alter table t1 enable row movement;
+
+     Table altered.
+
+     SQL> drop table t1;
+
+     Table dropped.
+
+     SQL> flashback table t1 to before drop;
+
+     Flashback complete.
+
+     SQL> select count(*) from t1 as of timestamp to_date('20201220 17:00:00', 'yyyymmdd hh24:mi:ss');
+
+       COUNT(*)
+     ----------
+          87188
+
+     SQL> select count(*) from t1 as of timestamp to_date('20201220 17:04:00', 'yyyymmdd hh24:mi:ss');
+
+       COUNT(*)
+     ----------
+            298
+   #+END_SRC
 * 参考链接
   1. [[https://docs.oracle.com/cd/E11882_01/index.htm][Oracle Database 11g Release 2 在线文档]]
   2. [[http://download.oracle.com/docs/cds/E11882_01.zip][Oracle 11g Release 2 文档离线]] - 点击后下载得到 Zip 包
