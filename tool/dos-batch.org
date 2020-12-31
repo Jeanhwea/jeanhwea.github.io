@@ -101,3 +101,50 @@
     set TEXT_COUNT=0
     for %%a in (*.txt) do set /a TEXT_COUNT+=1
   #+END_SRC
+
+* 连接远程共享文件系统
+  Windows 可以使用 ~net use~ 命令来连接远程共享的网络文件系统
+  #+BEGIN_SRC text
+    D:\Test>net use /?
+    此命令的语法是:
+
+    NET USE
+    [devicename | *] [\\computername\sharename[\volume] [password | *]]
+            [/USER:[domainname\]username]
+            [/USER:[dotted domain name\]username]
+            [/USER:[username@dotted domain name]
+            [/SMARTCARD]
+            [/SAVECRED]
+            [/REQUIREINTEGRITY]
+            [/REQUIREPRIVACY]
+            [/WRITETHROUGH]
+            [[/DELETE] | [/PERSISTENT:{YES | NO}]]
+
+    NET USE {devicename | *} [password | *] /HOME
+
+    NET USE [/PERSISTENT:{YES | NO}]
+
+    D:\Test>net use
+    会记录新的网络连接。
+
+
+    状态       本地        远程                      网络
+
+    -------------------------------------------------------------------------------
+    OK           Z:        \\192.168.1.100\Share      Microsoft Windows Network
+    命令成功完成。
+
+
+    D:\Test>net use z: /delete
+    在与 z: 的连接中，有打开的文件和/或没有结束的目录搜索。
+
+    是否继续断开连接并强行关闭? (Y/N) [N]: y
+    z: 已经删除。
+
+
+    D:\Test>net use z: \\192.168.1.100\Share
+    命令成功完成。
+
+
+    D:\Test>
+  #+END_SRC

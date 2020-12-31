@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-12-31 Thu 20:29 -->
+<!-- 2020-12-31 Thu 20:47 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>DOS Batch 编程</title>
@@ -244,18 +244,19 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org126db62">1. 编程范式</a></li>
-<li><a href="#org5c8a1aa">2. 定义函数</a></li>
-<li><a href="#org973e6fb">3. 获取返回值</a></li>
-<li><a href="#orgc1b6750">4. 遍历传入的命令行参数</a></li>
-<li><a href="#orgdce1f79">5. 常见功能</a></li>
+<li><a href="#org0e32c82">1. 编程范式</a></li>
+<li><a href="#org1d1e571">2. 定义函数</a></li>
+<li><a href="#org7df2ef4">3. 获取返回值</a></li>
+<li><a href="#org563f09e">4. 遍历传入的命令行参数</a></li>
+<li><a href="#org3c9aeb0">5. 常见功能</a></li>
+<li><a href="#org3fd683b">6. 连接远程共享文件系统</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org126db62" class="outline-2">
-<h2 id="org126db62"><span class="section-number-2">1</span> 编程范式</h2>
+<div id="outline-container-org0e32c82" class="outline-2">
+<h2 id="org0e32c82"><span class="section-number-2">1</span> 编程范式</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
 <pre class="src src-bat">@<span style="color: #c397d8;">echo</span> off
@@ -276,8 +277,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org5c8a1aa" class="outline-2">
-<h2 id="org5c8a1aa"><span class="section-number-2">2</span> 定义函数</h2>
+<div id="outline-container-org1d1e571" class="outline-2">
+<h2 id="org1d1e571"><span class="section-number-2">2</span> 定义函数</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Batch 脚本中没有函数，可以使用符号模拟的方式来创建
@@ -316,8 +317,8 @@ ping -<span style="color: #7aa6da;">n</span> %~1 127.0.0.1 &gt;nul 2&gt;&amp;1
 </div>
 </div>
 
-<div id="outline-container-org973e6fb" class="outline-2">
-<h2 id="org973e6fb"><span class="section-number-2">3</span> 获取返回值</h2>
+<div id="outline-container-org7df2ef4" class="outline-2">
+<h2 id="org7df2ef4"><span class="section-number-2">3</span> 获取返回值</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Batch 脚本通过 <code>%ERRORLEVEL%</code> 变量获取，常见的代码片段如下
@@ -331,8 +332,8 @@ Batch 脚本通过 <code>%ERRORLEVEL%</code> 变量获取，常见的代码片�
 </div>
 </div>
 
-<div id="outline-container-orgc1b6750" class="outline-2">
-<h2 id="orgc1b6750"><span class="section-number-2">4</span> 遍历传入的命令行参数</h2>
+<div id="outline-container-org563f09e" class="outline-2">
+<h2 id="org563f09e"><span class="section-number-2">4</span> 遍历传入的命令行参数</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 这里使用到
@@ -363,8 +364,8 @@ Batch 脚本通过 <code>%ERRORLEVEL%</code> 变量获取，常见的代码片�
 </div>
 </div>
 
-<div id="outline-container-orgdce1f79" class="outline-2">
-<h2 id="orgdce1f79"><span class="section-number-2">5</span> 常见功能</h2>
+<div id="outline-container-org3c9aeb0" class="outline-2">
+<h2 id="org3c9aeb0"><span class="section-number-2">5</span> 常见功能</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 获取当前机器 IP
@@ -393,9 +394,63 @@ Batch 脚本通过 <code>%ERRORLEVEL%</code> 变量获取，常见的代码片�
 </div>
 </div>
 </div>
+
+<div id="outline-container-org3fd683b" class="outline-2">
+<h2 id="org3fd683b"><span class="section-number-2">6</span> 连接远程共享文件系统</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+Windows 可以使用 <code>net use</code> 命令来连接远程共享的网络文件系统
+</p>
+<div class="org-src-container">
+<pre class="src src-text">D:\Test&gt;net use /?
+&#27492;&#21629;&#20196;&#30340;&#35821;&#27861;&#26159;:
+
+NET USE
+[devicename | *] [\\computername\sharename[\volume] [password | *]]
+        [/USER:[domainname\]username]
+        [/USER:[dotted domain name\]username]
+        [/USER:[username@dotted domain name]
+        [/SMARTCARD]
+        [/SAVECRED]
+        [/REQUIREINTEGRITY]
+        [/REQUIREPRIVACY]
+        [/WRITETHROUGH]
+        [[/DELETE] | [/PERSISTENT:{YES | NO}]]
+
+NET USE {devicename | *} [password | *] /HOME
+
+NET USE [/PERSISTENT:{YES | NO}]
+
+D:\Test&gt;net use
+&#20250;&#35760;&#24405;&#26032;&#30340;&#32593;&#32476;&#36830;&#25509;&#12290;
+
+
+&#29366;&#24577;       &#26412;&#22320;        &#36828;&#31243;                      &#32593;&#32476;
+
+-------------------------------------------------------------------------------
+OK           Z:        \\192.168.1.100\Share      Microsoft Windows Network
+&#21629;&#20196;&#25104;&#21151;&#23436;&#25104;&#12290;
+
+
+D:\Test&gt;net use z: /delete
+&#22312;&#19982; z: &#30340;&#36830;&#25509;&#20013;&#65292;&#26377;&#25171;&#24320;&#30340;&#25991;&#20214;&#21644;/&#25110;&#27809;&#26377;&#32467;&#26463;&#30340;&#30446;&#24405;&#25628;&#32034;&#12290;
+
+&#26159;&#21542;&#32487;&#32493;&#26029;&#24320;&#36830;&#25509;&#24182;&#24378;&#34892;&#20851;&#38381;? (Y/N) [N]: y
+z: &#24050;&#32463;&#21024;&#38500;&#12290;
+
+
+D:\Test&gt;net use z: \\192.168.1.100\Share
+&#21629;&#20196;&#25104;&#21151;&#23436;&#25104;&#12290;
+
+
+D:\Test&gt;
+</pre>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-12-31 Thu 20:29. Created by Jinghui Hu at 2020-12-30 Wed 19:16.</p>
+<p class="author">Last Updated 2020-12-31 Thu 20:47. Created by Jinghui Hu at 2020-12-30 Wed 19:16.</p>
 </div>
 </body>
 </html>
