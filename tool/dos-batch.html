@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-12-30 Wed 19:24 -->
+<!-- 2020-12-31 Thu 14:26 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DOS Batch Scripting</title>
+<title>DOS Batch 编程</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="Jinghui Hu" />
 <style type="text/css">
@@ -180,12 +180,6 @@
   .org-svg { width: 90%; }
   /*]]>*/-->
 </style>
-<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
-<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
-<script type="text/javascript" src="styles/lib/js/jquery.min.js"></script>
-<script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
-<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -239,85 +233,105 @@ for the JavaScript code in this tag.
  |
  <a accesskey="H" href="../index.html"> HOME </a>
 </div><div id="content">
-<h1 class="title">DOS Batch Scripting</h1>
+<h1 class="title">DOS Batch 编程</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgafd11b4">1. 通常模式</a></li>
-<li><a href="#orgf93cf7e">2. 定义函数</a></li>
-<li><a href="#org7949049">3. 常见功能</a></li>
+<li><a href="#org8e8028a">1. 编程范式</a></li>
+<li><a href="#orgf908622">2. 定义函数</a></li>
+<li><a href="#orga5a9e2b">3. 获取返回值</a></li>
+<li><a href="#org84c49de">4. 常见功能</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgafd11b4" class="outline-2">
-<h2 id="orgafd11b4"><span class="section-number-2">1</span> 通常模式</h2>
+<div id="outline-container-org8e8028a" class="outline-2">
+<h2 id="org8e8028a"><span class="section-number-2">1</span> 编程范式</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
-<pre class="src src-bat">@<span style="color: #c397d8;">echo</span> off
-<span style="color: #c397d8;">setlocal</span> EnableExtensions
-<span style="color: #c397d8;">set</span> <span style="color: #e7c547;">HERE</span>=%~dp0
-<span style="color: #c397d8;">set</span> <span style="color: #e7c547;">DRIVER</span>=%~d0
+<pre class="src src-bat">@<span style="color: #6c71c4;">echo</span> off
+<span style="color: #6c71c4;">setlocal</span> EnableExtensions
+<span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">HERE</span>=%~dp0
+<span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">DRIVER</span>=%~d0
 
 
-<span style="color: #969896; font-style: italic;">rem </span><span style="color: #969896; font-style: italic;">coding...</span>
+<span style="color: #93a1a1; font-style: italic;">rem </span><span style="color: #93a1a1; font-style: italic;">coding...</span>
 
 
 <span style="font-weight: bold;">:DONE</span>
-<span style="color: #c397d8;">endlocal</span>
-<span style="color: #c397d8;">echo</span> on
-<span style="color: #b9ca4a;">exit</span> /<span style="color: #7aa6da;">b</span> 0
+<span style="color: #6c71c4;">endlocal</span>
+<span style="color: #6c71c4;">echo</span> on
+<span style="color: #859900;">exit</span> /<span style="color: #268bd2;">b</span> 0
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgf93cf7e" class="outline-2">
-<h2 id="orgf93cf7e"><span class="section-number-2">2</span> 定义函数</h2>
+<div id="outline-container-orgf908622" class="outline-2">
+<h2 id="orgf908622"><span class="section-number-2">2</span> 定义函数</h2>
 <div class="outline-text-2" id="text-2">
 <p>
-Batch 脚本中没有函数，需要通过 <code>call</code> 来模拟函数调用，例如
+Batch 脚本中没有函数，可以使用符号模拟的方式来创建
 </p>
+<ol class="org-ol">
+<li>定义的函数一定要写在脚本最后</li>
+<li>需要通过 <code>call</code> 来模拟函数调用</li>
+</ol>
 <div class="org-src-container">
-<pre class="src src-bat"><span style="color: #b9ca4a;">call</span> <span style="color: #7aa6da;">:GetDateTime</span> time0
-<span style="color: #b9ca4a;">call</span> <span style="color: #7aa6da;">:Sleep</span> 10
-<span style="color: #b9ca4a;">call</span> <span style="color: #7aa6da;">:GetDateTime</span> time1
+<pre class="src src-bat"><span style="color: #859900;">call</span> <span style="color: #268bd2;">:GetDateTime</span> time0
+<span style="color: #859900;">call</span> <span style="color: #268bd2;">:Sleep</span> 10
+<span style="color: #859900;">call</span> <span style="color: #268bd2;">:GetDateTime</span> time1
 
-<span style="color: #c397d8;">echo</span> %<span style="color: #e7c547;">time0</span>%
-<span style="color: #c397d8;">echo</span> %<span style="color: #e7c547;">time1</span>%
+<span style="color: #6c71c4;">echo</span> %<span style="color: #6c71c4;">time0</span>%
+<span style="color: #6c71c4;">echo</span> %<span style="color: #6c71c4;">time1</span>%
 
 
 <span style="font-weight: bold;">:DONE</span>
-<span style="color: #c397d8;">endlocal</span>
-<span style="color: #c397d8;">echo</span> on
-<span style="color: #b9ca4a;">exit</span> /<span style="color: #7aa6da;">b</span> 0
+<span style="color: #6c71c4;">endlocal</span>
+<span style="color: #6c71c4;">echo</span> on
+<span style="color: #859900;">exit</span> /<span style="color: #268bd2;">b</span> 0
 
 <span style="font-weight: bold;">:GetDateTime</span>
-<span style="color: #c397d8;">set</span> <span style="color: #e7c547;">DATETAG</span>=%<span style="color: #e7c547;">date:</span>~0,4%<span style="color: #e7c547;">-</span>%<span style="color: #c397d8;">date</span>:~5,2%<span style="color: #e7c547;">-</span>%<span style="color: #c397d8;">date</span>:~8,2%
-<span style="color: #c397d8;">set</span> <span style="color: #e7c547;">TIMETAG</span>=%<span style="color: #e7c547;">time:</span>~0,2%<span style="color: #e7c547;">:</span>%<span style="color: #c397d8;">time</span>:~3,2%<span style="color: #e7c547;">:</span>%<span style="color: #c397d8;">time</span>:~6,2%
-<span style="color: #c397d8;">set</span> <span style="color: #e7c547;">HOUR</span>=%<span style="color: #e7c547;">time:</span>~0,2%
-<span style="color: #b9ca4a;">if</span> /<span style="color: #7aa6da;">i</span> %<span style="color: #e7c547;">HOUR</span>% <span style="color: #b9ca4a;">lss</span> 10 (<span style="color: #c397d8;">set</span> <span style="color: #e7c547;">TIMETAG</span>=0%<span style="color: #e7c547;">time:</span>~1,1%<span style="color: #e7c547;">:</span>%<span style="color: #c397d8;">time</span>:~3,2%<span style="color: #e7c547;">:</span>%<span style="color: #c397d8;">time</span>:~6,2%<span style="color: #e7c547;">)</span>
-<span style="color: #c397d8;">set</span> %~1=%<span style="color: #e7c547;">DATETAG</span>% %<span style="color: #e7c547;">TIMETAG</span>%
-<span style="color: #b9ca4a;">exit</span> /<span style="color: #7aa6da;">b</span> 0
+<span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">DATETAG</span>=%<span style="color: #6c71c4;">date:</span>~0,4%<span style="color: #6c71c4;">-</span>%<span style="color: #6c71c4;">date</span>:~5,2%<span style="color: #6c71c4;">-</span>%<span style="color: #6c71c4;">date</span>:~8,2%
+<span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">TIMETAG</span>=%<span style="color: #6c71c4;">time:</span>~0,2%<span style="color: #6c71c4;">:</span>%<span style="color: #6c71c4;">time</span>:~3,2%<span style="color: #6c71c4;">:</span>%<span style="color: #6c71c4;">time</span>:~6,2%
+<span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">HOUR</span>=%<span style="color: #6c71c4;">time:</span>~0,2%
+<span style="color: #859900;">if</span> /<span style="color: #268bd2;">i</span> %<span style="color: #6c71c4;">HOUR</span>% <span style="color: #859900;">lss</span> 10 (<span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">TIMETAG</span>=0%<span style="color: #6c71c4;">time:</span>~1,1%<span style="color: #6c71c4;">:</span>%<span style="color: #6c71c4;">time</span>:~3,2%<span style="color: #6c71c4;">:</span>%<span style="color: #6c71c4;">time</span>:~6,2%<span style="color: #6c71c4;">)</span>
+<span style="color: #6c71c4;">set</span> %~1=%<span style="color: #6c71c4;">DATETAG</span>% %<span style="color: #6c71c4;">TIMETAG</span>%
+<span style="color: #859900;">exit</span> /<span style="color: #268bd2;">b</span> 0
 
 <span style="font-weight: bold;">:Sleep</span>
-ping -<span style="color: #7aa6da;">n</span> %~1 127.0.0.1 &gt; nul
-<span style="color: #b9ca4a;">exit</span> /<span style="color: #7aa6da;">b</span> 0
+ping -<span style="color: #268bd2;">n</span> %~1 127.0.0.1 &gt;nul
+<span style="color: #859900;">exit</span> /<span style="color: #268bd2;">b</span> 0
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org7949049" class="outline-2">
-<h2 id="org7949049"><span class="section-number-2">3</span> 常见功能</h2>
+<div id="outline-container-orga5a9e2b" class="outline-2">
+<h2 id="orga5a9e2b"><span class="section-number-2">3</span> 获取返回值</h2>
 <div class="outline-text-2" id="text-3">
+<p>
+Batch 脚本通过 <code>%ERRORLEVEL%</code> 变量获取，常见的代码片段如下
+</p>
+<div class="org-src-container">
+<pre class="src src-bat">execute.exe
+<span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">RETCODE</span>=0
+<span style="color: #859900;">if</span> /<span style="color: #268bd2;">i</span> %<span style="color: #6c71c4;">ERRORLEVEL</span>% <span style="color: #859900;">neq</span> 0 (<span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">RETCODE</span>=%<span style="color: #6c71c4;">ERRORLEVEL</span>%)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org84c49de" class="outline-2">
+<h2 id="org84c49de"><span class="section-number-2">4</span> 常见功能</h2>
+<div class="outline-text-2" id="text-4">
 <p>
 获取当前机器 IP
 </p>
 <div class="org-src-container">
-<pre class="src src-bat"><span style="color: #b9ca4a;">for</span> /<span style="color: #7aa6da;">f</span> <span style="color: #70c0b1;">"delims=[] tokens=2"</span> %%<span style="color: #e7c547;">a</span> <span style="color: #b9ca4a;">in</span> ('ping %<span style="color: #e7c547;">computername</span>% -<span style="color: #7aa6da;">4</span> -<span style="color: #7aa6da;">n</span> 1 ^| <span style="color: #c397d8;">findstr</span> <span style="color: #70c0b1;">"["</span>') <span style="color: #b9ca4a;">do</span> (<span style="color: #c397d8;">set</span> <span style="color: #e7c547;">IPSTR</span>=%%<span style="color: #e7c547;">a)</span>
+<pre class="src src-bat"><span style="color: #859900;">for</span> /<span style="color: #268bd2;">f</span> <span style="color: #2aa198;">"delims=[] tokens=2"</span> %%<span style="color: #6c71c4;">a</span> <span style="color: #859900;">in</span> ('ping %<span style="color: #6c71c4;">computername</span>% -<span style="color: #268bd2;">4</span> -<span style="color: #268bd2;">n</span> 1 ^| <span style="color: #6c71c4;">findstr</span> <span style="color: #2aa198;">"["</span>') <span style="color: #859900;">do</span> (<span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">IPSTR</span>=%%<span style="color: #6c71c4;">a)</span>
 </pre>
 </div>
 
@@ -325,21 +339,24 @@ ping -<span style="color: #7aa6da;">n</span> %~1 127.0.0.1 &gt; nul
 获取当前主机名称
 </p>
 <div class="org-src-container">
-<pre class="src src-bat"><span style="color: #b9ca4a;">for</span> /<span style="color: #7aa6da;">f</span> %%<span style="color: #e7c547;">a</span> <span style="color: #b9ca4a;">in</span> ('hostname') <span style="color: #b9ca4a;">do</span> <span style="color: #c397d8;">set</span> <span style="color: #e7c547;">HOSTSTR</span>=%%<span style="color: #e7c547;">a</span>
+<pre class="src src-bat"><span style="color: #859900;">for</span> /<span style="color: #268bd2;">f</span> %%<span style="color: #6c71c4;">a</span> <span style="color: #859900;">in</span> ('hostname') <span style="color: #859900;">do</span> <span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">HOSTSTR</span>=%%<span style="color: #6c71c4;">a</span>
 </pre>
 </div>
 
+<p>
+统计 txt 文件名数量
+</p>
 <div class="org-src-container">
-<pre class="src src-bat"><span style="color: #c397d8;">setlocal</span> EnableExtensions
-<span style="color: #c397d8;">set</span> <span style="color: #e7c547;">TEXT_COUNT</span>=0
-<span style="color: #b9ca4a;">for</span> %%<span style="color: #e7c547;">a</span> <span style="color: #b9ca4a;">in</span> (*.txt) <span style="color: #b9ca4a;">do</span> <span style="color: #c397d8;">set</span> <span style="color: #e7c547;">/</span><span style="color: #e7c547;">a</span> TEXT_COUNT+=1
+<pre class="src src-bat"><span style="color: #6c71c4;">setlocal</span> EnableExtensions
+<span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">TEXT_COUNT</span>=0
+<span style="color: #859900;">for</span> %%<span style="color: #6c71c4;">a</span> <span style="color: #859900;">in</span> (*.txt) <span style="color: #859900;">do</span> <span style="color: #6c71c4;">set</span> <span style="color: #6c71c4;">/</span><span style="color: #6c71c4;">a</span> TEXT_COUNT+=1
 </pre>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-12-30 Wed 19:24. Created by Jinghui Hu at 2020-12-30 Wed 19:16.</p>
+<p class="author">Last Updated 2020-12-31 Thu 14:26. Created by Jinghui Hu at 2020-12-30 Wed 19:16.</p>
 </div>
 </body>
 </html>

@@ -1,4 +1,4 @@
-#+TITLE: DOS Batch Scripting
+#+TITLE: DOS Batch 编程
 #+AUTHOR: Jinghui Hu
 #+EMAIL: hujinghui@buaa.edu.cn
 #+DATE: <2020-12-30 Wed 19:16:35>
@@ -8,7 +8,7 @@
 #+TAGS: scripting dos
 
 
-* 通常模式
+* 编程范式
   #+BEGIN_SRC bat
     @echo off
     setlocal EnableExtensions
@@ -26,7 +26,9 @@
   #+END_SRC
 
 * 定义函数
-  Batch 脚本中没有函数，需要通过 ~call~ 来模拟函数调用，例如
+  Batch 脚本中没有函数，可以使用符号模拟的方式来创建
+  1. 定义的函数一定要写在脚本最后
+  2. 需要通过 ~call~ 来模拟函数调用
   #+BEGIN_SRC bat
     call :GetDateTime time0
     call :Sleep 10
@@ -50,8 +52,16 @@
     exit /b 0
 
     :Sleep
-    ping -n %~1 127.0.0.1 > nul
+    ping -n %~1 127.0.0.1 >nul
     exit /b 0
+  #+END_SRC
+
+* 获取返回值
+  Batch 脚本通过 ~%ERRORLEVEL%~ 变量获取，常见的代码片段如下
+  #+BEGIN_SRC bat
+    execute.exe
+    set RETCODE=0
+    if /i %ERRORLEVEL% neq 0 (set RETCODE=%ERRORLEVEL%)
   #+END_SRC
 
 * 常见功能
