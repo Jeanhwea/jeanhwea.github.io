@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-12-31 Thu 20:19 -->
+<!-- 2020-12-31 Thu 20:29 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>DOS Batch 编程</title>
@@ -244,17 +244,18 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgc5bcc3e">1. 编程范式</a></li>
-<li><a href="#org7f2b7db">2. 定义函数</a></li>
-<li><a href="#org4eebe2d">3. 获取返回值</a></li>
-<li><a href="#org003406a">4. 常见功能</a></li>
+<li><a href="#org126db62">1. 编程范式</a></li>
+<li><a href="#org5c8a1aa">2. 定义函数</a></li>
+<li><a href="#org973e6fb">3. 获取返回值</a></li>
+<li><a href="#orgc1b6750">4. 遍历传入的命令行参数</a></li>
+<li><a href="#orgdce1f79">5. 常见功能</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgc5bcc3e" class="outline-2">
-<h2 id="orgc5bcc3e"><span class="section-number-2">1</span> 编程范式</h2>
+<div id="outline-container-org126db62" class="outline-2">
+<h2 id="org126db62"><span class="section-number-2">1</span> 编程范式</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
 <pre class="src src-bat">@<span style="color: #c397d8;">echo</span> off
@@ -275,8 +276,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org7f2b7db" class="outline-2">
-<h2 id="org7f2b7db"><span class="section-number-2">2</span> 定义函数</h2>
+<div id="outline-container-org5c8a1aa" class="outline-2">
+<h2 id="org5c8a1aa"><span class="section-number-2">2</span> 定义函数</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Batch 脚本中没有函数，可以使用符号模拟的方式来创建
@@ -315,8 +316,8 @@ ping -<span style="color: #7aa6da;">n</span> %~1 127.0.0.1 &gt;nul 2&gt;&amp;1
 </div>
 </div>
 
-<div id="outline-container-org4eebe2d" class="outline-2">
-<h2 id="org4eebe2d"><span class="section-number-2">3</span> 获取返回值</h2>
+<div id="outline-container-org973e6fb" class="outline-2">
+<h2 id="org973e6fb"><span class="section-number-2">3</span> 获取返回值</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Batch 脚本通过 <code>%ERRORLEVEL%</code> 变量获取，常见的代码片段如下
@@ -330,9 +331,41 @@ Batch 脚本通过 <code>%ERRORLEVEL%</code> 变量获取，常见的代码片�
 </div>
 </div>
 
-<div id="outline-container-org003406a" class="outline-2">
-<h2 id="org003406a"><span class="section-number-2">4</span> 常见功能</h2>
+<div id="outline-container-orgc1b6750" class="outline-2">
+<h2 id="orgc1b6750"><span class="section-number-2">4</span> 遍历传入的命令行参数</h2>
 <div class="outline-text-2" id="text-4">
+<p>
+这里使用到
+</p>
+<ol class="org-ol">
+<li><code>shift</code> 来移动传入的参数</li>
+<li>通过跳转来模拟循环</li>
+</ol>
+<div class="org-src-container">
+<pre class="src src-bat">@<span style="color: #c397d8;">echo</span> off
+<span style="font-weight: bold;">:Loop</span>
+<span style="color: #b9ca4a;">if</span> <span style="color: #70c0b1;">"%1"</span>==<span style="color: #70c0b1;">""</span> <span style="color: #b9ca4a;">goto</span> <span style="color: #7aa6da;">EndLoop</span>
+<span style="color: #b9ca4a;">for</span> %%<span style="color: #e7c547;">a</span> <span style="color: #b9ca4a;">in</span> (%<span style="color: #e7c547;">1)</span> <span style="color: #b9ca4a;">do</span> <span style="color: #c397d8;">echo</span> %%<span style="color: #e7c547;">a</span>
+<span style="color: #c397d8;">shift</span>
+<span style="color: #b9ca4a;">goto</span> <span style="color: #7aa6da;">Loop</span>
+
+<span style="font-weight: bold;">:EndLoop</span>
+</pre>
+</div>
+
+<p>
+需要注意的是当传入的参数包含 <code>"</code> 时，判断空字符串可以考虑以下形式
+</p>
+<div class="org-src-container">
+<pre class="src src-bat"><span style="color: #b9ca4a;">if</span> [%<span style="color: #e7c547;">1]==[]</span> <span style="color: #b9ca4a;">goto</span> <span style="color: #7aa6da;">EndLoop</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgdce1f79" class="outline-2">
+<h2 id="orgdce1f79"><span class="section-number-2">5</span> 常见功能</h2>
+<div class="outline-text-2" id="text-5">
 <p>
 获取当前机器 IP
 </p>
@@ -362,7 +395,7 @@ Batch 脚本通过 <code>%ERRORLEVEL%</code> 变量获取，常见的代码片�
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-12-31 Thu 20:19. Created by Jinghui Hu at 2020-12-30 Wed 19:16.</p>
+<p class="author">Last Updated 2020-12-31 Thu 20:29. Created by Jinghui Hu at 2020-12-30 Wed 19:16.</p>
 </div>
 </body>
 </html>

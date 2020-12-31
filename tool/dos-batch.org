@@ -64,6 +64,26 @@
     if /i %ERRORLEVEL% neq 0 (set RETCODE=%ERRORLEVEL%)
   #+END_SRC
 
+* 遍历传入的命令行参数
+  这里使用到
+  1. ~shift~ 来移动传入的参数
+  2. 通过跳转来模拟循环
+  #+BEGIN_SRC bat
+    @echo off
+    :Loop
+    if "%1"=="" goto EndLoop
+    for %%a in (%1) do echo %%a
+    shift
+    goto Loop
+
+    :EndLoop
+  #+END_SRC
+
+  需要注意的是当传入的参数包含 ~"~ 时，判断空字符串可以考虑以下形式
+  #+BEGIN_SRC bat
+    if [%1]==[] goto EndLoop
+  #+END_SRC
+
 * 常见功能
   获取当前机器 IP
   #+BEGIN_SRC bat
