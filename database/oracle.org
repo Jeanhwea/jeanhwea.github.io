@@ -2598,6 +2598,42 @@
      ----------
             298
    #+END_SRC
+
+** 追溯其它会话
+   通过 ~set_sql_trace_in_session~ 包来追溯其它会话
+   #+BEGIN_SRC sql
+     -- 当前会话 sid
+     SELECT USERENV('sid') FROM DUAL;
+
+     -- 查看当前默认的追溯文件位置
+     SELECT VALUE FROM V$DIAG_INFO WHERE NAME LIKE 'Default%';
+
+     SELECT SID,
+            SERIAL#,
+            PROGRAM
+       FROM V$SESSION
+      WHERE PROGRAM like '%sqlplus%';
+
+     -- 开启其它会话的追溯文件
+     execute dbms_system.set_sql_trace_in_session(5,131,true);
+
+     -- 关闭其它会话的追溯文件
+     execute dbms_system.set_sql_trace_in_session(5,131,false);
+
+     -- 查看追溯会话的 spid, 找最
+     SELECT B.SPID
+       FROM V$SESSION A,
+            V$PROCESS B
+      WHERE A.PADDR = B.ADDR
+        AND A.SID = 5
+        AND A.SERIAL# = 131;
+   #+END_SRC
+
+   通过 ~tkprof~ 来分析会话的运行资源消耗数
+   #+BEGIN_SRC text
+     tkprof ora11g_ora_10868.trc d:\a.txt
+   #+END_SRC
+
 * 参考链接
   1. [[https://docs.oracle.com/cd/E11882_01/index.htm][Oracle Database 11g Release 2 在线文档]]
   2. [[http://download.oracle.com/docs/cds/E11882_01.zip][Oracle 11g Release 2 文档离线]] - 点击后下载得到 Zip 包
