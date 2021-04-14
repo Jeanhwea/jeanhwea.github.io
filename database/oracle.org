@@ -72,8 +72,8 @@
 ** 数据库和表
 *** 创建表
     #+BEGIN_SRC sql
-      create table [scmname.]tabname (
-        colname dbtype [not null | null] [default default_value] [primary key]
+      CREATE TABLE [scmname.]tabname (
+        colname DBTYPE [NOT NULL | NULL] [DEFAULT DEFAULT_VALUE] [PRIMARY KEY]
       );
     #+END_SRC
     - Oracle 数据库中 ~scmname~, ~tabname~, 和 ~colname~ 不加引号默认大写，即使
@@ -84,18 +84,18 @@
 
     简单的用户表创建
     #+BEGIN_SRC sql
-      create table users (
-        id number(16) primary key not null,
-        created_by varchar2(64) default 'sysman' not null,
-        updated_at date default sysdate not null,
-        valid char(1) default 'y' not null,
-        -- code rule and type
-        code varchar2(32) unique not null,
-        name varchar2(32)
+      CREATE TABLE USERS (
+        ID NUMBER(16) PRIMARY KEY NOT NULL,
+        CREATED_BY VARCHAR2(64) DEFAULT 'SYSMAN' NOT NULL,
+        UPDATED_AT DATE DEFAULT SYSDATE NOT NULL,
+        VALID CHAR(1) DEFAULT 'Y' NOT NULL,
+        -- CODE RULE AND TYPE
+        CODE VARCHAR2(32) UNIQUE NOT NULL,
+        NAME VARCHAR2(32)
       );
 
-      comment on column users.code is '用户编号, 用于登录';
-      comment on column users.name is '用户名字, 用于显示';
+      COMMENT ON COLUMN USERS.CODE IS '用户编号, 用于登录';
+      COMMENT ON COLUMN USERS.NAME IS '用户名字, 用于显示';
     #+END_SRC
 
 *** 数据类型
@@ -231,49 +231,49 @@
 
     基于范围的分区表
     #+BEGIN_SRC sql
-      create table time_range_sales (
-        prod_id number (6), -- 产品 ID
-        cust_id number,     -- 顾客 ID
-        time_id date,       -- 时间 ID
-        channel_id char(1), -- 渠道 ID
-        promo_id number(6),
-        quantity_sold number (3),
-        amount_sold number (10, 2)
-      ) partition by range (time_id) (
-        partition sales_1998 values less than (to_date('1999-01-01', 'YYYY-MM-DD')),
-        partition sales_1999 values less than (to_date('2000-01-01', 'YYYY-MM-DD')),
-        partition sales_2000 values less than (to_date('2001-01-01', 'YYYY-MM-DD')),
-        partition sales_2001 values less than (maxvalue)
+      CREATE TABLE TIME_RANGE_SALES (
+        PROD_ID NUMBER (6), -- 产品 ID
+        CUST_ID NUMBER,     -- 顾客 ID
+        TIME_ID DATE,       -- 时间 ID
+        CHANNEL_ID CHAR(1), -- 渠道 ID
+        PROMO_ID NUMBER(6),
+        QUANTITY_SOLD NUMBER (3),
+        AMOUNT_SOLD NUMBER (10, 2)
+      ) PARTITION BY RANGE (TIME_ID) (
+        PARTITION SALES_1998 VALUES LESS THAN (TO_DATE('1999-01-01', 'YYYY-MM-DD')),
+        PARTITION SALES_1999 VALUES LESS THAN (TO_DATE('2000-01-01', 'YYYY-MM-DD')),
+        PARTITION SALES_2000 VALUES LESS THAN (TO_DATE('2001-01-01', 'YYYY-MM-DD')),
+        PARTITION SALES_2001 VALUES LESS THAN (MAXVALUE)
       );
     #+END_SRC
 
     基于列表的分区表
     #+BEGIN_SRC sql
-      create table list_sales (
-        prod_id number (6), -- 产品 ID
-        cust_id number,     -- 顾客 ID
-        time_id date,       -- 时间 ID
-        channel_id char(1), -- 渠道 ID
-        promo_id number(6),
-        quantity_sold number (3),
-        amount_sold number (10, 2)
-      ) partition by list (channel_id) (
-        partition even_channels values (2, 4),
-        partition odd_channels values (3, 9)
+      CREATE TABLE LIST_SALES (
+        PROD_ID NUMBER(6), -- 产品 ID
+        CUST_ID NUMBER,     -- 顾客 ID
+        TIME_ID DATE,       -- 时间 ID
+        CHANNEL_ID CHAR(1), -- 渠道 ID
+        PROMO_ID NUMBER(6),
+        QUANTITY_SOLD NUMBER (3),
+        AMOUNT_SOLD NUMBER (10, 2)
+      ) PARTITION BY LIST (CHANNEL_ID) (
+        PARTITION EVEN_CHANNELS VALUES (2, 4),
+        PARTITION ODD_CHANNELS VALUES (3, 9)
       );
     #+END_SRC
 
     基于哈希的分区表
     #+BEGIN_SRC sql
-      create table hash_sales (
-        prod_id number (6), -- 产品 ID
-        cust_id number,     -- 顾客 ID
-        time_id date,       -- 时间 ID
-        channel_id char(1), -- 渠道 ID
-        promo_id number(6),
-        quantity_sold number (3),
-        amount_sold number (10, 2)
-      ) partition by hash (prod_id) partitions 2;
+      CREATE TABLE HASH_SALES (
+        PROD_ID NUMBER(6), -- 产品 ID
+        CUST_ID NUMBER,     -- 顾客 ID
+        TIME_ID DATE,       -- 时间 ID
+        CHANNEL_ID CHAR(1), -- 渠道 ID
+        PROMO_ID NUMBER(6),
+        QUANTITY_SOLD NUMBER (3),
+        AMOUNT_SOLD NUMBER (10, 2)
+      ) PARTITION BY HASH (PROD_ID) PARTITIONS 2;
     #+END_SRC
 *** 分区索引
     分区表和不分区表建索引也是不同的。分区表的索引包含全局索引 (Global Indexes)
@@ -288,16 +288,16 @@
     创建分区表的索引方法如下
     #+BEGIN_SRC sql
       -- 创建分区表的局部索引
-      create index hash_sales_idx
-        on hash_sales (time_id) local;
+      CREATE INDEX HASH_SALES_IDX
+        ON HASH_SALES (TIME_ID) LOCAL;
 
       -- 创建分区表的全局索引
-      create index time_channel_sales_idx
-        on time_range_sales (channel_id) global
-        partition by range (channel_id) (
-          partition p1 values less than (3),
-          partition p2 values less than (4),
-          partition p3 values less than (maxvalue)
+      CREATE INDEX TIME_CHANNEL_SALES_IDX
+        ON TIME_RANGE_SALES (CHANNEL_ID) GLOBAL
+        PARTITION BY RANGE (CHANNEL_ID) (
+          PARTITION P1 VALUES LESS THAN (3),
+          PARTITION P2 VALUES LESS THAN (4),
+          PARTITION P3 VALUES LESS THAN (MAXVALUE)
         );
     #+END_SRC
 *** 视图
@@ -320,80 +320,80 @@
 *** 创建视图
     简单的创建视图可以暴露源表的某些字段
     #+BEGIN_SRC sql
-      create view staff as
-      select
-        employee_id,
-        last_name,
-        job_id
-      from
-        employees;
+      CREATE VIEW STAFF AS
+      SELECT
+        EMPLOYEE_ID,
+        LAST_NAME,
+        JOB_ID
+      FROM
+        EMPLOYEES;
     #+END_SRC
 
     视图可以封装做一些对源表的数据处理
     #+BEGIN_SRC sql
-      create view staff_dept_10 as
-      select
-        employee_id,
-        last_name,
-        job_id
-      from
-        employees
-      where
-        department_id = 10 with check option constraint staff_dept_10_cnst;
+      CREATE VIEW STAFF_DEPT_10 AS
+      SELECT
+        EMPLOYEE_ID,
+        LAST_NAME,
+        JOB_ID
+      FROM
+        EMPLOYEES
+      WHERE
+        DEPARTMENT_ID = 10 WITH CHECK OPTION CONSTRAINT STAFF_DEPT_10_CNST;
     #+END_SRC
 
     合并多个表，给用户暴露一个单一的表
     #+BEGIN_SRC sql
-      create view staff_dept_10_30 as
-      select
-        e.employee_id,
-        e.last_name,
-        e.job_id,
-        d.department_name
-      from
-        employee e,
-        department d
-      where
-        e.department_id in (10, 30)
-        and e.department_id = d.department_id;
+      CREATE VIEW STAFF_DEPT_10_30 AS
+      SELECT
+        E.EMPLOYEE_ID,
+        E.LAST_NAME,
+        E.JOB_ID,
+        D.DEPARTMENT_NAME
+      FROM
+        EMPLOYEE E,
+        DEPARTMENT D
+      WHERE
+        E.DEPARTMENT_ID IN (10, 30)
+        AND E.DEPARTMENT_ID = D.DEPARTMENT_ID;
     #+END_SRC
 *** 物化视图
     物化视图 (Materialized View) 将视图选取的数据进行存储，目的是减少构建视图时
     的计算时间，用空间换时间
     #+BEGIN_SRC sql
-      create materialized view sales_mv as
-      select
-        t.calendar_year,
-        p.prod_id,
-        sum(s.amount_sold) as sum_sales
-      from
-        times t,
-        products p,
-        sales s
-      where
-        t.time_id = s.time_id
-        and p.prod_id = s.prod_id
-      group by
-        t.calendar_year,
-        p.prod_id;
+      CREATE MATERIALIZED VIEW SALES_MV AS
+      SELECT
+        T.CALENDAR_YEAR,
+        P.PROD_ID,
+        SUM(S.AMOUNT_SOLD) AS SUM_SALES
+      FROM
+        TIMES T,
+        PRODUCTS P,
+        SALES S
+      WHERE
+        T.TIME_ID = S.TIME_ID
+        AND P.PROD_ID = S.PROD_ID
+      GROUP BY
+        T.CALENDAR_YEAR,
+        P.PROD_ID;
     #+END_SRC
 *** 序列
     序列可以生成连续的数，主要用于解决数据库并发访问时 ID 值生成策略
     #+BEGIN_SRC sql
       -- 创建一个序列
-      create sequence cust_seq
-        start with 1000
-        increment by 1 nocache nocycle;
+      CREATE SEQUENCE CUST_SEQ
+        START WITH 1000
+        INCREMENT BY 1 NOCACHE NOCYCLE;
       -- 使用方法
-      select cust_seq.nextval from dual;
+      SELECT CUST_SEQ.NEXTVAL FROM DUAL;
       -- 查看当前序列值
-      select cust_seq.currval from dual;
+      SELECT CUST_SEQ.CURRVAL FROM DUAL;
     #+END_SRC
 *** 同义词
     同义词定义了数据库结构的别名，可以方便访问。同义词分为 public 和 private 的
     两种， public 对所有用户公开， private 针对特定用户
     #+BEGIN_SRC sql
-      create public synonym people hr.employees;
+      CREATE PUBLIC SYNONYM PEOPLE HR.EMPLOYEES;
     #+END_SRC
 
 ** 数据完整性
@@ -404,40 +404,40 @@
 
     建表时指定在对应列后面添加 ~not null~ 指定该列为非空
     #+BEGIN_SRC sql
-      create table employees (
-        id number(16) primary key,
-        created_by varchar2(64) default 'sysman' not null, -- 指定当前列为非空
-        name varchar2(32)
+      CREATE TABLE EMPLOYEES (
+        ID NUMBER(16) PRIMARY KEY,
+        CREATED_BY VARCHAR2(64) DEFAULT 'SYSMAN' NOT NULL, -- 指定当前列为非空
+        NAME VARCHAR2(32)
       );
 
       -- 给非空约束添加名称
-      create table employees (
-        id number(16) primary key,
-        created_by varchar2(64) default 'sysman',
-        name varchar2(32),
-        constraint emp_created_by_uk(created_by) not null; -- 指定当前列为非空
+      CREATE TABLE EMPLOYEES (
+        ID NUMBER(16) PRIMARY KEY,
+        CREATED_BY VARCHAR2(64) DEFAULT 'SYSMAN',
+        NAME VARCHAR2(32),
+        CONSTRAINT EMP_CREATED_BY_UK(CREATED_BY) NOT NULL; -- 指定当前列为非空
       );
     #+END_SRC
 
     修改列的非空属性
     #+BEGIN_SRC sql
       -- 添加非空约束
-      alter table tabname modify colname [constraint constraint_name] not null;
+      ALTER TABLE TABNAME MODIFY COLNAME [CONSTRAINT CONSTRAINT_NAME] NOT NULL;
       -- 删除非空约束
-      alter table tabname modify colname null;
+      ALTER TABLE TABNAME MODIFY COLNAME NULL;
     #+END_SRC
 
 *** 唯一性约束
     唯一性 (Unique) 约束表示该列值是不能重复的，但是可以为 NULL
     #+BEGIN_SRC sql
-      create table employees (
-        email varchar2 (25),
-        constraint emp_email_nn not null,      -- 非空
-        constraint emp_email_uk unique (email) -- 唯一键
+      CREATE TABLE EMPLOYEES (
+        EMAIL VARCHAR2 (25),
+        CONSTRAINT EMP_EMAIL_NN NOT NULL,      -- 非空
+        CONSTRAINT EMP_EMAIL_UK UNIQUE (EMAIL) -- 唯一键
       );
 
       -- 添加唯一键
-      alter table tabname add constraint emp_email_uk unique (email);
+      ALTER TABLE TABNAME ADD CONSTRAINT EMP_EMAIL_UK UNIQUE (EMAIL);
     #+END_SRC
 
 *** 主键约束
@@ -446,15 +446,15 @@
     Oracle 会自动创建一个与约束同名的索引 (Uniquenes 为 Unique 唯一索引) 需要注
     意的是： *每个表只能有且有一个主键约束*
     #+BEGIN_SRC sql
-      create table employees (
-        id number (16) primary key, -- 主键约束
-        name varchar2 (32)
+      CREATE TABLE EMPLOYEES (
+        ID NUMBER (16) PRIMARY KEY, -- 主键约束
+        NAME VARCHAR2 (32)
       );
 
-      create table employees (
-        id number (16),
-        name varchar2 (32),
-        constraint employee_pk primary key (id) -- 主键约束
+      CREATE TABLE EMPLOYEES (
+        ID NUMBER (16),
+        NAME VARCHAR2 (32),
+        CONSTRAINT EMPLOYEE_PK PRIMARY KEY (ID) -- 主键约束
       );
     #+END_SRC
 
@@ -484,26 +484,26 @@
     | ~delete set null~  | 任何情况都可行                   | 任何情况都可行                                    |
 
     #+BEGIN_SRC sql
-      create table departments (
-        id number (16) primary key
+      CREATE TABLE DEPARTMENTS (
+        ID NUMBER (16) PRIMARY KEY
       );
 
-      create table employees (
-        id number (16),
-        dept_id number (16),
+      CREATE TABLE EMPLOYEES (
+        ID NUMBER (16),
+        DEPT_ID NUMBER (16),
         -- 添加外键
-        constraint emp_dept_fk foreign key (dept_id) references departments (id)
+        CONSTRAINT EMP_DEPT_FK FOREIGN KEY (DEPT_ID) REFERENCES DEPARTMENTS (ID)
       );
 
       -- 修改表，添加外键
-      alter table employees
-        add constraint emp_dept_fk foreign key (dept_id) references departments (id);
+      ALTER TABLE EMPLOYEES
+        ADD CONSTRAINT EMP_DEPT_FK FOREIGN KEY (DEPT_ID) REFERENCES DEPARTMENTS (ID);
     #+END_SRC
 
 *** 条件约束
     条件约束 (check constraint) 用于强制行数据必须满足的条件
     #+BEGIN_SRC sql
-      alter table employees add constraint max_emp_sal_ck check(salary < 10001);
+      ALTER TABLE EMPLOYEES ADD CONSTRAINT MAX_EMP_SAL_CK CHECK(SALARY < 10001);
     #+END_SRC
 
 *** 约束命名规范
@@ -538,32 +538,32 @@
 *** 数据字典的使用
     表列属性，可以查看表中每列的名字，数据类型，长度等信息
     #+BEGIN_SRC sql
-      select c.table_name, c.column_name, c.data_type, c.data_length, c.nullable
-        from user_tab_columns c order by c.table_name;
+      SELECT C.TABLE_NAME, C.COLUMN_NAME, C.DATA_TYPE, C.DATA_LENGTH, C.NULLABLE
+        FROM USER_TAB_COLUMNS C ORDER BY C.TABLE_NAME;
     #+END_SRC
 
     唯一性约束，获取列的约束名称
     #+BEGIN_SRC sql
-      select c.owner, c.constraint_name, c.table_name, c.column_name, c.position
-        from user_cons_columns c order by c.table_name;
+      SELECT C.OWNER, C.CONSTRAINT_NAME, C.TABLE_NAME, C.COLUMN_NAME, C.POSITION
+        FROM USER_CONS_COLUMNS C ORDER BY C.TABLE_NAME;
     #+END_SRC
 
     获取列的约束类型
     #+BEGIN_SRC sql
-      select c.constraint_name, c.constraint_type, c.status
-        from user_constraints c
-       where upper(c.constraint_type) in ('U', 'P')
-       order by c.constraint_name;
+      SELECT C.CONSTRAINT_NAME, C.CONSTRAINT_TYPE, C.STATUS
+        FROM USER_CONSTRAINTS C
+       WHERE UPPER(C.CONSTRAINT_TYPE) IN ('U', 'P')
+       ORDER BY C.CONSTRAINT_NAME;
     #+END_SRC
 
     获取数据库中的一些注释信息
     #+BEGIN_SRC sql
       -- 获取所有表注释
-      select c.table_name, c.table_type, c.comments
-        from user_tab_comments c order by c.table_name;
+      SELECT C.TABLE_NAME, C.TABLE_TYPE, C.COMMENTS
+        FROM USER_TAB_COMMENTS C ORDER BY C.TABLE_NAME;
       -- 获取所有表的对应列的注释
-      select c.table_name, c.column_name, c.comments
-        from user_col_comments c order by c.table_name;
+      SELECT C.TABLE_NAME, C.COLUMN_NAME, C.COMMENTS
+        FROM USER_COL_COMMENTS C ORDER BY C.TABLE_NAME;
     #+END_SRC
 *** 动态性能视图
     Oracle 提供了一下可以查看当前数据库性能的视图，这些视图的统一前缀为 ~v$*~
@@ -574,21 +574,21 @@
 
     查看所有系统性能视图名称
     #+BEGIN_SRC sql
-      select d.table_name from dictionary d
-       where lower(d.table_name) like 'v$%' order by d.table_name;
+      SELECT D.TABLE_NAME FROM DICTIONARY D
+       WHERE UPPER(D.TABLE_NAME) LIKE 'V$%' ORDER BY D.TABLE_NAME;
     #+END_SRC
 
     查看数据库对象
     #+BEGIN_SRC sql
-      -- 所有 dba_ 开头的数据库对象信息
-      select o.owner, o.object_name, o.object_type
-        from dba_objects o order by o.owner, o.object_name;
-      -- 所有 all_ 开头的数据库对象信息
-      select o.owner, o.object_name, o.object_type
-        from all_objects o order by o.owner, o.object_name;
+      -- 所有 DBA_ 开头的数据库对象信息
+      SELECT O.OWNER, O.OBJECT_NAME, O.OBJECT_TYPE
+        FROM DBA_OBJECTS O ORDER BY O.OWNER, O.OBJECT_NAME;
+      -- 所有 ALL_ 开头的数据库对象信息
+      SELECT O.OWNER, O.OBJECT_NAME, O.OBJECT_TYPE
+        FROM ALL_OBJECTS O ORDER BY O.OWNER, O.OBJECT_NAME;
 
-      -- 所有 user_ 开头的数据库对象信息select o.object_name, o.object_type from
-      user_objects o order by o.object_name;
+      -- 所有 USER_ 开头的数据库对象信息SELECT O.OBJECT_NAME, O.OBJECT_TYPE FROM
+      USER_OBJECTS O ORDER BY O.OBJECT_NAME;
     #+END_SRC
 
     所有用户对象的多少和用户的角色相关，见如下的例子
@@ -623,15 +623,15 @@
 
    *执行 DDL 语句相当于隐式提交事务*, 常见的 DDL 语句如下：
    #+BEGIN_SRC sql
-     create table plants (
-       plant_id number primary key,
-       common_name varchar2(15)
+     CREATE TABLE PLANTS (
+       PLANT_ID NUMBER PRIMARY KEY,
+       COMMON_NAME VARCHAR2(15)
      );
 
-     alter table plants add (latin_name varchar2(40));
-     grant select on plants to scott;
-     revoke select on plants from scott;
-     drop table plants;
+     ALTER TABLE PLANTS ADD (LATIN_NAME VARCHAR2(40));
+     GRANT SELECT ON PLANTS TO SCOTT;
+     REVOKE SELECT ON PLANTS FROM SCOTT;
+     DROP TABLE PLANTS;
    #+END_SRC
 
 ** DML 语句
@@ -644,23 +644,25 @@
    - 查看执行计划 ~explain plan~
    - 锁表或锁视图 ~lock table~
    #+BEGIN_SRC sql
-     select * from employees;
-     insert into
-       employees (employee_id, last_name, email, job_id, hire_date, salary)
-       values (1234, 'Mascis', 'JMASCIS', 'IT_PROG', '14-FEB-2011', 9000);
-     update employees set salary=9100 where employee_id=1234;
-     delete from employees where employee_id=1234;
+     SELECT * FROM EMPLOYEES;
+     INSERT INTO
+       EMPLOYEES (EMPLOYEE_ID, LAST_NAME, EMAIL, JOB_ID, HIRE_DATE, SALARY)
+       VALUES (1234, 'MASCIS', 'JMASCIS', 'IT_PROG', '14-FEB-2011', 9000);
+     UPDATE EMPLOYEES SET SALARY=9100 WHERE EMPLOYEE_ID=1234;
+     DELETE FROM EMPLOYEES WHERE EMPLOYEE_ID=1234;
    #+END_SRC
 
 *** 查询语句
     Select 查询语句是最常见的 DML，并且大多数和数据库打交道的工作就是查数据，下面
     是一个查询的例子
     #+BEGIN_SRC sql
-      select email, department_name
-        from employees join departments
-          on employees.department_id = departments.department_id
-      where employee_id in (100,103)
-      order by email;
+      SELECT EMAIL,
+             DEPARTMENT_NAME
+        FROM EMPLOYEES
+        JOIN DEPARTMENTS
+          ON EMPLOYEES.DEPARTMENT_ID = DEPARTMENTS.DEPARTMENT_ID
+       WHERE EMPLOYEE_ID IN (100,103)
+       ORDER BY EMAIL;
     #+END_SRC
 
     Join 类型有以下几种：
@@ -671,31 +673,38 @@
 
     #+BEGIN_SRC sql
       -- 左连接，如果有些员工没有部门 ID 对应的部门名称返回 NULL
-      select email, department_name
-        from employees left join departments
-          on employees.department_id = departments.department_id
-      where employee_id in (100,103)
-      order by email;
+      SELECT EMAIL,
+             DEPARTMENT_NAME
+        FROM EMPLOYEES
+        LEFT JOIN DEPARTMENTS
+          ON EMPLOYEES.DEPARTMENT_ID = DEPARTMENTS.DEPARTMENT_ID
+       WHERE EMPLOYEE_ID in (100,103)
+       ORDER BY EMAIL;
 
       -- 笛卡尔积，返回所有员工和部门的排列
-      select employee_name, department_name
-        from employees, departments
-      order by employee_name, department_name;
+      SELECT EMPLOYEE_NAME,
+             DEPARTMENT_NAME
+        FROM EMPLOYEES,
+             DEPARTMENTS
+       ORDER BY EMPLOYEE_NAME,
+                DEPARTMENT_NAME;
     #+END_SRC
 *** 子查询和隐式查询
     如果一个查询包含在另外一个查询语句中，则该语句被称为子查询 (subquery)
     #+BEGIN_SRC sql
-      select first_name, last_name
-      from employees
-      where department_id in
-          (select department_id -- 子查询
-           from departments
-           where location_id = 1800);
+      SELECT FIRST_NAME,
+             LAST_NAME
+        FROM EMPLOYEES
+       WHERE DEPARTMENT_ID IN (
+              SELECT DEPARTMENT_ID -- 子查询
+                FROM DEPARTMENTS
+               WHERE LOCATION_ID = 1800
+             );
     #+END_SRC
 
     隐式查询指一些语句没有使用 ~select~ 关键字，但实际上执行了查询结果集
     #+BEGIN_SRC sql
-      update employees set salary = salary * 1.1 where last_name = 'Baer';
+      UPDATE EMPLOYEES SET SALARY = SALARY * 1.1 WHERE LAST_NAME = 'Baer';
     #+END_SRC
 
 ** TCS 语句
@@ -1159,46 +1168,33 @@
        据文件信息存放在 ~dba_data_files~ 和 ~v$datafile~ 视图中
        #+BEGIN_SRC sql
          -- 查看临时数据文件
-         select
-           t.creation_time as "Creation Time",
-           round(t.bytes / 1024 / 1024, 2) as "Size (M)",
-           substr(t.name, 1, 60) as "File Name"
-         from
-           v$tempfile t
-         order by
-           t.name;
+         SELECT T.CREATION_TIME AS "Creation Time",
+                ROUND(T.BYTES / 1024 / 1024, 2) AS "Size (M)",
+                SUBSTR(T.NAME, 1, 60) AS "File Name"
+           FROM V$TEMPFILE T
+          ORDER BY T.NAME;
 
          -- 查看永久数据文件
-         select
-           t.creation_time as "Creation Time",
-           round(t.bytes / 1024 / 1024, 2) as "Size (M)",
-           substr(t.name, 1, 60) as "File Name"
-         from
-           v$datafile t
-         order by
-           t.name;
+         SELECT T.CREATION_TIME AS "Creation Time",
+                ROUND(T.BYTES / 1024 / 1024, 2) AS "Size (M)",
+                SUBSTR(T.NAME, 1, 60) AS "File Name"
+           FROM V$DATAFILE T
+          ORDER BY T.NAME;
        #+END_SRC
     5. 数据文件的状态分为 ONLINE 和 OFFLINE，备份文件、重命名文件等操作会使得数
        据文件离线
        #+BEGIN_SRC sql
          -- 查看离线的数据文件
-         select
-           t.creation_time as "Creation Time",
-           round(t.bytes / 1024 / 1024, 2) as "Size (M)",
-           substr(t.name, 1, 60) as "File Name"
-         from
-           v$tempfile t
-         where
-           lower(t.status) = 'offline'
-         union
-         select
-           t.creation_time as "Creation Time",
-           round(t.bytes / 1024 / 1024, 2) as "Size (M)",
-           substr(t.name, 1, 60) as "File Name"
-         from
-           v$datafile t
-         where
-           lower(t.status) = 'offline';
+         SELECT T.CREATION_TIME AS "Creation Time",
+                ROUND(T.BYTES / 1024 / 1024, 2) AS "Size (M)",
+                SUBSTR(T.NAME, 1, 60) AS "File Name"
+           FROM V$TEMPFILE T
+          WHERE LOWER(T.STATUS) = 'offline'
+          UNION SELECT T.CREATION_TIME AS "Creation Time",
+                ROUND(T.BYTES / 1024 / 1024, 2) AS "Size (M)",
+                SUBSTR(T.NAME, 1, 60) AS "File Name"
+           FROM V$DATAFILE T
+          WHERE LOWER(T.STATUS) = 'offline';
        #+END_SRC
 *** 控制文件 Control Files
     控制文件是一个很小的二进制记录文件，数据库启动是通过控制文件查找数据库的数据
@@ -1285,92 +1281,88 @@
 
     #+BEGIN_SRC sql
       -- 查看表空间和数据文件的对应关系
-      column "Tablespace" format a20;
-      column "Datafile" format a60;
+      COLUMN "Tablespace" FORMAT A20;
+      COLUMN "Datafile" FORMAT A60;
 
-      select
-        a.tablespace_name as "Tablespace",
-        a.file_name as "Datafile"
-      from
-        dba_data_files a
-      order by
-        a.tablespace_name,
-        a.file_name;
+      SELECT A.TABLESPACE_NAME AS "Tablespace",
+             A.FILE_NAME AS "Datafile"
+        FROM DBA_DATA_FILES A
+       ORDER BY A.TABLESPACE_NAME,
+                A.FILE_NAME;
     #+END_SRC
 
     #+BEGIN_SRC sql
       -- 看表空间剩余的容量
-      column "Tablespace" format a20;
+      COLUMN "Tablespace" FORMAT A20;
 
-      select
-        a.tablespace_name as "Tablespace",
-        sum(blocks) as "Blocks",
-        round(sum(bytes) / 1024 / 1024, 2) as "Free (M)"
-      from
-        dba_free_space a
-      group by
-        a.tablespace_name
-      order by
-        a.tablespace_name;
+      SELECT A.TABLESPACE_NAME AS "Tablespace",
+             SUM(BLOCKS) AS "Blocks",
+             ROUND(SUM(BYTES) / 1024 / 1024, 2) AS "Free (M)"
+        FROM DBA_FREE_SPACE A
+       GROUP BY A.TABLESPACE_NAME
+       ORDER BY A.TABLESPACE_NAME;
     #+END_SRC
 
     #+BEGIN_SRC sql
       -- 查看表空间使用量
-      column "Tablespace" format a20;
+      COLUMN "Tablespace" FORMAT A20;
 
-      select
-        substr(a.tablespace_name, 1, 20) as "Tablespace",
-        round(a.bytes / 1024 / 1024, 2) as "Size (M)",
-        decode(b.used_bytes, null, 0, round(b.used_bytes / 1024 / 1024, 2)) as "Current (M)",
-        decode(c.free_bytes, null, 0, round(c.free_bytes / 1024 / 1024, 2)) as "Free (M)",
-        decode(b.used_bytes, null, 0, round((b.used_bytes / a.bytes) * 100, 2)) as "Used (%)"
-      from
-        dba_data_files a,
-        (select file_id, sum(bytes) used_bytes from dba_extents group by file_id) b,
-        (select sum(bytes) free_bytes, file_id from dba_free_space group by file_id) c
-      where
-        b.file_id(+) = a.file_id and c.file_id(+) = a.file_id
-      order by
-        a.tablespace_name,
-        a.file_name;
+      SELECT SUBSTR(A.TABLESPACE_NAME, 1, 20) AS "Tablespace",
+             ROUND(A.BYTES / 1024 / 1024, 2) AS "Size (M)",
+             DECODE(B.USED_BYTES, NULL, 0, ROUND(B.USED_BYTES / 1024 / 1024, 2)) AS "Current (M)",
+             DECODE(C.FREE_BYTES, NULL, 0, ROUND(C.FREE_BYTES / 1024 / 1024, 2)) AS "Free (M)",
+             DECODE(B.USED_BYTES, NULL, 0, ROUND((B.USED_BYTES / A.BYTES) * 100, 2)) AS "Used (%)"
+        FROM DBA_DATA_FILES A,
+             (
+              SELECT FILE_ID,
+                     SUM(BYTES) USED_BYTES
+                FROM DBA_EXTENTS
+               GROUP BY FILE_ID
+             ) B,
+             (
+              SELECT SUM(BYTES) FREE_BYTES,
+                     FILE_ID
+                FROM DBA_FREE_SPACE
+               GROUP BY FILE_ID
+             ) C
+       WHERE B.FILE_ID(+) = A.FILE_ID
+         AND C.FILE_ID(+) = A.FILE_ID
+       ORDER BY A.TABLESPACE_NAME,
+                A.FILE_NAME;
     #+END_SRC
 
     #+BEGIN_SRC sql
       -- 查看表空间对应数据文件数量
-      column "Tablespace" format a20;
-      column "Datafile" format a60;
+      COLUMN "Tablespace" FORMAT A20;
+      COLUMN "Datafile" FORMAT A60;
 
-      select
-        a.tablespace_name as "Tablespace",
-        count(*) as "Count",
-        round(sum(bytes) / 1024 / 1024, 2) as "Current (M)",
-        round(sum(maxbytes) / 1024 / 1024, 2) as "Maximum (M)",
-        round(sum(bytes) / sum(maxbytes), 2) as "Used (%)"
-      from
-        dba_data_files a
-      group by
-        a.tablespace_name
-      order by
-        a.tablespace_name;
+      SELECT A.TABLESPACE_NAME AS "Tablespace",
+             COUNT(*) AS "Count",
+             ROUND(SUM(BYTES) / 1024 / 1024, 2) AS "Current (M)",
+             ROUND(SUM(MAXBYTES) / 1024 / 1024, 2) AS "Maximum (M)",
+             ROUND(SUM(BYTES) / SUM(MAXBYTES), 2) AS "Used (%)"
+        FROM DBA_DATA_FILES A
+       GROUP BY A.TABLESPACE_NAME
+       ORDER BY A.TABLESPACE_NAME;
     #+END_SRC
 
     #+BEGIN_SRC sql
       -- 创建默认表空间
-      create tablespace pfile1
-        datafile '/oradata/xe/part1.dbf'
-        size 128m autoextend off
-        logging online permanent
-        extent management local autoallocate
-        blocksize 8k
-        segment space management auto
-        flashback on;
+      CREATE TABLESPACE PFILE1
+        DATAFILE '/oradata/xe/part1.dbf'
+        SIZE 128M AUTOEXTEND OFF
+        LOGGING ONLINE PERMANENT
+        EXTENT MANAGEMENT LOCAL AUTOALLOCATE
+        BLOCKSIZE 8K
+        SEGMENT SPACE MANAGEMENT AUTO
+        FLASHBACK ON;
 
       -- 创建临时表空间
-      create temporary tablespace tfile1
-        tempfile '/oradata/xe/temp1.dbf'
-        size 2048m autoextend off
-        tablespace group ''
-        extent management local uniform size 1m;
+      CREATE TEMPORARY TABLESPACE TFILE1
+        TEMPFILE '/oradata/xe/temp1.dbf'
+        SIZE 2048M AUTOEXTEND OFF
+        TABLESPACE GROUP ''
+        EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M;
     #+END_SRC
 ** 数据库实例
    Oracle 常见的实例包含单实例和 RAC 两种模式，他们的物理结构如下：
@@ -1459,34 +1451,27 @@
     示让 Oracle 自动管理
     #+BEGIN_SRC sql
       -- 查看 Buffer Cache 参数
-      column "Name" format a32;
-      column "Value" format a64;
+      COLUMN "Name" FORMAT A32;
+      COLUMN "Value" FORMAT A64;
 
-      select
-        t.name as "Name",
-        t.value as "Value"
-      from
-        v$parameter t
-      where
-        t.name in ('db_cache_size', 'db_keep_cache_size', 'db_recycle_cache_size');
+      SELECT T.NAME AS "Name",
+             T.VALUE AS "Value"
+        FROM V$PARAMETER T
+       WHERE T.NAME IN ('db_cache_size', 'db_keep_cache_size', 'db_recycle_cache_size');
     #+END_SRC
 
     缓冲区的命中率一般要达到 98% 以上才算正常
     #+BEGIN_SRC sql
       -- 查看缓冲区命中率
-      select
-        100 * (1 - ((physical.value - direct.value - lobs.value) / logical.value)) as
-          "Buffer Cache Hit Ratio (%)"
-      from
-        v$sysstat physical,
-        v$sysstat direct,
-        v$sysstat lobs,
-        v$sysstat logical
-      where
-        physical.name = 'physical reads'
-        and direct.name = 'physical reads direct'
-        and lobs.name = 'physical reads direct (lob)'
-        and logical.name = 'session logical reads';
+      SELECT 100 * (1 - ((PHYSICAL.VALUE - DIRECT.VALUE - LOBS.VALUE) / LOGICAL.VALUE)) AS "Buffer Cache Hit Ratio (%)"
+        FROM V$SYSSTAT PHYSICAL,
+             V$SYSSTAT DIRECT,
+             V$SYSSTAT LOBS,
+             V$SYSSTAT LOGICAL
+       WHERE PHYSICAL.NAME = 'physical reads'
+         AND DIRECT.NAME = 'physical reads direct'
+         AND LOBS.NAME = 'physical reads direct (lob)'
+         AND LOGICAL.NAME = 'session logical reads';
     #+END_SRC
 
     获取推荐的缓冲区值
@@ -1547,16 +1532,13 @@
 
    直接在 ~v$parameter~ 视图中查看进程数和会话数
    #+BEGIN_SRC sql
-     column name format a32;
-     column value format a64;
+     COLUMN NAME FORMAT A32;
+     COLUMN VALUE FORMAT A64;
 
-     select
-       t.name,
-       t.value
-     from
-       v$parameter t
-     where
-       name in ('sessions', 'processes', 'transactions');
+     SELECT T.NAME,
+            T.VALUE
+       FROM V$PARAMETER T
+      WHERE NAME in ('sessions', 'processes', 'transactions');
    #+END_SRC
 
    #+RESULTS:
@@ -1772,11 +1754,9 @@
 
    通过 ~tz_offset~ 转化数据库的时区和当前会话的时区
    #+BEGIN_SRC sql
-     select
-       tz_offset (dbtimezone) as "Remote Time Zone",
-       tz_offset (sessiontimezone) as "Local Time Zone"
-     from
-       dual;
+     SELECT TZ_OFFSET (DBTIMEZONE) AS "Remote Time Zone",
+            TZ_OFFSET (SESSIONTIMEZONE) AS "Local Time Zone"
+       FROM DUAL;
    #+END_SRC
 
    #+RESULTS:
@@ -1790,26 +1770,26 @@
    2. 创建自增序列
    3. 添加更新 ID 值的触发器
    #+BEGIN_SRC sql
-     create table tb_users (
-       id number not null,
-       available char(1) default 'y' not null,
-       created_at date default sysdate not null,
-       updated_at date default sysdate not null,
-       constraint tb_users_pk primary key (id)
+     CREATE TABLE TB_USERS (
+       ID NUMBER NOT NULL,
+       AVAILABLE CHAR(1) DEFAULT 'Y' NOT NULL,
+       CREATED_AT DATE DEFAULT SYSDATE NOT NULL,
+       UPDATED_AT DATE DEFAULT SYSDATE NOT NULL,
+       CONSTRAINT TB_USERS_PK PRIMARY KEY (ID)
      );
 
-     create sequence tb_users_id_seq
-       increment by 1
-       start with 1
-       minvalue 1
-       maxvalue 999999999;
+     CREATE SEQUENCE TB_USERS_ID_SEQ
+       INCREMENT BY 1
+       START WITH 1
+       MINVALUE 1
+       MAXVALUE 999999999;
 
-     create or replace trigger tb_users_id_tgr
-       before insert on tb_users
-       for each row when (new.id is null)
-     begin
-       select tb_users_id_seq.nextval into :new.id from dual;
-     end;
+     CREATE OR REPLACE TRIGGER TB_USERS_ID_TGR
+       BEFORE INSERT ON TB_USERS
+       FOR EACH ROW WHEN (NEW.ID IS NULL)
+     BEGIN
+       SELECT TB_USERS_ID_SEQ.NEXTVAL INTO :NEW.ID FROM DUAL;
+     END;
      /
    #+END_SRC
 ** 创建新的表空间以及用户
@@ -1825,23 +1805,23 @@
     的表空间。为了避免这种情况，提前创建默认表空间和临时表空间
     #+BEGIN_SRC sql
       -- 创建默认表空间
-      create tablespace pfile1
-        datafile '/u01/app/oracle/oradata/xe/pfile1.dbf'
-        size 128m autoextend off
-        logging
-        online
-        permanent
-        extent management local autoallocate
-        blocksize 8k
-        segment space management auto
-        flashback on;
+      CREATE TABLESPACE PFILE1
+        DATAFILE '/u01/app/oracle/oradata/xe/pfile1.dbf'
+        SIZE 128M AUTOEXTEND OFF
+        LOGGING
+        ONLINE
+        PERMANENT
+        EXTENT MANAGEMENT LOCAL AUTOALLOCATE
+        BLOCKSIZE 8K
+        SEGMENT SPACE MANAGEMENT AUTO
+        FLASHBACK ON;
 
       -- 创建临时表空间
-      create temporary tablespace tfile1
-        tempfile '/u01/app/oracle/oradata/xe/tfile1.dbf'
-        size 2048m autoextend off
-        tablespace group ''
-        extent management local uniform size 1m;
+      CREATE TEMPORARY TABLESPACE TFILE1
+        TEMPFILE '/u01/app/oracle/oradata/xe/tfile1.dbf'
+        SIZE 2048M AUTOEXTEND OFF
+        TABLESPACE GROUP ''
+        EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M;
     #+END_SRC
 
 *** 创建用户
@@ -1969,18 +1949,20 @@
 ** 限制查询结果的行数
    使用 ~ROWNUM~ 在条件语句中限制
    #+BEGIN_SRC sql
-     select id from employee where rownum < 100;
+     SELECT ID FROM EMPLOYEE WHERE ROWNUM < 100;
    #+END_SRC
 
 ** 删除表中重复的行数据
    Oracle 里面每行都有一个 ~ROWID~ 的伪列，即使两行的数据是相同的， ~ROWID~ 也是
    唯一的。
    #+BEGIN_SRC sql
-     select distinct myid from t_employee_base e1
-      where rowid != (
-        select max(rowid) from t_employee_base e2
-         where e1.myid = e2.myid
-      );
+     SELECT DISTINCT MYID
+       FROM T_EMPLOYEE_BASE E1
+      WHERE ROWID != (
+             SELECT MAX(ROWID)
+               FROM T_EMPLOYEE_BASE E2
+              WHERE E1.MYID = E2.MYID
+            );
    #+END_SRC
    将 SELECT 修改成 DELETE 即可删除重复行。
 
@@ -2039,34 +2021,26 @@
 
    10g 的使用方式
    #+BEGIN_SRC sql
-     select
-       a.constraint_name,
-       wm_concat (to_char(a.column_name)) as colnames
-     from
-       user_cons_columns a,
-       user_constraints b
-     where
-       a.constraint_name = b.constraint_name
-       and lower(b.constraint_type) = 'u'
-       and lower(a.table_name) = lower('tabname')
-     group by
-       a.constraint_name;
+     SELECT A.CONSTRAINT_NAME,
+            WM_CONCAT (TO_CHAR(A.COLUMN_NAME)) AS COLNAMES
+       FROM USER_CONS_COLUMNS A,
+            USER_CONSTRAINTS B
+      WHERE A.CONSTRAINT_NAME = B.CONSTRAINT_NAME
+        AND UPPER(B.CONSTRAINT_TYPE) = 'U'
+        AND UPPER(A.TABLE_NAME) = UPPER('tabname')
+      GROUP BY A.CONSTRAINT_NAME;
    #+END_SRC
 
    11g 的使用方式
    #+BEGIN_SRC sql
-     select
-       a.constraint_name,
-       listagg (a.column_name, ',') within group (order by a.position) as colnames
-     from
-       user_cons_columns a,
-       user_constraints b
-     where
-       a.constraint_name = b.constraint_name
-       and lower(b.constraint_type) = 'u'
-       and lower(a.table_name) = lower('tabname')
-     group by
-       a.constraint_name;
+     SELECT A.CONSTRAINT_NAME,
+            LISTAGG (A.COLUMN_NAME, ',') WITHIN GROUP (ORDER BY A.POSITION) AS COLNAMES
+       FROM USER_CONS_COLUMNS A,
+            USER_CONSTRAINTS B
+      WHERE A.CONSTRAINT_NAME = B.CONSTRAINT_NAME
+        AND UPPER(B.CONSTRAINT_TYPE) = 'U'
+        AND UPPER(A.TABLE_NAME) = UPPER('tabname')
+      GROUP BY A.CONSTRAINT_NAME;
    #+END_SRC
 
 * 常见问题
