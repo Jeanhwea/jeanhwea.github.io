@@ -80,6 +80,42 @@
    #+END_SRC
 
 * 配置和建库
+** 配置数据库
+   备份操作系统默认的配置文件
+   #+BEGIN_SRC sh
+     sudo mv /etc/my.cnf /etc/my.cnf.1
+   #+END_SRC
+
+   添加配置文件 =/etc/my.cnf=, 注意有些系统的发行版中默认包含 =my.cnf= 文件，在
+   安装时需要修改
+   #+BEGIN_SRC conf
+     [mysqld]
+     basedir   = /usr/local/mysql
+     datadir   = /usr/local/mysql/data
+     socket    = /usr/local/mysql/mysql.sock
+     pid-file  = /usr/local/mysql/mysqld.pid
+     log-error = /usr/local/mysql/error.log
+
+     # Disabling symbolic-links is recommended to prevent assorted security risks
+     symbolic-links       = 0
+     user                 = mysql
+     bind-address         = 0.0.0.0
+     character-set-server = utf8mb4
+     collation-server     = utf8mb4_unicode_ci
+     init-connect         = 'SET NAMES utf8mb4'
+
+     # skip-grant-tables to reset root password
+     # skip-grant-tables
+     skip-character-set-client-handshake = true
+
+     [mysql]
+     socket    = /usr/local/mysql/mysql.sock
+     default-character-set = utf8mb4
+
+     [client]
+     default-character-set = utf8mb4
+   #+END_SRC
+
 ** 初始化和建库
    初始化数据库目录
    #+BEGIN_SRC sh
@@ -100,8 +136,10 @@
 
    启动 MySQL 服务器进程
    #+BEGIN_SRC sh
-     service mysql.server start
+     sudo service mysql.server start
    #+END_SRC
+
+   #+RESULTS:
 
    登录进去重置密码
    #+BEGIN_SRC text
@@ -124,37 +162,6 @@
 
      mysql>
    #+END_SRC
-
-** 配置数据库
-  添加配置文件 =/etc/my.cnf=, 注意有些系统的发行版中默认包含 =my.cnf= 文件，在安
-  装时需要修改
-  #+BEGIN_SRC conf
-    [mysqld]
-    basedir   = /usr/local/mysql
-    datadir   = /usr/local/mysql/data
-    socket    = /usr/local/mysql/mysql.sock
-    pid-file  = /usr/local/mysql/mysqld.pid
-    log-error = /usr/local/mysql/error.log
-
-    # Disabling symbolic-links is recommended to prevent assorted security risks
-    symbolic-links       = 0
-    user                 = mysql
-    bind-address         = 0.0.0.0
-    character-set-server = utf8mb4
-    collation-server     = utf8mb4_unicode_ci
-    init-connect         = 'SET NAMES utf8mb4'
-
-    # skip-grant-tables to reset root password
-    # skip-grant-tables
-    skip-character-set-client-handshake = true
-
-    [mysql]
-    socket    = /usr/local/mysql/mysql.sock
-    default-character-set = utf8mb4
-
-    [client]
-    default-character-set = utf8mb4
-  #+END_SRC
 
 * 相关连接
   1. [[https://dev.mysql.com/doc/refman/5.7/en/source-installation.html][MySQL 官方安装文档]]
