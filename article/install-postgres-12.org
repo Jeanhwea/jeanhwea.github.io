@@ -40,9 +40,17 @@
      su - postgres # 使用 postgres 帐号操作
      /usr/local/pgsql/bin/initdb -E UTF8 -D /usr/local/pgsql/data # 初始化数据库
      /usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start # 启动数据库
-     /usr/local/pgsql/bin/createdb -E UTF8 demo # 假定数据库名为 demo
-     /usr/local/pgsql/bin/psql demo # 进入数据库内部
+     /usr/local/pgsql/bin/createuser -d user01 # 假定用户名为 user01
+     /usr/local/pgsql/bin/createdb -E UTF8 -o user01 db01 # 假定数据库名为 db01, 指定用户所有者为 user01
+     /usr/local/pgsql/bin/psql -U user01 db01 # 进入数据库内部
    #+end_src
+
+   获取使用 SQL 语句来创建用户和数据库也是可行的
+   #+BEGIN_SRC sql
+     CREATE ROLE user01 NOSUPERUSER CREATEDB NOCREATEROLE INHERIT LOGIN;
+
+     CREATE DATABASE db01 OWNER user01 ENCODING 'UTF8';
+   #+END_SRC
 
 * 配置相关的环境变量
   #+BEGIN_SRC sh
