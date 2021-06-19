@@ -1864,6 +1864,24 @@
      export MYSQL_PS1="\u@\h [\d]> "
    #+END_SRC
 
+** 开启通用日志，慢日志和 binlog
+   在 my.cnf 添加如下启动选项
+   #+BEGIN_SRC conf
+     [mysqld]
+     log-bin             = binlog
+     server-id           = 1
+
+     log-output          = TABLE
+     general-log         = 1
+     #general-log-file    = /usr/local/var/mysql/general.log
+     slow-query-log      = 1
+     #slow-query-log-file = /usr/local/var/mysql/slow.log
+     long-query-time     = 1
+   #+END_SRC
+
+   需要注意的是 =log-output= 指定 TABLE 可以将通用日志和慢日志直接输出到系统表中
+   对应 =mysql.general_log= 和 =mysql.slow_log=
+
 * 参考连接
   1. [[https://github.com/jaywcjlove/mysql-tutorial/blob/master/21-minutes-MySQL-basic-entry.md]]
   2. [[https://github.com/XD-DENG/SQL-exercise][https://github.com/XD-DENG/SQL-exercise]]
