@@ -27,8 +27,8 @@
      程中可见，即栈内存可以理解成线程的私有内存，堆内存中的对象对所有线程可见。
      堆内存中的对象可以被所有线程访问
   3. 如果栈内存没有可用的空间存储方法调用和局部变量，JVM 会抛出
-     ~Java.lang.StackOverFlowError~, 如果是堆内存没有可用的空间存储生成的对象，
-     JVM 会抛出 ~Java.lang.OutOfMemoryError~
+     ~java.lang.StackOverFlowError~, 如果是堆内存没有可用的空间存储生成的对象，
+     JVM 会抛出 ~java.lang.OutOfMemoryError~
   4. 栈的内存要远远小于堆内存，如果你使用递归的话，那么你的栈很快就会充满,
      - ~-Xms<size>~ set initial Java heap size
      - ~-Xmx<size>~ set maximum Java heap size
@@ -135,12 +135,12 @@
 
   1. 概念:
      - 虚拟机把描述类的数据文件（字节码）加载到内存，并对数据进行验证、准备、解
-       析以及类初始化，最终形成可以被虚拟机直接使用的 ~Java.lang.Class~ Java 类
+       析以及类初始化，最终形成可以被虚拟机直接使用的 ~java.lang.Class~ Java 类
        型对象
   2. 类的生命周期:
      - *加载*: 通过一个类的全限定名来获取定义此类的二进制字节流，将这个字节流所
        代表的静态存储结构转化为方法区的运行时数据结构。在内存中(方法区)生成一个
-       代表这个类的 ~Java.lang.Class~ 对象，作为方法区这个类的各种数据的访问入口
+       代表这个类的 ~java.lang.Class~ 对象，作为方法区这个类的各种数据的访问入口
      - *验证*: 为了确保 ~Class~ 文件的字节流中包含的信息符合当前虚拟机的要求，文
        件格式验证、元数据验证、字节码验证、符号引用验证
      - *准备*: 正式为类属性分配内存，设置类属性初始值，这些内存都将在方法区中进
@@ -154,18 +154,18 @@
      - 类加载器负责加载所有的类，同一个类(一个类用其全限定类名(包名加类名)标志)
        只会被加载一次
      - ~Bootstrap ClassLoader~ : 根类加载器，负责加载 Java 的核心类，它不是
-       ~Java.lang.ClassLoader~ 的子类，而是由 JVM 自身实现
+       ~java.lang.ClassLoader~ 的子类，而是由 JVM 自身实现
      - ~Extension ClassLoader~: 扩展类加载器，扩展类加载器的加载路径是 JDK 目录
        下 ~jre/lib/ext~, 扩展类的 ~getParent()~ 方法返回 null,实际上扩展类加载器
        的父类加载器是根加载器，只是根加载器并不是 Java 实现的
      - ~System ClassLoader~: 系统(应用)类加载器，它负责在 JVM 启动时加载来自
-       Java 命令的 ~-classpath~ 选项、java.class.path 系统属性或 CLASSPATH 环境
-       变量所指定的 jar 包和类路径。程序可以通过 ~getSystemClassLoader()~ 来获取
-       系统类加载器。系统加载器的加载路径是程序运行的当前路径
+       Java 命令的 ~-classpath~ 选项, ~java.class.path~ 系统属性或 ~CLASSPATH~
+       环境变量所指定的 jar 包和类路径。程序可以通过 ~getSystemClassLoader()~ 来
+       获取系统类加载器。系统加载器的加载路径是程序运行的当前路径
   4. 双亲委派模型的工作过程:
-     - 首先会先查找当前 ~ClassLoader~ 是否加载过此类，有就返回；
-     - 如果没有，查询父 ~ClassLoader~ 是否已经加载过此类，如果已经加载过,就直接
-       返回 Parent 加载的类；
+     - 首先会先查找当前 ~ClassLoader~ 是否加载过此类，有就返回
+     - 如果没有，查询父 ~ClassLoader~ 是否已经加载过此类，如果已经加载过，就直接
+       返回 Parent 加载的类
      - 如果整个类加载器体系上的 ~ClassLoader~ 都没有加载过，才由当前
        ~ClassLoader~ 加载(调用 ~findClass~)，整个过程类似循环链表一样。
   5. 双亲委托机制的作用:
@@ -175,16 +175,16 @@
      - 隔离功能: 因为 String 已经在启动时被加载，所以用户自定义类是无法加载一个
        自定义的类装载器，保证 Java/Android 核心类库的纯净和安全，防止恶意加载。
   6. 如何打破双亲委派模型？
-     - 双亲委派模型的逻辑都在 ~loadClass()~ 中，重写 ~loaderClass()~, 一般是重写
-       ~findClass()~ 的
+     - 双亲委派模型的逻辑都在 ~loadClass()~ 中，重写 ~loaderClass()~, 在实际工程
+       中一般是通过重写 ~findClass()~ 实现类加载
      - 系统自带的三个类加载器都加载特定目录下的类，如果我们自己的类加载器放在一
        个特殊的目录，那么系统的加载器就无法加载，也就是最终还是由我们自己的加载
        器加载
   7. 自定义 ~ClassLoader~:
-     - ~loadClass(String name,boolean resolve)~: 根据指定的二进制名称加载类
+     - ~loadClass(String name, boolean resolve)~: 根据指定的二进制名称加载类
      - ~findClass(String name)~: 根据二进制名称来查找类
-     - 直接使用或继承已有的 ~ClassLoader~ 实现: ~Java.net.URLClassLoader~,
-       ~Java.security.SecureClassLoader~, ~Java.rmi.server.RMIClassLoader~
+     - 直接使用或继承已有的 ~ClassLoader~ 实现: ~java.net.URLClassLoader~,
+       ~java.security.SecureClassLoader~, ~java.rmi.server.RMIClassLoader~
      - 在调用 ~loadClass()~, 会先根据委派模型在父加载器中加载，如果加载失败，则
        会调用自己的 ~findClass~ 方法来完成加载
 
