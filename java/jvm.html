@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-06-21 Mon 14:51 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JVM 知识点</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script type="text/javascript" src="styles/lib/js/jquery.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="../readme.html"> UP </a>
+ |
+ <a accesskey="H" href="../index.html"> HOME </a>
+</div><div id="content">
+<h1 class="title">JVM 知识点</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org02752a9">1. JVM 运行内存的分类</a></li>
+<li><a href="#org6a59b09">2. Java 内存堆和栈区别</a></li>
+<li><a href="#orgbd71b14">3. Java 四引用</a></li>
+<li><a href="#org9b6a1e9">4. GC 回收机制</a></li>
+<li><a href="#org7408963">5. GC 标记对象的死活</a></li>
+<li><a href="#org8d49af3">6. GC 回收算法</a></li>
+<li><a href="#org2103c61">7. MinorGC 和 FullGC</a></li>
+<li><a href="#org6d1be77">8. 内存分配与回收策略</a></li>
+<li><a href="#org7923689">9. GC 垃圾收集器</a></li>
+<li><a href="#org9cfe55e">10. Java 类加载机制</a></li>
+<li><a href="#orga165588">11. 引起类加载操作的五个行为</a></li>
+<li><a href="#org359ce37">12. Java 对象创建时机</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org02752a9" class="outline-2">
+<h2 id="org02752a9"><span class="section-number-2">1</span> JVM 运行内存的分类</h2>
+<div class="outline-text-2" id="text-1">
+<ol class="org-ol">
+<li><b>程序计数器</b> 当前线程所执行的字节码的行号指示器，用于记录正在执行的虚拟机字
+节指令地址，线程私有 注: 如果正在执行的是 Native 方法，计数器值则为空</li>
+<li><b>Java 虚拟栈</b> 存放基本数据类型、对象的引用、方法出口等，线程私有</li>
+<li><b>Native 方法栈</b> 和虚拟栈相似，只不过它服务于 Native 方法，线程私有</li>
+<li><b>Java 堆</b> Java 内存最大的一块，所有对象实例、数组都存放在 Java 堆，GC 回收的
+地方，线程共享</li>
+<li><b>方法区</b> 存放已被加载的类信息、常量、静态变量、即时编译器编译后的代码数据等。
+（即永久带），回收目标主要是常量池的回收和类型的卸载，各线程共享</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org6a59b09" class="outline-2">
+<h2 id="org6a59b09"><span class="section-number-2">2</span> Java 内存堆和栈区别</h2>
+<div class="outline-text-2" id="text-2">
+<ol class="org-ol">
+<li>栈内存用来存储基本类型的变量和对象的引用变量，堆内存用来存储 Java 中的对象，
+无论是成员变量，局部变量，还是类变量，它们指向的对象都存储在堆内存中</li>
+<li>栈内存归属于单个线程，每个线程都会有一个栈内存，其存储的变量只能在其所属线
+程中可见，即栈内存可以理解成线程的私有内存，堆内存中的对象对所有线程可见。
+堆内存中的对象可以被所有线程访问</li>
+<li>如果栈内存没有可用的空间存储方法调用和局部变量，JVM 会抛出
+<code>Java.lang.StackOverFlowError</code>, 如果是堆内存没有可用的空间存储生成的对象，
+JVM 会抛出 <code>Java.lang.OutOfMemoryError</code></li>
+<li>栈的内存要远远小于堆内存，如果你使用递归的话，那么你的栈很快就会充满,
+<ul class="org-ul">
+<li><code>-Xss</code> 选项设置栈内存的大小</li>
+<li><code>-Xms</code> 选项可以设置堆的开始时的大小</li>
+</ul></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgbd71b14" class="outline-2">
+<h2 id="orgbd71b14"><span class="section-number-2">3</span> Java 四引用</h2>
+<div class="outline-text-2" id="text-3">
+<ol class="org-ol">
+<li><b>强引用</b> （StrongReference）强引用是使用最普遍的引用。如果一个对象具有强引
+用，那垃圾回收器绝不会回收它。当内存空间不足，Java 虚拟机宁愿抛出
+<code>OutOfMemoryError</code> 错误，使程序异常终止，也不会靠随意回收具有强引用的对象来
+解决内存不足的问题</li>
+<li><b>软引用</b> （SoftReference） 如果内存空间不足了，就会回收这些对象的内存。只要
+垃圾回收器没有回收它，软引用可以和一个引用队列（ReferenceQueue）联合使用，
+如果软引用所引用的对象被垃圾回收器回收，Java 虚拟机就会把这个软引用加入到与
+之关联的引用队列中</li>
+<li><b>弱引用</b> （WeakReference） 弱引用与软引用的区别在于: 只具有弱引用的对象拥有
+更短暂的生命周期。在垃圾回收器线程扫描它所管辖的内存区域的过程中，一旦发现
+了只具有弱引用的对象，不管当前内存空间足够与否，都会回收它的内存。弱引用可
+以和一个引用队列（ReferenceQueue）联合使用，如果弱引用所引用的对象被垃圾回
+收，Java 虚拟机就会把这个弱引用加入到与之关联的引用队列中</li>
+<li><b>虚引用</b> （PhantomReference）虚引用在任何时候都可能被垃圾回收器回收，主要用
+来跟踪对象被垃圾回收器回收的活动，被回收时会收到一个系统通知。虚引用与软引
+用和弱引用的一个区别在于: 虚引用必须和引用队列 （ReferenceQueue）联合使用。
+当垃圾回收器准备回收一个对象时，如果发现它还有虚引用，就会在回收对象的内存
+之前，把这个虚引用加入到与之关联的引用队列中</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org9b6a1e9" class="outline-2">
+<h2 id="org9b6a1e9"><span class="section-number-2">4</span> GC 回收机制</h2>
+<div class="outline-text-2" id="text-4">
+<ol class="org-ol">
+<li>Java 中对象是采用 <code>new</code> 或者反射的方法创建的，这些对象的创建都是在堆（Heap）
+中分配的，所有对象的回收都是由 Java 虚拟机通过垃圾回收机制完成的。GC 为了能
+够正确释放对象，会监控每个对象的运行状况，对他们的申请、引用、被引用、赋值
+等状 况进行监控</li>
+<li>Java 程序员不用担心内存管理，因为垃圾收集器会自动进行管理</li>
+<li>可以调用下面的方法之一 <code>System.gc()</code> 或 <code>Runtime.getRuntime().gc()</code> 但 JVM
+可以屏蔽掉显示的垃圾回收调用</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org7408963" class="outline-2">
+<h2 id="org7408963"><span class="section-number-2">5</span> GC 标记对象的死活</h2>
+<div class="outline-text-2" id="text-5">
+<ol class="org-ol">
+<li><b>引用计数法</b> 给对象添加一个引用计数器,没当被引用的时候,计数器的值就加一。引
+用失效的时候减一,当计数器的值为 0 的时候就表示改对象可以被 GC 回收了，弊
+端: A-&gt;B,B-&gt;A, 那么 AB 将永远不会被回收了。也就是引用有环的情况</li>
+<li><b>根搜索算法</b> (可达性算法) GC Roots Tracing: 通过一个叫 GC Roots 的对象作为起
+点,从这些结点开始向下搜索,搜索所走过的路径称为引用链,当一个对象没有与任何的
+引用链相连的时候则改对象就可以被。 GC 回收回收了 Roots 包括: Java 虚拟机栈中
+引用的对象,本地方法栈中引用的对象,方法区中常量引用的对象,方法区中静态属性引
+用的对象在 Java 语言里，可作为 GC Roots 的对象包括以下几种:</li>
+
+<li>虚拟机栈（栈帧中的本地变量表）中的引用的对象</li>
+<li>方法区中的类静态属性引用的对象</li>
+<li>方法区中的常量引用的对象。</li>
+<li>本地方法栈中 JNI(即一般说的 Native 方法)的引用的对象。</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org8d49af3" class="outline-2">
+<h2 id="org8d49af3"><span class="section-number-2">6</span> GC 回收算法</h2>
+<div class="outline-text-2" id="text-6">
+<ol class="org-ol">
+<li>标记-清除法: 标记出没有用的对象，然后一个一个回收掉
+<ul class="org-ul">
+<li>缺点: 标记和清除两个过程效率不高，产生内存碎片导致需要分配较大对象时无法
+找到足够的连续内存而需要触发一次 GC 操作</li>
+</ul></li>
+<li>复制算法: 按照容量划分二个大小相等的内存区域，当一块用完的时候将活着的对象
+复制到另一块上，然后再把已使用的内存空间一次清理掉
+<ul class="org-ul">
+<li>缺点: 将内存缩小为了原来的一半</li>
+</ul></li>
+<li>标记-整理法: 标记出没有用的对象，让所有存活的对象都向一端移动，然后直接清除
+掉端边界以外的内
+<ul class="org-ul">
+<li>优点: 解决了标记- 清除算法导致的内存碎片问题和在存活率较高时复制算法效率
+低的问题。</li>
+</ul></li>
+<li>分代回收: 根据对象存活周期的不同将内存划分为几块，一般是新生代和老年代，新
+生代基本采用复制算法，老年代采用标记整理算法</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org2103c61" class="outline-2">
+<h2 id="org2103c61"><span class="section-number-2">7</span> MinorGC 和 FullGC</h2>
+<div class="outline-text-2" id="text-7">
+<ol class="org-ol">
+<li>Minor GC 通常发生在新生代的 Eden 区，在这个区的对象生存期短，往往发生 GC 的
+频率较高，回收速度比较快，一般采用复制-回收算法</li>
+<li>Full GC/Major GC 发生在老年代，一般情况下，触发老年代 GC 的时候不会触发
+Minor GC，所采用的是标记-清除算法</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org6d1be77" class="outline-2">
+<h2 id="org6d1be77"><span class="section-number-2">8</span> 内存分配与回收策略</h2>
+<div class="outline-text-2" id="text-8">
+<ol class="org-ol">
+<li>结构（堆大小 = 新生代 + 老年代 ）:
+<ul class="org-ul">
+<li>新生代(1/3)(初始对象，生命周期短): <code>Eden:s0:s1 = 8:1:1</code></li>
+<li>老年代(2/3)(长时间存在的对象)</li>
+</ul></li>
+<li>一般小型的对象都会在 Eden 区上分配，如果 Eden 区无法分配，那么尝试把活着的
+对象放到 survivor0 中去（Minor GC）
+<ul class="org-ul">
+<li>如果 survivor0 可以放入，那么放入之后清除 Eden 区</li>
+<li>如果 survivor0 不可以放入，那么尝试把 Eden 和 survivor0 的存活对象放到
+survivor1 中
+<ul class="org-ul">
+<li>如果 survivor1 可以放入，那么放入 survivor1 之后清除 Eden 和 survivor0，
+之后再把 survivor1 中的对象复制到 survivor0 中，保持 survivor1 一直为空。</li>
+<li>如果 survivor1 不可以放入，那么直接把它们放入到老年代中，并清除 Eden 和
+survivor0，这个过程也称为分配担保（Full GC）</li>
+</ul></li>
+</ul></li>
+<li>大对象、长期存活的对象则直接进入老年代</li>
+<li>动态对象年龄判定</li>
+<li>空间分配担保，Full GC&#x2026;</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org7923689" class="outline-2">
+<h2 id="org7923689"><span class="section-number-2">9</span> GC 垃圾收集器</h2>
+<div class="outline-text-2" id="text-9">
+<ol class="org-ol">
+<li>Serial New 收集器是针对新生代的收集器，采用的是复制算法</li>
+<li>Parallel New（并行）收集器，新生代采用复制算法，老年代采用标记整理</li>
+<li>Parallel Scavenge（并行）收集器，针对新生代，采用复制收集算法</li>
+<li>Serial Old（串行）收集器，新生代采用复制，老年代采用标记清理</li>
+<li>Parallel Old（并行）收集器，针对老年代，标记整理</li>
+<li>CMS 收集器，基于标记清理</li>
+<li>G1 收集器(JDK): 整体上是基于标记清理，局部采用复制</li>
+<li>综上: 新生代基本采用复制算法，老年代采用标记整理算法。cms 采用标记清理</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org9cfe55e" class="outline-2">
+<h2 id="org9cfe55e"><span class="section-number-2">10</span> Java 类加载机制</h2>
+<div class="outline-text-2" id="text-10">
+<ol class="org-ol">
+<li>概念:
+<ul class="org-ul">
+<li>虚拟机把描述类的数据文件（字节码）加载到内存，并对数据进行验证、准备、解
+析以及类初始化，最终形成可以被虚拟机直接使用的 <code>Java.lang.Class</code> Java 类型
+对象</li>
+</ul></li>
+<li>类的生命周期:
+<ul class="org-ul">
+<li><b>加载</b>: 通过一个类的全限定名来获取定义此类的二进制字节流，将这个字节流
+所代表的静态存储结构转化为方法区的运行时数据结构。在内存中(方法区)生成一
+个代表这个类的 <code>Java.lang.Class</code> 对象，作为方法区这个类的各种数据的访问入
+口</li>
+<li><b>验证</b>: 为了确保 Class 文件的字节流中包含的信息符合当前虚拟机的要求，文件
+格式验证、元数据验证、字节码验证、符号引用验证</li>
+<li><b>准备</b>: 正式为类属性分配内存并设置类属性初始值的阶段，这些内存都将在方法
+区中进行分配</li>
+<li><b>解析</b>: 虚拟机将常量池内的符号引用替换为直接引用的过程</li>
+<li><b>初始化</b>: 类初始化阶段是类加载过程最后一步。初始化阶段就是执行类构造器
+<code>&lt;clinit&gt;()</code> 方法的过程</li>
+<li>使用:</li>
+<li>卸载:</li>
+</ul></li>
+<li>Java 类加载器:
+<ul class="org-ul">
+<li>类加载器负责加载所有的类，同一个类(一个类用其全限定类名(包名加类名)标志)
+只会被加载一次</li>
+<li><code>Bootstrap ClassLoader</code> : 根类加载器，负责加载 Java 的核心类，它不是
+<code>Java.lang.ClassLoader</code> 的子类，而是由 JVM 自身实现</li>
+<li><code>Extension ClassLoader</code>: 扩展类加载器，扩展类加载器的加载路径是 JDK 目录
+下 <code>jre/lib/ext</code>, 扩展类的 <code>getParent()</code> 方法返回 null,实际上扩展类加载器
+的父类加载器是根加载器，只是根加载器并不是 Java 实现的</li>
+<li><code>System ClassLoader</code>: 系统(应用)类加载器，它负责在 JVM 启动时加载来自
+Java 命令的 <code>-classpath</code> 选项、java.class.path 系统属性或 CLASSPATH 环境
+变量所指定的 jar 包和类路径。程序可以通过 <code>getSystemClassLoader()</code> 来获取
+系统类加载器。系统加载器的加载路径是程序运行的当前路径</li>
+</ul></li>
+<li>双亲委派模型的工作过程:
+<ul class="org-ul">
+<li>首先会先查找当前 ClassLoader 是否加载过此类，有就返回；</li>
+<li>如果没有，查询父 ClassLoader 是否已经加载过此类，如果已经加载过,就直接返
+回 Parent 加载的类；</li>
+<li>如果整个类加载器体系上的 ClassLoader 都没有加载过，才由当前 ClassLoader
+加载(调用 findClass)，整个过程类似循环链表一样。</li>
+</ul></li>
+<li>双亲委托机制的作用:
+<ul class="org-ul">
+<li>共享功能: 可以避免重复加载，当父亲已经加载了该类的时候，子类不需要再次加
+载，一些 Framework 层级的类一旦被顶层的 ClassLoader 加载过就缓存在内存里
+面，以后任何地方用到都不需要重新加载。</li>
+<li>隔离功能: 因为 String 已经在启动时被加载，所以用户自定义类是无法加载一个
+自定义的类装载器，保证 Java/Android 核心类库的纯净和安全，防止恶意加载。</li>
+</ul></li>
+<li>如何打破双亲委派模型？
+<ul class="org-ul">
+<li>双亲委派模型的逻辑都在 loadClass()中，重写 loaderClass()，一般是重写
+findClass()的</li>
+<li>系统自带的三个类加载器都加载特定目录下的类，如果我们自己的类加载器放在一
+个特殊的目录，那么系统的加载器就无法加载，也就是最终还是由我们自己的加载
+器加载</li>
+</ul></li>
+<li>自定义 ClassLoader:
+<ul class="org-ul">
+<li>loadClass(String name,boolean resolve): 根据指定的二进制名称加载类</li>
+<li>findClass(String name): 根据二进制名称来查找类</li>
+<li>直接使用或继承已有的 ClassLoader 实现: <code>Java.net.URLClassLoader</code>,
+<code>Java.security.SecureClassLoader</code>, <code>Java.rmi.server.RMIClassLoader</code></li>
+<li>在调用 loadClass()，会先根据委派模型在父加载器中加载，如果加载失败，则会
+调用自己的 findClass 方法来完成加载</li>
+</ul></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orga165588" class="outline-2">
+<h2 id="orga165588"><span class="section-number-2">11</span> 引起类加载操作的五个行为</h2>
+<div class="outline-text-2" id="text-11">
+<ol class="org-ol">
+<li>遇到 <code>new</code>, <code>getstatic</code>, <code>putstatic</code> 或 <code>invokestatic</code> 这四条字节码指令</li>
+<li>反射调用的时候，如果类没有进行过初始化，则需要先触发其初始化</li>
+<li>子类初始化的时候，如果其父类还没初始化，则需先触发其父类的初始化</li>
+<li>虚拟机执行主类的时候(有 main(string[] args))</li>
+<li>JDK1.7 动态语言支持</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org359ce37" class="outline-2">
+<h2 id="org359ce37"><span class="section-number-2">12</span> Java 对象创建时机</h2>
+<div class="outline-text-2" id="text-12">
+<ol class="org-ol">
+<li>使用 new 关键字创建对象</li>
+<li>使用 Class 类的 newInstance 方法(反射机制)</li>
+<li>使用 Constructor 类的 newInstance 方法(反射机制)</li>
+<li>使用 Clone 方法创建对象</li>
+<li>使用(反)序列化机制创建对象</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Last Updated 2021-06-21 Mon 14:51. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
+</div>
+</body>
+</html>
