@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-06-21 Mon 15:19 -->
+<!-- 2021-06-21 Mon 15:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JVM 知识点</title>
@@ -233,41 +233,41 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgde424f0">1. JVM 运行内存的分类</a></li>
-<li><a href="#orga62fdad">2. Java 内存堆和栈区别</a></li>
-<li><a href="#org3556d5b">3. Java 四引用</a></li>
-<li><a href="#orga956a86">4. GC 回收机制</a></li>
-<li><a href="#org296786b">5. GC 标记对象的死活</a></li>
-<li><a href="#orgd8d0a30">6. GC 回收算法</a></li>
-<li><a href="#orgc5cdc2f">7. MinorGC 和 FullGC</a></li>
-<li><a href="#orgd25725f">8. 内存分配与回收策略</a></li>
-<li><a href="#org9c34fae">9. GC 垃圾收集器</a></li>
-<li><a href="#orge2bb6d1">10. Java 类加载机制</a></li>
-<li><a href="#orgcdabe8e">11. 引起类加载操作的五个行为</a></li>
-<li><a href="#orgf8f5b9e">12. Java 对象创建时机</a></li>
+<li><a href="#orgfeab99c">1. JVM 运行内存的分类</a></li>
+<li><a href="#orgb0c4689">2. Java 内存堆和栈区别</a></li>
+<li><a href="#orgf089808">3. Java 四引用</a></li>
+<li><a href="#org8ff2b4b">4. GC 回收机制</a></li>
+<li><a href="#org0f380a9">5. GC 标记对象的死活</a></li>
+<li><a href="#org1a9c44a">6. GC 回收算法</a></li>
+<li><a href="#orgb0f6a3c">7. MinorGC 和 FullGC</a></li>
+<li><a href="#org74ba738">8. 内存分配与回收策略</a></li>
+<li><a href="#org51d1a2e">9. GC 垃圾收集器</a></li>
+<li><a href="#orgc60ed26">10. Java 类加载机制</a></li>
+<li><a href="#org2a7a38c">11. 引起类加载操作的五个行为</a></li>
+<li><a href="#orga406335">12. Java 对象创建时机</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgde424f0" class="outline-2">
-<h2 id="orgde424f0"><span class="section-number-2">1</span> JVM 运行内存的分类</h2>
+<div id="outline-container-orgfeab99c" class="outline-2">
+<h2 id="orgfeab99c"><span class="section-number-2">1</span> JVM 运行内存的分类</h2>
 <div class="outline-text-2" id="text-1">
 <ol class="org-ol">
 <li><b>程序计数器</b> 当前线程所执行的字节码的行号指示器，用于记录正在执行的虚拟机字
 节指令地址，线程私有 注: 如果正在执行的是 Native 方法，计数器值则为空</li>
 <li><b>Java 虚拟栈</b> 存放基本数据类型、对象的引用、方法出口等，线程私有</li>
 <li><b>Native 方法栈</b> 和虚拟栈相似，只不过它服务于 Native 方法，线程私有</li>
-<li><b>Java 堆</b> Java 内存最大的一块，所有对象实例、数组都存放在 Java 堆，GC 回收的
-地方，线程共享</li>
+<li><b>Java 堆</b> Java 内存最大的一块，所有对象实例、数组都存放在 Java 堆，GC 回收
+的地方，线程共享</li>
 <li><b>方法区</b> 存放已被加载的类信息、常量、静态变量、即时编译器编译后的代码数据等。
 （即永久带），回收目标主要是常量池的回收和类型的卸载，各线程共享</li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orga62fdad" class="outline-2">
-<h2 id="orga62fdad"><span class="section-number-2">2</span> Java 内存堆和栈区别</h2>
+<div id="outline-container-orgb0c4689" class="outline-2">
+<h2 id="orgb0c4689"><span class="section-number-2">2</span> Java 内存堆和栈区别</h2>
 <div class="outline-text-2" id="text-2">
 <ol class="org-ol">
 <li>栈内存用来存储基本类型的变量和对象的引用变量，堆内存用来存储 Java 中的对象，
@@ -288,8 +288,8 @@ JVM 会抛出 <code>Java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org3556d5b" class="outline-2">
-<h2 id="org3556d5b"><span class="section-number-2">3</span> Java 四引用</h2>
+<div id="outline-container-orgf089808" class="outline-2">
+<h2 id="orgf089808"><span class="section-number-2">3</span> Java 四引用</h2>
 <div class="outline-text-2" id="text-3">
 <ol class="org-ol">
 <li><b>强引用</b> （StrongReference）强引用是使用最普遍的引用。如果一个对象具有强引
@@ -314,8 +314,8 @@ JVM 会抛出 <code>Java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-orga956a86" class="outline-2">
-<h2 id="orga956a86"><span class="section-number-2">4</span> GC 回收机制</h2>
+<div id="outline-container-org8ff2b4b" class="outline-2">
+<h2 id="org8ff2b4b"><span class="section-number-2">4</span> GC 回收机制</h2>
 <div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li>Java 中对象是采用 <code>new</code> 或者反射的方法创建的，这些对象的创建都是在堆（Heap）
@@ -329,56 +329,56 @@ JVM 会抛出 <code>Java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org296786b" class="outline-2">
-<h2 id="org296786b"><span class="section-number-2">5</span> GC 标记对象的死活</h2>
+<div id="outline-container-org0f380a9" class="outline-2">
+<h2 id="org0f380a9"><span class="section-number-2">5</span> GC 标记对象的死活</h2>
 <div class="outline-text-2" id="text-5">
 <ol class="org-ol">
 <li><b>引用计数法</b> 给对象添加一个引用计数器,没当被引用的时候,计数器的值就加一。引
-用失效的时候减一,当计数器的值为 0 的时候就表示改对象可以被 GC 回收了，弊
-端: A-&gt;B,B-&gt;A, 那么 AB 将永远不会被回收了。也就是引用有环的情况</li>
-<li><b>根搜索算法</b> (可达性算法) GC Roots Tracing: 通过一个叫 GC Roots 的对象作为起
-点,从这些结点开始向下搜索,搜索所走过的路径称为引用链,当一个对象没有与任何的
-引用链相连的时候则改对象就可以被。 GC 回收回收了 Roots 包括: Java 虚拟机栈中
-引用的对象,本地方法栈中引用的对象,方法区中常量引用的对象,方法区中静态属性引
-用的对象在 Java 语言里，可作为 GC Roots 的对象包括以下几种:
+用失效的时候减一,当计数器的值为 0 的时候就表示改对象可以被 GC 回收了，弊端:
+<code>A-&gt;B,B-&gt;A</code>, 那么 AB 将永远不会被回收了。也就是引用有环的情况</li>
+<li><b>根搜索算法</b> (可达性算法) GC Roots Tracing: 通过一个叫 GC Roots 的对象作为
+起点,从这些结点开始向下搜索,搜索所走过的路径称为引用链,当一个对象没有与任何
+的引用链相连的时候则改对象就可以被。 GC 回收回收了 Roots 包括: Java 虚拟机
+栈中引用的对象,本地方法栈中引用的对象,方法区中常量引用的对象,方法区中静态属
+性引用的对象在 Java 语言里，可作为 GC Roots 的对象包括以下几种:
 <ul class="org-ul">
 <li>虚拟机栈（栈帧中的本地变量表）中的引用的对象</li>
 <li>方法区中的类静态属性引用的对象</li>
-<li>方法区中的常量引用的对象。</li>
-<li>本地方法栈中 JNI(即一般说的 Native 方法)的引用的对象。</li>
+<li>方法区中的常量引用的对象</li>
+<li>本地方法栈中 JNI(即一般说的 Native 方法)的引用的对象</li>
 </ul></li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orgd8d0a30" class="outline-2">
-<h2 id="orgd8d0a30"><span class="section-number-2">6</span> GC 回收算法</h2>
+<div id="outline-container-org1a9c44a" class="outline-2">
+<h2 id="org1a9c44a"><span class="section-number-2">6</span> GC 回收算法</h2>
 <div class="outline-text-2" id="text-6">
 <ol class="org-ol">
-<li>标记-清除法: 标记出没有用的对象，然后一个一个回收掉
+<li><b>标记-清除法</b>: 标记出没有用的对象，然后一个一个回收掉
 <ul class="org-ul">
 <li>缺点: 标记和清除两个过程效率不高，产生内存碎片导致需要分配较大对象时无法
 找到足够的连续内存而需要触发一次 GC 操作</li>
 </ul></li>
-<li>复制算法: 按照容量划分二个大小相等的内存区域，当一块用完的时候将活着的对象
-复制到另一块上，然后再把已使用的内存空间一次清理掉
+<li><b>复制算法</b>: 按照容量划分二个大小相等的内存区域，当一块用完的时候将活着的对
+象复制到另一块上，然后再把已使用的内存空间一次清理掉
 <ul class="org-ul">
 <li>缺点: 将内存缩小为了原来的一半</li>
 </ul></li>
-<li>标记-整理法: 标记出没有用的对象，让所有存活的对象都向一端移动，然后直接清除
-掉端边界以外的内
+<li><b>标记-整理法</b>: 标记出没有用的对象，让所有存活的对象都向一端移动，然后直接清
+除掉端边界以外的内
 <ul class="org-ul">
-<li>优点: 解决了标记- 清除算法导致的内存碎片问题和在存活率较高时复制算法效率
-低的问题。</li>
+<li>优点: 解决了标记-清除算法导致的内存碎片问题和在存活率较高时复制算法效率
+低的问题</li>
 </ul></li>
-<li>分代回收: 根据对象存活周期的不同将内存划分为几块，一般是新生代和老年代，新
-生代基本采用复制算法，老年代采用标记整理算法</li>
+<li><b>分代回收法</b>: 根据对象存活周期的不同将内存划分为几块，一般是新生代和老年代，
+新生代基本采用复制算法，老年代采用标记整理算法</li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orgc5cdc2f" class="outline-2">
-<h2 id="orgc5cdc2f"><span class="section-number-2">7</span> MinorGC 和 FullGC</h2>
+<div id="outline-container-orgb0f6a3c" class="outline-2">
+<h2 id="orgb0f6a3c"><span class="section-number-2">7</span> MinorGC 和 FullGC</h2>
 <div class="outline-text-2" id="text-7">
 <ol class="org-ol">
 <li>Minor GC 通常发生在新生代的 Eden 区，在这个区的对象生存期短，往往发生 GC 的
@@ -389,8 +389,8 @@ Minor GC，所采用的是标记-清除算法</li>
 </div>
 </div>
 
-<div id="outline-container-orgd25725f" class="outline-2">
-<h2 id="orgd25725f"><span class="section-number-2">8</span> 内存分配与回收策略</h2>
+<div id="outline-container-org74ba738" class="outline-2">
+<h2 id="org74ba738"><span class="section-number-2">8</span> 内存分配与回收策略</h2>
 <div class="outline-text-2" id="text-8">
 <ol class="org-ol">
 <li>结构（堆大小 = 新生代 + 老年代 ）:
@@ -418,8 +418,8 @@ survivor0，这个过程也称为分配担保（Full GC）</li>
 </div>
 </div>
 
-<div id="outline-container-org9c34fae" class="outline-2">
-<h2 id="org9c34fae"><span class="section-number-2">9</span> GC 垃圾收集器</h2>
+<div id="outline-container-org51d1a2e" class="outline-2">
+<h2 id="org51d1a2e"><span class="section-number-2">9</span> GC 垃圾收集器</h2>
 <div class="outline-text-2" id="text-9">
 <ol class="org-ol">
 <li>Serial New 收集器是针对新生代的收集器，采用的是复制算法</li>
@@ -434,8 +434,8 @@ survivor0，这个过程也称为分配担保（Full GC）</li>
 </div>
 </div>
 
-<div id="outline-container-orge2bb6d1" class="outline-2">
-<h2 id="orge2bb6d1"><span class="section-number-2">10</span> Java 类加载机制</h2>
+<div id="outline-container-orgc60ed26" class="outline-2">
+<h2 id="orgc60ed26"><span class="section-number-2">10</span> Java 类加载机制</h2>
 <div class="outline-text-2" id="text-10">
 <ol class="org-ol">
 <li>概念:
@@ -450,15 +450,15 @@ survivor0，这个过程也称为分配担保（Full GC）</li>
 所代表的静态存储结构转化为方法区的运行时数据结构。在内存中(方法区)生成一
 个代表这个类的 <code>Java.lang.Class</code> 对象，作为方法区这个类的各种数据的访问入
 口</li>
-<li><b>验证</b>: 为了确保 Class 文件的字节流中包含的信息符合当前虚拟机的要求，文件
+<li><b>验证</b>: 为了确保 <code>Class</code> 文件的字节流中包含的信息符合当前虚拟机的要求，文件
 格式验证、元数据验证、字节码验证、符号引用验证</li>
 <li><b>准备</b>: 正式为类属性分配内存并设置类属性初始值的阶段，这些内存都将在方法
 区中进行分配</li>
 <li><b>解析</b>: 虚拟机将常量池内的符号引用替换为直接引用的过程</li>
 <li><b>初始化</b>: 类初始化阶段是类加载过程最后一步。初始化阶段就是执行类构造器
 <code>&lt;clinit&gt;()</code> 方法的过程</li>
-<li>使用:</li>
-<li>卸载:</li>
+<li><b>使用</b>:</li>
+<li><b>卸载</b>:</li>
 </ul></li>
 <li>Java 类加载器:
 <ul class="org-ul">
@@ -476,69 +476,69 @@ Java 命令的 <code>-classpath</code> 选项、java.class.path 系统属性或 
 </ul></li>
 <li>双亲委派模型的工作过程:
 <ul class="org-ul">
-<li>首先会先查找当前 ClassLoader 是否加载过此类，有就返回；</li>
-<li>如果没有，查询父 ClassLoader 是否已经加载过此类，如果已经加载过,就直接返
-回 Parent 加载的类；</li>
-<li>如果整个类加载器体系上的 ClassLoader 都没有加载过，才由当前 ClassLoader
-加载(调用 findClass)，整个过程类似循环链表一样。</li>
+<li>首先会先查找当前 <code>ClassLoader</code> 是否加载过此类，有就返回；</li>
+<li>如果没有，查询父 <code>ClassLoader</code> 是否已经加载过此类，如果已经加载过,就直接
+返回 Parent 加载的类；</li>
+<li>如果整个类加载器体系上的 <code>ClassLoader</code> 都没有加载过，才由当前
+<code>ClassLoader</code> 加载(调用 <code>findClass</code>)，整个过程类似循环链表一样。</li>
 </ul></li>
 <li>双亲委托机制的作用:
 <ul class="org-ul">
 <li>共享功能: 可以避免重复加载，当父亲已经加载了该类的时候，子类不需要再次加
-载，一些 Framework 层级的类一旦被顶层的 ClassLoader 加载过就缓存在内存里
-面，以后任何地方用到都不需要重新加载。</li>
+载，一些 Framework 层级的类一旦被顶层的 <code>ClassLoader</code> 加载过就缓存在内存
+里面，以后任何地方用到都不需要重新加载。</li>
 <li>隔离功能: 因为 String 已经在启动时被加载，所以用户自定义类是无法加载一个
 自定义的类装载器，保证 Java/Android 核心类库的纯净和安全，防止恶意加载。</li>
 </ul></li>
 <li>如何打破双亲委派模型？
 <ul class="org-ul">
-<li>双亲委派模型的逻辑都在 loadClass()中，重写 loaderClass()，一般是重写
-findClass()的</li>
+<li>双亲委派模型的逻辑都在 <code>loadClass()</code> 中，重写 <code>loaderClass()</code>, 一般是重写
+<code>findClass()</code> 的</li>
 <li>系统自带的三个类加载器都加载特定目录下的类，如果我们自己的类加载器放在一
 个特殊的目录，那么系统的加载器就无法加载，也就是最终还是由我们自己的加载
 器加载</li>
 </ul></li>
-<li>自定义 ClassLoader:
+<li>自定义 <code>ClassLoader</code>:
 <ul class="org-ul">
-<li>loadClass(String name,boolean resolve): 根据指定的二进制名称加载类</li>
-<li>findClass(String name): 根据二进制名称来查找类</li>
-<li>直接使用或继承已有的 ClassLoader 实现: <code>Java.net.URLClassLoader</code>,
+<li><code>loadClass(String name,boolean resolve)</code>: 根据指定的二进制名称加载类</li>
+<li><code>findClass(String name)</code>: 根据二进制名称来查找类</li>
+<li>直接使用或继承已有的 <code>ClassLoader</code> 实现: <code>Java.net.URLClassLoader</code>,
 <code>Java.security.SecureClassLoader</code>, <code>Java.rmi.server.RMIClassLoader</code></li>
-<li>在调用 loadClass()，会先根据委派模型在父加载器中加载，如果加载失败，则会
-调用自己的 findClass 方法来完成加载</li>
+<li>在调用 <code>loadClass()</code>, 会先根据委派模型在父加载器中加载，如果加载失败，则
+会调用自己的 <code>findClass</code> 方法来完成加载</li>
 </ul></li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orgcdabe8e" class="outline-2">
-<h2 id="orgcdabe8e"><span class="section-number-2">11</span> 引起类加载操作的五个行为</h2>
+<div id="outline-container-org2a7a38c" class="outline-2">
+<h2 id="org2a7a38c"><span class="section-number-2">11</span> 引起类加载操作的五个行为</h2>
 <div class="outline-text-2" id="text-11">
 <ol class="org-ol">
 <li>遇到 <code>new</code>, <code>getstatic</code>, <code>putstatic</code> 或 <code>invokestatic</code> 这四条字节码指令</li>
 <li>反射调用的时候，如果类没有进行过初始化，则需要先触发其初始化</li>
 <li>子类初始化的时候，如果其父类还没初始化，则需先触发其父类的初始化</li>
-<li>虚拟机执行主类的时候(有 main(string[] args))</li>
+<li>虚拟机执行主类的时候(有 <code>main(string[] args)</code> )</li>
 <li>JDK1.7 动态语言支持</li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orgf8f5b9e" class="outline-2">
-<h2 id="orgf8f5b9e"><span class="section-number-2">12</span> Java 对象创建时机</h2>
+<div id="outline-container-orga406335" class="outline-2">
+<h2 id="orga406335"><span class="section-number-2">12</span> Java 对象创建时机</h2>
 <div class="outline-text-2" id="text-12">
 <ol class="org-ol">
-<li>使用 new 关键字创建对象</li>
-<li>使用 Class 类的 newInstance 方法(反射机制)</li>
-<li>使用 Constructor 类的 newInstance 方法(反射机制)</li>
-<li>使用 Clone 方法创建对象</li>
+<li>使用 <code>new</code> 关键字创建对象</li>
+<li>使用 <code>Class</code> 类的 <code>newInstance</code> 方法(反射机制)</li>
+<li>使用 <code>Constructor</code> 类的 <code>newInstance</code> 方法(反射机制)</li>
+<li>使用 <code>Clone</code> 方法创建对象</li>
 <li>使用(反)序列化机制创建对象</li>
 </ol>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-06-21 Mon 15:19. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
+<p class="author">Last Updated 2021-06-21 Mon 15:30. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
 </div>
 </body>
 </html>
