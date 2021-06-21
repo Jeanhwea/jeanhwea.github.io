@@ -162,6 +162,12 @@
        Java 命令的 ~-classpath~ 选项, ~java.class.path~ 系统属性或 ~CLASSPATH~
        环境变量所指定的 jar 包和类路径。程序可以通过 ~getSystemClassLoader()~ 来
        获取系统类加载器。系统加载器的加载路径是程序运行的当前路径
+       #+BEGIN_SRC java
+         ClassLoader loader = ClassLoader.getSystemClassLoader();
+         System.out.println(loader); // => sun.misc.Launcher$AppClassLoader@73d16e93
+         System.out.println(loader.getParent()); // => sun.misc.Launcher$ExtClassLoader@15db9742
+         System.out.println(loader.getParent().getParent()); // => null
+       #+END_SRC
   4. 双亲委派模型的工作过程:
      - 首先会先查找当前 ~ClassLoader~ 是否加载过此类，有就返回
      - 如果没有，查询父 ~ClassLoader~ 是否已经加载过此类，如果已经加载过，就直接
