@@ -1882,6 +1882,30 @@
    需要注意的是 =log-output= 指定 TABLE 可以将通用日志和慢日志直接输出到系统表中
    对应 =mysql.general_log= 和 =mysql.slow_log=
 
+** 创建用户和数据库
+   #+BEGIN_SRC sql
+     create database test01 default character set utf8mb4 collate utf8mb4_general_ci;
+
+     create user 'test01'@'%' identified by 'test01';
+     grant all privileges on test01.* to 'test01'@'%';
+     flush privileges;
+   #+END_SRC
+
+** 修改用户密码
+   修改自身的密码
+   #+BEGIN_SRC sql
+     use mysql;
+     set password = password('root');
+     update user set host = '%' where user = 'root';
+     flush privileges;
+   #+END_SRC
+
+   修改其它用户密码
+   #+BEGIN_SRC sql
+     set password for 'test01'@'%' = password('1234');
+     flush privileges;
+   #+END_SRC
+
 * 参考连接
   1. [[https://github.com/jaywcjlove/mysql-tutorial/blob/master/21-minutes-MySQL-basic-entry.md]]
   2. [[https://github.com/XD-DENG/SQL-exercise][https://github.com/XD-DENG/SQL-exercise]]
