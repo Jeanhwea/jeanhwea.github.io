@@ -1183,6 +1183,72 @@
      看作是一个集合，按照记录出现的顺序，索引从 0 开始。LIMIT 起始位置, 获取条数
      省略第一个参数，表示从索引 0 开始。LIMIT 获取条数
    - DISTINCT/ALL 选项 : DISTINCT 去除重复记录， 默认为 ALL, 全部记录
+* 数据优化：索引
+** 数据准备
+   添加 author 表
+   #+BEGIN_SRC sql
+     drop table author;
+
+     create table author (
+       id int auto_increment primary key,
+       name varchar(128) not null,
+       age int,
+       gender varchar(32),
+       a int,
+       b int,
+       c int
+     );
+   #+END_SRC
+
+   准备数据
+   #+BEGIN_SRC sql
+     insert into author(name, age, gender, a, b, c) values ('aaa', 11, 'M', 10, 21, 34);
+     insert into author(name, age, gender, a, b, c) values ('abc', 12, 'M', 10, 22, 33);
+     insert into author(name, age, gender, a, b, c) values ('bbb', 10, 'F', 10, 23, 31);
+     insert into author(name, age, gender, a, b, c) values ('baa', 40, 'M', 11, 21, 31);
+     insert into author(name, age, gender, a, b, c) values ('bac', 22, 'F', 11, 22, 32);
+     insert into author(name, age, gender, a, b, c) values ('caa', 70, 'M', 11, 23, 33);
+     insert into author(name, age, gender, a, b, c) values ('bca', 30, 'M', 11, 20, 30);
+   #+END_SRC
+
+** 查看新建删除索引
+   #+BEGIN_SRC sql
+     create table author (
+       id int auto_increment primary key,
+       name varchar(128) not null,
+       age int,
+       gender varchar(32),
+       a int,
+       b int,
+       c int
+     );
+
+     delete from author;
+
+     insert into author(name, age, gender, a, b, c) values ('aaa', 11, 'M', 10, 21, 34);
+     insert into author(name, age, gender, a, b, c) values ('abc', 12, 'M', 10, 22, 33);
+     insert into author(name, age, gender, a, b, c) values ('bbb', 10, 'F', 10, 23, 31);
+     insert into author(name, age, gender, a, b, c) values ('baa', 40, 'M', 11, 21, 31);
+     insert into author(name, age, gender, a, b, c) values ('bac', 22, 'F', 11, 22, 32);
+     insert into author(name, age, gender, a, b, c) values ('caa', 70, 'M', 11, 23, 33);
+     insert into author(name, age, gender, a, b, c) values ('bca', 30, 'M', 11, 20, 30);
+
+     -- 指定名称创建
+     alter table author add unique key uk_author_nag (name, age, gender);
+     create index ix_author_abc on author(a, b, c);
+
+     -- 删除唯一键和索引
+     alter table author drop key uk_author_nag;
+     alter table author drop index ix_author_abc;
+
+     -- 匿名创建
+     alter table author add unique key (name, age, gender);
+     alter table author add index (a,b,c);
+
+     -- 查看索引
+     show create table author\G
+     show index from author;
+   #+END_SRC
 
 * 高级查询
 ** 合并多个查询结果 ~UNION~
