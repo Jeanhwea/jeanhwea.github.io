@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-03 Sat 13:51 -->
+<!-- 2021-07-03 Sat 13:55 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MySQL 索引笔记</title>
@@ -233,13 +233,13 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgac56a73">1. 准备测试表</a></li>
-<li><a href="#orgc4fedbb">2. 修改索引</a></li>
-<li><a href="#org8fe6e8d">3. 索引数据结构</a>
+<li><a href="#orgf60213a">1. 准备测试表</a></li>
+<li><a href="#org2db2486">2. 修改索引</a></li>
+<li><a href="#org1822c4e">3. 索引数据结构</a>
 <ul>
-<li><a href="#org2f87fb5">3.1. 索引示例表数据</a></li>
-<li><a href="#org427ba9a">3.2. 主键索引</a></li>
-<li><a href="#orgf12523e">3.3. 联合键索引</a></li>
+<li><a href="#orgb0e140d">3.1. 索引示例表数据</a></li>
+<li><a href="#org4ae19ad">3.2. 主键索引</a></li>
+<li><a href="#org736de8b">3.3. 联合键索引</a></li>
 </ul>
 </li>
 </ul>
@@ -247,8 +247,8 @@
 </div>
 
 
-<div id="outline-container-orgac56a73" class="outline-2">
-<h2 id="orgac56a73"><span class="section-number-2">1</span> 准备测试表</h2>
+<div id="outline-container-orgf60213a" class="outline-2">
+<h2 id="orgf60213a"><span class="section-number-2">1</span> 准备测试表</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 构建测试表 <code>author</code>, 建表语句如下
@@ -283,10 +283,137 @@
 </pre>
 </div>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+</table>
+
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author;
 </pre>
 </div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">name</th>
+<th scope="col" class="org-right">age</th>
+<th scope="col" class="org-left">gender</th>
+<th scope="col" class="org-right">a</th>
+<th scope="col" class="org-right">b</th>
+<th scope="col" class="org-right">c</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">aaa</td>
+<td class="org-right">11</td>
+<td class="org-left">M</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">aab</td>
+<td class="org-right">12</td>
+<td class="org-left">M</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">abc</td>
+<td class="org-right">10</td>
+<td class="org-left">F</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-left">bba</td>
+<td class="org-right">22</td>
+<td class="org-left">M</td>
+<td class="org-right">2</td>
+<td class="org-right">2</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">5</td>
+<td class="org-left">bcb</td>
+<td class="org-right">42</td>
+<td class="org-left">F</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">2</td>
+</tr>
+
+<tr>
+<td class="org-right">6</td>
+<td class="org-left">bcc</td>
+<td class="org-right">12</td>
+<td class="org-left">M</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">3</td>
+</tr>
+
+<tr>
+<td class="org-right">7</td>
+<td class="org-left">cba</td>
+<td class="org-right">17</td>
+<td class="org-left">M</td>
+<td class="org-right">3</td>
+<td class="org-right">2</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">8</td>
+<td class="org-left">bcb</td>
+<td class="org-right">32</td>
+<td class="org-left">F</td>
+<td class="org-right">3</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+</tr>
+
+<tr>
+<td class="org-right">9</td>
+<td class="org-left">bcc</td>
+<td class="org-right">82</td>
+<td class="org-left">M</td>
+<td class="org-right">3</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+</tr>
+</tbody>
+</table>
 
 <p>
 添加唯一性约束和联合索引
@@ -297,6 +424,11 @@
 </pre>
 </div>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+</table>
+
 <p>
 查看准备好的表结构和索引键
 </p>
@@ -304,6 +436,72 @@
 <pre class="src src-sql"><span style="color: #859900;">show</span> <span style="color: #859900;">create</span> <span style="color: #859900;">table</span> author\G
 </pre>
 </div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left"><b><b><b><b><b><b><b><b><b><b><b><b><b>*</b></b></b></b></b></b></b></b></b></b></b></b></b> 1. row <b><b><b><b><b><b><b><b><b><b><b><b><b>*</b></b></b></b></b></b></b></b></b></b></b></b></b></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Table: author</td>
+</tr>
+
+<tr>
+<td class="org-left">Create Table: CREATE TABLE `author` (</td>
+</tr>
+
+<tr>
+<td class="org-left">`id` int(11) NOT NULL AUTO<sub>INCREMENT</sub>,</td>
+</tr>
+
+<tr>
+<td class="org-left">`name` varchar(128) COLLATE utf8mb4<sub>unicode</sub><sub>ci</sub> NOT NULL,</td>
+</tr>
+
+<tr>
+<td class="org-left">`age` int(11) DEFAULT NULL,</td>
+</tr>
+
+<tr>
+<td class="org-left">`gender` varchar(32) COLLATE utf8mb4<sub>unicode</sub><sub>ci</sub> DEFAULT NULL,</td>
+</tr>
+
+<tr>
+<td class="org-left">`a` int(11) DEFAULT NULL,</td>
+</tr>
+
+<tr>
+<td class="org-left">`b` int(11) DEFAULT NULL,</td>
+</tr>
+
+<tr>
+<td class="org-left">`c` int(11) DEFAULT NULL,</td>
+</tr>
+
+<tr>
+<td class="org-left">PRIMARY KEY (`id`),</td>
+</tr>
+
+<tr>
+<td class="org-left">UNIQUE KEY `uk<sub>author</sub><sub>nag</sub>` (`name`,`age`,`gender`),</td>
+</tr>
+
+<tr>
+<td class="org-left">KEY `ix<sub>author</sub><sub>abc</sub>` (`a`,`b`,`c`)</td>
+</tr>
+
+<tr>
+<td class="org-left">) ENGINE=InnoDB AUTO<sub>INCREMENT</sub>=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4<sub>unicode</sub><sub>ci</sub></td>
+</tr>
+</tbody>
+</table>
 
 <p>
 查看表结构
@@ -313,6 +511,98 @@
 </pre>
 </div>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Field</th>
+<th scope="col" class="org-left">Type</th>
+<th scope="col" class="org-left">Null</th>
+<th scope="col" class="org-left">Key</th>
+<th scope="col" class="org-left">Default</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">id</td>
+<td class="org-left">int(11)</td>
+<td class="org-left">NO</td>
+<td class="org-left">PRI</td>
+<td class="org-left">NULL</td>
+<td class="org-left">auto<sub>increment</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">name</td>
+<td class="org-left">varchar(128)</td>
+<td class="org-left">NO</td>
+<td class="org-left">MUL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">age</td>
+<td class="org-left">int(11)</td>
+<td class="org-left">YES</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">NULL</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">gender</td>
+<td class="org-left">varchar(32)</td>
+<td class="org-left">YES</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">NULL</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">a</td>
+<td class="org-left">int(11)</td>
+<td class="org-left">YES</td>
+<td class="org-left">MUL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">b</td>
+<td class="org-left">int(11)</td>
+<td class="org-left">YES</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">NULL</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">c</td>
+<td class="org-left">int(11)</td>
+<td class="org-left">YES</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">NULL</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
 <p>
 查看准备好的表索引信息
 </p>
@@ -320,11 +610,173 @@
 <pre class="src src-sql"><span style="color: #859900;">show</span> <span style="color: #859900;">index</span> <span style="color: #6c71c4;">from</span> author;
 </pre>
 </div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Table</th>
+<th scope="col" class="org-right">Non<sub>unique</sub></th>
+<th scope="col" class="org-left">Key<sub>name</sub></th>
+<th scope="col" class="org-right">Seq<sub>in</sub><sub>index</sub></th>
+<th scope="col" class="org-left">Column<sub>name</sub></th>
+<th scope="col" class="org-left">Collation</th>
+<th scope="col" class="org-right">Cardinality</th>
+<th scope="col" class="org-left">Sub<sub>part</sub></th>
+<th scope="col" class="org-left">Packed</th>
+<th scope="col" class="org-left">Null</th>
+<th scope="col" class="org-left">Index<sub>type</sub></th>
+<th scope="col" class="org-left">Comment</th>
+<th scope="col" class="org-left">Index<sub>comment</sub></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">author</td>
+<td class="org-right">0</td>
+<td class="org-left">PRIMARY</td>
+<td class="org-right">1</td>
+<td class="org-left">id</td>
+<td class="org-left">A</td>
+<td class="org-right">9</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">BTREE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">author</td>
+<td class="org-right">0</td>
+<td class="org-left">uk<sub>author</sub><sub>nag</sub></td>
+<td class="org-right">1</td>
+<td class="org-left">name</td>
+<td class="org-left">A</td>
+<td class="org-right">7</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">BTREE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">author</td>
+<td class="org-right">0</td>
+<td class="org-left">uk<sub>author</sub><sub>nag</sub></td>
+<td class="org-right">2</td>
+<td class="org-left">age</td>
+<td class="org-left">A</td>
+<td class="org-right">9</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">YES</td>
+<td class="org-left">BTREE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">author</td>
+<td class="org-right">0</td>
+<td class="org-left">uk<sub>author</sub><sub>nag</sub></td>
+<td class="org-right">3</td>
+<td class="org-left">gender</td>
+<td class="org-left">A</td>
+<td class="org-right">9</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">YES</td>
+<td class="org-left">BTREE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">author</td>
+<td class="org-right">1</td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-right">1</td>
+<td class="org-left">a</td>
+<td class="org-left">A</td>
+<td class="org-right">3</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">YES</td>
+<td class="org-left">BTREE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">author</td>
+<td class="org-right">1</td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-right">2</td>
+<td class="org-left">b</td>
+<td class="org-left">A</td>
+<td class="org-right">6</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">YES</td>
+<td class="org-left">BTREE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">author</td>
+<td class="org-right">1</td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-right">3</td>
+<td class="org-left">c</td>
+<td class="org-left">A</td>
+<td class="org-right">9</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">YES</td>
+<td class="org-left">BTREE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
-<div id="outline-container-orgc4fedbb" class="outline-2">
-<h2 id="orgc4fedbb"><span class="section-number-2">2</span> 修改索引</h2>
+<div id="outline-container-org2db2486" class="outline-2">
+<h2 id="org2db2486"><span class="section-number-2">2</span> 修改索引</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 删除唯一键和索引
@@ -347,8 +799,8 @@
 </div>
 </div>
 
-<div id="outline-container-org8fe6e8d" class="outline-2">
-<h2 id="org8fe6e8d"><span class="section-number-2">3</span> 索引数据结构</h2>
+<div id="outline-container-org1822c4e" class="outline-2">
+<h2 id="org1822c4e"><span class="section-number-2">3</span> 索引数据结构</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 常见索引包括：B+树和哈希索引两种。哈希索引由于不支持范围查找一般使用较少，后面
@@ -362,18 +814,140 @@
 </ol>
 </div>
 
-<div id="outline-container-org2f87fb5" class="outline-3">
-<h3 id="org2f87fb5"><span class="section-number-3">3.1</span> 索引示例表数据</h3>
+<div id="outline-container-orgb0e140d" class="outline-3">
+<h3 id="orgb0e140d"><span class="section-number-3">3.1</span> 索引示例表数据</h3>
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author;
 </pre>
 </div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">name</th>
+<th scope="col" class="org-right">age</th>
+<th scope="col" class="org-left">gender</th>
+<th scope="col" class="org-right">a</th>
+<th scope="col" class="org-right">b</th>
+<th scope="col" class="org-right">c</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">aaa</td>
+<td class="org-right">11</td>
+<td class="org-left">M</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">aab</td>
+<td class="org-right">12</td>
+<td class="org-left">M</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">abc</td>
+<td class="org-right">10</td>
+<td class="org-left">F</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-left">bba</td>
+<td class="org-right">22</td>
+<td class="org-left">M</td>
+<td class="org-right">2</td>
+<td class="org-right">2</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">5</td>
+<td class="org-left">bcb</td>
+<td class="org-right">42</td>
+<td class="org-left">F</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">2</td>
+</tr>
+
+<tr>
+<td class="org-right">6</td>
+<td class="org-left">bcc</td>
+<td class="org-right">12</td>
+<td class="org-left">M</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">3</td>
+</tr>
+
+<tr>
+<td class="org-right">7</td>
+<td class="org-left">cba</td>
+<td class="org-right">17</td>
+<td class="org-left">M</td>
+<td class="org-right">3</td>
+<td class="org-right">2</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">8</td>
+<td class="org-left">bcb</td>
+<td class="org-right">32</td>
+<td class="org-left">F</td>
+<td class="org-right">3</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+</tr>
+
+<tr>
+<td class="org-right">9</td>
+<td class="org-left">bcc</td>
+<td class="org-right">82</td>
+<td class="org-left">M</td>
+<td class="org-right">3</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
-<div id="outline-container-org427ba9a" class="outline-3">
-<h3 id="org427ba9a"><span class="section-number-3">3.2</span> 主键索引</h3>
+<div id="outline-container-org4ae19ad" class="outline-3">
+<h3 id="org4ae19ad"><span class="section-number-3">3.2</span> 主键索引</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 全表扫描，不走索引
@@ -383,6 +957,68 @@
 </pre>
 </div>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-left">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">ALL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-right">9</td>
+<td class="org-right">100.00</td>
+<td class="org-left">NULL</td>
+</tr>
+</tbody>
+</table>
+
 <p>
 主键查找，走 const 主键索引
 </p>
@@ -391,6 +1027,68 @@
 </pre>
 </div>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-right">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">const</td>
+<td class="org-left">PRIMARY</td>
+<td class="org-left">PRIMARY</td>
+<td class="org-right">4</td>
+<td class="org-left">const</td>
+<td class="org-right">1</td>
+<td class="org-right">100.00</td>
+<td class="org-left">NULL</td>
+</tr>
+</tbody>
+</table>
+
 <p>
 主键查找，走 range 主键索引
 </p>
@@ -398,11 +1096,73 @@
 <pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> id &gt; 4;
 </pre>
 </div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-right">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">range</td>
+<td class="org-left">PRIMARY</td>
+<td class="org-left">PRIMARY</td>
+<td class="org-right">4</td>
+<td class="org-left">NULL</td>
+<td class="org-right">5</td>
+<td class="org-right">100.00</td>
+<td class="org-left">Using where</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
-<div id="outline-container-orgf12523e" class="outline-3">
-<h3 id="orgf12523e"><span class="section-number-3">3.3</span> 联合键索引</h3>
+<div id="outline-container-org736de8b" class="outline-3">
+<h3 id="org736de8b"><span class="section-number-3">3.3</span> 联合键索引</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 联合键查找，走 ref 范围索引
@@ -412,6 +1172,68 @@
 </pre>
 </div>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-right">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">ref</td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-right">5</td>
+<td class="org-left">const</td>
+<td class="org-right">1</td>
+<td class="org-right">100.00</td>
+<td class="org-left">NULL</td>
+</tr>
+</tbody>
+</table>
+
 <p>
 联合键查找，走 range 范围索引
 </p>
@@ -419,6 +1241,68 @@
 <pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> a &gt; 4;
 </pre>
 </div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-right">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">range</td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-right">5</td>
+<td class="org-left">NULL</td>
+<td class="org-right">1</td>
+<td class="org-right">100.00</td>
+<td class="org-left">Using index condition</td>
+</tr>
+</tbody>
+</table>
 
 <p>
 多个联合键字段查询，符号最左前缀原则走索引 <code>ix_author_abc</code>
@@ -428,6 +1312,68 @@
 </pre>
 </div>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-right">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">ref</td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-right">10</td>
+<td class="org-left">const,const</td>
+<td class="org-right">1</td>
+<td class="org-right">100.00</td>
+<td class="org-left">NULL</td>
+</tr>
+</tbody>
+</table>
+
 <p>
 同上，a 和 b 的顺序调换也走索引 <code>ix_author_abc</code>
 </p>
@@ -435,6 +1381,68 @@
 <pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> b = 1 <span style="color: #859900;">and</span> a = 4;
 </pre>
 </div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-right">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">ref</td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-right">10</td>
+<td class="org-left">const,const</td>
+<td class="org-right">1</td>
+<td class="org-right">100.00</td>
+<td class="org-left">NULL</td>
+</tr>
+</tbody>
+</table>
 
 <p>
 查询 b 和 c 情况不符合最左前缀原则，不走索引 <code>ix_author_abc</code>
@@ -444,6 +1452,68 @@
 </pre>
 </div>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-left">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">ALL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-right">9</td>
+<td class="org-right">11.11</td>
+<td class="org-left">Using where</td>
+</tr>
+</tbody>
+</table>
+
 <p>
 构建 <code>a+1</code> 为键的 B+树效率较大，无法走联合索引 <code>ix_author_abc</code>
 </p>
@@ -451,6 +1521,68 @@
 <pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> a + 1 &gt; 3;
 </pre>
 </div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-left">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">ALL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-right">9</td>
+<td class="org-right">100.00</td>
+<td class="org-left">Using where</td>
+</tr>
+</tbody>
+</table>
 
 <p>
 查找联合索引字段包含值，走主键索引
@@ -460,6 +1592,68 @@
 </pre>
 </div>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-right">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">range</td>
+<td class="org-left">PRIMARY</td>
+<td class="org-left">PRIMARY</td>
+<td class="org-right">4</td>
+<td class="org-left">NULL</td>
+<td class="org-right">5</td>
+<td class="org-right">100.00</td>
+<td class="org-left">Using where</td>
+</tr>
+</tbody>
+</table>
+
 <p>
 查找联合索引字段包含值，并且同时过滤主键，走联合索引效率更高
 </p>
@@ -467,6 +1661,68 @@
 <pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> a <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> id &gt; 4 <span style="color: #859900;">and</span> a &gt; 4;
 </pre>
 </div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-right">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">range</td>
+<td class="org-left">PRIMARY,ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-right">5</td>
+<td class="org-left">NULL</td>
+<td class="org-right">1</td>
+<td class="org-right">55.56</td>
+<td class="org-left">Using where; Using index</td>
+</tr>
+</tbody>
+</table>
 
 <p>
 排序索引 <code>ix_author_abc</code> 包含时，直接走索引
@@ -476,6 +1732,68 @@
 </pre>
 </div>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-right">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">index</td>
+<td class="org-left">NULL</td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-right">15</td>
+<td class="org-left">NULL</td>
+<td class="org-right">9</td>
+<td class="org-right">100.00</td>
+<td class="org-left">Using index</td>
+</tr>
+</tbody>
+</table>
+
 <p>
 排序所有字段时无法走索引
 </p>
@@ -484,6 +1802,68 @@
 </pre>
 </div>
 
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-left">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">ALL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-left">NULL</td>
+<td class="org-right">9</td>
+<td class="org-right">100.00</td>
+<td class="org-left">Using filesort</td>
+</tr>
+</tbody>
+</table>
+
 <p>
 排序索引 <code>ix_author_abc</code> 包含时，走索引并且需要文件排序 <code>filesort</code>
 </p>
@@ -491,12 +1871,74 @@
 <pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> a, b <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">order</span> <span style="color: #859900;">by</span> a, b <span style="color: #859900;">desc</span>, c;
 </pre>
 </div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-left">select<sub>type</sub></th>
+<th scope="col" class="org-left">table</th>
+<th scope="col" class="org-left">partitions</th>
+<th scope="col" class="org-left">type</th>
+<th scope="col" class="org-left">possible<sub>keys</sub></th>
+<th scope="col" class="org-left">key</th>
+<th scope="col" class="org-right">key<sub>len</sub></th>
+<th scope="col" class="org-left">ref</th>
+<th scope="col" class="org-right">rows</th>
+<th scope="col" class="org-right">filtered</th>
+<th scope="col" class="org-left">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">SIMPLE</td>
+<td class="org-left">author</td>
+<td class="org-left">NULL</td>
+<td class="org-left">index</td>
+<td class="org-left">NULL</td>
+<td class="org-left">ix<sub>author</sub><sub>abc</sub></td>
+<td class="org-right">15</td>
+<td class="org-left">NULL</td>
+<td class="org-right">9</td>
+<td class="org-right">100.00</td>
+<td class="org-left">Using index; Using filesort</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-03 Sat 13:51. Created by Jinghui Hu at 2021-07-03 Sat 09:36.</p>
+<p class="author">Last Updated 2021-07-03 Sat 13:55. Created by Jinghui Hu at 2021-07-03 Sat 09:36.</p>
 </div>
 </body>
 </html>
