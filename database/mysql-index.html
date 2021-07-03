@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-03 Sat 10:17 -->
+<!-- 2021-07-03 Sat 13:51 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MySQL 索引笔记</title>
@@ -233,13 +233,13 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgd49f33f">1. 准备测试表</a></li>
-<li><a href="#orgf0c9f3b">2. 修改索引</a></li>
-<li><a href="#org9be8792">3. 索引数据结构</a>
+<li><a href="#orgac56a73">1. 准备测试表</a></li>
+<li><a href="#orgc4fedbb">2. 修改索引</a></li>
+<li><a href="#org8fe6e8d">3. 索引数据结构</a>
 <ul>
-<li><a href="#org78abf53">3.1. 索引示例表数据</a></li>
-<li><a href="#org8c3999a">3.2. 主键索引</a></li>
-<li><a href="#orgeafb396">3.3. 联合键索引</a></li>
+<li><a href="#org2f87fb5">3.1. 索引示例表数据</a></li>
+<li><a href="#org427ba9a">3.2. 主键索引</a></li>
+<li><a href="#orgf12523e">3.3. 联合键索引</a></li>
 </ul>
 </li>
 </ul>
@@ -247,8 +247,8 @@
 </div>
 
 
-<div id="outline-container-orgd49f33f" class="outline-2">
-<h2 id="orgd49f33f"><span class="section-number-2">1</span> 准备测试表</h2>
+<div id="outline-container-orgac56a73" class="outline-2">
+<h2 id="orgac56a73"><span class="section-number-2">1</span> 准备测试表</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 构建测试表 <code>author</code>, 建表语句如下
@@ -323,8 +323,8 @@
 </div>
 </div>
 
-<div id="outline-container-orgf0c9f3b" class="outline-2">
-<h2 id="orgf0c9f3b"><span class="section-number-2">2</span> 修改索引</h2>
+<div id="outline-container-orgc4fedbb" class="outline-2">
+<h2 id="orgc4fedbb"><span class="section-number-2">2</span> 修改索引</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 删除唯一键和索引
@@ -347,8 +347,8 @@
 </div>
 </div>
 
-<div id="outline-container-org9be8792" class="outline-2">
-<h2 id="org9be8792"><span class="section-number-2">3</span> 索引数据结构</h2>
+<div id="outline-container-org8fe6e8d" class="outline-2">
+<h2 id="org8fe6e8d"><span class="section-number-2">3</span> 索引数据结构</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 常见索引包括：B+树和哈希索引两种。哈希索引由于不支持范围查找一般使用较少，后面
@@ -362,8 +362,8 @@
 </ol>
 </div>
 
-<div id="outline-container-org78abf53" class="outline-3">
-<h3 id="org78abf53"><span class="section-number-3">3.1</span> 索引示例表数据</h3>
+<div id="outline-container-org2f87fb5" class="outline-3">
+<h3 id="org2f87fb5"><span class="section-number-3">3.1</span> 索引示例表数据</h3>
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author;
@@ -372,8 +372,8 @@
 </div>
 </div>
 
-<div id="outline-container-org8c3999a" class="outline-3">
-<h3 id="org8c3999a"><span class="section-number-3">3.2</span> 主键索引</h3>
+<div id="outline-container-org427ba9a" class="outline-3">
+<h3 id="org427ba9a"><span class="section-number-3">3.2</span> 主键索引</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 全表扫描，不走索引
@@ -401,8 +401,8 @@
 </div>
 </div>
 
-<div id="outline-container-orgeafb396" class="outline-3">
-<h3 id="orgeafb396"><span class="section-number-3">3.3</span> 联合键索引</h3>
+<div id="outline-container-orgf12523e" class="outline-3">
+<h3 id="orgf12523e"><span class="section-number-3">3.3</span> 联合键索引</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 联合键查找，走 ref 范围索引
@@ -417,6 +417,30 @@
 </p>
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> a &gt; 4;
+</pre>
+</div>
+
+<p>
+多个联合键字段查询，符号最左前缀原则走索引 <code>ix_author_abc</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> a = 4 <span style="color: #859900;">and</span> b = 1;
+</pre>
+</div>
+
+<p>
+同上，a 和 b 的顺序调换也走索引 <code>ix_author_abc</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> b = 1 <span style="color: #859900;">and</span> a = 4;
+</pre>
+</div>
+
+<p>
+查询 b 和 c 情况不符合最左前缀原则，不走索引 <code>ix_author_abc</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> b = 1 <span style="color: #859900;">and</span> c = 4;
 </pre>
 </div>
 
@@ -472,7 +496,7 @@
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-03 Sat 10:17. Created by Jinghui Hu at 2021-07-03 Sat 09:36.</p>
+<p class="author">Last Updated 2021-07-03 Sat 13:51. Created by Jinghui Hu at 2021-07-03 Sat 09:36.</p>
 </div>
 </body>
 </html>
