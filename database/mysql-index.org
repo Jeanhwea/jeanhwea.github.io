@@ -5,7 +5,8 @@
 #+HTML_LINK_UP: ../readme.html
 #+HTML_LINK_HOME: ../index.html
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
-#+PROPERTY: header-args:sql :dbhost 127.0.0.1 :database test01 :engine mysql :dbuser user01 :dbpassword user01 :dbport 3306 :exports both
+#+PROPERTY: header-args:sql :dbhost 127.0.0.1 :database test01 :engine mysql :dbuser user01 :dbpassword user01 :dbport 3306 :exports both :results output
+#+OPTIONS: ^:nil
 
 
 * 准备测试表
@@ -66,26 +67,27 @@
   |---|
 
   查看准备好的表结构和索引键
-  #+BEGIN_SRC sql
+  #+BEGIN_SRC sql :results text
     show create table author\G
   #+END_SRC
 
   #+RESULTS:
-  | *************************** 1. row ***************************                       |
-  |--------------------------------------------------------------------------------------|
-  | Table: author                                                                        |
-  | Create Table: CREATE TABLE `author` (                                                |
-  | `id` int(11) NOT NULL AUTO_INCREMENT,                                                |
-  | `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,                             |
-  | `age` int(11) DEFAULT NULL,                                                          |
-  | `gender` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,                        |
-  | `a` int(11) DEFAULT NULL,                                                            |
-  | `b` int(11) DEFAULT NULL,                                                            |
-  | `c` int(11) DEFAULT NULL,                                                            |
-  | PRIMARY KEY (`id`),                                                                  |
-  | UNIQUE KEY `uk_author_nag` (`name`,`age`,`gender`),                                  |
-  | KEY `ix_author_abc` (`a`,`b`,`c`)                                                    |
-  | ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci |
+  #+begin_example
+  ,*************************** 1. row ***************************
+         Table: author
+  Create Table: CREATE TABLE `author` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `age` int(11) DEFAULT NULL,
+    `gender` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `a` int(11) DEFAULT NULL,
+    `b` int(11) DEFAULT NULL,
+    `c` int(11) DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_author_nag` (`name`,`age`,`gender`),
+    KEY `ix_author_abc` (`a`,`b`,`c`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  #+end_example
 
   查看表结构
   #+BEGIN_SRC sql
