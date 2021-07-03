@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-06-21 Mon 16:49 -->
+<!-- 2021-07-03 Sat 18:33 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JVM 知识点</title>
@@ -233,25 +233,26 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org20e6abf">1. JVM 运行内存的分类</a></li>
-<li><a href="#orga249284">2. Java 内存堆和栈区别</a></li>
-<li><a href="#org3753080">3. Java 四引用</a></li>
-<li><a href="#org5bb3851">4. GC 回收机制</a></li>
-<li><a href="#orgae42aae">5. GC 标记对象的死活</a></li>
-<li><a href="#org2bd294a">6. GC 回收算法</a></li>
-<li><a href="#org62b8121">7. MinorGC 和 FullGC</a></li>
-<li><a href="#org53543c5">8. 内存分配与回收策略</a></li>
-<li><a href="#orgcca538b">9. GC 垃圾收集器</a></li>
-<li><a href="#orga3a13f0">10. Java 类加载机制</a></li>
-<li><a href="#org1f5b36c">11. 引起类加载操作的五个行为</a></li>
-<li><a href="#org26438b9">12. Java 对象创建时机</a></li>
+<li><a href="#org9bd95f6">1. JVM 运行内存的分类</a></li>
+<li><a href="#orgdd33679">2. Java 内存堆和栈区别</a></li>
+<li><a href="#org1b47a62">3. Java 四引用</a></li>
+<li><a href="#org78db976">4. GC 回收机制</a></li>
+<li><a href="#orge88717d">5. GC 标记对象的死活</a></li>
+<li><a href="#org6d65da1">6. GC 回收算法</a></li>
+<li><a href="#org88251a3">7. MinorGC 和 FullGC</a></li>
+<li><a href="#org1329a69">8. 内存分配与回收策略</a></li>
+<li><a href="#orgfe6a6be">9. GC 垃圾收集器</a></li>
+<li><a href="#org8ecbca8">10. Java 类加载机制</a></li>
+<li><a href="#org9742d1d">11. 引起类加载操作的五个行为</a></li>
+<li><a href="#orgd9c3f0e">12. Java 对象创建时机</a></li>
+<li><a href="#org50c1441">13. JVM 调优参数</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org20e6abf" class="outline-2">
-<h2 id="org20e6abf"><span class="section-number-2">1</span> JVM 运行内存的分类</h2>
+<div id="outline-container-org9bd95f6" class="outline-2">
+<h2 id="org9bd95f6"><span class="section-number-2">1</span> JVM 运行内存的分类</h2>
 <div class="outline-text-2" id="text-1">
 <ol class="org-ol">
 <li><b>程序计数器</b> 当前线程所执行的字节码的行号指示器，用于记录正在执行的虚拟机字
@@ -266,8 +267,8 @@
 </div>
 </div>
 
-<div id="outline-container-orga249284" class="outline-2">
-<h2 id="orga249284"><span class="section-number-2">2</span> Java 内存堆和栈区别</h2>
+<div id="outline-container-orgdd33679" class="outline-2">
+<h2 id="orgdd33679"><span class="section-number-2">2</span> Java 内存堆和栈区别</h2>
 <div class="outline-text-2" id="text-2">
 <ol class="org-ol">
 <li>栈内存用来存储基本类型的变量和对象的引用变量，堆内存用来存储 Java 中的对象，
@@ -288,8 +289,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org3753080" class="outline-2">
-<h2 id="org3753080"><span class="section-number-2">3</span> Java 四引用</h2>
+<div id="outline-container-org1b47a62" class="outline-2">
+<h2 id="org1b47a62"><span class="section-number-2">3</span> Java 四引用</h2>
 <div class="outline-text-2" id="text-3">
 <ol class="org-ol">
 <li><b>强引用</b> （StrongReference）强引用是使用最普遍的引用。如果一个对象具有强引
@@ -314,8 +315,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org5bb3851" class="outline-2">
-<h2 id="org5bb3851"><span class="section-number-2">4</span> GC 回收机制</h2>
+<div id="outline-container-org78db976" class="outline-2">
+<h2 id="org78db976"><span class="section-number-2">4</span> GC 回收机制</h2>
 <div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li>Java 中对象是采用 <code>new</code> 或者反射的方法创建的，这些对象的创建都是在堆（Heap）
@@ -329,8 +330,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-orgae42aae" class="outline-2">
-<h2 id="orgae42aae"><span class="section-number-2">5</span> GC 标记对象的死活</h2>
+<div id="outline-container-orge88717d" class="outline-2">
+<h2 id="orge88717d"><span class="section-number-2">5</span> GC 标记对象的死活</h2>
 <div class="outline-text-2" id="text-5">
 <ol class="org-ol">
 <li><b>引用计数法</b> 给对象添加一个引用计数器,没当被引用的时候,计数器的值就加一。引
@@ -351,8 +352,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org2bd294a" class="outline-2">
-<h2 id="org2bd294a"><span class="section-number-2">6</span> GC 回收算法</h2>
+<div id="outline-container-org6d65da1" class="outline-2">
+<h2 id="org6d65da1"><span class="section-number-2">6</span> GC 回收算法</h2>
 <div class="outline-text-2" id="text-6">
 <ol class="org-ol">
 <li><b>标记-清除法</b>: 标记出没有用的对象，然后一个一个回收掉
@@ -377,8 +378,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org62b8121" class="outline-2">
-<h2 id="org62b8121"><span class="section-number-2">7</span> MinorGC 和 FullGC</h2>
+<div id="outline-container-org88251a3" class="outline-2">
+<h2 id="org88251a3"><span class="section-number-2">7</span> MinorGC 和 FullGC</h2>
 <div class="outline-text-2" id="text-7">
 <ol class="org-ol">
 <li><b>Minor GC</b> 通常发生在新生代的 Eden 区，在这个区的对象生存期短，往往发生 GC 的
@@ -389,8 +390,8 @@ Minor GC，所采用的是标记-清除算法</li>
 </div>
 </div>
 
-<div id="outline-container-org53543c5" class="outline-2">
-<h2 id="org53543c5"><span class="section-number-2">8</span> 内存分配与回收策略</h2>
+<div id="outline-container-org1329a69" class="outline-2">
+<h2 id="org1329a69"><span class="section-number-2">8</span> 内存分配与回收策略</h2>
 <div class="outline-text-2" id="text-8">
 <ol class="org-ol">
 <li>结构（堆大小 = 新生代(1/3) + 老年代(2/3)）:
@@ -418,8 +419,8 @@ survivor0，这个过程也称为 <b>分配担保</b> （ <code>Full GC</code> �
 </div>
 </div>
 
-<div id="outline-container-orgcca538b" class="outline-2">
-<h2 id="orgcca538b"><span class="section-number-2">9</span> GC 垃圾收集器</h2>
+<div id="outline-container-orgfe6a6be" class="outline-2">
+<h2 id="orgfe6a6be"><span class="section-number-2">9</span> GC 垃圾收集器</h2>
 <div class="outline-text-2" id="text-9">
 <ol class="org-ol">
 <li>Serial New 收集器是针对新生代的收集器，采用的是复制算法</li>
@@ -434,8 +435,8 @@ survivor0，这个过程也称为 <b>分配担保</b> （ <code>Full GC</code> �
 </div>
 </div>
 
-<div id="outline-container-orga3a13f0" class="outline-2">
-<h2 id="orga3a13f0"><span class="section-number-2">10</span> Java 类加载机制</h2>
+<div id="outline-container-org8ecbca8" class="outline-2">
+<h2 id="org8ecbca8"><span class="section-number-2">10</span> Java 类加载机制</h2>
 <div class="outline-text-2" id="text-10">
 <ol class="org-ol">
 <li>概念:
@@ -519,8 +520,8 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-org1f5b36c" class="outline-2">
-<h2 id="org1f5b36c"><span class="section-number-2">11</span> 引起类加载操作的五个行为</h2>
+<div id="outline-container-org9742d1d" class="outline-2">
+<h2 id="org9742d1d"><span class="section-number-2">11</span> 引起类加载操作的五个行为</h2>
 <div class="outline-text-2" id="text-11">
 <ol class="org-ol">
 <li>遇到 <code>new</code>, <code>getstatic</code>, <code>putstatic</code> 或 <code>invokestatic</code> 这四条字节码指令</li>
@@ -532,8 +533,8 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-org26438b9" class="outline-2">
-<h2 id="org26438b9"><span class="section-number-2">12</span> Java 对象创建时机</h2>
+<div id="outline-container-orgd9c3f0e" class="outline-2">
+<h2 id="orgd9c3f0e"><span class="section-number-2">12</span> Java 对象创建时机</h2>
 <div class="outline-text-2" id="text-12">
 <ol class="org-ol">
 <li>使用 <code>new</code> 关键字创建对象</li>
@@ -544,9 +545,22 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </ol>
 </div>
 </div>
+
+<div id="outline-container-org50c1441" class="outline-2">
+<h2 id="org50c1441"><span class="section-number-2">13</span> JVM 调优参数</h2>
+<div class="outline-text-2" id="text-13">
+<p>
+设置堆空间，栈空间和元数据空间大小
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">java -Xms3072M -Xmx3072M -Xss1M -XX:<span style="color: #6c71c4;">MetaspaceSize</span>=512M -XX:<span style="color: #6c71c4;">MaxMetaspaceSize</span>=512M -jar app.jar
+</pre>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-06-21 Mon 16:49. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
+<p class="author">Last Updated 2021-07-03 Sat 18:33. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
 </div>
 </body>
 </html>
