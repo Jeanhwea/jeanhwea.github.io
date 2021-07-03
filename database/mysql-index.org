@@ -240,3 +240,33 @@
    | id | select_type | table  | partitions | type  | possible_keys         | key           | key_len | ref  | rows | filtered | Extra                    |
    |----+-------------+--------+------------+-------+-----------------------+---------------+---------+------+------+----------+--------------------------|
    |  1 | SIMPLE      | author | NULL       | range | PRIMARY,ix_author_abc | ix_author_abc |       5 | NULL |    1 |    55.56 | Using where; Using index |
+
+   排序索引 ~ix_author_abc~ 包含时，直接走索引
+   #+BEGIN_SRC sql
+     explain select a, b from author order by a, b, c;
+   #+END_SRC
+
+   #+RESULTS:
+   | id | select_type | table  | partitions | type  | possible_keys | key           | key_len | ref  | rows | filtered | Extra       |
+   |----+-------------+--------+------------+-------+---------------+---------------+---------+------+------+----------+-------------|
+   |  1 | SIMPLE      | author | NULL       | index | NULL          | ix_author_abc |      15 | NULL |    9 |   100.00 | Using index |
+
+   排序所有字段时无法走索引
+   #+BEGIN_SRC sql
+     explain select * from author order by a, b, c;
+   #+END_SRC
+
+   #+RESULTS:
+   | id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra          |
+   |----+-------------+--------+------------+------+---------------+------+---------+------+------+----------+----------------|
+   |  1 | SIMPLE      | author | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    9 |   100.00 | Using filesort |
+
+   排序索引 ~ix_author_abc~ 包含时，走索引并且需要文件排序 ~filesort~
+   #+BEGIN_SRC sql
+     explain select a, b from author order by a, b desc, c;
+   #+END_SRC
+
+   #+RESULTS:
+   | id | select_type | table  | partitions | type  | possible_keys | key           | key_len | ref  | rows | filtered | Extra                       |
+   |----+-------------+--------+------------+-------+---------------+---------------+---------+------+------+----------+-----------------------------|
+   |  1 | SIMPLE      | author | NULL       | index | NULL          | ix_author_abc |      15 | NULL |    9 |   100.00 | Using index; Using filesort |
