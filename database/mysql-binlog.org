@@ -158,8 +158,21 @@
    #+END_SRC
 
    slave 指向 master 的用户名和密码是在 slave 节点中动态配置
-   #+BEGIN_SRC sh
-     change master to master_host='172.17.0.2', master_port=3306, master_user='repl', master_password='repl';
+   #+BEGIN_SRC sql
+     -- 配置主库同步的用户信息
+     change master to
+     master_host='172.17.0.2',
+     master_port=3306,
+     master_user='repl',
+     master_password='repl';
+
+     -- 指定 binlog 文件
+     change master to
+     master_host='172.17.0.2',
+     master_port=3306,
+     master_user='repl',
+     master_password='repl'
+     master_log_file='binlog.000004';
    #+END_SRC
 
    启动 slave 节点中 slave 服务
