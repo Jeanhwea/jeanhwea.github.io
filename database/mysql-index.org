@@ -143,163 +143,163 @@
   2. 联合索引叶子节点存升序的联合键，并且另存主键，当出现联合键不包含的字段需要
      回表查询
 
-** 索引示例表数据
-   #+BEGIN_SRC sql
-     select * from author;
-   #+END_SRC
+* 示例数据
+  #+BEGIN_SRC sql
+    select * from author;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | name | age | gender | a | b | c |
-   |----+------+-----+--------+---+---+---|
-   |  1 | aaa  |  11 | M      | 1 | 1 | 1 |
-   |  2 | aab  |  12 | M      | 1 | 1 | 2 |
-   |  3 | abc  |  10 | F      | 1 | 2 | 3 |
-   |  4 | bba  |  22 | M      | 2 | 2 | 1 |
-   |  5 | bcb  |  42 | F      | 2 | 3 | 2 |
-   |  6 | bcc  |  12 | M      | 2 | 3 | 3 |
-   |  7 | cba  |  17 | M      | 3 | 2 | 1 |
-   |  8 | bcb  |  32 | F      | 3 | 1 | 2 |
-   |  9 | bcc  |  82 | M      | 3 | 1 | 3 |
+  #+RESULTS:
+  | id | name | age | gender | a | b | c |
+  |----+------+-----+--------+---+---+---|
+  |  1 | aaa  |  11 | M      | 1 | 1 | 1 |
+  |  2 | aab  |  12 | M      | 1 | 1 | 2 |
+  |  3 | abc  |  10 | F      | 1 | 2 | 3 |
+  |  4 | bba  |  22 | M      | 2 | 2 | 1 |
+  |  5 | bcb  |  42 | F      | 2 | 3 | 2 |
+  |  6 | bcc  |  12 | M      | 2 | 3 | 3 |
+  |  7 | cba  |  17 | M      | 3 | 2 | 1 |
+  |  8 | bcb  |  32 | F      | 3 | 1 | 2 |
+  |  9 | bcc  |  82 | M      | 3 | 1 | 3 |
 
-** 主键索引
-   全表扫描，不走索引
-   #+BEGIN_SRC sql
-     explain select * from author;
-   #+END_SRC
+* 主键索引
+  全表扫描，不走索引
+  #+BEGIN_SRC sql
+    explain select * from author;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra |
-   |----+-------------+--------+------------+------+---------------+------+---------+------+------+----------+-------|
-   |  1 | SIMPLE      | author | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    9 |   100.00 | NULL  |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra |
+  |----+-------------+--------+------------+------+---------------+------+---------+------+------+----------+-------|
+  |  1 | SIMPLE      | author | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    9 |   100.00 | NULL  |
 
-   主键查找，走 const 主键索引
-   #+BEGIN_SRC sql
-     explain select * from author where id = 4;
-   #+END_SRC
+  主键查找，走 const 主键索引
+  #+BEGIN_SRC sql
+    explain select * from author where id = 4;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type  | possible_keys | key     | key_len | ref   | rows | filtered | Extra |
-   |----+-------------+--------+------------+-------+---------------+---------+---------+-------+------+----------+-------|
-   |  1 | SIMPLE      | author | NULL       | const | PRIMARY       | PRIMARY |       4 | const |    1 |   100.00 | NULL  |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type  | possible_keys | key     | key_len | ref   | rows | filtered | Extra |
+  |----+-------------+--------+------------+-------+---------------+---------+---------+-------+------+----------+-------|
+  |  1 | SIMPLE      | author | NULL       | const | PRIMARY       | PRIMARY |       4 | const |    1 |   100.00 | NULL  |
 
-   主键查找，走 range 主键索引
-   #+BEGIN_SRC sql
-     explain select * from author where id > 4;
-   #+END_SRC
+  主键查找，走 range 主键索引
+  #+BEGIN_SRC sql
+    explain select * from author where id > 4;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type  | possible_keys | key     | key_len | ref  | rows | filtered | Extra       |
-   |----+-------------+--------+------------+-------+---------------+---------+---------+------+------+----------+-------------|
-   |  1 | SIMPLE      | author | NULL       | range | PRIMARY       | PRIMARY |       4 | NULL |    5 |   100.00 | Using where |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type  | possible_keys | key     | key_len | ref  | rows | filtered | Extra       |
+  |----+-------------+--------+------------+-------+---------------+---------+---------+------+------+----------+-------------|
+  |  1 | SIMPLE      | author | NULL       | range | PRIMARY       | PRIMARY |       4 | NULL |    5 |   100.00 | Using where |
 
-** 联合键索引
+* 联合键索引
 
-   联合键查找，走 ref 范围索引
-   #+BEGIN_SRC sql
-     explain select * from author where a = 4;
-   #+END_SRC
+  联合键查找，走 ref 范围索引
+  #+BEGIN_SRC sql
+    explain select * from author where a = 4;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type | possible_keys | key           | key_len | ref   | rows | filtered | Extra |
-   |----+-------------+--------+------------+------+---------------+---------------+---------+-------+------+----------+-------|
-   |  1 | SIMPLE      | author | NULL       | ref  | ix_author_abc | ix_author_abc |       5 | const |    1 |   100.00 | NULL  |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type | possible_keys | key           | key_len | ref   | rows | filtered | Extra |
+  |----+-------------+--------+------------+------+---------------+---------------+---------+-------+------+----------+-------|
+  |  1 | SIMPLE      | author | NULL       | ref  | ix_author_abc | ix_author_abc |       5 | const |    1 |   100.00 | NULL  |
 
-   联合键查找，走 range 范围索引
-   #+BEGIN_SRC sql
-     explain select * from author where a > 4;
-   #+END_SRC
+  联合键查找，走 range 范围索引
+  #+BEGIN_SRC sql
+    explain select * from author where a > 4;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type  | possible_keys | key           | key_len | ref  | rows | filtered | Extra                 |
-   |----+-------------+--------+------------+-------+---------------+---------------+---------+------+------+----------+-----------------------|
-   |  1 | SIMPLE      | author | NULL       | range | ix_author_abc | ix_author_abc |       5 | NULL |    1 |   100.00 | Using index condition |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type  | possible_keys | key           | key_len | ref  | rows | filtered | Extra                 |
+  |----+-------------+--------+------------+-------+---------------+---------------+---------+------+------+----------+-----------------------|
+  |  1 | SIMPLE      | author | NULL       | range | ix_author_abc | ix_author_abc |       5 | NULL |    1 |   100.00 | Using index condition |
 
-   多个联合键字段查询，符号最左前缀原则走索引 ~ix_author_abc~
-   #+BEGIN_SRC sql
-     explain select * from author where a = 4 and b = 1;
-   #+END_SRC
+  多个联合键字段查询，符号最左前缀原则走索引 ~ix_author_abc~
+  #+BEGIN_SRC sql
+    explain select * from author where a = 4 and b = 1;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type | possible_keys | key           | key_len | ref         | rows | filtered | Extra |
-   |----+-------------+--------+------------+------+---------------+---------------+---------+-------------+------+----------+-------|
-   |  1 | SIMPLE      | author | NULL       | ref  | ix_author_abc | ix_author_abc |      10 | const,const |    1 |   100.00 | NULL  |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type | possible_keys | key           | key_len | ref         | rows | filtered | Extra |
+  |----+-------------+--------+------------+------+---------------+---------------+---------+-------------+------+----------+-------|
+  |  1 | SIMPLE      | author | NULL       | ref  | ix_author_abc | ix_author_abc |      10 | const,const |    1 |   100.00 | NULL  |
 
-   同上，a 和 b 的顺序调换也走索引 ~ix_author_abc~
-   #+BEGIN_SRC sql
-     explain select * from author where b = 1 and a = 4;
-   #+END_SRC
+  同上，a 和 b 的顺序调换也走索引 ~ix_author_abc~
+  #+BEGIN_SRC sql
+    explain select * from author where b = 1 and a = 4;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type | possible_keys | key           | key_len | ref         | rows | filtered | Extra |
-   |----+-------------+--------+------------+------+---------------+---------------+---------+-------------+------+----------+-------|
-   |  1 | SIMPLE      | author | NULL       | ref  | ix_author_abc | ix_author_abc |      10 | const,const |    1 |   100.00 | NULL  |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type | possible_keys | key           | key_len | ref         | rows | filtered | Extra |
+  |----+-------------+--------+------------+------+---------------+---------------+---------+-------------+------+----------+-------|
+  |  1 | SIMPLE      | author | NULL       | ref  | ix_author_abc | ix_author_abc |      10 | const,const |    1 |   100.00 | NULL  |
 
-   查询 b 和 c 情况不符合最左前缀原则，不走索引 ~ix_author_abc~
-   #+BEGIN_SRC sql
-     explain select * from author where b = 1 and c = 4;
-   #+END_SRC
+  查询 b 和 c 情况不符合最左前缀原则，不走索引 ~ix_author_abc~
+  #+BEGIN_SRC sql
+    explain select * from author where b = 1 and c = 4;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra       |
-   |----+-------------+--------+------------+------+---------------+------+---------+------+------+----------+-------------|
-   |  1 | SIMPLE      | author | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    9 |    11.11 | Using where |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra       |
+  |----+-------------+--------+------------+------+---------------+------+---------+------+------+----------+-------------|
+  |  1 | SIMPLE      | author | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    9 |    11.11 | Using where |
 
-   构建 ~a+1~ 为键的 B+树效率较大，无法走联合索引 =ix_author_abc=
-   #+BEGIN_SRC sql
-     explain select * from author where a + 1 > 3;
-   #+END_SRC
+  构建 ~a+1~ 为键的 B+树效率较大，无法走联合索引 =ix_author_abc=
+  #+BEGIN_SRC sql
+    explain select * from author where a + 1 > 3;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra       |
-   |----+-------------+--------+------------+------+---------------+------+---------+------+------+----------+-------------|
-   |  1 | SIMPLE      | author | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    9 |   100.00 | Using where |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra       |
+  |----+-------------+--------+------------+------+---------------+------+---------+------+------+----------+-------------|
+  |  1 | SIMPLE      | author | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    9 |   100.00 | Using where |
 
-   查找联合索引字段包含值，走主键索引
-   #+BEGIN_SRC sql
-     explain select a from author where id > 4;
-   #+END_SRC
+  查找联合索引字段包含值，走主键索引
+  #+BEGIN_SRC sql
+    explain select a from author where id > 4;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type  | possible_keys | key     | key_len | ref  | rows | filtered | Extra       |
-   |----+-------------+--------+------------+-------+---------------+---------+---------+------+------+----------+-------------|
-   |  1 | SIMPLE      | author | NULL       | range | PRIMARY       | PRIMARY |       4 | NULL |    5 |   100.00 | Using where |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type  | possible_keys | key     | key_len | ref  | rows | filtered | Extra       |
+  |----+-------------+--------+------------+-------+---------------+---------+---------+------+------+----------+-------------|
+  |  1 | SIMPLE      | author | NULL       | range | PRIMARY       | PRIMARY |       4 | NULL |    5 |   100.00 | Using where |
 
-   查找联合索引字段包含值，并且同时过滤主键，走联合索引效率更高
-   #+BEGIN_SRC sql
-     explain select a from author where id > 4 and a > 4;
-   #+END_SRC
+  查找联合索引字段包含值，并且同时过滤主键，走联合索引效率更高
+  #+BEGIN_SRC sql
+    explain select a from author where id > 4 and a > 4;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type  | possible_keys         | key           | key_len | ref  | rows | filtered | Extra                    |
-   |----+-------------+--------+------------+-------+-----------------------+---------------+---------+------+------+----------+--------------------------|
-   |  1 | SIMPLE      | author | NULL       | range | PRIMARY,ix_author_abc | ix_author_abc |       5 | NULL |    1 |    55.56 | Using where; Using index |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type  | possible_keys         | key           | key_len | ref  | rows | filtered | Extra                    |
+  |----+-------------+--------+------------+-------+-----------------------+---------------+---------+------+------+----------+--------------------------|
+  |  1 | SIMPLE      | author | NULL       | range | PRIMARY,ix_author_abc | ix_author_abc |       5 | NULL |    1 |    55.56 | Using where; Using index |
 
-   排序索引 ~ix_author_abc~ 包含时，直接走索引
-   #+BEGIN_SRC sql
-     explain select a, b from author order by a, b, c;
-   #+END_SRC
+  排序索引 ~ix_author_abc~ 包含时，直接走索引
+  #+BEGIN_SRC sql
+    explain select a, b from author order by a, b, c;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type  | possible_keys | key           | key_len | ref  | rows | filtered | Extra       |
-   |----+-------------+--------+------------+-------+---------------+---------------+---------+------+------+----------+-------------|
-   |  1 | SIMPLE      | author | NULL       | index | NULL          | ix_author_abc |      15 | NULL |    9 |   100.00 | Using index |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type  | possible_keys | key           | key_len | ref  | rows | filtered | Extra       |
+  |----+-------------+--------+------------+-------+---------------+---------------+---------+------+------+----------+-------------|
+  |  1 | SIMPLE      | author | NULL       | index | NULL          | ix_author_abc |      15 | NULL |    9 |   100.00 | Using index |
 
-   排序所有字段时无法走索引
-   #+BEGIN_SRC sql
-     explain select * from author order by a, b, c;
-   #+END_SRC
+  排序所有字段时无法走索引
+  #+BEGIN_SRC sql
+    explain select * from author order by a, b, c;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra          |
-   |----+-------------+--------+------------+------+---------------+------+---------+------+------+----------+----------------|
-   |  1 | SIMPLE      | author | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    9 |   100.00 | Using filesort |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra          |
+  |----+-------------+--------+------------+------+---------------+------+---------+------+------+----------+----------------|
+  |  1 | SIMPLE      | author | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    9 |   100.00 | Using filesort |
 
-   排序索引 ~ix_author_abc~ 包含时，走索引并且需要文件排序 ~filesort~
-   #+BEGIN_SRC sql
-     explain select a, b from author order by a, b desc, c;
-   #+END_SRC
+  排序索引 ~ix_author_abc~ 包含时，走索引并且需要文件排序 ~filesort~
+  #+BEGIN_SRC sql
+    explain select a, b from author order by a, b desc, c;
+  #+END_SRC
 
-   #+RESULTS:
-   | id | select_type | table  | partitions | type  | possible_keys | key           | key_len | ref  | rows | filtered | Extra                       |
-   |----+-------------+--------+------------+-------+---------------+---------------+---------+------+------+----------+-----------------------------|
-   |  1 | SIMPLE      | author | NULL       | index | NULL          | ix_author_abc |      15 | NULL |    9 |   100.00 | Using index; Using filesort |
+  #+RESULTS:
+  | id | select_type | table  | partitions | type  | possible_keys | key           | key_len | ref  | rows | filtered | Extra                       |
+  |----+-------------+--------+------------+-------+---------------+---------------+---------+------+------+----------+-----------------------------|
+  |  1 | SIMPLE      | author | NULL       | index | NULL          | ix_author_abc |      15 | NULL |    9 |   100.00 | Using index; Using filesort |
