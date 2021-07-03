@@ -1,0 +1,75 @@
+#+TITLE: MySQL 主从同步
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2021-07-03 Sat 14:50:35>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+PROPERTY: header-args:sql :dbhost 127.0.0.1 :database test01 :engine mysql :dbuser user01 :dbpassword user01 :dbport 3306 :exports both
+#+OPTIONS: ^:nil
+
+
+* binlog
+  binlog,即二进制日志,它记录了数据库上的所有改变. 改变数据库的 SQL 语句执行结束
+  时,将在 binlog 的末尾写入一条记录,同时通知语句解析器,语句执行完毕.
+
+  binlog 格式
+  - 基于语句, 无法保证所有语句都在从库执行成功, 比如 ~update ... limit 1~
+  - 基于行, 将每一次改动记为 binlog 中的一行.在执行一个特别复杂的 update 或者
+    delete 操作时,基于行的格式会有优势.
+
+* binlog 使用
+  获取所有 binlog 文件列表
+  #+BEGIN_SRC sql
+    show binary logs;
+  #+END_SRC
+
+  #+RESULTS:
+  | Log_name      | File_size |
+  |---------------+-----------|
+  | binlog.000001 |      6370 |
+  | binlog.000002 |       177 |
+  | binlog.000003 |       177 |
+  | binlog.000004 |       177 |
+  | binlog.000005 |       177 |
+  | binlog.000006 |       177 |
+  | binlog.000007 |       177 |
+  | binlog.000008 |       177 |
+  | binlog.000009 |       177 |
+  | binlog.000010 |       177 |
+  | binlog.000011 |     21668 |
+  | binlog.000012 |       177 |
+  | binlog.000013 |      3367 |
+  | binlog.000014 |     31076 |
+
+  查看当前正在写入的 binlog
+  #+BEGIN_SRC sql
+    show master status;
+  #+END_SRC
+
+  #+RESULTS:
+  | File          | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
+  |---------------+----------+--------------+------------------+-------------------|
+  | binlog.000014 |    31076 |              |                  |                   |
+
+  查看 binlog 的内容
+  #+BEGIN_SRC sql
+    show binlog events;
+  #+END_SRC
+
+  #+RESULTS:
+  #+begin_example
+  Log_name	Pos	Event_type	Server_id	End_log_pos	Info
+  binlog.000001	4	Format_desc	1	123	Server ver: 5.7.31-log, Binlog ver: 4
+  binlog.000001	123	Previous_gtids	1	154
+  binlog.000001	154	Anonymous_Gtid	1	219	SET @@SESSION.GTID_NEXT= 'ANONYMOUS'
+  binlog.000001	219	Query	1	319	create database test01
+  binlog.000001	319	Anonymous_Gtid	1	384	SET @@SESSION.GTID_NEXT= 'ANONYMOUS'
+  ... ...
+  binlog.000001	6080	Anonymous_Gtid	1	6145	SET @@SESSION.GTID_NEXT= 'ANONYMOUS'
+  binlog.000001	6145	Query	1	6219	BEGIN
+  binlog.000001	6219	Table_map	1	6271	table_id: 222 (test01.user)
+  binlog.000001	6271	Delete_rows	1	6316	table_id: 222 flags: STMT_END_F
+  binlog.000001	6316	Xid	1	6347	COMMIT /* xid=429 */
+  binlog.000001	6347	Stop	1	6370
+  #+end_example
