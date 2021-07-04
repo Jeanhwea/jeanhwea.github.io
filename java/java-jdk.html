@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-04 Sun 22:26 -->
+<!-- 2021-07-04 Sun 23:03 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JDK 相关知识点</title>
@@ -233,33 +233,34 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org6b53249">1. 基本用法</a>
+<li><a href="#org342ecc5">1. 基本用法</a>
 <ul>
-<li><a href="#org5e648aa">1.1. 基本数据类型</a></li>
-<li><a href="#orgb2df525">1.2. String 字符串</a>
+<li><a href="#orgfc74e44">1.1. 基本数据类型</a></li>
+<li><a href="#org0e1002d">1.2. String 字符串</a>
 <ul>
-<li><a href="#org8b3b0a0">1.2.1. 字符串基本操作</a></li>
-<li><a href="#orga2fa135">1.2.2. String 的不可变性</a></li>
-<li><a href="#org894abab">1.2.3. String, StringBuilder 和 StringBuffer</a></li>
+<li><a href="#orgd5949ed">1.2.1. 字符串基本操作</a></li>
+<li><a href="#org4e2701d">1.2.2. String 的不可变性</a></li>
+<li><a href="#org1264184">1.2.3. String, StringBuilder 和 StringBuffer</a></li>
 </ul>
 </li>
-<li><a href="#org56b3aa9">1.3. 输入和输出</a></li>
-<li><a href="#orgea79100">1.4. 数组的操作</a></li>
-<li><a href="#org8c26c3b">1.5. 静态变量和实例变量</a></li>
-<li><a href="#org30dad4e">1.6. <code>final</code> 关键字</a></li>
-<li><a href="#org5d63304">1.7. equals 与 <code>==</code> 的区别</a></li>
-<li><a href="#org51ae87f">1.8. 序列化</a></li>
-<li><a href="#org405e14a">1.9. 错误和异常</a></li>
+<li><a href="#org8fef2a9">1.3. <code>==</code> 与 equals 的区别</a></li>
+<li><a href="#orgfd7f462">1.4. hashCode() 和 equals() 方法</a></li>
+<li><a href="#org2fd0346">1.5. 错误和异常</a></li>
+<li><a href="#org88918f7">1.6. 静态变量和实例变量</a></li>
+<li><a href="#org6f1d5e8">1.7. <code>final</code> 关键字</a></li>
+<li><a href="#org4bcaa16">1.8. 序列化</a></li>
+<li><a href="#org1867856">1.9. 数组的操作</a></li>
+<li><a href="#org4cab09d">1.10. 输入和输出</a></li>
 </ul>
 </li>
-<li><a href="#org14eeeb7">2. 开发工具</a>
+<li><a href="#org59f054b">2. 开发工具</a>
 <ul>
-<li><a href="#org448c819">2.1. JDK 1.8 简洁和新特性</a></li>
-<li><a href="#orgaddf396">2.2. JDK 的安装和环境变量配置</a></li>
-<li><a href="#org1ed97c1">2.3. 编译器 javac 和虚拟机 java</a></li>
-<li><a href="#org39a9328">2.4. <span class="todo TODO">TODO</span> 调试器 jdb</a></li>
-<li><a href="#orgbc639e4">2.5. 解释器 jrepl</a></li>
-<li><a href="#org12a58c6">2.6. 反汇编器 javap</a></li>
+<li><a href="#orgbb6fb76">2.1. JDK 1.8 简介和新特性</a></li>
+<li><a href="#orgdf455ad">2.2. JDK 的安装和环境变量配置</a></li>
+<li><a href="#org553c6fa">2.3. 编译器 javac 和虚拟机 java</a></li>
+<li><a href="#org09a4ef5">2.4. <span class="todo TODO">TODO</span> 调试器 jdb</a></li>
+<li><a href="#org2ea46dc">2.5. 解释器 jrepl</a></li>
+<li><a href="#org84294e7">2.6. 反汇编器 javap</a></li>
 </ul>
 </li>
 </ul>
@@ -267,12 +268,12 @@
 </div>
 
 
-<div id="outline-container-org6b53249" class="outline-2">
-<h2 id="org6b53249"><span class="section-number-2">1</span> 基本用法</h2>
+<div id="outline-container-org342ecc5" class="outline-2">
+<h2 id="org342ecc5"><span class="section-number-2">1</span> 基本用法</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org5e648aa" class="outline-3">
-<h3 id="org5e648aa"><span class="section-number-3">1.1</span> 基本数据类型</h3>
+<div id="outline-container-orgfc74e44" class="outline-3">
+<h3 id="orgfc74e44"><span class="section-number-3">1.1</span> 基本数据类型</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Java 语言中有 8 个基本类型，和 C++ 语言不同的是 Java 的基本类型的存储空间是固
@@ -359,11 +360,12 @@ Java 语言中有 8 个基本类型，和 C++ 语言不同的是 Java 的基本�
 </table>
 
 <p>
-数值基本类型可以存在如下的自动转换（红色虚线表示损失精度，蓝色实线表示不损失精度）：
+数值基本类型可以存在如下的自动转换（红色虚线表示损失精度，蓝色实线表示不损失
+精度）：
 </p>
 
 
-<div id="orgfe46a63" class="figure">
+<div id="org91282a4" class="figure">
 <p><img src="../static/image/2019/08/java-conversions-between-numeric-types.png" alt="java-conversions-between-numeric-types.png" />
 </p>
 </div>
@@ -371,47 +373,44 @@ Java 语言中有 8 个基本类型，和 C++ 语言不同的是 Java 的基本�
 <p>
 基本类型和封装类的区别
 </p>
-<ul class="org-ul">
+<ol class="org-ol">
 <li>传值方式不同，基本数据类型（原始数据类型）是值传递，封装类型是引用传递</li>
-<li>封装类有方法和属性，可以利用这些方法和属性来处理数据，例如
-<code>Integer.parseInt(String str);</code> 基本数据类型都是 final 修饰的，不能被继承和
-扩展新的类、方法</li>
-<li>默认值不同，如 <code>int i;</code> 默认值为 0，而 <code>Integer j;</code> 默认值为 <code>null</code>, 因为此
-时 <code>j</code> 为对象，对象默认值为 <code>null</code></li>
+<li>封装类有方法和属性
+<ul class="org-ul">
+<li>可以利用这些方法和属性来处理数据，例如 <code>Integer.parseInt(String str);</code></li>
+<li>基本数据类型都是 <code>final</code> 修饰的，不能被继承和扩展新的类、方法</li>
+</ul></li>
+<li>默认值不同，
+<ul class="org-ul">
+<li>如 <code>int i;</code> 默认值为 0，而 <code>Integer j;</code> 默认值为 <code>null</code>,</li>
+<li>因为此时 <code>j</code> 为对象，对象默认值为 <code>null</code></li>
+</ul></li>
 <li>存储位置不同, 定义的基本数据类型的变量和对象的引用变量（地址）存储在栈中，
 而实际对应的对象（value）是存储在堆中</li>
-</ul>
+</ol>
 </div>
 </div>
 
-<div id="outline-container-orgb2df525" class="outline-3">
-<h3 id="orgb2df525"><span class="section-number-3">1.2</span> String 字符串</h3>
+<div id="outline-container-org0e1002d" class="outline-3">
+<h3 id="org0e1002d"><span class="section-number-3">1.2</span> String 字符串</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
-<div id="outline-container-org8b3b0a0" class="outline-4">
-<h4 id="org8b3b0a0"><span class="section-number-4">1.2.1</span> 字符串基本操作</h4>
+<div id="outline-container-orgd5949ed" class="outline-4">
+<h4 id="orgd5949ed"><span class="section-number-4">1.2.1</span> 字符串基本操作</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <p>
 String 在 Java 中不是基本类型，对应的有一个 String 类
 </p>
 <div class="org-src-container">
-<pre class="src src-text">java&gt; String str1 = "";
-java.lang.String str1 = ""
-java&gt; str1.isEmpty();
-java.lang.Boolean res1 = true
-java&gt; str1.substring(0,3);
-java.lang.StringIndexOutOfBoundsException: String index out of range: 3
-java&gt; String str2 = "Hello"
-java.lang.String str2 = "Hello"
-java&gt; str2.substring(0,3)
-java.lang.String res3 = "Hel"
-java&gt; str2.substring(1,3)
-java.lang.String res4 = "el"
-java&gt; str2.substring(1,3) == "el"
-java.lang.Boolean res5 = false
-java&gt; str2.substring(1,3).equals("el")
-java.lang.Boolean res6 = true
-java&gt;
+<pre class="src src-java"><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">str1</span> = <span style="color: #2aa198;">""</span>;
+str1.isEmpty<span style="color: #8d5649;">()</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; true</span>
+str1.substring<span style="color: #8d5649;">(</span>0,3<span style="color: #8d5649;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; java.lang.StringIndexOutOfBoundsException: String index out of range: 3</span>
+
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">str2</span> = <span style="color: #2aa198;">"Hello"</span>
+str2.substring<span style="color: #8d5649;">(</span>0,3<span style="color: #8d5649;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; "Hel"</span>
+str2.substring<span style="color: #8d5649;">(</span>1,3<span style="color: #8d5649;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; "el"</span>
+str2.substring<span style="color: #8d5649;">(</span>1,3<span style="color: #8d5649;">)</span> == <span style="color: #2aa198;">"el"</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; false</span>
+str2.substring<span style="color: #8d5649;">(</span>1,3<span style="color: #8d5649;">)</span>.equals<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"el"</span><span style="color: #8d5649;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; true</span>
 </pre>
 </div>
 
@@ -427,14 +426,13 @@ java&gt;
 </div>
 </div>
 
-<div id="outline-container-orga2fa135" class="outline-4">
-<h4 id="orga2fa135"><span class="section-number-4">1.2.2</span> String 的不可变性</h4>
+<div id="outline-container-org4e2701d" class="outline-4">
+<h4 id="org4e2701d"><span class="section-number-4">1.2.2</span> String 的不可变性</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <p>
 不可变对象指的是 <b>一个对象，在它创建完成之后，不能再改变它的状态</b> 。不能改变
 状态的意思是，不能改变对象内的成员变量，包括基本数据类型的值不能改变，引用类
-型的变量不能指向其他的对象，引用类型指向的对象的状态也不能改变。 如何创建不
-可变类
+型的变量不能指向其他的对象，引用类型指向的对象的状态也不能改变。
 </p>
 
 <p>
@@ -454,181 +452,33 @@ Java 标准类库还提供了一个可变版本，即 StringBuffer。
 </div>
 </div>
 
-<div id="outline-container-org894abab" class="outline-4">
-<h4 id="org894abab"><span class="section-number-4">1.2.3</span> String, StringBuilder 和 StringBuffer</h4>
+<div id="outline-container-org1264184" class="outline-4">
+<h4 id="org1264184"><span class="section-number-4">1.2.3</span> String, StringBuilder 和 StringBuffer</h4>
 <div class="outline-text-4" id="text-1-2-3">
 <p>
-Java 平台提供了两种类型的字符串：String 和 StringBuffer / StringBuilder，它们
-可以储存和操作字符串。其中 String 是只读字符串，也就意味着 String 引用的字符
-串内容是不能被改变的。
+Java 平台提供了两种类型的字符串：
 </p>
-
-<p>
-而 StringBuffer 和 StringBuilder 类表示的字符串对象可以直接进行修改。
-StringBuilder 是 JDK 1.5 中引入的，它和 StringBuffer 的方法完全相同，区别在
-于它是在单线程环境下使用的，因为它的所有方面都没有被 <code>synchronized</code> 修饰，因
-此它的效率也比 StringBuffer 略高。
-</p>
+<ul class="org-ul">
+<li><code>String</code> 和 <code>StringBuffer</code> / <code>StringBuilder</code>, 它们可以储存和操作字符串。其
+中 String 是只读字符串，也就意味着 String 引用的字符串内容是不能被改变的。</li>
+<li>而 StringBuffer 和 StringBuilder 类表示的字符串对象可以直接进行修改。
+StringBuilder 是 JDK 1.5 中引入的，它和 StringBuffer 的方法完全相同，区别
+在 于它是在单线程环境下使用的，因为它的所有方面都没有被 <code>synchronized</code> 修
+饰，因 此它的效率也比 StringBuffer 略高。</li>
+</ul>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org56b3aa9" class="outline-3">
-<h3 id="org56b3aa9"><span class="section-number-3">1.3</span> 输入和输出</h3>
+<div id="outline-container-org8fef2a9" class="outline-3">
+<h3 id="org8fef2a9"><span class="section-number-3">1.3</span> <code>==</code> 与 equals 的区别</h3>
 <div class="outline-text-3" id="text-1-3">
-<p>
-读取数据的输入和打印到标准输出
-</p>
-<div class="org-src-container">
-<pre class="src src-java"><span style="color: #268bd2;">Scanner</span> <span style="color: #6c71c4;">in</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Scanner</span><span style="color: #8d5649;">(</span>System.in<span style="color: #8d5649;">)</span>;
-System.out.println<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"What is your name?"</span><span style="color: #8d5649;">)</span>;
-<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span> = in.nextLine<span style="color: #8d5649;">()</span>;
-</pre>
-</div>
-
-<p>
-格式化输出浮点数
-</p>
-<div class="org-src-container">
-<pre class="src src-text">java&gt; double x = 100000.0 / 3.0;
-double x = 33333.333333333336
-java&gt; System.out.printf("%.3f", x)
-33333.333
-java&gt; System.out.printf("%,.3f", x)
-33,333.333
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-orgea79100" class="outline-3">
-<h3 id="orgea79100"><span class="section-number-3">1.4</span> 数组的操作</h3>
-<div class="outline-text-3" id="text-1-4">
-<p>
-不知道为什么，总是记不住 Java 的数组定义方式，这里记一下 Java 中数组定义方式
-</p>
-<div class="org-src-container">
-<pre class="src src-java"><span style="color: #859900;">class</span> <span style="color: #268bd2;">App73</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">args</span><span style="color: #9564bf;">[]</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">int array</span>
-    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">arr</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[</span>10<span style="color: #9564bf;">]</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; elements are initialezd to 0</span>
-    System.out.println<span style="color: #9564bf;">(</span>arr<span style="color: #24a222;">[</span>3<span style="color: #24a222;">]</span><span style="color: #9564bf;">)</span>;
-    System.out.println<span style="color: #9564bf;">(</span>arr.length<span style="color: #9564bf;">)</span>;
-
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">String array</span>
-    <span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">sarr</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">String</span><span style="color: #9564bf;">[</span>3<span style="color: #9564bf;">]</span>;
-    sarr<span style="color: #9564bf;">[</span>0<span style="color: #9564bf;">]</span> = <span style="color: #2aa198;">"Hello"</span>;
-    sarr<span style="color: #9564bf;">[</span>1<span style="color: #9564bf;">]</span> = <span style="color: #2aa198;">"Man"</span>;
-    sarr<span style="color: #9564bf;">[</span>2<span style="color: #9564bf;">]</span> = <span style="color: #2aa198;">"Welcome to Java world"</span>;
-
-    <span style="color: #859900;">for</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">w</span>: sarr<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span> System.out.println<span style="color: #24a222;">(</span>w<span style="color: #24a222;">)</span>; <span style="color: #9564bf;">}</span>
-  <span style="color: #d8241f;">}</span>
-<span style="color: #8d5649;">}</span>
-</pre>
-</div>
-
-<p>
-初始化数组的数据
-</p>
-<div class="org-src-container">
-<pre class="src src-java"><span style="color: #859900;">class</span> <span style="color: #268bd2;">App341</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">args</span><span style="color: #9564bf;">[]</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">primes</span> = <span style="color: #9564bf;">{</span>2, 3, 5, 7<span style="color: #9564bf;">}</span>;
-    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">primes</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #9564bf;">{</span>2, 3, 5, 7<span style="color: #9564bf;">}</span>;
-    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[][]</span> <span style="color: #6c71c4;">magicSquare</span> = <span style="color: #9564bf;">{</span>
-      <span style="color: #24a222;">{</span>1, 2, 3, 4<span style="color: #24a222;">}</span>,
-      <span style="color: #24a222;">{</span>1, 0, 3, 9<span style="color: #24a222;">}</span>,
-      <span style="color: #24a222;">{</span>1, 0, 3, 9<span style="color: #24a222;">}</span>,
-      <span style="color: #24a222;">{</span>1, 0, 3, 9<span style="color: #24a222;">}</span>
-    <span style="color: #9564bf;">}</span>;
-  <span style="color: #d8241f;">}</span>
-<span style="color: #8d5649;">}</span>
-</pre>
-</div>
-
-<p>
-Java 数组默认时引用，如果需要复制可以调用 <code>Arrays.copyOf(...)</code> 方法
-</p>
-<div class="org-src-container">
-<pre class="src src-text">java&gt; x = new int[] {1,2,3}
-int[] x = [1, 2, 3]
-java&gt; y = new int[] {1,2,3}
-int[] y = [1, 2, 3]
-java&gt; z1 = x
-int[] z1 = [1, 2, 3]
-java&gt; y.length
-java.lang.Integer res24 = 3
-java&gt; z2 = Arrays.copyOf(y, y.length)
-int[] z2 = [1, 2, 3]
-java&gt; z1[0] = 9
-java.lang.Integer res25 = 9
-java&gt; z2[0] = 9
-java.lang.Integer res26 = 9
-java&gt; x
-int[] x = [9, 2, 3]
-java&gt; y
-int[] y = [1, 2, 3]
-java&gt;
-</pre>
-</div>
-
-<p>
-排序数组
-</p>
-<div class="org-src-container">
-<pre class="src src-text">java&gt; x
-int[] x = [9, 2, 3]
-java&gt; Arrays.sort(x)
-
-java&gt; x
-int[] x = [2, 3, 9]
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org8c26c3b" class="outline-3">
-<h3 id="org8c26c3b"><span class="section-number-3">1.5</span> 静态变量和实例变量</h3>
-<div class="outline-text-3" id="text-1-5">
-<ul class="org-ul">
-<li>在语法定义上的区别：静态变量前要加 <code>static</code> 关键字，而实例变量前则不加。</li>
-<li>在程序运行时的区别：实例变量属于某个对象的属性，必须创建了实例对象，其中的
-实例变量才会被分配空间，才能使用这个实例变量。静态变量不属于某个实例对象，
-而是属于类，所以也称为类变量，只要程序加载了类的字节码，不用创建任何实例对
-象，静态变量就会被分配空间，静态变量就可以被使用了。总之，实例变量必须创建
-对象后才可以通过这个对象来使用，静态变量则可以直接使用类名来引用。</li>
-</ul>
-
-<p>
-静态变量在 Java 中是属于类的，它在所有的实例中的值是一样的。当类被 Java 虚拟
-机载入的时候，会对静态变量进行初始化。如果你的代码尝试不用实例来访问非静态的
-变量，编译器会报错，因为这些变量还没有被创建出来，还没有跟任何实例关联上。
-</p>
-</div>
-</div>
-
-<div id="outline-container-org30dad4e" class="outline-3">
-<h3 id="org30dad4e"><span class="section-number-3">1.6</span> <code>final</code> 关键字</h3>
-<div class="outline-text-3" id="text-1-6">
-<ul class="org-ul">
-<li>修饰类：表示该类不能被继承</li>
-<li>修饰方法：表示方法不能被覆盖</li>
-<li>修饰变量：表示变量只能一次赋值以后值不能被修改（常量）</li>
-</ul>
-</div>
-</div>
-
-<div id="outline-container-org5d63304" class="outline-3">
-<h3 id="org5d63304"><span class="section-number-3">1.7</span> equals 与 <code>==</code> 的区别</h3>
-<div class="outline-text-3" id="text-1-7">
-<p>
-<code>==</code> 是一个运算符。 equals 则是 String 对象的方法，可以.（点）出来。 我们比较
-无非就是这两种:
-</p>
 <ol class="org-ol">
+<li><code>==</code> 是一个运算符。 equals 则是 String 对象的方法</li>
 <li>基本数据类型比较 <code>==</code> 比较两个值是否相等。相等为 true 否则为 false；equals
 不能直接用于基本类型的比较。需要将基本类型转换为包装器进行比较。</li>
-<li>引用对象比较 <code>==</code> 和 equals 都是比较栈内存中的地址是否相等 。相等为 true
-否则为 false。 需注意几点：
+<li>引用对象比较 <code>==</code> 和 equals 都是比较栈内存中的地址是否相等 。相等为 true 否
+则为 false。 需注意几点：
 <ul class="org-ul">
 <li>String 是一个特殊的引用类型。对于两个字符串的比较，不管是 <code>==</code> 和 equals
 这两者比较的都是字符串是否相同</li>
@@ -659,28 +509,29 @@ int[] x = [2, 3, 9]
 </div>
 </div>
 
-<div id="outline-container-org51ae87f" class="outline-3">
-<h3 id="org51ae87f"><span class="section-number-3">1.8</span> 序列化</h3>
-<div class="outline-text-3" id="text-1-8">
-<p>
-序列化就是一种用来处理对象流的机制，所谓对象流也就是将对象的内容进行流化。可
-以对流化后的对象进行读写操作，也可将流化后的对象传输于网络之间。序列化是为了
-解决在对对象流进行读写操作时所引发的问题。
+<div id="outline-container-orgfd7f462" class="outline-3">
+<h3 id="orgfd7f462"><span class="section-number-3">1.4</span> hashCode() 和 equals() 方法</h3>
+<div class="outline-text-3" id="text-1-4">
+<ol class="org-ol">
+<li><p>
+Object 类中的方法定义如下
 </p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">native</span> <span style="color: #268bd2;">int</span> <span style="color: #b58900;">hashCode</span><span style="color: #8d5649;">()</span>;
 
-<p>
-序列化的实现：将需要被序列化的类实现 <code>Serializable</code> 接口，该接口没有需要实现
-的方法， <code>implements Serializable</code> 只是为了标注该对象是可被序列化的，然后使用
-一个输出流 (如：FileOutputStream) 来构造一个 ObjectOutputStream(对象流) 对象，
-接着，使用 ObjectOutputStream 对象的 <code>writeObject(Object obj)</code> 方法就可以将参
-数为 obj 的对象写出(即保存其状态)，要恢复的话则用输入流。
-</p>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">boolean</span> <span style="color: #b58900;">equals</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">obj</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #859900;">return</span> <span style="color: #d8241f;">(</span><span style="color: #859900;">this</span> == obj<span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div></li>
+<li><code>==</code> 比较对象的地址</li>
+</ol>
 </div>
 </div>
 
-<div id="outline-container-org405e14a" class="outline-3">
-<h3 id="org405e14a"><span class="section-number-3">1.9</span> 错误和异常</h3>
-<div class="outline-text-3" id="text-1-9">
+<div id="outline-container-org2fd0346" class="outline-3">
+<h3 id="org2fd0346"><span class="section-number-3">1.5</span> 错误和异常</h3>
+<div class="outline-text-3" id="text-1-5">
 <ul class="org-ul">
 <li><code>java.lang.Error</code> : Throwable 的子类，用于标记严重错误，表示系统级的错误和
 程序不必处理的异常。合理的应用程序不应该去 <code>try/catch</code> 这种错误。是恢复不是
@@ -789,14 +640,172 @@ RuntimeException：RuntimeException 体系包括错误的类型转换、数组�
 </ul>
 </div>
 </div>
+
+<div id="outline-container-org88918f7" class="outline-3">
+<h3 id="org88918f7"><span class="section-number-3">1.6</span> 静态变量和实例变量</h3>
+<div class="outline-text-3" id="text-1-6">
+<ol class="org-ol">
+<li>在语法定义上的区别：静态变量前要加 <code>static</code> 关键字，而实例变量前则不加。</li>
+<li>在程序运行时的区别：实例变量属于某个对象的属性，必须创建了实例对象，其中的
+实例变量才会被分配空间，才能使用这个实例变量。静态变量不属于某个实例对象，
+而是属于类，所以也称为类变量，只要程序加载了类的字节码，不用创建任何实例对
+象，静态变量就会被分配空间，静态变量就可以被使用了。总之，实例变量必须创建
+对象后才可以通过这个对象来使用，静态变量则可以直接使用类名来引用。</li>
+<li>静态变量在 Java 中是属于类的，它在所有的实例中的值是一样的。当类被 Java 虚
+拟机载入的时候，会对静态变量进行初始化。如果你的代码尝试不用实例来访问非静
+态的变量，编译器会报错，因为这些变量还没有被创建出来，还没有跟任何实例关联
+上</li>
+</ol>
+</div>
 </div>
 
-<div id="outline-container-org14eeeb7" class="outline-2">
-<h2 id="org14eeeb7"><span class="section-number-2">2</span> 开发工具</h2>
+<div id="outline-container-org6f1d5e8" class="outline-3">
+<h3 id="org6f1d5e8"><span class="section-number-3">1.7</span> <code>final</code> 关键字</h3>
+<div class="outline-text-3" id="text-1-7">
+<ol class="org-ol">
+<li>修饰类：表示该类不能被继承</li>
+<li>修饰方法：表示方法不能被覆盖</li>
+<li>修饰变量：表示变量只能一次赋值以后值不能被修改（常量）</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org4bcaa16" class="outline-3">
+<h3 id="org4bcaa16"><span class="section-number-3">1.8</span> 序列化</h3>
+<div class="outline-text-3" id="text-1-8">
+<ol class="org-ol">
+<li>序列化就是一种用来处理对象流的机制，所谓对象流也就是将对象的内容进行流化。
+可以对流化后的对象进行读写操作，也可将流化后的对象传输于网络之间。序列化是
+为了解决在对对象流进行读写操作时所引发的问题</li>
+<li>序列化的实现
+<ul class="org-ul">
+<li>将需要被序列化的类实现 <code>Serializable</code> 接口</li>
+<li><code>Serializable</code> 接口没有需要实现的方法，只是为了标注该对象是可被序列化的</li>
+</ul></li>
+<li>被 <code>transient</code> 修饰的变量不属于对象持久化的一部分，该变量内容在序列化后无
+法获得访问</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org1867856" class="outline-3">
+<h3 id="org1867856"><span class="section-number-3">1.9</span> 数组的操作</h3>
+<div class="outline-text-3" id="text-1-9">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">class</span> <span style="color: #268bd2;">App73</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">args</span><span style="color: #9564bf;">[]</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">int array</span>
+    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">arr</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[</span>10<span style="color: #9564bf;">]</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; elements are initialezd to 0</span>
+    System.out.println<span style="color: #9564bf;">(</span>arr<span style="color: #24a222;">[</span>3<span style="color: #24a222;">]</span><span style="color: #9564bf;">)</span>;
+    System.out.println<span style="color: #9564bf;">(</span>arr.length<span style="color: #9564bf;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">String array</span>
+    <span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">sarr</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">String</span><span style="color: #9564bf;">[</span>3<span style="color: #9564bf;">]</span>;
+    sarr<span style="color: #9564bf;">[</span>0<span style="color: #9564bf;">]</span> = <span style="color: #2aa198;">"Hello"</span>;
+    sarr<span style="color: #9564bf;">[</span>1<span style="color: #9564bf;">]</span> = <span style="color: #2aa198;">"Man"</span>;
+    sarr<span style="color: #9564bf;">[</span>2<span style="color: #9564bf;">]</span> = <span style="color: #2aa198;">"Welcome to Java world"</span>;
+
+    <span style="color: #859900;">for</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">w</span>: sarr<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span> System.out.println<span style="color: #24a222;">(</span>w<span style="color: #24a222;">)</span>; <span style="color: #9564bf;">}</span>
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+初始化数组的数据
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">class</span> <span style="color: #268bd2;">App341</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">args</span><span style="color: #9564bf;">[]</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">primes</span> = <span style="color: #9564bf;">{</span>2, 3, 5, 7<span style="color: #9564bf;">}</span>;
+    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">primes</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #9564bf;">{</span>2, 3, 5, 7<span style="color: #9564bf;">}</span>;
+    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[][]</span> <span style="color: #6c71c4;">magicSquare</span> = <span style="color: #9564bf;">{</span>
+      <span style="color: #24a222;">{</span>1, 2, 3, 4<span style="color: #24a222;">}</span>,
+      <span style="color: #24a222;">{</span>1, 0, 3, 9<span style="color: #24a222;">}</span>,
+      <span style="color: #24a222;">{</span>1, 0, 3, 9<span style="color: #24a222;">}</span>,
+      <span style="color: #24a222;">{</span>1, 0, 3, 9<span style="color: #24a222;">}</span>
+    <span style="color: #9564bf;">}</span>;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+Java 数组默认时引用，如果需要复制可以调用 <code>Arrays.copyOf(...)</code> 方法
+</p>
+<div class="org-src-container">
+<pre class="src src-text">java&gt; x = new int[] {1,2,3}
+int[] x = [1, 2, 3]
+java&gt; y = new int[] {1,2,3}
+int[] y = [1, 2, 3]
+java&gt; z1 = x
+int[] z1 = [1, 2, 3]
+java&gt; y.length
+java.lang.Integer res24 = 3
+java&gt; z2 = Arrays.copyOf(y, y.length)
+int[] z2 = [1, 2, 3]
+java&gt; z1[0] = 9
+java.lang.Integer res25 = 9
+java&gt; z2[0] = 9
+java.lang.Integer res26 = 9
+java&gt; x
+int[] x = [9, 2, 3]
+java&gt; y
+int[] y = [1, 2, 3]
+java&gt;
+</pre>
+</div>
+
+<p>
+排序数组
+</p>
+<div class="org-src-container">
+<pre class="src src-text">java&gt; x
+int[] x = [9, 2, 3]
+java&gt; Arrays.sort(x)
+
+java&gt; x
+int[] x = [2, 3, 9]
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4cab09d" class="outline-3">
+<h3 id="org4cab09d"><span class="section-number-3">1.10</span> 输入和输出</h3>
+<div class="outline-text-3" id="text-1-10">
+<p>
+读取数据的输入和打印到标准输出
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">Scanner</span> <span style="color: #6c71c4;">in</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Scanner</span><span style="color: #8d5649;">(</span>System.in<span style="color: #8d5649;">)</span>;
+System.out.println<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"What is your name?"</span><span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span> = in.nextLine<span style="color: #8d5649;">()</span>;
+</pre>
+</div>
+
+<p>
+格式化输出浮点数
+</p>
+<div class="org-src-container">
+<pre class="src src-text">java&gt; double x = 100000.0 / 3.0;
+double x = 33333.333333333336
+java&gt; System.out.printf("%.3f", x)
+33333.333
+java&gt; System.out.printf("%,.3f", x)
+33,333.333
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org59f054b" class="outline-2">
+<h2 id="org59f054b"><span class="section-number-2">2</span> 开发工具</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org448c819" class="outline-3">
-<h3 id="org448c819"><span class="section-number-3">2.1</span> JDK 1.8 简洁和新特性</h3>
+<div id="outline-container-orgbb6fb76" class="outline-3">
+<h3 id="orgbb6fb76"><span class="section-number-3">2.1</span> JDK 1.8 简介和新特性</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 <a href="https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">JDK</a> 是 Java 语言的软件开发工具包，主要用于移动设备、嵌入式设备上的 JAVA 应用
@@ -818,15 +827,15 @@ JDK 1.8 的概念图如下：
 </p>
 
 
-<div id="orgeb8f9a8" class="figure">
+<div id="orgf11c978" class="figure">
 <p><img src="../static/image/2019/07/jdk8-conceptual-diagram.png" alt="jdk8-conceptual-diagram.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgaddf396" class="outline-3">
-<h3 id="orgaddf396"><span class="section-number-3">2.2</span> JDK 的安装和环境变量配置</h3>
+<div id="outline-container-orgdf455ad" class="outline-3">
+<h3 id="orgdf455ad"><span class="section-number-3">2.2</span> JDK 的安装和环境变量配置</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 JDK 可以直接在 Oracle 网站上下载，链接是 <a href="https://www.oracle.com/java/technologies/javase-jdk8-downloads.html">JDK 1.8 Download</a> ，将 JDK 直接解压放
@@ -850,8 +859,8 @@ tar xzvf jdk-8u231-linux-x64.tar.gz
 </div>
 </div>
 
-<div id="outline-container-org1ed97c1" class="outline-3">
-<h3 id="org1ed97c1"><span class="section-number-3">2.3</span> 编译器 javac 和虚拟机 java</h3>
+<div id="outline-container-org553c6fa" class="outline-3">
+<h3 id="org553c6fa"><span class="section-number-3">2.3</span> 编译器 javac 和虚拟机 java</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 Java 的两个基本工具是 <code>javac</code> 和 <code>java</code>, 其中这两个工具功能如下：
@@ -897,8 +906,8 @@ $
 </div>
 </div>
 
-<div id="outline-container-org39a9328" class="outline-3">
-<h3 id="org39a9328"><span class="section-number-3">2.4</span> <span class="todo TODO">TODO</span> 调试器 jdb</h3>
+<div id="outline-container-org09a4ef5" class="outline-3">
+<h3 id="org09a4ef5"><span class="section-number-3">2.4</span> <span class="todo TODO">TODO</span> 调试器 jdb</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 Java 自带的调试器是 <code>jdb</code> 命令，通常可以使用集成开发环境（IDE）中的调试工具来
@@ -907,8 +916,8 @@ Java 自带的调试器是 <code>jdb</code> 命令，通常可以使用集成开
 </div>
 </div>
 
-<div id="outline-container-orgbc639e4" class="outline-3">
-<h3 id="orgbc639e4"><span class="section-number-3">2.5</span> 解释器 jrepl</h3>
+<div id="outline-container-org2ea46dc" class="outline-3">
+<h3 id="org2ea46dc"><span class="section-number-3">2.5</span> 解释器 jrepl</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 Java 9 的 JDK 中就自带解释器, 可以用于调试一些常见的命令。Java 8 用户可以使用
@@ -937,8 +946,8 @@ java&gt;
 </div>
 </div>
 
-<div id="outline-container-org12a58c6" class="outline-3">
-<h3 id="org12a58c6"><span class="section-number-3">2.6</span> 反汇编器 javap</h3>
+<div id="outline-container-org84294e7" class="outline-3">
+<h3 id="org84294e7"><span class="section-number-3">2.6</span> 反汇编器 javap</h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 javap 时 JDK 自带的反汇编器，可以反汇编 java 的类
@@ -1078,7 +1087,7 @@ SourceFile: "Apple.java"
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-04 Sun 22:26. Created by Jinghui Hu at 2021-07-04 Sun 22:20.</p>
+<p class="author">Last Updated 2021-07-04 Sun 23:03. Created by Jinghui Hu at 2021-07-04 Sun 22:20.</p>
 </div>
 </body>
 </html>
