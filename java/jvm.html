@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-04 Sun 10:06 -->
+<!-- 2021-07-04 Sun 11:31 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JVM 知识点</title>
@@ -233,39 +233,39 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9a03e2f">1. 知识点</a>
+<li><a href="#org5da229c">1. 知识点</a>
 <ul>
-<li><a href="#org63ffc3b">1.1. JVM 运行内存的分类</a></li>
-<li><a href="#orgcce30be">1.2. Java 内存堆和栈区别</a></li>
-<li><a href="#org93c9b7f">1.3. Java 四引用</a></li>
-<li><a href="#org38bdfc4">1.4. GC 回收机制</a></li>
-<li><a href="#org094715f">1.5. GC 标记对象的死活</a></li>
-<li><a href="#orga23ac77">1.6. GC 回收算法</a></li>
-<li><a href="#orgf0c317a">1.7. MinorGC 和 FullGC</a></li>
-<li><a href="#orgce53c4b">1.8. 内存分配与回收策略</a></li>
-<li><a href="#orgb1f0278">1.9. GC 垃圾收集器</a></li>
-<li><a href="#orgcdf9405">1.10. Java 类加载机制</a></li>
-<li><a href="#org013b74d">1.11. 引起类加载操作的五个行为</a></li>
-<li><a href="#orgf54d2c1">1.12. Java 对象创建时机</a></li>
+<li><a href="#org0a25e02">1.1. JVM 运行内存的分类</a></li>
+<li><a href="#org4fa1ace">1.2. Java 内存堆和栈区别</a></li>
+<li><a href="#org8582096">1.3. Java 四引用</a></li>
+<li><a href="#orgadb162e">1.4. GC 回收机制</a></li>
+<li><a href="#orga56b631">1.5. GC 标记对象的死活</a></li>
+<li><a href="#org1f43f99">1.6. GC 回收算法</a></li>
+<li><a href="#orgd2e40a5">1.7. MinorGC 和 FullGC</a></li>
+<li><a href="#org8b0b08d">1.8. 内存分配与回收策略</a></li>
+<li><a href="#org12f7bb0">1.9. GC 垃圾收集器</a></li>
+<li><a href="#org2cb2427">1.10. Java 类加载机制</a></li>
+<li><a href="#orge0ef8d5">1.11. 引起类加载操作的五个行为</a></li>
+<li><a href="#org04748d5">1.12. Java 对象创建时机</a></li>
 </ul>
 </li>
-<li><a href="#orgc119955">2. 实践案例</a>
+<li><a href="#orge0dc9c7">2. 实践案例</a>
 <ul>
-<li><a href="#orge836fec">2.1. JVM 调优参数</a></li>
-<li><a href="#orge52cda5">2.2. JVM 内存查看工具</a></li>
-<li><a href="#orge78a750">2.3. 逃逸分析</a></li>
+<li><a href="#orgd8ce3e9">2.1. JVM 调优参数</a></li>
+<li><a href="#org3f9f2f1">2.2. JVM 内存查看工具</a></li>
+<li><a href="#org21b7b48">2.3. 逃逸分析</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org9a03e2f" class="outline-2">
-<h2 id="org9a03e2f"><span class="section-number-2">1</span> 知识点</h2>
+<div id="outline-container-org5da229c" class="outline-2">
+<h2 id="org5da229c"><span class="section-number-2">1</span> 知识点</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org63ffc3b" class="outline-3">
-<h3 id="org63ffc3b"><span class="section-number-3">1.1</span> JVM 运行内存的分类</h3>
+<div id="outline-container-org0a25e02" class="outline-3">
+<h3 id="org0a25e02"><span class="section-number-3">1.1</span> JVM 运行内存的分类</h3>
 <div class="outline-text-3" id="text-1-1">
 <ol class="org-ol">
 <li><b>程序计数器</b> 当前线程所执行的字节码的行号指示器，用于记录正在执行的虚拟机字
@@ -280,8 +280,8 @@
 </div>
 </div>
 
-<div id="outline-container-orgcce30be" class="outline-3">
-<h3 id="orgcce30be"><span class="section-number-3">1.2</span> Java 内存堆和栈区别</h3>
+<div id="outline-container-org4fa1ace" class="outline-3">
+<h3 id="org4fa1ace"><span class="section-number-3">1.2</span> Java 内存堆和栈区别</h3>
 <div class="outline-text-3" id="text-1-2">
 <ol class="org-ol">
 <li>栈内存用来存储基本类型的变量和对象的引用变量，堆内存用来存储 Java 中的对象，
@@ -302,8 +302,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org93c9b7f" class="outline-3">
-<h3 id="org93c9b7f"><span class="section-number-3">1.3</span> Java 四引用</h3>
+<div id="outline-container-org8582096" class="outline-3">
+<h3 id="org8582096"><span class="section-number-3">1.3</span> Java 四引用</h3>
 <div class="outline-text-3" id="text-1-3">
 <ol class="org-ol">
 <li><b>强引用</b> （StrongReference）强引用是使用最普遍的引用。如果一个对象具有强引
@@ -328,8 +328,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org38bdfc4" class="outline-3">
-<h3 id="org38bdfc4"><span class="section-number-3">1.4</span> GC 回收机制</h3>
+<div id="outline-container-orgadb162e" class="outline-3">
+<h3 id="orgadb162e"><span class="section-number-3">1.4</span> GC 回收机制</h3>
 <div class="outline-text-3" id="text-1-4">
 <ol class="org-ol">
 <li>Java 中对象是采用 <code>new</code> 或者反射的方法创建的，这些对象的创建都是在堆（Heap）
@@ -343,8 +343,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org094715f" class="outline-3">
-<h3 id="org094715f"><span class="section-number-3">1.5</span> GC 标记对象的死活</h3>
+<div id="outline-container-orga56b631" class="outline-3">
+<h3 id="orga56b631"><span class="section-number-3">1.5</span> GC 标记对象的死活</h3>
 <div class="outline-text-3" id="text-1-5">
 <ol class="org-ol">
 <li><b>引用计数法</b> 给对象添加一个引用计数器,没当被引用的时候,计数器的值就加一。引
@@ -365,8 +365,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-orga23ac77" class="outline-3">
-<h3 id="orga23ac77"><span class="section-number-3">1.6</span> GC 回收算法</h3>
+<div id="outline-container-org1f43f99" class="outline-3">
+<h3 id="org1f43f99"><span class="section-number-3">1.6</span> GC 回收算法</h3>
 <div class="outline-text-3" id="text-1-6">
 <ol class="org-ol">
 <li><b>标记-清除法</b>: 标记出没有用的对象，然后一个一个回收掉
@@ -391,8 +391,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-orgf0c317a" class="outline-3">
-<h3 id="orgf0c317a"><span class="section-number-3">1.7</span> MinorGC 和 FullGC</h3>
+<div id="outline-container-orgd2e40a5" class="outline-3">
+<h3 id="orgd2e40a5"><span class="section-number-3">1.7</span> MinorGC 和 FullGC</h3>
 <div class="outline-text-3" id="text-1-7">
 <ol class="org-ol">
 <li><b>Minor GC</b> 通常发生在新生代的 Eden 区，在这个区的对象生存期短，往往发生 GC 的
@@ -403,8 +403,8 @@ Minor GC，所采用的是标记-清除算法</li>
 </div>
 </div>
 
-<div id="outline-container-orgce53c4b" class="outline-3">
-<h3 id="orgce53c4b"><span class="section-number-3">1.8</span> 内存分配与回收策略</h3>
+<div id="outline-container-org8b0b08d" class="outline-3">
+<h3 id="org8b0b08d"><span class="section-number-3">1.8</span> 内存分配与回收策略</h3>
 <div class="outline-text-3" id="text-1-8">
 <ol class="org-ol">
 <li>结构（堆大小 = 新生代(1/3) + 老年代(2/3)）:
@@ -434,24 +434,57 @@ survivor0，这个过程也称为 <b>分配担保</b> （ <code>Full GC</code> �
 </div>
 </div>
 
-<div id="outline-container-orgb1f0278" class="outline-3">
-<h3 id="orgb1f0278"><span class="section-number-3">1.9</span> GC 垃圾收集器</h3>
+<div id="outline-container-org12f7bb0" class="outline-3">
+<h3 id="org12f7bb0"><span class="section-number-3">1.9</span> GC 垃圾收集器</h3>
 <div class="outline-text-3" id="text-1-9">
 <ol class="org-ol">
-<li>Serial New 收集器是针对新生代的收集器，采用的是复制算法</li>
-<li>Parallel New（并行）收集器，新生代采用复制算法，老年代采用标记整理</li>
-<li>Parallel Scavenge（并行）收集器，针对新生代，采用复制收集算法</li>
-<li>Serial Old（串行）收集器，新生代采用复制，老年代采用标记清理</li>
-<li>Parallel Old（并行）收集器，针对老年代，标记整理</li>
-<li>CMS 收集器，基于标记清理</li>
-<li>G1 收集器(JDK): 整体上是基于标记清理，局部采用复制</li>
-<li>综上: 新生代基本采用复制算法，老年代采用标记整理算法。cms 采用标记清理</li>
+<li>年轻代常见垃圾收集器
+<ol class="org-ol">
+<li>Serial New 收集器是针对新生代的收集器，
+<ul class="org-ul">
+<li>采用的是复制算法</li>
+<li>每次收集使用单线程来做 GC 操作</li>
+</ul></li>
+<li>Parallel New 收集器，是  SN 收集器的多线程版本
+<ul class="org-ul">
+<li>使用复制算法</li>
+<li>每次收集使用多线程并行来做 GC 操作</li>
+</ul></li>
+<li>Parallel Scavenge 收集器，针对新生代，采用复制收集算法
+<ul class="org-ul">
+<li>提供了参数 <code>-XX:+UseAdaptiveSizePolicy</code>, 打开参数后，就不需要手工指定
+新生代的大小（-Xmn）, Eden 和 Survivor 区的比例 <code>-XX:SurvivorRatio</code>,
+晋升老年代对象年龄 <code>-XX:PretenureSizeThreshold</code> 等细节参数</li>
+<li>吞吐量高 虚拟机会根据当前系统的运行情况收集性能监控信息，动态调整这些
+参数以提供最合适的停顿时间或者最大的吞吐量</li>
+</ul></li>
+</ol></li>
+<li>老年代常见垃圾收集器
+<ol class="org-ol">
+<li>Serial Old 收集器，老年代采用标记清理，一般配合年轻代 SN 收集器使用</li>
+<li>CMS 收集器，基于标记清理，目的是 <code>减少单次 GC的响应时间</code>, 一般配合年轻
+代 PN 收集器一起使用
+<ol class="org-ol">
+<li>初次标记（触发 STW），仅标记 GC Roots 直接引用对象，耗时短</li>
+<li>并发标记（不 STW），多线程标记待回收的对象，耗时长</li>
+<li>重新标记（触发 STW, 修正初次标记），并发标记因为没有 STW, 可能产生错
+误标记，这里修正这些错误</li>
+<li>并发清理</li>
+</ol></li>
+<li>Parallel Old 收集器，针对老年代，标记整理，一般配合年轻代 PS 收集使用</li>
+</ol></li>
+<li>G1 收集器(JDK): 整体上是基于标记清理，局部采用复制
+<ol class="org-ol">
+<li>标记成 Region 的网格区域</li>
+<li>E, S, O 分片存在不同 Region</li>
+</ol></li>
+<li>综上: 新生代基本采用复制算法，老年代采用标记整理算法。CMS 采用标记清理</li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orgcdf9405" class="outline-3">
-<h3 id="orgcdf9405"><span class="section-number-3">1.10</span> Java 类加载机制</h3>
+<div id="outline-container-org2cb2427" class="outline-3">
+<h3 id="org2cb2427"><span class="section-number-3">1.10</span> Java 类加载机制</h3>
 <div class="outline-text-3" id="text-1-10">
 <ol class="org-ol">
 <li>概念:
@@ -535,8 +568,8 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-org013b74d" class="outline-3">
-<h3 id="org013b74d"><span class="section-number-3">1.11</span> 引起类加载操作的五个行为</h3>
+<div id="outline-container-orge0ef8d5" class="outline-3">
+<h3 id="orge0ef8d5"><span class="section-number-3">1.11</span> 引起类加载操作的五个行为</h3>
 <div class="outline-text-3" id="text-1-11">
 <ol class="org-ol">
 <li>遇到 <code>new</code>, <code>getstatic</code>, <code>putstatic</code> 或 <code>invokestatic</code> 这四条字节码指令</li>
@@ -548,8 +581,8 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-orgf54d2c1" class="outline-3">
-<h3 id="orgf54d2c1"><span class="section-number-3">1.12</span> Java 对象创建时机</h3>
+<div id="outline-container-org04748d5" class="outline-3">
+<h3 id="org04748d5"><span class="section-number-3">1.12</span> Java 对象创建时机</h3>
 <div class="outline-text-3" id="text-1-12">
 <ol class="org-ol">
 <li>使用 <code>new</code> 关键字创建对象</li>
@@ -562,12 +595,12 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-orgc119955" class="outline-2">
-<h2 id="orgc119955"><span class="section-number-2">2</span> 实践案例</h2>
+<div id="outline-container-orge0dc9c7" class="outline-2">
+<h2 id="orge0dc9c7"><span class="section-number-2">2</span> 实践案例</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orge836fec" class="outline-3">
-<h3 id="orge836fec"><span class="section-number-3">2.1</span> JVM 调优参数</h3>
+<div id="outline-container-orgd8ce3e9" class="outline-3">
+<h3 id="orgd8ce3e9"><span class="section-number-3">2.1</span> JVM 调优参数</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 设置堆空间，栈空间和元数据空间大小
@@ -579,8 +612,8 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-orge52cda5" class="outline-3">
-<h3 id="orge52cda5"><span class="section-number-3">2.2</span> JVM 内存查看工具</h3>
+<div id="outline-container-org3f9f2f1" class="outline-3">
+<h3 id="org3f9f2f1"><span class="section-number-3">2.2</span> JVM 内存查看工具</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 通过 <code>jstat</code> 动态查看堆内存使用情况
@@ -645,8 +678,8 @@ jmap -dump:<span style="color: #6c71c4;">format</span>=b,<span style="color: #6c
 </div>
 </div>
 
-<div id="outline-container-orge78a750" class="outline-3">
-<h3 id="orge78a750"><span class="section-number-3">2.3</span> 逃逸分析</h3>
+<div id="outline-container-org21b7b48" class="outline-3">
+<h3 id="org21b7b48"><span class="section-number-3">2.3</span> 逃逸分析</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 Java 在发现 new 出来的对象如果只在当前方法中运行，会直接进入线程栈，而不会放入
@@ -705,7 +738,7 @@ JDK 1.6 后默认开启逃逸分析 <code>-XX:-DoEscapeAnalysis</code> 选项，
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-04 Sun 10:06. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
+<p class="author">Last Updated 2021-07-04 Sun 11:31. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
 </div>
 </body>
 </html>
