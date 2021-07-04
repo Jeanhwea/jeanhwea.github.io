@@ -171,7 +171,9 @@
       - 类加载器负责加载所有的类，同一个类(一个类用其全限定类名(包名加类名)标志)
         只会被加载一次
       - ~Bootstrap ClassLoader~ : 根类加载器，负责加载 Java 的核心类，它不是
-        ~java.lang.ClassLoader~ 的子类，而是由 JVM 自身实现
+        ~java.lang.ClassLoader~ 的子类，而是由 JVM 自身实现, 主要负责加载
+        ~jre/lib~ 目录中或被 =-Xbootclasspath= 指定的路径中的并且文件名是被虚拟
+        机识别的文件
       - ~Extension ClassLoader~: 扩展类加载器，扩展类加载器的加载路径是 JDK 目录
         下 ~jre/lib/ext~, 扩展类的 ~getParent()~ 方法返回 null,实际上扩展类加载
         器的父类加载器是根加载器，只是根加载器并不是 Java 实现的
@@ -326,3 +328,186 @@
      [GC (Allocation Failure)  1457K->433K(9216K), 0.0002524 secs]
      ... 疯狂地 GC
    #+END_SRC
+
+** JDBC 知识点
+   1. SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式和配置文
+      件组合实现的动态加载机制
+      - 三方驱动在 =META-INF/services/java.sql.Driver= 中添加驱动配置信息
+      - ~DriverManager~ 的静态代码块中通过调用 ~loadInitialDrivers();~ 来读取使
+        用驱动信息
+        #+BEGIN_SRC java
+          /**
+           ,* Load the initial JDBC drivers by checking the System property
+           ,* jdbc.properties and then use the {@code ServiceLoader} mechanism
+           ,*/
+          static {
+              loadInitialDrivers();
+              println("JDBC DriverManager initialized");
+          }
+        #+END_SRC
+      - 在 ~loadInitialDrivers();~ 方法中， ~ServiceLoader.load(Driver.class)~
+        通过扫描 =META-INF/services= 目录下的配置文件找到实现类的全限定名，把类
+        加载到 JVM
+        #+BEGIN_SRC java
+          AccessController.doPrivileged(new PrivilegedAction<Void>() {
+              public Void run() {
+
+                  ServiceLoader<Driver> loadedDrivers = ServiceLoader.load(Driver.class);
+                  Iterator<Driver> driversIterator = loadedDrivers.iterator();
+
+                  /* Load these drivers, so that they can be instantiated.
+                   ,* It may be the case that the driver class may not be there
+                   ,* i.e. there may be a packaged driver with the service class
+                   ,* as implementation of java.sql.Driver but the actual class
+                   ,* may be missing. In that case a java.util.ServiceConfigurationError
+                   ,* will be thrown at runtime by the VM trying to locate
+                   ,* and load the service.
+                   ,*
+                   ,* Adding a try catch block to catch those runtime errors
+                   ,* if driver not available in classpath but it's
+                   ,* packaged as service and that service is there in classpath.
+                   ,*/
+                  try{
+                      while(driversIterator.hasNext()) {
+                          driversIterator.next();
+                      }
+                  } catch(Throwable t) {
+                  // Do nothing
+                  }
+                  return null;
+              }
+          });
+        #+END_SRC
+   2. 使用 ~DriverManager~ 中定义了 ~registeredDrivers~ 来存储项目中引用的确定类
+      信息
+      #+BEGIN_SRC java
+        // List of registered JDBC drivers
+        private final static CopyOnWriteArrayList<DriverInfo> registeredDrivers = new CopyOnWriteArrayList<>();
+      #+END_SRC
+   3. 调用 ~getConnection~ 方法时通过变量所有注册的驱动来获取连接信息
+      #+BEGIN_SRC java
+        //  Worker method called by the public getConnection() methods.
+        private static Connection getConnection(
+            String url, java.util.Properties info, Class<?> caller) throws SQLException {
+            /*
+             ,* When callerCl is null, we should check the application's
+             ,* (which is invoking this class indirectly)
+             ,* classloader, so that the JDBC driver class outside rt.jar
+             ,* can be loaded from here.
+             ,*/
+            ClassLoader callerCL = caller != null ? caller.getClassLoader() : null;
+            synchronized(DriverManager.class) {
+                // synchronize loading of the correct classloader.
+                if (callerCL == null) {
+                    callerCL = Thread.currentThread().getContextClassLoader();
+                }
+            }
+
+            if(url == null) {
+                throw new SQLException("The url cannot be null", "08001");
+            }
+
+            println("DriverManager.getConnection(\"" + url + "\")");
+
+            // Walk through the loaded registeredDrivers attempting to make a connection.
+            // Remember the first exception that gets raised so we can reraise it.
+            SQLException reason = null;
+
+            for(DriverInfo aDriver : registeredDrivers) {
+                // If the caller does not have permission to load the driver then
+                // skip it.
+                if(isDriverAllowed(aDriver.driver, callerCL)) {
+                    try {
+                        println("    trying " + aDriver.driver.getClass().getName());
+                        Connection con = aDriver.driver.connect(url, info);
+                        if (con != null) {
+                            // Success!
+                            println("getConnection returning " + aDriver.driver.getClass().getName());
+                            return (con);
+                        }
+                    } catch (SQLException ex) {
+                        if (reason == null) {
+                            reason = ex;
+                        }
+                    }
+
+                } else {
+                    println("    skipping: " + aDriver.getClass().getName());
+                }
+
+            }
+
+            // if we got here nobody could connect.
+            if (reason != null)    {
+                println("getConnection failed: " + reason);
+                throw reason;
+            }
+
+            println("getConnection: no suitable driver found for "+ url);
+            throw new SQLException("No suitable driver found for "+ url, "08001");
+        }
+      #+END_SRC
+   4. 打破双亲委派
+      - 由于 ~java.sql.Driver~ 的类加载器是 Bootstrap ClassLoader, 而实际加载三
+        方实现类的 ~Launcher.AppClassLoader.getAppClassLoader(var1);~ 方法的线程
+        上下文应该是 ~AppClassLoader~, 这违背了双亲委派模型
+        #+BEGIN_SRC java
+          public class Launcher {
+              private static URLStreamHandlerFactory factory = new Launcher.Factory();
+              private static Launcher launcher = new Launcher();
+              private static String bootClassPath = System.getProperty("sun.boot.class.path");
+              private ClassLoader loader;
+              private static URLStreamHandler fileHandler;
+
+              public static Launcher getLauncher() {
+                  return launcher;
+              }
+
+              public Launcher() {
+                  Launcher.ExtClassLoader var1;
+                  try {
+                      var1 = Launcher.ExtClassLoader.getExtClassLoader();
+                  } catch (IOException var10) {
+                      throw new InternalError("Could not create extension class loader", var10);
+                  }
+
+                  try {
+                      this.loader = Launcher.AppClassLoader.getAppClassLoader(var1);
+                  } catch (IOException var9) {
+                      throw new InternalError("Could not create application class loader", var9);
+                  }
+
+                  Thread.currentThread().setContextClassLoader(this.loader);
+                  String var2 = System.getProperty("java.security.manager");
+                  if (var2 != null) {
+                      SecurityManager var3 = null;
+                      if (!"".equals(var2) && !"default".equals(var2)) {
+                          try {
+                              var3 = (SecurityManager)this.loader.loadClass(var2).newInstance();
+                          } catch (IllegalAccessException var5) {
+                          } catch (InstantiationException var6) {
+                          } catch (ClassNotFoundException var7) {
+                          } catch (ClassCastException var8) {
+                          }
+                      } else {
+                          var3 = new SecurityManager();
+                      }
+
+                      if (var3 == null) {
+                          throw new InternalError("Could not create SecurityManager: " + var2);
+                      }
+
+                      System.setSecurityManager(var3);
+                  }
+
+              }
+
+            // 省略
+          }
+        #+END_SRC
+      - JDBC 4.0 之前使用 ~Class.forName("")~ 方式加载驱动是不会破坏双亲委派的，
+        JDBC 4.0 之后使用 SPI 机制才会破坏双亲委派机制
+      - Bootstrap ClassLoader 和 Extension ClassLoader, 他们只能加载自己指定目录
+        下的类，无法加载运行时的，其他目录下的类
+      - JDBC 接口都是由 JDK 提供，具体实现是由第三方数据库产商提供的,所以也只能
+        采用这种方式去加载驱动实现类
