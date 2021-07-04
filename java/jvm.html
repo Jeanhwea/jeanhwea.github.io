@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-04 Sun 00:19 -->
+<!-- 2021-07-04 Sun 09:36 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JVM 知识点</title>
@@ -233,27 +233,40 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgdf90cc4">1. JVM 运行内存的分类</a></li>
-<li><a href="#orgd7ddcc8">2. Java 内存堆和栈区别</a></li>
-<li><a href="#org858b53f">3. Java 四引用</a></li>
-<li><a href="#orge9d80a0">4. GC 回收机制</a></li>
-<li><a href="#org61468e0">5. GC 标记对象的死活</a></li>
-<li><a href="#org61b35de">6. GC 回收算法</a></li>
-<li><a href="#org3827ab0">7. MinorGC 和 FullGC</a></li>
-<li><a href="#orgb9616c4">8. 内存分配与回收策略</a></li>
-<li><a href="#orgaaf2113">9. GC 垃圾收集器</a></li>
-<li><a href="#orgf7175c1">10. Java 类加载机制</a></li>
-<li><a href="#org716a424">11. 引起类加载操作的五个行为</a></li>
-<li><a href="#orgc589a9d">12. Java 对象创建时机</a></li>
-<li><a href="#org08ac897">13. JVM 调优参数</a></li>
+<li><a href="#org711fbe0">1. 知识点</a>
+<ul>
+<li><a href="#org9c50ae7">1.1. JVM 运行内存的分类</a></li>
+<li><a href="#org11a966a">1.2. Java 内存堆和栈区别</a></li>
+<li><a href="#orga433f48">1.3. Java 四引用</a></li>
+<li><a href="#orgbe4dd87">1.4. GC 回收机制</a></li>
+<li><a href="#org698579e">1.5. GC 标记对象的死活</a></li>
+<li><a href="#org89acf45">1.6. GC 回收算法</a></li>
+<li><a href="#org9544eb9">1.7. MinorGC 和 FullGC</a></li>
+<li><a href="#org3db3f3d">1.8. 内存分配与回收策略</a></li>
+<li><a href="#orged3740d">1.9. GC 垃圾收集器</a></li>
+<li><a href="#org936fa36">1.10. Java 类加载机制</a></li>
+<li><a href="#org7fbb7c0">1.11. 引起类加载操作的五个行为</a></li>
+<li><a href="#orgbdcb4f8">1.12. Java 对象创建时机</a></li>
+</ul>
+</li>
+<li><a href="#org826c62b">2. 实践案例</a>
+<ul>
+<li><a href="#org89b5716">2.1. JVM 调优参数</a></li>
+<li><a href="#org972b4c1">2.2. JVM 内存查看工具</a></li>
+<li><a href="#orgefb3919">2.3. 逃逸分析</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
-
-<div id="outline-container-orgdf90cc4" class="outline-2">
-<h2 id="orgdf90cc4"><span class="section-number-2">1</span> JVM 运行内存的分类</h2>
+<div id="outline-container-org711fbe0" class="outline-2">
+<h2 id="org711fbe0"><span class="section-number-2">1</span> 知识点</h2>
 <div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org9c50ae7" class="outline-3">
+<h3 id="org9c50ae7"><span class="section-number-3">1.1</span> JVM 运行内存的分类</h3>
+<div class="outline-text-3" id="text-1-1">
 <ol class="org-ol">
 <li><b>程序计数器</b> 当前线程所执行的字节码的行号指示器，用于记录正在执行的虚拟机字
 节指令地址，线程私有 注: 如果正在执行的是 Native 方法，计数器值则为空</li>
@@ -267,9 +280,9 @@
 </div>
 </div>
 
-<div id="outline-container-orgd7ddcc8" class="outline-2">
-<h2 id="orgd7ddcc8"><span class="section-number-2">2</span> Java 内存堆和栈区别</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-org11a966a" class="outline-3">
+<h3 id="org11a966a"><span class="section-number-3">1.2</span> Java 内存堆和栈区别</h3>
+<div class="outline-text-3" id="text-1-2">
 <ol class="org-ol">
 <li>栈内存用来存储基本类型的变量和对象的引用变量，堆内存用来存储 Java 中的对象，
 无论是成员变量，局部变量，还是类变量，它们指向的对象都存储在堆内存中</li>
@@ -289,9 +302,9 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org858b53f" class="outline-2">
-<h2 id="org858b53f"><span class="section-number-2">3</span> Java 四引用</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-orga433f48" class="outline-3">
+<h3 id="orga433f48"><span class="section-number-3">1.3</span> Java 四引用</h3>
+<div class="outline-text-3" id="text-1-3">
 <ol class="org-ol">
 <li><b>强引用</b> （StrongReference）强引用是使用最普遍的引用。如果一个对象具有强引
 用，那垃圾回收器绝不会回收它。当内存空间不足，Java 虚拟机宁愿抛出
@@ -315,9 +328,9 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-orge9d80a0" class="outline-2">
-<h2 id="orge9d80a0"><span class="section-number-2">4</span> GC 回收机制</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-orgbe4dd87" class="outline-3">
+<h3 id="orgbe4dd87"><span class="section-number-3">1.4</span> GC 回收机制</h3>
+<div class="outline-text-3" id="text-1-4">
 <ol class="org-ol">
 <li>Java 中对象是采用 <code>new</code> 或者反射的方法创建的，这些对象的创建都是在堆（Heap）
 中分配的，所有对象的回收都是由 Java 虚拟机通过垃圾回收机制完成的。GC 为了能
@@ -330,9 +343,9 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org61468e0" class="outline-2">
-<h2 id="org61468e0"><span class="section-number-2">5</span> GC 标记对象的死活</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-org698579e" class="outline-3">
+<h3 id="org698579e"><span class="section-number-3">1.5</span> GC 标记对象的死活</h3>
+<div class="outline-text-3" id="text-1-5">
 <ol class="org-ol">
 <li><b>引用计数法</b> 给对象添加一个引用计数器,没当被引用的时候,计数器的值就加一。引
 用失效的时候减一,当计数器的值为 0 的时候就表示改对象可以被 GC 回收了，弊端:
@@ -352,9 +365,9 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org61b35de" class="outline-2">
-<h2 id="org61b35de"><span class="section-number-2">6</span> GC 回收算法</h2>
-<div class="outline-text-2" id="text-6">
+<div id="outline-container-org89acf45" class="outline-3">
+<h3 id="org89acf45"><span class="section-number-3">1.6</span> GC 回收算法</h3>
+<div class="outline-text-3" id="text-1-6">
 <ol class="org-ol">
 <li><b>标记-清除法</b>: 标记出没有用的对象，然后一个一个回收掉
 <ul class="org-ul">
@@ -378,9 +391,9 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org3827ab0" class="outline-2">
-<h2 id="org3827ab0"><span class="section-number-2">7</span> MinorGC 和 FullGC</h2>
-<div class="outline-text-2" id="text-7">
+<div id="outline-container-org9544eb9" class="outline-3">
+<h3 id="org9544eb9"><span class="section-number-3">1.7</span> MinorGC 和 FullGC</h3>
+<div class="outline-text-3" id="text-1-7">
 <ol class="org-ol">
 <li><b>Minor GC</b> 通常发生在新生代的 Eden 区，在这个区的对象生存期短，往往发生 GC 的
 频率较高，回收速度比较快，一般采用复制回收算法</li>
@@ -390,9 +403,9 @@ Minor GC，所采用的是标记-清除算法</li>
 </div>
 </div>
 
-<div id="outline-container-orgb9616c4" class="outline-2">
-<h2 id="orgb9616c4"><span class="section-number-2">8</span> 内存分配与回收策略</h2>
-<div class="outline-text-2" id="text-8">
+<div id="outline-container-org3db3f3d" class="outline-3">
+<h3 id="org3db3f3d"><span class="section-number-3">1.8</span> 内存分配与回收策略</h3>
+<div class="outline-text-3" id="text-1-8">
 <ol class="org-ol">
 <li>结构（堆大小 = 新生代(1/3) + 老年代(2/3)）:
 <ul class="org-ul">
@@ -417,45 +430,13 @@ survivor0，这个过程也称为 <b>分配担保</b> （ <code>Full GC</code> �
 <li>动态对象年龄判定，当进入一批进入 survivor0 对象大小大于等于 survivor0 总内
 存 50% 时会直接进入老年代 (可通过 <code>-XX:TargetSurvivorRatio</code> 控制 )</li>
 <li>空间分配担保，Full GC</li>
-<li><p>
-JVM 内存查看工具
-</p>
-<div class="org-src-container">
-<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#22534;&#20869;&#23384;&#20351;&#29992;&#24773;&#20917;</span>
-&#10140; jstat -gcutil 70670 1000
-  S0     S1     E      O      M     CCS    YGC     YGCT    FGC    FGCT     GCT
-  0.00   0.00   6.00   7.90  93.92  84.70      2    0.009     2    0.150    0.159
-  0.00   0.00   6.00   7.90  93.92  84.70      2    0.009     2    0.150    0.159
-  0.00   0.00   6.00   7.90  93.92  84.70      2    0.009     2    0.150    0.159
-  0.00   0.00   6.00   7.90  93.92  84.70      2    0.009     2    0.150    0.159
-  0.00   0.00   6.00   7.90  93.92  84.70      2    0.009     2    0.150    0.159
-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#32769;&#24180;&#20195;&#20351;&#29992;&#24773;&#20917;</span>
-&#10140; jstat -gcold 70670 1000
-     MC       MU      CCSC     CCSU       OC          OU       YGC    FGC    FGCT     GCT
- 21888.0  20556.1   2432.0   2059.9     79872.0      6313.3      2     2    0.150    0.159
- 21888.0  20556.1   2432.0   2059.9     79872.0      6313.3      2     2    0.150    0.159
- 21888.0  20556.1   2432.0   2059.9     79872.0      6313.3      2     2    0.150    0.159
- 21888.0  20556.1   2432.0   2059.9     79872.0      6313.3      2     2    0.150    0.159
- 21888.0  20556.1   2432.0   2059.9     79872.0      6313.3      2     2    0.150    0.159
-
-<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#24180;&#36731;&#20195;&#20351;&#29992;&#24773;&#20917;</span>
-&#10140; jstat -gcnew 70670 1000
- S0C    S1C    S0U    S1U   TT MTT  DSS      EC       EU     YGC     YGCT
- 0.0    0.0    0.0    0.0  1  15 1024.0  51200.0   3072.0      2    0.009
- 0.0    0.0    0.0    0.0  1  15 1024.0  51200.0   3072.0      2    0.009
- 0.0    0.0    0.0    0.0  1  15 1024.0  51200.0   3072.0      2    0.009
- 0.0    0.0    0.0    0.0  1  15 1024.0  51200.0   3072.0      2    0.009
- 0.0    0.0    0.0    0.0  1  15 1024.0  51200.0   3072.0      2    0.009
-</pre>
-</div></li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orgaaf2113" class="outline-2">
-<h2 id="orgaaf2113"><span class="section-number-2">9</span> GC 垃圾收集器</h2>
-<div class="outline-text-2" id="text-9">
+<div id="outline-container-orged3740d" class="outline-3">
+<h3 id="orged3740d"><span class="section-number-3">1.9</span> GC 垃圾收集器</h3>
+<div class="outline-text-3" id="text-1-9">
 <ol class="org-ol">
 <li>Serial New 收集器是针对新生代的收集器，采用的是复制算法</li>
 <li>Parallel New（并行）收集器，新生代采用复制算法，老年代采用标记整理</li>
@@ -469,9 +450,9 @@ JVM 内存查看工具
 </div>
 </div>
 
-<div id="outline-container-orgf7175c1" class="outline-2">
-<h2 id="orgf7175c1"><span class="section-number-2">10</span> Java 类加载机制</h2>
-<div class="outline-text-2" id="text-10">
+<div id="outline-container-org936fa36" class="outline-3">
+<h3 id="org936fa36"><span class="section-number-3">1.10</span> Java 类加载机制</h3>
+<div class="outline-text-3" id="text-1-10">
 <ol class="org-ol">
 <li>概念:
 <ul class="org-ul">
@@ -554,9 +535,9 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-org716a424" class="outline-2">
-<h2 id="org716a424"><span class="section-number-2">11</span> 引起类加载操作的五个行为</h2>
-<div class="outline-text-2" id="text-11">
+<div id="outline-container-org7fbb7c0" class="outline-3">
+<h3 id="org7fbb7c0"><span class="section-number-3">1.11</span> 引起类加载操作的五个行为</h3>
+<div class="outline-text-3" id="text-1-11">
 <ol class="org-ol">
 <li>遇到 <code>new</code>, <code>getstatic</code>, <code>putstatic</code> 或 <code>invokestatic</code> 这四条字节码指令</li>
 <li>反射调用的时候，如果类没有进行过初始化，则需要先触发其初始化</li>
@@ -567,9 +548,9 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-orgc589a9d" class="outline-2">
-<h2 id="orgc589a9d"><span class="section-number-2">12</span> Java 对象创建时机</h2>
-<div class="outline-text-2" id="text-12">
+<div id="outline-container-orgbdcb4f8" class="outline-3">
+<h3 id="orgbdcb4f8"><span class="section-number-3">1.12</span> Java 对象创建时机</h3>
+<div class="outline-text-3" id="text-1-12">
 <ol class="org-ol">
 <li>使用 <code>new</code> 关键字创建对象</li>
 <li>使用 <code>Class</code> 类的 <code>newInstance</code> 方法(反射机制)</li>
@@ -579,10 +560,15 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </ol>
 </div>
 </div>
+</div>
 
-<div id="outline-container-org08ac897" class="outline-2">
-<h2 id="org08ac897"><span class="section-number-2">13</span> JVM 调优参数</h2>
-<div class="outline-text-2" id="text-13">
+<div id="outline-container-org826c62b" class="outline-2">
+<h2 id="org826c62b"><span class="section-number-2">2</span> 实践案例</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org89b5716" class="outline-3">
+<h3 id="org89b5716"><span class="section-number-3">2.1</span> JVM 调优参数</h3>
+<div class="outline-text-3" id="text-2-1">
 <p>
 设置堆空间，栈空间和元数据空间大小
 </p>
@@ -592,9 +578,130 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 </div>
+
+<div id="outline-container-org972b4c1" class="outline-3">
+<h3 id="org972b4c1"><span class="section-number-3">2.2</span> JVM 内存查看工具</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+通过 <code>jstat</code> 动态查看堆内存使用情况
+</p>
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#22534;&#20869;&#23384;&#20351;&#29992;&#24773;&#20917;</span>
+&#10140; jstat -gcutil 70670 1000
+  S0     S1     E      O      M     CCS    YGC     YGCT    FGC    FGCT     GCT
+  0.00   0.00   6.00   7.90  93.92  84.70      2    0.009     2    0.150    0.159
+  0.00   0.00   6.00   7.90  93.92  84.70      2    0.009     2    0.150    0.159
+  0.00   0.00   6.00   7.90  93.92  84.70      2    0.009     2    0.150    0.159
+  0.00   0.00   6.00   7.90  93.92  84.70      2    0.009     2    0.150    0.159
+  0.00   0.00   6.00   7.90  93.92  84.70      2    0.009     2    0.150    0.159
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#32769;&#24180;&#20195;&#20351;&#29992;&#24773;&#20917;</span>
+&#10140; jstat -gcold 70670 1000
+     MC       MU      CCSC     CCSU       OC          OU       YGC    FGC    FGCT     GCT
+ 21888.0  20556.1   2432.0   2059.9     79872.0      6313.3      2     2    0.150    0.159
+ 21888.0  20556.1   2432.0   2059.9     79872.0      6313.3      2     2    0.150    0.159
+ 21888.0  20556.1   2432.0   2059.9     79872.0      6313.3      2     2    0.150    0.159
+ 21888.0  20556.1   2432.0   2059.9     79872.0      6313.3      2     2    0.150    0.159
+ 21888.0  20556.1   2432.0   2059.9     79872.0      6313.3      2     2    0.150    0.159
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#24180;&#36731;&#20195;&#20351;&#29992;&#24773;&#20917;</span>
+&#10140; jstat -gcnew 70670 1000
+ S0C    S1C    S0U    S1U   TT MTT  DSS      EC       EU     YGC     YGCT
+ 0.0    0.0    0.0    0.0  1  15 1024.0  51200.0   3072.0      2    0.009
+ 0.0    0.0    0.0    0.0  1  15 1024.0  51200.0   3072.0      2    0.009
+ 0.0    0.0    0.0    0.0  1  15 1024.0  51200.0   3072.0      2    0.009
+ 0.0    0.0    0.0    0.0  1  15 1024.0  51200.0   3072.0      2    0.009
+ 0.0    0.0    0.0    0.0  1  15 1024.0  51200.0   3072.0      2    0.009
+</pre>
+</div>
+
+<p>
+使用 <code>jmap</code> 查看 JVM 虚拟机内存
+</p>
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#20869;&#23384;&#20998;&#24067;</span>
+jmap &lt;pid&gt;
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#22534;&#20869;&#23384;&#20449;&#24687;</span>
+jmap -heap &lt;pid&gt;
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#26174;&#31034;&#22534;&#20013;&#23545;&#35937;&#30340;&#32479;&#35745;&#20449;&#24687;</span>
+jmap -histo:live &lt;pid&gt;
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#31867;&#21152;&#36733;&#22120;&#20449;&#24687;</span>
+jmap -clstats &lt;pid&gt;
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#25171;&#21360;&#31561;&#24453;&#32456;&#32467;&#30340;&#23545;&#35937;&#20449;&#24687;</span>
+jmap -finalizerinfo &lt;pid&gt;
+
+<span style="color: #586e75; font-style: italic;"># </span><span style="color: #586e75; font-style: italic;">&#29983;&#25104;&#22534;&#36716;&#20648;&#24555;&#29031; dump &#25991;&#20214;</span>
+jmap -dump:<span style="color: #6c71c4;">format</span>=b,<span style="color: #6c71c4;">file</span>=heapdump.phrof &lt;pid&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgefb3919" class="outline-3">
+<h3 id="orgefb3919"><span class="section-number-3">2.3</span> 逃逸分析</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+Java 在发现 new 出来的对象如果只在当前方法中运行，会直接进入线程栈，而不会放入
+堆空间，这个现象叫做逃逸分析
+</p>
+
+<p>
+实验时可以添加下列 Java 启动参数来显示，为达到演示效果需要现在堆空间为 10M
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">-Xmx10m -Xms10m -XX:+PrintGC -XX:-DoEscapeAnalysis
+</pre>
+</div>
+
+<p>
+JDK 1.6 后默认开启逃逸分析 <code>-XX:-DoEscapeAnalysis</code> 选项，为完成实验需要临时关
+闭一下逃逸分析选项
+</p>
+
+<p>
+添加如下实验代码
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Example02</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">-Xmx10m -Xms10m -XX:+PrintGC -XX:-DoEscapeAnalysis</span>
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">while</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">true</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+      <span style="color: #268bd2;">Integer</span> <span style="color: #6c71c4;">temp</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Integer</span><span style="color: #24a222;">(</span>999999999<span style="color: #24a222;">)</span>;
+    <span style="color: #9564bf;">}</span>
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+添加 <code>-XX:-DoEscapeAnalysis</code> 选项关闭逃逸分析后
+</p>
+<div class="org-src-container">
+<pre class="src src-text">[GC (Allocation Failure)  2048K-&gt;488K(9728K), 0.0015437 secs]
+[GC (Allocation Failure)  2536K-&gt;504K(9728K), 0.0013609 secs]
+[GC (Allocation Failure)  2552K-&gt;504K(9728K), 0.0004373 secs]
+[GC (Allocation Failure)  2552K-&gt;488K(9728K), 0.0004283 secs]
+[GC (Allocation Failure)  2536K-&gt;488K(9728K), 0.0004708 secs]
+[GC (Allocation Failure)  2536K-&gt;488K(9728K), 0.0004193 secs]
+[GC (Allocation Failure)  2536K-&gt;433K(9728K), 0.0004879 secs]
+[GC (Allocation Failure)  2481K-&gt;433K(8704K), 0.0002465 secs]
+[GC (Allocation Failure)  1457K-&gt;433K(9216K), 0.0002974 secs]
+[GC (Allocation Failure)  1457K-&gt;433K(9216K), 0.0002519 secs]
+[GC (Allocation Failure)  1457K-&gt;433K(9216K), 0.0002466 secs]
+[GC (Allocation Failure)  1457K-&gt;433K(9216K), 0.0002524 secs]
+... &#30127;&#29378;&#22320; GC
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-04 Sun 00:19. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
+<p class="author">Last Updated 2021-07-04 Sun 09:36. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
 </div>
 </body>
 </html>
