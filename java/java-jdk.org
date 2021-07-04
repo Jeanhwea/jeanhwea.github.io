@@ -87,7 +87,7 @@
       在 于它是在单线程环境下使用的，因为它的所有方面都没有被 ~synchronized~ 修
       饰，因 此它的效率也比 StringBuffer 略高。
 
-** equals 与 ~==~ 的区别
+** ~==~ 与 equals 的区别
    1. ~==~ 是一个运算符。 equals 则是 String 对象的方法
    2. 基本数据类型比较 ~==~ 比较两个值是否相等。相等为 true 否则为 false；equals
       不能直接用于基本类型的比较。需要将基本类型转换为包装器进行比较。
@@ -118,121 +118,16 @@
      }
    #+END_SRC
 
-** 输入和输出
-   读取数据的输入和打印到标准输出
-   #+BEGIN_SRC java
-     Scanner in = new Scanner(System.in);
-     System.out.println("What is your name?");
-     String name = in.nextLine();
-   #+END_SRC
+** hashCode() 和 equals() 方法
+   1. Object 类中的方法定义如下
+      #+BEGIN_SRC java
+        public native int hashCode();
 
-   格式化输出浮点数
-   #+BEGIN_SRC text
-     java> double x = 100000.0 / 3.0;
-     double x = 33333.333333333336
-     java> System.out.printf("%.3f", x)
-     33333.333
-     java> System.out.printf("%,.3f", x)
-     33,333.333
-   #+END_SRC
-
-** 数组的操作
-   #+HEADER: :classname App73
-   #+BEGIN_SRC java :exports code
-     class App73 {
-       public static void main(String args[]) {
-         // int array
-         int[] arr = new int[10]; // => elements are initialezd to 0
-         System.out.println(arr[3]);
-         System.out.println(arr.length);
-
-         // String array
-         String[] sarr = new String[3];
-         sarr[0] = "Hello";
-         sarr[1] = "Man";
-         sarr[2] = "Welcome to Java world";
-
-         for (String w: sarr) { System.out.println(w); }
-       }
-     }
-   #+END_SRC
-
-   初始化数组的数据
-   #+HEADER: :classname App341
-   #+BEGIN_SRC java :exports code
-     class App341 {
-       public static void main(String args[]) {
-         int[] primes = {2, 3, 5, 7};
-         int[] primes = new int[] {2, 3, 5, 7};
-         int[][] magicSquare = {
-           {1, 2, 3, 4},
-           {1, 0, 3, 9},
-           {1, 0, 3, 9},
-           {1, 0, 3, 9}
-         };
-       }
-     }
-   #+END_SRC
-
-   Java 数组默认时引用，如果需要复制可以调用 ~Arrays.copyOf(...)~ 方法
-   #+BEGIN_SRC text
-     java> x = new int[] {1,2,3}
-     int[] x = [1, 2, 3]
-     java> y = new int[] {1,2,3}
-     int[] y = [1, 2, 3]
-     java> z1 = x
-     int[] z1 = [1, 2, 3]
-     java> y.length
-     java.lang.Integer res24 = 3
-     java> z2 = Arrays.copyOf(y, y.length)
-     int[] z2 = [1, 2, 3]
-     java> z1[0] = 9
-     java.lang.Integer res25 = 9
-     java> z2[0] = 9
-     java.lang.Integer res26 = 9
-     java> x
-     int[] x = [9, 2, 3]
-     java> y
-     int[] y = [1, 2, 3]
-     java>
-   #+END_SRC
-
-   排序数组
-   #+BEGIN_SRC text
-     java> x
-     int[] x = [9, 2, 3]
-     java> Arrays.sort(x)
-
-     java> x
-     int[] x = [2, 3, 9]
-   #+END_SRC
-
-** 静态变量和实例变量
-   1. 在语法定义上的区别：静态变量前要加 ~static~ 关键字，而实例变量前则不加。
-   2. 在程序运行时的区别：实例变量属于某个对象的属性，必须创建了实例对象，其中的
-      实例变量才会被分配空间，才能使用这个实例变量。静态变量不属于某个实例对象，
-      而是属于类，所以也称为类变量，只要程序加载了类的字节码，不用创建任何实例对
-      象，静态变量就会被分配空间，静态变量就可以被使用了。总之，实例变量必须创建
-      对象后才可以通过这个对象来使用，静态变量则可以直接使用类名来引用。
-   3. 静态变量在 Java 中是属于类的，它在所有的实例中的值是一样的。当类被 Java 虚
-      拟机载入的时候，会对静态变量进行初始化。如果你的代码尝试不用实例来访问非静
-      态的变量，编译器会报错，因为这些变量还没有被创建出来，还没有跟任何实例关联
-      上
-
-** ~final~ 关键字
-   1. 修饰类：表示该类不能被继承
-   2. 修饰方法：表示方法不能被覆盖
-   3. 修饰变量：表示变量只能一次赋值以后值不能被修改（常量）
-
-** 序列化
-   1. 序列化就是一种用来处理对象流的机制，所谓对象流也就是将对象的内容进行流化。
-      可 以对流化后的对象进行读写操作，也可将流化后的对象传输于网络之间。序列化
-      是为了 解决在对对象流进行读写操作时所引发的问题。
-   2. 序列化的实现：将需要被序列化的类实现 ~Serializable~ 接口，该接口没有需要实
-      现 的方法， ~implements Serializable~ 只是为了标注该对象是可被序列化的，然
-      后使用 一个输出流 (如：FileOutputStream) 来构造一个 ObjectOutputStream(对
-      象流) 对象， 接着，使用 ObjectOutputStream 对象的 ~writeObject(Object obj)~ 方法就可以将参 数为 obj 的对象写出(即保存其状态)，要恢复的话则用输入
-      流。
+        public boolean equals(Object obj) {
+            return (this == obj);
+        }
+      #+END_SRC
+   2. ~==~ 比较对象的地址
 
 ** 错误和异常
    - ~java.lang.Error~ : Throwable 的子类，用于标记严重错误，表示系统级的错误和
@@ -325,6 +220,122 @@
    - 每个方法抛出的异常都要有文档
    - 保持异常的原子性
    - 不要在 catch 中忽略掉捕获到的异常
+
+** 静态变量和实例变量
+   1. 在语法定义上的区别：静态变量前要加 ~static~ 关键字，而实例变量前则不加。
+   2. 在程序运行时的区别：实例变量属于某个对象的属性，必须创建了实例对象，其中的
+      实例变量才会被分配空间，才能使用这个实例变量。静态变量不属于某个实例对象，
+      而是属于类，所以也称为类变量，只要程序加载了类的字节码，不用创建任何实例对
+      象，静态变量就会被分配空间，静态变量就可以被使用了。总之，实例变量必须创建
+      对象后才可以通过这个对象来使用，静态变量则可以直接使用类名来引用。
+   3. 静态变量在 Java 中是属于类的，它在所有的实例中的值是一样的。当类被 Java 虚
+      拟机载入的时候，会对静态变量进行初始化。如果你的代码尝试不用实例来访问非静
+      态的变量，编译器会报错，因为这些变量还没有被创建出来，还没有跟任何实例关联
+      上
+
+** ~final~ 关键字
+   1. 修饰类：表示该类不能被继承
+   2. 修饰方法：表示方法不能被覆盖
+   3. 修饰变量：表示变量只能一次赋值以后值不能被修改（常量）
+
+** 序列化
+   1. 序列化就是一种用来处理对象流的机制，所谓对象流也就是将对象的内容进行流化。
+      可以对流化后的对象进行读写操作，也可将流化后的对象传输于网络之间。序列化是
+      为了解决在对对象流进行读写操作时所引发的问题
+   2. 序列化的实现
+      - 将需要被序列化的类实现 ~Serializable~ 接口
+      -  ~Serializable~ 接口没有需要实现的方法，只是为了标注该对象是可被序列化的
+   4. 被 ~transient~ 修饰的变量不属于对象持久化的一部分，该变量内容在序列化后无
+      法获得访问
+
+** 数组的操作
+   #+HEADER: :classname App73
+   #+BEGIN_SRC java :exports code
+     class App73 {
+       public static void main(String args[]) {
+         // int array
+         int[] arr = new int[10]; // => elements are initialezd to 0
+         System.out.println(arr[3]);
+         System.out.println(arr.length);
+
+         // String array
+         String[] sarr = new String[3];
+         sarr[0] = "Hello";
+         sarr[1] = "Man";
+         sarr[2] = "Welcome to Java world";
+
+         for (String w: sarr) { System.out.println(w); }
+       }
+     }
+   #+END_SRC
+
+   初始化数组的数据
+   #+HEADER: :classname App341
+   #+BEGIN_SRC java :exports code
+     class App341 {
+       public static void main(String args[]) {
+         int[] primes = {2, 3, 5, 7};
+         int[] primes = new int[] {2, 3, 5, 7};
+         int[][] magicSquare = {
+           {1, 2, 3, 4},
+           {1, 0, 3, 9},
+           {1, 0, 3, 9},
+           {1, 0, 3, 9}
+         };
+       }
+     }
+   #+END_SRC
+
+   Java 数组默认时引用，如果需要复制可以调用 ~Arrays.copyOf(...)~ 方法
+   #+BEGIN_SRC text
+     java> x = new int[] {1,2,3}
+     int[] x = [1, 2, 3]
+     java> y = new int[] {1,2,3}
+     int[] y = [1, 2, 3]
+     java> z1 = x
+     int[] z1 = [1, 2, 3]
+     java> y.length
+     java.lang.Integer res24 = 3
+     java> z2 = Arrays.copyOf(y, y.length)
+     int[] z2 = [1, 2, 3]
+     java> z1[0] = 9
+     java.lang.Integer res25 = 9
+     java> z2[0] = 9
+     java.lang.Integer res26 = 9
+     java> x
+     int[] x = [9, 2, 3]
+     java> y
+     int[] y = [1, 2, 3]
+     java>
+   #+END_SRC
+
+   排序数组
+   #+BEGIN_SRC text
+     java> x
+     int[] x = [9, 2, 3]
+     java> Arrays.sort(x)
+
+     java> x
+     int[] x = [2, 3, 9]
+   #+END_SRC
+
+** 输入和输出
+   读取数据的输入和打印到标准输出
+   #+BEGIN_SRC java
+     Scanner in = new Scanner(System.in);
+     System.out.println("What is your name?");
+     String name = in.nextLine();
+   #+END_SRC
+
+   格式化输出浮点数
+   #+BEGIN_SRC text
+     java> double x = 100000.0 / 3.0;
+     double x = 33333.333333333336
+     java> System.out.printf("%.3f", x)
+     33333.333
+     java> System.out.printf("%,.3f", x)
+     33,333.333
+   #+END_SRC
 
 * 开发工具
 ** JDK 1.8 简洁和新特性
