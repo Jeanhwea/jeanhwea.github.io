@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-03 Sat 14:27 -->
+<!-- 2021-07-06 Tue 14:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MySQL 索引笔记</title>
@@ -233,27 +233,28 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org4451eb1">1. 准备测试表</a></li>
-<li><a href="#orge5b2295">2. 修改索引</a></li>
-<li><a href="#org167c70f">3. 索引数据结构</a></li>
-<li><a href="#orgf0b9f4a">4. 示例数据</a></li>
-<li><a href="#orge569e2d">5. 主键索引</a></li>
-<li><a href="#orgaac69c1">6. 联合键索引</a></li>
+<li><a href="#orgbf5fd2a">1. 准备测试表</a></li>
+<li><a href="#orge820bfe">2. 修改索引</a></li>
+<li><a href="#org44d8cd9">3. 索引数据结构</a></li>
+<li><a href="#org26408cd">4. 示例数据</a></li>
+<li><a href="#orgbe6b136">5. 主键索引</a></li>
+<li><a href="#org0976964">6. 联合键索引</a></li>
+<li><a href="#org78ee639">7. 索引失效情形</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org4451eb1" class="outline-2">
-<h2 id="org4451eb1"><span class="section-number-2">1</span> 准备测试表</h2>
+<div id="outline-container-orgbf5fd2a" class="outline-2">
+<h2 id="orgbf5fd2a"><span class="section-number-2">1</span> 准备测试表</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 构建测试表 <code>author</code>, 建表语句如下
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">drop</span> <span style="color: #859900;">table</span> <span style="color: #859900;">if</span> <span style="color: #859900;">exists</span> author;
+<pre class="src src-sql"><span style="color: #859900;">drop</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">if</span> <span style="color: #859900;">exists</span> author;
 <span style="color: #859900;">create</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> (
-  id <span style="color: #268bd2;">int</span> <span style="color: #859900;">auto_increment</span> <span style="color: #859900;">primary</span> <span style="color: #859900;">key</span>,
+  id <span style="color: #268bd2;">int</span> auto_increment <span style="color: #859900;">primary</span> <span style="color: #859900;">key</span>,
   <span style="color: #859900;">name</span> <span style="color: #268bd2;">varchar</span>(128) <span style="color: #859900;">not</span> <span style="color: #859900;">null</span>,
   age <span style="color: #268bd2;">int</span>,
   gender <span style="color: #268bd2;">varchar</span>(32),
@@ -286,7 +287,7 @@
 </table>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author;
+<pre class="src src-sql"><span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author;
 </pre>
 </div>
 
@@ -417,7 +418,7 @@
 </p>
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> <span style="color: #859900;">add</span> <span style="color: #859900;">unique</span> <span style="color: #859900;">key</span> uk_author_nag (<span style="color: #859900;">name</span>, age, gender);
-<span style="color: #859900;">create</span> <span style="color: #859900;">index</span> ix_author_abc <span style="color: #859900;">on</span> author(a, b, c);
+<span style="color: #859900;">create</span> index ix_author_abc <span style="color: #859900;">on</span> author(a, b, c);
 </pre>
 </div>
 
@@ -430,11 +431,11 @@
 查看准备好的表结构和索引键
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">show</span> <span style="color: #859900;">create</span> <span style="color: #859900;">table</span> author\G
+<pre class="src src-sql">show <span style="color: #859900;">create</span> <span style="color: #859900;">table</span> author\G
 </pre>
 </div>
 
-<pre class="example" id="org2a42ee8">
+<pre class="example" id="orgdf9c67e">
 *************************** 1. row ***************************
        Table: author
 Create Table: CREATE TABLE `author` (
@@ -555,7 +556,7 @@ Create Table: CREATE TABLE `author` (
 查看准备好的表索引信息
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">show</span> <span style="color: #859900;">index</span> <span style="color: #6c71c4;">from</span> author;
+<pre class="src src-sql">show index <span style="color: #859900;">from</span> author;
 </pre>
 </div>
 
@@ -723,15 +724,15 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-orge5b2295" class="outline-2">
-<h2 id="orge5b2295"><span class="section-number-2">2</span> 修改索引</h2>
+<div id="outline-container-orge820bfe" class="outline-2">
+<h2 id="orge820bfe"><span class="section-number-2">2</span> 修改索引</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 删除唯一键和索引
 </p>
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> <span style="color: #859900;">drop</span> <span style="color: #859900;">key</span> uk_author_nag;
-<span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> <span style="color: #859900;">drop</span> <span style="color: #859900;">index</span> ix_author_abc;
+<span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> <span style="color: #859900;">drop</span> index ix_author_abc;
 </pre>
 </div>
 
@@ -740,15 +741,15 @@ Create Table: CREATE TABLE `author` (
 名称
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> <span style="color: #859900;">rename</span> <span style="color: #859900;">index</span> aa <span style="color: #859900;">to</span> ix_author_abc;
-<span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> <span style="color: #859900;">rename</span> <span style="color: #859900;">index</span> bbb <span style="color: #859900;">to</span> uk_author_nag;
+<pre class="src src-sql"><span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> rename index aa <span style="color: #859900;">to</span> ix_author_abc;
+<span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> rename index bbb <span style="color: #859900;">to</span> uk_author_nag;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org167c70f" class="outline-2">
-<h2 id="org167c70f"><span class="section-number-2">3</span> 索引数据结构</h2>
+<div id="outline-container-org44d8cd9" class="outline-2">
+<h2 id="org44d8cd9"><span class="section-number-2">3</span> 索引数据结构</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 常见索引包括：B+树和哈希索引两种。哈希索引由于不支持范围查找一般使用较少，后面
@@ -763,11 +764,11 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-orgf0b9f4a" class="outline-2">
-<h2 id="orgf0b9f4a"><span class="section-number-2">4</span> 示例数据</h2>
+<div id="outline-container-org26408cd" class="outline-2">
+<h2 id="org26408cd"><span class="section-number-2">4</span> 示例数据</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author;
+<pre class="src src-sql"><span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author;
 </pre>
 </div>
 
@@ -895,14 +896,14 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-orge569e2d" class="outline-2">
-<h2 id="orge569e2d"><span class="section-number-2">5</span> 主键索引</h2>
+<div id="outline-container-orgbe6b136" class="outline-2">
+<h2 id="orgbe6b136"><span class="section-number-2">5</span> 主键索引</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 全表扫描，不走索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author;
 </pre>
 </div>
 
@@ -972,7 +973,7 @@ Create Table: CREATE TABLE `author` (
 主键查找，走 const 主键索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> id = 4;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> id = 4;
 </pre>
 </div>
 
@@ -1042,7 +1043,7 @@ Create Table: CREATE TABLE `author` (
 主键查找，走 range 主键索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> id &gt; 4;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> id &gt; 4;
 </pre>
 </div>
 
@@ -1110,14 +1111,14 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-orgaac69c1" class="outline-2">
-<h2 id="orgaac69c1"><span class="section-number-2">6</span> 联合键索引</h2>
+<div id="outline-container-org0976964" class="outline-2">
+<h2 id="org0976964"><span class="section-number-2">6</span> 联合键索引</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 联合键查找，走 ref 范围索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> a = 4;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> a = 4;
 </pre>
 </div>
 
@@ -1187,7 +1188,7 @@ Create Table: CREATE TABLE `author` (
 联合键查找，走 range 范围索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> a &gt; 4;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> a &gt; 4;
 </pre>
 </div>
 
@@ -1257,7 +1258,7 @@ Create Table: CREATE TABLE `author` (
 多个联合键字段查询，符号最左前缀原则走索引 <code>ix_author_abc</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> a = 4 <span style="color: #859900;">and</span> b = 1;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> a = 4 <span style="color: #859900;">and</span> b = 1;
 </pre>
 </div>
 
@@ -1327,7 +1328,7 @@ Create Table: CREATE TABLE `author` (
 同上，a 和 b 的顺序调换也走索引 <code>ix_author_abc</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> b = 1 <span style="color: #859900;">and</span> a = 4;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> b = 1 <span style="color: #859900;">and</span> a = 4;
 </pre>
 </div>
 
@@ -1397,7 +1398,7 @@ Create Table: CREATE TABLE `author` (
 查询 b 和 c 情况不符合最左前缀原则，不走索引 <code>ix_author_abc</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> b = 1 <span style="color: #859900;">and</span> c = 4;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> b = 1 <span style="color: #859900;">and</span> c = 4;
 </pre>
 </div>
 
@@ -1467,7 +1468,7 @@ Create Table: CREATE TABLE `author` (
 构建 <code>a+1</code> 为键的 B+树效率较大，无法走联合索引 <code>ix_author_abc</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> a + 1 &gt; 3;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> a + 1 &gt; 3;
 </pre>
 </div>
 
@@ -1537,7 +1538,7 @@ Create Table: CREATE TABLE `author` (
 查找联合索引字段包含值，走主键索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> a <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> id &gt; 4;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> a <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> id &gt; 4;
 </pre>
 </div>
 
@@ -1607,7 +1608,7 @@ Create Table: CREATE TABLE `author` (
 查找联合索引字段包含值，并且同时过滤主键，走联合索引效率更高
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> a <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">where</span> id &gt; 4 <span style="color: #859900;">and</span> a &gt; 4;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> a <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> id &gt; 4 <span style="color: #859900;">and</span> a &gt; 4;
 </pre>
 </div>
 
@@ -1677,7 +1678,7 @@ Create Table: CREATE TABLE `author` (
 排序索引 <code>ix_author_abc</code> 包含时，直接走索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> a, b <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">order</span> <span style="color: #859900;">by</span> a, b, c;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> a, b <span style="color: #859900;">from</span> author <span style="color: #859900;">order</span> <span style="color: #859900;">by</span> a, b, c;
 </pre>
 </div>
 
@@ -1747,7 +1748,7 @@ Create Table: CREATE TABLE `author` (
 排序所有字段时无法走索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> * <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">order</span> <span style="color: #859900;">by</span> a, b, c;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">order</span> <span style="color: #859900;">by</span> a, b, c;
 </pre>
 </div>
 
@@ -1817,7 +1818,7 @@ Create Table: CREATE TABLE `author` (
 排序索引 <code>ix_author_abc</code> 包含时，走索引并且需要文件排序 <code>filesort</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">explain</span> <span style="color: #859900;">select</span> a, b <span style="color: #6c71c4;">from</span> author <span style="color: #859900;">order</span> <span style="color: #859900;">by</span> a, b <span style="color: #859900;">desc</span>, c;
+<pre class="src src-sql">explain <span style="color: #859900;">select</span> a, b <span style="color: #859900;">from</span> author <span style="color: #859900;">order</span> <span style="color: #859900;">by</span> a, b <span style="color: #859900;">desc</span>, c;
 </pre>
 </div>
 
@@ -1884,9 +1885,20 @@ Create Table: CREATE TABLE `author` (
 </table>
 </div>
 </div>
+
+<div id="outline-container-org78ee639" class="outline-2">
+<h2 id="org78ee639"><span class="section-number-2">7</span> 索引失效情形</h2>
+<div class="outline-text-2" id="text-7">
+<ol class="org-ol">
+<li>没有符合最左前缀原值</li>
+<li>字段发送隐式类型转换</li>
+<li>走索引比全表扫描代价大</li>
+</ol>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-03 Sat 14:27. Created by Jinghui Hu at 2021-07-03 Sat 09:36.</p>
+<p class="author">Last Updated 2021-07-06 Tue 14:15. Created by Jinghui Hu at 2021-07-03 Sat 09:36.</p>
 </div>
 </body>
 </html>
