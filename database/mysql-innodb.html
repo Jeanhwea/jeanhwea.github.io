@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-07 Wed 11:08 -->
+<!-- 2021-07-07 Wed 11:25 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>InnoDB 存储引擎</title>
@@ -233,28 +233,32 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org075a2f6">1. InnoDB 体系结构</a></li>
-<li><a href="#org0cd079a">2. InnoDB 内存结构</a>
+<li><a href="#orgfcc3151">1. InnoDB 体系结构</a></li>
+<li><a href="#org23305f1">2. InnoDB 内存结构</a>
 <ul>
-<li><a href="#orgd9a2448">2.1. Buffer Pool</a></li>
-<li><a href="#orgff47586">2.2. Change Buffer</a></li>
+<li><a href="#orgb796610">2.1. Buffer Pool</a>
+<ul>
+<li><a href="#org989159c">2.1.1. Buffer Pool 相关调优</a></li>
 </ul>
 </li>
-<li><a href="#orga739a78">3. InnoDB 磁盘结构</a></li>
+<li><a href="#org7413afb">2.2. Change Buffer</a></li>
+</ul>
+</li>
+<li><a href="#org901f027">3. InnoDB 磁盘结构</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org075a2f6" class="outline-2">
-<h2 id="org075a2f6"><span class="section-number-2">1</span> InnoDB 体系结构</h2>
+<div id="outline-container-orgfcc3151" class="outline-2">
+<h2 id="orgfcc3151"><span class="section-number-2">1</span> InnoDB 体系结构</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 MySQL 的 InnoDB 存储引擎体系结构如下图所示
 </p>
 
 
-<div id="org201eb28" class="figure">
+<div id="orgc9d69f4" class="figure">
 <p><img src="../static/image/2021/07/innodb-architecture.png" alt="innodb-architecture.png" />
 </p>
 </div>
@@ -292,25 +296,68 @@ drwxr-x--- 2 mysql mysql      8192 May 21 09:58 sys
 </div>
 </div>
 
-<div id="outline-container-org0cd079a" class="outline-2">
-<h2 id="org0cd079a"><span class="section-number-2">2</span> InnoDB 内存结构</h2>
+<div id="outline-container-org23305f1" class="outline-2">
+<h2 id="org23305f1"><span class="section-number-2">2</span> InnoDB 内存结构</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgd9a2448" class="outline-3">
-<h3 id="orgd9a2448"><span class="section-number-3">2.1</span> Buffer Pool</h3>
+<div id="outline-container-orgb796610" class="outline-3">
+<h3 id="orgb796610"><span class="section-number-3">2.1</span> Buffer Pool</h3>
+<div class="outline-text-3" id="text-2-1">
+</div>
+<div id="outline-container-org989159c" class="outline-4">
+<h4 id="org989159c"><span class="section-number-4">2.1.1</span> Buffer Pool 相关调优</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<p>
+MySQL 默认的 <code>innodb_buffer_pool_size</code> 的默认大小 128 M，一般需要根据需求进
+行配置
+</p>
+<div class="org-src-container">
+<pre class="src src-text">root@localhost [(none)]&gt; show variables like '%buffer%';
++-------------------------------------+----------------+
+| Variable_name                       | Value          |
++-------------------------------------+----------------+
+| bulk_insert_buffer_size             | 8388608        |
+| innodb_buffer_pool_chunk_size       | 134217728      |
+| innodb_buffer_pool_dump_at_shutdown | ON             |
+| innodb_buffer_pool_dump_now         | OFF            |
+| innodb_buffer_pool_dump_pct         | 25             |
+| innodb_buffer_pool_filename         | ib_buffer_pool |
+| innodb_buffer_pool_instances        | 1              |
+| innodb_buffer_pool_load_abort       | OFF            |
+| innodb_buffer_pool_load_at_startup  | ON             |
+| innodb_buffer_pool_load_now         | OFF            |
+| innodb_buffer_pool_size             | 134217728      |
+| innodb_change_buffer_max_size       | 25             |
+| innodb_change_buffering             | all            |
+| innodb_log_buffer_size              | 16777216       |
+| innodb_sort_buffer_size             | 1048576        |
+| join_buffer_size                    | 262144         |
+| key_buffer_size                     | 8388608        |
+| myisam_sort_buffer_size             | 8388608        |
+| net_buffer_length                   | 16384          |
+| preload_buffer_size                 | 32768          |
+| read_buffer_size                    | 131072         |
+| read_rnd_buffer_size                | 262144         |
+| sort_buffer_size                    | 262144         |
+| sql_buffer_result                   | OFF            |
++-------------------------------------+----------------+
+</pre>
+</div>
+</div>
+</div>
 </div>
 
-<div id="outline-container-orgff47586" class="outline-3">
-<h3 id="orgff47586"><span class="section-number-3">2.2</span> Change Buffer</h3>
+<div id="outline-container-org7413afb" class="outline-3">
+<h3 id="org7413afb"><span class="section-number-3">2.2</span> Change Buffer</h3>
 </div>
 </div>
 
-<div id="outline-container-orga739a78" class="outline-2">
-<h2 id="orga739a78"><span class="section-number-2">3</span> InnoDB 磁盘结构</h2>
+<div id="outline-container-org901f027" class="outline-2">
+<h2 id="org901f027"><span class="section-number-2">3</span> InnoDB 磁盘结构</h2>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-07 Wed 11:08. Created by Jinghui Hu at 2021-07-07 Wed 09:41.</p>
+<p class="author">Last Updated 2021-07-07 Wed 11:25. Created by Jinghui Hu at 2021-07-07 Wed 09:41.</p>
 </div>
 </body>
 </html>
