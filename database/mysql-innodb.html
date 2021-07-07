@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-07 Wed 09:52 -->
+<!-- 2021-07-07 Wed 11:08 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>InnoDB 存储引擎</title>
@@ -233,21 +233,28 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org56ccce2">1. InnoDB 体系结构</a></li>
+<li><a href="#org075a2f6">1. InnoDB 体系结构</a></li>
+<li><a href="#org0cd079a">2. InnoDB 内存结构</a>
+<ul>
+<li><a href="#orgd9a2448">2.1. Buffer Pool</a></li>
+<li><a href="#orgff47586">2.2. Change Buffer</a></li>
+</ul>
+</li>
+<li><a href="#orga739a78">3. InnoDB 磁盘结构</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org56ccce2" class="outline-2">
-<h2 id="org56ccce2"><span class="section-number-2">1</span> InnoDB 体系结构</h2>
+<div id="outline-container-org075a2f6" class="outline-2">
+<h2 id="org075a2f6"><span class="section-number-2">1</span> InnoDB 体系结构</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 MySQL 的 InnoDB 存储引擎体系结构如下图所示
 </p>
 
 
-<div id="orgce0ebfe" class="figure">
+<div id="org201eb28" class="figure">
 <p><img src="../static/image/2021/07/innodb-architecture.png" alt="innodb-architecture.png" />
 </p>
 </div>
@@ -270,11 +277,40 @@ drwxr-x--- 2 mysql mysql      8192 May 21 09:58 performance_schema
 drwxr-x--- 2 mysql mysql      8192 May 21 09:58 sys
 </pre>
 </div>
+
+<p>
+备注：
+</p>
+<ul class="org-ul">
+<li><code>O_DIRECT</code> 一般如果在 Linux 内核中读写一个文件，其 IO 流程都需要经过 Kernel
+内的 Page Cache 层次，若想要使用自己开发的缓存系统，那么就可以在打开这个文件
+的时候， 对该文件加以 <code>O_DIRECT</code> 的标志位，这样一来就可以让程序对该文件的 IO
+直接在磁盘上进行，从而避开了 Kernel 的 Page Cache，进而对 IO 流程里的块数据
+进行拦截，让其流入到自己开发的缓存系统内</li>
+<li>Redo Log 是循环写入多个文件的，当文件写满可能会触发 checkpoint</li>
+</ul>
 </div>
+</div>
+
+<div id="outline-container-org0cd079a" class="outline-2">
+<h2 id="org0cd079a"><span class="section-number-2">2</span> InnoDB 内存结构</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgd9a2448" class="outline-3">
+<h3 id="orgd9a2448"><span class="section-number-3">2.1</span> Buffer Pool</h3>
+</div>
+
+<div id="outline-container-orgff47586" class="outline-3">
+<h3 id="orgff47586"><span class="section-number-3">2.2</span> Change Buffer</h3>
+</div>
+</div>
+
+<div id="outline-container-orga739a78" class="outline-2">
+<h2 id="orga739a78"><span class="section-number-2">3</span> InnoDB 磁盘结构</h2>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-07 Wed 09:52. Created by Jinghui Hu at 2021-07-07 Wed 09:41.</p>
+<p class="author">Last Updated 2021-07-07 Wed 11:08. Created by Jinghui Hu at 2021-07-07 Wed 09:41.</p>
 </div>
 </body>
 </html>

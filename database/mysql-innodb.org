@@ -30,6 +30,17 @@
     drwxr-x--- 2 mysql mysql      8192 May 21 09:58 sys
   #+END_SRC
 
-* Buffer Pool
+  备注：
+  - =O_DIRECT= 一般如果在 Linux 内核中读写一个文件，其 IO 流程都需要经过 Kernel
+    内的 Page Cache 层次，若想要使用自己开发的缓存系统，那么就可以在打开这个文件
+    的时候， 对该文件加以 =O_DIRECT= 的标志位，这样一来就可以让程序对该文件的 IO
+    直接在磁盘上进行，从而避开了 Kernel 的 Page Cache，进而对 IO 流程里的块数据
+    进行拦截，让其流入到自己开发的缓存系统内
+  - Redo Log 是循环写入多个文件的，当文件写满可能会触发 checkpoint
 
-* Change Buffer
+* InnoDB 内存结构
+** Buffer Pool
+
+** Change Buffer
+
+* InnoDB 磁盘结构
