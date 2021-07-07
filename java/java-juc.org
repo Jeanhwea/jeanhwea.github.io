@@ -9,20 +9,40 @@
 
 
 * 线程
-** 线程状态
+** 线程六种状态
    1. NEW
+      - 线程对象刚创建，还未调用 ~Thread.start()~ 方法之前的状态
    2. RUNNALBE
+      - 线程调用 ~Thread.start()~ 方法过后，线程等待操作系统资源状态
+      - 该状态线程获取到操作系统资源后会立马执行
    3. BLOCKED
+      - 线程执行状态被阻塞
+      - 线程进入 synchronized 代码块或 synchronized 方法时会出现 BLOCKED 状态
+      - 线程重入 synchronized 代码块或 synchronized 方法，调用 ~Object.wait()~
+        方法也会进入阻塞状态
    4. WAITING
+      - 当前线程处于等待状态，等待其它线程释放资源
+      - 调用下来方法会进入等待状态
+        + 无超时版本的 ~Object.wait()~ 方法
+        + 无超时版本的 ~Thread.join()~ 方法
+        + ~LockSupport.park()~
    5. TIMED_WAINTING
+      - 和 WAINTING 类似，只不过添加了超时
+      - 调用下来方法会进入超时等待状态
+        + ~Thread.sleep()~
+        + 超时版本的 ~Object.wait()~ 方法
+        + 超时版本的 ~Thread.join()~ 方法
+        + ~LockSupport.parkNanos()~
+        + ~LockSupport.parkUntil()~
    6. TERMINATED
+      - 线程结束
 ** Thread
 
 ** ThreadLocal
 
 ** ThreadPoolExecutor
 
-* 死锁
+* 线程死锁
 ** 死锁的四个必要条件
    1. =互斥条件=: 一个资源每次只能被一个进程使用
    2. =请求与保持条件=: 一个进程因请求资源而阻塞时，对已获得的资源保持不放
