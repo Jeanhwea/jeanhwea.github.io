@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-03 Sat 23:07 -->
+<!-- 2021-07-09 Fri 13:18 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MySQL 主从同步</title>
@@ -255,14 +255,14 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org086c21e">1. binlog 简介</a></li>
-<li><a href="#org90db55d">2. 查看 binlog event</a></li>
-<li><a href="#org6faab6a">3. 一主一从配置</a>
+<li><a href="#org1b2fc68">1. binlog 简介</a></li>
+<li><a href="#org5b7ae10">2. 查看 binlog event</a></li>
+<li><a href="#orge1d0eb9">3. 一主一从配置</a>
 <ul>
-<li><a href="#org0f666a6">3.1. 准备数据库镜像</a></li>
-<li><a href="#org382e184">3.2. 主节点配置</a></li>
-<li><a href="#org645e4c3">3.3. 从节点配置</a></li>
-<li><a href="#orgf28f49a">3.4. 配置项目</a></li>
+<li><a href="#orgf1a8243">3.1. 准备数据库镜像</a></li>
+<li><a href="#org300cd92">3.2. 主节点配置</a></li>
+<li><a href="#orge92e1e7">3.3. 从节点配置</a></li>
+<li><a href="#orgd986398">3.4. 配置项目</a></li>
 </ul>
 </li>
 </ul>
@@ -270,8 +270,8 @@
 </div>
 
 
-<div id="outline-container-org086c21e" class="outline-2">
-<h2 id="org086c21e"><span class="section-number-2">1</span> binlog 简介</h2>
+<div id="outline-container-org1b2fc68" class="outline-2">
+<h2 id="org1b2fc68"><span class="section-number-2">1</span> binlog 简介</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 binlog,即二进制日志,它记录了数据库上的所有改变. 改变数据库的 SQL 语句执行结束
@@ -289,14 +289,14 @@ delete 操作时,基于行的格式会有优势.</li>
 </div>
 </div>
 
-<div id="outline-container-org90db55d" class="outline-2">
-<h2 id="org90db55d"><span class="section-number-2">2</span> 查看 binlog event</h2>
+<div id="outline-container-org5b7ae10" class="outline-2">
+<h2 id="org5b7ae10"><span class="section-number-2">2</span> 查看 binlog event</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 获取所有 binlog 文件列表
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">show</span> <span style="color: #268bd2;">binary</span> logs;
+<pre class="src src-sql">show <span style="color: #268bd2;">binary</span> logs;
 </pre>
 </div>
 
@@ -391,7 +391,7 @@ delete 操作时,基于行的格式会有优势.</li>
 查看当前正在写入的 binlog
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">show</span> master status;
+<pre class="src src-sql">show master status;
 </pre>
 </div>
 
@@ -433,7 +433,7 @@ delete 操作时,基于行的格式会有优势.</li>
 查看第一个 binlog 的内容
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">show</span> binlog events <span style="color: #859900;">limit</span> 20;
+<pre class="src src-sql">show binlog events <span style="color: #859900;">limit</span> 20;
 </pre>
 </div>
 
@@ -650,7 +650,7 @@ delete 操作时,基于行的格式会有优势.</li>
 查看指定 binlog 内容
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">show</span> binlog events <span style="color: #859900;">in</span> <span style="color: #2aa198;">'binlog.000014'</span> <span style="color: #859900;">limit</span> 10;
+<pre class="src src-sql">show binlog events <span style="color: #859900;">in</span> <span style="color: #2aa198;">'binlog.000014'</span> <span style="color: #859900;">limit</span> 10;
 </pre>
 </div>
 
@@ -775,12 +775,12 @@ delete 操作时,基于行的格式会有优势.</li>
 </div>
 </div>
 
-<div id="outline-container-org6faab6a" class="outline-2">
-<h2 id="org6faab6a"><span class="section-number-2">3</span> 一主一从配置</h2>
+<div id="outline-container-orge1d0eb9" class="outline-2">
+<h2 id="orge1d0eb9"><span class="section-number-2">3</span> 一主一从配置</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org0f666a6" class="outline-3">
-<h3 id="org0f666a6"><span class="section-number-3">3.1</span> 准备数据库镜像</h3>
+<div id="outline-container-orgf1a8243" class="outline-3">
+<h3 id="orgf1a8243"><span class="section-number-3">3.1</span> 准备数据库镜像</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 启动两个 mysql 容器，一个做主节点，一个做从节点
@@ -810,25 +810,25 @@ docker run --detach --restart always <span style="color: #2aa198;">\</span>
 </div>
 </div>
 
-<div id="outline-container-org382e184" class="outline-3">
-<h3 id="org382e184"><span class="section-number-3">3.2</span> 主节点配置</h3>
+<div id="outline-container-org300cd92" class="outline-3">
+<h3 id="org300cd92"><span class="section-number-3">3.2</span> 主节点配置</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 <pre class="src src-conf">[<span style="color: #268bd2;">mysqld</span>]
-<span style="color: #6c71c4;">server-id</span>        = 100
-<span style="color: #6c71c4;">log-bin</span>          = binlog
-<span style="color: #6c71c4;">binlog-do-db</span>     = test01
-<span style="color: #6c71c4;">binlog-ignore-db</span> = information_schema
-<span style="color: #6c71c4;">binlog-ignore-db</span> = mysql
-<span style="color: #6c71c4;">binlog-ignore-db</span> = performance_schema
-<span style="color: #6c71c4;">binlog-ignore-db</span> = sys
+<span style="color: #6c71c4;">server-id</span>           = 100
+<span style="color: #6c71c4;">log-bin</span>             = binlog
+<span style="color: #6c71c4;">binlog-do-db</span>        = test01
+<span style="color: #6c71c4;">binlog-ignore-db</span>    = information_schema
+<span style="color: #6c71c4;">binlog-ignore-db</span>    = mysql
+<span style="color: #6c71c4;">binlog-ignore-db</span>    = performance_schema
+<span style="color: #6c71c4;">binlog-ignore-db</span>    = sys
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org645e4c3" class="outline-3">
-<h3 id="org645e4c3"><span class="section-number-3">3.3</span> 从节点配置</h3>
+<div id="outline-container-orge92e1e7" class="outline-3">
+<h3 id="orge92e1e7"><span class="section-number-3">3.3</span> 从节点配置</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 配置 slave 节点启动参数，指定需要同步和复制的数据库
@@ -847,8 +847,8 @@ docker run --detach --restart always <span style="color: #2aa198;">\</span>
 </div>
 </div>
 
-<div id="outline-container-orgf28f49a" class="outline-3">
-<h3 id="orgf28f49a"><span class="section-number-3">3.4</span> 配置项目</h3>
+<div id="outline-container-orgd986398" class="outline-3">
+<h3 id="orgd986398"><span class="section-number-3">3.4</span> 配置项目</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 master 上授权给 slave 复制权限
@@ -864,14 +864,14 @@ slave 指向 master 的用户名和密码是在 slave 节点中动态配置
 </p>
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #586e75; font-style: italic;">-- &#37197;&#32622;&#20027;&#24211;&#21516;&#27493;&#30340;&#29992;&#25143;&#20449;&#24687;</span>
-<span style="color: #859900;">change</span> master <span style="color: #859900;">to</span>
+change master <span style="color: #859900;">to</span>
 master_host=<span style="color: #2aa198;">'172.17.0.2'</span>,
 master_port=3306,
 master_user=<span style="color: #2aa198;">'repl'</span>,
 master_password=<span style="color: #2aa198;">'repl'</span>;
 
 <span style="color: #586e75; font-style: italic;">-- &#25351;&#23450; binlog &#25991;&#20214;</span>
-<span style="color: #859900;">change</span> master <span style="color: #859900;">to</span>
+change master <span style="color: #859900;">to</span>
 master_host=<span style="color: #2aa198;">'172.17.0.2'</span>,
 master_port=3306,
 master_user=<span style="color: #2aa198;">'repl'</span>,
@@ -893,11 +893,11 @@ master_log_file=<span style="color: #2aa198;">'binlog.000004'</span>;
 查看 slave 状态，确保参数 <code>Slave_IO_Running: Yes</code> 和 <code>Slave_SQL_Running: Yes</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">show</span> slave status\G
+<pre class="src src-sql">show slave status\G
 </pre>
 </div>
 
-<pre class="example" id="org19c7662">
+<pre class="example" id="org35c9958">
 *************************** 1. row ***************************
                Slave_IO_State: Waiting for master to send event
                   Master_Host: 172.17.0.2
@@ -962,7 +962,7 @@ Master_SSL_Verify_Server_Cert: No
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-03 Sat 23:07. Created by Jinghui Hu at 2021-07-03 Sat 14:50.</p>
+<p class="author">Last Updated 2021-07-09 Fri 13:18. Created by Jinghui Hu at 2021-07-03 Sat 14:50.</p>
 </div>
 </body>
 </html>
