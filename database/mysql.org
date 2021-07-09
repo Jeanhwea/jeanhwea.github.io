@@ -1976,6 +1976,58 @@
    需要注意的是 =log-output= 指定 TABLE 可以将通用日志和慢日志直接输出到系统表中
    对应 =mysql.general_log= 和 =mysql.slow_log=
 
+** CPU 和内存的调优参数
+   主要调整一些 CPU 核心使用数量，添加一些内存参数
+   #+BEGIN_SRC conf
+     [mysqld]
+     ################################################################################
+     # CPU
+     ################################################################################
+     innodb_thread_concurrency = 32
+
+     ################################################################################
+     # Memory
+     ################################################################################
+
+     # mysql> show variables like 'innodb_buffer_%';
+     # +-------------------------------------+----------------+
+     # | Variable_name                       | Value          |
+     # +-------------------------------------+----------------+
+     # | innodb_buffer_pool_chunk_size       | 134217728      |
+     # | innodb_buffer_pool_dump_at_shutdown | ON             |
+     # | innodb_buffer_pool_dump_now         | OFF            |
+     # | innodb_buffer_pool_dump_pct         | 25             |
+     # | innodb_buffer_pool_filename         | ib_buffer_pool |
+     # | innodb_buffer_pool_instances        | 1              |
+     # | innodb_buffer_pool_load_abort       | OFF            |
+     # | innodb_buffer_pool_load_at_startup  | ON             |
+     # | innodb_buffer_pool_load_now         | OFF            |
+     # | innodb_buffer_pool_size             | 134217728      |
+     # +-------------------------------------+----------------+
+     innodb_buffer_pool_size = 24576M
+
+     # mysql> show variables like '%buffer_size';
+     # +-------------------------+----------+
+     # | Variable_name           | Value    |
+     # +-------------------------+----------+
+     # | bulk_insert_buffer_size | 8388608  |
+     # | innodb_log_buffer_size  | 16777216 |
+     # | innodb_sort_buffer_size | 1048576  |
+     # | join_buffer_size        | 262144   |
+     # | key_buffer_size         | 8388608  |
+     # | myisam_sort_buffer_size | 8388608  |
+     # | preload_buffer_size     | 32768    |
+     # | read_buffer_size        | 131072   |
+     # | read_rnd_buffer_size    | 262144   |
+     # | sort_buffer_size        | 262144   |
+     # +-------------------------+----------+
+     key_buffer_size         = 1024M
+     sort_buffer_size        = 1024M
+     join_buffer_size        = 1024M
+     read_buffer_size        = 1024M
+     read_rnd_buffer_size    = 1024M
+   #+END_SRC
+
 ** 创建用户和数据库
    #+BEGIN_SRC sql
      create database test01 default character set utf8mb4 collate utf8mb4_general_ci;
