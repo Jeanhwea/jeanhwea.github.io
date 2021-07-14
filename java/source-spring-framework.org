@@ -29,4 +29,26 @@
      - ~postProcessAfterInitialization(Object bean, String beanName)~
        + Bean 实例化后置处理方法
 
+* BeanFactory
+** DefaultListableBeanFactory
+   XmlBeanFactory 继承自 DefaultListableBeanFactory, 并且
+   DefaultListableBeanFactory 实现了大部分的 Spring 注册及加载的实现。
+
+   [[file:../static/image/2021/07/DefaultListableBeanFactory.png]]
+
+   该类定了 BeanDefinition 类的 Map
+   #+BEGIN_SRC java
+     /** Map of bean definition objects, keyed by bean name. */
+     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
+
+     /** Map of singleton and non-singleton bean names, keyed by dependency type. */
+     private final Map<Class<?>, String[]> allBeanNamesByType = new ConcurrentHashMap<>(64);
+
+     /** Map of singleton-only bean names, keyed by dependency type. */
+     private final Map<Class<?>, String[]> singletonBeanNamesByType = new ConcurrentHashMap<>(64);
+
+     /** List of bean definition names, in registration order. */
+     private volatile List<String> beanDefinitionNames = new ArrayList<>(256);
+   #+END_SRC
+
 * ApplicationContext
