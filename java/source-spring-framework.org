@@ -51,4 +51,98 @@
      private volatile List<String> beanDefinitionNames = new ArrayList<>(256);
    #+END_SRC
 
+** XmlBeanDefinitionReader
+   主要用于读取 XML 文件中的定义，其核心读取方法如下
+   #+BEGIN_SRC java
+     /**
+      ,* Load bean definitions from the specified XML file.
+      ,* @param encodedResource the resource descriptor for the XML file,
+      ,* allowing to specify an encoding to use for parsing the file
+      ,* @return the number of bean definitions found
+      ,* @throws BeanDefinitionStoreException in case of loading or parsing errors
+      ,*/
+     public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException {
+         Assert.notNull(encodedResource, "EncodedResource must not be null");
+         if (logger.isTraceEnabled()) {
+             logger.trace("Loading XML bean definitions from " + encodedResource);
+         }
+
+         Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
+         if (currentResources == null) {
+             currentResources = new HashSet<>(4);
+             this.resourcesCurrentlyBeingLoaded.set(currentResources);
+         }
+         if (!currentResources.add(encodedResource)) {
+             throw new BeanDefinitionStoreException(
+                     "Detected cyclic loading of " + encodedResource + " - check your import definitions!");
+         }
+
+         try (InputStream inputStream = encodedResource.getResource().getInputStream()) {
+             InputSource inputSource = new InputSource(inputStream);
+             if (encodedResource.getEncoding() != null) {
+                 inputSource.setEncoding(encodedResource.getEncoding());
+             }
+             return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
+         }
+         catch (IOException ex) {
+             throw new BeanDefinitionStoreException(
+                     "IOException parsing XML document from " + encodedResource.getResource(), ex);
+         }
+         finally {
+             currentResources.remove(encodedResource);
+             if (currentResources.isEmpty()) {
+                 this.resourcesCurrentlyBeingLoaded.remove();
+             }
+         }
+     }
+   #+END_SRC
+
+   实际实现读取 BeanDefinition 的方法
+   #+BEGIN_SRC java
+     /**
+      ,* Actually load bean definitions from the specified XML file.
+      ,* @param inputSource the SAX InputSource to read from
+      ,* @param resource the resource descriptor for the XML file
+      ,* @return the number of bean definitions found
+      ,* @throws BeanDefinitionStoreException in case of loading or parsing errors
+      ,* @see #doLoadDocument
+      ,* @see #registerBeanDefinitions
+      ,*/
+     protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
+             throws BeanDefinitionStoreException {
+
+         try {
+             Document doc = doLoadDocument(inputSource, resource);
+             int count = registerBeanDefinitions(doc, resource);
+             if (logger.isDebugEnabled()) {
+                 logger.debug("Loaded " + count + " bean definitions from " + resource);
+             }
+             return count;
+         }
+         catch (BeanDefinitionStoreException ex) {
+             throw ex;
+         }
+         catch (SAXParseException ex) {
+             throw new XmlBeanDefinitionStoreException(resource.getDescription(),
+                     "Line " + ex.getLineNumber() + " in XML document from " + resource + " is invalid", ex);
+         }
+         catch (SAXException ex) {
+             throw new XmlBeanDefinitionStoreException(resource.getDescription(),
+                     "XML document from " + resource + " is invalid", ex);
+         }
+         catch (ParserConfigurationException ex) {
+             throw new BeanDefinitionStoreException(resource.getDescription(),
+                     "Parser configuration exception parsing XML from " + resource, ex);
+         }
+         catch (IOException ex) {
+             throw new BeanDefinitionStoreException(resource.getDescription(),
+                     "IOException parsing XML document from " + resource, ex);
+         }
+         catch (Throwable ex) {
+             throw new BeanDefinitionStoreException(resource.getDescription(),
+                     "Unexpected exception parsing XML document from " + resource, ex);
+         }
+     }
+   #+END_SRC
+
 * ApplicationContext
