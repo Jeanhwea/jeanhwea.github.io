@@ -212,76 +212,107 @@
     2. import 标签的解析
     3. alias 标签的解析
 
-* BeanFactory
-** DefaultListableBeanFactory
-   XmlBeanFactory 继承自 DefaultListableBeanFactory, 并且
-   DefaultListableBeanFactory 实现了大部分的 Spring 注册及加载的实现
+** TODO 自定义标签注册
+   ~BeanDefinitionParser~
 
-   [[file:../static/image/2021/07/DefaultListableBeanFactory.png]]
+** TODO 别名注册
 
-   该类定了 BeanDefinition 类的 Map
-   #+BEGIN_SRC java
-     /** Map of bean definition objects, keyed by bean name. */
-     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
-
-     /** Map of singleton and non-singleton bean names, keyed by dependency type. */
-     private final Map<Class<?>, String[]> allBeanNamesByType = new ConcurrentHashMap<>(64);
-
-     /** Map of singleton-only bean names, keyed by dependency type. */
-     private final Map<Class<?>, String[]> singletonBeanNamesByType = new ConcurrentHashMap<>(64);
-
-     /** List of bean definition names, in registration order. */
-     private volatile List<String> beanDefinitionNames = new ArrayList<>(256);
-   #+END_SRC
-
-** XmlBeanDefinitionReader
-   实际实现读取 BeanDefinition 的方法
+** ~<bean/>~ 标签解析
+   ~BeanDefinitionDocumentReader~ 类中的 ~processBeanDefinition(...)~ 方法事先对
+   ~<bean/>~ 标签的解析
    #+BEGIN_SRC java
      /**
-      ,* Actually load bean definitions from the specified XML file.
-      ,* @param inputSource the SAX InputSource to read from
-      ,* @param resource the resource descriptor for the XML file
-      ,* @return the number of bean definitions found
-      ,* @throws BeanDefinitionStoreException in case of loading or parsing errors
-      ,* @see #doLoadDocument
-      ,* @see #registerBeanDefinitions
+      ,* Process the given bean element, parsing the bean definition
+      ,* and registering it with the registry.
       ,*/
-     protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
-             throws BeanDefinitionStoreException {
-
-         try {
-             Document doc = doLoadDocument(inputSource, resource);
-             int count = registerBeanDefinitions(doc, resource);
-             if (logger.isDebugEnabled()) {
-                 logger.debug("Loaded " + count + " bean definitions from " + resource);
+     protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
+         BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
+         if (bdHolder != null) {
+             bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
+             try {
+                 // Register the final decorated instance.
+                 BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
              }
-             return count;
-         }
-         catch (BeanDefinitionStoreException ex) {
-             throw ex;
-         }
-         catch (SAXParseException ex) {
-             throw new XmlBeanDefinitionStoreException(resource.getDescription(),
-                     "Line " + ex.getLineNumber() + " in XML document from " + resource + " is invalid", ex);
-         }
-         catch (SAXException ex) {
-             throw new XmlBeanDefinitionStoreException(resource.getDescription(),
-                     "XML document from " + resource + " is invalid", ex);
-         }
-         catch (ParserConfigurationException ex) {
-             throw new BeanDefinitionStoreException(resource.getDescription(),
-                     "Parser configuration exception parsing XML from " + resource, ex);
-         }
-         catch (IOException ex) {
-             throw new BeanDefinitionStoreException(resource.getDescription(),
-                     "IOException parsing XML document from " + resource, ex);
-         }
-         catch (Throwable ex) {
-             throw new BeanDefinitionStoreException(resource.getDescription(),
-                     "Unexpected exception parsing XML document from " + resource, ex);
+             catch (BeanDefinitionStoreException ex) {
+                 getReaderContext().error("Failed to register bean definition with name '" +
+                         bdHolder.getBeanName() + "'", ele, ex);
+             }
+             // Send registration event.
+             getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));
          }
      }
    #+END_SRC
+
+** BeanDefinition 注册
+*** DefaultListableBeanFactory
+    ~XmlBeanFactory~ 继承自 ~DefaultListableBeanFactory~, 并且
+    ~DefaultListableBeanFactory~ 实现了大部分的 Spring 注册及加载的实现
+
+    [[file:../static/image/2021/07/DefaultListableBeanFactory.png]]
+
+    该类定了 BeanDefinition 类的 Map
+    #+BEGIN_SRC java
+      /** Map of bean definition objects, keyed by bean name. */
+      private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
+
+      /** Map of singleton and non-singleton bean names, keyed by dependency type. */
+      private final Map<Class<?>, String[]> allBeanNamesByType = new ConcurrentHashMap<>(64);
+
+      /** Map of singleton-only bean names, keyed by dependency type. */
+      private final Map<Class<?>, String[]> singletonBeanNamesByType = new ConcurrentHashMap<>(64);
+
+      /** List of bean definition names, in registration order. */
+      private volatile List<String> beanDefinitionNames = new ArrayList<>(256);
+    #+END_SRC
+
+*** XmlBeanDefinitionReader
+    实际实现读取 BeanDefinition 的方法
+    #+BEGIN_SRC java
+      /**
+       ,* Actually load bean definitions from the specified XML file.
+       ,* @param inputSource the SAX InputSource to read from
+       ,* @param resource the resource descriptor for the XML file
+       ,* @return the number of bean definitions found
+       ,* @throws BeanDefinitionStoreException in case of loading or parsing errors
+       ,* @see #doLoadDocument
+       ,* @see #registerBeanDefinitions
+       ,*/
+      protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
+              throws BeanDefinitionStoreException {
+
+          try {
+              Document doc = doLoadDocument(inputSource, resource);
+              int count = registerBeanDefinitions(doc, resource);
+              if (logger.isDebugEnabled()) {
+                  logger.debug("Loaded " + count + " bean definitions from " + resource);
+              }
+              return count;
+          }
+          catch (BeanDefinitionStoreException ex) {
+              throw ex;
+          }
+          catch (SAXParseException ex) {
+              throw new XmlBeanDefinitionStoreException(resource.getDescription(),
+                      "Line " + ex.getLineNumber() + " in XML document from " + resource + " is invalid", ex);
+          }
+          catch (SAXException ex) {
+              throw new XmlBeanDefinitionStoreException(resource.getDescription(),
+                      "XML document from " + resource + " is invalid", ex);
+          }
+          catch (ParserConfigurationException ex) {
+              throw new BeanDefinitionStoreException(resource.getDescription(),
+                      "Parser configuration exception parsing XML from " + resource, ex);
+          }
+          catch (IOException ex) {
+              throw new BeanDefinitionStoreException(resource.getDescription(),
+                      "IOException parsing XML document from " + resource, ex);
+          }
+          catch (Throwable ex) {
+              throw new BeanDefinitionStoreException(resource.getDescription(),
+                      "Unexpected exception parsing XML document from " + resource, ex);
+          }
+      }
+    #+END_SRC
 
 * ApplicationContext
 
