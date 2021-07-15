@@ -572,6 +572,30 @@
        }
      #+END_SRC
 
+** Bean 的生命周期
+   ~BeanFactory~ 的注释中完整地说明的实现标准 BeanFactory 的代码
+   1. BeanFactory 初始化过程，支持的标准 Bean 的生命周期
+      - ~BeanNameAware#setBeanName(...)~
+      - ~BeanClassLoaderAware#setBeanClassLoader(...)~
+      - ~BeanFactoryAware#setBeanFactory(...)~
+      - ~EnvironmentAware#setEnvironment(...)~
+      - ~EmbeddedValueResolverAware#setEmbeddedValueResolver(...)~
+      - ~ResourceLoaderAware#setResourceLoader(...)~ 在 ApplicationContext 中
+      - ~ApplicationEventPublisherAware#setApplicationEventPublisher(...)~ 在
+        ApplicationContext 中
+      - ~MessageSourceAware#setMessageSource(...)~ 在 ApplicationContext 中
+      - ~ApplicationContextAware#setApplicationContext(...)~ 在
+        ApplicationContext 中
+      - ~ServletContextAware#setServletContext(...)~ 在 ApplicationContext 中
+      - ~BeanPostProcessors~ 的一系列 ~postProcessBeforeInitialization(...)~ 方法
+      - ~InitializingBean#afterPropertiesSet(...)~
+      - a custom init-method definition
+      - ~BeanPostProcessors~ 的一系列 ~postProcessAfterInitialization(...)~ 方法
+   2. 关闭 BeanFactory 时，执行的 Bean 销毁方法
+      - ~DestructionAwareBeanPostProcessors~ 的一系列
+        ~postProcessBeforeDestruction(...)~ 方法
+      - ~DisposableBean#destroy(...)~
+      - a custom destroy-method definition
 *** XmlBeanDefinitionReader
     实际实现读取 BeanDefinition 的方法
     #+BEGIN_SRC java
