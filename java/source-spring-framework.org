@@ -244,6 +244,59 @@
    #+END_SRC
 
 ** BeanDefinition 注册
+*** BeanDefinition 的注册方法
+    BeanDefinition 的注册方法位于 ~BeanDefinitionReaderUtils~ 抽象类中
+    #+BEGIN_SRC java
+      /**
+       ,* Register the given bean definition with the given bean factory.
+       ,* @param definitionHolder the bean definition including name and aliases
+       ,* @param registry the bean factory to register with
+       ,* @throws BeanDefinitionStoreException if registration failed
+       ,*/
+      public static void registerBeanDefinition(
+              BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry)
+              throws BeanDefinitionStoreException {
+
+          // Register bean definition under primary name.
+          String beanName = definitionHolder.getBeanName();
+          registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
+
+          // Register aliases for bean name, if any.
+          String[] aliases = definitionHolder.getAliases();
+          if (aliases != null) {
+              for (String alias : aliases) {
+                  registry.registerAlias(beanName, alias);
+              }
+          }
+      }
+    #+END_SRC
+
+    在调用到注册方法的调用栈如下
+    #+BEGIN_SRC text
+      registerBeanDefinition:163, BeanDefinitionReaderUtils (org.springframework.beans.factory.support)
+      processBeanDefinition:311, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+      parseDefaultElement:197, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+      parseBeanDefinitions:176, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+      doRegisterBeanDefinitions:149, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+      registerBeanDefinitions:96, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+      registerBeanDefinitions:509, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+      doLoadBeanDefinitions:389, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+      loadBeanDefinitions:336, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+      loadBeanDefinitions:305, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+      loadBeanDefinitions:188, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+      loadBeanDefinitions:224, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+      loadBeanDefinitions:195, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+      loadBeanDefinitions:257, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+      loadBeanDefinitions:128, AbstractXmlApplicationContext (org.springframework.context.support)
+      loadBeanDefinitions:94, AbstractXmlApplicationContext (org.springframework.context.support)
+      refreshBeanFactory:133, AbstractRefreshableApplicationContext (org.springframework.context.support)
+      obtainFreshBeanFactory:637, AbstractApplicationContext (org.springframework.context.support)
+      refresh:522, AbstractApplicationContext (org.springframework.context.support)
+      <init>:144, ClassPathXmlApplicationContext (org.springframework.context.support)
+      <init>:85, ClassPathXmlApplicationContext (org.springframework.context.support)
+      main:10, MyApplication (io.github.jeanhwea)
+    #+END_SRC
+
 *** DefaultListableBeanFactory
     ~XmlBeanFactory~ 继承自 ~DefaultListableBeanFactory~, 并且
     ~DefaultListableBeanFactory~ 实现了大部分的 Spring 注册及加载的实现
