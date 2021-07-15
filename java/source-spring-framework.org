@@ -299,7 +299,7 @@
       main:10, MyApplication (io.github.jeanhwea)
     #+END_SRC
 
-*** DefaultListableBeanFactory 实现
+*** DefaultListableBeanFactory 的实现
     通过观察上文的调用栈可以发现注册 BeanDefinition 是通过
     ~AbstractRefreshableApplicationContext~ 类中的 ~loadBeanDefinitions(...)~ 方
     法实现
@@ -431,6 +431,125 @@
 
           if (existingDefinition != null || containsSingleton(beanName)) {
               resetBeanDefinition(beanName);
+          }
+      }
+    #+END_SRC
+
+    在上面注册过程中， ~hasBeanCreationStarted()~ 方法用于判断 Bean 是否开始创建，
+    它实现逻辑在父类 ~AbstractBeanFactory~ 中
+    #+BEGIN_SRC java
+      /**
+       ,* Check whether this factory's bean creation phase already started,
+       ,* i.e. whether any bean has been marked as created in the meantime.
+       ,* @since 4.2.2
+       ,* @see #markBeanAsCreated
+       ,*/
+      protected boolean hasBeanCreationStarted() {
+          return !this.alreadyCreated.isEmpty();
+      }
+    #+END_SRC
+
+    父类 ~AbstractBeanFactory~ 中定义了一个集合记录正在创建的 Bean
+    #+BEGIN_SRC java
+      /** Names of beans that have already been created at least once. */
+      private final Set<String> alreadyCreated = Collections.newSetFromMap(new ConcurrentHashMap<>(256));
+    #+END_SRC
+
+    创建时通过 ~markBeanAsCreated(...)~ 方法标记，注意对 ~alreadyCreated~ 的访问
+    是需要加锁的
+    #+BEGIN_SRC java
+      /**
+       ,* Mark the specified bean as already created (or about to be created).
+       ,* <p>This allows the bean factory to optimize its caching for repeated
+       ,* creation of the specified bean.
+       ,* @param beanName the name of the bean
+       ,*/
+      protected void markBeanAsCreated(String beanName) {
+          if (!this.alreadyCreated.contains(beanName)) {
+              synchronized (this.mergedBeanDefinitions) {
+                  if (!this.alreadyCreated.contains(beanName)) {
+                      // Let the bean definition get re-merged now that we're actually creating
+                      // the bean... just in case some of its metadata changed in the meantime.
+                      clearMergedBeanDefinition(beanName);
+                      this.alreadyCreated.add(beanName);
+                  }
+              }
+          }
+      }
+    #+END_SRC
+
+    BeanDefinition 的移除方法如下，通过 ~removeBeanDefinition(...)~ 方法
+    #+BEGIN_SRC java
+      @Override
+      public void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
+          Assert.hasText(beanName, "'beanName' must not be empty");
+
+          BeanDefinition bd = this.beanDefinitionMap.remove(beanName);
+          if (bd == null) {
+              if (logger.isTraceEnabled()) {
+                  logger.trace("No bean named '" + beanName + "' found in " + this);
+              }
+              throw new NoSuchBeanDefinitionException(beanName);
+          }
+
+          if (hasBeanCreationStarted()) {
+              // Cannot modify startup-time collection elements anymore (for stable iteration)
+              synchronized (this.beanDefinitionMap) {
+                  List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames);
+                  updatedDefinitions.remove(beanName);
+                  this.beanDefinitionNames = updatedDefinitions;
+              }
+          }
+          else {
+              // Still in startup registration phase
+              this.beanDefinitionNames.remove(beanName);
+          }
+          this.frozenBeanDefinitionNames = null;
+
+          resetBeanDefinition(beanName);
+      }
+    #+END_SRC
+
+    移除 BeanDefinition 中调用了刷新 BeanDefinition 的方法
+    ~resetBeanDefinition(...)~
+    #+BEGIN_SRC java
+      /**
+       ,* Reset all bean definition caches for the given bean,
+       ,* including the caches of beans that are derived from it.
+       ,* <p>Called after an existing bean definition has been replaced or removed,
+       ,* triggering {@link #clearMergedBeanDefinition}, {@link #destroySingleton}
+       ,* and {@link MergedBeanDefinitionPostProcessor#resetBeanDefinition} on the
+       ,* given bean and on all bean definitions that have the given bean as parent.
+       ,* @param beanName the name of the bean to reset
+       ,* @see #registerBeanDefinition
+       ,* @see #removeBeanDefinition
+       ,*/
+      protected void resetBeanDefinition(String beanName) {
+          // Remove the merged bean definition for the given bean, if already created.
+          clearMergedBeanDefinition(beanName);
+
+          // Remove corresponding bean from singleton cache, if any. Shouldn't usually
+          // be necessary, rather just meant for overriding a context's default beans
+          // (e.g. the default StaticMessageSource in a StaticApplicationContext).
+          destroySingleton(beanName);
+
+          // Notify all post-processors that the specified bean definition has been reset.
+          for (BeanPostProcessor processor : getBeanPostProcessors()) {
+              if (processor instanceof MergedBeanDefinitionPostProcessor) {
+                  ((MergedBeanDefinitionPostProcessor) processor).resetBeanDefinition(beanName);
+              }
+          }
+
+          // Reset all bean definitions that have the given bean as parent (recursively).
+          for (String bdName : this.beanDefinitionNames) {
+              if (!beanName.equals(bdName)) {
+                  BeanDefinition bd = this.beanDefinitionMap.get(bdName);
+                  // Ensure bd is non-null due to potential concurrent modification
+                  // of the beanDefinitionMap.
+                  if (bd != null && beanName.equals(bd.getParentName())) {
+                      resetBeanDefinition(bdName);
+                  }
+              }
           }
       }
     #+END_SRC
