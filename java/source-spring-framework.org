@@ -246,6 +246,8 @@
 ** BeanDefinition 注册
 *** BeanDefinition 的注册方法
     BeanDefinition 的注册方法位于 ~BeanDefinitionReaderUtils~ 抽象类中
+    1. 确定 beanName 和 BeanDefinition 的绑定关系
+    2. 确定 beanName 和 Alias 的对应关系
     #+BEGIN_SRC java
       /**
        ,* Register the given bean definition with the given bean factory.
@@ -297,13 +299,44 @@
       main:10, MyApplication (io.github.jeanhwea)
     #+END_SRC
 
-*** DefaultListableBeanFactory
-    ~XmlBeanFactory~ 继承自 ~DefaultListableBeanFactory~, 并且
-    ~DefaultListableBeanFactory~ 实现了大部分的 Spring 注册及加载的实现
+*** DefaultListableBeanFactory 实现
+    通过观察上文的调用栈可以发现注册 BeanDefinition 是通过
+    ~AbstractRefreshableApplicationContext~ 类中的 ~loadBeanDefinitions(...)~ 方
+    法实现
+    #+BEGIN_SRC java
+      /**
+       ,* This implementation performs an actual refresh of this context's underlying
+       ,* bean factory, shutting down the previous bean factory (if any) and
+       ,* initializing a fresh bean factory for the next phase of the context's lifecycle.
+       ,*/
+      @Override
+      protected final void refreshBeanFactory() throws BeansException {
+          if (hasBeanFactory()) {
+              destroyBeans();
+              closeBeanFactory();
+          }
+          try {
+              DefaultListableBeanFactory beanFactory = createBeanFactory();
+              beanFactory.setSerializationId(getId());
+              customizeBeanFactory(beanFactory);
+              loadBeanDefinitions(beanFactory);
+              synchronized (this.beanFactoryMonitor) {
+                  this.beanFactory = beanFactory;
+              }
+          }
+          catch (IOException ex) {
+              throw new ApplicationContextException("I/O error parsing bean definition source for " + getDisplayName(), ex);
+          }
+      }
+    #+END_SRC
+
+    这里使用的 beanFactory 是 ~DefaultListableBeanFactory~, 并且
+    ~DefaultListableBeanFactory~ 实现了大部分的 Spring 注册及加载的实现，先查看
+    其集成关系
 
     [[file:../static/image/2021/07/DefaultListableBeanFactory.png]]
 
-    该类定了 BeanDefinition 类的 Map
+    该类定了 BeanDefinition 类的 Map, 是用于存 BeanDefinition 信息的缓存
     #+BEGIN_SRC java
       /** Map of bean definition objects, keyed by bean name. */
       private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
@@ -316,6 +349,90 @@
 
       /** List of bean definition names, in registration order. */
       private volatile List<String> beanDefinitionNames = new ArrayList<>(256);
+    #+END_SRC
+
+    ~DefaultListableBeanFactory~ 的 ~registerBeanDefinition(...)~ 才是真正实现注
+    册 BeanDefinition 逻辑，其代码如下：
+    1. 对 beanDefinition 进行验证
+    2. 检查 beanDefinition 是否存在
+       - 如果存在，判断是否覆盖对应的 BeanDefinition
+       - 如果 beanDefinition 不存在，进行创建并注册
+    #+BEGIN_SRC java
+      //---------------------------------------------------------------------
+      // Implementation of BeanDefinitionRegistry interface
+      //---------------------------------------------------------------------
+
+      @Override
+      public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+              throws BeanDefinitionStoreException {
+
+          Assert.hasText(beanName, "Bean name must not be empty");
+          Assert.notNull(beanDefinition, "BeanDefinition must not be null");
+
+          if (beanDefinition instanceof AbstractBeanDefinition) {
+              try {
+                  ((AbstractBeanDefinition) beanDefinition).validate();
+              }
+              catch (BeanDefinitionValidationException ex) {
+                  throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
+                          "Validation of bean definition failed", ex);
+              }
+          }
+
+          BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
+          if (existingDefinition != null) {
+              if (!isAllowBeanDefinitionOverriding()) {
+                  throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
+              }
+              else if (existingDefinition.getRole() < beanDefinition.getRole()) {
+                  // e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE
+                  if (logger.isInfoEnabled()) {
+                      logger.info("Overriding user-defined bean definition for bean '" + beanName +
+                              "' with a framework-generated bean definition: replacing [" +
+                              existingDefinition + "] with [" + beanDefinition + "]");
+                  }
+              }
+              else if (!beanDefinition.equals(existingDefinition)) {
+                  if (logger.isDebugEnabled()) {
+                      logger.debug("Overriding bean definition for bean '" + beanName +
+                              "' with a different definition: replacing [" + existingDefinition +
+                              "] with [" + beanDefinition + "]");
+                  }
+              }
+              else {
+                  if (logger.isTraceEnabled()) {
+                      logger.trace("Overriding bean definition for bean '" + beanName +
+                              "' with an equivalent definition: replacing [" + existingDefinition +
+                              "] with [" + beanDefinition + "]");
+                  }
+              }
+              this.beanDefinitionMap.put(beanName, beanDefinition);
+          }
+          else {
+              if (hasBeanCreationStarted()) {
+                  // Cannot modify startup-time collection elements anymore (for stable iteration)
+                  synchronized (this.beanDefinitionMap) {
+                      this.beanDefinitionMap.put(beanName, beanDefinition);
+                      List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames.size() + 1);
+                      updatedDefinitions.addAll(this.beanDefinitionNames);
+                      updatedDefinitions.add(beanName);
+                      this.beanDefinitionNames = updatedDefinitions;
+                      removeManualSingletonName(beanName);
+                  }
+              }
+              else {
+                  // Still in startup registration phase
+                  this.beanDefinitionMap.put(beanName, beanDefinition);
+                  this.beanDefinitionNames.add(beanName);
+                  removeManualSingletonName(beanName);
+              }
+              this.frozenBeanDefinitionNames = null;
+          }
+
+          if (existingDefinition != null || containsSingleton(beanName)) {
+              resetBeanDefinition(beanName);
+          }
+      }
     #+END_SRC
 
 *** XmlBeanDefinitionReader
