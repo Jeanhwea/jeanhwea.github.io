@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-15 Thu 12:26 -->
+<!-- 2021-07-16 Fri 22:50 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Spring Framework v5.2.5.RELEASE</title>
@@ -233,40 +233,48 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgb3aead2">1. IoC</a>
+<li><a href="#orgefb2665">1. IoC</a>
 <ul>
-<li><a href="#orge3a80f0">1.1. IoC 核心接口和类</a></li>
-<li><a href="#org4cfae89">1.2. IoC 资源读取及注册</a>
+<li><a href="#orgc79bda6">1.1. IoC 核心接口和类</a></li>
+<li><a href="#org10a399a">1.2. IoC 资源读取及注册</a>
 <ul>
-<li><a href="#orgb19c1a6">1.2.1. XML 文档验证</a></li>
-<li><a href="#org1ab28fd">1.2.2. XML 文档读取</a></li>
-<li><a href="#org39e38d1">1.2.3. XML 标签解析</a></li>
+<li><a href="#orgab5efcb">1.2.1. XML 文档验证</a></li>
+<li><a href="#org1f41b82">1.2.2. XML 文档读取</a></li>
+<li><a href="#org04da339">1.2.3. XML 标签解析</a></li>
+</ul>
+</li>
+<li><a href="#org70bfc23">1.3. <span class="todo TODO">TODO</span> 自定义标签注册</a></li>
+<li><a href="#orgd7cac45">1.4. <span class="todo TODO">TODO</span> 别名注册</a></li>
+<li><a href="#orga36de60">1.5. <code>&lt;bean/&gt;</code> 标签解析</a></li>
+<li><a href="#org3cdbb2a">1.6. BeanDefinition 注册</a>
+<ul>
+<li><a href="#orgd2685fa">1.6.1. BeanDefinition 的注册</a></li>
+<li><a href="#orgcd31dd5">1.6.2. DefaultListableBeanFactory</a></li>
+</ul>
+</li>
+<li><a href="#org4c1b33b">1.7. Bean 的生命周期</a>
+<ul>
+<li><a href="#orgeea498d">1.7.1. XmlBeanDefinitionReader</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org00f09b7">2. BeanFactory</a>
-<ul>
-<li><a href="#org130a5eb">2.1. DefaultListableBeanFactory</a></li>
-<li><a href="#orgd06abfc">2.2. XmlBeanDefinitionReader</a></li>
-</ul>
-</li>
-<li><a href="#org1f3915d">3. ApplicationContext</a></li>
-<li><a href="#orge6ebd64">4. AOP</a></li>
-<li><a href="#org6a327e2">5. Spring 核心类梳理</a></li>
-<li><a href="#org96e27bc">6. SpringBoot 自动装配</a></li>
-<li><a href="#org5e3d7a7">7. 参考链接</a></li>
+<li><a href="#orga1532db">2. ApplicationContext</a></li>
+<li><a href="#orgd04e10d">3. AOP</a></li>
+<li><a href="#org69df34f">4. Spring 核心类梳理</a></li>
+<li><a href="#org1021f33">5. SpringBoot 自动装配</a></li>
+<li><a href="#org9f4273f">6. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgb3aead2" class="outline-2">
-<h2 id="orgb3aead2"><span class="section-number-2">1</span> IoC</h2>
+<div id="outline-container-orgefb2665" class="outline-2">
+<h2 id="orgefb2665"><span class="section-number-2">1</span> IoC</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orge3a80f0" class="outline-3">
-<h3 id="orge3a80f0"><span class="section-number-3">1.1</span> IoC 核心接口和类</h3>
+<div id="outline-container-orgc79bda6" class="outline-3">
+<h3 id="orgc79bda6"><span class="section-number-3">1.1</span> IoC 核心接口和类</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Spring 的 IoC 容器对象一般继承自 <code>ApplicationContext</code> 接口，常见的对象类如下
@@ -278,7 +286,7 @@ Spring 的 IoC 容器对象一般继承自 <code>ApplicationContext</code> 接�
 </p>
 
 
-<div id="org8101237" class="figure">
+<div id="org9a60fa4" class="figure">
 <p><img src="../static/image/2021/07/ClassPathXmlApplicationContext.png" alt="ClassPathXmlApplicationContext.png" />
 </p>
 </div>
@@ -288,7 +296,7 @@ Spring 的 IoC 容器对象一般继承自 <code>ApplicationContext</code> 接�
 </p>
 
 
-<div id="orgb8593eb" class="figure">
+<div id="org4169569" class="figure">
 <p><img src="../static/image/2021/07/AnnotationConfigApplicationContext.png" alt="AnnotationConfigApplicationContext.png" />
 </p>
 </div>
@@ -333,12 +341,12 @@ Spring 的 IoC 容器对象一般继承自 <code>ApplicationContext</code> 接�
 </div>
 </div>
 
-<div id="outline-container-org4cfae89" class="outline-3">
-<h3 id="org4cfae89"><span class="section-number-3">1.2</span> IoC 资源读取及注册</h3>
+<div id="outline-container-org10a399a" class="outline-3">
+<h3 id="org10a399a"><span class="section-number-3">1.2</span> IoC 资源读取及注册</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
-<div id="outline-container-orgb19c1a6" class="outline-4">
-<h4 id="orgb19c1a6"><span class="section-number-4">1.2.1</span> XML 文档验证</h4>
+<div id="outline-container-orgab5efcb" class="outline-4">
+<h4 id="orgab5efcb"><span class="section-number-4">1.2.1</span> XML 文档验证</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <p>
 XML 文档验证常见有如下两种方式
@@ -376,8 +384,8 @@ XML 文档读取实现位于 <code>XmlBeanDefinitionReader</code> 类中实现�
 </div>
 </div>
 
-<div id="outline-container-org1ab28fd" class="outline-4">
-<h4 id="org1ab28fd"><span class="section-number-4">1.2.2</span> XML 文档读取</h4>
+<div id="outline-container-org1f41b82" class="outline-4">
+<h4 id="org1f41b82"><span class="section-number-4">1.2.2</span> XML 文档读取</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <p>
 读取 XML 文件核心方法 <code>loadBeanDefinitions(...)</code> 实现如下
@@ -502,14 +510,14 @@ XML 文档读取实现位于 <code>XmlBeanDefinitionReader</code> 类中实现�
 <code>&lt;bean&gt;</code> 标签中的信息
 </p>
 <div class="org-src-container">
-<pre class="src src-xml">&lt;?<span style="color: #859900;">xml</span> <span style="color: #d33682;">version="1.0" encoding="UTF-8"</span>?&gt;
+<pre class="src src-xml">&lt;<span style="color: #859900;">?xml</span> <span style="color: #6c71c4;">version</span>="1.0" <span style="color: #6c71c4;">encoding</span>="UTF-8"?&gt;
 &lt;<span style="color: #b58900;">beans</span> <span style="color: #6c71c4;">xmlns</span>=<span style="color: #2aa198;">"http://www.springframework.org/schema/beans"</span>
        <span style="color: #6c71c4;">xmlns</span>:<span style="color: #6c71c4;">xsi</span>=<span style="color: #2aa198;">"http://www.w3.org/2001/XMLSchema-instance"</span>
        <span style="color: #6c71c4;">xsi</span>:<span style="color: #6c71c4;">schemaLocation</span>=<span style="color: #2aa198;">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"</span>&gt;
 
-    &lt;<span style="color: #b58900;">bean</span> <span style="color: #6c71c4;">id</span>=<span style="color: #2aa198;">"author"</span> <span style="color: #6c71c4;">class</span>=<span style="color: #2aa198;">"io.github.jeanhwea.bean.Author"</span>&gt;
-        &lt;<span style="color: #b58900;">property</span> <span style="color: #6c71c4;">name</span>=<span style="color: #2aa198;">"name"</span> <span style="color: #6c71c4;">value</span>=<span style="color: #2aa198;">"Martin Flower"</span>/&gt;
-    &lt;/<span style="color: #b58900;">bean</span>&gt;
+  &lt;<span style="color: #b58900;">bean</span> <span style="color: #6c71c4;">id</span>=<span style="color: #2aa198;">"author"</span> <span style="color: #6c71c4;">class</span>=<span style="color: #2aa198;">"io.github.jeanhwea.bean.Author"</span>&gt;
+    &lt;<span style="color: #b58900;">property</span> <span style="color: #6c71c4;">name</span>=<span style="color: #2aa198;">"name"</span> <span style="color: #6c71c4;">value</span>=<span style="color: #2aa198;">"Martin Flower"</span>/&gt;
+  &lt;/<span style="color: #b58900;">bean</span>&gt;
 
 &lt;/<span style="color: #b58900;">beans</span>&gt;
 </pre>
@@ -522,8 +530,8 @@ XML 文档读取实现位于 <code>XmlBeanDefinitionReader</code> 类中实现�
 </div>
 </div>
 
-<div id="outline-container-org39e38d1" class="outline-4">
-<h4 id="org39e38d1"><span class="section-number-4">1.2.3</span> XML 标签解析</h4>
+<div id="outline-container-org04da339" class="outline-4">
+<h4 id="org04da339"><span class="section-number-4">1.2.3</span> XML 标签解析</h4>
 <div class="outline-text-4" id="text-1-2-3">
 <p>
 标签解析的细节比较多，这里跳过
@@ -552,28 +560,174 @@ XML 文档读取实现位于 <code>XmlBeanDefinitionReader</code> 类中实现�
 </div>
 </div>
 </div>
+
+<div id="outline-container-org70bfc23" class="outline-3">
+<h3 id="org70bfc23"><span class="section-number-3">1.3</span> <span class="todo TODO">TODO</span> 自定义标签注册</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+<code>BeanDefinitionParser</code>
+</p>
+</div>
 </div>
 
-<div id="outline-container-org00f09b7" class="outline-2">
-<h2 id="org00f09b7"><span class="section-number-2">2</span> BeanFactory</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-orgd7cac45" class="outline-3">
+<h3 id="orgd7cac45"><span class="section-number-3">1.4</span> <span class="todo TODO">TODO</span> 别名注册</h3>
 </div>
-<div id="outline-container-org130a5eb" class="outline-3">
-<h3 id="org130a5eb"><span class="section-number-3">2.1</span> DefaultListableBeanFactory</h3>
-<div class="outline-text-3" id="text-2-1">
+
+<div id="outline-container-orga36de60" class="outline-3">
+<h3 id="orga36de60"><span class="section-number-3">1.5</span> <code>&lt;bean/&gt;</code> 标签解析</h3>
+<div class="outline-text-3" id="text-1-5">
 <p>
-XmlBeanFactory 继承自 DefaultListableBeanFactory, 并且
-DefaultListableBeanFactory 实现了大部分的 Spring 注册及加载的实现
+<code>BeanDefinitionDocumentReader</code> 类中的 <code>processBeanDefinition(...)</code> 方法事先对
+<code>&lt;bean/&gt;</code> 标签的解析
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Process the given bean element, parsing the bean definition</span>
+<span style="color: #d33682;"> * and registering it with the registry.</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">processBeanDefinition</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">Element</span> <span style="color: #6c71c4;">ele</span>, <span style="color: #268bd2;">BeanDefinitionParserDelegate</span> <span style="color: #6c71c4;">delegate</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #268bd2;">BeanDefinitionHolder</span> <span style="color: #6c71c4;">bdHolder</span> = delegate.parseBeanDefinitionElement<span style="color: #d8241f;">(</span>ele<span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>bdHolder != <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        bdHolder = delegate.decorateBeanDefinitionIfRequired<span style="color: #9564bf;">(</span>ele, bdHolder<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">try</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Register the final decorated instance.</span>
+            BeanDefinitionReaderUtils.registerBeanDefinition<span style="color: #24a222;">(</span>bdHolder, getReaderContext<span style="color: #ff7f00;">()</span>.getRegistry<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">catch</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">BeanDefinitionStoreException</span> <span style="color: #6c71c4;">ex</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            getReaderContext<span style="color: #24a222;">()</span>.error<span style="color: #24a222;">(</span><span style="color: #2aa198;">"Failed to register bean definition with name '"</span> +
+                    bdHolder.getBeanName<span style="color: #ff7f00;">()</span> + <span style="color: #2aa198;">"'"</span>, ele, ex<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Send registration event.</span>
+        getReaderContext<span style="color: #9564bf;">()</span>.fireComponentRegistered<span style="color: #9564bf;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanComponentDefinition</span><span style="color: #24a222;">(</span>bdHolder<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3cdbb2a" class="outline-3">
+<h3 id="org3cdbb2a"><span class="section-number-3">1.6</span> BeanDefinition 注册</h3>
+<div class="outline-text-3" id="text-1-6">
+</div>
+<div id="outline-container-orgd2685fa" class="outline-4">
+<h4 id="orgd2685fa"><span class="section-number-4">1.6.1</span> BeanDefinition 的注册</h4>
+<div class="outline-text-4" id="text-1-6-1">
+<p>
+BeanDefinition 的注册方法位于 <code>BeanDefinitionReaderUtils</code> 抽象类中
+</p>
+<ol class="org-ol">
+<li>确定 beanName 和 BeanDefinition 的绑定关系</li>
+<li>确定 beanName 和 Alias 的对应关系</li>
+</ol>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Register the given bean definition with the given bean factory.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> definitionHolder the bean definition including name and aliases</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> registry the bean factory to register with</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@throws</span><span style="color: #d33682;"> BeanDefinitionStoreException if registration failed</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">registerBeanDefinition</span><span style="color: #8d5649;">(</span>
+        <span style="color: #268bd2;">BeanDefinitionHolder</span> <span style="color: #6c71c4;">definitionHolder</span>, <span style="color: #268bd2;">BeanDefinitionRegistry</span> <span style="color: #6c71c4;">registry</span><span style="color: #8d5649;">)</span>
+        <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeanDefinitionStoreException</span> <span style="color: #8d5649;">{</span>
+
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Register bean definition under primary name.</span>
+    <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span> = definitionHolder.getBeanName<span style="color: #d8241f;">()</span>;
+    registry.registerBeanDefinition<span style="color: #d8241f;">(</span>beanName, definitionHolder.getBeanDefinition<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Register aliases for bean name, if any.</span>
+    <span style="color: #268bd2;">String</span><span style="color: #d8241f;">[]</span> <span style="color: #6c71c4;">aliases</span> = definitionHolder.getAliases<span style="color: #d8241f;">()</span>;
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>aliases != <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">for</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">alias</span> : aliases<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            registry.registerAlias<span style="color: #24a222;">(</span>beanName, alias<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+在调用到注册方法的调用栈如下
+</p>
+<div class="org-src-container">
+<pre class="src src-text">registerBeanDefinition:163, BeanDefinitionReaderUtils (org.springframework.beans.factory.support)
+processBeanDefinition:311, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+parseDefaultElement:197, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+parseBeanDefinitions:176, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+doRegisterBeanDefinitions:149, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+registerBeanDefinitions:96, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+registerBeanDefinitions:509, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+doLoadBeanDefinitions:389, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+loadBeanDefinitions:336, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+loadBeanDefinitions:305, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+loadBeanDefinitions:188, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+loadBeanDefinitions:224, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+loadBeanDefinitions:195, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+loadBeanDefinitions:257, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+loadBeanDefinitions:128, AbstractXmlApplicationContext (org.springframework.context.support)
+loadBeanDefinitions:94, AbstractXmlApplicationContext (org.springframework.context.support)
+refreshBeanFactory:133, AbstractRefreshableApplicationContext (org.springframework.context.support)
+obtainFreshBeanFactory:637, AbstractApplicationContext (org.springframework.context.support)
+refresh:522, AbstractApplicationContext (org.springframework.context.support)
+&lt;init&gt;:144, ClassPathXmlApplicationContext (org.springframework.context.support)
+&lt;init&gt;:85, ClassPathXmlApplicationContext (org.springframework.context.support)
+main:10, MyApplication (io.github.jeanhwea)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcd31dd5" class="outline-4">
+<h4 id="orgcd31dd5"><span class="section-number-4">1.6.2</span> DefaultListableBeanFactory</h4>
+<div class="outline-text-4" id="text-1-6-2">
+<p>
+通过观察上文的调用栈可以发现注册 BeanDefinition 是通过
+<code>AbstractRefreshableApplicationContext</code> 类中的 <code>loadBeanDefinitions(...)</code> 方
+法实现
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * This implementation performs an actual refresh of this context's underlying</span>
+<span style="color: #d33682;"> * bean factory, shutting down the previous bean factory (if any) and</span>
+<span style="color: #d33682;"> * initializing a fresh bean factory for the next phase of the context's lifecycle.</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #268bd2;">@Override</span>
+<span style="color: #859900;">protected</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">refreshBeanFactory</span><span style="color: #8d5649;">()</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeansException</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>hasBeanFactory<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        destroyBeans<span style="color: #9564bf;">()</span>;
+        closeBeanFactory<span style="color: #9564bf;">()</span>;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">try</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #268bd2;">DefaultListableBeanFactory</span> <span style="color: #6c71c4;">beanFactory</span> = createBeanFactory<span style="color: #9564bf;">()</span>;
+        beanFactory.setSerializationId<span style="color: #9564bf;">(</span>getId<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+        customizeBeanFactory<span style="color: #9564bf;">(</span>beanFactory<span style="color: #9564bf;">)</span>;
+        loadBeanDefinitions<span style="color: #9564bf;">(</span>beanFactory<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">synchronized</span> <span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.beanFactoryMonitor<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">this</span>.beanFactory = beanFactory;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">IOException</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">ApplicationContextException</span><span style="color: #9564bf;">(</span><span style="color: #2aa198;">"I/O error parsing bean definition source for "</span> + getDisplayName<span style="color: #24a222;">()</span>, ex<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+这里使用的 beanFactory 是 <code>DefaultListableBeanFactory</code>, 并且
+<code>DefaultListableBeanFactory</code> 实现了大部分的 Spring 注册及加载的实现，先查看
+其集成关系
 </p>
 
 
-<div id="orgb41498f" class="figure">
+<div id="orgdc5e45a" class="figure">
 <p><img src="../static/image/2021/07/DefaultListableBeanFactory.png" alt="DefaultListableBeanFactory.png" />
 </p>
 </div>
 
 <p>
-该类定了 BeanDefinition 类的 Map
+该类定了 BeanDefinition 类的 Map, 是用于存 BeanDefinition 信息的缓存
 </p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #d33682;">/** Map of bean definition objects, keyed by bean name. */</span>
@@ -590,11 +744,304 @@ DefaultListableBeanFactory 实现了大部分的 Spring 注册及加载的实现
 </pre>
 </div>
 </div>
+
+<ol class="org-ol">
+<li><a id="org631d8ac"></a>BeanDefinition 注册的实现<br />
+<div class="outline-text-5" id="text-1-6-2-1">
+<p>
+<code>DefaultListableBeanFactory</code> 的 <code>registerBeanDefinition(...)</code> 才是真正实现
+注册 BeanDefinition 逻辑，其代码如下：
+</p>
+<ol class="org-ol">
+<li>对 beanDefinition 进行验证</li>
+<li>检查 beanDefinition 是否存在
+<ul class="org-ul">
+<li>如果存在，判断是否覆盖对应的 BeanDefinition</li>
+<li>如果 beanDefinition 不存在，进行创建并注册</li>
+</ul></li>
+</ol>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">//</span><span style="color: #93a1a1; font-style: italic;">---------------------------------------------------------------------</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Implementation of BeanDefinitionRegistry interface</span>
+<span style="color: #93a1a1; font-style: italic;">//</span><span style="color: #93a1a1; font-style: italic;">---------------------------------------------------------------------</span>
+
+<span style="color: #268bd2;">@Override</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">registerBeanDefinition</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span>, <span style="color: #268bd2;">BeanDefinition</span> <span style="color: #6c71c4;">beanDefinition</span><span style="color: #8d5649;">)</span>
+        <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeanDefinitionStoreException</span> <span style="color: #8d5649;">{</span>
+
+    Assert.hasText<span style="color: #d8241f;">(</span>beanName, <span style="color: #2aa198;">"Bean name must not be empty"</span><span style="color: #d8241f;">)</span>;
+    Assert.notNull<span style="color: #d8241f;">(</span>beanDefinition, <span style="color: #2aa198;">"BeanDefinition must not be null"</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>beanDefinition <span style="color: #859900;">instanceof</span> AbstractBeanDefinition<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">try</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #24a222;">(</span><span style="color: #ff7f00;">(</span><span style="color: #268bd2;">AbstractBeanDefinition</span><span style="color: #ff7f00;">)</span> beanDefinition<span style="color: #24a222;">)</span>.validate<span style="color: #24a222;">()</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">catch</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">BeanDefinitionValidationException</span> <span style="color: #6c71c4;">ex</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanDefinitionStoreException</span><span style="color: #24a222;">(</span>beanDefinition.getResourceDescription<span style="color: #ff7f00;">()</span>, beanName,
+                    <span style="color: #2aa198;">"Validation of bean definition failed"</span>, ex<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #268bd2;">BeanDefinition</span> <span style="color: #6c71c4;">existingDefinition</span> = <span style="color: #859900;">this</span>.beanDefinitionMap.get<span style="color: #d8241f;">(</span>beanName<span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>existingDefinition != <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">!</span>isAllowBeanDefinitionOverriding<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanDefinitionOverrideException</span><span style="color: #24a222;">(</span>beanName, beanDefinition, existingDefinition<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>existingDefinition.getRole<span style="color: #24a222;">()</span> &lt; beanDefinition.getRole<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>logger.isInfoEnabled<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                logger.info<span style="color: #ff7f00;">(</span><span style="color: #2aa198;">"Overriding user-defined bean definition for bean '"</span> + beanName +
+                        <span style="color: #2aa198;">"' with a framework-generated bean definition: replacing ["</span> +
+                        existingDefinition + <span style="color: #2aa198;">"] with ["</span> + beanDefinition + <span style="color: #2aa198;">"]"</span><span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">!</span>beanDefinition.equals<span style="color: #24a222;">(</span>existingDefinition<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>logger.isDebugEnabled<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                logger.debug<span style="color: #ff7f00;">(</span><span style="color: #2aa198;">"Overriding bean definition for bean '"</span> + beanName +
+                        <span style="color: #2aa198;">"' with a different definition: replacing ["</span> + existingDefinition +
+                        <span style="color: #2aa198;">"] with ["</span> + beanDefinition + <span style="color: #2aa198;">"]"</span><span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>logger.isTraceEnabled<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                logger.trace<span style="color: #ff7f00;">(</span><span style="color: #2aa198;">"Overriding bean definition for bean '"</span> + beanName +
+                        <span style="color: #2aa198;">"' with an equivalent definition: replacing ["</span> + existingDefinition +
+                        <span style="color: #2aa198;">"] with ["</span> + beanDefinition + <span style="color: #2aa198;">"]"</span><span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">this</span>.beanDefinitionMap.put<span style="color: #9564bf;">(</span>beanName, beanDefinition<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>hasBeanCreationStarted<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Cannot modify startup-time collection elements anymore (for stable iteration)</span>
+            <span style="color: #859900;">synchronized</span> <span style="color: #24a222;">(</span><span style="color: #859900;">this</span>.beanDefinitionMap<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #859900;">this</span>.beanDefinitionMap.put<span style="color: #ff7f00;">(</span>beanName, beanDefinition<span style="color: #ff7f00;">)</span>;
+                <span style="color: #268bd2;">List</span><span style="color: #ff7f00;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #ff7f00;">&gt;</span> <span style="color: #6c71c4;">updatedDefinitions</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #ff7f00;">&lt;&gt;(</span><span style="color: #859900;">this</span>.beanDefinitionNames.size<span style="color: #1776b6;">()</span> + 1<span style="color: #ff7f00;">)</span>;
+                updatedDefinitions.addAll<span style="color: #ff7f00;">(</span><span style="color: #859900;">this</span>.beanDefinitionNames<span style="color: #ff7f00;">)</span>;
+                updatedDefinitions.add<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span>;
+                <span style="color: #859900;">this</span>.beanDefinitionNames = updatedDefinitions;
+                removeManualSingletonName<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Still in startup registration phase</span>
+            <span style="color: #859900;">this</span>.beanDefinitionMap.put<span style="color: #24a222;">(</span>beanName, beanDefinition<span style="color: #24a222;">)</span>;
+            <span style="color: #859900;">this</span>.beanDefinitionNames.add<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
+            removeManualSingletonName<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">this</span>.frozenBeanDefinitionNames = <span style="color: #268bd2;">null</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>existingDefinition != <span style="color: #268bd2;">null</span> || containsSingleton<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        resetBeanDefinition<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
 </div>
 
-<div id="outline-container-orgd06abfc" class="outline-3">
-<h3 id="orgd06abfc"><span class="section-number-3">2.2</span> XmlBeanDefinitionReader</h3>
-<div class="outline-text-3" id="text-2-2">
+<p>
+在上面注册过程中， <code>hasBeanCreationStarted()</code> 方法用于判断 Bean 是否开始创
+建，它实现逻辑在父类 <code>AbstractBeanFactory</code> 中
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Check whether this factory's bean creation phase already started,</span>
+<span style="color: #d33682;"> * i.e. whether any bean has been marked as created in the meantime.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@since</span><span style="color: #d33682;"> 4.2.2</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@see</span><span style="color: #d33682;"> #markBeanAsCreated</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">boolean</span> <span style="color: #b58900;">hasBeanCreationStarted</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #859900;">return</span> <span style="color: #268bd2;">!</span><span style="color: #859900;">this</span>.alreadyCreated.isEmpty<span style="color: #d8241f;">()</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+父类 <code>AbstractBeanFactory</code> 中定义了一个集合记录正在创建的 Bean
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/** Names of beans that have already been created at least once. */</span>
+<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Set</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">alreadyCreated</span> = Collections.newSetFromMap<span style="color: #8d5649;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">ConcurrentHashMap</span><span style="color: #d8241f;">&lt;&gt;(</span>256<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>;
+</pre>
+</div>
+
+<p>
+创建时通过 <code>markBeanAsCreated(...)</code> 方法标记，注意对 <code>alreadyCreated</code> 的访
+问是需要加锁的
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Mark the specified bean as already created (or about to be created).</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">&lt;p&gt;</span><span style="color: #d33682;">This allows the bean factory to optimize its caching for repeated</span>
+<span style="color: #d33682;"> * creation of the specified bean.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> beanName the name of the bean</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">markBeanAsCreated</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">!</span><span style="color: #859900;">this</span>.alreadyCreated.contains<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">synchronized</span> <span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.mergedBeanDefinitions<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span><span style="color: #268bd2;">!</span><span style="color: #859900;">this</span>.alreadyCreated.contains<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Let the bean definition get re-merged now that we're actually creating</span>
+                <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">the bean... just in case some of its metadata changed in the meantime.</span>
+                clearMergedBeanDefinition<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span>;
+                <span style="color: #859900;">this</span>.alreadyCreated.add<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="org5b8c1b6"></a>BeanDefinition 移除的实现<br />
+<div class="outline-text-5" id="text-1-6-2-2">
+<p>
+BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</code> 方法
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@Override</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">removeBeanDefinition</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span><span style="color: #8d5649;">)</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">NoSuchBeanDefinitionException</span> <span style="color: #8d5649;">{</span>
+    Assert.hasText<span style="color: #d8241f;">(</span>beanName, <span style="color: #2aa198;">"'beanName' must not be empty"</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #268bd2;">BeanDefinition</span> <span style="color: #6c71c4;">bd</span> = <span style="color: #859900;">this</span>.beanDefinitionMap.remove<span style="color: #d8241f;">(</span>beanName<span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>bd == <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>logger.isTraceEnabled<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            logger.trace<span style="color: #24a222;">(</span><span style="color: #2aa198;">"No bean named '"</span> + beanName + <span style="color: #2aa198;">"' found in "</span> + <span style="color: #859900;">this</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">NoSuchBeanDefinitionException</span><span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>hasBeanCreationStarted<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Cannot modify startup-time collection elements anymore (for stable iteration)</span>
+        <span style="color: #859900;">synchronized</span> <span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.beanDefinitionMap<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #268bd2;">List</span><span style="color: #24a222;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #24a222;">&gt;</span> <span style="color: #6c71c4;">updatedDefinitions</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #24a222;">&lt;&gt;(</span><span style="color: #859900;">this</span>.beanDefinitionNames<span style="color: #24a222;">)</span>;
+            updatedDefinitions.remove<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
+            <span style="color: #859900;">this</span>.beanDefinitionNames = updatedDefinitions;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Still in startup registration phase</span>
+        <span style="color: #859900;">this</span>.beanDefinitionNames.remove<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">this</span>.frozenBeanDefinitionNames = <span style="color: #268bd2;">null</span>;
+
+    resetBeanDefinition<span style="color: #d8241f;">(</span>beanName<span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+移除 BeanDefinition 中调用了刷新 BeanDefinition 的方法
+<code>resetBeanDefinition(...)</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Reset all bean definition caches for the given bean,</span>
+<span style="color: #d33682;"> * including the caches of beans that are derived from it.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">&lt;p&gt;</span><span style="color: #d33682;">Called after an existing bean definition has been replaced or removed,</span>
+<span style="color: #d33682;"> * triggering </span><span style="color: #268bd2;">{@link #clearMergedBeanDefinition}</span><span style="color: #d33682;">, </span><span style="color: #268bd2;">{@link #destroySingleton}</span>
+<span style="color: #d33682;"> * and </span><span style="color: #268bd2;">{@link MergedBeanDefinitionPostProcessor#resetBeanDefinition}</span><span style="color: #d33682;"> on the</span>
+<span style="color: #d33682;"> * given bean and on all bean definitions that have the given bean as parent.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> beanName the name of the bean to reset</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@see</span><span style="color: #d33682;"> #registerBeanDefinition</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@see</span><span style="color: #d33682;"> #removeBeanDefinition</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">resetBeanDefinition</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Remove the merged bean definition for the given bean, if already created.</span>
+    clearMergedBeanDefinition<span style="color: #d8241f;">(</span>beanName<span style="color: #d8241f;">)</span>;
+
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Remove corresponding bean from singleton cache, if any. Shouldn't usually</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">be necessary, rather just meant for overriding a context's default beans</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">(e.g. the default StaticMessageSource in a StaticApplicationContext).</span>
+    destroySingleton<span style="color: #d8241f;">(</span>beanName<span style="color: #d8241f;">)</span>;
+
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Notify all post-processors that the specified bean definition has been reset.</span>
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">BeanPostProcessor</span> <span style="color: #6c71c4;">processor</span> : getBeanPostProcessors<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>processor <span style="color: #859900;">instanceof</span> MergedBeanDefinitionPostProcessor<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #24a222;">(</span><span style="color: #ff7f00;">(</span><span style="color: #268bd2;">MergedBeanDefinitionPostProcessor</span><span style="color: #ff7f00;">)</span> processor<span style="color: #24a222;">)</span>.resetBeanDefinition<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Reset all bean definitions that have the given bean as parent (recursively).</span>
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">bdName</span> : <span style="color: #859900;">this</span>.beanDefinitionNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">!</span>beanName.equals<span style="color: #24a222;">(</span>bdName<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #268bd2;">BeanDefinition</span> <span style="color: #6c71c4;">bd</span> = <span style="color: #859900;">this</span>.beanDefinitionMap.get<span style="color: #24a222;">(</span>bdName<span style="color: #24a222;">)</span>;
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Ensure bd is non-null due to potential concurrent modification</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">of the beanDefinitionMap.</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>bd != <span style="color: #268bd2;">null</span> &amp;&amp; beanName.equals<span style="color: #ff7f00;">(</span>bd.getParentName<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                resetBeanDefinition<span style="color: #ff7f00;">(</span>bdName<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="org4fce4db"></a>BeanDefinition 获取<br />
+<div class="outline-text-5" id="text-1-6-2-3">
+<p>
+<code>DefaultListableBeanFactory</code> 的实现获取 BeanDefinition 的逻辑如下
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@Override</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">BeanDefinition</span> <span style="color: #b58900;">getBeanDefinition</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span><span style="color: #8d5649;">)</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">NoSuchBeanDefinitionException</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #268bd2;">BeanDefinition</span> <span style="color: #6c71c4;">bd</span> = <span style="color: #859900;">this</span>.beanDefinitionMap.get<span style="color: #d8241f;">(</span>beanName<span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>bd == <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>logger.isTraceEnabled<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            logger.trace<span style="color: #24a222;">(</span><span style="color: #2aa198;">"No bean named '"</span> + beanName + <span style="color: #2aa198;">"' found in "</span> + <span style="color: #859900;">this</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">NoSuchBeanDefinitionException</span><span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">return</span> bd;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org4c1b33b" class="outline-3">
+<h3 id="org4c1b33b"><span class="section-number-3">1.7</span> Bean 的生命周期</h3>
+<div class="outline-text-3" id="text-1-7">
+<p>
+<code>BeanFactory</code> 的注释中完整地说明的实现标准 BeanFactory 的代码
+</p>
+<ol class="org-ol">
+<li>BeanFactory 初始化过程，支持的标准 Bean 的生命周期
+<ul class="org-ul">
+<li><code>BeanNameAware#setBeanName(...)</code></li>
+<li><code>BeanClassLoaderAware#setBeanClassLoader(...)</code></li>
+<li><code>BeanFactoryAware#setBeanFactory(...)</code></li>
+<li><code>EnvironmentAware#setEnvironment(...)</code></li>
+<li><code>EmbeddedValueResolverAware#setEmbeddedValueResolver(...)</code></li>
+<li><code>ResourceLoaderAware#setResourceLoader(...)</code> 在 ApplicationContext 中</li>
+<li><code>ApplicationEventPublisherAware#setApplicationEventPublisher(...)</code> 在
+ApplicationContext 中</li>
+<li><code>MessageSourceAware#setMessageSource(...)</code> 在 ApplicationContext 中</li>
+<li><code>ApplicationContextAware#setApplicationContext(...)</code> 在
+ApplicationContext 中</li>
+<li><code>ServletContextAware#setServletContext(...)</code> 在 ApplicationContext 中</li>
+<li><code>BeanPostProcessors</code> 的一系列 <code>postProcessBeforeInitialization(...)</code> 方法</li>
+<li><code>InitializingBean#afterPropertiesSet(...)</code></li>
+<li>a custom init-method definition</li>
+<li><code>BeanPostProcessors</code> 的一系列 <code>postProcessAfterInitialization(...)</code> 方法</li>
+</ul></li>
+<li>关闭 BeanFactory 时，执行的 Bean 销毁方法
+<ul class="org-ul">
+<li><code>DestructionAwareBeanPostProcessors</code> 的一系列
+<code>postProcessBeforeDestruction(...)</code> 方法</li>
+<li><code>DisposableBean#destroy(...)</code></li>
+<li>a custom destroy-method definition</li>
+</ul></li>
+</ol>
+</div>
+<div id="outline-container-orgeea498d" class="outline-4">
+<h4 id="orgeea498d"><span class="section-number-4">1.7.1</span> XmlBeanDefinitionReader</h4>
+<div class="outline-text-4" id="text-1-7-1">
 <p>
 实际实现读取 BeanDefinition 的方法
 </p>
@@ -648,14 +1095,15 @@ DefaultListableBeanFactory 实现了大部分的 Spring 注册及加载的实现
 </div>
 </div>
 </div>
-
-<div id="outline-container-org1f3915d" class="outline-2">
-<h2 id="org1f3915d"><span class="section-number-2">3</span> ApplicationContext</h2>
 </div>
 
-<div id="outline-container-orge6ebd64" class="outline-2">
-<h2 id="orge6ebd64"><span class="section-number-2">4</span> AOP</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-orga1532db" class="outline-2">
+<h2 id="orga1532db"><span class="section-number-2">2</span> ApplicationContext</h2>
+</div>
+
+<div id="outline-container-orgd04e10d" class="outline-2">
+<h2 id="orgd04e10d"><span class="section-number-2">3</span> AOP</h2>
+<div class="outline-text-2" id="text-3">
 <p>
 使用动态代理实现
 </p>
@@ -666,9 +1114,9 @@ DefaultListableBeanFactory 实现了大部分的 Spring 注册及加载的实现
 </div>
 </div>
 
-<div id="outline-container-org6a327e2" class="outline-2">
-<h2 id="org6a327e2"><span class="section-number-2">5</span> Spring 核心类梳理</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-org69df34f" class="outline-2">
+<h2 id="org69df34f"><span class="section-number-2">4</span> Spring 核心类梳理</h2>
+<div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li>ApplicationContext
 <ul class="org-ul">
@@ -713,12 +1161,12 @@ DefaultListableBeanFactory 实现了大部分的 Spring 注册及加载的实现
 </div>
 </div>
 
-<div id="outline-container-org96e27bc" class="outline-2">
-<h2 id="org96e27bc"><span class="section-number-2">6</span> SpringBoot 自动装配</h2>
+<div id="outline-container-org1021f33" class="outline-2">
+<h2 id="org1021f33"><span class="section-number-2">5</span> SpringBoot 自动装配</h2>
 </div>
-<div id="outline-container-org5e3d7a7" class="outline-2">
-<h2 id="org5e3d7a7"><span class="section-number-2">7</span> 参考链接</h2>
-<div class="outline-text-2" id="text-7">
+<div id="outline-container-org9f4273f" class="outline-2">
+<h2 id="org9f4273f"><span class="section-number-2">6</span> 参考链接</h2>
+<div class="outline-text-2" id="text-6">
 <ol class="org-ol">
 <li><a href="https://huifer.github.io/spring-analysis/">Spring Analysis</a></li>
 </ol>
@@ -726,7 +1174,7 @@ DefaultListableBeanFactory 实现了大部分的 Spring 注册及加载的实现
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-15 Thu 12:26. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
+<p class="author">Last Updated 2021-07-16 Fri 22:50. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
 </div>
 </body>
 </html>
