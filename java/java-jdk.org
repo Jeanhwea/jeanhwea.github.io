@@ -8,13 +8,13 @@
 #+TAGS: java jdk
 
 
-* 基本用法
+* 基础知识
 ** 基本数据类型
    Java 语言中有 8 个基本类型，和 C++ 语言不同的是 Java 的基本类型的存储空间是固
    定的，每种类型的信息如下
 
    | 类型    | 存储空间 | 封装类    | 说明         |
-   |---------+----------+-----------+--------------|
+   |---------+----------+----------+--------------|
    | boolean | 1 bit    | Boolean   |              |
    | byte    | 1 字节   | Byte      |              |
    | char    | 2 字节   | Character | Unicode 编码 |
@@ -40,59 +40,12 @@
    4. 存储位置不同, 定义的基本数据类型的变量和对象的引用变量（地址）存储在栈中，
       而实际对应的对象（value）是存储在堆中
 
-** String 字符串
-*** 字符串基本操作
-    String 在 Java 中不是基本类型，对应的有一个 String 类
-    #+BEGIN_SRC java
-      String str1 = "";
-      str1.isEmpty(); // => true
-      str1.substring(0,3); // => java.lang.StringIndexOutOfBoundsException: String index out of range: 3
-
-      String str2 = "Hello"
-      str2.substring(0,3); // => "Hel"
-      str2.substring(1,3); // => "el"
-      str2.substring(1,3) == "el"; // => false
-      str2.substring(1,3).equals("el"); // => true
-    #+END_SRC
-
-    在判断字符串 str 为非空时需要写如下的两个条件
-    #+BEGIN_SRC java
-      if (str != null && !str.isEmpty()) {
-        // if str is not empty
-      }
-    #+END_SRC
-
-*** String 的不可变性
-    不可变对象指的是 *一个对象，在它创建完成之后，不能再改变它的状态* 。不能改变
-    状态的意思是，不能改变对象内的成员变量，包括基本数据类型的值不能改变，引用类
-    型的变量不能指向其他的对象，引用类型指向的对象的状态也不能改变。
-
-    至于为什么要把 String 类设计成不可变类，是它的用途决定的。其实不只 String，
-    很多 Java 标准类库中的类都是不可变的。在开发一个系统的时候，我们有时候也需要
-    设计不可变类，来传递一组相关的值，这也是面向对象思想的体现。不可变类有一些优
-    点，比如因为它的对象是只读的，所以多线程并发访问也不会有任何问题。当然也有一
-    些缺点，比如每个不同的状态都要一个对象来代表，可能会造成性能上的问题。所以
-    Java 标准类库还提供了一个可变版本，即 StringBuffer。
-
-    ~javac~ 编译可以对字符串常量直接相加的表达式进行优化，不必要等到运行期去进行
-    加法运算处理，而是在编译时去掉其中的加号，直接将其编译成一个这些常量相连的结
-    果。所以 ~String s = "a" + "b" + "c" + "d";~ 只生成一个对象.
-
-*** String, StringBuilder 和 StringBuffer
-    Java 平台提供了两种类型的字符串：
-    - ~String~ 和 ~StringBuffer~ / ~StringBuilder~, 它们可以储存和操作字符串。其
-      中 String 是只读字符串，也就意味着 String 引用的字符串内容是不能被改变的。
-    - 而 StringBuffer 和 StringBuilder 类表示的字符串对象可以直接进行修改。
-      StringBuilder 是 JDK 1.5 中引入的，它和 StringBuffer 的方法完全相同，区别
-      在 于它是在单线程环境下使用的，因为它的所有方面都没有被 ~synchronized~ 修
-      饰，因 此它的效率也比 StringBuffer 略高。
-
 ** ~==~ 与 equals 的区别
    1. ~==~ 是一个运算符。 equals 则是 String 对象的方法
    2. 基本数据类型比较 ~==~ 比较两个值是否相等。相等为 true 否则为 false；equals
       不能直接用于基本类型的比较。需要将基本类型转换为包装器进行比较。
-   3. 引用对象比较 ~==~ 和 equals 都是比较栈内存中的地址是否相等 。相等为 true 否
-      则为 false。 需注意几点：
+   3. 引用对象比较 ~==~ 和 equals 都是比较栈内存中的地址是否相等 。相等为 true
+      否则为 false。 需注意几点：
       - String 是一个特殊的引用类型。对于两个字符串的比较，不管是 ~==~ 和 equals
         这两者比较的都是字符串是否相同
       - 当你创建两个 String 对象时，内存中的地址是不相同的，你可以赋相同的值。所
@@ -100,22 +53,17 @@
         但反过来却是肯定的
       - 基本数据类型比较 (String 除外) ~==~ 和 equals 两者都是比较值
 
-   #+HEADER: :classname App198
-   #+BEGIN_SRC java exports code
-     class App198 {
-       public static void main(String args[]) {
-         String s1 = "Hello";
-         String s2 = "Hello";
-         String s3 = new String("Hello");
-         String s4 = "Hel" + "lo";          // String is immutable, it will compiles to "Hello"
-         System.out.println(s1 == s2);      // => true
-         System.out.println(s1.equals(s2)); // => ture
-         System.out.println(s1 == s3);      // => false
-         System.out.println(s1.equals(s3)); // => ture
-         System.out.println(s1 == s4);      // => true
-         System.out.println(s1.equals(s4)); // => true
-       }
-     }
+   #+BEGIN_SRC java
+     String s1 = "Hello";
+     String s2 = "Hello";
+     String s3 = new String("Hello");
+     String s4 = "Hel" + "lo";          // String is immutable, it will compiles to "Hello"
+     System.out.println(s1 == s2);      // => true
+     System.out.println(s1.equals(s2)); // => ture
+     System.out.println(s1 == s3);      // => false
+     System.out.println(s1.equals(s3)); // => ture
+     System.out.println(s1 == s4);      // => true
+     System.out.println(s1.equals(s4)); // => true
    #+END_SRC
 
 ** hashCode() 和 equals() 方法
@@ -124,23 +72,22 @@
         public native int hashCode();
 
         public boolean equals(Object obj) {
-            return (this == obj);
+          return (this == obj);
         }
       #+END_SRC
    2. ~==~ 比较对象的地址
 
 ** 错误和异常
-   - ~java.lang.Error~ : Throwable 的子类，用于标记严重错误，表示系统级的错误和
-     程序不必处理的异常。合理的应用程序不应该去 ~try/catch~ 这种错误。是恢复不是
-     不可能但很困难的情况下的一种严重问题；比如内存溢出，不可能指望程序能处理这
-     样的情况；
-   - ~java.lang.Exception~ : Throwable 的子类，表示需要捕捉或者需要程序进行处理
-     的异常，是一种设计或实现问题；也就是说，它表示如果程序运行正常，从不会发生
-     的情况。并且鼓励用户程序去 ~catch~ 它。
+   1. ~java.lang.Error~ : Throwable 的子类，用于标记严重错误，表示系统级的错误和
+      程序不必处理的异常。合理的应用程序不应该去 ~try/catch~ 这种错误。是恢复不
+      是不可能但很困难的情况下的一种严重问题；比如内存溢出，不可能指望程序能处理
+      这样的情况；
+   2. ~java.lang.Exception~ : Throwable 的子类，表示需要捕捉或者需要程序进行处理
+      的异常，是一种设计或实现问题；也就是说，它表示如果程序运行正常，从不会发生
+      的情况。并且鼓励用户程序去 ~catch~ 它。
 
    处理异常的一种方式是在类方法的定义中 ~throws~ 相应的异常
-   #+HEADER: :classname App148
-   #+BEGIN_SRC java :exports code
+   #+BEGIN_SRC java
      class App148 {
        public static void main(String args[]) throws MyException {
          MyException myecpt = new MyException("Ops!");
@@ -157,53 +104,46 @@
    #+END_SRC
 
    或者使用 ~try/catch~ 块来捕获异常进行处理
-   #+HEADER: :classname App253
-   #+BEGIN_SRC java :exports code
-     class App166 {
-
-       public static void main(String args[]) {
-         int num1, num2;
-         try {
-           num1 = 0;
-           num2 = 62 / num1;
-           System.out.println(num2);
-           System.out.println("Hey I'm at the end of try block");
-         } catch (ArithmeticException e) {
-           System.out.println("You should not divide a number by zero");
-         } catch (Exception e) {
-           System.out.println("Exception occurred");
-         }
-         System.out.println("I'm out of try-catch block in Java.");
+   #+BEGIN_SRC java
+     public static void main(String args[]) {
+       int num1, num2;
+       try {
+         num1 = 0;
+         num2 = 62 / num1;
+         System.out.println(num2);
+         System.out.println("Hey I'm at the end of try block");
+       } catch (ArithmeticException e) {
+         System.out.println("You should not divide a number by zero");
+       } catch (Exception e) {
+         System.out.println("Exception occurred");
        }
+       System.out.println("I'm out of try-catch block in Java.");
      }
    #+END_SRC
 
-   #+RESULTS:
-   : You should not divide a number by zero
-   : I'm out of try-catch block in Java.
 
    *Error 和 RuntimeException 及其子类都是未检查的异常* （unchecked exceptions），
    而所有其他的 Exception 类都是检查了的异常（checked exceptions）
 
-   - checked exceptions: 上下文环境有关，即使程序设计无误，仍然可能因使用的问题
-     而引发．通常是从一个可以恢复的程序中抛出来的，并且最好能够从这种异常中使用
-     程序恢复。比如 FileNotFoundException, ParseException 等。检查了的异常发生在
-     编译阶段，必须要使用 ~try/catch~ （或者 ~throws~ ）否则编译不通过。
-     + ClassNotFoundException
-     + IOException
-     + FileNotFoundException
-   - unchecked exceptions: 通常是如果一切正常的话本不该发生的异常，但是的确发生
-     了。 发生在运行期，具有不确定性，主要是由于程序的逻辑问题所引起的。比如
-     ArrayIndexOutOfBoundException, ClassCastException 等。从语言本身的角度讲，
-     程序不该去 catch 这类异常，虽然能够从诸如 RuntimeException 这样的异常中
-     catch 并恢复，但是并不鼓励终端程序员这么做，因为完全没要必要。因为这类错误
-     本身就是 bug，应该被修复，出现此类错误时程序就应该立即停止执行。 因此，面对
-     Errors 和 unchecked exceptions 应该让程序自动终止执行，程序员不该做诸如
-     ~try/catch~ 这样的事情，而是应该查明原因，修改代码逻辑。
-     + NullPointerException
-     + ArrayIndexOutOfBoundException
-     + IllegalArgumentException
-     + OutOfMemoryError
+   1. checked exceptions: 上下文环境有关，即使程序设计无误，仍然可能因使用的问题
+      而引发．通常是从一个可以恢复的程序中抛出来的，并且最好能够从这种异常中使用
+      程序恢复。比如 FileNotFoundException, ParseException 等。检查了的异常发生
+      在编译阶段，必须要使用 ~try/catch~ （或者 ~throws~ ）否则编译不通过。
+      - ClassNotFoundException
+      - IOException
+      - FileNotFoundException
+   2. unchecked exceptions: 通常是如果一切正常的话本不该发生的异常，但是的确发生
+      了。 发生在运行期，具有不确定性，主要是由于程序的逻辑问题所引起的。比如
+      ArrayIndexOutOfBoundException, ClassCastException 等。从语言本身的角度讲，
+      程序不该去 catch 这类异常，虽然能够从诸如 RuntimeException 这样的异常中
+      catch 并恢复，但是并不鼓励终端程序员这么做，因为完全没要必要。因为这类错误
+      本身就是 bug，应该被修复，出现此类错误时程序就应该立即停止执行。 因此，面
+      对 Errors 和 unchecked exceptions 应该让程序自动终止执行，程序员不该做诸
+      如~try/catch~ 这样的事情，而是应该查明原因，修改代码逻辑。
+      - NullPointerException
+      - ArrayIndexOutOfBoundException
+      - IllegalArgumentException
+      - OutOfMemoryError
 
    RuntimeException：RuntimeException 体系包括错误的类型转换、数组越界访问和试图
    访问空指针等等。处理 RuntimeException 的原则是：如果出现 RuntimeException，那
@@ -212,8 +152,8 @@
    读取数据等，这并不是程序本身的错误，而是在应用环境中出现的外部错误。
 
    《Effective Java》 中对于异常处理总结如下：
-   - 不要将异常处理用于正常的控制流（设计良好的 API 不应该强迫它的调用者为了正常的
-     控制流而使用异常）
+   - 不要将异常处理用于正常的控制流（设计良好的 API 不应该强迫它的调用者为了正常
+     的控制流而使用异常）
    - 对可以恢复的情况使用受检异常，对编程错误使用运行时异常
    - 避免不必要的使用受检异常（可以通过一些状态检测手段来避免异常的发生）
    - 优先使用标准的异常
@@ -244,28 +184,9 @@
       为了解决在对对象流进行读写操作时所引发的问题
    2. 序列化的实现
       - 将需要被序列化的类实现 ~Serializable~ 接口
-      -  ~Serializable~ 接口没有需要实现的方法，只是为了标注该对象是可被序列化的
-   4. 被 ~transient~ 修饰的变量不属于对象持久化的一部分，该变量内容在序列化后无
+      - ~Serializable~ 接口没有需要实现的方法，只是为了标注该对象是可被序列化的
+   3. 被 ~transient~ 修饰的变量不属于对象持久化的一部分，该变量内容在序列化后无
       法获得访问
-
-** 输入和输出
-   读取数据的输入和打印到标准输出
-   #+BEGIN_SRC java
-     Scanner in = new Scanner(System.in);
-     System.out.println("What is your name?");
-     String name = in.nextLine();
-   #+END_SRC
-
-   格式化输出浮点数
-   #+BEGIN_SRC text
-     java> double x = 100000.0 / 3.0;
-     double x = 33333.333333333336
-     java> System.out.printf("%.3f", x)
-     33333.333
-     java> System.out.printf("%,.3f", x)
-     33,333.333
-   #+END_SRC
-
 
 * 面向对象
 ** 对象初始化和消亡
@@ -384,8 +305,8 @@
 
    [[file:../static/image/2019/07/overload-override.png]]
 
-   1. Overload 表示同一个类中可以有多个名称相同的方法，但这些方法的参数列表各不相
-      同
+   1. Overload 表示同一个类中可以有多个名称相同的方法，但这些方法的参数列表各不
+      相同
       - Overload 的参数列表不同包括：参数类型不同，参数个数不同
       - Overload 不能重载函数返回值，即方法名称、参数个数和参数类型相同的方法被
         视为同一个重载方法
@@ -395,10 +316,10 @@
       子类创建的实例对象调用这个方法时，将调用子类中的定义方法，这相当于把父类中
       定义的那个完全相同的方法给覆盖了
       - Override 可以用于接口实现类中实现接口类中的方法
-      - Override 可以在子类中实现父类的方法，相当于子类中的方法覆盖了父类中的方法，
-        是一种实现多态的重要途径
-      - Override 覆盖父类方法时，子类只能抛出比父类更少的异常。或者是抛出父类抛出
-        的异常的子异常
+      - Override 可以在子类中实现父类的方法，相当于子类中的方法覆盖了父类中的方
+        法，是一种实现多态的重要途径
+      - Override 覆盖父类方法时，子类只能抛出比父类更少的异常。或者是抛出父类抛
+        出的异常的子异常
       - Override 不能覆盖父类中的 private 方法
 
    #+BEGIN_SRC java
@@ -442,8 +363,8 @@
       西也不能够算共有。所以 *变量是不可变 (final)类型，也就是常量了*
 
     接口中不可以定义变量即只能定义常量(加上 final 修饰就会变成常量)。所以接口的
-    属性默认是 ~public static final~ 常量，且必须赋初值。 注意：final 和
-    abstract 不能同时出现。接口中的方法默认是 ~public abstract~
+    属性默认是 ~public static final~ 常量，且必须赋初值。 注意：final 和 abstract
+    不能同时出现。接口中的方法默认是 ~public abstract~
 
     接口的定义使用 ~interface~ 关键字
     #+BEGIN_SRC java
@@ -543,6 +464,8 @@
    #+BEGIN_SRC java
      // 字符串
      String str1 = "abcdef";
+     str1.isEmpty();
+     str1.length();
      str1.substring(0, 3); // => "abc"
 
      // 字符串分割和合并
@@ -559,6 +482,13 @@
      // 正则表达式
      String str6 = "3 +5-4";
      str6 = str6.replaceAll("(\\+|-|\\*|/)", " $1 ").replaceAll("  ", " ").trim();
+   #+END_SRC
+
+   在判断字符串 str 为非空时需要写如下的两个条件
+   #+BEGIN_SRC java
+     if (str != null && !str.isEmpty()) {
+       // if str is not empty
+     }
    #+END_SRC
 
 ** 格式化
@@ -593,6 +523,32 @@
      java.lang.String res18 = "12345"
      java>
    #+END_SRC
+
+
+** String 的不可变性
+   不可变对象指的是 *一个对象，在它创建完成之后，不能再改变它的状态* 。不能改变
+   状态的意思是，不能改变对象内的成员变量，包括基本数据类型的值不能改变，引用类
+   型的变量不能指向其他的对象，引用类型指向的对象的状态也不能改变。
+
+   至于为什么要把 String 类设计成不可变类，是它的用途决定的。其实不只 String，很
+   多 Java 标准类库中的类都是不可变的。在开发一个系统的时候，我们有时候也需要设
+   计不可变类，来传递一组相关的值，这也是面向对象思想的体现。不可变类有一些优点，
+   比如因为它的对象是只读的，所以多线程并发访问也不会有任何问题。当然也有一些缺
+   点，比如每个不同的状态都要一个对象来代表，可能会造成性能上的问题。所以 Java 标
+   准类库还提供了一个可变版本，即 StringBuffer。
+
+   ~javac~ 编译可以对字符串常量直接相加的表达式进行优化，不必要等到运行期去进行
+   加法运算处理，而是在编译时去掉其中的加号，直接将其编译成一个这些常量相连的结
+   果。所以 ~String s = "a" + "b" + "c" + "d";~ 只生成一个对象.
+
+** String, StringBuilder 和 StringBuffer
+   Java 平台提供了两种类型的字符串：
+   1. ~String~ 和 ~StringBuffer~, ~StringBuilder~, 它们可以储存和操作字符串。其
+      中 String 是只读字符串，也就意味着 String 引用的字符串内容是不能被改变的。
+   2. 而 StringBuffer 和 StringBuilder 类表示的字符串对象可以直接进行修改。
+      StringBuilder 是 JDK 1.5 中引入的，它和 StringBuffer 的方法完全相同，区别
+      在 于它是在单线程环境下使用的，因为它的所有方面都没有被 ~synchronized~ 修
+      饰，因此它的效率也比 StringBuffer 略高。
 
 * 数组
 ** 基本操作
@@ -754,7 +710,6 @@
      map1.entrySet(); // 键值对的集合
 
    #+END_SRC
-
 
 * 正则表达式
   正则表达式是处理字符串的一个非常有效的工具，Java 中关于正则表达式处理的相关方

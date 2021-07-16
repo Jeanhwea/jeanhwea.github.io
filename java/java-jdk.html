@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-04 Sun 23:03 -->
+<!-- 2021-07-16 Fri 22:39 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JDK 相关知识点</title>
@@ -233,34 +233,86 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org342ecc5">1. 基本用法</a>
+<li><a href="#org3f4a6f5">1. 基础知识</a>
 <ul>
-<li><a href="#orgfc74e44">1.1. 基本数据类型</a></li>
-<li><a href="#org0e1002d">1.2. String 字符串</a>
-<ul>
-<li><a href="#orgd5949ed">1.2.1. 字符串基本操作</a></li>
-<li><a href="#org4e2701d">1.2.2. String 的不可变性</a></li>
-<li><a href="#org1264184">1.2.3. String, StringBuilder 和 StringBuffer</a></li>
+<li><a href="#orgb9547b3">1.1. 基本数据类型</a></li>
+<li><a href="#orgfe3e9c6">1.2. <code>==</code> 与 equals 的区别</a></li>
+<li><a href="#orgc30a0b4">1.3. hashCode() 和 equals() 方法</a></li>
+<li><a href="#org0eb7173">1.4. 错误和异常</a></li>
+<li><a href="#orgc576068">1.5. 静态变量和实例变量</a></li>
+<li><a href="#orgb5e4cd5">1.6. <code>final</code> 关键字</a></li>
+<li><a href="#org7d62138">1.7. 序列化</a></li>
 </ul>
 </li>
-<li><a href="#org8fef2a9">1.3. <code>==</code> 与 equals 的区别</a></li>
-<li><a href="#orgfd7f462">1.4. hashCode() 和 equals() 方法</a></li>
-<li><a href="#org2fd0346">1.5. 错误和异常</a></li>
-<li><a href="#org88918f7">1.6. 静态变量和实例变量</a></li>
-<li><a href="#org6f1d5e8">1.7. <code>final</code> 关键字</a></li>
-<li><a href="#org4bcaa16">1.8. 序列化</a></li>
-<li><a href="#org1867856">1.9. 数组的操作</a></li>
-<li><a href="#org4cab09d">1.10. 输入和输出</a></li>
+<li><a href="#org46f9c93">2. 面向对象</a>
+<ul>
+<li><a href="#orga2ff13f">2.1. 对象初始化和消亡</a></li>
+<li><a href="#orgfdf3a2d">2.2. 面向对象的特征</a>
+<ul>
+<li><a href="#orga211e61">2.2.1. 继承</a></li>
+<li><a href="#orgcf624fb">2.2.2. 多态</a></li>
+<li><a href="#org2a4d6cd">2.2.3. 封装</a></li>
 </ul>
 </li>
-<li><a href="#org59f054b">2. 开发工具</a>
+<li><a href="#org74da624">2.3. Overload 和 Override</a></li>
+<li><a href="#org19f7c53">2.4. 接口和抽象类</a>
 <ul>
-<li><a href="#orgbb6fb76">2.1. JDK 1.8 简介和新特性</a></li>
-<li><a href="#orgdf455ad">2.2. JDK 的安装和环境变量配置</a></li>
-<li><a href="#org553c6fa">2.3. 编译器 javac 和虚拟机 java</a></li>
-<li><a href="#org09a4ef5">2.4. <span class="todo TODO">TODO</span> 调试器 jdb</a></li>
-<li><a href="#org2ea46dc">2.5. 解释器 jrepl</a></li>
-<li><a href="#org84294e7">2.6. 反汇编器 javap</a></li>
+<li><a href="#org9b1b929">2.4.1. 接口</a></li>
+<li><a href="#org1b69d8f">2.4.2. 抽象类</a></li>
+</ul>
+</li>
+<li><a href="#org85475c2">2.5. 泛型</a>
+<ul>
+<li><a href="#org6f63e00">2.5.1. 类和接口的泛型</a></li>
+<li><a href="#org3cf90c6">2.5.2. 方法的泛型</a></li>
+<li><a href="#org3de1a89">2.5.3. 泛型中使用 extends 和 super 关键字</a></li>
+<li><a href="#org430b10a">2.5.4. 泛型的注意点</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgbc0b1f8">3. 字符串</a>
+<ul>
+<li><a href="#orgbaef575">3.1. 基本操作</a></li>
+<li><a href="#org37798ea">3.2. 格式化</a></li>
+<li><a href="#org6e15b3e">3.3. String 的不可变性</a></li>
+<li><a href="#orge72334a">3.4. String, StringBuilder 和 StringBuffer</a></li>
+</ul>
+</li>
+<li><a href="#orgef953cf">4. 数组</a>
+<ul>
+<li><a href="#org813c4a7">4.1. 基本操作</a></li>
+<li><a href="#orgc9dc5f0">4.2. 列表和数组互转</a></li>
+</ul>
+</li>
+<li><a href="#org63d1a94">5. 集合</a>
+<ul>
+<li><a href="#org971545a">5.1. List</a>
+<ul>
+<li><a href="#orga338db1">5.1.1. LinkedList</a></li>
+</ul>
+</li>
+<li><a href="#org6dac999">5.2. Queue &amp; Deque</a></li>
+<li><a href="#orge8e52b9">5.3. Stack &amp; Heap</a></li>
+<li><a href="#org366da02">5.4. Set &amp; Map</a></li>
+</ul>
+</li>
+<li><a href="#org8528ee0">6. 正则表达式</a></li>
+<li><a href="#orgba01f9e">7. 反射</a></li>
+<li><a href="#org7e73f0a">8. 其它</a>
+<ul>
+<li><a href="#org79961c8">8.1. 断言</a></li>
+<li><a href="#orgd3a9f2f">8.2. 时间戳</a></li>
+</ul>
+</li>
+<li><a href="#org562ca6f">9. 开发工具</a>
+<ul>
+<li><a href="#org49c9836">9.1. JDK 1.8 简介和新特性</a></li>
+<li><a href="#org62e23f3">9.2. JDK 的安装和环境变量配置</a></li>
+<li><a href="#orgaf4425f">9.3. 编译器 javac 和虚拟机 java</a></li>
+<li><a href="#orgc15f270">9.4. <span class="todo TODO">TODO</span> 调试器 jdb</a></li>
+<li><a href="#org832efd5">9.5. 解释器 jrepl</a></li>
+<li><a href="#org065cbf9">9.6. 反汇编器 javap</a></li>
 </ul>
 </li>
 </ul>
@@ -268,12 +320,12 @@
 </div>
 
 
-<div id="outline-container-org342ecc5" class="outline-2">
-<h2 id="org342ecc5"><span class="section-number-2">1</span> 基本用法</h2>
+<div id="outline-container-org3f4a6f5" class="outline-2">
+<h2 id="org3f4a6f5"><span class="section-number-2">1</span> 基础知识</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgfc74e44" class="outline-3">
-<h3 id="orgfc74e44"><span class="section-number-3">1.1</span> 基本数据类型</h3>
+<div id="outline-container-orgb9547b3" class="outline-3">
+<h3 id="orgb9547b3"><span class="section-number-3">1.1</span> 基本数据类型</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Java 语言中有 8 个基本类型，和 C++ 语言不同的是 Java 的基本类型的存储空间是固
@@ -365,7 +417,7 @@ Java 语言中有 8 个基本类型，和 C++ 语言不同的是 Java 的基本�
 </p>
 
 
-<div id="org91282a4" class="figure">
+<div id="org2b79780" class="figure">
 <p><img src="../static/image/2019/08/java-conversions-between-numeric-types.png" alt="java-conversions-between-numeric-types.png" />
 </p>
 </div>
@@ -391,94 +443,15 @@ Java 语言中有 8 个基本类型，和 C++ 语言不同的是 Java 的基本�
 </div>
 </div>
 
-<div id="outline-container-org0e1002d" class="outline-3">
-<h3 id="org0e1002d"><span class="section-number-3">1.2</span> String 字符串</h3>
+<div id="outline-container-orgfe3e9c6" class="outline-3">
+<h3 id="orgfe3e9c6"><span class="section-number-3">1.2</span> <code>==</code> 与 equals 的区别</h3>
 <div class="outline-text-3" id="text-1-2">
-</div>
-<div id="outline-container-orgd5949ed" class="outline-4">
-<h4 id="orgd5949ed"><span class="section-number-4">1.2.1</span> 字符串基本操作</h4>
-<div class="outline-text-4" id="text-1-2-1">
-<p>
-String 在 Java 中不是基本类型，对应的有一个 String 类
-</p>
-<div class="org-src-container">
-<pre class="src src-java"><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">str1</span> = <span style="color: #2aa198;">""</span>;
-str1.isEmpty<span style="color: #8d5649;">()</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; true</span>
-str1.substring<span style="color: #8d5649;">(</span>0,3<span style="color: #8d5649;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; java.lang.StringIndexOutOfBoundsException: String index out of range: 3</span>
-
-<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">str2</span> = <span style="color: #2aa198;">"Hello"</span>
-str2.substring<span style="color: #8d5649;">(</span>0,3<span style="color: #8d5649;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; "Hel"</span>
-str2.substring<span style="color: #8d5649;">(</span>1,3<span style="color: #8d5649;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; "el"</span>
-str2.substring<span style="color: #8d5649;">(</span>1,3<span style="color: #8d5649;">)</span> == <span style="color: #2aa198;">"el"</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; false</span>
-str2.substring<span style="color: #8d5649;">(</span>1,3<span style="color: #8d5649;">)</span>.equals<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"el"</span><span style="color: #8d5649;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; true</span>
-</pre>
-</div>
-
-<p>
-在判断字符串 str 为非空时需要写如下的两个条件
-</p>
-<div class="org-src-container">
-<pre class="src src-java"><span style="color: #859900;">if</span> <span style="color: #8d5649;">(</span>str != <span style="color: #268bd2;">null</span> &amp;&amp; <span style="color: #268bd2;">!</span>str.isEmpty<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">if str is not empty</span>
-<span style="color: #8d5649;">}</span>
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org4e2701d" class="outline-4">
-<h4 id="org4e2701d"><span class="section-number-4">1.2.2</span> String 的不可变性</h4>
-<div class="outline-text-4" id="text-1-2-2">
-<p>
-不可变对象指的是 <b>一个对象，在它创建完成之后，不能再改变它的状态</b> 。不能改变
-状态的意思是，不能改变对象内的成员变量，包括基本数据类型的值不能改变，引用类
-型的变量不能指向其他的对象，引用类型指向的对象的状态也不能改变。
-</p>
-
-<p>
-至于为什么要把 String 类设计成不可变类，是它的用途决定的。其实不只 String，
-很多 Java 标准类库中的类都是不可变的。在开发一个系统的时候，我们有时候也需要
-设计不可变类，来传递一组相关的值，这也是面向对象思想的体现。不可变类有一些优
-点，比如因为它的对象是只读的，所以多线程并发访问也不会有任何问题。当然也有一
-些缺点，比如每个不同的状态都要一个对象来代表，可能会造成性能上的问题。所以
-Java 标准类库还提供了一个可变版本，即 StringBuffer。
-</p>
-
-<p>
-<code>javac</code> 编译可以对字符串常量直接相加的表达式进行优化，不必要等到运行期去进行
-加法运算处理，而是在编译时去掉其中的加号，直接将其编译成一个这些常量相连的结
-果。所以 <code>String s = "a" + "b" + "c" + "d";</code> 只生成一个对象.
-</p>
-</div>
-</div>
-
-<div id="outline-container-org1264184" class="outline-4">
-<h4 id="org1264184"><span class="section-number-4">1.2.3</span> String, StringBuilder 和 StringBuffer</h4>
-<div class="outline-text-4" id="text-1-2-3">
-<p>
-Java 平台提供了两种类型的字符串：
-</p>
-<ul class="org-ul">
-<li><code>String</code> 和 <code>StringBuffer</code> / <code>StringBuilder</code>, 它们可以储存和操作字符串。其
-中 String 是只读字符串，也就意味着 String 引用的字符串内容是不能被改变的。</li>
-<li>而 StringBuffer 和 StringBuilder 类表示的字符串对象可以直接进行修改。
-StringBuilder 是 JDK 1.5 中引入的，它和 StringBuffer 的方法完全相同，区别
-在 于它是在单线程环境下使用的，因为它的所有方面都没有被 <code>synchronized</code> 修
-饰，因 此它的效率也比 StringBuffer 略高。</li>
-</ul>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org8fef2a9" class="outline-3">
-<h3 id="org8fef2a9"><span class="section-number-3">1.3</span> <code>==</code> 与 equals 的区别</h3>
-<div class="outline-text-3" id="text-1-3">
 <ol class="org-ol">
 <li><code>==</code> 是一个运算符。 equals 则是 String 对象的方法</li>
 <li>基本数据类型比较 <code>==</code> 比较两个值是否相等。相等为 true 否则为 false；equals
 不能直接用于基本类型的比较。需要将基本类型转换为包装器进行比较。</li>
-<li>引用对象比较 <code>==</code> 和 equals 都是比较栈内存中的地址是否相等 。相等为 true 否
-则为 false。 需注意几点：
+<li>引用对象比较 <code>==</code> 和 equals 都是比较栈内存中的地址是否相等 。相等为 true
+否则为 false。 需注意几点：
 <ul class="org-ul">
 <li>String 是一个特殊的引用类型。对于两个字符串的比较，不管是 <code>==</code> 和 equals
 这两者比较的都是字符串是否相同</li>
@@ -490,28 +463,24 @@ StringBuilder 是 JDK 1.5 中引入的，它和 StringBuffer 的方法完全相�
 </ol>
 
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #859900;">class</span> <span style="color: #268bd2;">App198</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">args</span><span style="color: #9564bf;">[]</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">s1</span> = <span style="color: #2aa198;">"Hello"</span>;
-    <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">s2</span> = <span style="color: #2aa198;">"Hello"</span>;
-    <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">s3</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">String</span><span style="color: #9564bf;">(</span><span style="color: #2aa198;">"Hello"</span><span style="color: #9564bf;">)</span>;
-    <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">s4</span> = <span style="color: #2aa198;">"Hel"</span> + <span style="color: #2aa198;">"lo"</span>;          <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">String is immutable, it will compiles to "Hello"</span>
-    System.out.println<span style="color: #9564bf;">(</span>s1 == s2<span style="color: #9564bf;">)</span>;      <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; true</span>
-    System.out.println<span style="color: #9564bf;">(</span>s1.equals<span style="color: #24a222;">(</span>s2<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; ture</span>
-    System.out.println<span style="color: #9564bf;">(</span>s1 == s3<span style="color: #9564bf;">)</span>;      <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; false</span>
-    System.out.println<span style="color: #9564bf;">(</span>s1.equals<span style="color: #24a222;">(</span>s3<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; ture</span>
-    System.out.println<span style="color: #9564bf;">(</span>s1 == s4<span style="color: #9564bf;">)</span>;      <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; true</span>
-    System.out.println<span style="color: #9564bf;">(</span>s1.equals<span style="color: #24a222;">(</span>s4<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; true</span>
-  <span style="color: #d8241f;">}</span>
-<span style="color: #8d5649;">}</span>
+<pre class="src src-java"><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">s1</span> = <span style="color: #2aa198;">"Hello"</span>;
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">s2</span> = <span style="color: #2aa198;">"Hello"</span>;
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">s3</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">String</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"Hello"</span><span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">s4</span> = <span style="color: #2aa198;">"Hel"</span> + <span style="color: #2aa198;">"lo"</span>;          <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">String is immutable, it will compiles to "Hello"</span>
+System.out.println<span style="color: #8d5649;">(</span>s1 == s2<span style="color: #8d5649;">)</span>;      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; true</span>
+System.out.println<span style="color: #8d5649;">(</span>s1.equals<span style="color: #d8241f;">(</span>s2<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; ture</span>
+System.out.println<span style="color: #8d5649;">(</span>s1 == s3<span style="color: #8d5649;">)</span>;      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; false</span>
+System.out.println<span style="color: #8d5649;">(</span>s1.equals<span style="color: #d8241f;">(</span>s3<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; ture</span>
+System.out.println<span style="color: #8d5649;">(</span>s1 == s4<span style="color: #8d5649;">)</span>;      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; true</span>
+System.out.println<span style="color: #8d5649;">(</span>s1.equals<span style="color: #d8241f;">(</span>s4<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; true</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgfd7f462" class="outline-3">
-<h3 id="orgfd7f462"><span class="section-number-3">1.4</span> hashCode() 和 equals() 方法</h3>
-<div class="outline-text-3" id="text-1-4">
+<div id="outline-container-orgc30a0b4" class="outline-3">
+<h3 id="orgc30a0b4"><span class="section-number-3">1.3</span> hashCode() 和 equals() 方法</h3>
+<div class="outline-text-3" id="text-1-3">
 <ol class="org-ol">
 <li><p>
 Object 类中的方法定义如下
@@ -520,7 +489,7 @@ Object 类中的方法定义如下
 <pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">native</span> <span style="color: #268bd2;">int</span> <span style="color: #b58900;">hashCode</span><span style="color: #8d5649;">()</span>;
 
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">boolean</span> <span style="color: #b58900;">equals</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">obj</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
-    <span style="color: #859900;">return</span> <span style="color: #d8241f;">(</span><span style="color: #859900;">this</span> == obj<span style="color: #d8241f;">)</span>;
+  <span style="color: #859900;">return</span> <span style="color: #d8241f;">(</span><span style="color: #859900;">this</span> == obj<span style="color: #d8241f;">)</span>;
 <span style="color: #8d5649;">}</span>
 </pre>
 </div></li>
@@ -529,18 +498,18 @@ Object 类中的方法定义如下
 </div>
 </div>
 
-<div id="outline-container-org2fd0346" class="outline-3">
-<h3 id="org2fd0346"><span class="section-number-3">1.5</span> 错误和异常</h3>
-<div class="outline-text-3" id="text-1-5">
-<ul class="org-ul">
+<div id="outline-container-org0eb7173" class="outline-3">
+<h3 id="org0eb7173"><span class="section-number-3">1.4</span> 错误和异常</h3>
+<div class="outline-text-3" id="text-1-4">
+<ol class="org-ol">
 <li><code>java.lang.Error</code> : Throwable 的子类，用于标记严重错误，表示系统级的错误和
-程序不必处理的异常。合理的应用程序不应该去 <code>try/catch</code> 这种错误。是恢复不是
-不可能但很困难的情况下的一种严重问题；比如内存溢出，不可能指望程序能处理这
-样的情况；</li>
+程序不必处理的异常。合理的应用程序不应该去 <code>try/catch</code> 这种错误。是恢复不
+是不可能但很困难的情况下的一种严重问题；比如内存溢出，不可能指望程序能处理
+这样的情况；</li>
 <li><code>java.lang.Exception</code> : Throwable 的子类，表示需要捕捉或者需要程序进行处理
 的异常，是一种设计或实现问题；也就是说，它表示如果程序运行正常，从不会发生
 的情况。并且鼓励用户程序去 <code>catch</code> 它。</li>
-</ul>
+</ol>
 
 <p>
 处理异常的一种方式是在类方法的定义中 <code>throws</code> 相应的异常
@@ -550,7 +519,7 @@ Object 类中的方法定义如下
   <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">args</span><span style="color: #9564bf;">[]</span><span style="color: #d8241f;">)</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">MyException</span> <span style="color: #d8241f;">{</span>
     <span style="color: #268bd2;">MyException</span> <span style="color: #6c71c4;">myecpt</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">MyException</span><span style="color: #9564bf;">(</span><span style="color: #2aa198;">"Ops!"</span><span style="color: #9564bf;">)</span>;
     <span style="color: #859900;">throw</span> myexcpt;
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">System.out.println("Dead code");</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">System.out.println("Dead code");</span>
   <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 
@@ -566,36 +535,34 @@ Object 类中的方法定义如下
 或者使用 <code>try/catch</code> 块来捕获异常进行处理
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #859900;">class</span> <span style="color: #268bd2;">App166</span> <span style="color: #8d5649;">{</span>
-
-  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">args</span><span style="color: #9564bf;">[]</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">num1</span>, <span style="color: #6c71c4;">num2</span>;
-    <span style="color: #859900;">try</span> <span style="color: #9564bf;">{</span>
-      num1 = 0;
-      num2 = 62 / num1;
-      System.out.println<span style="color: #24a222;">(</span>num2<span style="color: #24a222;">)</span>;
-      System.out.println<span style="color: #24a222;">(</span><span style="color: #2aa198;">"Hey I'm at the end of try block"</span><span style="color: #24a222;">)</span>;
-    <span style="color: #9564bf;">}</span> <span style="color: #859900;">catch</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">ArithmeticException</span> <span style="color: #6c71c4;">e</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-      System.out.println<span style="color: #24a222;">(</span><span style="color: #2aa198;">"You should not divide a number by zero"</span><span style="color: #24a222;">)</span>;
-    <span style="color: #9564bf;">}</span> <span style="color: #859900;">catch</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">Exception</span> <span style="color: #6c71c4;">e</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-      System.out.println<span style="color: #24a222;">(</span><span style="color: #2aa198;">"Exception occurred"</span><span style="color: #24a222;">)</span>;
-    <span style="color: #9564bf;">}</span>
-    System.out.println<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"I'm out of try-catch block in Java."</span><span style="color: #9564bf;">)</span>;
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">[]</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">num1</span>, <span style="color: #6c71c4;">num2</span>;
+  <span style="color: #859900;">try</span> <span style="color: #d8241f;">{</span>
+    num1 = 0;
+    num2 = 62 / num1;
+    System.out.println<span style="color: #9564bf;">(</span>num2<span style="color: #9564bf;">)</span>;
+    System.out.println<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"Hey I'm at the end of try block"</span><span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span> <span style="color: #859900;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">ArithmeticException</span> <span style="color: #6c71c4;">e</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    System.out.println<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"You should not divide a number by zero"</span><span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span> <span style="color: #859900;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">Exception</span> <span style="color: #6c71c4;">e</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    System.out.println<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"Exception occurred"</span><span style="color: #9564bf;">)</span>;
   <span style="color: #d8241f;">}</span>
+  System.out.println<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"I'm out of try-catch block in Java."</span><span style="color: #d8241f;">)</span>;
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
+
 
 <p>
 <b>Error 和 RuntimeException 及其子类都是未检查的异常</b> （unchecked exceptions），
 而所有其他的 Exception 类都是检查了的异常（checked exceptions）
 </p>
 
-<ul class="org-ul">
+<ol class="org-ol">
 <li>checked exceptions: 上下文环境有关，即使程序设计无误，仍然可能因使用的问题
 而引发．通常是从一个可以恢复的程序中抛出来的，并且最好能够从这种异常中使用
-程序恢复。比如 FileNotFoundException, ParseException 等。检查了的异常发生在
-编译阶段，必须要使用 <code>try/catch</code> （或者 <code>throws</code> ）否则编译不通过。
+程序恢复。比如 FileNotFoundException, ParseException 等。检查了的异常发生
+在编译阶段，必须要使用 <code>try/catch</code> （或者 <code>throws</code> ）否则编译不通过。
 <ul class="org-ul">
 <li>ClassNotFoundException</li>
 <li>IOException</li>
@@ -606,16 +573,16 @@ Object 类中的方法定义如下
 ArrayIndexOutOfBoundException, ClassCastException 等。从语言本身的角度讲，
 程序不该去 catch 这类异常，虽然能够从诸如 RuntimeException 这样的异常中
 catch 并恢复，但是并不鼓励终端程序员这么做，因为完全没要必要。因为这类错误
-本身就是 bug，应该被修复，出现此类错误时程序就应该立即停止执行。 因此，面对
-Errors 和 unchecked exceptions 应该让程序自动终止执行，程序员不该做诸如
-<code>try/catch</code> 这样的事情，而是应该查明原因，修改代码逻辑。
+本身就是 bug，应该被修复，出现此类错误时程序就应该立即停止执行。 因此，面
+对 Errors 和 unchecked exceptions 应该让程序自动终止执行，程序员不该做诸
+如~try/catch~ 这样的事情，而是应该查明原因，修改代码逻辑。
 <ul class="org-ul">
 <li>NullPointerException</li>
 <li>ArrayIndexOutOfBoundException</li>
 <li>IllegalArgumentException</li>
 <li>OutOfMemoryError</li>
 </ul></li>
-</ul>
+</ol>
 
 <p>
 RuntimeException：RuntimeException 体系包括错误的类型转换、数组越界访问和试图
@@ -629,8 +596,8 @@ RuntimeException：RuntimeException 体系包括错误的类型转换、数组�
 《Effective Java》 中对于异常处理总结如下：
 </p>
 <ul class="org-ul">
-<li>不要将异常处理用于正常的控制流（设计良好的 API 不应该强迫它的调用者为了正常的
-控制流而使用异常）</li>
+<li>不要将异常处理用于正常的控制流（设计良好的 API 不应该强迫它的调用者为了正常
+的控制流而使用异常）</li>
 <li>对可以恢复的情况使用受检异常，对编程错误使用运行时异常</li>
 <li>避免不必要的使用受检异常（可以通过一些状态检测手段来避免异常的发生）</li>
 <li>优先使用标准的异常</li>
@@ -641,9 +608,9 @@ RuntimeException：RuntimeException 体系包括错误的类型转换、数组�
 </div>
 </div>
 
-<div id="outline-container-org88918f7" class="outline-3">
-<h3 id="org88918f7"><span class="section-number-3">1.6</span> 静态变量和实例变量</h3>
-<div class="outline-text-3" id="text-1-6">
+<div id="outline-container-orgc576068" class="outline-3">
+<h3 id="orgc576068"><span class="section-number-3">1.5</span> 静态变量和实例变量</h3>
+<div class="outline-text-3" id="text-1-5">
 <ol class="org-ol">
 <li>在语法定义上的区别：静态变量前要加 <code>static</code> 关键字，而实例变量前则不加。</li>
 <li>在程序运行时的区别：实例变量属于某个对象的属性，必须创建了实例对象，其中的
@@ -659,9 +626,9 @@ RuntimeException：RuntimeException 体系包括错误的类型转换、数组�
 </div>
 </div>
 
-<div id="outline-container-org6f1d5e8" class="outline-3">
-<h3 id="org6f1d5e8"><span class="section-number-3">1.7</span> <code>final</code> 关键字</h3>
-<div class="outline-text-3" id="text-1-7">
+<div id="outline-container-orgb5e4cd5" class="outline-3">
+<h3 id="orgb5e4cd5"><span class="section-number-3">1.6</span> <code>final</code> 关键字</h3>
+<div class="outline-text-3" id="text-1-6">
 <ol class="org-ol">
 <li>修饰类：表示该类不能被继承</li>
 <li>修饰方法：表示方法不能被覆盖</li>
@@ -670,9 +637,9 @@ RuntimeException：RuntimeException 体系包括错误的类型转换、数组�
 </div>
 </div>
 
-<div id="outline-container-org4bcaa16" class="outline-3">
-<h3 id="org4bcaa16"><span class="section-number-3">1.8</span> 序列化</h3>
-<div class="outline-text-3" id="text-1-8">
+<div id="outline-container-org7d62138" class="outline-3">
+<h3 id="org7d62138"><span class="section-number-3">1.7</span> 序列化</h3>
+<div class="outline-text-3" id="text-1-7">
 <ol class="org-ol">
 <li>序列化就是一种用来处理对象流的机制，所谓对象流也就是将对象的内容进行流化。
 可以对流化后的对象进行读写操作，也可将流化后的对象传输于网络之间。序列化是
@@ -687,126 +654,903 @@ RuntimeException：RuntimeException 体系包括错误的类型转换、数组�
 </ol>
 </div>
 </div>
+</div>
 
-<div id="outline-container-org1867856" class="outline-3">
-<h3 id="org1867856"><span class="section-number-3">1.9</span> 数组的操作</h3>
-<div class="outline-text-3" id="text-1-9">
+<div id="outline-container-org46f9c93" class="outline-2">
+<h2 id="org46f9c93"><span class="section-number-2">2</span> 面向对象</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orga2ff13f" class="outline-3">
+<h3 id="orga2ff13f"><span class="section-number-3">2.1</span> 对象初始化和消亡</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+一般类的初始化工具有以下几种方式：
+</p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #859900;">class</span> <span style="color: #268bd2;">App73</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">args</span><span style="color: #9564bf;">[]</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">int array</span>
-    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">arr</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[</span>10<span style="color: #9564bf;">]</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">=&gt; elements are initialezd to 0</span>
-    System.out.println<span style="color: #9564bf;">(</span>arr<span style="color: #24a222;">[</span>3<span style="color: #24a222;">]</span><span style="color: #9564bf;">)</span>;
-    System.out.println<span style="color: #9564bf;">(</span>arr.length<span style="color: #9564bf;">)</span>;
+<pre class="src src-java"><span style="color: #859900;">import</span> <span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">util</span>.<span style="color: #268bd2;">Random</span>;
 
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">String array</span>
-    <span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">sarr</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">String</span><span style="color: #9564bf;">[</span>3<span style="color: #9564bf;">]</span>;
-    sarr<span style="color: #9564bf;">[</span>0<span style="color: #9564bf;">]</span> = <span style="color: #2aa198;">"Hello"</span>;
-    sarr<span style="color: #9564bf;">[</span>1<span style="color: #9564bf;">]</span> = <span style="color: #2aa198;">"Man"</span>;
-    sarr<span style="color: #9564bf;">[</span>2<span style="color: #9564bf;">]</span> = <span style="color: #2aa198;">"Welcome to Java world"</span>;
+<span style="color: #859900;">class</span> <span style="color: #268bd2;">Employee</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">private</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">nextId</span>;
 
-    <span style="color: #859900;">for</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">w</span>: sarr<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span> System.out.println<span style="color: #24a222;">(</span>w<span style="color: #24a222;">)</span>; <span style="color: #9564bf;">}</span>
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">id</span>;
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span>;
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">double</span> <span style="color: #6c71c4;">salary</span>;
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#38745;&#24577;&#21021;&#22987;&#21270;&#22359;: &#21021;&#22987;&#21270;&#38745;&#24577;&#21464;&#37327;</span>
+  <span style="color: #859900;">static</span> <span style="color: #d8241f;">{</span>
+    System.out.println<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"Static Initialezation Block"</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #268bd2;">Random</span> <span style="color: #6c71c4;">gen</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Random</span><span style="color: #9564bf;">()</span>;
+    nextId = gen.nextInt<span style="color: #9564bf;">(</span>1000<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#23545;&#35937;&#21021;&#22987;&#21270;&#22359;: &#24403;&#23545;&#35937;&#23454;&#20363;&#21270;&#26102;&#35843;&#29992;</span>
+  <span style="color: #d8241f;">{</span>
+    System.out.println<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"Object Initialezation Block"</span><span style="color: #9564bf;">)</span>;
+    id = nextId;
+    nextId++;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#40664;&#35748;&#26500;&#36896;&#22120;</span>
+  <span style="color: #859900;">public</span> <span style="color: #b58900;">Employee</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    System.out.println<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"Default Constructor"</span><span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #268bd2;">Employee</span> <span style="color: #6c71c4;">e1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Employee</span><span style="color: #9564bf;">()</span>;
+    <span style="color: #268bd2;">Employee</span> <span style="color: #6c71c4;">e2</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Employee</span><span style="color: #9564bf;">()</span>;
   <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
 
 <p>
-初始化数组的数据
+由下面运行结果可以得知，静态初始化块只在类第一次实例化才调用一次，对象初始化
+块每次对象实例化都调用一次，并且是中构造器调用前调用
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #859900;">class</span> <span style="color: #268bd2;">App341</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">args</span><span style="color: #9564bf;">[]</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">primes</span> = <span style="color: #9564bf;">{</span>2, 3, 5, 7<span style="color: #9564bf;">}</span>;
-    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">primes</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[]</span> <span style="color: #9564bf;">{</span>2, 3, 5, 7<span style="color: #9564bf;">}</span>;
-    <span style="color: #268bd2;">int</span><span style="color: #9564bf;">[][]</span> <span style="color: #6c71c4;">magicSquare</span> = <span style="color: #9564bf;">{</span>
-      <span style="color: #24a222;">{</span>1, 2, 3, 4<span style="color: #24a222;">}</span>,
-      <span style="color: #24a222;">{</span>1, 0, 3, 9<span style="color: #24a222;">}</span>,
-      <span style="color: #24a222;">{</span>1, 0, 3, 9<span style="color: #24a222;">}</span>,
-      <span style="color: #24a222;">{</span>1, 0, 3, 9<span style="color: #24a222;">}</span>
-    <span style="color: #9564bf;">}</span>;
+<pre class="src src-text">$ java Employee
+Static Initialezation Block
+Object Initialezation Block
+Default Constructor
+Object Initialezation Block
+Default Constructor
+</pre>
+</div>
+
+<p>
+Java 有自己的垃圾回收机制 (GC)，一般 <code>finalize()</code> 只会在对象内存回收前被调用
+一次，所以我们不需要显示让对象消亡，而是让 GC 来自动处理对象的析构，并且当需
+要阻止对象消亡时，就需要显示将保护的对象通过 <code>finalize()</code> 挂载到 GCRoot 上
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfdf3a2d" class="outline-3">
+<h3 id="orgfdf3a2d"><span class="section-number-3">2.2</span> 面向对象的特征</h3>
+<div class="outline-text-3" id="text-2-2">
+</div>
+<div id="outline-container-orga211e61" class="outline-4">
+<h4 id="orga211e61"><span class="section-number-4">2.2.1</span> 继承</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<ul class="org-ul">
+<li>概念：继承是从已有的类中派生出新的类，新的类能吸收已有类的数据属性和行为，
+并能扩展新的能力</li>
+<li>好处：提高代码的复用，缩短开发周期</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">class</span> <span style="color: #268bd2;">Employee</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span>;
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">double</span> <span style="color: #6c71c4;">salary</span>;
+
+  <span style="color: #859900;">public</span> <span style="color: #b58900;">getName</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #b58900;">getSalary</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #859900;">class</span> <span style="color: #268bd2;">Manager</span> <span style="color: #859900;">extends</span> <span style="color: #268bd2;">Employee</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">double</span> <span style="color: #6c71c4;">bonus</span>;
+
+  <span style="color: #859900;">public</span> <span style="color: #b58900;">getSalary</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #b58900;">setBonus</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">double</span> <span style="color: #6c71c4;">bonus</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+<ul class="org-ul">
+<li>final 类不允许继承，final 方法不允许 Override</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">final</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Executive</span> <span style="color: #859900;">extends</span> <span style="color: #268bd2;">Manager</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">...</span>
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #859900;">class</span> <span style="color: #268bd2;">Employee</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span>;
+  <span style="color: #859900;">public</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">String</span> <span style="color: #b58900;">getName</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> <span style="color: #859900;">return</span> <span style="color: #859900;">this</span>.name; <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcf624fb" class="outline-4">
+<h4 id="orgcf624fb"><span class="section-number-4">2.2.2</span> 多态</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<ol class="org-ol">
+<li>概念：多态（Polymorphism）按字面的意思就是“多种状态，即同一个实体同时具有
+多种形式"。一般表现形式是程序在运行的过程中，同一种类型在不同的条件下表现
+不同的结果。多态也称为动态绑定，一般是在运行时刻才能确定方法的具体执行对
+象，这个过程也称为动态委派</li>
+<li>好处：
+<ul class="org-ul">
+<li>将接口和实现分开，改善代码的组织结构和可读性，还能创建可拓展的程序</li>
+<li>消除类型之间的耦合关系。允许将多个类型视为同一个类型</li>
+<li>一个多态方法的调用允许有多种表现形式</li>
+</ul></li>
+</ol>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">Employee</span> <span style="color: #6c71c4;">e</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Employee</span><span style="color: #8d5649;">()</span>;
+e.getName<span style="color: #8d5649;">()</span>;   <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; Employee.getName()</span>
+e.getSalary<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; Employee.getSalary()</span>
+
+<span style="color: #268bd2;">Manager</span> <span style="color: #6c71c4;">m</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Manager</span><span style="color: #8d5649;">()</span>;
+m.getName<span style="color: #8d5649;">()</span>;        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; Employee.getName()</span>
+m.getSalary<span style="color: #8d5649;">()</span>;      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; Manager.getSalary()</span>
+m.setBonus<span style="color: #8d5649;">(</span>1000.0<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Manager.setBonus(...)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org2a4d6cd" class="outline-4">
+<h4 id="org2a4d6cd"><span class="section-number-4">2.2.3</span> 封装</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<ol class="org-ol">
+<li>概念：就是把对象的属性和行为（或服务）结合为一个独立的整体，并尽可能隐藏
+对象的内部实现细节</li>
+<li>好处：
+<ul class="org-ul">
+<li>隐藏信息，实现细节。让客户端程序员无法触及他们不应该触及的部分</li>
+<li>允许可设计者可以改变类内部的工作方式而不用担心会影响到客户端程序员</li>
+</ul></li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org74da624" class="outline-3">
+<h3 id="org74da624"><span class="section-number-3">2.3</span> Overload 和 Override</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+Overload 是 <b>重载</b> 的意思，Override 是 <b>覆盖</b> 的意思，也就是 <b>重写</b>
+</p>
+
+
+<div id="orgcba674d" class="figure">
+<p><img src="../static/image/2019/07/overload-override.png" alt="overload-override.png" />
+</p>
+</div>
+
+<ol class="org-ol">
+<li>Overload 表示同一个类中可以有多个名称相同的方法，但这些方法的参数列表各不
+相同
+<ul class="org-ul">
+<li>Overload 的参数列表不同包括：参数类型不同，参数个数不同</li>
+<li>Overload 不能重载函数返回值，即方法名称、参数个数和参数类型相同的方法被
+视为同一个重载方法</li>
+<li>Overload 也不能覆盖访问权限、抛出的异常。方法的异常类型和数目不会对覆盖
+造成影响</li>
+</ul></li>
+<li>Override 表示子类中的方法可以与父类中的某个方法的名称和参数完全相同，通过
+子类创建的实例对象调用这个方法时，将调用子类中的定义方法，这相当于把父类中
+定义的那个完全相同的方法给覆盖了
+<ul class="org-ul">
+<li>Override 可以用于接口实现类中实现接口类中的方法</li>
+<li>Override 可以在子类中实现父类的方法，相当于子类中的方法覆盖了父类中的方
+法，是一种实现多态的重要途径</li>
+<li>Override 覆盖父类方法时，子类只能抛出比父类更少的异常。或者是抛出父类抛
+出的异常的子异常</li>
+<li>Override 不能覆盖父类中的 private 方法</li>
+</ul></li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">class</span> <span style="color: #268bd2;">Employee</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">firstname</span>;
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">lastname</span>;
+
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setName</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">firstname</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">this</span>.firstname = firstname;
+    <span style="color: #859900;">this</span>.lastname = <span style="color: #268bd2;">null</span>;
   <span style="color: #d8241f;">}</span>
+
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setName</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">firstname</span>, <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">lastname</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">this</span>.firstname = firstname;
+    <span style="color: #859900;">this</span>.lastname = lastname;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #859900;">class</span> <span style="color: #268bd2;">Teacher</span> <span style="color: #859900;">extends</span> <span style="color: #268bd2;">Employee</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">fullname</span>;
+
+  <span style="color: #268bd2;">@Override</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setName</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">firstname</span>, <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">lastname</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #859900;">this</span>.firstname = firstname;
+    <span style="color: #859900;">this</span>.lastname = lastname;
+    <span style="color: #859900;">this</span>.fullname = firstname + <span style="color: #2aa198;">" "</span> + lastname;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org19f7c53" class="outline-3">
+<h3 id="org19f7c53"><span class="section-number-3">2.4</span> 接口和抽象类</h3>
+<div class="outline-text-3" id="text-2-4">
+</div>
+<div id="outline-container-org9b1b929" class="outline-4">
+<h4 id="org9b1b929"><span class="section-number-4">2.4.1</span> 接口</h4>
+<div class="outline-text-4" id="text-2-4-1">
+<ul class="org-ul">
+<li>接口用于描述系统对外提供的所有服务， 因此 <b>接口中的成员常量和方法都必须是
+公开</b> ( public) 类型的，确保外部使用者能访问它们</li>
+<li>接口仅仅描述系统能做什么,但不指明如何去做,所以 <b>接口中的方法都是抽象</b>
+(abstract) 方法</li>
+<li>接口不涉及和任何具体实例相关的细节, 因此 <b>接口没有构造方法</b> ，不能被实例化，
+没有实例变量，只有静态（static）变量；</li>
+<li>接口的中的变量是所有实现类共有的，既然共有，肯定是不变的东西，因为变化的东
+西也不能够算共有。所以 <b>变量是不可变 (final)类型，也就是常量了</b></li>
+</ul>
+
+<p>
+接口中不可以定义变量即只能定义常量(加上 final 修饰就会变成常量)。所以接口的
+属性默认是 <code>public static final</code> 常量，且必须赋初值。 注意：final 和 abstract
+不能同时出现。接口中的方法默认是 <code>public abstract</code>
+</p>
+
+<p>
+接口的定义使用 <code>interface</code> 关键字
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">interface</span> <span style="color: #268bd2;">HelloInterface</span> <span style="color: #8d5649;">{</span>
+
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
 
 <p>
-Java 数组默认时引用，如果需要复制可以调用 <code>Arrays.copyOf(...)</code> 方法
+实现接口使用 <code>implements</code> 关键字
 </p>
 <div class="org-src-container">
-<pre class="src src-text">java&gt; x = new int[] {1,2,3}
-int[] x = [1, 2, 3]
-java&gt; y = new int[] {1,2,3}
-int[] y = [1, 2, 3]
-java&gt; z1 = x
-int[] z1 = [1, 2, 3]
-java&gt; y.length
-java.lang.Integer res24 = 3
-java&gt; z2 = Arrays.copyOf(y, y.length)
-int[] z2 = [1, 2, 3]
-java&gt; z1[0] = 9
-java.lang.Integer res25 = 9
-java&gt; z2[0] = 9
-java.lang.Integer res26 = 9
-java&gt; x
-int[] x = [9, 2, 3]
-java&gt; y
-int[] y = [1, 2, 3]
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">HelloInterfaceImpl</span> <span style="color: #859900;">implements</span> <span style="color: #268bd2;">HelloInterface</span> <span style="color: #8d5649;">{</span>
+
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1b69d8f" class="outline-4">
+<h4 id="org1b69d8f"><span class="section-number-4">2.4.2</span> 抽象类</h4>
+<div class="outline-text-4" id="text-2-4-2">
+<p>
+在面向对象的概念中，所有的对象都是通过类来描绘的，但是反过来，并不是所有的类
+都是用来描绘对象的，如果一个类中没有包含足够的信息来描绘一个具体的对象，这样
+的类就是抽象类。 抽象类和接口很像，他们之间的一些关键区别如下：
+</p>
+<ul class="org-ul">
+<li>接口中所有的方法隐含的都是抽象的。而抽象类则可以同时包含抽象和非抽象的方法</li>
+<li>类可以实现很多个接口，但是只能继承一个抽象类</li>
+<li>类如果要实现一个接口，它必须要实现接口声明的所有方法。但是，类可以不实现抽
+象类声明的所有方法，当然，在这种情况下，类也必须得声明成是抽象的。</li>
+<li>抽象类可以在不提供接口方法实现的情况下实现接口</li>
+<li>Java 接口中声明的变量默认都是 final 的。抽象类可以包含非 final 的变量。</li>
+<li>Java 接口中的成员函数默认是 public 的。抽象类的成员函数可以是 private
+protected 或者是 public</li>
+<li>接口是绝对抽象的，不可以被实例化。抽象类也不可以被实例化，但是，如果它包含
+main 方法的话是可以被调用的</li>
+</ul>
+
+<p>
+抽象类的定义如下：
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">abstract</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Employee</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span>;
+  <span style="color: #859900;">private</span> <span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">number</span>;
+
+  <span style="color: #859900;">public</span> <span style="color: #859900;">abstract</span> <span style="color: #268bd2;">double</span> <span style="color: #b58900;">computePay</span><span style="color: #d8241f;">()</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org85475c2" class="outline-3">
+<h3 id="org85475c2"><span class="section-number-3">2.5</span> 泛型</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+泛型在实际工作中使用的非常频繁，可以很大程度上减少对不同类型的重复操作的代码。
+</p>
+</div>
+
+<div id="outline-container-org6f63e00" class="outline-4">
+<h4 id="org6f63e00"><span class="section-number-4">2.5.1</span> 类和接口的泛型</h4>
+<div class="outline-text-4" id="text-2-5-1">
+<p>
+类的泛型定义，之间在类名称后添加尖括号来表示
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">GenericClassOneType</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">T</span><span style="color: #8d5649;">&gt;</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">performAction</span><span style="color: #d8241f;">(</span><span style="color: #859900;">final</span> <span style="color: #268bd2;">T</span> <span style="color: #6c71c4;">action</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">coding</span>
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3cf90c6" class="outline-4">
+<h4 id="org3cf90c6"><span class="section-number-4">2.5.2</span> 方法的泛型</h4>
+<div class="outline-text-4" id="text-2-5-2">
+<p>
+方法的泛型定义在 <code>public</code>, <code>abstract</code>, <code>static</code> 等关键字后面，例如：
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">T</span>, <span style="color: #268bd2;">R</span><span style="color: #8d5649;">&gt;</span> <span style="color: #268bd2;">R</span> <span style="color: #b58900;">performAction</span><span style="color: #8d5649;">(</span><span style="color: #859900;">final</span> <span style="color: #268bd2;">T</span> <span style="color: #6c71c4;">action</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">final</span> <span style="color: #268bd2;">R</span> <span style="color: #6c71c4;">result</span> = <span style="color: #268bd2;">null</span>;
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">coding</span>
+  <span style="color: #859900;">return</span> result;
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #859900;">protected</span> <span style="color: #859900;">static</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">T</span>, <span style="color: #268bd2;">R</span><span style="color: #8d5649;">&gt;</span> <span style="color: #268bd2;">R</span> <span style="color: #b58900;">performAction2</span><span style="color: #8d5649;">(</span><span style="color: #859900;">final</span> <span style="color: #268bd2;">T</span> <span style="color: #6c71c4;">action</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">final</span> <span style="color: #268bd2;">R</span> <span style="color: #6c71c4;">result2</span> = <span style="color: #268bd2;">null</span>;
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">coding</span>
+  <span style="color: #859900;">return</span> result2;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3de1a89" class="outline-4">
+<h4 id="org3de1a89"><span class="section-number-4">2.5.3</span> 泛型中使用 extends 和 super 关键字</h4>
+<div class="outline-text-4" id="text-2-5-3">
+<p>
+在泛型中可以使用对类型的基础关系
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">T</span> <span style="color: #859900;">extends</span> <span style="color: #268bd2;">InputStream</span><span style="color: #8d5649;">&gt;</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">read</span><span style="color: #8d5649;">(</span><span style="color: #859900;">final</span> <span style="color: #268bd2;">T</span> <span style="color: #6c71c4;">stream</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">T</span> <span style="color: #859900;">extends</span> <span style="color: #268bd2;">Serializable</span><span style="color: #8d5649;">&gt;</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">store</span><span style="color: #8d5649;">(</span><span style="color: #859900;">final</span> <span style="color: #268bd2;">T</span> <span style="color: #6c71c4;">object</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #8d5649;">}</span>
+
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">interate</span><span style="color: #8d5649;">(</span><span style="color: #859900;">final</span> <span style="color: #268bd2;">Collection</span><span style="color: #d8241f;">&lt;</span> ? <span style="color: #859900;">super</span> <span style="color: #268bd2;">Integer</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">objects</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org430b10a" class="outline-4">
+<h4 id="org430b10a"><span class="section-number-4">2.5.4</span> 泛型的注意点</h4>
+<div class="outline-text-4" id="text-2-5-4">
+<ul class="org-ul">
+<li>Java 中泛型必须是对象，像 <code>int</code>, <code>long</code>, <code>double</code> 等是不可以定义到泛型中，
+需要使用对应的适配类</li>
+<li><p>
+泛型只是在编译是才存在，编译完成后就没有泛型的留在字节码中。所以对应使用泛
+型作为传参的其实是一个方法，例如：
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">void</span> <span style="color: #b58900;">sort</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">Collection</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">strings</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #8d5649;">}</span>
+<span style="color: #268bd2;">void</span> <span style="color: #b58900;">sort</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">Collection</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">Number</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">strings</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #8d5649;">}</span>
+</pre>
+</div>
+<p>
+在编译成字节码后其实是一个方法
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">void</span> <span style="color: #b58900;">sort</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">Collection</span> <span style="color: #6c71c4;">arg1</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #8d5649;">}</span>
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgbc0b1f8" class="outline-2">
+<h2 id="orgbc0b1f8"><span class="section-number-2">3</span> 字符串</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgbaef575" class="outline-3">
+<h3 id="orgbaef575"><span class="section-number-3">3.1</span> 基本操作</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#23383;&#31526;&#20018;</span>
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">str1</span> = <span style="color: #2aa198;">"abcdef"</span>;
+str1.isEmpty<span style="color: #8d5649;">()</span>;
+str1.length<span style="color: #8d5649;">()</span>;
+str1.substring<span style="color: #8d5649;">(</span>0, 3<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; "abc"</span>
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#23383;&#31526;&#20018;&#20998;&#21106;&#21644;&#21512;&#24182;</span>
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">str2</span> = <span style="color: #2aa198;">"1,2,3,4"</span>;
+<span style="color: #268bd2;">String</span><span style="color: #8d5649;">[]</span> <span style="color: #6c71c4;">res1</span> = str2.split<span style="color: #8d5649;">(</span><span style="color: #2aa198;">","</span><span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; ["1", "2", "3", "4"]</span>
+
+<span style="color: #268bd2;">List</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">res2</span> = Arrays.asList<span style="color: #8d5649;">(</span>res1<span style="color: #8d5649;">)</span>;
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">res2.add("xxx"); // =&gt; throw UnsupportedOperationException</span>
+<span style="color: #268bd2;">List</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">res3</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedList</span><span style="color: #8d5649;">&lt;&gt;(</span>Arrays.asList<span style="color: #d8241f;">(</span>res1<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>;
+res3.add<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"xxx"</span><span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">now is OK</span>
+
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">str3</span> = String.join<span style="color: #8d5649;">(</span><span style="color: #2aa198;">":"</span>, res3<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; "1:2:3:4:xxx"</span>
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#27491;&#21017;&#34920;&#36798;&#24335;</span>
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">str6</span> = <span style="color: #2aa198;">"3 +5-4"</span>;
+str6 = str6.replaceAll<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"(\\+|-|\\*|/)"</span>, <span style="color: #2aa198;">" $1 "</span><span style="color: #8d5649;">)</span>.replaceAll<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"  "</span>, <span style="color: #2aa198;">" "</span><span style="color: #8d5649;">)</span>.trim<span style="color: #8d5649;">()</span>;
+</pre>
+</div>
+
+<p>
+在判断字符串 str 为非空时需要写如下的两个条件
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">if</span> <span style="color: #8d5649;">(</span>str != <span style="color: #268bd2;">null</span> &amp;&amp; <span style="color: #268bd2;">!</span>str.isEmpty<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">if str is not empty</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org37798ea" class="outline-3">
+<h3 id="org37798ea"><span class="section-number-3">3.2</span> 格式化</h3>
+<div class="outline-text-3" id="text-3-2">
+<ul class="org-ul">
+<li><code>String.format(String fmt, Object... args)</code> 的字符串格式和 C 语言的 printf
+一样。</li>
+<li><code>MessageFormat.format(String fmt, Object... args)</code> 使用单引号标记任意字面量，
+使用花括号加数字来表示相应的位置的占位符，例如： <code>{0}</code> 表示第 1 个位置的参
+数， <code>{1}</code> 表示第 2 个位置的参数，以此类推。</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-java">java&gt; String.format<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"Hi, %s"</span>, <span style="color: #2aa198;">"Jack"</span><span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">lang</span>.<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">res0</span> = <span style="color: #2aa198;">"Hi, Jack"</span>
+java&gt; <span style="color: #859900;">import</span> <span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">text</span>.<span style="color: #268bd2;">MessageFormat</span>;
+Imported <span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">text</span>.<span style="color: #268bd2;">MessageFormat</span>
+<span style="color: #b58900;">java</span>&gt; MessageFormat.format<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"Hi, {0}, I''m {1} years old."</span>, <span style="color: #2aa198;">"Tom"</span>, 18<span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">lang</span>.<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">res1</span> = <span style="color: #2aa198;">"Hi, Tom, I'm 18 years old."</span>
+java&gt; MessageFormat.format<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"'Hi, {0}, I''m {1} years old.'"</span>, <span style="color: #2aa198;">"Tom"</span>, 18<span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">lang</span>.<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">res2</span> = <span style="color: #2aa198;">"Hi, {0}, I'm {1} years old."</span>
 java&gt;
 </pre>
 </div>
 
 <p>
-排序数组
+格式化数字，注意在处理 <code>long</code> 类型的数字时，需要对数字进行格式化
 </p>
 <div class="org-src-container">
-<pre class="src src-text">java&gt; x
-int[] x = [9, 2, 3]
-java&gt; Arrays.sort(x)
-
-java&gt; x
-int[] x = [2, 3, 9]
+<pre class="src src-java">java&gt; MessageFormat.format<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"{0,number,#}"</span>, 1889989898989L<span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">lang</span>.<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">res14</span> = <span style="color: #2aa198;">"1889989898989"</span>
+java&gt; MessageFormat.format<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"{0}"</span>, 1889989898989L<span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">lang</span>.<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">res15</span> = <span style="color: #2aa198;">"1,889,989,898,989"</span>
+java&gt; MessageFormat.format<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"{0,number,#000000}"</span>, 1889989898989L<span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">lang</span>.<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">res16</span> = <span style="color: #2aa198;">"1889989898989"</span>
+java&gt; MessageFormat.format<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"{0,number,#000000}"</span>, 12345L<span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">lang</span>.<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">res17</span> = <span style="color: #2aa198;">"012345"</span>
+java&gt; MessageFormat.format<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"{0,number,#}"</span>, 12345L<span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">lang</span>.<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">res18</span> = <span style="color: #2aa198;">"12345"</span>
+java&gt;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org4cab09d" class="outline-3">
-<h3 id="org4cab09d"><span class="section-number-3">1.10</span> 输入和输出</h3>
-<div class="outline-text-3" id="text-1-10">
+
+<div id="outline-container-org6e15b3e" class="outline-3">
+<h3 id="org6e15b3e"><span class="section-number-3">3.3</span> String 的不可变性</h3>
+<div class="outline-text-3" id="text-3-3">
 <p>
-读取数据的输入和打印到标准输出
+不可变对象指的是 <b>一个对象，在它创建完成之后，不能再改变它的状态</b> 。不能改变
+状态的意思是，不能改变对象内的成员变量，包括基本数据类型的值不能改变，引用类
+型的变量不能指向其他的对象，引用类型指向的对象的状态也不能改变。
 </p>
+
+<p>
+至于为什么要把 String 类设计成不可变类，是它的用途决定的。其实不只 String，很
+多 Java 标准类库中的类都是不可变的。在开发一个系统的时候，我们有时候也需要设
+计不可变类，来传递一组相关的值，这也是面向对象思想的体现。不可变类有一些优点，
+比如因为它的对象是只读的，所以多线程并发访问也不会有任何问题。当然也有一些缺
+点，比如每个不同的状态都要一个对象来代表，可能会造成性能上的问题。所以 Java 标
+准类库还提供了一个可变版本，即 StringBuffer。
+</p>
+
+<p>
+<code>javac</code> 编译可以对字符串常量直接相加的表达式进行优化，不必要等到运行期去进行
+加法运算处理，而是在编译时去掉其中的加号，直接将其编译成一个这些常量相连的结
+果。所以 <code>String s = "a" + "b" + "c" + "d";</code> 只生成一个对象.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge72334a" class="outline-3">
+<h3 id="orge72334a"><span class="section-number-3">3.4</span> String, StringBuilder 和 StringBuffer</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+Java 平台提供了两种类型的字符串：
+</p>
+<ol class="org-ol">
+<li><code>String</code> 和 <code>StringBuffer</code>, <code>StringBuilder</code>, 它们可以储存和操作字符串。其
+中 String 是只读字符串，也就意味着 String 引用的字符串内容是不能被改变的。</li>
+<li>而 StringBuffer 和 StringBuilder 类表示的字符串对象可以直接进行修改。
+StringBuilder 是 JDK 1.5 中引入的，它和 StringBuffer 的方法完全相同，区别
+在 于它是在单线程环境下使用的，因为它的所有方面都没有被 <code>synchronized</code> 修
+饰，因此它的效率也比 StringBuffer 略高。</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgef953cf" class="outline-2">
+<h2 id="orgef953cf"><span class="section-number-2">4</span> 数组</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-org813c4a7" class="outline-3">
+<h3 id="org813c4a7"><span class="section-number-3">4.1</span> 基本操作</h3>
+<div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #268bd2;">Scanner</span> <span style="color: #6c71c4;">in</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Scanner</span><span style="color: #8d5649;">(</span>System.in<span style="color: #8d5649;">)</span>;
-System.out.println<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"What is your name?"</span><span style="color: #8d5649;">)</span>;
-<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span> = in.nextLine<span style="color: #8d5649;">()</span>;
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#23450;&#38271;&#25968;&#32452;</span>
+<span style="color: #268bd2;">int</span><span style="color: #8d5649;">[]</span> <span style="color: #6c71c4;">arr1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">int</span><span style="color: #8d5649;">[</span>10<span style="color: #8d5649;">]</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#23450;&#20041;&#25968;&#32452;</span>
+<span style="color: #268bd2;">int</span><span style="color: #8d5649;">[]</span> <span style="color: #6c71c4;">arr2</span> = <span style="color: #8d5649;">{</span>1, 2, 3, 4<span style="color: #8d5649;">}</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#23450;&#20041;&#24182;&#21021;&#22987;&#21270;&#25968;&#32452;</span>
+
+Arrays.fill<span style="color: #8d5649;">(</span>arr1, 1<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#22635;&#20805;&#25968;&#32452;&#30340;&#25152;&#26377;&#20803;&#32032;&#20026; 1</span>
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#32452;&#22797;&#21046;</span>
+<span style="color: #268bd2;">int</span><span style="color: #8d5649;">[]</span> <span style="color: #6c71c4;">arr3</span> = Arrays.copyOf<span style="color: #8d5649;">(</span>arr2, arr2.length<span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">int</span><span style="color: #8d5649;">[]</span> <span style="color: #6c71c4;">arr4</span> = Arrays.copyOfRange<span style="color: #8d5649;">(</span>arr2, 2, 3<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; [3]</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">System.out.println(Arrays.toString(arr4));</span>
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21464;&#38271;&#25968;&#32452;</span>
+<span style="color: #268bd2;">ArrayList</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">vec1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;()</span>;
+vec1.add<span style="color: #8d5649;">(</span>1<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#28155;&#21152;&#20803;&#32032;&#21040;&#25968;&#32452;&#26368;&#21518;</span>
+vec1.add<span style="color: #8d5649;">(</span>3<span style="color: #8d5649;">)</span>;
+vec1.add<span style="color: #8d5649;">(</span>4<span style="color: #8d5649;">)</span>;
+vec1.get<span style="color: #8d5649;">(</span>0<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#31532; 0 &#20010;&#20803;&#32032;</span>
+vec1.size<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#32452;&#30340;&#38271;&#24230;</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">System.out.println(vec1);</span>
+vec1.add<span style="color: #8d5649;">(</span>0, 8<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#28155;&#21152;&#21040;&#25968;&#32452;&#30340;&#31532; 0 &#20010;&#20803;&#32032;</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">System.out.println(vec1);</span>
+vec1.set<span style="color: #8d5649;">(</span>1, 4<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#20462;&#25913;&#25968;&#32452;&#30340;&#31532; 1 &#20010;&#20803;&#32032;</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">System.out.println(vec1);</span>
+vec1.remove<span style="color: #8d5649;">(</span>1<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21024;&#38500;&#31532; 1 &#20010;&#20803;&#32032;</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">System.out.println(vec1);</span>
+
+<span style="color: #268bd2;">List</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">vec2</span> = vec1.subList<span style="color: #8d5649;">(</span>0, 2<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#23376;&#38142;&#34920;&#30340;&#21069; 2 &#20010;&#20803;&#32032;</span>
+System.out.println<span style="color: #8d5649;">(</span>vec2<span style="color: #8d5649;">)</span>;
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#25968;&#32452;&#25490;&#24207;</span>
+Arrays.sort<span style="color: #8d5649;">(</span>arr2<span style="color: #8d5649;">)</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc9dc5f0" class="outline-3">
+<h3 id="orgc9dc5f0"><span class="section-number-3">4.2</span> 列表和数组互转</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">List &#36716; Array</span>
+<span style="color: #268bd2;">List</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Employee</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">list</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #8d5649;">&lt;&gt;()</span>;
+<span style="color: #859900;">while</span> <span style="color: #8d5649;">(</span>...<span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+  x = ...;
+  list.add<span style="color: #d8241f;">(</span>x<span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Array &#36716; List</span>
+<span style="color: #268bd2;">Employee</span><span style="color: #8d5649;">[]</span> <span style="color: #6c71c4;">arr</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Employee</span><span style="color: #8d5649;">[</span>list.size<span style="color: #d8241f;">()</span><span style="color: #8d5649;">]</span>;
+list.toArray<span style="color: #8d5649;">(</span>arr<span style="color: #8d5649;">)</span>;
 </pre>
 </div>
 
 <p>
-格式化输出浮点数
+注意 <code>Arrays.asList(...)</code> 将数组转 List 时需要传对象。
 </p>
 <div class="org-src-container">
-<pre class="src src-text">java&gt; double x = 100000.0 / 3.0;
-double x = 33333.333333333336
-java&gt; System.out.printf("%.3f", x)
-33333.333
-java&gt; System.out.printf("%,.3f", x)
-33,333.333
+<pre class="src src-java"><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">[]</span> <span style="color: #6c71c4;">primes1</span> = <span style="color: #8d5649;">{</span>2,3,5<span style="color: #8d5649;">}</span>;
+<span style="color: #268bd2;">List</span> <span style="color: #6c71c4;">list1</span> = Arrays.asList<span style="color: #8d5649;">(</span>primes1<span style="color: #8d5649;">)</span>;
+list1.size<span style="color: #8d5649;">()</span>;
+
+<span style="color: #268bd2;">int</span><span style="color: #8d5649;">[]</span> <span style="color: #6c71c4;">primes2</span> = <span style="color: #8d5649;">{</span>2,3,5<span style="color: #8d5649;">}</span>;
+<span style="color: #268bd2;">List</span> <span style="color: #6c71c4;">list2</span> = Arrays.asList<span style="color: #8d5649;">(</span>primes2<span style="color: #8d5649;">)</span>;
+list2.size<span style="color: #8d5649;">()</span>;
+</pre>
+</div>
+
+<p>
+在 <code>Arrays.asList(...)</code> 中，该方法接受一个变长参数，一般可看做数组参数，但是
+因为 <code>int[]</code> 本身就是一个类型，所以 primes2 变量作为参数传递时，编译器认为只
+传了一个变量，这个变量的类型是 int 数组
+</p>
+<div class="org-src-container">
+<pre class="src src-text">java&gt; Integer[] primes1 = {2,3,5};
+java.lang.Integer[] primes1 = [2, 3, 5]
+java&gt; List list1 = Arrays.asList(primes1);
+java.util.List list1 = [2, 3, 5]
+java&gt; list1.size();
+java.lang.Integer res7 = 3
+java&gt; int[] primes2 = {2,3,5};
+int[] primes2 = [2, 3, 5]
+java&gt; List list2 = Arrays.asList(primes2);
+java.util.List list2 = [[I@4ed8ff]
+java&gt; list2.size();
+java.lang.Integer res10 = 1
+java&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org63d1a94" class="outline-2">
+<h2 id="org63d1a94"><span class="section-number-2">5</span> 集合</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org971545a" class="outline-3">
+<h3 id="org971545a"><span class="section-number-3">5.1</span> List</h3>
+<div class="outline-text-3" id="text-5-1">
+</div>
+<div id="outline-container-orga338db1" class="outline-4">
+<h4 id="orga338db1"><span class="section-number-4">5.1.1</span> LinkedList</h4>
+<div class="outline-text-4" id="text-5-1-1">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21333;&#38142;&#34920;</span>
+<span style="color: #268bd2;">Deque</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">list1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedList</span><span style="color: #8d5649;">&lt;&gt;(</span>Arrays.asList<span style="color: #d8241f;">(</span>1, 2, 3<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">Deque</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">list2</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedList</span><span style="color: #8d5649;">&lt;&gt;()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21021;&#22987;&#21270;&#31354;&#30340;&#21333;&#38142;&#34920;</span>
+list1.size<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#38142;&#34920;&#22823;&#23567;</span>
+list1.isEmpty<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26159;&#21542;&#20026;&#31354;</span>
+list1.offerFirst<span style="color: #8d5649;">(</span>8<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#34920;&#22836;&#25554;&#20837; 1 &#20010;&#20803;&#32032;</span>
+list1.pollFirst<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#34920;&#22836;&#21024;&#38500; 1 &#20010;&#20803;&#32032;</span>
+list1.peekFirst<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#34920;&#22836;&#20803;&#32032;</span>
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21452;&#21521;&#38142;&#34920;</span>
+<span style="color: #268bd2;">Deque</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">delist1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedList</span><span style="color: #8d5649;">&lt;&gt;(</span>Arrays.asList<span style="color: #d8241f;">(</span>2, 3, 4<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>;
+delist1.offerFirst<span style="color: #8d5649;">(</span>1<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#24448;&#34920;&#22836;&#25554;&#20837; 1 &#20010;&#20803;&#32032;</span>
+delist1.offerLast<span style="color: #8d5649;">(</span>8<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#24448;&#34920;&#23614;&#25554;&#20837; 1 &#20010;&#20803;&#32032;</span>
+
+delist1.pollFirst<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21024;&#38500;&#34920;&#22836;&#30340; 1 &#20010;&#20803;&#32032;</span>
+delist1.pollLast<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21024;&#38500;&#34920;&#23614;&#30340; 1 &#20010;&#20803;&#32032;</span>
+
+delist1.peekFirst<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#34920;&#22836;&#30340;&#20803;&#32032;</span>
+delist1.peekLast<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#34920;&#23614;&#30340;&#20803;&#32032;</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org6dac999" class="outline-3">
+<h3 id="org6dac999"><span class="section-number-3">5.2</span> Queue &amp; Deque</h3>
+<div class="outline-text-3" id="text-5-2">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#38431;&#21015;</span>
+<span style="color: #268bd2;">Queue</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">queue1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedList</span><span style="color: #8d5649;">&lt;&gt;()</span>;
+queue1.offer<span style="color: #8d5649;">(</span>7<span style="color: #8d5649;">)</span>;
+queue1.poll<span style="color: #8d5649;">()</span>;
+queue1.peek<span style="color: #8d5649;">()</span>;
+queue1.isEmpty<span style="color: #8d5649;">()</span>;
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21452;&#21521;&#38431;&#21015; &#65288;&#21644;&#21452;&#21521;&#38142;&#34920;&#19968;&#26679;&#65289;</span>
+<span style="color: #268bd2;">Deque</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">deque1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedList</span><span style="color: #8d5649;">&lt;&gt;()</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge8e52b9" class="outline-3">
+<h3 id="orge8e52b9"><span class="section-number-3">5.3</span> Stack &amp; Heap</h3>
+<div class="outline-text-3" id="text-5-3">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26632;</span>
+<span style="color: #268bd2;">Deque</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">stack1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedList</span><span style="color: #8d5649;">&lt;&gt;()</span>;
+stack1.push<span style="color: #8d5649;">(</span>2<span style="color: #8d5649;">)</span>;
+stack1.push<span style="color: #8d5649;">(</span>3<span style="color: #8d5649;">)</span>;
+stack1.pop<span style="color: #8d5649;">()</span>;
+stack1.peek<span style="color: #8d5649;">()</span>;
+stack1.isEmpty<span style="color: #8d5649;">()</span>;
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#20248;&#20808;&#38431;&#21015;&#65288;&#22534;&#65289;</span>
+<span style="color: #268bd2;">PriorityQueue</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">pq1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">PriorityQueue</span><span style="color: #8d5649;">&lt;&gt;()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26032;&#24314;&#19968;&#20010;&#23567;&#26681;&#22534;</span>
+<span style="color: #268bd2;">PriorityQueue</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">pq2</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">PriorityQueue</span><span style="color: #8d5649;">&lt;&gt;(</span><span style="color: #d8241f;">(</span>x, y<span style="color: #d8241f;">)</span> -&gt; y - x<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26032;&#24314;&#19968;&#20010;&#22823;&#26681;&#22534;</span>
+pq1.offer<span style="color: #8d5649;">(</span>3<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#24448;&#22534;&#28155;&#21152; 1 &#20010;&#20803;&#32032;</span>
+pq1.poll<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21024;&#38500;&#22534;&#20013;&#30340;&#20803;&#32032;</span>
+pq1.peek<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#22534;&#39030;&#30340;&#20803;&#32032;</span>
+pq1.isEmpty<span style="color: #8d5649;">()</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org366da02" class="outline-3">
+<h3 id="org366da02"><span class="section-number-3">5.4</span> Set &amp; Map</h3>
+<div class="outline-text-3" id="text-5-4">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#38598;&#21512;</span>
+<span style="color: #268bd2;">Set</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">set1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">HashSet</span><span style="color: #8d5649;">&lt;&gt;()</span>;
+set1.add<span style="color: #8d5649;">(</span>3<span style="color: #8d5649;">)</span>;
+set1.add<span style="color: #8d5649;">(</span>3<span style="color: #8d5649;">)</span>;
+set1.add<span style="color: #8d5649;">(</span>4<span style="color: #8d5649;">)</span>;
+set1.contains<span style="color: #8d5649;">(</span>4<span style="color: #8d5649;">)</span>;
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#25955;&#21015;&#34920;</span>
+<span style="color: #268bd2;">Map</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">Integer</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">map1</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">HashMap</span><span style="color: #8d5649;">&lt;&gt;()</span>;
+map1.put<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"a"</span>, 3<span style="color: #8d5649;">)</span>;
+map1.put<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"b"</span>, 4<span style="color: #8d5649;">)</span>;
+map1.put<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"b"</span>, 8<span style="color: #8d5649;">)</span>;
+map1.putIfAbsent<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"b"</span>, 8<span style="color: #8d5649;">)</span>;
+map1.get<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"c"</span><span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#25214; key, &#22914;&#26524;&#19981;&#23384;&#22312;&#36820;&#22238; null</span>
+map1.getOrDefault<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"c"</span>, 0<span style="color: #8d5649;">)</span>;
+
+map1.containsKey<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"s"</span><span style="color: #8d5649;">)</span>;
+map1.containsValue<span style="color: #8d5649;">(</span>8<span style="color: #8d5649;">)</span>;
+
+map1.keySet<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#38190;&#30340;&#38598;&#21512;</span>
+map1.values<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#20540;&#30340;&#38598;&#21512;</span>
+map1.entrySet<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#38190;&#20540;&#23545;&#30340;&#38598;&#21512;</span>
+
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org59f054b" class="outline-2">
-<h2 id="org59f054b"><span class="section-number-2">2</span> 开发工具</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-org8528ee0" class="outline-2">
+<h2 id="org8528ee0"><span class="section-number-2">6</span> 正则表达式</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+正则表达式是处理字符串的一个非常有效的工具，Java 中关于正则表达式处理的相关方
+法在 <code>java.util.regex.*</code> 包中
+</p>
+
+<p>
+一种正则表达式的方式是，新建一个 Pattern，然后通过 Matcher 来匹配
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">text</span> = <span style="color: #2aa198;">"823-232-232"</span>;
+<span style="color: #268bd2;">Pattern</span> <span style="color: #6c71c4;">regex1</span> = Pattern.compile<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"^([0-9]*)\\s*"</span>, <span style="color: #268bd2;">Pattern</span>.CASE_INSENSITIVE<span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">Matcher</span> <span style="color: #6c71c4;">matcher1</span> = regex1.matcher<span style="color: #8d5649;">(</span>text<span style="color: #8d5649;">)</span>;
+<span style="color: #859900;">if</span> <span style="color: #8d5649;">(</span>matcher1.find<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">g1</span> = matcher1.group<span style="color: #d8241f;">(</span>1<span style="color: #d8241f;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; "832"</span>
+<span style="color: #8d5649;">}</span>
+</pre>
 </div>
-<div id="outline-container-orgbb6fb76" class="outline-3">
-<h3 id="orgbb6fb76"><span class="section-number-3">2.1</span> JDK 1.8 简介和新特性</h3>
-<div class="outline-text-3" id="text-2-1">
+
+<p>
+如果仅仅判断字符串是否符合正则表达式，可以使用 Pattern 类中的 <code>matches(..)</code> 静
+态方法
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">text</span> = <span style="color: #2aa198;">"Hello world"</span>;
+<span style="color: #859900;">if</span> <span style="color: #8d5649;">(</span><span style="color: #268bd2;">!</span> Pattern.matches<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"\\s*"</span>, text<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">find non-blank text</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+使用正则表达式替换字符串，例如 <code>replaceAll(...)</code> 可以使用下面的方法来替换
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">Pattern</span> <span style="color: #6c71c4;">regex2</span> = Pattern.compile<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"[0-9]+"</span>, <span style="color: #268bd2;">Pattern</span>.CASE_INSENSITIVE<span style="color: #8d5649;">)</span>;
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">text</span> = <span style="color: #2aa198;">"823-232-232"</span>;
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">res1</span> = regex2.matcher<span style="color: #8d5649;">(</span>text<span style="color: #8d5649;">)</span>.replaceAll<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"#"</span><span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; "#-#-#"</span>
+<span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">res2</span> = text.replaceAll<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"[0-9]+"</span>, <span style="color: #2aa198;">"#"</span><span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">same as res1</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgba01f9e" class="outline-2">
+<h2 id="orgba01f9e"><span class="section-number-2">7</span> 反射</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+Java 提供可以动态创建对象和操作对象的方法，一般叫做反射
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #8d5649;">)</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">Exception</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462; Class &#31867;</span>
+  <span style="color: #268bd2;">Class</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">clz</span> = Class.forName<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"io.github.jeanhwea.app03.bean.Person"</span><span style="color: #d8241f;">)</span>;
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#31867;&#30340;&#26500;&#36896;&#22120;</span>
+  <span style="color: #268bd2;">Constructor</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">ctor</span> = clz.getConstructor<span style="color: #d8241f;">()</span>;
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26032;&#24314;&#23545;&#35937;</span>
+  <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">obj</span> = ctor.newInstance<span style="color: #d8241f;">()</span>;
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#23450;&#20041;&#30340;&#23383;&#27573;</span>
+  <span style="color: #268bd2;">Field</span> <span style="color: #6c71c4;">field</span> = clz.getDeclaredField<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"name"</span><span style="color: #d8241f;">)</span>;
+  field.setAccessible<span style="color: #d8241f;">(</span><span style="color: #268bd2;">true</span><span style="color: #d8241f;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">private &#20462;&#39280;&#30340;&#23383;&#27573;&#38656;&#35201;&#37197;&#32622;&#21487;&#35265;&#24615;</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#35774;&#32622;&#23383;&#27573;&#20540;</span>
+  field.set<span style="color: #d8241f;">(</span>obj, <span style="color: #2aa198;">"Injected Person Name"</span><span style="color: #d8241f;">)</span>;
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#31867;&#30340;&#26041;&#27861;</span>
+  <span style="color: #268bd2;">Method</span> <span style="color: #6c71c4;">method</span> = clz.getMethod<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"getName"</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#35843;&#29992;&#26041;&#27861;</span>
+  <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span> = <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">)</span> method.invoke<span style="color: #d8241f;">(</span>obj<span style="color: #d8241f;">)</span>;
+  System.out.println<span style="color: #d8241f;">(</span>name<span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7e73f0a" class="outline-2">
+<h2 id="org7e73f0a"><span class="section-number-2">8</span> 其它</h2>
+<div class="outline-text-2" id="text-8">
+</div>
+<div id="outline-container-org79961c8" class="outline-3">
+<h3 id="org79961c8"><span class="section-number-3">8.1</span> 断言</h3>
+<div class="outline-text-3" id="text-8-1">
+<p>
+assertion (断言) 在软件开发中是一种常用的调试方式，很多开发语言中都支持这种机
+制。一般来说，assertion 用于保证程序最基本、关键的正确性。assertion 检查通常
+在开发和测试时开启。为了提高性能，在软件发布后， assertion 检查通常是关闭的。
+在实现中，断言是一个包含布尔表达式的语句，在执行这个语句时假定该表达式为 true；
+如果表达式计算为 <code>false</code>, 那么系统会报告一个 AssertionError。
+</p>
+
+<p>
+断言用于调试目的：
+</p>
+<div class="org-src-container">
+<pre class="src src-java">assert<span style="color: #8d5649;">(</span>a &gt; 0<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">throws an AssertionError if a &lt;= 0</span>
+</pre>
+</div>
+
+<p>
+断言可以有两种形式：
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">assert</span> <span style="color: #6c71c4;">Expression1</span>;
+<span style="color: #268bd2;">assert</span> <span style="color: #6c71c4;">Expression1</span> : Expression2;
+</pre>
+</div>
+
+<p>
+Expression1 应该总是产生一个布尔值。 Expression2 可以是得出一个值的任意表达式；
+这个值用于生成显示更多调试信息的字符串消息 断言在默认情况下是禁用的，要在编译
+时启用断言，需使用 source 1.4 标记：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">javac -source 1.4 Test.java
+</pre>
+</div>
+
+<p>
+要在运行时启用断言需要开启允许断言的选项：
+</p>
+<ul class="org-ul">
+<li><code>-ea</code> 或者 <code>-enableassertions</code> : 启用断言</li>
+<li><code>-da</code> 或者 <code>-disableassertions</code> : 禁用断言</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgd3a9f2f" class="outline-3">
+<h3 id="orgd3a9f2f"><span class="section-number-3">8.2</span> 时间戳</h3>
+<div class="outline-text-3" id="text-8-2">
+<p>
+自带的时间戳的获取方式有一下两种
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">new</span> <span style="color: #268bd2;">Date</span><span style="color: #8d5649;">()</span>.getTime<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt;  1583839335691</span>
+System.currentTimeMillis<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; 1583839349221</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org562ca6f" class="outline-2">
+<h2 id="org562ca6f"><span class="section-number-2">9</span> 开发工具</h2>
+<div class="outline-text-2" id="text-9">
+</div>
+<div id="outline-container-org49c9836" class="outline-3">
+<h3 id="org49c9836"><span class="section-number-3">9.1</span> JDK 1.8 简介和新特性</h3>
+<div class="outline-text-3" id="text-9-1">
 <p>
 <a href="https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">JDK</a> 是 Java 语言的软件开发工具包，主要用于移动设备、嵌入式设备上的 JAVA 应用
 程序。JDK 是整个 Java 开发的核心，它包含了 JAVA 的运行环境（JVM+Java 系统类库）
@@ -827,16 +1571,16 @@ JDK 1.8 的概念图如下：
 </p>
 
 
-<div id="orgf11c978" class="figure">
+<div id="org586407e" class="figure">
 <p><img src="../static/image/2019/07/jdk8-conceptual-diagram.png" alt="jdk8-conceptual-diagram.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgdf455ad" class="outline-3">
-<h3 id="orgdf455ad"><span class="section-number-3">2.2</span> JDK 的安装和环境变量配置</h3>
-<div class="outline-text-3" id="text-2-2">
+<div id="outline-container-org62e23f3" class="outline-3">
+<h3 id="org62e23f3"><span class="section-number-3">9.2</span> JDK 的安装和环境变量配置</h3>
+<div class="outline-text-3" id="text-9-2">
 <p>
 JDK 可以直接在 Oracle 网站上下载，链接是 <a href="https://www.oracle.com/java/technologies/javase-jdk8-downloads.html">JDK 1.8 Download</a> ，将 JDK 直接解压放
 到一个文件夹里就可以使用 JDK，Java 一般会配置 <code>JAVA_HOME</code> 环境变量，
@@ -859,9 +1603,9 @@ tar xzvf jdk-8u231-linux-x64.tar.gz
 </div>
 </div>
 
-<div id="outline-container-org553c6fa" class="outline-3">
-<h3 id="org553c6fa"><span class="section-number-3">2.3</span> 编译器 javac 和虚拟机 java</h3>
-<div class="outline-text-3" id="text-2-3">
+<div id="outline-container-orgaf4425f" class="outline-3">
+<h3 id="orgaf4425f"><span class="section-number-3">9.3</span> 编译器 javac 和虚拟机 java</h3>
+<div class="outline-text-3" id="text-9-3">
 <p>
 Java 的两个基本工具是 <code>javac</code> 和 <code>java</code>, 其中这两个工具功能如下：
 </p>
@@ -906,9 +1650,9 @@ $
 </div>
 </div>
 
-<div id="outline-container-org09a4ef5" class="outline-3">
-<h3 id="org09a4ef5"><span class="section-number-3">2.4</span> <span class="todo TODO">TODO</span> 调试器 jdb</h3>
-<div class="outline-text-3" id="text-2-4">
+<div id="outline-container-orgc15f270" class="outline-3">
+<h3 id="orgc15f270"><span class="section-number-3">9.4</span> <span class="todo TODO">TODO</span> 调试器 jdb</h3>
+<div class="outline-text-3" id="text-9-4">
 <p>
 Java 自带的调试器是 <code>jdb</code> 命令，通常可以使用集成开发环境（IDE）中的调试工具来
 调试 Java，所以 jdb 一般使用的比较少
@@ -916,9 +1660,9 @@ Java 自带的调试器是 <code>jdb</code> 命令，通常可以使用集成开
 </div>
 </div>
 
-<div id="outline-container-org2ea46dc" class="outline-3">
-<h3 id="org2ea46dc"><span class="section-number-3">2.5</span> 解释器 jrepl</h3>
-<div class="outline-text-3" id="text-2-5">
+<div id="outline-container-org832efd5" class="outline-3">
+<h3 id="org832efd5"><span class="section-number-3">9.5</span> 解释器 jrepl</h3>
+<div class="outline-text-3" id="text-9-5">
 <p>
 Java 9 的 JDK 中就自带解释器, 可以用于调试一些常见的命令。Java 8 用户可以使用
 一个民间开发的 REPL，就叫 <code>java-repl</code>, 该工具可以在 <a href="https://github.com/albertlatacz/java-repl">github</a> 中下载 jar 包，然
@@ -946,9 +1690,9 @@ java&gt;
 </div>
 </div>
 
-<div id="outline-container-org84294e7" class="outline-3">
-<h3 id="org84294e7"><span class="section-number-3">2.6</span> 反汇编器 javap</h3>
-<div class="outline-text-3" id="text-2-6">
+<div id="outline-container-org065cbf9" class="outline-3">
+<h3 id="org065cbf9"><span class="section-number-3">9.6</span> 反汇编器 javap</h3>
+<div class="outline-text-3" id="text-9-6">
 <p>
 javap 时 JDK 自带的反汇编器，可以反汇编 java 的类
 </p>
@@ -1087,7 +1831,7 @@ SourceFile: "Apple.java"
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-04 Sun 23:03. Created by Jinghui Hu at 2021-07-04 Sun 22:20.</p>
+<p class="author">Last Updated 2021-07-16 Fri 22:39. Created by Jinghui Hu at 2021-07-04 Sun 22:20.</p>
 </div>
 </body>
 </html>
