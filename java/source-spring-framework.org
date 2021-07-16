@@ -653,6 +653,7 @@
    ~invokeBeanFactoryPostProcessors()~ 方法，这里牵扯到几个核心的方法
    1. ~AbstractApplicationContext#refresh()~
    2. ~AbstractBeanFactory#doGetBean(...)~
+   3. ~AbstractAutowireCapableBeanFactory#instantiateBean(...)~
    #+BEGIN_SRC text
      instantiateClass:185, BeanUtils (org.springframework.beans)
      instantiate:87, SimpleInstantiationStrategy (org.springframework.beans.factory.support)
@@ -671,54 +672,231 @@
      main:18, MyApp02 (io.github.jeanhwea.app02)
    #+END_SRC
 
-*** XmlBeanDefinitionReader
-    实际实现读取 BeanDefinition 的方法
-    #+BEGIN_SRC java
-      /**
-       ,* Actually load bean definitions from the specified XML file.
-       ,* @param inputSource the SAX InputSource to read from
-       ,* @param resource the resource descriptor for the XML file
-       ,* @return the number of bean definitions found
-       ,* @throws BeanDefinitionStoreException in case of loading or parsing errors
-       ,* @see #doLoadDocument
-       ,* @see #registerBeanDefinitions
-       ,*/
-      protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
-              throws BeanDefinitionStoreException {
+   ~instantiateBean(...)~ 实例化 Bean 主要完成如下工作
+   1. 使用 InstantiationStrategy 实例化策略来实例化 Bean, Spring 中创建 Bean 有如
+      下两种方式
+      - 通过 ~BeanUtils.instantiateClass()~ 方法创建实例
+      - 通过 ~new CglibSubclassCreator(bd, owner).instantiate(ctor, args)~ 方式
+        进行创建
+   2. 添加 BeanWrapper 封装 Bean 对象
+      - 实现类为 ~BeanWrapperImpl~
+      - ~BeanWrapperImpl~ 继承自 ~AbstractNestablePropertyAccessor~
+      - ~AbstractNestablePropertyAccessor#setPropertyValue(...)~ 方法设置属性值
+   #+BEGIN_SRC java
+     /**
+      ,* Instantiate the given bean using its default constructor.
+      ,* @param beanName the name of the bean
+      ,* @param mbd the bean definition for the bean
+      ,* @return a BeanWrapper for the new instance
+      ,*/
+     protected BeanWrapper instantiateBean(final String beanName, final RootBeanDefinition mbd) {
+         try {
+             Object beanInstance;
+             final BeanFactory parent = this;
+             if (System.getSecurityManager() != null) {
+                 beanInstance = AccessController.doPrivileged((PrivilegedAction<Object>) () ->
+                         getInstantiationStrategy().instantiate(mbd, beanName, parent),
+                         getAccessControlContext());
+             }
+             else {
+                 beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, parent);
+             }
+             BeanWrapper bw = new BeanWrapperImpl(beanInstance);
+             initBeanWrapper(bw);
+             return bw;
+         }
+         catch (Throwable ex) {
+             throw new BeanCreationException(
+                     mbd.getResourceDescription(), beanName, "Instantiation of bean failed", ex);
+         }
+     }
+   #+END_SRC
 
-          try {
-              Document doc = doLoadDocument(inputSource, resource);
-              int count = registerBeanDefinitions(doc, resource);
-              if (logger.isDebugEnabled()) {
-                  logger.debug("Loaded " + count + " bean definitions from " + resource);
-              }
-              return count;
-          }
-          catch (BeanDefinitionStoreException ex) {
-              throw ex;
-          }
-          catch (SAXParseException ex) {
-              throw new XmlBeanDefinitionStoreException(resource.getDescription(),
-                      "Line " + ex.getLineNumber() + " in XML document from " + resource + " is invalid", ex);
-          }
-          catch (SAXException ex) {
-              throw new XmlBeanDefinitionStoreException(resource.getDescription(),
-                      "XML document from " + resource + " is invalid", ex);
-          }
-          catch (ParserConfigurationException ex) {
-              throw new BeanDefinitionStoreException(resource.getDescription(),
-                      "Parser configuration exception parsing XML from " + resource, ex);
-          }
-          catch (IOException ex) {
-              throw new BeanDefinitionStoreException(resource.getDescription(),
-                      "IOException parsing XML document from " + resource, ex);
-          }
-          catch (Throwable ex) {
-              throw new BeanDefinitionStoreException(resource.getDescription(),
-                      "Unexpected exception parsing XML document from " + resource, ex);
-          }
-      }
-    #+END_SRC
+   ~doGetBean(...)~ 方法是获取 Bean 的最终处理函数，它的逻辑比较复杂，可以分成以
+   下流程
+   1. 获取 beanName, 这里处理了 Bean 的别名
+   2. 单例容器中尝试获取，调用 ~DefaultSingletonBeanRegistry#getSingleton()~ 方
+      法来处理
+   3. 获取 FactoryBean 生成的 Bean 实例
+      - 通过 ~getObjectForBeanInstance()~ 方法获取 beanInstance
+   4. 尝试从父容器中获取
+   5. 调用 ~markBeanAsCreated()~ 方法标记创建 Bean
+   6. 单例 Bean 创建
+      - ~getSingleton(String beanName, ObjectFactory<?> singletonFactory)~
+   7. 原型 Bean 创建
+   8. 非单例 Bean 也非原型 Bean 创建
+   #+BEGIN_SRC java
+     /**
+      ,* Return an instance, which may be shared or independent, of the specified bean.
+      ,* @param name the name of the bean to retrieve
+      ,* @param requiredType the required type of the bean to retrieve
+      ,* @param args arguments to use when creating a bean instance using explicit arguments
+      ,* (only applied when creating a new instance as opposed to retrieving an existing one)
+      ,* @param typeCheckOnly whether the instance is obtained for a type check,
+      ,* not for actual use
+      ,* @return an instance of the bean
+      ,* @throws BeansException if the bean could not be created
+      ,*/
+     @SuppressWarnings("unchecked")
+     protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
+             @Nullable final Object[] args, boolean typeCheckOnly) throws BeansException {
+
+         final String beanName = transformedBeanName(name);
+         Object bean;
+
+         // Eagerly check singleton cache for manually registered singletons.
+         Object sharedInstance = getSingleton(beanName);
+         if (sharedInstance != null && args == null) {
+             if (logger.isTraceEnabled()) {
+                 if (isSingletonCurrentlyInCreation(beanName)) {
+                     logger.trace("Returning eagerly cached instance of singleton bean '" + beanName +
+                             "' that is not fully initialized yet - a consequence of a circular reference");
+                 }
+                 else {
+                     logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
+                 }
+             }
+             bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
+         }
+
+         else {
+             // Fail if we're already creating this bean instance:
+             // We're assumably within a circular reference.
+             if (isPrototypeCurrentlyInCreation(beanName)) {
+                 throw new BeanCurrentlyInCreationException(beanName);
+             }
+
+             // Check if bean definition exists in this factory.
+             BeanFactory parentBeanFactory = getParentBeanFactory();
+             if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
+                 // Not found -> check parent.
+                 String nameToLookup = originalBeanName(name);
+                 if (parentBeanFactory instanceof AbstractBeanFactory) {
+                     return ((AbstractBeanFactory) parentBeanFactory).doGetBean(
+                             nameToLookup, requiredType, args, typeCheckOnly);
+                 }
+                 else if (args != null) {
+                     // Delegation to parent with explicit args.
+                     return (T) parentBeanFactory.getBean(nameToLookup, args);
+                 }
+                 else if (requiredType != null) {
+                     // No args -> delegate to standard getBean method.
+                     return parentBeanFactory.getBean(nameToLookup, requiredType);
+                 }
+                 else {
+                     return (T) parentBeanFactory.getBean(nameToLookup);
+                 }
+             }
+
+             if (!typeCheckOnly) {
+                 markBeanAsCreated(beanName);
+             }
+
+             try {
+                 final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+                 checkMergedBeanDefinition(mbd, beanName, args);
+
+                 // Guarantee initialization of beans that the current bean depends on.
+                 String[] dependsOn = mbd.getDependsOn();
+                 if (dependsOn != null) {
+                     for (String dep : dependsOn) {
+                         if (isDependent(beanName, dep)) {
+                             throw new BeanCreationException(mbd.getResourceDescription(), beanName,
+                                     "Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
+                         }
+                         registerDependentBean(dep, beanName);
+                         try {
+                             getBean(dep);
+                         }
+                         catch (NoSuchBeanDefinitionException ex) {
+                             throw new BeanCreationException(mbd.getResourceDescription(), beanName,
+                                     "'" + beanName + "' depends on missing bean '" + dep + "'", ex);
+                         }
+                     }
+                 }
+
+                 // Create bean instance.
+                 if (mbd.isSingleton()) {
+                     sharedInstance = getSingleton(beanName, () -> {
+                         try {
+                             return createBean(beanName, mbd, args);
+                         }
+                         catch (BeansException ex) {
+                             // Explicitly remove instance from singleton cache: It might have been put there
+                             // eagerly by the creation process, to allow for circular reference resolution.
+                             // Also remove any beans that received a temporary reference to the bean.
+                             destroySingleton(beanName);
+                             throw ex;
+                         }
+                     });
+                     bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
+                 }
+
+                 else if (mbd.isPrototype()) {
+                     // It's a prototype -> create a new instance.
+                     Object prototypeInstance = null;
+                     try {
+                         beforePrototypeCreation(beanName);
+                         prototypeInstance = createBean(beanName, mbd, args);
+                     }
+                     finally {
+                         afterPrototypeCreation(beanName);
+                     }
+                     bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
+                 }
+
+                 else {
+                     String scopeName = mbd.getScope();
+                     final Scope scope = this.scopes.get(scopeName);
+                     if (scope == null) {
+                         throw new IllegalStateException("No Scope registered for scope name '" + scopeName + "'");
+                     }
+                     try {
+                         Object scopedInstance = scope.get(beanName, () -> {
+                             beforePrototypeCreation(beanName);
+                             try {
+                                 return createBean(beanName, mbd, args);
+                             }
+                             finally {
+                                 afterPrototypeCreation(beanName);
+                             }
+                         });
+                         bean = getObjectForBeanInstance(scopedInstance, name, beanName, mbd);
+                     }
+                     catch (IllegalStateException ex) {
+                         throw new BeanCreationException(beanName,
+                                 "Scope '" + scopeName + "' is not active for the current thread; consider " +
+                                 "defining a scoped proxy for this bean if you intend to refer to it from a singleton",
+                                 ex);
+                     }
+                 }
+             }
+             catch (BeansException ex) {
+                 cleanupAfterBeanCreationFailure(beanName);
+                 throw ex;
+             }
+         }
+
+         // Check if required type matches the type of the actual bean instance.
+         if (requiredType != null && !requiredType.isInstance(bean)) {
+             try {
+                 T convertedBean = getTypeConverter().convertIfNecessary(bean, requiredType);
+                 if (convertedBean == null) {
+                     throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
+                 }
+                 return convertedBean;
+             }
+             catch (TypeMismatchException ex) {
+                 if (logger.isTraceEnabled()) {
+                     logger.trace("Failed to convert bean '" + name + "' to required type '" +
+                             ClassUtils.getQualifiedName(requiredType) + "'", ex);
+                 }
+                 throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
+             }
+         }
+         return (T) bean;
+     }
+   #+END_SRC
 
 * ApplicationContext
 
