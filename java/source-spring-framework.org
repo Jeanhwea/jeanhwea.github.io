@@ -596,6 +596,81 @@
         ~postProcessBeforeDestruction(...)~ 方法
       - ~DisposableBean#destroy(...)~
       - a custom destroy-method definition
+
+   实例化 Bean 的方法为 ~instantiateClass(...)~, 它的实现如下
+   #+BEGIN_SRC java
+     /**
+      ,* Convenience method to instantiate a class using the given constructor.
+      ,* <p>Note that this method tries to set the constructor accessible if given a
+      ,* non-accessible (that is, non-public) constructor, and supports Kotlin classes
+      ,* with optional parameters and default values.
+      ,* @param ctor the constructor to instantiate
+      ,* @param args the constructor arguments to apply (use {@code null} for an unspecified
+      ,* parameter, Kotlin optional parameters and Java primitive types are supported)
+      ,* @return the new instance
+      ,* @throws BeanInstantiationException if the bean cannot be instantiated
+      ,* @see Constructor#newInstance
+      ,*/
+     public static <T> T instantiateClass(Constructor<T> ctor, Object... args) throws BeanInstantiationException {
+         Assert.notNull(ctor, "Constructor must not be null");
+         try {
+             ReflectionUtils.makeAccessible(ctor); // 设置构造器的可见性
+             if (KotlinDetector.isKotlinReflectPresent() && KotlinDetector.isKotlinType(ctor.getDeclaringClass())) {
+                 return KotlinDelegate.instantiateClass(ctor, args);
+             }
+             else {
+                 Class<?>[] parameterTypes = ctor.getParameterTypes();
+                 Assert.isTrue(args.length <= parameterTypes.length, "Can't specify more arguments than constructor parameters");
+                 Object[] argsWithDefaultValues = new Object[args.length];
+                 for (int i = 0 ; i < args.length; i++) {
+                     if (args[i] == null) {
+                         Class<?> parameterType = parameterTypes[i];
+                         argsWithDefaultValues[i] = (parameterType.isPrimitive() ? DEFAULT_TYPE_VALUES.get(parameterType) : null);
+                     }
+                     else {
+                         argsWithDefaultValues[i] = args[i];
+                     }
+                 }
+                 return ctor.newInstance(argsWithDefaultValues); // 实例化 Bean 对象
+             }
+         }
+         catch (InstantiationException ex) {
+             throw new BeanInstantiationException(ctor, "Is it an abstract class?", ex);
+         }
+         catch (IllegalAccessException ex) {
+             throw new BeanInstantiationException(ctor, "Is the constructor accessible?", ex);
+         }
+         catch (IllegalArgumentException ex) {
+             throw new BeanInstantiationException(ctor, "Illegal arguments for constructor", ex);
+         }
+         catch (InvocationTargetException ex) {
+             throw new BeanInstantiationException(ctor, "Constructor threw exception", ex.getTargetException());
+         }
+     }
+   #+END_SRC
+
+   先分析调用栈，可以知道创建 Bean 的入口是 ~refresh()~ 方法的
+   ~invokeBeanFactoryPostProcessors()~ 方法，这里牵扯到几个核心的方法
+   1. ~AbstractApplicationContext#refresh()~
+   2. ~AbstractBeanFactory#doGetBean(...)~
+   #+BEGIN_SRC text
+     instantiateClass:185, BeanUtils (org.springframework.beans)
+     instantiate:87, SimpleInstantiationStrategy (org.springframework.beans.factory.support)
+     instantiateBean:1312, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     createBeanInstance:1214, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     doCreateBean:557, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     createBean:517, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     lambda$doGetBean$0:323, AbstractBeanFactory (org.springframework.beans.factory.support)
+     getObject:-1, 1027007693 (org.springframework.beans.factory.support.AbstractBeanFactory$$Lambda$29)
+     getSingleton:222, DefaultSingletonBeanRegistry (org.springframework.beans.factory.support)
+     doGetBean:321, AbstractBeanFactory (org.springframework.beans.factory.support)
+     getBean:207, AbstractBeanFactory (org.springframework.beans.factory.support)
+     invokeBeanFactoryPostProcessors:89, PostProcessorRegistrationDelegate (org.springframework.context.support)
+     invokeBeanFactoryPostProcessors:706, AbstractApplicationContext (org.springframework.context.support)
+     refresh:532, AbstractApplicationContext (org.springframework.context.support)
+     main:18, MyApp02 (io.github.jeanhwea.app02)
+   #+END_SRC
+
 *** XmlBeanDefinitionReader
     实际实现读取 BeanDefinition 的方法
     #+BEGIN_SRC java
