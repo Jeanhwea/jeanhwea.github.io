@@ -890,6 +890,28 @@
           return (T) bean;
       }
     #+END_SRC
+** FactoryBean
+   FactoryBean 不同于普通的 Bean， FactoryBean 自身就是一个组装 Bean 的微型工厂，
+   即在调用 ~BeanFactory#getBean(...)~ 方法时不返回 FactoryBean，而是返回工厂方
+   法返回的 Bean，定义 FactoryBean 只需要实现 ~FactoryBean~ 接口即可
+
+   #+BEGIN_SRC java
+     public interface FactoryBean<T> {
+         @Nullable
+         T getObject() throws Exception;
+
+         @Nullable
+         Class<?> getObjectType();
+
+         default boolean isSingleton() {
+             return true;
+         }
+     }
+   #+END_SRC
+   1. ~getObject(...)~ 方法返回 FactoryBean 创建的实例，也称工厂方法
+   2. ~getObjectType(...)~ 方法返回 FactoryBean 创建的实例的类型
+   3. ~isSingleton(...)~ 方法返回FactoryBean创建的实例的Scope
+
 * IoC
 ** IoC 核心接口和类
    Spring 的 IoC 容器对象一般继承自 ~ApplicationContext~ 接口，常见的对象类如下
