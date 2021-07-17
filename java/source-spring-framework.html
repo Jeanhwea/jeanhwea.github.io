@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-18 Sun 00:00 -->
+<!-- 2021-07-18 Sun 01:09 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Spring Framework v5.2.5.RELEASE</title>
@@ -233,39 +233,49 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org4445f77">1. 容器实现原理</a>
+<li><a href="#org35bcdd2">1. 容器实现原理</a>
 <ul>
-<li><a href="#orgeec0316">1.1. Bean 工厂接口: BeanFactory</a></li>
-<li><a href="#org6c657e7">1.2. Bean 工厂的实现类: DefaultListableBeanFactory</a></li>
-<li><a href="#org67fef6f">1.3. Bean 定义的读取器: XmlBeanDefinitionReader</a></li>
-<li><a href="#orgf41f924">1.4. BeanDefinition 自动加载流程</a></li>
-<li><a href="#orgf5e83c2">1.5. BeanDefinition 注册的实现</a></li>
-<li><a href="#org4c8a8ef">1.6. BeanDefinition 移除的实现</a></li>
-<li><a href="#org8071530">1.7. BeanDefinition 获取的实现</a></li>
-<li><a href="#org0a3d028">1.8. <code>&lt;bean/&gt;</code> 标签解析</a></li>
+<li><a href="#org2e802d5">1.1. Bean 工厂接口: BeanFactory</a></li>
+<li><a href="#org29d01e2">1.2. Bean 工厂的实现类: DefaultListableBeanFactory</a></li>
+<li><a href="#orgf5b25ee">1.3. Bean 定义的读取器: XmlBeanDefinitionReader</a></li>
+<li><a href="#orgea8d182">1.4. BeanDefinition 自动加载流程</a></li>
+<li><a href="#org064cb64">1.5. BeanDefinition 注册的实现</a></li>
+<li><a href="#org3e69650">1.6. BeanDefinition 移除的实现</a></li>
+<li><a href="#orgcadeeea">1.7. BeanDefinition 获取的实现</a></li>
+<li><a href="#org4557e74">1.8. <code>&lt;bean/&gt;</code> 标签解析</a></li>
 </ul>
 </li>
-<li><a href="#org1490cb9">2. IoC</a>
+<li><a href="#org5891502">2. Bean 实现原理</a>
 <ul>
-<li><a href="#orgec53fc7">2.1. IoC 核心接口和类</a></li>
-<li><a href="#orgf0fed2c">2.2. Bean 的生命周期</a></li>
+<li><a href="#org8a1fb65">2.1. Bean 的生命周期</a></li>
+<li><a href="#org9333cd9">2.2. Bean 的流程分析</a>
+<ul>
+<li><a href="#orgb62a505">2.2.1. 实例化 Bean: <code>instantiateBean()</code> 方法</a></li>
+<li><a href="#orgb207576">2.2.2. 获取 Bean 实例: <code>doGetBean()</code> 方法</a></li>
 </ul>
 </li>
-<li><a href="#org897911a">3. ApplicationContext</a></li>
-<li><a href="#orgcc326dc">4. AOP</a></li>
-<li><a href="#org23f2b92">5. Spring 核心类梳理</a></li>
-<li><a href="#org71493f1">6. SpringBoot 自动装配</a></li>
-<li><a href="#orga6f04a4">7. 参考链接</a></li>
+</ul>
+</li>
+<li><a href="#orgab32c7f">3. IoC</a>
+<ul>
+<li><a href="#org8ba1567">3.1. IoC 核心接口和类</a></li>
+</ul>
+</li>
+<li><a href="#orgc1fb627">4. ApplicationContext</a></li>
+<li><a href="#org2607de3">5. AOP</a></li>
+<li><a href="#orgc30f1cd">6. Spring 核心类梳理</a></li>
+<li><a href="#org3a4b6aa">7. SpringBoot 自动装配</a></li>
+<li><a href="#org0e4b01f">8. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org4445f77" class="outline-2">
-<h2 id="org4445f77"><span class="section-number-2">1</span> 容器实现原理</h2>
+<div id="outline-container-org35bcdd2" class="outline-2">
+<h2 id="org35bcdd2"><span class="section-number-2">1</span> 容器实现原理</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgeec0316" class="outline-3">
-<h3 id="orgeec0316"><span class="section-number-3">1.1</span> Bean 工厂接口: BeanFactory</h3>
+<div id="outline-container-org2e802d5" class="outline-3">
+<h3 id="org2e802d5"><span class="section-number-3">1.1</span> Bean 工厂接口: BeanFactory</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 <code>BeanFactory</code> 是 Spring 的 Bean 工厂的接口定义，它定义对 Spring Bean 容器访问的
@@ -307,8 +317,8 @@
 </div>
 </div>
 
-<div id="outline-container-org6c657e7" class="outline-3">
-<h3 id="org6c657e7"><span class="section-number-3">1.2</span> Bean 工厂的实现类: DefaultListableBeanFactory</h3>
+<div id="outline-container-org29d01e2" class="outline-3">
+<h3 id="org29d01e2"><span class="section-number-3">1.2</span> Bean 工厂的实现类: DefaultListableBeanFactory</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 <code>DefaultListableBeanFactory</code> 是实现 <code>BeanFactory</code> 接口的核心类，熟悉它的类继
@@ -388,8 +398,8 @@ BeanDefinition, 直接通过实现 <code>T getObject()</code> 方法来返回创
 </div>
 </div>
 
-<div id="outline-container-org67fef6f" class="outline-3">
-<h3 id="org67fef6f"><span class="section-number-3">1.3</span> Bean 定义的读取器: XmlBeanDefinitionReader</h3>
+<div id="outline-container-orgf5b25ee" class="outline-3">
+<h3 id="orgf5b25ee"><span class="section-number-3">1.3</span> Bean 定义的读取器: XmlBeanDefinitionReader</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 <code>XmlBeanDefinitionReader</code> 是实现读取 BeanDefinition 的类，它的继承关系如下
@@ -442,8 +452,8 @@ Class XmlBeanDefinitionReader
 </div>
 </div>
 
-<div id="outline-container-orgf41f924" class="outline-3">
-<h3 id="orgf41f924"><span class="section-number-3">1.4</span> BeanDefinition 自动加载流程</h3>
+<div id="outline-container-orgea8d182" class="outline-3">
+<h3 id="orgea8d182"><span class="section-number-3">1.4</span> BeanDefinition 自动加载流程</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 <code>DefaultListableBeanFactory</code> 类定义了存储 BeanDefinition 类的哈希表, 具体定义如下
@@ -596,14 +606,21 @@ BeanDefinition</li>
 <li>然后调用 <code>registerBeanDefinitions(doc, resource)</code> 完成 BeanDefinition 的
 注册</li>
 </ul></li>
-<li>接着进行解析，处理等操作，最终交付到
+<li>调用 <code>parseDefaultElement(...)</code> 方法对默认元素进行解析
+<ul class="org-ul">
+<li>对 import 类型标签解析</li>
+<li>对 alias 类型标签解析</li>
+<li>对 bean 类型标签解析</li>
+<li>对嵌套 bean 类型标签解析</li>
+</ul></li>
+<li>接着对标签进行处理，最终交付到
 <code>DefaultListableBeanFactory#registerBeanDefinition(...)</code> 方法进行注册</li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orgf5e83c2" class="outline-3">
-<h3 id="orgf5e83c2"><span class="section-number-3">1.5</span> BeanDefinition 注册的实现</h3>
+<div id="outline-container-org064cb64" class="outline-3">
+<h3 id="org064cb64"><span class="section-number-3">1.5</span> BeanDefinition 注册的实现</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 <code>DefaultListableBeanFactory</code> 的 <code>registerBeanDefinition(...)</code> 才是真正实现注
@@ -750,8 +767,8 @@ BeanDefinition</li>
 </div>
 </div>
 
-<div id="outline-container-org4c8a8ef" class="outline-3">
-<h3 id="org4c8a8ef"><span class="section-number-3">1.6</span> BeanDefinition 移除的实现</h3>
+<div id="outline-container-org3e69650" class="outline-3">
+<h3 id="org3e69650"><span class="section-number-3">1.6</span> BeanDefinition 移除的实现</h3>
 <div class="outline-text-3" id="text-1-6">
 <p>
 BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</code> 方法
@@ -837,8 +854,8 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-org8071530" class="outline-3">
-<h3 id="org8071530"><span class="section-number-3">1.7</span> BeanDefinition 获取的实现</h3>
+<div id="outline-container-orgcadeeea" class="outline-3">
+<h3 id="orgcadeeea"><span class="section-number-3">1.7</span> BeanDefinition 获取的实现</h3>
 <div class="outline-text-3" id="text-1-7">
 <p>
 <code>DefaultListableBeanFactory</code> 的实现获取 BeanDefinition 的逻辑如下
@@ -860,8 +877,8 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-org0a3d028" class="outline-3">
-<h3 id="org0a3d028"><span class="section-number-3">1.8</span> <code>&lt;bean/&gt;</code> 标签解析</h3>
+<div id="outline-container-org4557e74" class="outline-3">
+<h3 id="org4557e74"><span class="section-number-3">1.8</span> <code>&lt;bean/&gt;</code> 标签解析</h3>
 <div class="outline-text-3" id="text-1-8">
 <p>
 之前在 BeanDefinition 自动加载流程中忽略了对 <code>&lt;bean/&gt;</code> 标签的解析，其核心实现
@@ -966,81 +983,13 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-org1490cb9" class="outline-2">
-<h2 id="org1490cb9"><span class="section-number-2">2</span> IoC</h2>
+<div id="outline-container-org5891502" class="outline-2">
+<h2 id="org5891502"><span class="section-number-2">2</span> Bean 实现原理</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgec53fc7" class="outline-3">
-<h3 id="orgec53fc7"><span class="section-number-3">2.1</span> IoC 核心接口和类</h3>
+<div id="outline-container-org8a1fb65" class="outline-3">
+<h3 id="org8a1fb65"><span class="section-number-3">2.1</span> Bean 的生命周期</h3>
 <div class="outline-text-3" id="text-2-1">
-<p>
-Spring 的 IoC 容器对象一般继承自 <code>ApplicationContext</code> 接口，常见的对象类如下
-</p>
-
-<p>
-<code>ClassPathXmlApplicationContext</code>: 读取 ClassPath 中 XML 配置文件的 Bean 定义
-的容器
-</p>
-
-
-<div id="orgb1d53ae" class="figure">
-<p><img src="../static/image/2021/07/ClassPathXmlApplicationContext.png" alt="ClassPathXmlApplicationContext.png" />
-</p>
-</div>
-
-<p>
-<code>AnnotationConfigApplicationContext</code>: 读取注解 Bean 定义的容器
-</p>
-
-
-<div id="org2500caf" class="figure">
-<p><img src="../static/image/2021/07/AnnotationConfigApplicationContext.png" alt="AnnotationConfigApplicationContext.png" />
-</p>
-</div>
-
-<p>
-常见的类简单可以分成以下几类
-</p>
-<ol class="org-ol">
-<li>资源处理
-<ul class="org-ul">
-<li><code>Resource</code> Spring 中关于资源的定义</li>
-<li><code>ResourceLoader</code> 提供资源加载方法</li>
-<li><code>BeanDefinitionReader</code> 读取接口主要用来读取信息</li>
-</ul></li>
-<li>注册形式，在 Spring 中关于注册的几个核心
-<ul class="org-ul">
-<li><code>AliasRegistry</code> 别名注册</li>
-<li><code>BeanDefinitionRegistry</code> Bean 定义注册</li>
-<li><code>SingletonBeanRegistry</code> 单例 Bean 注册
-<ul class="org-ul">
-<li><code>DefaultSingletonBeanRegistry</code></li>
-</ul></li>
-</ul></li>
-<li>生命周期，可以分成容器生命周期和 Bean 生命周期两个小类
-<ul class="org-ul">
-<li><code>Lifecycle</code> 容器生命周期的核心接口</li>
-<li><code>InitializingBean</code>, <code>DisposableBean</code> 等 Bean 的生命周期接口</li>
-</ul></li>
-<li>Bean 拓展
-<ul class="org-ul">
-<li><code>BeanPostProcessor</code></li>
-<li><code>Aware</code> 系列接口</li>
-</ul></li>
-<li>上下文的接口:
-<ul class="org-ul">
-<li><code>ApplicationContext</code> 作为主导接口
-<ul class="org-ul">
-<li><code>AbstractApplicationContext</code></li>
-</ul></li>
-</ul></li>
-</ol>
-</div>
-</div>
-
-<div id="outline-container-orgf0fed2c" class="outline-3">
-<h3 id="orgf0fed2c"><span class="section-number-3">2.2</span> Bean 的生命周期</h3>
-<div class="outline-text-3" id="text-2-2">
 <p>
 <code>BeanFactory</code> 的注释中完整地说明的实现标准 BeanFactory 的代码
 </p>
@@ -1072,71 +1021,15 @@ ApplicationContext 中</li>
 <li>a custom destroy-method definition</li>
 </ul></li>
 </ol>
-
-<p>
-实例化 Bean 的方法为 <code>instantiateClass(...)</code>, 它的实现如下
-</p>
-<div class="org-src-container">
-<pre class="src src-java"><span style="color: #d33682;">/**</span>
-<span style="color: #d33682;"> * Convenience method to instantiate a class using the given constructor.</span>
-<span style="color: #d33682;"> * </span><span style="color: #268bd2;">&lt;p&gt;</span><span style="color: #d33682;">Note that this method tries to set the constructor accessible if given a</span>
-<span style="color: #d33682;"> * non-accessible (that is, non-public) constructor, and supports Kotlin classes</span>
-<span style="color: #d33682;"> * with optional parameters and default values.</span>
-<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> ctor the constructor to instantiate</span>
-<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> args the constructor arguments to apply (use </span><span style="color: #268bd2;">{@code null}</span><span style="color: #d33682;"> for an unspecified</span>
-<span style="color: #d33682;"> * parameter, Kotlin optional parameters and Java primitive types are supported)</span>
-<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@return</span><span style="color: #d33682;"> the new instance</span>
-<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@throws</span><span style="color: #d33682;"> BeanInstantiationException if the bean cannot be instantiated</span>
-<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@see</span><span style="color: #d33682;"> Constructor#newInstance</span>
-<span style="color: #d33682;"> */</span>
-<span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">T</span><span style="color: #8d5649;">&gt;</span> <span style="color: #268bd2;">T</span> <span style="color: #b58900;">instantiateClass</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">Constructor</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">T</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">ctor</span>, <span style="color: #268bd2;">Object</span>... <span style="color: #6c71c4;">args</span><span style="color: #8d5649;">)</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeanInstantiationException</span> <span style="color: #8d5649;">{</span>
-    Assert.notNull<span style="color: #d8241f;">(</span>ctor, <span style="color: #2aa198;">"Constructor must not be null"</span><span style="color: #d8241f;">)</span>;
-    <span style="color: #859900;">try</span> <span style="color: #d8241f;">{</span>
-        ReflectionUtils.makeAccessible<span style="color: #9564bf;">(</span>ctor<span style="color: #9564bf;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#35774;&#32622;&#26500;&#36896;&#22120;&#30340;&#21487;&#35265;&#24615;</span>
-        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>KotlinDetector.isKotlinReflectPresent<span style="color: #24a222;">()</span> &amp;&amp; KotlinDetector.isKotlinType<span style="color: #24a222;">(</span>ctor.getDeclaringClass<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #859900;">return</span> KotlinDelegate.instantiateClass<span style="color: #24a222;">(</span>ctor, args<span style="color: #24a222;">)</span>;
-        <span style="color: #9564bf;">}</span>
-        <span style="color: #859900;">else</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #268bd2;">Class</span><span style="color: #24a222;">&lt;</span>?<span style="color: #24a222;">&gt;[]</span> <span style="color: #6c71c4;">parameterTypes</span> = ctor.getParameterTypes<span style="color: #24a222;">()</span>;
-            Assert.isTrue<span style="color: #24a222;">(</span>args.length &lt;= parameterTypes.length, <span style="color: #2aa198;">"Can't specify more arguments than constructor parameters"</span><span style="color: #24a222;">)</span>;
-            <span style="color: #268bd2;">Object</span><span style="color: #24a222;">[]</span> <span style="color: #6c71c4;">argsWithDefaultValues</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Object</span><span style="color: #24a222;">[</span>args.length<span style="color: #24a222;">]</span>;
-            <span style="color: #859900;">for</span> <span style="color: #24a222;">(</span><span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">i</span> = 0 ; i &lt; args.<span style="color: #268bd2;">length</span>; i++<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
-                <span style="color: #859900;">if</span> <span style="color: #ff7f00;">(</span>args<span style="color: #1776b6;">[</span>i<span style="color: #1776b6;">]</span> == <span style="color: #268bd2;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
-                    <span style="color: #268bd2;">Class</span><span style="color: #1776b6;">&lt;</span>?<span style="color: #1776b6;">&gt;</span> <span style="color: #6c71c4;">parameterType</span> = parameterTypes<span style="color: #1776b6;">[</span>i<span style="color: #1776b6;">]</span>;
-                    argsWithDefaultValues<span style="color: #1776b6;">[</span>i<span style="color: #1776b6;">]</span> = <span style="color: #1776b6;">(</span>parameterType.isPrimitive<span style="color: #00bed1;">()</span> ? DEFAULT_TYPE_VALUES.get<span style="color: #00bed1;">(</span>parameterType<span style="color: #00bed1;">)</span> : <span style="color: #268bd2;">null</span><span style="color: #1776b6;">)</span>;
-                <span style="color: #ff7f00;">}</span>
-                <span style="color: #859900;">else</span> <span style="color: #ff7f00;">{</span>
-                    argsWithDefaultValues<span style="color: #1776b6;">[</span>i<span style="color: #1776b6;">]</span> = args<span style="color: #1776b6;">[</span>i<span style="color: #1776b6;">]</span>;
-                <span style="color: #ff7f00;">}</span>
-            <span style="color: #24a222;">}</span>
-            <span style="color: #859900;">return</span> ctor.newInstance<span style="color: #24a222;">(</span>argsWithDefaultValues<span style="color: #24a222;">)</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#23454;&#20363;&#21270; Bean &#23545;&#35937;</span>
-        <span style="color: #9564bf;">}</span>
-    <span style="color: #d8241f;">}</span>
-    <span style="color: #859900;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">InstantiationException</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanInstantiationException</span><span style="color: #9564bf;">(</span>ctor, <span style="color: #2aa198;">"Is it an abstract class?"</span>, ex<span style="color: #9564bf;">)</span>;
-    <span style="color: #d8241f;">}</span>
-    <span style="color: #859900;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">IllegalAccessException</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanInstantiationException</span><span style="color: #9564bf;">(</span>ctor, <span style="color: #2aa198;">"Is the constructor accessible?"</span>, ex<span style="color: #9564bf;">)</span>;
-    <span style="color: #d8241f;">}</span>
-    <span style="color: #859900;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">IllegalArgumentException</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanInstantiationException</span><span style="color: #9564bf;">(</span>ctor, <span style="color: #2aa198;">"Illegal arguments for constructor"</span>, ex<span style="color: #9564bf;">)</span>;
-    <span style="color: #d8241f;">}</span>
-    <span style="color: #859900;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">InvocationTargetException</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanInstantiationException</span><span style="color: #9564bf;">(</span>ctor, <span style="color: #2aa198;">"Constructor threw exception"</span>, ex.getTargetException<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
-    <span style="color: #d8241f;">}</span>
-<span style="color: #8d5649;">}</span>
-</pre>
+</div>
 </div>
 
+<div id="outline-container-org9333cd9" class="outline-3">
+<h3 id="org9333cd9"><span class="section-number-3">2.2</span> Bean 的流程分析</h3>
+<div class="outline-text-3" id="text-2-2">
 <p>
-先分析调用栈，可以知道创建 Bean 的入口是 <code>refresh()</code> 方法的
-<code>invokeBeanFactoryPostProcessors()</code> 方法，这里牵扯到几个核心的方法
+实例化 Bean 的方法为 <code>BeanUtils#instantiateClass(...)</code>, 先添加断点获取调用栈
 </p>
-<ol class="org-ol">
-<li><code>AbstractApplicationContext#refresh()</code></li>
-<li><code>AbstractBeanFactory#doGetBean(...)</code></li>
-<li><code>AbstractAutowireCapableBeanFactory#instantiateBean(...)</code></li>
-</ol>
 <div class="org-src-container">
 <pre class="src src-text">instantiateClass:185, BeanUtils (org.springframework.beans)
 instantiate:87, SimpleInstantiationStrategy (org.springframework.beans.factory.support)
@@ -1156,6 +1049,20 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </pre>
 </div>
 
+<p>
+先分析调用栈，可以知道创建 Bean 的入口是 <code>refresh()</code> 方法的
+<code>invokeBeanFactoryPostProcessors()</code> 方法，这里牵扯到几个核心的方法
+</p>
+<ol class="org-ol">
+<li><code>AbstractApplicationContext#refresh()</code></li>
+<li><code>AbstractBeanFactory#doGetBean(...)</code></li>
+<li><code>AbstractAutowireCapableBeanFactory#instantiateBean(...)</code></li>
+</ol>
+</div>
+
+<div id="outline-container-orgb62a505" class="outline-4">
+<h4 id="orgb62a505"><span class="section-number-4">2.2.1</span> 实例化 Bean: <code>instantiateBean()</code> 方法</h4>
+<div class="outline-text-4" id="text-2-2-1">
 <p>
 <code>instantiateBean(...)</code> 实例化 Bean 主要完成如下工作
 </p>
@@ -1204,27 +1111,60 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
+</div>
+</div>
 
+<div id="outline-container-orgb207576" class="outline-4">
+<h4 id="orgb207576"><span class="section-number-4">2.2.2</span> 获取 Bean 实例: <code>doGetBean()</code> 方法</h4>
+<div class="outline-text-4" id="text-2-2-2">
 <p>
-<code>doGetBean(...)</code> 方法是获取 Bean 的最终处理函数，它的逻辑比较复杂，可以分成以
-下流程
+<code>doGetBean(...)</code> 方法是获取 Bean 的最终处理函数，它的逻辑比较复杂，可以分成
+以下流程
 </p>
 <ol class="org-ol">
-<li>获取 beanName, 这里处理了 Bean 的别名</li>
-<li>单例容器中尝试获取，调用 <code>DefaultSingletonBeanRegistry#getSingleton()</code> 方
-法来处理</li>
+<li>获取 beanName
+<ul class="org-ul">
+<li>解析带有别名的 Bean 到最终的名称</li>
+<li>去除 FactoryBean 的修饰符，即 <code>&amp;</code> 前缀</li>
+</ul></li>
+<li>缓存获取
+<ul class="org-ul">
+<li>调用 <code>DefaultSingletonBeanRegistry#getSingleton()</code> 尝试从单例容器缓存中
+获取</li>
+<li>单例 Bean 只创建一次，创建完成直接放入缓存，参考
+<code>DefaultSingletonBeanRegistry</code> 的实现</li>
+<li>依赖的 Bean 避免循环依赖，只记录 <code>ObjectFactory</code> 对象, 参考
+<code>singletonFactories</code> 变量的定义及循环依赖的解决方法</li>
+</ul></li>
+<li>创建 Bean 实例
+<ul class="org-ul">
 <li>获取 FactoryBean 生成的 Bean 实例
 <ul class="org-ul">
-<li>通过 <code>getObjectForBeanInstance()</code> 方法获取 beanInstance</li>
+<li>FactoryBean 的实例是 <code>factory-method</code> 返回的 Bean, 后面称为
+beanInstance</li>
+<li><code>getObjectForBeanInstance()</code> 方法实现了获取 beanInstance 的逻辑</li>
 </ul></li>
-<li>尝试从父容器中获取</li>
-<li>调用 <code>markBeanAsCreated()</code> 方法标记创建 Bean</li>
-<li>单例 Bean 创建
+<li>如果不是 FactoryBean
 <ul class="org-ul">
-<li><code>getSingleton(String beanName, ObjectFactory&lt;?&gt; singletonFactory)</code></li>
+<li>调用 <code>isPrototypeCurrentlyInCreation(...)</code> 判断创建原型 Bean 是否出现
+循环依赖</li>
+<li>尝试从 parentBeanFactory 中获取 Bean</li>
+<li>将 BeanDefinition 进行合并，得到 <code>RootBeanDefinition</code>, 并检验</li>
+<li>调用 <code>markBeanAsCreated()</code> 方法标记创建 Bean</li>
+<li>解决 Bean 依赖
+<ul class="org-ul">
+<li>Bean 是动态加载的，当前待创建 Bean 的可能存在依赖项</li>
+<li>解决依赖的策略是顺序寻找出所有依赖，并完成创建</li>
 </ul></li>
-<li>原型 Bean 创建</li>
-<li>非单例 Bean 也非原型 Bean 创建</li>
+<li>通过不同的 scope 完成对应 Bean 的创建
+<ul class="org-ul">
+<li>单例 Bean 创建: <code>getSingleton(...)</code></li>
+<li>原型 Bean 创建: <code>getSingleton(...)</code></li>
+<li>其它情况 Bean 创建，例如： <code>@RequestScope</code> <code>@SessionScope</code> 等</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>检查 Bean 实例，完成类型转换</li>
 </ol>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #d33682;">/**</span>
@@ -1402,14 +1342,87 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </div>
 </div>
 </div>
+</div>
+<div id="outline-container-orgab32c7f" class="outline-2">
+<h2 id="orgab32c7f"><span class="section-number-2">3</span> IoC</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org8ba1567" class="outline-3">
+<h3 id="org8ba1567"><span class="section-number-3">3.1</span> IoC 核心接口和类</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Spring 的 IoC 容器对象一般继承自 <code>ApplicationContext</code> 接口，常见的对象类如下
+</p>
 
-<div id="outline-container-org897911a" class="outline-2">
-<h2 id="org897911a"><span class="section-number-2">3</span> ApplicationContext</h2>
+<p>
+<code>ClassPathXmlApplicationContext</code>: 读取 ClassPath 中 XML 配置文件的 Bean 定义
+的容器
+</p>
+
+
+<div id="orga1dbf28" class="figure">
+<p><img src="../static/image/2021/07/ClassPathXmlApplicationContext.png" alt="ClassPathXmlApplicationContext.png" />
+</p>
 </div>
 
-<div id="outline-container-orgcc326dc" class="outline-2">
-<h2 id="orgcc326dc"><span class="section-number-2">4</span> AOP</h2>
-<div class="outline-text-2" id="text-4">
+<p>
+<code>AnnotationConfigApplicationContext</code>: 读取注解 Bean 定义的容器
+</p>
+
+
+<div id="org61da38e" class="figure">
+<p><img src="../static/image/2021/07/AnnotationConfigApplicationContext.png" alt="AnnotationConfigApplicationContext.png" />
+</p>
+</div>
+
+<p>
+常见的类简单可以分成以下几类
+</p>
+<ol class="org-ol">
+<li>资源处理
+<ul class="org-ul">
+<li><code>Resource</code> Spring 中关于资源的定义</li>
+<li><code>ResourceLoader</code> 提供资源加载方法</li>
+<li><code>BeanDefinitionReader</code> 读取接口主要用来读取信息</li>
+</ul></li>
+<li>注册形式，在 Spring 中关于注册的几个核心
+<ul class="org-ul">
+<li><code>AliasRegistry</code> 别名注册</li>
+<li><code>BeanDefinitionRegistry</code> Bean 定义注册</li>
+<li><code>SingletonBeanRegistry</code> 单例 Bean 注册
+<ul class="org-ul">
+<li><code>DefaultSingletonBeanRegistry</code></li>
+</ul></li>
+</ul></li>
+<li>生命周期，可以分成容器生命周期和 Bean 生命周期两个小类
+<ul class="org-ul">
+<li><code>Lifecycle</code> 容器生命周期的核心接口</li>
+<li><code>InitializingBean</code>, <code>DisposableBean</code> 等 Bean 的生命周期接口</li>
+</ul></li>
+<li>Bean 拓展
+<ul class="org-ul">
+<li><code>BeanPostProcessor</code></li>
+<li><code>Aware</code> 系列接口</li>
+</ul></li>
+<li>上下文的接口:
+<ul class="org-ul">
+<li><code>ApplicationContext</code> 作为主导接口
+<ul class="org-ul">
+<li><code>AbstractApplicationContext</code></li>
+</ul></li>
+</ul></li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc1fb627" class="outline-2">
+<h2 id="orgc1fb627"><span class="section-number-2">4</span> ApplicationContext</h2>
+</div>
+
+<div id="outline-container-org2607de3" class="outline-2">
+<h2 id="org2607de3"><span class="section-number-2">5</span> AOP</h2>
+<div class="outline-text-2" id="text-5">
 <p>
 使用动态代理实现
 </p>
@@ -1420,9 +1433,9 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </div>
 </div>
 
-<div id="outline-container-org23f2b92" class="outline-2">
-<h2 id="org23f2b92"><span class="section-number-2">5</span> Spring 核心类梳理</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-orgc30f1cd" class="outline-2">
+<h2 id="orgc30f1cd"><span class="section-number-2">6</span> Spring 核心类梳理</h2>
+<div class="outline-text-2" id="text-6">
 <ol class="org-ol">
 <li>ApplicationContext
 <ul class="org-ul">
@@ -1467,12 +1480,12 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </div>
 </div>
 
-<div id="outline-container-org71493f1" class="outline-2">
-<h2 id="org71493f1"><span class="section-number-2">6</span> SpringBoot 自动装配</h2>
+<div id="outline-container-org3a4b6aa" class="outline-2">
+<h2 id="org3a4b6aa"><span class="section-number-2">7</span> SpringBoot 自动装配</h2>
 </div>
-<div id="outline-container-orga6f04a4" class="outline-2">
-<h2 id="orga6f04a4"><span class="section-number-2">7</span> 参考链接</h2>
-<div class="outline-text-2" id="text-7">
+<div id="outline-container-org0e4b01f" class="outline-2">
+<h2 id="org0e4b01f"><span class="section-number-2">8</span> 参考链接</h2>
+<div class="outline-text-2" id="text-8">
 <ol class="org-ol">
 <li><a href="https://huifer.github.io/spring-analysis/">Spring Analysis</a></li>
 </ol>
@@ -1480,7 +1493,7 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-18 Sun 00:00. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
+<p class="author">Last Updated 2021-07-18 Sun 01:09. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
 </div>
 </body>
 </html>
