@@ -134,7 +134,7 @@
         + DTD (Document Type Definition) 验证
         + XSD (XML Schema Definition) 验证
 
-** BeanDefinition 的加载
+** BeanDefinition 自动加载流程
    ~DefaultListableBeanFactory~ 类定义了存储 BeanDefinition 类的哈希表, 具体定义如下
    #+BEGIN_SRC java
       /** Map of bean definition objects, keyed by bean name. */
@@ -272,6 +272,322 @@
    4. 接着进行解析，处理等操作，最终交付到
       ~DefaultListableBeanFactory#registerBeanDefinition(...)~ 方法进行注册
 
+** BeanDefinition 注册的实现
+   ~DefaultListableBeanFactory~ 的 ~registerBeanDefinition(...)~ 才是真正实现注
+   册 BeanDefinition 逻辑，其代码如下：
+   1. 对 beanDefinition 进行验证
+   2. 检查 beanDefinition 是否存在
+      - 如果存在，判断是否覆盖对应的 BeanDefinition
+      - 如果 beanDefinition 不存在，进行创建并注册
+   #+BEGIN_SRC java
+     //---------------------------------------------------------------------
+     // Implementation of BeanDefinitionRegistry interface
+     //---------------------------------------------------------------------
+
+     @Override
+     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+             throws BeanDefinitionStoreException {
+
+         Assert.hasText(beanName, "Bean name must not be empty");
+         Assert.notNull(beanDefinition, "BeanDefinition must not be null");
+
+         if (beanDefinition instanceof AbstractBeanDefinition) {
+             try {
+                 ((AbstractBeanDefinition) beanDefinition).validate();
+             }
+             catch (BeanDefinitionValidationException ex) {
+                 throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
+                         "Validation of bean definition failed", ex);
+             }
+         }
+
+         BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
+         if (existingDefinition != null) {
+             if (!isAllowBeanDefinitionOverriding()) {
+                 throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
+             }
+             else if (existingDefinition.getRole() < beanDefinition.getRole()) {
+                 // e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE
+                 if (logger.isInfoEnabled()) {
+                     logger.info("Overriding user-defined bean definition for bean '" + beanName +
+                             "' with a framework-generated bean definition: replacing [" +
+                             existingDefinition + "] with [" + beanDefinition + "]");
+                 }
+             }
+             else if (!beanDefinition.equals(existingDefinition)) {
+                 if (logger.isDebugEnabled()) {
+                     logger.debug("Overriding bean definition for bean '" + beanName +
+                             "' with a different definition: replacing [" + existingDefinition +
+                             "] with [" + beanDefinition + "]");
+                 }
+             }
+             else {
+                 if (logger.isTraceEnabled()) {
+                     logger.trace("Overriding bean definition for bean '" + beanName +
+                             "' with an equivalent definition: replacing [" + existingDefinition +
+                             "] with [" + beanDefinition + "]");
+                 }
+             }
+             this.beanDefinitionMap.put(beanName, beanDefinition);
+         }
+         else {
+             if (hasBeanCreationStarted()) {
+                 // Cannot modify startup-time collection elements anymore (for stable iteration)
+                 synchronized (this.beanDefinitionMap) {
+                     this.beanDefinitionMap.put(beanName, beanDefinition);
+                     List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames.size() + 1);
+                     updatedDefinitions.addAll(this.beanDefinitionNames);
+                     updatedDefinitions.add(beanName);
+                     this.beanDefinitionNames = updatedDefinitions;
+                     removeManualSingletonName(beanName);
+                 }
+             }
+             else {
+                 // Still in startup registration phase
+                 this.beanDefinitionMap.put(beanName, beanDefinition);
+                 this.beanDefinitionNames.add(beanName);
+                 removeManualSingletonName(beanName);
+             }
+             this.frozenBeanDefinitionNames = null;
+         }
+
+         if (existingDefinition != null || containsSingleton(beanName)) {
+             resetBeanDefinition(beanName);
+         }
+     }
+   #+END_SRC
+
+   在上面注册过程中， ~hasBeanCreationStarted()~ 方法用于判断 Bean 是否开始创建，
+   它实现逻辑在父类 ~AbstractBeanFactory~ 中
+   #+BEGIN_SRC java
+     /**
+      ,* Check whether this factory's bean creation phase already started,
+      ,* i.e. whether any bean has been marked as created in the meantime.
+      ,* @since 4.2.2
+      ,* @see #markBeanAsCreated
+      ,*/
+     protected boolean hasBeanCreationStarted() {
+         return !this.alreadyCreated.isEmpty();
+     }
+   #+END_SRC
+
+   父类 ~AbstractBeanFactory~ 中定义了一个集合记录正在创建的 Bean
+   #+BEGIN_SRC java
+     /** Names of beans that have already been created at least once. */
+     private final Set<String> alreadyCreated = Collections.newSetFromMap(new ConcurrentHashMap<>(256));
+   #+END_SRC
+
+   创建时通过 ~markBeanAsCreated(...)~ 方法标记，注意对 ~alreadyCreated~ 的访问
+   是需要加锁的
+   #+BEGIN_SRC java
+     /**
+      ,* Mark the specified bean as already created (or about to be created).
+      ,* <p>This allows the bean factory to optimize its caching for repeated
+      ,* creation of the specified bean.
+      ,* @param beanName the name of the bean
+      ,*/
+     protected void markBeanAsCreated(String beanName) {
+         if (!this.alreadyCreated.contains(beanName)) {
+             synchronized (this.mergedBeanDefinitions) {
+                 if (!this.alreadyCreated.contains(beanName)) {
+                     // Let the bean definition get re-merged now that we're actually creating
+                     // the bean... just in case some of its metadata changed in the meantime.
+                     clearMergedBeanDefinition(beanName);
+                     this.alreadyCreated.add(beanName);
+                 }
+             }
+         }
+     }
+   #+END_SRC
+
+** BeanDefinition 移除的实现
+   BeanDefinition 的移除方法如下，通过 ~removeBeanDefinition(...)~ 方法
+   #+BEGIN_SRC java
+     @Override
+     public void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
+         Assert.hasText(beanName, "'beanName' must not be empty");
+
+         BeanDefinition bd = this.beanDefinitionMap.remove(beanName);
+         if (bd == null) {
+             if (logger.isTraceEnabled()) {
+                 logger.trace("No bean named '" + beanName + "' found in " + this);
+             }
+             throw new NoSuchBeanDefinitionException(beanName);
+         }
+
+         if (hasBeanCreationStarted()) {
+             // Cannot modify startup-time collection elements anymore (for stable iteration)
+             synchronized (this.beanDefinitionMap) {
+                 List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames);
+                 updatedDefinitions.remove(beanName);
+                 this.beanDefinitionNames = updatedDefinitions;
+             }
+         }
+         else {
+             // Still in startup registration phase
+             this.beanDefinitionNames.remove(beanName);
+         }
+         this.frozenBeanDefinitionNames = null;
+
+         resetBeanDefinition(beanName);
+     }
+   #+END_SRC
+
+   移除 BeanDefinition 中调用了刷新 BeanDefinition 的方法
+   ~resetBeanDefinition(...)~
+   #+BEGIN_SRC java
+     /**
+      ,* Reset all bean definition caches for the given bean,
+      ,* including the caches of beans that are derived from it.
+      ,* <p>Called after an existing bean definition has been replaced or removed,
+      ,* triggering {@link #clearMergedBeanDefinition}, {@link #destroySingleton}
+      ,* and {@link MergedBeanDefinitionPostProcessor#resetBeanDefinition} on the
+      ,* given bean and on all bean definitions that have the given bean as parent.
+      ,* @param beanName the name of the bean to reset
+      ,* @see #registerBeanDefinition
+      ,* @see #removeBeanDefinition
+      ,*/
+     protected void resetBeanDefinition(String beanName) {
+         // Remove the merged bean definition for the given bean, if already created.
+         clearMergedBeanDefinition(beanName);
+
+         // Remove corresponding bean from singleton cache, if any. Shouldn't usually
+         // be necessary, rather just meant for overriding a context's default beans
+         // (e.g. the default StaticMessageSource in a StaticApplicationContext).
+         destroySingleton(beanName);
+
+         // Notify all post-processors that the specified bean definition has been reset.
+         for (BeanPostProcessor processor : getBeanPostProcessors()) {
+             if (processor instanceof MergedBeanDefinitionPostProcessor) {
+                 ((MergedBeanDefinitionPostProcessor) processor).resetBeanDefinition(beanName);
+             }
+         }
+
+         // Reset all bean definitions that have the given bean as parent (recursively).
+         for (String bdName : this.beanDefinitionNames) {
+             if (!beanName.equals(bdName)) {
+                 BeanDefinition bd = this.beanDefinitionMap.get(bdName);
+                 // Ensure bd is non-null due to potential concurrent modification
+                 // of the beanDefinitionMap.
+                 if (bd != null && beanName.equals(bd.getParentName())) {
+                     resetBeanDefinition(bdName);
+                 }
+             }
+         }
+     }
+   #+END_SRC
+
+** BeanDefinition 获取的实现
+   ~DefaultListableBeanFactory~ 的实现获取 BeanDefinition 的逻辑如下
+   #+BEGIN_SRC java
+     @Override
+     public BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
+         BeanDefinition bd = this.beanDefinitionMap.get(beanName);
+         if (bd == null) {
+             if (logger.isTraceEnabled()) {
+                 logger.trace("No bean named '" + beanName + "' found in " + this);
+             }
+             throw new NoSuchBeanDefinitionException(beanName);
+         }
+         return bd;
+     }
+   #+END_SRC
+
+** ~<bean/>~ 标签解析
+   之前在 BeanDefinition 自动加载流程中忽略了对 ~<bean/>~ 标签的解析，其核心实现
+   逻辑 ~BeanDefinitionDocumentReader~ 类中的 ~processBeanDefinition(...)~ 方法
+   #+BEGIN_SRC java
+     /**
+      ,* Process the given bean element, parsing the bean definition
+      ,* and registering it with the registry.
+      ,*/
+     protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
+         BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
+         if (bdHolder != null) {
+             bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
+             try {
+                 // Register the final decorated instance.
+                 BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
+             }
+             catch (BeanDefinitionStoreException ex) {
+                 getReaderContext().error("Failed to register bean definition with name '" +
+                         bdHolder.getBeanName() + "'", ele, ex);
+             }
+             // Send registration event.
+             getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));
+         }
+     }
+   #+END_SRC
+
+   可以看出对 XML 标签的解析核心逻辑为 ~parseBeanDefinitionElement(...)~
+   #+BEGIN_SRC java
+     /**
+      ,* Parses the supplied {@code <bean>} element. May return {@code null}
+      ,* if there were errors during parse. Errors are reported to the
+      ,* {@link org.springframework.beans.factory.parsing.ProblemReporter}.
+      ,*/
+     @Nullable
+     public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+         String id = ele.getAttribute(ID_ATTRIBUTE);
+         String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
+
+         List<String> aliases = new ArrayList<>();
+         if (StringUtils.hasLength(nameAttr)) {
+             String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
+             aliases.addAll(Arrays.asList(nameArr));
+         }
+
+         String beanName = id;
+         if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
+             beanName = aliases.remove(0);
+             if (logger.isTraceEnabled()) {
+                 logger.trace("No XML 'id' specified - using '" + beanName +
+                         "' as bean name and " + aliases + " as aliases");
+             }
+         }
+
+         if (containingBean == null) {
+             checkNameUniqueness(beanName, aliases, ele);
+         }
+
+         AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
+         if (beanDefinition != null) {
+             if (!StringUtils.hasText(beanName)) {
+                 try {
+                     if (containingBean != null) {
+                         beanName = BeanDefinitionReaderUtils.generateBeanName(
+                                 beanDefinition, this.readerContext.getRegistry(), true);
+                     }
+                     else {
+                         beanName = this.readerContext.generateBeanName(beanDefinition);
+                         // Register an alias for the plain bean class name, if still possible,
+                         // if the generator returned the class name plus a suffix.
+                         // This is expected for Spring 1.2/2.0 backwards compatibility.
+                         String beanClassName = beanDefinition.getBeanClassName();
+                         if (beanClassName != null &&
+                                 beanName.startsWith(beanClassName) && beanName.length() > beanClassName.length() &&
+                                 !this.readerContext.getRegistry().isBeanNameInUse(beanClassName)) {
+                             aliases.add(beanClassName);
+                         }
+                     }
+                     if (logger.isTraceEnabled()) {
+                         logger.trace("Neither XML 'id' nor 'name' specified - " +
+                                 "using generated bean name [" + beanName + "]");
+                     }
+                 }
+                 catch (Exception ex) {
+                     error(ex.getMessage(), ele);
+                     return null;
+                 }
+             }
+             String[] aliasesArray = StringUtils.toStringArray(aliases);
+             return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
+         }
+
+         return null;
+     }
+   #+END_SRC
+
 * IoC
 ** IoC 核心接口和类
    Spring 的 IoC 容器对象一般继承自 ~ApplicationContext~ 接口，常见的对象类如下
@@ -304,366 +620,6 @@
    5. 上下文的接口:
       - ~ApplicationContext~ 作为主导接口
         - ~AbstractApplicationContext~
-
-** TODO 自定义标签注册
-   ~BeanDefinitionParser~
-
-** TODO 别名注册
-
-** ~<bean/>~ 标签解析
-   ~BeanDefinitionDocumentReader~ 类中的 ~processBeanDefinition(...)~ 方法事先对
-   ~<bean/>~ 标签的解析
-   #+BEGIN_SRC java
-     /**
-      ,* Process the given bean element, parsing the bean definition
-      ,* and registering it with the registry.
-      ,*/
-     protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
-         BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
-         if (bdHolder != null) {
-             bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
-             try {
-                 // Register the final decorated instance.
-                 BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
-             }
-             catch (BeanDefinitionStoreException ex) {
-                 getReaderContext().error("Failed to register bean definition with name '" +
-                         bdHolder.getBeanName() + "'", ele, ex);
-             }
-             // Send registration event.
-             getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));
-         }
-     }
-   #+END_SRC
-
-** BeanDefinition 注册
-*** BeanDefinition 的注册
-    BeanDefinition 的注册方法位于 ~BeanDefinitionReaderUtils~ 抽象类中
-    1. 确定 beanName 和 BeanDefinition 的绑定关系
-    2. 确定 beanName 和 Alias 的对应关系
-    #+BEGIN_SRC java
-      /**
-       ,* Register the given bean definition with the given bean factory.
-       ,* @param definitionHolder the bean definition including name and aliases
-       ,* @param registry the bean factory to register with
-       ,* @throws BeanDefinitionStoreException if registration failed
-       ,*/
-      public static void registerBeanDefinition(
-              BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry)
-              throws BeanDefinitionStoreException {
-
-          // Register bean definition under primary name.
-          String beanName = definitionHolder.getBeanName();
-          registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
-
-          // Register aliases for bean name, if any.
-          String[] aliases = definitionHolder.getAliases();
-          if (aliases != null) {
-              for (String alias : aliases) {
-                  registry.registerAlias(beanName, alias);
-              }
-          }
-      }
-    #+END_SRC
-
-    在调用到注册方法的调用栈如下
-    #+BEGIN_SRC text
-      registerBeanDefinition:163, BeanDefinitionReaderUtils (org.springframework.beans.factory.support)
-      processBeanDefinition:311, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
-      parseDefaultElement:197, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
-      parseBeanDefinitions:176, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
-      doRegisterBeanDefinitions:149, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
-      registerBeanDefinitions:96, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
-      registerBeanDefinitions:509, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
-      doLoadBeanDefinitions:389, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
-      loadBeanDefinitions:336, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
-      loadBeanDefinitions:305, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
-      loadBeanDefinitions:188, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
-      loadBeanDefinitions:224, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
-      loadBeanDefinitions:195, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
-      loadBeanDefinitions:257, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
-      loadBeanDefinitions:128, AbstractXmlApplicationContext (org.springframework.context.support)
-      loadBeanDefinitions:94, AbstractXmlApplicationContext (org.springframework.context.support)
-      refreshBeanFactory:133, AbstractRefreshableApplicationContext (org.springframework.context.support)
-      obtainFreshBeanFactory:637, AbstractApplicationContext (org.springframework.context.support)
-      refresh:522, AbstractApplicationContext (org.springframework.context.support)
-      <init>:144, ClassPathXmlApplicationContext (org.springframework.context.support)
-      <init>:85, ClassPathXmlApplicationContext (org.springframework.context.support)
-      main:10, MyApplication (io.github.jeanhwea)
-    #+END_SRC
-
-*** DefaultListableBeanFactory
-    通过观察上文的调用栈可以发现注册 BeanDefinition 是通过
-    ~AbstractRefreshableApplicationContext~ 类中的 ~loadBeanDefinitions(...)~ 方
-    法实现
-    #+BEGIN_SRC java
-      /**
-       ,* This implementation performs an actual refresh of this context's underlying
-       ,* bean factory, shutting down the previous bean factory (if any) and
-       ,* initializing a fresh bean factory for the next phase of the context's lifecycle.
-       ,*/
-      @Override
-      protected final void refreshBeanFactory() throws BeansException {
-          if (hasBeanFactory()) {
-              destroyBeans();
-              closeBeanFactory();
-          }
-          try {
-              DefaultListableBeanFactory beanFactory = createBeanFactory();
-              beanFactory.setSerializationId(getId());
-              customizeBeanFactory(beanFactory);
-              loadBeanDefinitions(beanFactory);
-              synchronized (this.beanFactoryMonitor) {
-                  this.beanFactory = beanFactory;
-              }
-          }
-          catch (IOException ex) {
-              throw new ApplicationContextException("I/O error parsing bean definition source for " + getDisplayName(), ex);
-          }
-      }
-    #+END_SRC
-
-    这里使用的 beanFactory 是 ~DefaultListableBeanFactory~, 并且
-    ~DefaultListableBeanFactory~ 实现了大部分的 Spring 注册及加载的实现，先查看
-    其集成关系
-
-    [[file:../static/image/2021/07/DefaultListableBeanFactory.png]]
-
-    该类定了 BeanDefinition 类的 Map, 是用于存 BeanDefinition 信息的缓存
-    #+BEGIN_SRC java
-      /** Map of bean definition objects, keyed by bean name. */
-      private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
-
-      /** Map of singleton and non-singleton bean names, keyed by dependency type. */
-      private final Map<Class<?>, String[]> allBeanNamesByType = new ConcurrentHashMap<>(64);
-
-      /** Map of singleton-only bean names, keyed by dependency type. */
-      private final Map<Class<?>, String[]> singletonBeanNamesByType = new ConcurrentHashMap<>(64);
-
-      /** List of bean definition names, in registration order. */
-      private volatile List<String> beanDefinitionNames = new ArrayList<>(256);
-    #+END_SRC
-
-**** BeanDefinition 注册的实现
-     ~DefaultListableBeanFactory~ 的 ~registerBeanDefinition(...)~ 才是真正实现
-     注册 BeanDefinition 逻辑，其代码如下：
-     1. 对 beanDefinition 进行验证
-     2. 检查 beanDefinition 是否存在
-        - 如果存在，判断是否覆盖对应的 BeanDefinition
-        - 如果 beanDefinition 不存在，进行创建并注册
-     #+BEGIN_SRC java
-       //---------------------------------------------------------------------
-       // Implementation of BeanDefinitionRegistry interface
-       //---------------------------------------------------------------------
-
-       @Override
-       public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
-               throws BeanDefinitionStoreException {
-
-           Assert.hasText(beanName, "Bean name must not be empty");
-           Assert.notNull(beanDefinition, "BeanDefinition must not be null");
-
-           if (beanDefinition instanceof AbstractBeanDefinition) {
-               try {
-                   ((AbstractBeanDefinition) beanDefinition).validate();
-               }
-               catch (BeanDefinitionValidationException ex) {
-                   throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
-                           "Validation of bean definition failed", ex);
-               }
-           }
-
-           BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
-           if (existingDefinition != null) {
-               if (!isAllowBeanDefinitionOverriding()) {
-                   throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
-               }
-               else if (existingDefinition.getRole() < beanDefinition.getRole()) {
-                   // e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE
-                   if (logger.isInfoEnabled()) {
-                       logger.info("Overriding user-defined bean definition for bean '" + beanName +
-                               "' with a framework-generated bean definition: replacing [" +
-                               existingDefinition + "] with [" + beanDefinition + "]");
-                   }
-               }
-               else if (!beanDefinition.equals(existingDefinition)) {
-                   if (logger.isDebugEnabled()) {
-                       logger.debug("Overriding bean definition for bean '" + beanName +
-                               "' with a different definition: replacing [" + existingDefinition +
-                               "] with [" + beanDefinition + "]");
-                   }
-               }
-               else {
-                   if (logger.isTraceEnabled()) {
-                       logger.trace("Overriding bean definition for bean '" + beanName +
-                               "' with an equivalent definition: replacing [" + existingDefinition +
-                               "] with [" + beanDefinition + "]");
-                   }
-               }
-               this.beanDefinitionMap.put(beanName, beanDefinition);
-           }
-           else {
-               if (hasBeanCreationStarted()) {
-                   // Cannot modify startup-time collection elements anymore (for stable iteration)
-                   synchronized (this.beanDefinitionMap) {
-                       this.beanDefinitionMap.put(beanName, beanDefinition);
-                       List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames.size() + 1);
-                       updatedDefinitions.addAll(this.beanDefinitionNames);
-                       updatedDefinitions.add(beanName);
-                       this.beanDefinitionNames = updatedDefinitions;
-                       removeManualSingletonName(beanName);
-                   }
-               }
-               else {
-                   // Still in startup registration phase
-                   this.beanDefinitionMap.put(beanName, beanDefinition);
-                   this.beanDefinitionNames.add(beanName);
-                   removeManualSingletonName(beanName);
-               }
-               this.frozenBeanDefinitionNames = null;
-           }
-
-           if (existingDefinition != null || containsSingleton(beanName)) {
-               resetBeanDefinition(beanName);
-           }
-       }
-     #+END_SRC
-
-     在上面注册过程中， ~hasBeanCreationStarted()~ 方法用于判断 Bean 是否开始创
-     建，它实现逻辑在父类 ~AbstractBeanFactory~ 中
-     #+BEGIN_SRC java
-       /**
-        ,* Check whether this factory's bean creation phase already started,
-        ,* i.e. whether any bean has been marked as created in the meantime.
-        ,* @since 4.2.2
-        ,* @see #markBeanAsCreated
-        ,*/
-       protected boolean hasBeanCreationStarted() {
-           return !this.alreadyCreated.isEmpty();
-       }
-     #+END_SRC
-
-     父类 ~AbstractBeanFactory~ 中定义了一个集合记录正在创建的 Bean
-     #+BEGIN_SRC java
-       /** Names of beans that have already been created at least once. */
-       private final Set<String> alreadyCreated = Collections.newSetFromMap(new ConcurrentHashMap<>(256));
-     #+END_SRC
-
-     创建时通过 ~markBeanAsCreated(...)~ 方法标记，注意对 ~alreadyCreated~ 的访
-     问是需要加锁的
-     #+BEGIN_SRC java
-       /**
-        ,* Mark the specified bean as already created (or about to be created).
-        ,* <p>This allows the bean factory to optimize its caching for repeated
-        ,* creation of the specified bean.
-        ,* @param beanName the name of the bean
-        ,*/
-       protected void markBeanAsCreated(String beanName) {
-           if (!this.alreadyCreated.contains(beanName)) {
-               synchronized (this.mergedBeanDefinitions) {
-                   if (!this.alreadyCreated.contains(beanName)) {
-                       // Let the bean definition get re-merged now that we're actually creating
-                       // the bean... just in case some of its metadata changed in the meantime.
-                       clearMergedBeanDefinition(beanName);
-                       this.alreadyCreated.add(beanName);
-                   }
-               }
-           }
-       }
-     #+END_SRC
-
-**** BeanDefinition 移除的实现
-     BeanDefinition 的移除方法如下，通过 ~removeBeanDefinition(...)~ 方法
-     #+BEGIN_SRC java
-       @Override
-       public void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
-           Assert.hasText(beanName, "'beanName' must not be empty");
-
-           BeanDefinition bd = this.beanDefinitionMap.remove(beanName);
-           if (bd == null) {
-               if (logger.isTraceEnabled()) {
-                   logger.trace("No bean named '" + beanName + "' found in " + this);
-               }
-               throw new NoSuchBeanDefinitionException(beanName);
-           }
-
-           if (hasBeanCreationStarted()) {
-               // Cannot modify startup-time collection elements anymore (for stable iteration)
-               synchronized (this.beanDefinitionMap) {
-                   List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames);
-                   updatedDefinitions.remove(beanName);
-                   this.beanDefinitionNames = updatedDefinitions;
-               }
-           }
-           else {
-               // Still in startup registration phase
-               this.beanDefinitionNames.remove(beanName);
-           }
-           this.frozenBeanDefinitionNames = null;
-
-           resetBeanDefinition(beanName);
-       }
-     #+END_SRC
-
-     移除 BeanDefinition 中调用了刷新 BeanDefinition 的方法
-     ~resetBeanDefinition(...)~
-     #+BEGIN_SRC java
-       /**
-        ,* Reset all bean definition caches for the given bean,
-        ,* including the caches of beans that are derived from it.
-        ,* <p>Called after an existing bean definition has been replaced or removed,
-        ,* triggering {@link #clearMergedBeanDefinition}, {@link #destroySingleton}
-        ,* and {@link MergedBeanDefinitionPostProcessor#resetBeanDefinition} on the
-        ,* given bean and on all bean definitions that have the given bean as parent.
-        ,* @param beanName the name of the bean to reset
-        ,* @see #registerBeanDefinition
-        ,* @see #removeBeanDefinition
-        ,*/
-       protected void resetBeanDefinition(String beanName) {
-           // Remove the merged bean definition for the given bean, if already created.
-           clearMergedBeanDefinition(beanName);
-
-           // Remove corresponding bean from singleton cache, if any. Shouldn't usually
-           // be necessary, rather just meant for overriding a context's default beans
-           // (e.g. the default StaticMessageSource in a StaticApplicationContext).
-           destroySingleton(beanName);
-
-           // Notify all post-processors that the specified bean definition has been reset.
-           for (BeanPostProcessor processor : getBeanPostProcessors()) {
-               if (processor instanceof MergedBeanDefinitionPostProcessor) {
-                   ((MergedBeanDefinitionPostProcessor) processor).resetBeanDefinition(beanName);
-               }
-           }
-
-           // Reset all bean definitions that have the given bean as parent (recursively).
-           for (String bdName : this.beanDefinitionNames) {
-               if (!beanName.equals(bdName)) {
-                   BeanDefinition bd = this.beanDefinitionMap.get(bdName);
-                   // Ensure bd is non-null due to potential concurrent modification
-                   // of the beanDefinitionMap.
-                   if (bd != null && beanName.equals(bd.getParentName())) {
-                       resetBeanDefinition(bdName);
-                   }
-               }
-           }
-       }
-     #+END_SRC
-
-**** BeanDefinition 获取
-     ~DefaultListableBeanFactory~ 的实现获取 BeanDefinition 的逻辑如下
-     #+BEGIN_SRC java
-       @Override
-       public BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
-           BeanDefinition bd = this.beanDefinitionMap.get(beanName);
-           if (bd == null) {
-               if (logger.isTraceEnabled()) {
-                   logger.trace("No bean named '" + beanName + "' found in " + this);
-               }
-               throw new NoSuchBeanDefinitionException(beanName);
-           }
-           return bd;
-       }
-     #+END_SRC
 
 ** Bean 的生命周期
    ~BeanFactory~ 的注释中完整地说明的实现标准 BeanFactory 的代码
