@@ -269,7 +269,12 @@
       - 首先调用 ~doLoadDocument(inputSource, resource)~ 读取到 Document 对象
       - 然后调用 ~registerBeanDefinitions(doc, resource)~ 完成 BeanDefinition 的
         注册
-   4. 接着进行解析，处理等操作，最终交付到
+   4. 调用 ~parseDefaultElement(...)~ 方法对默认元素进行解析
+      - 对 import 类型标签解析
+      - 对 alias 类型标签解析
+      - 对 bean 类型标签解析
+      - 对嵌套 bean 类型标签解析
+   5. 接着对标签进行处理，最终交付到
       ~DefaultListableBeanFactory#registerBeanDefinition(...)~ 方法进行注册
 
 ** BeanDefinition 注册的实现
