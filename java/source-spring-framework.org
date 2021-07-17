@@ -7,6 +7,270 @@
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
 #+TAGS: java spring source
 
+* 容器实现原理
+** Bean 工厂接口: BeanFactory
+   ~BeanFactory~ 是 Spring 的 Bean 工厂的接口定义，它定义对 Spring Bean 容器访问的
+   基本操作方法，这里简化如下
+   #+BEGIN_SRC java
+     public interface BeanFactory {
+
+       // FactoryBean 的 beanName 前缀
+       String FACTORY_BEAN_PREFIX = "&";
+
+       // 获取 Bean 的主方法
+       Object getBean(String name) throws BeansException;
+       <T> T getBean(String name, Class<T> requiredType) throws BeansException;
+       Object getBean(String name, Object... args) throws BeansException;
+       <T> T getBean(Class<T> requiredType) throws BeansException;
+       <T> T getBean(Class<T> requiredType, Object... args) throws BeansException;
+
+       <T> ObjectProvider<T> getBeanProvider(Class<T> requiredType);
+       <T> ObjectProvider<T> getBeanProvider(ResolvableType requiredType);
+
+       boolean containsBean(String name);
+
+       boolean isSingleton(String name) throws NoSuchBeanDefinitionException;
+       boolean isPrototype(String name) throws NoSuchBeanDefinitionException;
+
+       boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException;
+       boolean isTypeMatch(String name, Class<?> typeToMatch) throws NoSuchBeanDefinitionException;
+
+       @Nullable
+       Class<?> getType(String name) throws NoSuchBeanDefinitionException;
+       @Nullable
+       Class<?> getType(String name, boolean allowFactoryBeanInit) throws NoSuchBeanDefinitionException;
+
+       String[] getAliases(String name);
+     }
+   #+END_SRC
+
+** Bean 工厂的实现类: DefaultListableBeanFactory
+   ~DefaultListableBeanFactory~ 是实现 ~BeanFactory~ 接口的核心类，熟悉它的类继
+   承和实现接口是了解 Bean 工厂功能的基本方法， ~DefaultListableBeanFactory~ 的
+   关系如下
+   #+BEGIN_SRC text
+     org.springframework.beans.factory.support
+     Class DefaultListableBeanFactory
+
+         java.lang.Object
+             org.springframework.core.SimpleAliasRegistry
+                 org.springframework.beans.factory.support.DefaultSingletonBeanRegistry
+                     org.springframework.beans.factory.support.FactoryBeanRegistrySupport
+                         org.springframework.beans.factory.support.AbstractBeanFactory
+                             org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory
+                                 org.springframework.beans.factory.support.DefaultListableBeanFactory
+
+         All Implemented Interfaces:
+             Serializable, BeanFactory, AutowireCapableBeanFactory,
+             ConfigurableBeanFactory, ConfigurableListableBeanFactory,
+             SingletonBeanRegistry, HierarchicalBeanFactory, ListableBeanFactory,
+             BeanDefinitionRegistry, org.springframework.core.AliasRegistry
+
+         Direct Known Subclasses:
+             XmlBeanFactory
+   #+END_SRC
+
+   这里说明一下重要的类和接口的作用
+   1. ~SimpleAliasRegistry~ 实现了 ~AliasRegistry~ 接口
+      - ~AliasRegistry~ 定义了对别名的增删查改操作
+   2. ~DefaultSingletonBeanRegistry~ 实现了 ~SingletonBeanRegistry~ 接口
+      - ~SingletonBeanRegistry~ 定义了对单例 Bean 的注册及获取方法
+      - ~SingletonBeanRegistry~ 通过三级缓存来解决循环依赖
+   3. ~FactoryBeanRegistrySupport~ 实现了对 ~FactoryBean~ 的操作支持
+      - 在 Spring 管理中, ~FactoryBean~ 的 beanName 以 ~&~ 开头
+      - ~FactoryBean~ 的创建方式和普通 Spring Bean 是不一样的，它没有
+        BeanDefinition, 直接通过实现 ~T getObject()~ 方法来返回创建的 Bean 对象
+      - ~FactoryBean~ 还需要实现一些其他的方法，例如： ~isSingleton()~,
+        ~getObjectType()~
+   4. ~AbstractBeanFactory~ 实现了 ~BeanFactory~ 接口
+      - ~BeanFactory~ 接口的直接实现是 ~AbstractBeanFactory~ 抽象类
+      - ~AbstractBeanFactory~ 有很多核心方法
+        + ~doGetBean(...)~ 实现了获取 Bean 的核心逻辑
+        + ~isSingleton(...)~ 实现了判断 Bean 是否单例的核心逻辑
+        + ~isPrototype(...)~ 实现了判断 Bean 是否原型的核心逻辑
+   5. ~HierarchicalBeanFactory~ 接口继承自 ~BeanFactory~, 它增强了对 parentFactory
+      的支持
+   6. ~ConfigurableBeanFactory~ 接口提供了配置 Factory 的各种操作
+      - ~setBeanClassLoader(...)~ 设置 Bean 的类加载器
+      - ~registerDependentBean(...)~ 方法注册依赖 Bean
+      - ~registerScope(...)~ 注册 Scope
+      - ~isFactoryBean(...)~ 判断是否为 FactoryBean
+      - ~destroyBean(...)~ 销毁 Bean
+   7. ~ListableBeanFactory~ 定义了一些获取 Bean 清单的操作
+      - ~getBeanDefinitionCount()~ 获取工厂中定义 BeanDefinition 的数量
+      - ~getBeanDefinitionNames()~ 获取工厂定义的 BeanDefinition 名称
+
+** Bean 定义的读取器: XmlBeanDefinitionReader
+   ~XmlBeanDefinitionReader~ 是实现读取 BeanDefinition 的类，它的继承关系如下
+   #+BEGIN_SRC text
+     org.springframework.beans.factory.xml
+     Class XmlBeanDefinitionReader
+
+         java.lang.Object
+             org.springframework.beans.factory.support.AbstractBeanDefinitionReader
+                 org.springframework.beans.factory.xml.XmlBeanDefinitionReader
+
+         All Implemented Interfaces:
+             BeanDefinitionReader, org.springframework.core.env.EnvironmentCapable
+   #+END_SRC
+
+   这里说明一下重要的类和接口的作用
+   1. ~AbstractBeanDefinitionReader~ 实现了对 BeanDefinition 的读取操作，它包含
+      如下成员变量
+      #+BEGIN_SRC java
+        private final BeanDefinitionRegistry registry;
+        private ResourceLoader resourceLoader;
+        private ClassLoader beanClassLoader;
+        private Environment environment;
+        private BeanNameGenerator beanNameGenerator = DefaultBeanNameGenerator.INSTANCE;
+      #+END_SRC
+      - registry 表示 BeanDefinition 的注册类
+      - resourceLoader 实现了资源加载
+      - environment 实现了读取系统环境变量和 Java 属性
+      - beanNameGenerator 是 beanName 生成器
+   2. ~XmlBeanDefinitionReader~ 直接继承自 ~AbstractBeanDefinitionReader~, 增加了
+      - ~DocumentLoader~ 将资源转化成 Document 对象功能
+      - 添加了对 XML 的格式验证的方法
+        + DTD (Document Type Definition) 验证
+        + XSD (XML Schema Definition) 验证
+
+** BeanDefinition 的加载
+   ~DefaultListableBeanFactory~ 类定义了存储 BeanDefinition 类的哈希表, 具体定义如下
+   #+BEGIN_SRC java
+      /** Map of bean definition objects, keyed by bean name. */
+      private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
+
+      /** Map of singleton and non-singleton bean names, keyed by dependency type. */
+      private final Map<Class<?>, String[]> allBeanNamesByType = new ConcurrentHashMap<>(64);
+
+      /** Map of singleton-only bean names, keyed by dependency type. */
+      private final Map<Class<?>, String[]> singletonBeanNamesByType = new ConcurrentHashMap<>(64);
+
+      /** List of bean definition names, in registration order. */
+      private volatile List<String> beanDefinitionNames = new ArrayList<>(256);
+   #+END_SRC
+
+   最终 BeanDefinition 通过调用 ~registerBeanDefinition(...)~ 方法注册到
+   ~beanDefinitionMap~ 中，代码的注释也写了是对 ~BeanDefinitionRegistry~ 的实现
+   #+BEGIN_SRC java
+     //---------------------------------------------------------------------
+     // Implementation of BeanDefinitionRegistry interface
+     //---------------------------------------------------------------------
+
+     @Override
+     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+             throws BeanDefinitionStoreException {
+
+         Assert.hasText(beanName, "Bean name must not be empty");
+         Assert.notNull(beanDefinition, "BeanDefinition must not be null");
+
+         if (beanDefinition instanceof AbstractBeanDefinition) {
+             try {
+                 ((AbstractBeanDefinition) beanDefinition).validate();
+             }
+             catch (BeanDefinitionValidationException ex) {
+                 throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
+                         "Validation of bean definition failed", ex);
+             }
+         }
+
+         BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
+         if (existingDefinition != null) {
+             if (!isAllowBeanDefinitionOverriding()) {
+                 throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
+             }
+             else if (existingDefinition.getRole() < beanDefinition.getRole()) {
+                 // e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE
+                 if (logger.isInfoEnabled()) {
+                     logger.info("Overriding user-defined bean definition for bean '" + beanName +
+                             "' with a framework-generated bean definition: replacing [" +
+                             existingDefinition + "] with [" + beanDefinition + "]");
+                 }
+             }
+             else if (!beanDefinition.equals(existingDefinition)) {
+                 if (logger.isDebugEnabled()) {
+                     logger.debug("Overriding bean definition for bean '" + beanName +
+                             "' with a different definition: replacing [" + existingDefinition +
+                             "] with [" + beanDefinition + "]");
+                 }
+             }
+             else {
+                 if (logger.isTraceEnabled()) {
+                     logger.trace("Overriding bean definition for bean '" + beanName +
+                             "' with an equivalent definition: replacing [" + existingDefinition +
+                             "] with [" + beanDefinition + "]");
+                 }
+             }
+             this.beanDefinitionMap.put(beanName, beanDefinition);
+         }
+         else {
+             if (hasBeanCreationStarted()) {
+                 // Cannot modify startup-time collection elements anymore (for stable iteration)
+                 synchronized (this.beanDefinitionMap) {
+                     this.beanDefinitionMap.put(beanName, beanDefinition);
+                     List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames.size() + 1);
+                     updatedDefinitions.addAll(this.beanDefinitionNames);
+                     updatedDefinitions.add(beanName);
+                     this.beanDefinitionNames = updatedDefinitions;
+                     removeManualSingletonName(beanName);
+                 }
+             }
+             else {
+                 // Still in startup registration phase
+                 this.beanDefinitionMap.put(beanName, beanDefinition);
+                 this.beanDefinitionNames.add(beanName);
+                 removeManualSingletonName(beanName);
+             }
+             this.frozenBeanDefinitionNames = null;
+         }
+
+         if (existingDefinition != null || containsSingleton(beanName)) {
+             resetBeanDefinition(beanName);
+         }
+     }
+   #+END_SRC
+
+   在 ~registerBeanDefinition(...)~ 方法中添加端点可以获得如下的调用栈
+   #+BEGIN_SRC text
+     registerBeanDefinition:914, DefaultListableBeanFactory (org.springframework.beans.factory.support)
+     registerBeanDefinition:164, BeanDefinitionReaderUtils (org.springframework.beans.factory.support)
+     processBeanDefinition:311, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+     parseDefaultElement:197, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+     parseBeanDefinitions:176, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+     doRegisterBeanDefinitions:149, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+     registerBeanDefinitions:96, DefaultBeanDefinitionDocumentReader (org.springframework.beans.factory.xml)
+     registerBeanDefinitions:509, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+     doLoadBeanDefinitions:389, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+     loadBeanDefinitions:336, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+     loadBeanDefinitions:305, XmlBeanDefinitionReader (org.springframework.beans.factory.xml)
+     loadBeanDefinitions:188, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+     loadBeanDefinitions:224, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+     loadBeanDefinitions:195, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+     loadBeanDefinitions:257, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)
+     loadBeanDefinitions:128, AbstractXmlApplicationContext (org.springframework.context.support)
+     loadBeanDefinitions:94, AbstractXmlApplicationContext (org.springframework.context.support)
+     refreshBeanFactory:133, AbstractRefreshableApplicationContext (org.springframework.context.support)
+     obtainFreshBeanFactory:637, AbstractApplicationContext (org.springframework.context.support)
+     refresh:522, AbstractApplicationContext (org.springframework.context.support)
+     <init>:144, ClassPathXmlApplicationContext (org.springframework.context.support)
+     <init>:85, ClassPathXmlApplicationContext (org.springframework.context.support)
+     main:10, MyApp01 (io.github.jeanhwea.app01)
+   #+END_SRC
+
+   观察调用栈可以得到 BeanDefinition 的加载步骤如下:
+   1. 入口方法为 ~AbstractApplicationContext#refresh(...)~
+   2. ~obtainFreshBeanFactory(...)~ 方法获取 BeanFactory 的同时需要注册
+      BeanDefinition
+   3. ~XmlBeanDefinitionReader#doLoadBeanDefinitions(...)~ 方法完成如下操作
+      - 定义了 documentLoader 成员变量
+        #+BEGIN_SRC java
+          private DocumentLoader documentLoader = new DefaultDocumentLoader();
+        #+END_SRC
+      - 首先调用 ~doLoadDocument(inputSource, resource)~ 读取到 Document 对象
+      - 然后调用 ~registerBeanDefinitions(doc, resource)~ 完成 BeanDefinition 的
+        注册
+   4. 接着进行解析，处理等操作，最终交付到
+      ~DefaultListableBeanFactory#registerBeanDefinition(...)~ 方法进行注册
 
 * IoC
 ** IoC 核心接口和类
@@ -40,177 +304,6 @@
    5. 上下文的接口:
       - ~ApplicationContext~ 作为主导接口
         - ~AbstractApplicationContext~
-
-** IoC 资源读取及注册
-*** XML 文档验证
-    XML 文档验证常见有如下两种方式
-    - DTD (Document Type Definition) 验证
-    - XSD (XML Schema Definition) 验证
-    XML 文档读取实现位于 ~XmlBeanDefinitionReader~ 类中实现，该类中的实现了对上
-    述两种格式 XML 文档的读取
-    #+BEGIN_SRC java
-      /**
-       ,* Indicates that the validation should be disabled.
-       ,*/
-      public static final int VALIDATION_NONE = XmlValidationModeDetector.VALIDATION_NONE;
-
-      /**
-       ,* Indicates that the validation mode should be detected automatically.
-       ,*/
-      public static final int VALIDATION_AUTO = XmlValidationModeDetector.VALIDATION_AUTO;
-
-      /**
-       ,* Indicates that DTD validation should be used.
-       ,*/
-      public static final int VALIDATION_DTD = XmlValidationModeDetector.VALIDATION_DTD;
-
-      /**
-       ,* Indicates that XSD validation should be used.
-       ,*/
-      public static final int VALIDATION_XSD = XmlValidationModeDetector.VALIDATION_XSD;
-     #+END_SRC
-
-*** XML 文档读取
-     读取 XML 文件核心方法 ~loadBeanDefinitions(...)~ 实现如下
-     #+BEGIN_SRC java
-       /**
-        ,* Load bean definitions from the specified XML file.
-        ,* @param encodedResource the resource descriptor for the XML file,
-        ,* allowing to specify an encoding to use for parsing the file
-        ,* @return the number of bean definitions found
-        ,* @throws BeanDefinitionStoreException in case of loading or parsing errors
-        ,*/
-       public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException {
-           Assert.notNull(encodedResource, "EncodedResource must not be null");
-           if (logger.isTraceEnabled()) {
-               logger.trace("Loading XML bean definitions from " + encodedResource);
-           }
-
-           Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
-           if (currentResources == null) {
-               currentResources = new HashSet<>(4);
-               this.resourcesCurrentlyBeingLoaded.set(currentResources);
-           }
-           if (!currentResources.add(encodedResource)) {
-               throw new BeanDefinitionStoreException(
-                       "Detected cyclic loading of " + encodedResource + " - check your import definitions!");
-           }
-
-           try (InputStream inputStream = encodedResource.getResource().getInputStream()) {
-               InputSource inputSource = new InputSource(inputStream);
-               if (encodedResource.getEncoding() != null) {
-                   inputSource.setEncoding(encodedResource.getEncoding());
-               }
-               return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
-           }
-           catch (IOException ex) {
-               throw new BeanDefinitionStoreException(
-                       "IOException parsing XML document from " + encodedResource.getResource(), ex);
-           }
-           finally {
-               currentResources.remove(encodedResource);
-               if (currentResources.isEmpty()) {
-                   this.resourcesCurrentlyBeingLoaded.remove();
-               }
-           }
-       }
-     #+END_SRC
-
-     其中的 ~doLoadBeanDefinitions(...)~ 方法具体实现加载 ~BeanDefinition~
-     - ~doLoadDocument()~ 加载文档，这部分将 XML 作为资源读取
-     - ~registerBeanDefinitions()~ 注册 ~BeanDefinition~
-       + 其中 ~DefaultBeanDefinitionDocumentReader~ 中的
-         ~registerBeanDefinitions()~ 方法实现了注册 ~BeanDefinition~
-     #+BEGIN_SRC java
-       /**
-        ,* Actually load bean definitions from the specified XML file.
-        ,* @param inputSource the SAX InputSource to read from
-        ,* @param resource the resource descriptor for the XML file
-        ,* @return the number of bean definitions found
-        ,* @throws BeanDefinitionStoreException in case of loading or parsing errors
-        ,* @see #doLoadDocument
-        ,* @see #registerBeanDefinitions
-        ,*/
-       protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
-               throws BeanDefinitionStoreException {
-
-           try {
-               Document doc = doLoadDocument(inputSource, resource);
-               int count = registerBeanDefinitions(doc, resource);
-               if (logger.isDebugEnabled()) {
-                   logger.debug("Loaded " + count + " bean definitions from " + resource);
-               }
-               return count;
-           }
-           catch (BeanDefinitionStoreException ex) {
-               throw ex;
-           }
-           catch (SAXParseException ex) {
-               throw new XmlBeanDefinitionStoreException(resource.getDescription(),
-                       "Line " + ex.getLineNumber() + " in XML document from " + resource + " is invalid", ex);
-           }
-           catch (SAXException ex) {
-               throw new XmlBeanDefinitionStoreException(resource.getDescription(),
-                       "XML document from " + resource + " is invalid", ex);
-           }
-           catch (ParserConfigurationException ex) {
-               throw new BeanDefinitionStoreException(resource.getDescription(),
-                       "Parser configuration exception parsing XML from " + resource, ex);
-           }
-           catch (IOException ex) {
-               throw new BeanDefinitionStoreException(resource.getDescription(),
-                       "IOException parsing XML document from " + resource, ex);
-           }
-           catch (Throwable ex) {
-               throw new BeanDefinitionStoreException(resource.getDescription(),
-                       "Unexpected exception parsing XML document from " + resource, ex);
-           }
-       }
-     #+END_SRC
-
-     #+BEGIN_SRC java
-       public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
-           this.readerContext = readerContext;
-           doRegisterBeanDefinitions(doc.getDocumentElement());
-       }
-     #+END_SRC
-     ~DefaultBeanDefinitionDocumentReader~ 实现
-     - ~protected void doRegisterBeanDefinitions(Element root)~ 读取 XML 的
-       ~<bean>~ 标签中的信息
-       #+BEGIN_SRC xml
-         <?xml version="1.0" encoding="UTF-8"?>
-         <beans xmlns="http://www.springframework.org/schema/beans"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-           <bean id="author" class="io.github.jeanhwea.bean.Author">
-             <property name="name" value="Martin Flower"/>
-           </bean>
-
-         </beans>
-       #+END_SRC
-
-     至此 XML 格式的 ~BeanDefinition~ 注册完成
-
-*** XML 标签解析
-    标签解析的细节比较多，这里跳过
-    1. beans 标签的解析
-       - id
-       - name
-       - class
-       - parent
-       - scope
-       - abstract
-       - lazy-init
-       - autowire
-       - depends-on
-       - autowire-candidate
-       - init-method
-       - destroy-method
-       - factory-method
-       - factory-bean
-    2. import 标签的解析
-    3. alias 标签的解析
 
 ** TODO 自定义标签注册
    ~BeanDefinitionParser~
