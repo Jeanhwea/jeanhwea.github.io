@@ -913,6 +913,7 @@
    3. ~isSingleton(...)~ 方法返回 FactoryBean 创建的实例的 Scope
 
 ** 单例 Bean 工厂实现: ~DefaultSingletonBeanRegistry~ 类
+
    ~DefaultSingletonBeanRegistry~ 是对单例 Bean 注册的实现类，它的继承关系如下
    #+BEGIN_SRC text
      org.springframework.beans.factory.support
@@ -1095,6 +1096,155 @@
          #+END_SRC
        - ~addSingleton(...)~ 将新创建的 Bean 对象放入 ~singletonObjects~, 并从
          ~singletonFactories~ 中移除 ~ObjectFactory~ 对象
+
+*** 从 Bean 实例获取 Bean 对象: ~getObjectForBeanInstance(...)~ 方法
+    beanInstance -> beanOject 是将缓存中的 Bean 实例转化成最终用户所需对象的过程，
+    1. 在 ~doGetBean(...)~ 方法中的 ~getObjectForBeanInstance(...)~ 方法实现
+    2. beanInstance 如果是非 FactoryBean, beanInstance 即为 beanOject, 直接返回
+       创建好的 Bean 对象
+    3. beanInstance 如果是 FactoryBean, 需要调用工厂方法进行处理，创建 beanOject
+       - 先调用 ~getCachedObjectForFactoryBean(...)~ 从缓存中获取，获取成功直接
+         返回结果
+       - 如果未获取成功，调用 ~getObjectFromFactoryBean(...)~ 创建 beanOject
+       - 最终通过 ~doGetObjectFromFactoryBean(...)~ 完成调用工厂方法并获取
+         beanObject 逻辑
+
+    这里分析一下 ~doGetObjectFromFactoryBean(...)~ 的逻辑，先查看一下调用栈
+    #+BEGIN_SRC text
+      doGetObjectFromFactoryBean:161, FactoryBeanRegistrySupport (org.springframework.beans.factory.support)
+      getObjectFromFactoryBean:101, FactoryBeanRegistrySupport (org.springframework.beans.factory.support)
+      getObjectForBeanInstance:1818, AbstractBeanFactory (org.springframework.beans.factory.support)
+      getObjectForBeanInstance:1266, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+      doGetBean:260, AbstractBeanFactory (org.springframework.beans.factory.support)
+      getBean:202, AbstractBeanFactory (org.springframework.beans.factory.support)
+      getBean:1108, AbstractApplicationContext (org.springframework.context.support)
+      main:25, MyApp04 (io.github.jeanhwea.app04_factory_bean)
+    #+END_SRC
+
+    ~doGetObjectFromFactoryBean(...)~ 方法逻辑如下，可以看出在进行了一些校验工作，
+    最终调用 ~factory.getObject()~ 方法获取 beanObject
+    #+BEGIN_SRC java
+      /**
+       ,* Obtain an object to expose from the given FactoryBean.
+       ,* @param factory the FactoryBean instance
+       ,* @param beanName the name of the bean
+       ,* @return the object obtained from the FactoryBean
+       ,* @throws BeanCreationException if FactoryBean object creation failed
+       ,* @see org.springframework.beans.factory.FactoryBean#getObject()
+       ,*/
+      private Object doGetObjectFromFactoryBean(final FactoryBean<?> factory, final String beanName)
+              throws BeanCreationException {
+
+          Object object;
+          try {
+              if (System.getSecurityManager() != null) {
+                  AccessControlContext acc = getAccessControlContext();
+                  try {
+                      object = AccessController.doPrivileged((PrivilegedExceptionAction<Object>) factory::getObject, acc);
+                  }
+                  catch (PrivilegedActionException pae) {
+                      throw pae.getException();
+                  }
+              }
+              else {
+                  object = factory.getObject();
+              }
+          }
+          catch (FactoryBeanNotInitializedException ex) {
+              throw new BeanCurrentlyInCreationException(beanName, ex.toString());
+          }
+          catch (Throwable ex) {
+              throw new BeanCreationException(beanName, "FactoryBean threw exception on object creation", ex);
+          }
+
+          // Do not accept a null value for a FactoryBean that's not fully
+          // initialized yet: Many FactoryBeans just return null then.
+          if (object == null) {
+              if (isSingletonCurrentlyInCreation(beanName)) {
+                  throw new BeanCurrentlyInCreationException(
+                          beanName, "FactoryBean which is currently in creation returned null from getObject");
+              }
+              object = new NullBean();
+          }
+          return object;
+      }
+    #+END_SRC
+
+    往上跳一级，查看 ~FactoryBeanRegistrySupport#getObjectFromFactoryBean(...)~ 方法
+    #+BEGIN_SRC java
+      /**
+       ,* Obtain an object to expose from the given FactoryBean.
+       ,* @param factory the FactoryBean instance
+       ,* @param beanName the name of the bean
+       ,* @param shouldPostProcess whether the bean is subject to post-processing
+       ,* @return the object obtained from the FactoryBean
+       ,* @throws BeanCreationException if FactoryBean object creation failed
+       ,* @see org.springframework.beans.factory.FactoryBean#getObject()
+       ,*/
+      protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName, boolean shouldPostProcess) {
+          if (factory.isSingleton() && containsSingleton(beanName)) {
+              synchronized (getSingletonMutex()) {
+                  Object object = this.factoryBeanObjectCache.get(beanName);
+                  if (object == null) {
+                      object = doGetObjectFromFactoryBean(factory, beanName);
+                      // Only post-process and store if not put there already during getObject() call above
+                      // (e.g. because of circular reference processing triggered by custom getBean calls)
+                      Object alreadyThere = this.factoryBeanObjectCache.get(beanName);
+                      if (alreadyThere != null) {
+                          object = alreadyThere;
+                      }
+                      else {
+                          if (shouldPostProcess) {
+                              if (isSingletonCurrentlyInCreation(beanName)) {
+                                  // Temporarily return non-post-processed object, not storing it yet..
+                                  return object;
+                              }
+                              beforeSingletonCreation(beanName);
+                              try {
+                                  object = postProcessObjectFromFactoryBean(object, beanName);
+                              }
+                              catch (Throwable ex) {
+                                  throw new BeanCreationException(beanName,
+                                          "Post-processing of FactoryBean's singleton object failed", ex);
+                              }
+                              finally {
+                                  afterSingletonCreation(beanName);
+                              }
+                          }
+                          if (containsSingleton(beanName)) {
+                              this.factoryBeanObjectCache.put(beanName, object);
+                          }
+                      }
+                  }
+                  return object;
+              }
+          }
+          else {
+              Object object = doGetObjectFromFactoryBean(factory, beanName);
+              if (shouldPostProcess) {
+                  try {
+                      object = postProcessObjectFromFactoryBean(object, beanName);
+                  }
+                  catch (Throwable ex) {
+                      throw new BeanCreationException(beanName, "Post-processing of FactoryBean's object failed", ex);
+                  }
+              }
+              return object;
+          }
+      }
+    #+END_SRC
+    ~getObjectFromFactoryBean~ 实现了获取 FactoryBean 的 beanObject 的业务逻辑
+    1. 如果是非单例 FactoryBean，在最外层的 else 代码，直接创建 beanObject
+    2. 如果是单例 FactoryBean
+       - 首先获取单例缓存池 singletonObjects 的互斥锁
+       - 尝试从 factoryBeanObjectCache 缓存中获取创建好的 beanObject, 如果成功
+         直接返回结果
+       - 如果缓存获取失败，则需要调用 ~doGetObjectFromFactoryBean(...)~ 方法创
+         建 beanObject，并将创建好的 beanObject 放入 factoryBeanObjectCache 缓
+         存中
+    3. 在上述两种情况过后都需要调用 ~postProcessObjectFromFactoryBean(...)~ 方法
+       - ~postProcessObjectFromFactoryBean(...)~ 是一个空方法
+       - 这样设计是为子类提供扩展点
 
 * IoC
 ** IoC 核心接口和类

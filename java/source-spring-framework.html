@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-18 Sun 12:06 -->
+<!-- 2021-07-18 Sun 13:02 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Spring Framework v5.2.5.RELEASE</title>
@@ -233,55 +233,56 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org849ec88">1. 容器实现原理</a>
+<li><a href="#org0de9804">1. 容器实现原理</a>
 <ul>
-<li><a href="#org4a33e94">1.1. Bean 工厂接口: BeanFactory</a></li>
-<li><a href="#org53c5d66">1.2. Bean 工厂的实现类: DefaultListableBeanFactory</a></li>
-<li><a href="#orge115e3a">1.3. Bean 定义的读取器: XmlBeanDefinitionReader</a></li>
-<li><a href="#org065eeec">1.4. BeanDefinition 自动加载流程</a></li>
-<li><a href="#orgf43ceb5">1.5. BeanDefinition 注册的实现</a></li>
-<li><a href="#org9772eba">1.6. BeanDefinition 移除的实现</a></li>
-<li><a href="#org721ab02">1.7. BeanDefinition 获取的实现</a></li>
-<li><a href="#orga2b9a65">1.8. <code>&lt;bean/&gt;</code> 标签解析</a></li>
+<li><a href="#org5765517">1.1. Bean 工厂接口: BeanFactory</a></li>
+<li><a href="#org7cc4d2a">1.2. Bean 工厂的实现类: DefaultListableBeanFactory</a></li>
+<li><a href="#orgbf25d93">1.3. Bean 定义的读取器: XmlBeanDefinitionReader</a></li>
+<li><a href="#orgee2b6a7">1.4. BeanDefinition 自动加载流程</a></li>
+<li><a href="#orge81f660">1.5. BeanDefinition 注册的实现</a></li>
+<li><a href="#org5a92210">1.6. BeanDefinition 移除的实现</a></li>
+<li><a href="#org1890fd5">1.7. BeanDefinition 获取的实现</a></li>
+<li><a href="#orgd25827c">1.8. <code>&lt;bean/&gt;</code> 标签解析</a></li>
 </ul>
 </li>
-<li><a href="#org9aa2a88">2. Bean 实现原理</a>
+<li><a href="#org2e306cf">2. Bean 实现原理</a>
 <ul>
-<li><a href="#org96af7f8">2.1. Bean 的生命周期</a></li>
-<li><a href="#org42bbf23">2.2. Bean 的流程分析</a>
+<li><a href="#orgf0095d1">2.1. Bean 的生命周期</a></li>
+<li><a href="#orgc0b2fc5">2.2. Bean 的流程分析</a>
 <ul>
-<li><a href="#orgc623fed">2.2.1. 实例化 Bean: <code>instantiateBean()</code> 方法</a></li>
-<li><a href="#orge6d10a8">2.2.2. 获取 Bean 实例: <code>doGetBean()</code> 方法</a></li>
+<li><a href="#orgcb4c0f5">2.2.1. 实例化 Bean: <code>instantiateBean()</code> 方法</a></li>
+<li><a href="#orgdbdd270">2.2.2. 获取 Bean 实例: <code>doGetBean()</code> 方法</a></li>
 </ul>
 </li>
-<li><a href="#org35881b0">2.3. FactoryBean</a></li>
-<li><a href="#org7a2aa0b">2.4. 单例 Bean 工厂实现: <code>DefaultSingletonBeanRegistry</code> 类</a>
+<li><a href="#orga695c34">2.3. FactoryBean</a></li>
+<li><a href="#org88752ac">2.4. 单例 Bean 工厂实现: <code>DefaultSingletonBeanRegistry</code> 类</a>
 <ul>
-<li><a href="#org61d9530">2.4.1. 获取单例 Bean : <code>getSingleton(...)</code> 方法</a></li>
+<li><a href="#org5351dae">2.4.1. 获取单例 Bean : <code>getSingleton(...)</code> 方法</a></li>
+<li><a href="#org84ecd94">2.4.2. 从 Bean 实例获取 Bean 对象: <code>getObjectForBeanInstance(...)</code> 方法</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org3de7414">3. IoC</a>
+<li><a href="#org0d053a2">3. IoC</a>
 <ul>
-<li><a href="#orgc73b870">3.1. IoC 核心接口和类</a></li>
+<li><a href="#orgd575f30">3.1. IoC 核心接口和类</a></li>
 </ul>
 </li>
-<li><a href="#org44ffda2">4. ApplicationContext</a></li>
-<li><a href="#org78b2086">5. AOP</a></li>
-<li><a href="#org17a050c">6. Spring 核心类梳理</a></li>
-<li><a href="#orgb888d5f">7. SpringBoot 自动装配</a></li>
-<li><a href="#org6a4f146">8. 参考链接</a></li>
+<li><a href="#orged995ab">4. ApplicationContext</a></li>
+<li><a href="#org39b4e33">5. AOP</a></li>
+<li><a href="#orga09735e">6. Spring 核心类梳理</a></li>
+<li><a href="#orga31f056">7. SpringBoot 自动装配</a></li>
+<li><a href="#orgc38c6d6">8. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org849ec88" class="outline-2">
-<h2 id="org849ec88"><span class="section-number-2">1</span> 容器实现原理</h2>
+<div id="outline-container-org0de9804" class="outline-2">
+<h2 id="org0de9804"><span class="section-number-2">1</span> 容器实现原理</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org4a33e94" class="outline-3">
-<h3 id="org4a33e94"><span class="section-number-3">1.1</span> Bean 工厂接口: BeanFactory</h3>
+<div id="outline-container-org5765517" class="outline-3">
+<h3 id="org5765517"><span class="section-number-3">1.1</span> Bean 工厂接口: BeanFactory</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 <code>BeanFactory</code> 是 Spring 的 Bean 工厂的接口定义，它定义对 Spring Bean 容器访问的
@@ -323,8 +324,8 @@
 </div>
 </div>
 
-<div id="outline-container-org53c5d66" class="outline-3">
-<h3 id="org53c5d66"><span class="section-number-3">1.2</span> Bean 工厂的实现类: DefaultListableBeanFactory</h3>
+<div id="outline-container-org7cc4d2a" class="outline-3">
+<h3 id="org7cc4d2a"><span class="section-number-3">1.2</span> Bean 工厂的实现类: DefaultListableBeanFactory</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 <code>DefaultListableBeanFactory</code> 是实现 <code>BeanFactory</code> 接口的核心类，熟悉它的类继
@@ -404,8 +405,8 @@ BeanDefinition, 直接通过实现 <code>T getObject()</code> 方法来返回创
 </div>
 </div>
 
-<div id="outline-container-orge115e3a" class="outline-3">
-<h3 id="orge115e3a"><span class="section-number-3">1.3</span> Bean 定义的读取器: XmlBeanDefinitionReader</h3>
+<div id="outline-container-orgbf25d93" class="outline-3">
+<h3 id="orgbf25d93"><span class="section-number-3">1.3</span> Bean 定义的读取器: XmlBeanDefinitionReader</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 <code>XmlBeanDefinitionReader</code> 是实现读取 BeanDefinition 的类，它的继承关系如下
@@ -458,8 +459,8 @@ Class XmlBeanDefinitionReader
 </div>
 </div>
 
-<div id="outline-container-org065eeec" class="outline-3">
-<h3 id="org065eeec"><span class="section-number-3">1.4</span> BeanDefinition 自动加载流程</h3>
+<div id="outline-container-orgee2b6a7" class="outline-3">
+<h3 id="orgee2b6a7"><span class="section-number-3">1.4</span> BeanDefinition 自动加载流程</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 <code>DefaultListableBeanFactory</code> 类定义了存储 BeanDefinition 类的哈希表, 具体定义如下
@@ -625,8 +626,8 @@ BeanDefinition</li>
 </div>
 </div>
 
-<div id="outline-container-orgf43ceb5" class="outline-3">
-<h3 id="orgf43ceb5"><span class="section-number-3">1.5</span> BeanDefinition 注册的实现</h3>
+<div id="outline-container-orge81f660" class="outline-3">
+<h3 id="orge81f660"><span class="section-number-3">1.5</span> BeanDefinition 注册的实现</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 <code>DefaultListableBeanFactory</code> 的 <code>registerBeanDefinition(...)</code> 才是真正实现注
@@ -773,8 +774,8 @@ BeanDefinition</li>
 </div>
 </div>
 
-<div id="outline-container-org9772eba" class="outline-3">
-<h3 id="org9772eba"><span class="section-number-3">1.6</span> BeanDefinition 移除的实现</h3>
+<div id="outline-container-org5a92210" class="outline-3">
+<h3 id="org5a92210"><span class="section-number-3">1.6</span> BeanDefinition 移除的实现</h3>
 <div class="outline-text-3" id="text-1-6">
 <p>
 BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</code> 方法
@@ -860,8 +861,8 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-org721ab02" class="outline-3">
-<h3 id="org721ab02"><span class="section-number-3">1.7</span> BeanDefinition 获取的实现</h3>
+<div id="outline-container-org1890fd5" class="outline-3">
+<h3 id="org1890fd5"><span class="section-number-3">1.7</span> BeanDefinition 获取的实现</h3>
 <div class="outline-text-3" id="text-1-7">
 <p>
 <code>DefaultListableBeanFactory</code> 的实现获取 BeanDefinition 的逻辑如下
@@ -883,8 +884,8 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-orga2b9a65" class="outline-3">
-<h3 id="orga2b9a65"><span class="section-number-3">1.8</span> <code>&lt;bean/&gt;</code> 标签解析</h3>
+<div id="outline-container-orgd25827c" class="outline-3">
+<h3 id="orgd25827c"><span class="section-number-3">1.8</span> <code>&lt;bean/&gt;</code> 标签解析</h3>
 <div class="outline-text-3" id="text-1-8">
 <p>
 之前在 BeanDefinition 自动加载流程中忽略了对 <code>&lt;bean/&gt;</code> 标签的解析，其核心实现
@@ -989,12 +990,12 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-org9aa2a88" class="outline-2">
-<h2 id="org9aa2a88"><span class="section-number-2">2</span> Bean 实现原理</h2>
+<div id="outline-container-org2e306cf" class="outline-2">
+<h2 id="org2e306cf"><span class="section-number-2">2</span> Bean 实现原理</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org96af7f8" class="outline-3">
-<h3 id="org96af7f8"><span class="section-number-3">2.1</span> Bean 的生命周期</h3>
+<div id="outline-container-orgf0095d1" class="outline-3">
+<h3 id="orgf0095d1"><span class="section-number-3">2.1</span> Bean 的生命周期</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 <code>BeanFactory</code> 的注释中完整地说明的实现标准 BeanFactory 的代码
@@ -1030,8 +1031,8 @@ ApplicationContext 中</li>
 </div>
 </div>
 
-<div id="outline-container-org42bbf23" class="outline-3">
-<h3 id="org42bbf23"><span class="section-number-3">2.2</span> Bean 的流程分析</h3>
+<div id="outline-container-orgc0b2fc5" class="outline-3">
+<h3 id="orgc0b2fc5"><span class="section-number-3">2.2</span> Bean 的流程分析</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 实例化 Bean 的方法为 <code>BeanUtils#instantiateClass(...)</code>, 先添加断点获取调用栈
@@ -1066,8 +1067,8 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </ol>
 </div>
 
-<div id="outline-container-orgc623fed" class="outline-4">
-<h4 id="orgc623fed"><span class="section-number-4">2.2.1</span> 实例化 Bean: <code>instantiateBean()</code> 方法</h4>
+<div id="outline-container-orgcb4c0f5" class="outline-4">
+<h4 id="orgcb4c0f5"><span class="section-number-4">2.2.1</span> 实例化 Bean: <code>instantiateBean()</code> 方法</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 <code>instantiateBean(...)</code> 实例化 Bean 主要完成如下工作
@@ -1120,8 +1121,8 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </div>
 </div>
 
-<div id="outline-container-orge6d10a8" class="outline-4">
-<h4 id="orge6d10a8"><span class="section-number-4">2.2.2</span> 获取 Bean 实例: <code>doGetBean()</code> 方法</h4>
+<div id="outline-container-orgdbdd270" class="outline-4">
+<h4 id="orgdbdd270"><span class="section-number-4">2.2.2</span> 获取 Bean 实例: <code>doGetBean()</code> 方法</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 <code>doGetBean(...)</code> 方法是获取 Bean 的最终处理函数，它的逻辑比较复杂，可以分成
@@ -1146,9 +1147,9 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 <ul class="org-ul">
 <li>获取 FactoryBean 生成的 Bean 实例
 <ul class="org-ul">
-<li>FactoryBean 的实例是 <code>factory-method</code> 返回的 Bean, 后面称为
-beanInstance</li>
-<li><code>getObjectForBeanInstance()</code> 方法实现了获取 beanInstance 的逻辑</li>
+<li>FactoryBean 实例需要获取到的对象是 <code>factory-method</code> 返回的 Bean 对象</li>
+<li><code>getObjectForBeanInstance()</code> 方法实现了从 Bean 实例中获取 Bean 对象的
+逻辑，后续再说明该方法的逻辑</li>
 </ul></li>
 <li>如果不是 FactoryBean
 <ul class="org-ul">
@@ -1348,8 +1349,8 @@ beanInstance</li>
 </div>
 </div>
 </div>
-<div id="outline-container-org35881b0" class="outline-3">
-<h3 id="org35881b0"><span class="section-number-3">2.3</span> FactoryBean</h3>
+<div id="outline-container-orga695c34" class="outline-3">
+<h3 id="orga695c34"><span class="section-number-3">2.3</span> FactoryBean</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 FactoryBean 不同于普通的 Bean， FactoryBean 自身就是一个组装 Bean 的微型工厂，
@@ -1379,8 +1380,8 @@ FactoryBean 不同于普通的 Bean， FactoryBean 自身就是一个组装 Bean
 </div>
 </div>
 
-<div id="outline-container-org7a2aa0b" class="outline-3">
-<h3 id="org7a2aa0b"><span class="section-number-3">2.4</span> 单例 Bean 工厂实现: <code>DefaultSingletonBeanRegistry</code> 类</h3>
+<div id="outline-container-org88752ac" class="outline-3">
+<h3 id="org88752ac"><span class="section-number-3">2.4</span> 单例 Bean 工厂实现: <code>DefaultSingletonBeanRegistry</code> 类</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 <code>DefaultSingletonBeanRegistry</code> 是对单例 Bean 注册的实现类，它的继承关系如下
@@ -1480,8 +1481,8 @@ singletonFactories: 三级缓存单例对象工厂 ObjectFactory
 </ol>
 </div>
 
-<div id="outline-container-org61d9530" class="outline-4">
-<h4 id="org61d9530"><span class="section-number-4">2.4.1</span> 获取单例 Bean : <code>getSingleton(...)</code> 方法</h4>
+<div id="outline-container-org5351dae" class="outline-4">
+<h4 id="org5351dae"><span class="section-number-4">2.4.1</span> 获取单例 Bean : <code>getSingleton(...)</code> 方法</h4>
 <div class="outline-text-4" id="text-2-4-1">
 <p>
 <code>getSingleton()</code> 方法是获取 Bean 的核心方法, 它的实现如下
@@ -1598,15 +1599,191 @@ singletonFactories: 三级缓存单例对象工厂 ObjectFactory
 </ol>
 </div>
 </div>
+
+<div id="outline-container-org84ecd94" class="outline-4">
+<h4 id="org84ecd94"><span class="section-number-4">2.4.2</span> 从 Bean 实例获取 Bean 对象: <code>getObjectForBeanInstance(...)</code> 方法</h4>
+<div class="outline-text-4" id="text-2-4-2">
+<p>
+beanInstance -&gt; beanOject 是将缓存中的 Bean 实例转化成最终用户所需对象的过程，
+</p>
+<ol class="org-ol">
+<li>在 <code>doGetBean(...)</code> 方法中的 <code>getObjectForBeanInstance(...)</code> 方法实现</li>
+<li>beanInstance 如果是非 FactoryBean, beanInstance 即为 beanOject, 直接返回
+创建好的 Bean 对象</li>
+<li>beanInstance 如果是 FactoryBean, 需要调用工厂方法进行处理，创建 beanOject
+<ul class="org-ul">
+<li>先调用 <code>getCachedObjectForFactoryBean(...)</code> 从缓存中获取，获取成功直接
+返回结果</li>
+<li>如果未获取成功，调用 <code>getObjectFromFactoryBean(...)</code> 创建 beanOject</li>
+<li>最终通过 <code>doGetObjectFromFactoryBean(...)</code> 完成调用工厂方法并获取
+beanObject 逻辑</li>
+</ul></li>
+</ol>
+
+<p>
+这里分析一下 <code>doGetObjectFromFactoryBean(...)</code> 的逻辑，先查看一下调用栈
+</p>
+<div class="org-src-container">
+<pre class="src src-text">doGetObjectFromFactoryBean:161, FactoryBeanRegistrySupport (org.springframework.beans.factory.support)
+getObjectFromFactoryBean:101, FactoryBeanRegistrySupport (org.springframework.beans.factory.support)
+getObjectForBeanInstance:1818, AbstractBeanFactory (org.springframework.beans.factory.support)
+getObjectForBeanInstance:1266, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+doGetBean:260, AbstractBeanFactory (org.springframework.beans.factory.support)
+getBean:202, AbstractBeanFactory (org.springframework.beans.factory.support)
+getBean:1108, AbstractApplicationContext (org.springframework.context.support)
+main:25, MyApp04 (io.github.jeanhwea.app04_factory_bean)
+</pre>
+</div>
+
+<p>
+<code>doGetObjectFromFactoryBean(...)</code> 方法逻辑如下，可以看出在进行了一些校验工作，
+最终调用 <code>factory.getObject()</code> 方法获取 beanObject
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Obtain an object to expose from the given FactoryBean.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> factory the FactoryBean instance</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> beanName the name of the bean</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@return</span><span style="color: #d33682;"> the object obtained from the FactoryBean</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@throws</span><span style="color: #d33682;"> BeanCreationException if FactoryBean object creation failed</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@see</span><span style="color: #d33682;"> org.springframework.beans.factory.FactoryBean#getObject()</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">private</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">doGetObjectFromFactoryBean</span><span style="color: #8d5649;">(</span><span style="color: #859900;">final</span> <span style="color: #268bd2;">FactoryBean</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">factory</span>, <span style="color: #859900;">final</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span><span style="color: #8d5649;">)</span>
+        <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeanCreationException</span> <span style="color: #8d5649;">{</span>
+
+    <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">object</span>;
+    <span style="color: #859900;">try</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>System.getSecurityManager<span style="color: #24a222;">()</span> != <span style="color: #268bd2;">null</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #268bd2;">AccessControlContext</span> <span style="color: #6c71c4;">acc</span> = getAccessControlContext<span style="color: #24a222;">()</span>;
+            <span style="color: #859900;">try</span> <span style="color: #24a222;">{</span>
+                object = AccessController.doPrivileged<span style="color: #ff7f00;">(</span><span style="color: #1776b6;">(</span><span style="color: #268bd2;">PrivilegedExceptionAction</span><span style="color: #00bed1;">&lt;</span><span style="color: #268bd2;">Object</span><span style="color: #00bed1;">&gt;</span><span style="color: #1776b6;">)</span> factory::getObject, acc<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">catch</span> <span style="color: #24a222;">(</span><span style="color: #268bd2;">PrivilegedActionException</span> <span style="color: #6c71c4;">pae</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #859900;">throw</span> pae.getException<span style="color: #ff7f00;">()</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #9564bf;">{</span>
+            object = factory.getObject<span style="color: #24a222;">()</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">FactoryBeanNotInitializedException</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanCurrentlyInCreationException</span><span style="color: #9564bf;">(</span>beanName, ex.toString<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">Throwable</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanCreationException</span><span style="color: #9564bf;">(</span>beanName, <span style="color: #2aa198;">"FactoryBean threw exception on object creation"</span>, ex<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Do not accept a null value for a FactoryBean that's not fully</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">initialized yet: Many FactoryBeans just return null then.</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>object == <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>isSingletonCurrentlyInCreation<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanCurrentlyInCreationException</span><span style="color: #24a222;">(</span>
+                    beanName, <span style="color: #2aa198;">"FactoryBean which is currently in creation returned null from getObject"</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        object = <span style="color: #859900;">new</span> <span style="color: #268bd2;">NullBean</span><span style="color: #9564bf;">()</span>;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">return</span> object;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+往上跳一级，查看 <code>FactoryBeanRegistrySupport#getObjectFromFactoryBean(...)</code> 方法
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Obtain an object to expose from the given FactoryBean.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> factory the FactoryBean instance</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> beanName the name of the bean</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> shouldPostProcess whether the bean is subject to post-processing</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@return</span><span style="color: #d33682;"> the object obtained from the FactoryBean</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@throws</span><span style="color: #d33682;"> BeanCreationException if FactoryBean object creation failed</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@see</span><span style="color: #d33682;"> org.springframework.beans.factory.FactoryBean#getObject()</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">getObjectFromFactoryBean</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">FactoryBean</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">factory</span>, <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">shouldPostProcess</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>factory.isSingleton<span style="color: #9564bf;">()</span> &amp;&amp; containsSingleton<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">synchronized</span> <span style="color: #9564bf;">(</span>getSingletonMutex<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">object</span> = <span style="color: #859900;">this</span>.factoryBeanObjectCache.get<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>object == <span style="color: #268bd2;">null</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                object = doGetObjectFromFactoryBean<span style="color: #ff7f00;">(</span>factory, beanName<span style="color: #ff7f00;">)</span>;
+                <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Only post-process and store if not put there already during getObject() call above</span>
+                <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">(e.g. because of circular reference processing triggered by custom getBean calls)</span>
+                <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">alreadyThere</span> = <span style="color: #859900;">this</span>.factoryBeanObjectCache.get<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span>;
+                <span style="color: #859900;">if</span> <span style="color: #ff7f00;">(</span>alreadyThere != <span style="color: #268bd2;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                    object = alreadyThere;
+                <span style="color: #ff7f00;">}</span>
+                <span style="color: #859900;">else</span> <span style="color: #ff7f00;">{</span>
+                    <span style="color: #859900;">if</span> <span style="color: #1776b6;">(</span>shouldPostProcess<span style="color: #1776b6;">)</span> <span style="color: #1776b6;">{</span>
+                        <span style="color: #859900;">if</span> <span style="color: #00bed1;">(</span>isSingletonCurrentlyInCreation<span style="color: #bcbf00;">(</span>beanName<span style="color: #bcbf00;">)</span><span style="color: #00bed1;">)</span> <span style="color: #00bed1;">{</span>
+                            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Temporarily return non-post-processed object, not storing it yet..</span>
+                            <span style="color: #859900;">return</span> object;
+                        <span style="color: #00bed1;">}</span>
+                        beforeSingletonCreation<span style="color: #00bed1;">(</span>beanName<span style="color: #00bed1;">)</span>;
+                        <span style="color: #859900;">try</span> <span style="color: #00bed1;">{</span>
+                            object = postProcessObjectFromFactoryBean<span style="color: #bcbf00;">(</span>object, beanName<span style="color: #bcbf00;">)</span>;
+                        <span style="color: #00bed1;">}</span>
+                        <span style="color: #859900;">catch</span> <span style="color: #00bed1;">(</span><span style="color: #268bd2;">Throwable</span> <span style="color: #6c71c4;">ex</span><span style="color: #00bed1;">)</span> <span style="color: #00bed1;">{</span>
+                            <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanCreationException</span><span style="color: #bcbf00;">(</span>beanName,
+                                    <span style="color: #2aa198;">"Post-processing of FactoryBean's singleton object failed"</span>, ex<span style="color: #bcbf00;">)</span>;
+                        <span style="color: #00bed1;">}</span>
+                        <span style="color: #859900;">finally</span> <span style="color: #00bed1;">{</span>
+                            afterSingletonCreation<span style="color: #bcbf00;">(</span>beanName<span style="color: #bcbf00;">)</span>;
+                        <span style="color: #00bed1;">}</span>
+                    <span style="color: #1776b6;">}</span>
+                    <span style="color: #859900;">if</span> <span style="color: #1776b6;">(</span>containsSingleton<span style="color: #00bed1;">(</span>beanName<span style="color: #00bed1;">)</span><span style="color: #1776b6;">)</span> <span style="color: #1776b6;">{</span>
+                        <span style="color: #859900;">this</span>.factoryBeanObjectCache.put<span style="color: #00bed1;">(</span>beanName, object<span style="color: #00bed1;">)</span>;
+                    <span style="color: #1776b6;">}</span>
+                <span style="color: #ff7f00;">}</span>
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">return</span> object;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">object</span> = doGetObjectFromFactoryBean<span style="color: #9564bf;">(</span>factory, beanName<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>shouldPostProcess<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">try</span> <span style="color: #24a222;">{</span>
+                object = postProcessObjectFromFactoryBean<span style="color: #ff7f00;">(</span>object, beanName<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">catch</span> <span style="color: #24a222;">(</span><span style="color: #268bd2;">Throwable</span> <span style="color: #6c71c4;">ex</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanCreationException</span><span style="color: #ff7f00;">(</span>beanName, <span style="color: #2aa198;">"Post-processing of FactoryBean's object failed"</span>, ex<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">return</span> object;
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+<p>
+<code>getObjectFromFactoryBean</code> 实现了获取 FactoryBean 的 beanObject 的业务逻辑
+</p>
+<ol class="org-ol">
+<li>如果是非单例 FactoryBean，在最外层的 else 代码，直接创建 beanObject</li>
+<li>如果是单例 FactoryBean
+<ul class="org-ul">
+<li>首先获取单例缓存池 singletonObjects 的互斥锁</li>
+<li>尝试从 factoryBeanObjectCache 缓存中获取创建好的 beanObject, 如果成功
+直接返回结果</li>
+<li>如果缓存获取失败，则需要调用 <code>doGetObjectFromFactoryBean(...)</code> 方法创
+建 beanObject，并将创建好的 beanObject 放入 factoryBeanObjectCache 缓
+存中</li>
+</ul></li>
+<li>在上述两种情况过后都需要调用 <code>postProcessObjectFromFactoryBean(...)</code> 方法
+<ul class="org-ul">
+<li><code>postProcessObjectFromFactoryBean(...)</code> 是一个空方法</li>
+<li>这样设计是为子类提供扩展点</li>
+</ul></li>
+</ol>
+</div>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org3de7414" class="outline-2">
-<h2 id="org3de7414"><span class="section-number-2">3</span> IoC</h2>
+<div id="outline-container-org0d053a2" class="outline-2">
+<h2 id="org0d053a2"><span class="section-number-2">3</span> IoC</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgc73b870" class="outline-3">
-<h3 id="orgc73b870"><span class="section-number-3">3.1</span> IoC 核心接口和类</h3>
+<div id="outline-container-orgd575f30" class="outline-3">
+<h3 id="orgd575f30"><span class="section-number-3">3.1</span> IoC 核心接口和类</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Spring 的 IoC 容器对象一般继承自 <code>ApplicationContext</code> 接口，常见的对象类如下
@@ -1714,12 +1891,12 @@ Class AnnotationConfigApplicationContext
 </div>
 </div>
 
-<div id="outline-container-org44ffda2" class="outline-2">
-<h2 id="org44ffda2"><span class="section-number-2">4</span> ApplicationContext</h2>
+<div id="outline-container-orged995ab" class="outline-2">
+<h2 id="orged995ab"><span class="section-number-2">4</span> ApplicationContext</h2>
 </div>
 
-<div id="outline-container-org78b2086" class="outline-2">
-<h2 id="org78b2086"><span class="section-number-2">5</span> AOP</h2>
+<div id="outline-container-org39b4e33" class="outline-2">
+<h2 id="org39b4e33"><span class="section-number-2">5</span> AOP</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 使用动态代理实现
@@ -1731,8 +1908,8 @@ Class AnnotationConfigApplicationContext
 </div>
 </div>
 
-<div id="outline-container-org17a050c" class="outline-2">
-<h2 id="org17a050c"><span class="section-number-2">6</span> Spring 核心类梳理</h2>
+<div id="outline-container-orga09735e" class="outline-2">
+<h2 id="orga09735e"><span class="section-number-2">6</span> Spring 核心类梳理</h2>
 <div class="outline-text-2" id="text-6">
 <ol class="org-ol">
 <li>ApplicationContext
@@ -1778,11 +1955,11 @@ Class AnnotationConfigApplicationContext
 </div>
 </div>
 
-<div id="outline-container-orgb888d5f" class="outline-2">
-<h2 id="orgb888d5f"><span class="section-number-2">7</span> SpringBoot 自动装配</h2>
+<div id="outline-container-orga31f056" class="outline-2">
+<h2 id="orga31f056"><span class="section-number-2">7</span> SpringBoot 自动装配</h2>
 </div>
-<div id="outline-container-org6a4f146" class="outline-2">
-<h2 id="org6a4f146"><span class="section-number-2">8</span> 参考链接</h2>
+<div id="outline-container-orgc38c6d6" class="outline-2">
+<h2 id="orgc38c6d6"><span class="section-number-2">8</span> 参考链接</h2>
 <div class="outline-text-2" id="text-8">
 <ol class="org-ol">
 <li><a href="https://huifer.github.io/spring-analysis/">Spring Analysis</a></li>
@@ -1791,7 +1968,7 @@ Class AnnotationConfigApplicationContext
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-18 Sun 12:06. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
+<p class="author">Last Updated 2021-07-18 Sun 13:02. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
 </div>
 </body>
 </html>
