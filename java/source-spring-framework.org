@@ -1265,6 +1265,420 @@
        - ~postProcessObjectFromFactoryBean(...)~ 是一个空方法
        - 这样设计是为子类提供扩展点
 
+** Bean 生命周期的实现
+*** Bean 创建的实现类: ~AbstractAutowireCapableBeanFactory~
+    先看 ~AbstractAutowireCapableBeanFactory~ 的类继承关系
+    #+BEGIN_SRC text
+      org.springframework.beans.factory.support
+      Class AbstractAutowireCapableBeanFactory
+
+          java.lang.Object
+              org.springframework.core.SimpleAliasRegistry
+                  org.springframework.beans.factory.support.DefaultSingletonBeanRegistry
+                      org.springframework.beans.factory.support.FactoryBeanRegistrySupport
+                          org.springframework.beans.factory.support.AbstractBeanFactory
+                              org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory
+
+          All Implemented Interfaces:
+              BeanFactory, AutowireCapableBeanFactory, ConfigurableBeanFactory,
+              SingletonBeanRegistry, HierarchicalBeanFactory,
+              org.springframework.core.AliasRegistry
+    #+END_SRC
+    1. ~AbstractAutowireCapableBeanFactory~ 实现了 ~AutowireCapableBeanFactory~ 接口
+    2. ~AutowireCapableBeanFactory~ 中有管理 Autowire 功能 Bean 的方法
+       - ~createBean(...)~ 实例化 Bean
+       - ~initializeBean(...)~ 初始化 Bean
+       - ~destroyBean(...)~ 销毁 Bean
+       - 还有一些 Bean 的 ~*PostProcessor*~ 的增强函数
+       #+BEGIN_SRC java
+         public interface AutowireCapableBeanFactory extends BeanFactory {
+             //-------------------------------------------------------------------------
+             // Typical methods for creating and populating external bean instances
+             //-------------------------------------------------------------------------
+             <T> T createBean(Class<T> beanClass) throws BeansException;
+             void autowireBean(Object existingBean) throws BeansException;
+             Object configureBean(Object existingBean, String beanName) throws BeansException;
+
+             //-------------------------------------------------------------------------
+             // Specialized methods for fine-grained control over the bean lifecycle
+             //-------------------------------------------------------------------------
+             Object createBean(Class<?> beanClass, int autowireMode, boolean dependencyCheck) throws BeansException;
+             Object autowire(Class<?> beanClass, int autowireMode, boolean dependencyCheck) throws BeansException;
+             void autowireBeanProperties(Object existingBean, int autowireMode, boolean dependencyCheck)
+                     throws BeansException;
+             void applyBeanPropertyValues(Object existingBean, String beanName) throws BeansException;
+             Object initializeBean(Object existingBean, String beanName) throws BeansException;
+             Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName)
+                     throws BeansException;
+             Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
+                     throws BeansException;
+             void destroyBean(Object existingBean);
+
+             //-------------------------------------------------------------------------
+             // Delegate methods for resolving injection points
+             //-------------------------------------------------------------------------
+             <T> NamedBeanHolder<T> resolveNamedBean(Class<T> requiredType) throws BeansException;
+             Object resolveBeanByName(String name, DependencyDescriptor descriptor) throws BeansException;
+             @Nullable
+             Object resolveDependency(DependencyDescriptor descriptor, @Nullable String requestingBeanName) throws BeansException;
+             @Nullable
+             Object resolveDependency(DependencyDescriptor descriptor, @Nullable String requestingBeanName,
+                     @Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException;
+         }
+       #+END_SRC
+*** Bean 的实例化: ~createBean(...)~ 方法
+    实际实例化 Bean 是在 ~doCreateBean(...)~ 方法中完成的，先准备一下调用栈
+    #+BEGIN_SRC text
+      doCreateBean:552, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+      createBean:517, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+      lambda$doGetBean$0:323, AbstractBeanFactory (org.springframework.beans.factory.support)
+      getObject:-1, 1989335500 (org.springframework.beans.factory.support.AbstractBeanFactory$$Lambda$37)
+      getSingleton:222, DefaultSingletonBeanRegistry (org.springframework.beans.factory.support)
+      doGetBean:321, AbstractBeanFactory (org.springframework.beans.factory.support)
+      getBean:207, AbstractBeanFactory (org.springframework.beans.factory.support)
+      invokeBeanFactoryPostProcessors:89, PostProcessorRegistrationDelegate (org.springframework.context.support)
+      invokeBeanFactoryPostProcessors:706, AbstractApplicationContext (org.springframework.context.support)
+      refresh:532, AbstractApplicationContext (org.springframework.context.support)
+      <init>:101, AnnotationConfigApplicationContext (org.springframework.context.annotation)
+      main:21, MyApp04 (io.github.jeanhwea.app04_factory_bean)
+    #+END_SRC
+
+    ~createBean(...)~ 方法实现如下
+    #+BEGIN_SRC java
+      /**
+       ,* Central method of this class: creates a bean instance,
+       ,* populates the bean instance, applies post-processors, etc.
+       ,* @see #doCreateBean
+       ,*/
+      @Override
+      protected Object createBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
+              throws BeanCreationException {
+
+          if (logger.isTraceEnabled()) {
+              logger.trace("Creating instance of bean '" + beanName + "'");
+          }
+          RootBeanDefinition mbdToUse = mbd;
+
+          // Make sure bean class is actually resolved at this point, and
+          // clone the bean definition in case of a dynamically resolved Class
+          // which cannot be stored in the shared merged bean definition.
+          Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
+          if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
+              mbdToUse = new RootBeanDefinition(mbd);
+              mbdToUse.setBeanClass(resolvedClass);
+          }
+
+          // Prepare method overrides.
+          try {
+              mbdToUse.prepareMethodOverrides();
+          }
+          catch (BeanDefinitionValidationException ex) {
+              throw new BeanDefinitionStoreException(mbdToUse.getResourceDescription(),
+                      beanName, "Validation of method overrides failed", ex);
+          }
+
+          try {
+              // Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+              Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
+              if (bean != null) {
+                  return bean;
+              }
+          }
+          catch (Throwable ex) {
+              throw new BeanCreationException(mbdToUse.getResourceDescription(), beanName,
+                      "BeanPostProcessor before instantiation of bean failed", ex);
+          }
+
+          try {
+              Object beanInstance = doCreateBean(beanName, mbdToUse, args);
+              if (logger.isTraceEnabled()) {
+                  logger.trace("Finished creating instance of bean '" + beanName + "'");
+              }
+              return beanInstance;
+          }
+          catch (BeanCreationException | ImplicitlyAppearedSingletonException ex) {
+              // A previously detected exception with proper bean creation context already,
+              // or illegal singleton state to be communicated up to DefaultSingletonBeanRegistry.
+              throw ex;
+          }
+          catch (Throwable ex) {
+              throw new BeanCreationException(
+                      mbdToUse.getResourceDescription(), beanName, "Unexpected exception during bean creation", ex);
+          }
+      }
+
+    #+END_SRC
+    该方法的流程如下
+    1. 通过 BeanDefinition 和 beanName 解析获取到待创建的类 resolvedClass
+    2. 对 override 属性进行标记及验证
+       - ~lookup-method~, ~replace-method~ 等
+    3. 处理 BeanPostProcessors, 进行一些前置处理工作
+       - ~resolveBeforeInstantiation(...)~ 方法完成前置处理工作
+         #+BEGIN_SRC java
+           /**
+            ,* Apply before-instantiation post-processors, resolving whether there is a
+            ,* before-instantiation shortcut for the specified bean.
+            ,* @param beanName the name of the bean
+            ,* @param mbd the bean definition for the bean
+            ,* @return the shortcut-determined bean instance, or {@code null} if none
+            ,*/
+           @Nullable
+           protected Object resolveBeforeInstantiation(String beanName, RootBeanDefinition mbd) {
+               Object bean = null;
+               if (!Boolean.FALSE.equals(mbd.beforeInstantiationResolved)) {
+                   // Make sure bean class is actually resolved at this point.
+                   if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+                       Class<?> targetType = determineTargetType(beanName, mbd);
+                       if (targetType != null) {
+                           bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
+                           if (bean != null) {
+                               bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+                           }
+                       }
+                   }
+                   mbd.beforeInstantiationResolved = (bean != null);
+               }
+               return bean;
+           }
+         #+END_SRC
+       - ~applyBeanPostProcessorsBeforeInstantiation(...)~ 方法在实例化前调用
+       - ~applyBeanPostProcessorsAfterInitialization(...)~ 方法在初始化后调用
+    5. 调用 ~doCreateBean(...)~ 创建 Bean 实例 beanInstance, 并返回 beanInstance
+
+   ~doCreateBean(...)~ 方法实现如下
+   #+BEGIN_SRC java
+     /**
+      ,* Actually create the specified bean. Pre-creation processing has already happened
+      ,* at this point, e.g. checking {@code postProcessBeforeInstantiation} callbacks.
+      ,* <p>Differentiates between default bean instantiation, use of a
+      ,* factory method, and autowiring a constructor.
+      ,* @param beanName the name of the bean
+      ,* @param mbd the merged bean definition for the bean
+      ,* @param args explicit arguments to use for constructor or factory method invocation
+      ,* @return a new instance of the bean
+      ,* @throws BeanCreationException if the bean could not be created
+      ,* @see #instantiateBean
+      ,* @see #instantiateUsingFactoryMethod
+      ,* @see #autowireConstructor
+      ,*/
+     protected Object doCreateBean(final String beanName, final RootBeanDefinition mbd, final @Nullable Object[] args)
+             throws BeanCreationException {
+
+         // Instantiate the bean.
+         BeanWrapper instanceWrapper = null;
+         if (mbd.isSingleton()) {
+             instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
+         }
+         if (instanceWrapper == null) {
+             instanceWrapper = createBeanInstance(beanName, mbd, args);
+         }
+         final Object bean = instanceWrapper.getWrappedInstance();
+         Class<?> beanType = instanceWrapper.getWrappedClass();
+         if (beanType != NullBean.class) {
+             mbd.resolvedTargetType = beanType;
+         }
+
+         // Allow post-processors to modify the merged bean definition.
+         synchronized (mbd.postProcessingLock) {
+             if (!mbd.postProcessed) {
+                 try {
+                     applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
+                 }
+                 catch (Throwable ex) {
+                     throw new BeanCreationException(mbd.getResourceDescription(), beanName,
+                             "Post-processing of merged bean definition failed", ex);
+                 }
+                 mbd.postProcessed = true;
+             }
+         }
+
+         // Eagerly cache singletons to be able to resolve circular references
+         // even when triggered by lifecycle interfaces like BeanFactoryAware.
+         boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
+                 isSingletonCurrentlyInCreation(beanName));
+         if (earlySingletonExposure) {
+             if (logger.isTraceEnabled()) {
+                 logger.trace("Eagerly caching bean '" + beanName +
+                         "' to allow for resolving potential circular references");
+             }
+             addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+         }
+
+         // Initialize the bean instance.
+         Object exposedObject = bean;
+         try {
+             populateBean(beanName, mbd, instanceWrapper);
+             exposedObject = initializeBean(beanName, exposedObject, mbd);
+         }
+         catch (Throwable ex) {
+             if (ex instanceof BeanCreationException && beanName.equals(((BeanCreationException) ex).getBeanName())) {
+                 throw (BeanCreationException) ex;
+             }
+             else {
+                 throw new BeanCreationException(
+                         mbd.getResourceDescription(), beanName, "Initialization of bean failed", ex);
+             }
+         }
+
+         if (earlySingletonExposure) {
+             Object earlySingletonReference = getSingleton(beanName, false);
+             if (earlySingletonReference != null) {
+                 if (exposedObject == bean) {
+                     exposedObject = earlySingletonReference;
+                 }
+                 else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
+                     String[] dependentBeans = getDependentBeans(beanName);
+                     Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);
+                     for (String dependentBean : dependentBeans) {
+                         if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
+                             actualDependentBeans.add(dependentBean);
+                         }
+                     }
+                     if (!actualDependentBeans.isEmpty()) {
+                         throw new BeanCurrentlyInCreationException(beanName,
+                                 "Bean with name '" + beanName + "' has been injected into other beans [" +
+                                 StringUtils.collectionToCommaDelimitedString(actualDependentBeans) +
+                                 "] in its raw version as part of a circular reference, but has eventually been " +
+                                 "wrapped. This means that said other beans do not use the final version of the " +
+                                 "bean. This is often the result of over-eager type matching - consider using " +
+                                 "'getBeanNamesOfType' with the 'allowEagerInit' flag turned off, for example.");
+                     }
+                 }
+             }
+         }
+
+         // Register bean as disposable.
+         try {
+             registerDisposableBeanIfNecessary(beanName, bean, mbd);
+         }
+         catch (BeanDefinitionValidationException ex) {
+             throw new BeanCreationException(
+                     mbd.getResourceDescription(), beanName, "Invalid destruction signature", ex);
+         }
+
+         return exposedObject;
+     }
+   #+END_SRC
+   该方法实现流程如下
+   1. 如果是单例 Bean, 首先清理缓存
+   2. 通过 ~createBeanInstance(...)~ 方法将 BeanDefinition 转化成 BeanWrapper,
+      BeanWrapper 的作用如下
+      - 如果存在工厂方法则使用工厂方法进行实例化
+      - 如果包含多参数构造器，根据参数类型锁定的构造方法，然后调用进行实例化
+      - 其它情况使用无参构造器进行实例化
+   3. 允许后置处理器合并 BeanDefinition
+   4. 解决依赖，若有依赖项调用 ~addSingletonFactory(...)~ 添加到
+      singletonFactories 缓存中
+   5. 调用 ~populateBean(...)~ 方法进行属性填充
+   6. 调用 ~initializeBean(...)~ 方法进行初始化
+   7. 循环依赖检测
+      - 只检测单例 Bean 的循环依赖
+      - 原型 Bean 的循环检测很难做到，Spring 做法是直接抛出异常
+   8. 注册 DisposableBean
+      - 便于 destroy-method 在Bean销毁时调用
+   9. 完成创建并返回
+
+*** Bean 的初始化: ~initializeBean(...)~ 方法
+    #+BEGIN_SRC java
+      /**
+       ,* Initialize the given bean instance, applying factory callbacks
+       ,* as well as init methods and bean post processors.
+       ,* <p>Called from {@link #createBean} for traditionally defined beans,
+       ,* and from {@link #initializeBean} for existing bean instances.
+       ,* @param beanName the bean name in the factory (for debugging purposes)
+       ,* @param bean the new bean instance we may need to initialize
+       ,* @param mbd the bean definition that the bean was created with
+       ,* (can also be {@code null}, if given an existing bean instance)
+       ,* @return the initialized bean instance (potentially wrapped)
+       ,* @see BeanNameAware
+       ,* @see BeanClassLoaderAware
+       ,* @see BeanFactoryAware
+       ,* @see #applyBeanPostProcessorsBeforeInitialization
+       ,* @see #invokeInitMethods
+       ,* @see #applyBeanPostProcessorsAfterInitialization
+       ,*/
+      protected Object initializeBean(final String beanName, final Object bean, @Nullable RootBeanDefinition mbd) {
+          if (System.getSecurityManager() != null) {
+              AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+                  invokeAwareMethods(beanName, bean);
+                  return null;
+              }, getAccessControlContext());
+          }
+          else {
+              invokeAwareMethods(beanName, bean);
+          }
+
+          Object wrappedBean = bean;
+          if (mbd == null || !mbd.isSynthetic()) {
+              wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
+          }
+
+          try {
+              invokeInitMethods(beanName, wrappedBean, mbd);
+          }
+          catch (Throwable ex) {
+              throw new BeanCreationException(
+                      (mbd != null ? mbd.getResourceDescription() : null),
+                      beanName, "Invocation of init method failed", ex);
+          }
+          if (mbd == null || !mbd.isSynthetic()) {
+              wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+          }
+
+          return wrappedBean;
+      }
+    #+END_SRC
+    该方法用于初始化 Bean，它完成了如下工作
+    1. 调用 Aware 方法，例如
+       - BeanFactoryAware
+       - ApplicationContextAware
+       - ResourceLoaderAware
+       - ServletContextAware
+    2. 提供 BeanPostProcessor 的扩展点，环绕调用了如下两个钩子方法
+       - ~applyBeanPostProcessorsBeforeInitialization(...)~
+       - ~applyBeanPostProcessorsAfterInitialization(...)~
+    3. 调用自定义的初始化方法，及 init-method
+       - ~invokeInitMethods(beanName, wrappedBean, mbd);~
+
+*** Bean 的销毁
+    在 ~doCreateBean(...)~ 方法中调用了 ~registerDisposableBeanIfNecessary(...)~
+    方法来提供 ~destroy-method~ 销毁的扩展
+    #+BEGIN_SRC java
+      /**
+       ,* Add the given bean to the list of disposable beans in this factory,
+       ,* registering its DisposableBean interface and/or the given destroy method
+       ,* to be called on factory shutdown (if applicable). Only applies to singletons.
+       ,* @param beanName the name of the bean
+       ,* @param bean the bean instance
+       ,* @param mbd the bean definition for the bean
+       ,* @see RootBeanDefinition#isSingleton
+       ,* @see RootBeanDefinition#getDependsOn
+       ,* @see #registerDisposableBean
+       ,* @see #registerDependentBean
+       ,*/
+      protected void registerDisposableBeanIfNecessary(String beanName, Object bean, RootBeanDefinition mbd) {
+          AccessControlContext acc = (System.getSecurityManager() != null ? getAccessControlContext() : null);
+          if (!mbd.isPrototype() && requiresDestruction(bean, mbd)) {
+              if (mbd.isSingleton()) {
+                  // Register a DisposableBean implementation that performs all destruction
+                  // work for the given bean: DestructionAwareBeanPostProcessors,
+                  // DisposableBean interface, custom destroy method.
+                  registerDisposableBean(beanName,
+                          new DisposableBeanAdapter(bean, beanName, mbd, getBeanPostProcessors(), acc));
+              }
+              else {
+                  // A bean with a custom scope...
+                  Scope scope = this.scopes.get(mbd.getScope());
+                  if (scope == null) {
+                      throw new IllegalStateException("No Scope registered for scope name '" + mbd.getScope() + "'");
+                  }
+                  scope.registerDestructionCallback(beanName,
+                          new DisposableBeanAdapter(bean, beanName, mbd, getBeanPostProcessors(), acc));
+              }
+          }
+      }
+    #+END_SRC
+
 * IoC
 ** IoC 核心接口和类
    Spring 的 IoC 容器对象一般继承自 ~ApplicationContext~ 接口，常见的对象类如下
