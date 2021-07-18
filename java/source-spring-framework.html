@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-18 Sun 01:27 -->
+<!-- 2021-07-18 Sun 12:06 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Spring Framework v5.2.5.RELEASE</title>
@@ -233,50 +233,55 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org09fdc6c">1. 容器实现原理</a>
+<li><a href="#org849ec88">1. 容器实现原理</a>
 <ul>
-<li><a href="#orgba822bb">1.1. Bean 工厂接口: BeanFactory</a></li>
-<li><a href="#org92ef925">1.2. Bean 工厂的实现类: DefaultListableBeanFactory</a></li>
-<li><a href="#org498ec2c">1.3. Bean 定义的读取器: XmlBeanDefinitionReader</a></li>
-<li><a href="#orgee3d83d">1.4. BeanDefinition 自动加载流程</a></li>
-<li><a href="#orgb959e56">1.5. BeanDefinition 注册的实现</a></li>
-<li><a href="#org08cae01">1.6. BeanDefinition 移除的实现</a></li>
-<li><a href="#org74d1119">1.7. BeanDefinition 获取的实现</a></li>
-<li><a href="#orge39ba5c">1.8. <code>&lt;bean/&gt;</code> 标签解析</a></li>
+<li><a href="#org4a33e94">1.1. Bean 工厂接口: BeanFactory</a></li>
+<li><a href="#org53c5d66">1.2. Bean 工厂的实现类: DefaultListableBeanFactory</a></li>
+<li><a href="#orge115e3a">1.3. Bean 定义的读取器: XmlBeanDefinitionReader</a></li>
+<li><a href="#org065eeec">1.4. BeanDefinition 自动加载流程</a></li>
+<li><a href="#orgf43ceb5">1.5. BeanDefinition 注册的实现</a></li>
+<li><a href="#org9772eba">1.6. BeanDefinition 移除的实现</a></li>
+<li><a href="#org721ab02">1.7. BeanDefinition 获取的实现</a></li>
+<li><a href="#orga2b9a65">1.8. <code>&lt;bean/&gt;</code> 标签解析</a></li>
 </ul>
 </li>
-<li><a href="#org899beb5">2. Bean 实现原理</a>
+<li><a href="#org9aa2a88">2. Bean 实现原理</a>
 <ul>
-<li><a href="#org6deebf8">2.1. Bean 的生命周期</a></li>
-<li><a href="#org3ea8be7">2.2. Bean 的流程分析</a>
+<li><a href="#org96af7f8">2.1. Bean 的生命周期</a></li>
+<li><a href="#org42bbf23">2.2. Bean 的流程分析</a>
 <ul>
-<li><a href="#org2a2d4ab">2.2.1. 实例化 Bean: <code>instantiateBean()</code> 方法</a></li>
-<li><a href="#orgca15760">2.2.2. 获取 Bean 实例: <code>doGetBean()</code> 方法</a></li>
+<li><a href="#orgc623fed">2.2.1. 实例化 Bean: <code>instantiateBean()</code> 方法</a></li>
+<li><a href="#orge6d10a8">2.2.2. 获取 Bean 实例: <code>doGetBean()</code> 方法</a></li>
 </ul>
 </li>
-<li><a href="#org3135a63">2.3. FactoryBean</a></li>
-</ul>
-</li>
-<li><a href="#orgc7cc552">3. IoC</a>
+<li><a href="#org35881b0">2.3. FactoryBean</a></li>
+<li><a href="#org7a2aa0b">2.4. 单例 Bean 工厂实现: <code>DefaultSingletonBeanRegistry</code> 类</a>
 <ul>
-<li><a href="#org4b9254a">3.1. IoC 核心接口和类</a></li>
+<li><a href="#org61d9530">2.4.1. 获取单例 Bean : <code>getSingleton(...)</code> 方法</a></li>
 </ul>
 </li>
-<li><a href="#orgfd6c087">4. ApplicationContext</a></li>
-<li><a href="#org40d7b12">5. AOP</a></li>
-<li><a href="#orgfb71311">6. Spring 核心类梳理</a></li>
-<li><a href="#org61c2bcb">7. SpringBoot 自动装配</a></li>
-<li><a href="#orgd3a2d38">8. 参考链接</a></li>
+</ul>
+</li>
+<li><a href="#org3de7414">3. IoC</a>
+<ul>
+<li><a href="#orgc73b870">3.1. IoC 核心接口和类</a></li>
+</ul>
+</li>
+<li><a href="#org44ffda2">4. ApplicationContext</a></li>
+<li><a href="#org78b2086">5. AOP</a></li>
+<li><a href="#org17a050c">6. Spring 核心类梳理</a></li>
+<li><a href="#orgb888d5f">7. SpringBoot 自动装配</a></li>
+<li><a href="#org6a4f146">8. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org09fdc6c" class="outline-2">
-<h2 id="org09fdc6c"><span class="section-number-2">1</span> 容器实现原理</h2>
+<div id="outline-container-org849ec88" class="outline-2">
+<h2 id="org849ec88"><span class="section-number-2">1</span> 容器实现原理</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgba822bb" class="outline-3">
-<h3 id="orgba822bb"><span class="section-number-3">1.1</span> Bean 工厂接口: BeanFactory</h3>
+<div id="outline-container-org4a33e94" class="outline-3">
+<h3 id="org4a33e94"><span class="section-number-3">1.1</span> Bean 工厂接口: BeanFactory</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 <code>BeanFactory</code> 是 Spring 的 Bean 工厂的接口定义，它定义对 Spring Bean 容器访问的
@@ -285,10 +290,10 @@
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">interface</span> <span style="color: #268bd2;">BeanFactory</span> <span style="color: #8d5649;">{</span>
 
-  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">FactoryBean &#30340; beanName &#21069;&#32512;</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">FactoryBean &#30340; beanName &#21069;&#32512;</span>
   <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">FACTORY_BEAN_PREFIX</span> = <span style="color: #2aa198;">"&amp;"</span>;
 
-  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#33719;&#21462; Bean &#30340;&#20027;&#26041;&#27861;</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462; Bean &#30340;&#20027;&#26041;&#27861;</span>
   <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">getBean</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span><span style="color: #d8241f;">)</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeansException</span>;
   <span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">T</span><span style="color: #d8241f;">&gt;</span> T getBean<span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span>, <span style="color: #268bd2;">Class</span><span style="color: #9564bf;">&lt;</span><span style="color: #268bd2;">T</span><span style="color: #9564bf;">&gt;</span> <span style="color: #6c71c4;">requiredType</span><span style="color: #d8241f;">)</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeansException</span>;
   <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">getBean</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span>, <span style="color: #268bd2;">Object</span>... <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">)</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeansException</span>;
@@ -318,8 +323,8 @@
 </div>
 </div>
 
-<div id="outline-container-org92ef925" class="outline-3">
-<h3 id="org92ef925"><span class="section-number-3">1.2</span> Bean 工厂的实现类: DefaultListableBeanFactory</h3>
+<div id="outline-container-org53c5d66" class="outline-3">
+<h3 id="org53c5d66"><span class="section-number-3">1.2</span> Bean 工厂的实现类: DefaultListableBeanFactory</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 <code>DefaultListableBeanFactory</code> 是实现 <code>BeanFactory</code> 接口的核心类，熟悉它的类继
@@ -399,8 +404,8 @@ BeanDefinition, 直接通过实现 <code>T getObject()</code> 方法来返回创
 </div>
 </div>
 
-<div id="outline-container-org498ec2c" class="outline-3">
-<h3 id="org498ec2c"><span class="section-number-3">1.3</span> Bean 定义的读取器: XmlBeanDefinitionReader</h3>
+<div id="outline-container-orge115e3a" class="outline-3">
+<h3 id="orge115e3a"><span class="section-number-3">1.3</span> Bean 定义的读取器: XmlBeanDefinitionReader</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 <code>XmlBeanDefinitionReader</code> 是实现读取 BeanDefinition 的类，它的继承关系如下
@@ -453,8 +458,8 @@ Class XmlBeanDefinitionReader
 </div>
 </div>
 
-<div id="outline-container-orgee3d83d" class="outline-3">
-<h3 id="orgee3d83d"><span class="section-number-3">1.4</span> BeanDefinition 自动加载流程</h3>
+<div id="outline-container-org065eeec" class="outline-3">
+<h3 id="org065eeec"><span class="section-number-3">1.4</span> BeanDefinition 自动加载流程</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 <code>DefaultListableBeanFactory</code> 类定义了存储 BeanDefinition 类的哈希表, 具体定义如下
@@ -479,9 +484,9 @@ Class XmlBeanDefinitionReader
 <code>beanDefinitionMap</code> 中，代码的注释也写了是对 <code>BeanDefinitionRegistry</code> 的实现
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #586e75; font-style: italic;">//</span><span style="color: #586e75; font-style: italic;">---------------------------------------------------------------------</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Implementation of BeanDefinitionRegistry interface</span>
-<span style="color: #586e75; font-style: italic;">//</span><span style="color: #586e75; font-style: italic;">---------------------------------------------------------------------</span>
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">//</span><span style="color: #93a1a1; font-style: italic;">---------------------------------------------------------------------</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Implementation of BeanDefinitionRegistry interface</span>
+<span style="color: #93a1a1; font-style: italic;">//</span><span style="color: #93a1a1; font-style: italic;">---------------------------------------------------------------------</span>
 
 <span style="color: #268bd2;">@Override</span>
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">registerBeanDefinition</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span>, <span style="color: #268bd2;">BeanDefinition</span> <span style="color: #6c71c4;">beanDefinition</span><span style="color: #8d5649;">)</span>
@@ -506,7 +511,7 @@ Class XmlBeanDefinitionReader
             <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanDefinitionOverrideException</span><span style="color: #24a222;">(</span>beanName, beanDefinition, existingDefinition<span style="color: #24a222;">)</span>;
         <span style="color: #9564bf;">}</span>
         <span style="color: #859900;">else</span> <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>existingDefinition.getRole<span style="color: #24a222;">()</span> &lt; beanDefinition.getRole<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE</span>
             <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>logger.isInfoEnabled<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
                 logger.info<span style="color: #ff7f00;">(</span><span style="color: #2aa198;">"Overriding user-defined bean definition for bean '"</span> + beanName +
                         <span style="color: #2aa198;">"' with a framework-generated bean definition: replacing ["</span> +
@@ -531,7 +536,7 @@ Class XmlBeanDefinitionReader
     <span style="color: #d8241f;">}</span>
     <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
         <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>hasBeanCreationStarted<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Cannot modify startup-time collection elements anymore (for stable iteration)</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Cannot modify startup-time collection elements anymore (for stable iteration)</span>
             <span style="color: #859900;">synchronized</span> <span style="color: #24a222;">(</span><span style="color: #859900;">this</span>.beanDefinitionMap<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
                 <span style="color: #859900;">this</span>.beanDefinitionMap.put<span style="color: #ff7f00;">(</span>beanName, beanDefinition<span style="color: #ff7f00;">)</span>;
                 <span style="color: #268bd2;">List</span><span style="color: #ff7f00;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #ff7f00;">&gt;</span> <span style="color: #6c71c4;">updatedDefinitions</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #ff7f00;">&lt;&gt;(</span><span style="color: #859900;">this</span>.beanDefinitionNames.size<span style="color: #1776b6;">()</span> + 1<span style="color: #ff7f00;">)</span>;
@@ -542,7 +547,7 @@ Class XmlBeanDefinitionReader
             <span style="color: #24a222;">}</span>
         <span style="color: #9564bf;">}</span>
         <span style="color: #859900;">else</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Still in startup registration phase</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Still in startup registration phase</span>
             <span style="color: #859900;">this</span>.beanDefinitionMap.put<span style="color: #24a222;">(</span>beanName, beanDefinition<span style="color: #24a222;">)</span>;
             <span style="color: #859900;">this</span>.beanDefinitionNames.add<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
             removeManualSingletonName<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
@@ -620,8 +625,8 @@ BeanDefinition</li>
 </div>
 </div>
 
-<div id="outline-container-orgb959e56" class="outline-3">
-<h3 id="orgb959e56"><span class="section-number-3">1.5</span> BeanDefinition 注册的实现</h3>
+<div id="outline-container-orgf43ceb5" class="outline-3">
+<h3 id="orgf43ceb5"><span class="section-number-3">1.5</span> BeanDefinition 注册的实现</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 <code>DefaultListableBeanFactory</code> 的 <code>registerBeanDefinition(...)</code> 才是真正实现注
@@ -636,9 +641,9 @@ BeanDefinition</li>
 </ul></li>
 </ol>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #586e75; font-style: italic;">//</span><span style="color: #586e75; font-style: italic;">---------------------------------------------------------------------</span>
-<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Implementation of BeanDefinitionRegistry interface</span>
-<span style="color: #586e75; font-style: italic;">//</span><span style="color: #586e75; font-style: italic;">---------------------------------------------------------------------</span>
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">//</span><span style="color: #93a1a1; font-style: italic;">---------------------------------------------------------------------</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Implementation of BeanDefinitionRegistry interface</span>
+<span style="color: #93a1a1; font-style: italic;">//</span><span style="color: #93a1a1; font-style: italic;">---------------------------------------------------------------------</span>
 
 <span style="color: #268bd2;">@Override</span>
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">registerBeanDefinition</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span>, <span style="color: #268bd2;">BeanDefinition</span> <span style="color: #6c71c4;">beanDefinition</span><span style="color: #8d5649;">)</span>
@@ -663,7 +668,7 @@ BeanDefinition</li>
             <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanDefinitionOverrideException</span><span style="color: #24a222;">(</span>beanName, beanDefinition, existingDefinition<span style="color: #24a222;">)</span>;
         <span style="color: #9564bf;">}</span>
         <span style="color: #859900;">else</span> <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>existingDefinition.getRole<span style="color: #24a222;">()</span> &lt; beanDefinition.getRole<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE</span>
             <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>logger.isInfoEnabled<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
                 logger.info<span style="color: #ff7f00;">(</span><span style="color: #2aa198;">"Overriding user-defined bean definition for bean '"</span> + beanName +
                         <span style="color: #2aa198;">"' with a framework-generated bean definition: replacing ["</span> +
@@ -688,7 +693,7 @@ BeanDefinition</li>
     <span style="color: #d8241f;">}</span>
     <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
         <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>hasBeanCreationStarted<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Cannot modify startup-time collection elements anymore (for stable iteration)</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Cannot modify startup-time collection elements anymore (for stable iteration)</span>
             <span style="color: #859900;">synchronized</span> <span style="color: #24a222;">(</span><span style="color: #859900;">this</span>.beanDefinitionMap<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
                 <span style="color: #859900;">this</span>.beanDefinitionMap.put<span style="color: #ff7f00;">(</span>beanName, beanDefinition<span style="color: #ff7f00;">)</span>;
                 <span style="color: #268bd2;">List</span><span style="color: #ff7f00;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #ff7f00;">&gt;</span> <span style="color: #6c71c4;">updatedDefinitions</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #ff7f00;">&lt;&gt;(</span><span style="color: #859900;">this</span>.beanDefinitionNames.size<span style="color: #1776b6;">()</span> + 1<span style="color: #ff7f00;">)</span>;
@@ -699,7 +704,7 @@ BeanDefinition</li>
             <span style="color: #24a222;">}</span>
         <span style="color: #9564bf;">}</span>
         <span style="color: #859900;">else</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Still in startup registration phase</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Still in startup registration phase</span>
             <span style="color: #859900;">this</span>.beanDefinitionMap.put<span style="color: #24a222;">(</span>beanName, beanDefinition<span style="color: #24a222;">)</span>;
             <span style="color: #859900;">this</span>.beanDefinitionNames.add<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
             removeManualSingletonName<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
@@ -755,8 +760,8 @@ BeanDefinition</li>
     <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">!</span><span style="color: #859900;">this</span>.alreadyCreated.contains<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
         <span style="color: #859900;">synchronized</span> <span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.mergedBeanDefinitions<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
             <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span><span style="color: #268bd2;">!</span><span style="color: #859900;">this</span>.alreadyCreated.contains<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
-                <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Let the bean definition get re-merged now that we're actually creating</span>
-                <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">the bean... just in case some of its metadata changed in the meantime.</span>
+                <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Let the bean definition get re-merged now that we're actually creating</span>
+                <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">the bean... just in case some of its metadata changed in the meantime.</span>
                 clearMergedBeanDefinition<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span>;
                 <span style="color: #859900;">this</span>.alreadyCreated.add<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span>;
             <span style="color: #24a222;">}</span>
@@ -768,8 +773,8 @@ BeanDefinition</li>
 </div>
 </div>
 
-<div id="outline-container-org08cae01" class="outline-3">
-<h3 id="org08cae01"><span class="section-number-3">1.6</span> BeanDefinition 移除的实现</h3>
+<div id="outline-container-org9772eba" class="outline-3">
+<h3 id="org9772eba"><span class="section-number-3">1.6</span> BeanDefinition 移除的实现</h3>
 <div class="outline-text-3" id="text-1-6">
 <p>
 BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</code> 方法
@@ -788,7 +793,7 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
     <span style="color: #d8241f;">}</span>
 
     <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>hasBeanCreationStarted<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Cannot modify startup-time collection elements anymore (for stable iteration)</span>
+        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Cannot modify startup-time collection elements anymore (for stable iteration)</span>
         <span style="color: #859900;">synchronized</span> <span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.beanDefinitionMap<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
             <span style="color: #268bd2;">List</span><span style="color: #24a222;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #24a222;">&gt;</span> <span style="color: #6c71c4;">updatedDefinitions</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #24a222;">&lt;&gt;(</span><span style="color: #859900;">this</span>.beanDefinitionNames<span style="color: #24a222;">)</span>;
             updatedDefinitions.remove<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
@@ -796,7 +801,7 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
         <span style="color: #9564bf;">}</span>
     <span style="color: #d8241f;">}</span>
     <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Still in startup registration phase</span>
+        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Still in startup registration phase</span>
         <span style="color: #859900;">this</span>.beanDefinitionNames.remove<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span>;
     <span style="color: #d8241f;">}</span>
     <span style="color: #859900;">this</span>.frozenBeanDefinitionNames = <span style="color: #268bd2;">null</span>;
@@ -823,27 +828,27 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 <span style="color: #d33682;"> * </span><span style="color: #268bd2;">@see</span><span style="color: #d33682;"> #removeBeanDefinition</span>
 <span style="color: #d33682;"> */</span>
 <span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">resetBeanDefinition</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Remove the merged bean definition for the given bean, if already created.</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Remove the merged bean definition for the given bean, if already created.</span>
     clearMergedBeanDefinition<span style="color: #d8241f;">(</span>beanName<span style="color: #d8241f;">)</span>;
 
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Remove corresponding bean from singleton cache, if any. Shouldn't usually</span>
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">be necessary, rather just meant for overriding a context's default beans</span>
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">(e.g. the default StaticMessageSource in a StaticApplicationContext).</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Remove corresponding bean from singleton cache, if any. Shouldn't usually</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">be necessary, rather just meant for overriding a context's default beans</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">(e.g. the default StaticMessageSource in a StaticApplicationContext).</span>
     destroySingleton<span style="color: #d8241f;">(</span>beanName<span style="color: #d8241f;">)</span>;
 
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Notify all post-processors that the specified bean definition has been reset.</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Notify all post-processors that the specified bean definition has been reset.</span>
     <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">BeanPostProcessor</span> <span style="color: #6c71c4;">processor</span> : getBeanPostProcessors<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
         <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>processor <span style="color: #859900;">instanceof</span> MergedBeanDefinitionPostProcessor<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
             <span style="color: #24a222;">(</span><span style="color: #ff7f00;">(</span><span style="color: #268bd2;">MergedBeanDefinitionPostProcessor</span><span style="color: #ff7f00;">)</span> processor<span style="color: #24a222;">)</span>.resetBeanDefinition<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
         <span style="color: #9564bf;">}</span>
     <span style="color: #d8241f;">}</span>
 
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Reset all bean definitions that have the given bean as parent (recursively).</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Reset all bean definitions that have the given bean as parent (recursively).</span>
     <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">bdName</span> : <span style="color: #859900;">this</span>.beanDefinitionNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
         <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">!</span>beanName.equals<span style="color: #24a222;">(</span>bdName<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
             <span style="color: #268bd2;">BeanDefinition</span> <span style="color: #6c71c4;">bd</span> = <span style="color: #859900;">this</span>.beanDefinitionMap.get<span style="color: #24a222;">(</span>bdName<span style="color: #24a222;">)</span>;
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Ensure bd is non-null due to potential concurrent modification</span>
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">of the beanDefinitionMap.</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Ensure bd is non-null due to potential concurrent modification</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">of the beanDefinitionMap.</span>
             <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>bd != <span style="color: #268bd2;">null</span> &amp;&amp; beanName.equals<span style="color: #ff7f00;">(</span>bd.getParentName<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
                 resetBeanDefinition<span style="color: #ff7f00;">(</span>bdName<span style="color: #ff7f00;">)</span>;
             <span style="color: #24a222;">}</span>
@@ -855,8 +860,8 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-org74d1119" class="outline-3">
-<h3 id="org74d1119"><span class="section-number-3">1.7</span> BeanDefinition 获取的实现</h3>
+<div id="outline-container-org721ab02" class="outline-3">
+<h3 id="org721ab02"><span class="section-number-3">1.7</span> BeanDefinition 获取的实现</h3>
 <div class="outline-text-3" id="text-1-7">
 <p>
 <code>DefaultListableBeanFactory</code> 的实现获取 BeanDefinition 的逻辑如下
@@ -878,8 +883,8 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-orge39ba5c" class="outline-3">
-<h3 id="orge39ba5c"><span class="section-number-3">1.8</span> <code>&lt;bean/&gt;</code> 标签解析</h3>
+<div id="outline-container-orga2b9a65" class="outline-3">
+<h3 id="orga2b9a65"><span class="section-number-3">1.8</span> <code>&lt;bean/&gt;</code> 标签解析</h3>
 <div class="outline-text-3" id="text-1-8">
 <p>
 之前在 BeanDefinition 自动加载流程中忽略了对 <code>&lt;bean/&gt;</code> 标签的解析，其核心实现
@@ -895,14 +900,14 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
     <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>bdHolder != <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
         bdHolder = delegate.decorateBeanDefinitionIfRequired<span style="color: #9564bf;">(</span>ele, bdHolder<span style="color: #9564bf;">)</span>;
         <span style="color: #859900;">try</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Register the final decorated instance.</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Register the final decorated instance.</span>
             BeanDefinitionReaderUtils.registerBeanDefinition<span style="color: #24a222;">(</span>bdHolder, getReaderContext<span style="color: #ff7f00;">()</span>.getRegistry<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span>;
         <span style="color: #9564bf;">}</span>
         <span style="color: #859900;">catch</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">BeanDefinitionStoreException</span> <span style="color: #6c71c4;">ex</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
             getReaderContext<span style="color: #24a222;">()</span>.error<span style="color: #24a222;">(</span><span style="color: #2aa198;">"Failed to register bean definition with name '"</span> +
                     bdHolder.getBeanName<span style="color: #ff7f00;">()</span> + <span style="color: #2aa198;">"'"</span>, ele, ex<span style="color: #24a222;">)</span>;
         <span style="color: #9564bf;">}</span>
-        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Send registration event.</span>
+        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Send registration event.</span>
         getReaderContext<span style="color: #9564bf;">()</span>.fireComponentRegistered<span style="color: #9564bf;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanComponentDefinition</span><span style="color: #24a222;">(</span>bdHolder<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
     <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
@@ -952,9 +957,9 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
                 <span style="color: #ff7f00;">}</span>
                 <span style="color: #859900;">else</span> <span style="color: #ff7f00;">{</span>
                     beanName = <span style="color: #859900;">this</span>.readerContext.generateBeanName<span style="color: #1776b6;">(</span>beanDefinition<span style="color: #1776b6;">)</span>;
-                    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Register an alias for the plain bean class name, if still possible,</span>
-                    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">if the generator returned the class name plus a suffix.</span>
-                    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">This is expected for Spring 1.2/2.0 backwards compatibility.</span>
+                    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Register an alias for the plain bean class name, if still possible,</span>
+                    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">if the generator returned the class name plus a suffix.</span>
+                    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">This is expected for Spring 1.2/2.0 backwards compatibility.</span>
                     <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanClassName</span> = beanDefinition.getBeanClassName<span style="color: #1776b6;">()</span>;
                     <span style="color: #859900;">if</span> <span style="color: #1776b6;">(</span>beanClassName != <span style="color: #268bd2;">null</span> &amp;&amp;
                             beanName.startsWith<span style="color: #00bed1;">(</span>beanClassName<span style="color: #00bed1;">)</span> &amp;&amp; beanName.length<span style="color: #00bed1;">()</span> &gt; beanClassName.length<span style="color: #00bed1;">()</span> &amp;&amp;
@@ -984,12 +989,12 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-org899beb5" class="outline-2">
-<h2 id="org899beb5"><span class="section-number-2">2</span> Bean 实现原理</h2>
+<div id="outline-container-org9aa2a88" class="outline-2">
+<h2 id="org9aa2a88"><span class="section-number-2">2</span> Bean 实现原理</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org6deebf8" class="outline-3">
-<h3 id="org6deebf8"><span class="section-number-3">2.1</span> Bean 的生命周期</h3>
+<div id="outline-container-org96af7f8" class="outline-3">
+<h3 id="org96af7f8"><span class="section-number-3">2.1</span> Bean 的生命周期</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 <code>BeanFactory</code> 的注释中完整地说明的实现标准 BeanFactory 的代码
@@ -1025,8 +1030,8 @@ ApplicationContext 中</li>
 </div>
 </div>
 
-<div id="outline-container-org3ea8be7" class="outline-3">
-<h3 id="org3ea8be7"><span class="section-number-3">2.2</span> Bean 的流程分析</h3>
+<div id="outline-container-org42bbf23" class="outline-3">
+<h3 id="org42bbf23"><span class="section-number-3">2.2</span> Bean 的流程分析</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 实例化 Bean 的方法为 <code>BeanUtils#instantiateClass(...)</code>, 先添加断点获取调用栈
@@ -1061,8 +1066,8 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </ol>
 </div>
 
-<div id="outline-container-org2a2d4ab" class="outline-4">
-<h4 id="org2a2d4ab"><span class="section-number-4">2.2.1</span> 实例化 Bean: <code>instantiateBean()</code> 方法</h4>
+<div id="outline-container-orgc623fed" class="outline-4">
+<h4 id="orgc623fed"><span class="section-number-4">2.2.1</span> 实例化 Bean: <code>instantiateBean()</code> 方法</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 <code>instantiateBean(...)</code> 实例化 Bean 主要完成如下工作
@@ -1115,8 +1120,8 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </div>
 </div>
 
-<div id="outline-container-orgca15760" class="outline-4">
-<h4 id="orgca15760"><span class="section-number-4">2.2.2</span> 获取 Bean 实例: <code>doGetBean()</code> 方法</h4>
+<div id="outline-container-orge6d10a8" class="outline-4">
+<h4 id="orge6d10a8"><span class="section-number-4">2.2.2</span> 获取 Bean 实例: <code>doGetBean()</code> 方法</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 <code>doGetBean(...)</code> 方法是获取 Bean 的最终处理函数，它的逻辑比较复杂，可以分成
@@ -1186,7 +1191,7 @@ beanInstance</li>
     <span style="color: #859900;">final</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span> = transformedBeanName<span style="color: #d8241f;">(</span>name<span style="color: #d8241f;">)</span>;
     <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">bean</span>;
 
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Eagerly check singleton cache for manually registered singletons.</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Eagerly check singleton cache for manually registered singletons.</span>
     <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">sharedInstance</span> = getSingleton<span style="color: #d8241f;">(</span>beanName<span style="color: #d8241f;">)</span>;
     <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>sharedInstance != <span style="color: #268bd2;">null</span> &amp;&amp; args == <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
         <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>logger.isTraceEnabled<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
@@ -1202,27 +1207,27 @@ beanInstance</li>
     <span style="color: #d8241f;">}</span>
 
     <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Fail if we're already creating this bean instance:</span>
-        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">We're assumably within a circular reference.</span>
+        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Fail if we're already creating this bean instance:</span>
+        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">We're assumably within a circular reference.</span>
         <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>isPrototypeCurrentlyInCreation<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
             <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanCurrentlyInCreationException</span><span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
         <span style="color: #9564bf;">}</span>
 
-        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Check if bean definition exists in this factory.</span>
+        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Check if bean definition exists in this factory.</span>
         <span style="color: #268bd2;">BeanFactory</span> <span style="color: #6c71c4;">parentBeanFactory</span> = getParentBeanFactory<span style="color: #9564bf;">()</span>;
         <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>parentBeanFactory != <span style="color: #268bd2;">null</span> &amp;&amp; <span style="color: #268bd2;">!</span>containsBeanDefinition<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Not found -&gt; check parent.</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Not found -&gt; check parent.</span>
             <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">nameToLookup</span> = originalBeanName<span style="color: #24a222;">(</span>name<span style="color: #24a222;">)</span>;
             <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>parentBeanFactory <span style="color: #859900;">instanceof</span> AbstractBeanFactory<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
                 <span style="color: #859900;">return</span> <span style="color: #ff7f00;">(</span><span style="color: #1776b6;">(</span><span style="color: #268bd2;">AbstractBeanFactory</span><span style="color: #1776b6;">)</span> parentBeanFactory<span style="color: #ff7f00;">)</span>.doGetBean<span style="color: #ff7f00;">(</span>
                         nameToLookup, requiredType, args, typeCheckOnly<span style="color: #ff7f00;">)</span>;
             <span style="color: #24a222;">}</span>
             <span style="color: #859900;">else</span> <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>args != <span style="color: #268bd2;">null</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
-                <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Delegation to parent with explicit args.</span>
+                <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Delegation to parent with explicit args.</span>
                 <span style="color: #859900;">return</span> <span style="color: #ff7f00;">(</span><span style="color: #268bd2;">T</span><span style="color: #ff7f00;">)</span> parentBeanFactory.getBean<span style="color: #ff7f00;">(</span>nameToLookup, args<span style="color: #ff7f00;">)</span>;
             <span style="color: #24a222;">}</span>
             <span style="color: #859900;">else</span> <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>requiredType != <span style="color: #268bd2;">null</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
-                <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">No args -&gt; delegate to standard getBean method.</span>
+                <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">No args -&gt; delegate to standard getBean method.</span>
                 <span style="color: #859900;">return</span> parentBeanFactory.getBean<span style="color: #ff7f00;">(</span>nameToLookup, requiredType<span style="color: #ff7f00;">)</span>;
             <span style="color: #24a222;">}</span>
             <span style="color: #859900;">else</span> <span style="color: #24a222;">{</span>
@@ -1238,7 +1243,7 @@ beanInstance</li>
             <span style="color: #859900;">final</span> <span style="color: #268bd2;">RootBeanDefinition</span> <span style="color: #6c71c4;">mbd</span> = getMergedLocalBeanDefinition<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
             checkMergedBeanDefinition<span style="color: #24a222;">(</span>mbd, beanName, args<span style="color: #24a222;">)</span>;
 
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Guarantee initialization of beans that the current bean depends on.</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Guarantee initialization of beans that the current bean depends on.</span>
             <span style="color: #268bd2;">String</span><span style="color: #24a222;">[]</span> <span style="color: #6c71c4;">dependsOn</span> = mbd.getDependsOn<span style="color: #24a222;">()</span>;
             <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>dependsOn != <span style="color: #268bd2;">null</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
                 <span style="color: #859900;">for</span> <span style="color: #ff7f00;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">dep</span> : dependsOn<span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
@@ -1257,16 +1262,16 @@ beanInstance</li>
                 <span style="color: #ff7f00;">}</span>
             <span style="color: #24a222;">}</span>
 
-            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Create bean instance.</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Create bean instance.</span>
             <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>mbd.isSingleton<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
                 sharedInstance = getSingleton<span style="color: #ff7f00;">(</span>beanName, <span style="color: #1776b6;">()</span> -&gt; <span style="color: #1776b6;">{</span>
                     <span style="color: #859900;">try</span> <span style="color: #00bed1;">{</span>
                         <span style="color: #859900;">return</span> createBean<span style="color: #bcbf00;">(</span>beanName, mbd, args<span style="color: #bcbf00;">)</span>;
                     <span style="color: #00bed1;">}</span>
                     <span style="color: #859900;">catch</span> <span style="color: #00bed1;">(</span><span style="color: #268bd2;">BeansException</span> <span style="color: #6c71c4;">ex</span><span style="color: #00bed1;">)</span> <span style="color: #00bed1;">{</span>
-                        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Explicitly remove instance from singleton cache: It might have been put there</span>
-                        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">eagerly by the creation process, to allow for circular reference resolution.</span>
-                        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Also remove any beans that received a temporary reference to the bean.</span>
+                        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Explicitly remove instance from singleton cache: It might have been put there</span>
+                        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">eagerly by the creation process, to allow for circular reference resolution.</span>
+                        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Also remove any beans that received a temporary reference to the bean.</span>
                         destroySingleton<span style="color: #bcbf00;">(</span>beanName<span style="color: #bcbf00;">)</span>;
                         <span style="color: #859900;">throw</span> ex;
                     <span style="color: #00bed1;">}</span>
@@ -1275,7 +1280,7 @@ beanInstance</li>
             <span style="color: #24a222;">}</span>
 
             <span style="color: #859900;">else</span> <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>mbd.isPrototype<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
-                <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">It's a prototype -&gt; create a new instance.</span>
+                <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">It's a prototype -&gt; create a new instance.</span>
                 <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">prototypeInstance</span> = <span style="color: #268bd2;">null</span>;
                 <span style="color: #859900;">try</span> <span style="color: #ff7f00;">{</span>
                     beforePrototypeCreation<span style="color: #1776b6;">(</span>beanName<span style="color: #1776b6;">)</span>;
@@ -1319,7 +1324,7 @@ beanInstance</li>
         <span style="color: #9564bf;">}</span>
     <span style="color: #d8241f;">}</span>
 
-    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Check if required type matches the type of the actual bean instance.</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Check if required type matches the type of the actual bean instance.</span>
     <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>requiredType != <span style="color: #268bd2;">null</span> &amp;&amp; <span style="color: #268bd2;">!</span>requiredType.isInstance<span style="color: #9564bf;">(</span>bean<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
         <span style="color: #859900;">try</span> <span style="color: #9564bf;">{</span>
             <span style="color: #268bd2;">T</span> <span style="color: #6c71c4;">convertedBean</span> = getTypeConverter<span style="color: #24a222;">()</span>.convertIfNecessary<span style="color: #24a222;">(</span>bean, requiredType<span style="color: #24a222;">)</span>;
@@ -1343,8 +1348,8 @@ beanInstance</li>
 </div>
 </div>
 </div>
-<div id="outline-container-org3135a63" class="outline-3">
-<h3 id="org3135a63"><span class="section-number-3">2.3</span> FactoryBean</h3>
+<div id="outline-container-org35881b0" class="outline-3">
+<h3 id="org35881b0"><span class="section-number-3">2.3</span> FactoryBean</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 FactoryBean 不同于普通的 Bean， FactoryBean 自身就是一个组装 Bean 的微型工厂，
@@ -1369,18 +1374,239 @@ FactoryBean 不同于普通的 Bean， FactoryBean 自身就是一个组装 Bean
 <ol class="org-ol">
 <li><code>getObject(...)</code> 方法返回 FactoryBean 创建的实例，也称工厂方法</li>
 <li><code>getObjectType(...)</code> 方法返回 FactoryBean 创建的实例的类型</li>
-<li><code>isSingleton(...)</code> 方法返回FactoryBean创建的实例的Scope</li>
+<li><code>isSingleton(...)</code> 方法返回 FactoryBean 创建的实例的 Scope</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org7a2aa0b" class="outline-3">
+<h3 id="org7a2aa0b"><span class="section-number-3">2.4</span> 单例 Bean 工厂实现: <code>DefaultSingletonBeanRegistry</code> 类</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+<code>DefaultSingletonBeanRegistry</code> 是对单例 Bean 注册的实现类，它的继承关系如下
+</p>
+<div class="org-src-container">
+<pre class="src src-text">org.springframework.beans.factory.support
+Class DefaultSingletonBeanRegistry
+
+    java.lang.Object
+        org.springframework.core.SimpleAliasRegistry
+            org.springframework.beans.factory.support.DefaultSingletonBeanRegistry
+
+    All Implemented Interfaces:
+        SingletonBeanRegistry, org.springframework.core.AliasRegistry
+</pre>
+</div>
+
+<p>
+<code>DefaultSingletonBeanRegistry</code> 定义了如下成员变量
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/** Cache of singleton objects: bean name to bean instance. */</span>
+<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Map</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">Object</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">singletonObjects</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ConcurrentHashMap</span><span style="color: #8d5649;">&lt;&gt;(</span>256<span style="color: #8d5649;">)</span>;
+
+<span style="color: #d33682;">/** Cache of singleton factories: bean name to ObjectFactory. */</span>
+<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Map</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">ObjectFactory</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">singletonFactories</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">HashMap</span><span style="color: #8d5649;">&lt;&gt;(</span>16<span style="color: #8d5649;">)</span>;
+
+<span style="color: #d33682;">/** Cache of early singleton objects: bean name to bean instance. */</span>
+<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Map</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">Object</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">earlySingletonObjects</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">HashMap</span><span style="color: #8d5649;">&lt;&gt;(</span>16<span style="color: #8d5649;">)</span>;
+
+<span style="color: #d33682;">/** Set of registered singletons, containing the bean names in registration order. */</span>
+<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Set</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">registeredSingletons</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedHashSet</span><span style="color: #8d5649;">&lt;&gt;(</span>256<span style="color: #8d5649;">)</span>;
+
+<span style="color: #d33682;">/** Names of beans that are currently in creation. */</span>
+<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Set</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">singletonsCurrentlyInCreation</span> =
+        Collections.newSetFromMap<span style="color: #8d5649;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">ConcurrentHashMap</span><span style="color: #d8241f;">&lt;&gt;(</span>16<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>;
+
+<span style="color: #d33682;">/** Names of beans currently excluded from in creation checks. */</span>
+<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Set</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">inCreationCheckExclusions</span> =
+        Collections.newSetFromMap<span style="color: #8d5649;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">ConcurrentHashMap</span><span style="color: #d8241f;">&lt;&gt;(</span>16<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>;
+
+<span style="color: #d33682;">/** List of suppressed Exceptions, available for associating related causes. */</span>
+<span style="color: #268bd2;">@Nullable</span>
+<span style="color: #859900;">private</span> <span style="color: #268bd2;">Set</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Exception</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">suppressedExceptions</span>;
+
+<span style="color: #d33682;">/** Flag that indicates whether we're currently within destroySingletons. */</span>
+<span style="color: #859900;">private</span> <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">singletonsCurrentlyInDestruction</span> = <span style="color: #268bd2;">false</span>;
+
+<span style="color: #d33682;">/** Disposable bean instances: bean name to disposable instance. */</span>
+<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Map</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">Object</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">disposableBeans</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedHashMap</span><span style="color: #8d5649;">&lt;&gt;()</span>;
+
+<span style="color: #d33682;">/** Map between containing bean names: bean name to Set of bean names that the bean contains. */</span>
+<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Map</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">Set</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">containedBeanMap</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ConcurrentHashMap</span><span style="color: #8d5649;">&lt;&gt;(</span>16<span style="color: #8d5649;">)</span>;
+
+<span style="color: #d33682;">/** Map between dependent bean names: bean name to Set of dependent bean names. */</span>
+<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Map</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">Set</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">dependentBeanMap</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ConcurrentHashMap</span><span style="color: #8d5649;">&lt;&gt;(</span>64<span style="color: #8d5649;">)</span>;
+
+<span style="color: #d33682;">/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */</span>
+<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">Map</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">Set</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">dependenciesForBeanMap</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ConcurrentHashMap</span><span style="color: #8d5649;">&lt;&gt;(</span>64<span style="color: #8d5649;">)</span>;
+</pre>
+</div>
+<p>
+这里需要注意的是其定义的三级缓存结构
+</p>
+<ol class="org-ol">
+<li>singletonObjects:  一级缓存单例 Bean 对象</li>
+<li>earlySingletonObjects: 二级缓存早期创建的单例 Bean 对象
+<ul class="org-ul">
+<li>earlySingletonObjects 于 singletonObjects 不同之处是，当一个单例 Bean 还
+在创建过程中可以将其依赖的单例 Bean 放入 earlySingletonObjects 哈希表内</li>
+<li>这样做，即使单例 Bean 在创建过程中，调用 <code>getBean(...)</code> 方法依然可以获取
+到所依赖的 Bean 对象</li>
+<li>另外该方案用来循环检测，避免循环依赖</li>
+</ul></li>
+<li><p>
+singletonFactories: 三级缓存单例对象工厂 ObjectFactory
+</p>
+<ul class="org-ul">
+<li>singletonFactories 哈希表的值是 <code>ObjectFactory</code> 接口类型</li>
+<li><code>ObjectFactory</code> 是个函数式接口，用于延迟创建 Bean</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@FunctionalInterface</span>
+<span style="color: #859900;">public</span> <span style="color: #859900;">interface</span> <span style="color: #268bd2;">ObjectFactory</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">T</span><span style="color: #8d5649;">&gt;</span> <span style="color: #8d5649;">{</span>
+
+    <span style="color: #d33682;">/**</span>
+<span style="color: #d33682;">     * Return an instance (possibly shared or independent)</span>
+<span style="color: #d33682;">     * of the object managed by this factory.</span>
+<span style="color: #d33682;">     * </span><span style="color: #268bd2;">@return</span><span style="color: #d33682;"> the resulting instance</span>
+<span style="color: #d33682;">     * </span><span style="color: #268bd2;">@throws</span><span style="color: #d33682;"> BeansException in case of creation errors</span>
+<span style="color: #d33682;">     */</span>
+    <span style="color: #268bd2;">T</span> <span style="color: #b58900;">getObject</span><span style="color: #d8241f;">()</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeansException</span>;
+
+<span style="color: #8d5649;">}</span>
+</pre>
+</div></li>
+</ol>
+</div>
+
+<div id="outline-container-org61d9530" class="outline-4">
+<h4 id="org61d9530"><span class="section-number-4">2.4.1</span> 获取单例 Bean : <code>getSingleton(...)</code> 方法</h4>
+<div class="outline-text-4" id="text-2-4-1">
+<p>
+<code>getSingleton()</code> 方法是获取 Bean 的核心方法, 它的实现如下
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#21333;&#20363;&#65292;&#21487;&#20197;&#20174; earlySingletonObjects &#20013;&#33719;&#21462;</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">getSingleton</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #859900;">return</span> getSingleton<span style="color: #d8241f;">(</span>beanName, <span style="color: #268bd2;">true</span><span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#21333;&#20363;&#65292;&#28155;&#21152;&#26159;&#21542;&#21487;&#20197;&#20174; earlySingletonObjects &#20013;&#33719;&#21462;&#21442;&#25968;</span>
+<span style="color: #268bd2;">@Nullable</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">getSingleton</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">allowEarlyReference</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">singletonObject</span> = <span style="color: #859900;">this</span>.singletonObjects.get<span style="color: #d8241f;">(</span>beanName<span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>singletonObject == <span style="color: #268bd2;">null</span> &amp;&amp; isSingletonCurrentlyInCreation<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">synchronized</span> <span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.singletonObjects<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            singletonObject = <span style="color: #859900;">this</span>.earlySingletonObjects.get<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>singletonObject == <span style="color: #268bd2;">null</span> &amp;&amp; allowEarlyReference<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #268bd2;">ObjectFactory</span><span style="color: #ff7f00;">&lt;</span>?<span style="color: #ff7f00;">&gt;</span> <span style="color: #6c71c4;">singletonFactory</span> = <span style="color: #859900;">this</span>.singletonFactories.get<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span>;
+                <span style="color: #859900;">if</span> <span style="color: #ff7f00;">(</span>singletonFactory != <span style="color: #268bd2;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                    singletonObject = singletonFactory.getObject<span style="color: #1776b6;">()</span>;
+                    <span style="color: #859900;">this</span>.earlySingletonObjects.put<span style="color: #1776b6;">(</span>beanName, singletonObject<span style="color: #1776b6;">)</span>;
+                    <span style="color: #859900;">this</span>.singletonFactories.remove<span style="color: #1776b6;">(</span>beanName<span style="color: #1776b6;">)</span>;
+                <span style="color: #ff7f00;">}</span>
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">return</span> singletonObject;
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#21333;&#20363;&#65292;&#20027;&#35201;&#38024;&#23545;&#26410;&#21019;&#24314;&#30340; Bean &#23545;&#35937;&#65292;&#36890;&#36807; ObjectFactory &#21019;&#24314;&#23545;&#35937;&#24182;&#36820;&#22238;</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">getSingleton</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span>, <span style="color: #268bd2;">ObjectFactory</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">singletonFactory</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    Assert.notNull<span style="color: #d8241f;">(</span>beanName, <span style="color: #2aa198;">"Bean name must not be null"</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">synchronized</span> <span style="color: #d8241f;">(</span><span style="color: #859900;">this</span>.singletonObjects<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">singletonObject</span> = <span style="color: #859900;">this</span>.singletonObjects.get<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>singletonObject == <span style="color: #268bd2;">null</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span><span style="color: #859900;">this</span>.singletonsCurrentlyInDestruction<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanCreationNotAllowedException</span><span style="color: #ff7f00;">(</span>beanName,
+                        <span style="color: #2aa198;">"Singleton bean creation not allowed while singletons of this factory are in destruction "</span> +
+                        <span style="color: #2aa198;">"(Do not request a bean from a BeanFactory in a destroy method implementation!)"</span><span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>logger.isDebugEnabled<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                logger.debug<span style="color: #ff7f00;">(</span><span style="color: #2aa198;">"Creating shared instance of singleton bean '"</span> + beanName + <span style="color: #2aa198;">"'"</span><span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+            beforeSingletonCreation<span style="color: #24a222;">(</span>beanName<span style="color: #24a222;">)</span>;
+            <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">newSingleton</span> = <span style="color: #268bd2;">false</span>;
+            <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">recordSuppressedExceptions</span> = <span style="color: #24a222;">(</span><span style="color: #859900;">this</span>.suppressedExceptions == <span style="color: #268bd2;">null</span><span style="color: #24a222;">)</span>;
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>recordSuppressedExceptions<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #859900;">this</span>.suppressedExceptions = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedHashSet</span><span style="color: #ff7f00;">&lt;&gt;()</span>;
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">try</span> <span style="color: #24a222;">{</span>
+                singletonObject = singletonFactory.getObject<span style="color: #ff7f00;">()</span>;
+                newSingleton = <span style="color: #268bd2;">true</span>;
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">catch</span> <span style="color: #24a222;">(</span><span style="color: #268bd2;">IllegalStateException</span> <span style="color: #6c71c4;">ex</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Has the singleton object implicitly appeared in the meantime -&gt;</span>
+                <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">if yes, proceed with it since the exception indicates that state.</span>
+                singletonObject = <span style="color: #859900;">this</span>.singletonObjects.get<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span>;
+                <span style="color: #859900;">if</span> <span style="color: #ff7f00;">(</span>singletonObject == <span style="color: #268bd2;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                    <span style="color: #859900;">throw</span> ex;
+                <span style="color: #ff7f00;">}</span>
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">catch</span> <span style="color: #24a222;">(</span><span style="color: #268bd2;">BeanCreationException</span> <span style="color: #6c71c4;">ex</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #859900;">if</span> <span style="color: #ff7f00;">(</span>recordSuppressedExceptions<span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                    <span style="color: #859900;">for</span> <span style="color: #1776b6;">(</span><span style="color: #268bd2;">Exception</span> <span style="color: #6c71c4;">suppressedException</span> : <span style="color: #859900;">this</span>.suppressedExceptions<span style="color: #1776b6;">)</span> <span style="color: #1776b6;">{</span>
+                        ex.addRelatedCause<span style="color: #00bed1;">(</span>suppressedException<span style="color: #00bed1;">)</span>;
+                    <span style="color: #1776b6;">}</span>
+                <span style="color: #ff7f00;">}</span>
+                <span style="color: #859900;">throw</span> ex;
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">finally</span> <span style="color: #24a222;">{</span>
+                <span style="color: #859900;">if</span> <span style="color: #ff7f00;">(</span>recordSuppressedExceptions<span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                    <span style="color: #859900;">this</span>.suppressedExceptions = <span style="color: #268bd2;">null</span>;
+                <span style="color: #ff7f00;">}</span>
+                afterSingletonCreation<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>newSingleton<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                addSingleton<span style="color: #ff7f00;">(</span>beanName, singletonObject<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">return</span> singletonObject;
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+获取单例 Bean 的总逻辑需要结合 <code>doGetBean(...)</code> 方法看，它的逻辑如下
+</p>
+<ol class="org-ol">
+<li>首先尝试从 singletonObjects 哈希表中获取，获取成功直接返回 Bean 对象</li>
+<li>如果 singletonObjects 获取失败，尝试从 earlySingletonObjects 哈希表中获取，
+如果成功，返回 Bean 对象</li>
+<li>如果 earlySingletonObjects 获取失败，则需要创建单例 Bean 对象
+<ul class="org-ul">
+<li>调用 <code>ObjectFactory</code> 的 <code>getObject(...)</code> 方法来创建 Bean 对象</li>
+<li><p>
+创建成功的，调用 <code>addSingleton(...)</code> 来处理添加新创建 Bean 对象逻辑
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">addSingleton</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span>, <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">singletonObject</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #859900;">synchronized</span> <span style="color: #d8241f;">(</span><span style="color: #859900;">this</span>.singletonObjects<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">this</span>.singletonObjects.put<span style="color: #9564bf;">(</span>beanName, singletonObject<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">this</span>.singletonFactories.remove<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">this</span>.earlySingletonObjects.remove<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">this</span>.registeredSingletons.add<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div></li>
+<li><code>addSingleton(...)</code> 将新创建的 Bean 对象放入 <code>singletonObjects</code>, 并从
+<code>singletonFactories</code> 中移除 <code>ObjectFactory</code> 对象</li>
+</ul></li>
 </ol>
 </div>
 </div>
 </div>
+</div>
 
-<div id="outline-container-orgc7cc552" class="outline-2">
-<h2 id="orgc7cc552"><span class="section-number-2">3</span> IoC</h2>
+<div id="outline-container-org3de7414" class="outline-2">
+<h2 id="org3de7414"><span class="section-number-2">3</span> IoC</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org4b9254a" class="outline-3">
-<h3 id="org4b9254a"><span class="section-number-3">3.1</span> IoC 核心接口和类</h3>
+<div id="outline-container-orgc73b870" class="outline-3">
+<h3 id="orgc73b870"><span class="section-number-3">3.1</span> IoC 核心接口和类</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Spring 的 IoC 容器对象一般继承自 <code>ApplicationContext</code> 接口，常见的对象类如下
@@ -1488,12 +1714,12 @@ Class AnnotationConfigApplicationContext
 </div>
 </div>
 
-<div id="outline-container-orgfd6c087" class="outline-2">
-<h2 id="orgfd6c087"><span class="section-number-2">4</span> ApplicationContext</h2>
+<div id="outline-container-org44ffda2" class="outline-2">
+<h2 id="org44ffda2"><span class="section-number-2">4</span> ApplicationContext</h2>
 </div>
 
-<div id="outline-container-org40d7b12" class="outline-2">
-<h2 id="org40d7b12"><span class="section-number-2">5</span> AOP</h2>
+<div id="outline-container-org78b2086" class="outline-2">
+<h2 id="org78b2086"><span class="section-number-2">5</span> AOP</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 使用动态代理实现
@@ -1505,8 +1731,8 @@ Class AnnotationConfigApplicationContext
 </div>
 </div>
 
-<div id="outline-container-orgfb71311" class="outline-2">
-<h2 id="orgfb71311"><span class="section-number-2">6</span> Spring 核心类梳理</h2>
+<div id="outline-container-org17a050c" class="outline-2">
+<h2 id="org17a050c"><span class="section-number-2">6</span> Spring 核心类梳理</h2>
 <div class="outline-text-2" id="text-6">
 <ol class="org-ol">
 <li>ApplicationContext
@@ -1552,11 +1778,11 @@ Class AnnotationConfigApplicationContext
 </div>
 </div>
 
-<div id="outline-container-org61c2bcb" class="outline-2">
-<h2 id="org61c2bcb"><span class="section-number-2">7</span> SpringBoot 自动装配</h2>
+<div id="outline-container-orgb888d5f" class="outline-2">
+<h2 id="orgb888d5f"><span class="section-number-2">7</span> SpringBoot 自动装配</h2>
 </div>
-<div id="outline-container-orgd3a2d38" class="outline-2">
-<h2 id="orgd3a2d38"><span class="section-number-2">8</span> 参考链接</h2>
+<div id="outline-container-org6a4f146" class="outline-2">
+<h2 id="org6a4f146"><span class="section-number-2">8</span> 参考链接</h2>
 <div class="outline-text-2" id="text-8">
 <ol class="org-ol">
 <li><a href="https://huifer.github.io/spring-analysis/">Spring Analysis</a></li>
@@ -1565,7 +1791,7 @@ Class AnnotationConfigApplicationContext
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-18 Sun 01:27. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
+<p class="author">Last Updated 2021-07-18 Sun 12:06. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
 </div>
 </body>
 </html>
