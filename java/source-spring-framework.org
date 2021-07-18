@@ -7,6 +7,28 @@
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
 #+TAGS: java spring source
 
+* Spring 核心类梳理
+  1. ApplicationContext
+     - AbstractApplicationContext
+       + ~refresh()~ 实现 Spring Bean 加载的核心逻辑
+  2. BeanDefinition
+     - AbstractBeanDefinition
+  3. BeanDefinitionReader
+     - 读取 BeanDefinition 对象
+  4. BeanFactory
+     - Bean 工厂类
+     - AbstractBeanFactory
+       + ~doGetBean(...)~
+  5. BeanFactoryPostProcessor
+     - 函数式接口 ~@FunctionalInterface~
+     - 提交工厂创建的后置处理入口
+  6. BeanPostProcessor
+     - 提供自定义 Bean 实例化的处理接口扩展
+     - ~postProcessBeforeInitialization(Object bean, String beanName)~
+       + Bean 实例化前置处理方法
+     - ~postProcessAfterInitialization(Object bean, String beanName)~
+       + Bean 实例化后置处理方法
+
 * 容器实现原理
 ** Bean 工厂接口: BeanFactory
    ~BeanFactory~ 是 Spring 的 Bean 工厂的接口定义，它定义对 Spring Bean 容器访问的
@@ -1683,112 +1705,111 @@
       }
     #+END_SRC
 
-* IoC
-** IoC 核心接口和类
-   Spring 的 IoC 容器对象一般继承自 ~ApplicationContext~ 接口，常见的对象类如下
-
-   ~ClassPathXmlApplicationContext~: 读取 ClassPath 中 XML 配置文件的 Bean 定义
-   的容器
-
+* 容器功能扩展
+** 应用上下文 ApplicationContext
+   首先查看 ~ApplicationContext~ 接口的相关信息
    #+BEGIN_SRC text
-     org.springframework.context.support
-     Class ClassPathXmlApplicationContext
+     org.springframework.context
+     Interface ApplicationContext
 
-         java.lang.Object
-             org.springframework.core.io.DefaultResourceLoader
-                 org.springframework.context.support.AbstractApplicationContext
-                     org.springframework.context.support.AbstractRefreshableApplicationContext
-                         org.springframework.context.support.AbstractRefreshableConfigApplicationContext
-                             org.springframework.context.support.AbstractXmlApplicationContext
-                                 org.springframework.context.support.ClassPathXmlApplicationContext
-
-         All Implemented Interfaces:
-             Closeable, AutoCloseable, org.springframework.beans.factory.Aware,
+         All Superinterfaces:
+             ApplicationEventPublisher,
              org.springframework.beans.factory.BeanFactory,
-             org.springframework.beans.factory.BeanNameAware,
-             org.springframework.beans.factory.HierarchicalBeanFactory,
-             org.springframework.beans.factory.InitializingBean,
-             org.springframework.beans.factory.ListableBeanFactory,
-             ApplicationContext, ApplicationEventPublisher,
-             ConfigurableApplicationContext, Lifecycle, MessageSource,
              org.springframework.core.env.EnvironmentCapable,
+             org.springframework.beans.factory.HierarchicalBeanFactory,
+             org.springframework.beans.factory.ListableBeanFactory, MessageSource,
              org.springframework.core.io.ResourceLoader,
              org.springframework.core.io.support.ResourcePatternResolver
    #+END_SRC
+   可以看出 ~ApplicationContext~ 提供了所以 ~BeanFactory~ 的功能，另外还扩展了如
+   下功能
+   1. ~ResourceLoader~ 加载资源文件
+   2. ~ApplicationEventPublisher~ 事件发布和监听器注册
+   3. ~MessageSource~ 国际化的消息支持
+   4. ~HierarchicalBeanFactory~ 继承父的上下文功能
+   5. ~EnvironmentCapable~ 系统环境变量和 Java 属性支持
 
-   ~AnnotationConfigApplicationContext~: 读取注解 Bean 定义的容器
+** ApplicationContext 的常见实现类
+*** ClassPathXmlApplicationContext
 
-   #+BEGIN_SRC text
-     org.springframework.context.annotation
-     Class AnnotationConfigApplicationContext
+    读取 ClassPath 中 XML 配置文件的 Bean 定义的容器
+    #+BEGIN_SRC text
+      org.springframework.context.support
+      Class ClassPathXmlApplicationContext
 
-         java.lang.Object
-             org.springframework.core.io.DefaultResourceLoader
-                 org.springframework.context.support.AbstractApplicationContext
-                     org.springframework.context.support.GenericApplicationContext
-                         org.springframework.context.annotation.AnnotationConfigApplicationContext
+          java.lang.Object
+              org.springframework.core.io.DefaultResourceLoader
+                  org.springframework.context.support.AbstractApplicationContext
+                      org.springframework.context.support.AbstractRefreshableApplicationContext
+                          org.springframework.context.support.AbstractRefreshableConfigApplicationContext
+                              org.springframework.context.support.AbstractXmlApplicationContext
+                                  org.springframework.context.support.ClassPathXmlApplicationContext
 
-         All Implemented Interfaces:
-             Closeable, AutoCloseable,
-             org.springframework.beans.factory.BeanFactory,
-             org.springframework.beans.factory.HierarchicalBeanFactory,
-             org.springframework.beans.factory.ListableBeanFactory,
-             org.springframework.beans.factory.support.BeanDefinitionRegistry,
-             AnnotationConfigRegistry, ApplicationContext,
-             ApplicationEventPublisher, ConfigurableApplicationContext,
-             Lifecycle, MessageSource, org.springframework.core.AliasRegistry,
-             org.springframework.core.env.EnvironmentCapable,
-             org.springframework.core.io.ResourceLoader,
-             org.springframework.core.io.support.ResourcePatternResolver
-   #+END_SRC
+          All Implemented Interfaces:
+              Closeable, AutoCloseable, org.springframework.beans.factory.Aware,
+              org.springframework.beans.factory.BeanFactory,
+              org.springframework.beans.factory.BeanNameAware,
+              org.springframework.beans.factory.HierarchicalBeanFactory,
+              org.springframework.beans.factory.InitializingBean,
+              org.springframework.beans.factory.ListableBeanFactory,
+              ApplicationContext, ApplicationEventPublisher,
+              ConfigurableApplicationContext, Lifecycle, MessageSource,
+              org.springframework.core.env.EnvironmentCapable,
+              org.springframework.core.io.ResourceLoader,
+              org.springframework.core.io.support.ResourcePatternResolver
+    #+END_SRC
 
-   常见的类简单可以分成以下几类
-   1. 资源处理
-      - ~Resource~ Spring 中关于资源的定义
-      - ~ResourceLoader~ 提供资源加载方法
-      - ~BeanDefinitionReader~ 读取接口主要用来读取信息
-   2. 注册形式，在 Spring 中关于注册的几个核心
-      - ~AliasRegistry~ 别名注册
-      - ~BeanDefinitionRegistry~ Bean 定义注册
-      - ~SingletonBeanRegistry~ 单例 Bean 注册
-        + ~DefaultSingletonBeanRegistry~
-   3. 生命周期，可以分成容器生命周期和 Bean 生命周期两个小类
-      - ~Lifecycle~ 容器生命周期的核心接口
-      - ~InitializingBean~, ~DisposableBean~ 等 Bean 的生命周期接口
-   4. Bean 拓展
-      - ~BeanPostProcessor~
-      - ~Aware~ 系列接口
-   5. 上下文的接口:
-      - ~ApplicationContext~ 作为主导接口
-        - ~AbstractApplicationContext~
+*** AnnotationConfigApplicationContext
+    读取注解类型 Bean 定义的容器, ~@Component~, ~@Service~ 等
 
-* ApplicationContext
+    #+BEGIN_SRC text
+      org.springframework.context.annotation
+      Class AnnotationConfigApplicationContext
+
+          java.lang.Object
+              org.springframework.core.io.DefaultResourceLoader
+                  org.springframework.context.support.AbstractApplicationContext
+                      org.springframework.context.support.GenericApplicationContext
+                          org.springframework.context.annotation.AnnotationConfigApplicationContext
+
+          All Implemented Interfaces:
+              Closeable, AutoCloseable,
+              org.springframework.beans.factory.BeanFactory,
+              org.springframework.beans.factory.HierarchicalBeanFactory,
+              org.springframework.beans.factory.ListableBeanFactory,
+              org.springframework.beans.factory.support.BeanDefinitionRegistry,
+              AnnotationConfigRegistry, ApplicationContext,
+              ApplicationEventPublisher, ConfigurableApplicationContext,
+              Lifecycle, MessageSource, org.springframework.core.AliasRegistry,
+              org.springframework.core.env.EnvironmentCapable,
+              org.springframework.core.io.ResourceLoader,
+              org.springframework.core.io.support.ResourcePatternResolver
+    #+END_SRC
+
+    常见的类简单可以分成以下几类
+    1. 资源处理
+       - ~Resource~ Spring 中关于资源的定义
+       - ~ResourceLoader~ 提供资源加载方法
+       - ~BeanDefinitionReader~ 读取接口主要用来读取信息
+    2. 注册形式，在 Spring 中关于注册的几个核心
+       - ~AliasRegistry~ 别名注册
+       - ~BeanDefinitionRegistry~ Bean 定义注册
+       - ~SingletonBeanRegistry~ 单例 Bean 注册
+         + ~DefaultSingletonBeanRegistry~
+    3. 生命周期，可以分成容器生命周期和 Bean 生命周期两个小类
+       - ~Lifecycle~ 容器生命周期的核心接口
+       - ~InitializingBean~, ~DisposableBean~ 等 Bean 的生命周期接口
+    4. Bean 拓展
+       - ~BeanPostProcessor~
+       - ~Aware~ 系列接口
+    5. 上下文的接口:
+       - ~ApplicationContext~ 作为主导接口
+         - ~AbstractApplicationContext~
 
 * AOP
   使用动态代理实现
   - JDK 代理
   - cglib 代理
-
-* Spring 核心类梳理
-  1. ApplicationContext
-     - AbstractApplicationContext
-       + ~refresh()~ 实现 Spring Bean 加载的核心逻辑
-  2. BeanDefinition
-     - AbstractBeanDefinition
-  3. BeanDefinitionReader
-     - 读取 BeanDefinition 对象
-  4. BeanFactory
-     - Bean 工厂类
-     - AbstractBeanFactory
-       + ~doGetBean(...)~
-  5. BeanFactoryPostProcessor
-     - 函数式接口 ~@FunctionalInterface~
-  6. BeanPostProcessor
-     - 提供自定义 Bean 实例化的处理接口扩展
-     - ~postProcessBeforeInitialization(Object bean, String beanName)~
-       + Bean 实例化前置处理方法
-     - ~postProcessAfterInitialization(Object bean, String beanName)~
-       + Bean 实例化后置处理方法
 
 * SpringBoot 自动装配
 * 参考链接
