@@ -890,7 +890,7 @@
           return (T) bean;
       }
     #+END_SRC
-** FactoryBean
+** 特殊的 Spring Bean: FactoryBean
    FactoryBean 不同于普通的 Bean， FactoryBean 自身就是一个组装 Bean 的微型工厂，
    即在调用 ~BeanFactory#getBean(...)~ 方法时不返回 FactoryBean，而是返回工厂方
    法返回的 Bean，定义 FactoryBean 只需要实现 ~FactoryBean~ 接口即可
@@ -912,89 +912,90 @@
    2. ~getObjectType(...)~ 方法返回 FactoryBean 创建的实例的类型
    3. ~isSingleton(...)~ 方法返回 FactoryBean 创建的实例的 Scope
 
-** 单例 Bean 工厂实现: ~DefaultSingletonBeanRegistry~ 类
+** 单例 Bean 工厂的实现
+*** 单例 Bean 工厂的三级缓存: ~DefaultSingletonBeanRegistry~ 类的缓存
+    ~DefaultSingletonBeanRegistry~ 是对单例 Bean 注册的实现类，它的继承关系如下
+    #+BEGIN_SRC text
+      org.springframework.beans.factory.support
+      Class DefaultSingletonBeanRegistry
 
-   ~DefaultSingletonBeanRegistry~ 是对单例 Bean 注册的实现类，它的继承关系如下
-   #+BEGIN_SRC text
-     org.springframework.beans.factory.support
-     Class DefaultSingletonBeanRegistry
+          java.lang.Object
+              org.springframework.core.SimpleAliasRegistry
+                  org.springframework.beans.factory.support.DefaultSingletonBeanRegistry
 
-         java.lang.Object
-             org.springframework.core.SimpleAliasRegistry
-                 org.springframework.beans.factory.support.DefaultSingletonBeanRegistry
+          All Implemented Interfaces:
+              SingletonBeanRegistry, org.springframework.core.AliasRegistry
+    #+END_SRC
 
-         All Implemented Interfaces:
-             SingletonBeanRegistry, org.springframework.core.AliasRegistry
-   #+END_SRC
+    ~DefaultSingletonBeanRegistry~ 定义了如下成员变量
+    #+BEGIN_SRC java
+      /** Cache of singleton objects: bean name to bean instance. */
+      private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
-   ~DefaultSingletonBeanRegistry~ 定义了如下成员变量
-   #+BEGIN_SRC java
-     /** Cache of singleton objects: bean name to bean instance. */
-     private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
+      /** Cache of singleton factories: bean name to ObjectFactory. */
+      private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
-     /** Cache of singleton factories: bean name to ObjectFactory. */
-     private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
+      /** Cache of early singleton objects: bean name to bean instance. */
+      private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
-     /** Cache of early singleton objects: bean name to bean instance. */
-     private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
+      /** Set of registered singletons, containing the bean names in registration order. */
+      private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
-     /** Set of registered singletons, containing the bean names in registration order. */
-     private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
+      /** Names of beans that are currently in creation. */
+      private final Set<String> singletonsCurrentlyInCreation =
+              Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
-     /** Names of beans that are currently in creation. */
-     private final Set<String> singletonsCurrentlyInCreation =
-             Collections.newSetFromMap(new ConcurrentHashMap<>(16));
+      /** Names of beans currently excluded from in creation checks. */
+      private final Set<String> inCreationCheckExclusions =
+              Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
-     /** Names of beans currently excluded from in creation checks. */
-     private final Set<String> inCreationCheckExclusions =
-             Collections.newSetFromMap(new ConcurrentHashMap<>(16));
+      /** List of suppressed Exceptions, available for associating related causes. */
+      @Nullable
+      private Set<Exception> suppressedExceptions;
 
-     /** List of suppressed Exceptions, available for associating related causes. */
-     @Nullable
-     private Set<Exception> suppressedExceptions;
+      /** Flag that indicates whether we're currently within destroySingletons. */
+      private boolean singletonsCurrentlyInDestruction = false;
 
-     /** Flag that indicates whether we're currently within destroySingletons. */
-     private boolean singletonsCurrentlyInDestruction = false;
+      /** Disposable bean instances: bean name to disposable instance. */
+      private final Map<String, Object> disposableBeans = new LinkedHashMap<>();
 
-     /** Disposable bean instances: bean name to disposable instance. */
-     private final Map<String, Object> disposableBeans = new LinkedHashMap<>();
+      /** Map between containing bean names: bean name to Set of bean names that the bean contains. */
+      private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
 
-     /** Map between containing bean names: bean name to Set of bean names that the bean contains. */
-     private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
+      /** Map between dependent bean names: bean name to Set of dependent bean names. */
+      private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
-     /** Map between dependent bean names: bean name to Set of dependent bean names. */
-     private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
+      /** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
+      private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
+    #+END_SRC
+    这里需要注意的是其定义的三级缓存结构
+    1. singletonObjects: 一级缓存单例 Bean 对象
+    2. earlySingletonObjects: 二级缓存早期创建的单例 Bean 对象
+       - earlySingletonObjects 于 singletonObjects 不同之处是，当一个单例 Bean
+         还在创建过程中可以将其依赖的单例 Bean 放入 earlySingletonObjects 哈希表
+         内
+       - 这样做，即使单例 Bean 在创建过程中，调用 ~getBean(...)~ 方法依然可以获
+         取到所依赖的 Bean 对象
+       - 另外该方案用来循环检测，避免循环依赖
+    3. singletonFactories: 三级缓存单例对象工厂 ObjectFactory
+       - singletonFactories 哈希表的值是 ~ObjectFactory~ 接口类型
+       - ~ObjectFactory~ 是个函数式接口，用于延迟创建 Bean
+       #+BEGIN_SRC java
+         @FunctionalInterface
+         public interface ObjectFactory<T> {
 
-     /** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
-     private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
-   #+END_SRC
-   这里需要注意的是其定义的三级缓存结构
-   1. singletonObjects:  一级缓存单例 Bean 对象
-   2. earlySingletonObjects: 二级缓存早期创建的单例 Bean 对象
-      - earlySingletonObjects 于 singletonObjects 不同之处是，当一个单例 Bean 还
-        在创建过程中可以将其依赖的单例 Bean 放入 earlySingletonObjects 哈希表内
-      - 这样做，即使单例 Bean 在创建过程中，调用 ~getBean(...)~ 方法依然可以获取
-        到所依赖的 Bean 对象
-      - 另外该方案用来循环检测，避免循环依赖
-   3. singletonFactories: 三级缓存单例对象工厂 ObjectFactory
-      - singletonFactories 哈希表的值是 ~ObjectFactory~ 接口类型
-      - ~ObjectFactory~ 是个函数式接口，用于延迟创建 Bean
-      #+BEGIN_SRC java
-        @FunctionalInterface
-        public interface ObjectFactory<T> {
+             /**
+              ,* Return an instance (possibly shared or independent)
+              ,* of the object managed by this factory.
+              ,* @return the resulting instance
+              ,* @throws BeansException in case of creation errors
+              ,*/
+             T getObject() throws BeansException;
 
-            /**
-             ,* Return an instance (possibly shared or independent)
-             ,* of the object managed by this factory.
-             ,* @return the resulting instance
-             ,* @throws BeansException in case of creation errors
-             ,*/
-            T getObject() throws BeansException;
+         }
+       #+END_SRC
 
-        }
-      #+END_SRC
-
-*** 获取单例 Bean : ~getSingleton(...)~ 方法
+*** 获取单例 Bean 方法: ~getSingleton(...)~ 方法
     ~getSingleton()~ 方法是获取 Bean 的核心方法, 它的实现如下
     #+BEGIN_SRC java
       // 获取单例，可以从 earlySingletonObjects 中获取
@@ -1021,7 +1022,21 @@
           }
           return singletonObject;
       }
+    #+END_SRC
+    允许从 earlySingletonObjects 获取单例的 ~getSingleton(...)~ 方法逻辑比较清晰
+    1. 先尝试从 singletonObjects 中获取 singletonObject, 如果成功直接返回
+       singletonObject
+    2. 如果获取失败，则尝试从 earlySingletonObjects 中获取 singletonObject, 如果
+       成功直接返回 singletonObject
+    3. 如果再次失败，尝试从 singletonFactories 中创建 singletonObject，并返回创
+       建结果
+       - 首先通过 beanName, 查找到 ~ObjectFactory~ 的值, 即 singletonFactory
+       - 若 singletonFactory 存在，调用 ~singletonFactory.getObject(...)~ 方法创
+         建 singletonObject
+       - 创建成功将 singletonObject, 将 singletonObject 添加到
+         earlySingletonObjects, 并从 singletonFactories 移除 beanName 对应的值
 
+    #+BEGIN_SRC java
       // 获取单例，主要针对未创建的 Bean 对象，通过 ObjectFactory 创建对象并返回
       public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
           Assert.notNull(beanName, "Bean name must not be null");
@@ -1077,13 +1092,15 @@
       }
     #+END_SRC
 
-    获取单例 Bean 的总逻辑需要结合 ~doGetBean(...)~ 方法看，它的逻辑如下
-    1. 首先尝试从 singletonObjects 哈希表中获取，获取成功直接返回 Bean 对象
-    2. 如果 singletonObjects 获取失败，尝试从 earlySingletonObjects 哈希表中获取，
-       如果成功，返回 Bean 对象
-    3. 如果 earlySingletonObjects 获取失败，则需要创建单例 Bean 对象
-       - 调用 ~ObjectFactory~ 的 ~getObject(...)~ 方法来创建 Bean 对象
-       - 创建成功的，调用 ~addSingleton(...)~ 来处理添加新创建 Bean 对象逻辑
+    获取单例 Bean 的总逻辑逻辑如下
+    1. 首先尝试从 singletonObjects 获取 singletonObject, 获取成功直接返回
+       singletonObject
+    2. 如果 singletonObjects 获取失败，则需要创建 singletonObject
+       - 先调用 ~beforeSingletonCreation(...)~ 前置钩子函数
+       - 调用 ~ObjectFactory~ 的 ~getObject(...)~ 方法来创建 singletonObject
+       - 然后调用 ~afterSingletonCreation(...)~ 后置钩子函数
+       - 如果有信创建的 singletonObject, 调用 ~addSingleton(...)~ 来处理添加新创
+         建 singletonObject
          #+BEGIN_SRC java
            protected void addSingleton(String beanName, Object singletonObject) {
                synchronized (this.singletonObjects) {
@@ -1094,10 +1111,12 @@
                }
            }
          #+END_SRC
-       - ~addSingleton(...)~ 将新创建的 Bean 对象放入 ~singletonObjects~, 并从
-         ~singletonFactories~ 中移除 ~ObjectFactory~ 对象
+         + ~addSingleton(...)~ 将新创建的 singletonObject 放入 singletonObjects,
+           并从 singletonFactories 和 earlySingletonObjects 中移除
+           singletonObject 对象
+         + 将 singletonObject 添加到 registeredSingletons 中，完成 Bean 的注册
 
-*** 从 Bean 实例获取 Bean 对象: ~getObjectForBeanInstance(...)~ 方法
+*** beanInstance 到 beanOject 过程: ~getObjectForBeanInstance(...)~ 方法
     beanInstance -> beanOject 是将缓存中的 Bean 实例转化成最终用户所需对象的过程，
     1. 在 ~doGetBean(...)~ 方法中的 ~getObjectForBeanInstance(...)~ 方法实现
     2. beanInstance 如果是非 FactoryBean, beanInstance 即为 beanOject, 直接返回
