@@ -1563,9 +1563,13 @@
    1. 如果是单例 Bean, 首先清理缓存
    2. 通过 ~createBeanInstance(...)~ 方法将 BeanDefinition 转化成 BeanWrapper,
       BeanWrapper 的作用如下
-      - 如果存在工厂方法则使用工厂方法进行实例化
-      - 如果包含多参数构造器，根据参数类型锁定的构造方法，然后调用进行实例化
-      - 其它情况使用无参构造器进行实例化
+      - 如果检测到 Supplier, 使用 Supplier 进行实例化，具体实现见
+        ~obtainFromSupplier(...)~ 方法
+      - 如果存在工厂方法, 则使用工厂方法进行实例化, 具体实现见
+        ~instantiateUsingFactoryMethod(...)~
+      - 如果包含多参数构造器，根据参数类型锁定的构造方法，然后调用进行实例化，具
+        体实现见 ~autowireConstructor(...)~ 方法
+      - 其它情况使用无参构造器进行实例化, 具体实现见 ~instantiateBean(...)~ 方法
    3. 允许后置处理器合并 BeanDefinition
    4. 解决依赖，若有依赖项调用 ~addSingletonFactory(...)~ 添加到
       singletonFactories 缓存中
