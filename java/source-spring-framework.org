@@ -7,49 +7,68 @@
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
 #+TAGS: java spring source
 
-* Spring 核心类梳理
-  1. BeanFactory =Bean工厂=
-     - ~getBean(...)~
-     - AbstractBeanFactory
-       + ~doGetBean(...)~
-     - DefaultListableBeanFactory
-  2. BeanDefinition =Bean定义=
-     - BeanDefinition 描述 Bean 实例定义的相关信息
-     - BeanDefinition 提供 BeanFactoryPostProcessor 操作属性的最小接口
-     - 抽象类 ~AbstractBeanDefinition~ 实现了一些常用的方法
-       + ~setBeanClassName(...)~
-       + ~isSingleton(...)~
-     - BeanDefinitionReader 接口提供 ~loadBeanDefinitions(...)~ 方法
-       + 读取 BeanDefinition 对象
-       + 在 ~XmlBeanDefinitionReader~ 具体实现 ~doLoadBeanDefinitions(...)~ 读取
-         XML 中定义的 Bean 数据
-  3. SingletonBeanRegistry =单例 Bean 注册=
-     - ~registerSingleton(...)~ 方法提供注册单例 Bean 入口
-     - 常见的实现类 ~DefaultSingletonBeanRegistry~
-       + ~registerBeanDefinition(...)~ 注册 BeanDefinition
-         - ~Map<String, BeanDefinition> beanDefinitionMap~
-         - ~registerBeanDefinition(...)~ 添加 BeanDefinition 到
-           beanDefinitionMap
-       + 三级缓存解决循环依赖
-         - ~Map<String, Object> singletonObjects~
-         - ~Map<String, Object> earlySingletonObjects~
-         - ~Map<String, ObjectFactory<?>> singletonFactories~
-  4. ApplicationContext =应用上下文=
-     - AbstractApplicationContext
-       + ~refresh()~ 实现 Spring Bean 加载的核心逻辑
-       + 包含 15 个子函数处理 Bean 全生命周期的事情
-     - ~ClassPathXmlApplicationContext~ 读取 XML 文件中的 BeanDefinition
-     - ~AnnotationConfigApplicationContext~ 扫描包含 ~@Component~ 注解的
-       BeanDefinition
-  5. BeanFactoryPostProcessor =Bean工厂后置处理器=
-     - 函数式接口 ~@FunctionalInterface~
-     - 提交工厂创建的后置处理入口
-  6. BeanPostProcessor =Bean后置处理器=
-     - 提供自定义 Bean 实例化的处理接口扩展
-     - ~postProcessBeforeInitialization(Object bean, String beanName)~
-       + Bean 实例化前置处理方法
-     - ~postProcessAfterInitialization(Object bean, String beanName)~
-       + Bean 实例化后置处理方法
+* Spring 核心类和方法
+** 核心类
+   1. BeanFactory =Bean工厂=
+      - ~getBean(...)~
+      - AbstractBeanFactory (实现了 BeanFactory 的核心方法)
+        + ~doGetBean(...)~
+      - DefaultListableBeanFactory
+   2. BeanDefinition =Bean定义=
+      - BeanDefinition 描述 Bean 实例定义的相关信息
+      - BeanDefinition 提供 BeanFactoryPostProcessor 操作属性的最小接口
+      - 抽象类 ~AbstractBeanDefinition~ 实现了一些常用的方法
+        + ~setBeanClassName(...)~
+        + ~isSingleton(...)~
+      - BeanDefinitionReader 接口提供 ~loadBeanDefinitions(...)~ 方法
+        + 读取 BeanDefinition 对象
+        + 在 ~XmlBeanDefinitionReader~ 具体实现 ~doLoadBeanDefinitions(...)~ 读取
+          XML 中定义的 Bean 数据
+   3. SingletonBeanRegistry =单例 Bean 注册=
+      - ~registerSingleton(...)~ 方法提供注册单例 Bean 入口
+      - 常见的实现类 ~DefaultSingletonBeanRegistry~
+        + ~registerBeanDefinition(...)~ 注册 BeanDefinition
+          - ~Map<String, BeanDefinition> beanDefinitionMap~
+          - ~registerBeanDefinition(...)~ 添加 BeanDefinition 到
+            beanDefinitionMap
+        + 三级缓存解决循环依赖
+          - ~Map<String, Object> singletonObjects~
+          - ~Map<String, Object> earlySingletonObjects~
+          - ~Map<String, ObjectFactory<?>> singletonFactories~
+   4. ApplicationContext =应用上下文=
+      - AbstractApplicationContext
+        + ~refresh()~ 实现 Spring Bean 加载的核心逻辑
+        + 包含 15 个子函数处理 Bean 全生命周期的事情
+      - ~ClassPathXmlApplicationContext~ 读取 XML 文件中的 BeanDefinition
+      - ~AnnotationConfigApplicationContext~ 扫描包含 ~@Component~ 注解的
+        BeanDefinition
+   5. BeanFactoryPostProcessor =Bean工厂后置处理器=
+      - 函数式接口 ~@FunctionalInterface~
+      - ~postProcessBeanFactory(...)~  Bean 工厂后置器
+      - 实现
+   6. BeanPostProcessor =Bean后置处理器=
+      - 提供自定义 Bean 实例化的处理接口扩展
+      - ~postProcessBeforeInitialization(Object bean, String beanName)~
+        + Bean 实例化前置处理方法
+      - ~postProcessAfterInitialization(Object bean, String beanName)~
+        + Bean 实例化后置处理方法
+
+** IoC 核心方法
+   1. ~getBean()~ 获取 Bean
+   2. ~doGetBean()~ 真正获取 Bean
+   3. ~transformedBeanName()~ 转换 Bean 名称
+   4. ~getSingleton()~ 获取单例 Bean
+   5. ~getParentBeanFactory()~ 获取父 Bean 工厂
+   6. ~getDependsOn()~ 获取依赖项
+   7. ~getSingleton()~ 获取单例 Bean
+   8. ~createBean()~ 创建 Bean
+   9. ~resolveBeforeInstantiation()~ 实例化前解析
+   10. ~doCreateBean()~ 真正创建 Bean
+   11. ~createBeanInstance()~ 创建 Bean 实例
+   12. ~addSingletonFactory()~ 添加单例工厂
+   13. ~populateBean()~ 填充 Bean 属性
+   14. ~initializeBean()~ 初始化 Bean
+   15. ~addSingleton()~ 添加单例 Bean
 
 * 容器实现原理
 ** Bean 工厂接口: BeanFactory
@@ -1968,6 +1987,7 @@
         - ~destroyBeans()~ 销毁 Bean
         - ~cancelRefresh(ex)~ 重置 active 标注
     14. 最终结束, ~resetCommonCaches()~ 清空缓存
+
 *** 环境准备
     该部分主要包括以下几类工作
     1. 设置一下系统启动时间
