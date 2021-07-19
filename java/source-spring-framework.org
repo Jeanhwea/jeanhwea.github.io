@@ -1847,102 +1847,256 @@
     #+END_SRC
 
 ** 刷新应用上下文: ~refresh()~ 方法
-   该 ~refresh()~ 方法实现了 Spring 的 Bean 管理的全周期的流程，其中调用了 15 个
-   辅助方法，它的主要实现如下
-   #+BEGIN_SRC java
-     @Override
-     public void refresh() throws BeansException, IllegalStateException {
-         synchronized (this.startupShutdownMonitor) {
-             // Prepare this context for refreshing.
-             prepareRefresh();
+*** ~refresh()~ 方法总览
+    该 ~refresh()~ 方法实现了 Spring 的 Bean 管理的全周期的流程，其中调用了 15
+    个辅助方法，它的主要实现如下
+    #+BEGIN_SRC java
+      @Override
+      public void refresh() throws BeansException, IllegalStateException {
+          synchronized (this.startupShutdownMonitor) {
+              // Prepare this context for refreshing.
+              prepareRefresh();
 
-             // Tell the subclass to refresh the internal bean factory.
-             ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+              // Tell the subclass to refresh the internal bean factory.
+              ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-             // Prepare the bean factory for use in this context.
-             prepareBeanFactory(beanFactory);
+              // Prepare the bean factory for use in this context.
+              prepareBeanFactory(beanFactory);
 
-             try {
-                 // Allows post-processing of the bean factory in context subclasses.
-                 postProcessBeanFactory(beanFactory);
+              try {
+                  // Allows post-processing of the bean factory in context subclasses.
+                  postProcessBeanFactory(beanFactory);
 
-                 // Invoke factory processors registered as beans in the context.
-                 invokeBeanFactoryPostProcessors(beanFactory);
+                  // Invoke factory processors registered as beans in the context.
+                  invokeBeanFactoryPostProcessors(beanFactory);
 
-                 // Register bean processors that intercept bean creation.
-                 registerBeanPostProcessors(beanFactory);
+                  // Register bean processors that intercept bean creation.
+                  registerBeanPostProcessors(beanFactory);
 
-                 // Initialize message source for this context.
-                 initMessageSource();
+                  // Initialize message source for this context.
+                  initMessageSource();
 
-                 // Initialize event multicaster for this context.
-                 initApplicationEventMulticaster();
+                  // Initialize event multicaster for this context.
+                  initApplicationEventMulticaster();
 
-                 // Initialize other special beans in specific context subclasses.
-                 onRefresh();
+                  // Initialize other special beans in specific context subclasses.
+                  onRefresh();
 
-                 // Check for listener beans and register them.
-                 registerListeners();
+                  // Check for listener beans and register them.
+                  registerListeners();
 
-                 // Instantiate all remaining (non-lazy-init) singletons.
-                 finishBeanFactoryInitialization(beanFactory);
+                  // Instantiate all remaining (non-lazy-init) singletons.
+                  finishBeanFactoryInitialization(beanFactory);
 
-                 // Last step: publish corresponding event.
-                 finishRefresh();
-             }
+                  // Last step: publish corresponding event.
+                  finishRefresh();
+              }
 
-             catch (BeansException ex) {
-                 if (logger.isWarnEnabled()) {
-                     logger.warn("Exception encountered during context initialization - " +
-                             "cancelling refresh attempt: " + ex);
-                 }
+              catch (BeansException ex) {
+                  if (logger.isWarnEnabled()) {
+                      logger.warn("Exception encountered during context initialization - " +
+                              "cancelling refresh attempt: " + ex);
+                  }
 
-                 // Destroy already created singletons to avoid dangling resources.
-                 destroyBeans();
+                  // Destroy already created singletons to avoid dangling resources.
+                  destroyBeans();
 
-                 // Reset 'active' flag.
-                 cancelRefresh(ex);
+                  // Reset 'active' flag.
+                  cancelRefresh(ex);
 
-                 // Propagate exception to caller.
-                 throw ex;
-             }
+                  // Propagate exception to caller.
+                  throw ex;
+              }
 
-             finally {
-                 // Reset common introspection caches in Spring's core, since we
-                 // might not ever need metadata for singleton beans anymore...
-                 resetCommonCaches();
-             }
-         }
-     }
-   #+END_SRC
+              finally {
+                  // Reset common introspection caches in Spring's core, since we
+                  // might not ever need metadata for singleton beans anymore...
+                  resetCommonCaches();
+              }
+          }
+      }
+    #+END_SRC
 
-   每个方法的解释如下
-   1. ~prepareRefresh()~ 刷新应用上下文的准备工作
-      - 验证系统变量等
-   2. ~obtainFreshBeanFactory()~ 初始化 BeanFactory, 填充 BeanFactory 的属性
-   3. ~prepareBeanFactory(beanFactory)~ 准备当前上下文的 BeanFactory
-      - ~Qualifier~, ~@Autowired~ 注解支持
-   4. ~postProcessBeanFactory(beanFactory)~  的实现
-      该方法来扩展其功能，即子类重写当前方法来改变 BeanFactory 的功能
-   5. ~invokeBeanFactoryPostProcessors(beanFactory)~ 唤醒
-      BeanFactoryPostProcessor 的后置处理方法
-      - 调用 ~postProcessBeanFactory(...)~ 方法
-   6. ~registerBeanPostProcessors(beanFactory)~ 注册 BeanPostProcessor 的拦截器
-      - 拦截器在这里只是注册
-      - 调用拦截器在 ~getBean(...)~ 中实现
-   7. ~initMessageSource()~ 初始化不同语言的消息，提供国际化支持
-   8. ~initApplicationEventMulticaster()~ 初始化消息多播器
-      - 将 Bean 放入 ~applicationEventMulticaster~ 中
-   9. ~onRefresh()~ 提供子类的扩展接入点
-   10. ~registerListeners()~ 注册监听器，在所有注册的 Bean 中查找 listenerBean,
-       并将 listenerBean 添加到 applicationEventMulticaster 中
-   11. ~finishBeanFactoryInitialization(beanFactory)~ 初始化剩下的单例（非懒加载
-       的）
-   12. ~finishRefresh()~ 完成刷新过程，发布 ContextRefreshedEvent
-   13. 如果出现异常
-       - ~destroyBeans()~ 销毁 Bean
-       - ~cancelRefresh(ex)~ 重置 active 标注
-   14. 最终结束, ~resetCommonCaches()~ 清空缓存
+    每个方法的解释如下
+    1. ~prepareRefresh()~ 刷新应用上下文的准备工作
+       - 验证系统变量等
+    2. ~obtainFreshBeanFactory()~ 初始化 BeanFactory, 填充 BeanFactory 的属性
+       - 创建 BeanFactory
+       - 加载 BeanDefinition
+    3. ~prepareBeanFactory(beanFactory)~ 准备当前上下文的 BeanFactory
+       - ~@Qualifier~, ~@Autowired~ 注解支持
+    4. ~postProcessBeanFactory(beanFactory)~ 的实现该方法来扩展其功能，即子类重
+       写当前方法来改变 BeanFactory 的功能
+    5. ~invokeBeanFactoryPostProcessors(beanFactory)~ 唤醒
+       BeanFactoryPostProcessor 的后置处理方法
+       - 调用 ~postProcessBeanFactory(...)~ 方法
+    6. ~registerBeanPostProcessors(beanFactory)~ 注册 BeanPostProcessor 的拦截器
+       - 拦截器在这里只是注册
+       - 调用拦截器在 ~getBean(...)~ 中实现
+    7. ~initMessageSource()~ 初始化不同语言的消息，提供国际化支持
+    8. ~initApplicationEventMulticaster()~ 初始化消息多播器
+       - 将 Bean 放入 ~applicationEventMulticaster~ 中
+    9. ~onRefresh()~ 提供子类的扩展接入点
+    10. ~registerListeners()~ 注册监听器，在所有注册的 Bean 中查找 listenerBean,
+        并将 listenerBean 添加到 applicationEventMulticaster 中
+    11. ~finishBeanFactoryInitialization(beanFactory)~ 初始化剩下的单例（非懒加
+        载的）
+    12. ~finishRefresh()~ 完成刷新过程，发布 ContextRefreshedEvent
+    13. 如果出现异常
+        - ~destroyBeans()~ 销毁 Bean
+        - ~cancelRefresh(ex)~ 重置 active 标注
+    14. 最终结束, ~resetCommonCaches()~ 清空缓存
+*** 环境准备
+    该部分主要包括以下几类工作
+    1. 设置一下系统启动时间
+    2. ~initPropertySources()~ 提供个性化初始属性功能
+    3. ~getEnvironment().validateRequiredProperties()~ 对系统属性进行校验
+    4. 准备一些监听器 ApplicationListener
+    #+BEGIN_SRC java
+      /**
+       ,* Prepare this context for refreshing, setting its startup date and
+       ,* active flag as well as performing any initialization of property sources.
+       ,*/
+      protected void prepareRefresh() {
+          // Switch to active.
+          this.startupDate = System.currentTimeMillis();
+          this.closed.set(false);
+          this.active.set(true);
+
+          if (logger.isDebugEnabled()) {
+              if (logger.isTraceEnabled()) {
+                  logger.trace("Refreshing " + this);
+              }
+              else {
+                  logger.debug("Refreshing " + getDisplayName());
+              }
+          }
+
+          // Initialize any placeholder property sources in the context environment.
+          initPropertySources();
+
+          // Validate that all properties marked as required are resolvable:
+          // see ConfigurablePropertyResolver#setRequiredProperties
+          getEnvironment().validateRequiredProperties();
+
+          // Store pre-refresh ApplicationListeners...
+          if (this.earlyApplicationListeners == null) {
+              this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
+          }
+          else {
+              // Reset local application listeners to pre-refresh state.
+              this.applicationListeners.clear();
+              this.applicationListeners.addAll(this.earlyApplicationListeners);
+          }
+
+          // Allow for the collection of early ApplicationEvents,
+          // to be published once the multicaster is available...
+          this.earlyApplicationEvents = new LinkedHashSet<>();
+      }
+    #+END_SRC
+
+*** 加载 BeanFactory
+    ApplicationContext 是对 BeanFactory 的扩展，这里调用
+    ~obtainFreshBeanFactory()~ 方法获取 BeanFactory，但实际加载 BeanFactory 的实
+    现在 BeanFactory 中已经实现，通过之前对 BeanDefinition 加载分析知道
+    ~AbstractRefreshableApplicationContext~ 中的 ~refreshBeanFactory()~ 方法实现
+    了初始化 BeanFactory 的功能
+
+    #+BEGIN_SRC java
+      /**
+       ,* This implementation performs an actual refresh of this context's underlying
+       ,* bean factory, shutting down the previous bean factory (if any) and
+       ,* initializing a fresh bean factory for the next phase of the context's lifecycle.
+       ,*/
+      @Override
+      protected final void refreshBeanFactory() throws BeansException {
+          if (hasBeanFactory()) {
+              destroyBeans();
+              closeBeanFactory();
+          }
+          try {
+              DefaultListableBeanFactory beanFactory = createBeanFactory();
+              beanFactory.setSerializationId(getId());
+              customizeBeanFactory(beanFactory);
+              loadBeanDefinitions(beanFactory);
+              synchronized (this.beanFactoryMonitor) {
+                  this.beanFactory = beanFactory;
+              }
+          }
+          catch (IOException ex) {
+              throw new ApplicationContextException("I/O error parsing bean definition source for " + getDisplayName(), ex);
+          }
+      }
+    #+END_SRC
+
+    该方法功能如下
+    1. 调用 ~createBeanFactory()~ 方法创建 ~DefaultListableBeanFactory~
+    2. 指定序列化 ID
+    3. 配置自定义的 BeanFactory 参数
+    4. 加载 BeanDefinition
+    5. 设置全局的 beanFactory 类实例
+
+*** BeanFactory 准备工作
+    该项功能在 ~prepareBeanFactory(beanFactory)~ 函数中完成，它的实现如下
+    #+BEGIN_SRC java
+      /**
+       ,* Configure the factory's standard context characteristics,
+       ,* such as the context's ClassLoader and post-processors.
+       ,* @param beanFactory the BeanFactory to configure
+       ,*/
+      protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+          // Tell the internal bean factory to use the context's class loader etc.
+          beanFactory.setBeanClassLoader(getClassLoader());
+          beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
+          beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
+
+          // Configure the bean factory with context callbacks.
+          beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
+          beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
+          beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
+          beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
+          beanFactory.ignoreDependencyInterface(ApplicationEventPublisherAware.class);
+          beanFactory.ignoreDependencyInterface(MessageSourceAware.class);
+          beanFactory.ignoreDependencyInterface(ApplicationContextAware.class);
+
+          // BeanFactory interface not registered as resolvable type in a plain factory.
+          // MessageSource registered (and found for autowiring) as a bean.
+          beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
+          beanFactory.registerResolvableDependency(ResourceLoader.class, this);
+          beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);
+          beanFactory.registerResolvableDependency(ApplicationContext.class, this);
+
+          // Register early post-processor for detecting inner beans as ApplicationListeners.
+          beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
+
+          // Detect a LoadTimeWeaver and prepare for weaving, if found.
+          if (beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
+              beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));
+              // Set a temporary ClassLoader for type matching.
+              beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
+          }
+
+          // Register default environment beans.
+          if (!beanFactory.containsLocalBean(ENVIRONMENT_BEAN_NAME)) {
+              beanFactory.registerSingleton(ENVIRONMENT_BEAN_NAME, getEnvironment());
+          }
+          if (!beanFactory.containsLocalBean(SYSTEM_PROPERTIES_BEAN_NAME)) {
+              beanFactory.registerSingleton(SYSTEM_PROPERTIES_BEAN_NAME, getEnvironment().getSystemProperties());
+          }
+          if (!beanFactory.containsLocalBean(SYSTEM_ENVIRONMENT_BEAN_NAME)) {
+              beanFactory.registerSingleton(SYSTEM_ENVIRONMENT_BEAN_NAME, getEnvironment().getSystemEnvironment());
+          }
+      }
+    #+END_SRC
+
+    该方法做了以下工作
+    1. 配置 beanFactory 的内部环境，使 beanFactory 使用当前 ApplicationContext
+       的上下文，具体包括
+       - 设置 beanFactory 的类加载器
+       - 设置 beanFactory 对 SPEL 语言的支持
+       - 设置 beanFactory 对属性编辑器的支持
+    2. 配置 beanFactory 的回调函数，配置一系列 Aware 接口
+       - 设置
 
 * AOP
   使用动态代理实现
