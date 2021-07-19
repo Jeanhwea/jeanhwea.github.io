@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-19 Mon 09:48 -->
+<!-- 2021-07-19 Mon 16:32 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Spring Framework v5.2.5.RELEASE 源码赏析</title>
@@ -233,67 +233,77 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org53d152e">1. Spring 核心类梳理</a></li>
-<li><a href="#org57913a5">2. 容器实现原理</a>
+<li><a href="#org8ea41bc">1. Spring 核心类梳理</a></li>
+<li><a href="#org80c9041">2. 容器实现原理</a>
 <ul>
-<li><a href="#org2294b24">2.1. Bean 工厂接口: BeanFactory</a></li>
-<li><a href="#org0ac9916">2.2. Bean 工厂的实现类: DefaultListableBeanFactory</a></li>
-<li><a href="#orga34ccb6">2.3. Bean 定义的读取器: XmlBeanDefinitionReader</a></li>
-<li><a href="#orgf31efe7">2.4. BeanDefinition 自动加载流程</a></li>
-<li><a href="#orgccff8a6">2.5. BeanDefinition 注册的实现</a></li>
-<li><a href="#org999c48a">2.6. BeanDefinition 移除的实现</a></li>
-<li><a href="#orgf283d67">2.7. BeanDefinition 获取的实现</a></li>
-<li><a href="#org166bd64">2.8. <code>&lt;bean/&gt;</code> 标签解析</a></li>
+<li><a href="#orgc634384">2.1. Bean 工厂接口: BeanFactory</a></li>
+<li><a href="#org1029bec">2.2. Bean 工厂的实现类: DefaultListableBeanFactory</a></li>
+<li><a href="#org66a182e">2.3. Bean 定义的读取器: XmlBeanDefinitionReader</a></li>
+<li><a href="#orgf45b0a8">2.4. BeanDefinition 自动加载流程</a></li>
+<li><a href="#org3c32f00">2.5. BeanDefinition 注册的实现</a></li>
+<li><a href="#org317e139">2.6. BeanDefinition 移除的实现</a></li>
+<li><a href="#org18620b2">2.7. BeanDefinition 获取的实现</a></li>
+<li><a href="#org4e1fbd6">2.8. <code>&lt;bean/&gt;</code> 标签解析</a></li>
 </ul>
 </li>
-<li><a href="#org8064239">3. Bean 实现原理</a>
+<li><a href="#org202d6a6">3. Bean 实现原理</a>
 <ul>
-<li><a href="#orge25da59">3.1. Bean 的生命周期</a></li>
-<li><a href="#org03ecee6">3.2. Bean 的流程分析</a>
+<li><a href="#org3f3dd28">3.1. Bean 的生命周期</a></li>
+<li><a href="#org06c3bc5">3.2. Bean 的流程分析</a>
 <ul>
-<li><a href="#orgee84b3c">3.2.1. 实例化 Bean: <code>instantiateBean()</code> 方法</a></li>
-<li><a href="#orgaa70b82">3.2.2. 获取 Bean 实例: <code>doGetBean()</code> 方法</a></li>
+<li><a href="#orgfe23c54">3.2.1. 实例化 Bean: <code>instantiateBean()</code> 方法</a></li>
+<li><a href="#org5b3ae48">3.2.2. 获取 Bean 实例: <code>doGetBean()</code> 方法</a></li>
 </ul>
 </li>
-<li><a href="#org364febe">3.3. 特殊的 Spring Bean: FactoryBean</a></li>
-<li><a href="#orgde31f43">3.4. 单例 Bean 工厂的实现</a>
+<li><a href="#org602c549">3.3. 特殊的 Spring Bean: FactoryBean</a></li>
+<li><a href="#orgea5dfca">3.4. 单例 Bean 工厂的实现</a>
 <ul>
-<li><a href="#org3c53e19">3.4.1. 单例 Bean 工厂的三级缓存: <code>DefaultSingletonBeanRegistry</code> 类的缓存</a></li>
-<li><a href="#orgc149b82">3.4.2. 获取单例 Bean 方法: <code>getSingleton(...)</code> 方法</a></li>
-<li><a href="#orgf0ced63">3.4.3. beanInstance 到 beanOject 过程: <code>getObjectForBeanInstance(...)</code> 方法</a></li>
+<li><a href="#orge22e724">3.4.1. 单例 Bean 工厂的三级缓存: <code>DefaultSingletonBeanRegistry</code> 类的缓存</a></li>
+<li><a href="#org42e7190">3.4.2. 获取单例 Bean 方法: <code>getSingleton(...)</code> 方法</a></li>
+<li><a href="#org03813b8">3.4.3. beanInstance 到 beanOject 过程: <code>getObjectForBeanInstance(...)</code> 方法</a></li>
 </ul>
 </li>
-<li><a href="#org476a33e">3.5. Bean 生命周期的实现</a>
+<li><a href="#orgdd1d4c2">3.5. Bean 生命周期的实现</a>
 <ul>
-<li><a href="#orgf88a21f">3.5.1. Bean 创建的实现类: <code>AbstractAutowireCapableBeanFactory</code></a></li>
-<li><a href="#orgd22e441">3.5.2. Bean 的实例化: <code>createBean(...)</code> 方法</a></li>
-<li><a href="#orga5848a1">3.5.3. Bean 的初始化: <code>initializeBean(...)</code> 方法</a></li>
-<li><a href="#org2ae9cb9">3.5.4. Bean 的销毁</a></li>
+<li><a href="#orgc501a11">3.5.1. Bean 创建的实现类: <code>AbstractAutowireCapableBeanFactory</code></a></li>
+<li><a href="#orgd9311cd">3.5.2. Bean 的实例化: <code>createBean(...)</code> 方法</a></li>
+<li><a href="#org2080711">3.5.3. Bean 的初始化: <code>initializeBean(...)</code> 方法</a></li>
+<li><a href="#org07a784c">3.5.4. Bean 的销毁</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orge794f64">4. 容器功能扩展</a>
+<li><a href="#orgd96d228">4. 容器功能扩展</a>
 <ul>
-<li><a href="#orgd45530e">4.1. 应用上下文: ApplicationContext</a></li>
-<li><a href="#org6d1529d">4.2. ApplicationContext 接口的常见实现类</a>
+<li><a href="#org26d85db">4.1. 应用上下文: ApplicationContext</a></li>
+<li><a href="#org4822aa0">4.2. ApplicationContext 接口的常见实现类</a>
 <ul>
-<li><a href="#org8b8ddd6">4.2.1. ClassPathXmlApplicationContext</a></li>
-<li><a href="#orgd062ff1">4.2.2. AnnotationConfigApplicationContext</a></li>
+<li><a href="#org231995a">4.2.1. ClassPathXmlApplicationContext</a></li>
+<li><a href="#org822e20c">4.2.2. AnnotationConfigApplicationContext</a></li>
 </ul>
 </li>
-<li><a href="#orgf4faae6">4.3. 刷新应用上下文: <code>refresh()</code> 方法</a></li>
+<li><a href="#orgf0e81a4">4.3. 刷新应用上下文: <code>refresh()</code> 方法</a>
+<ul>
+<li><a href="#org11211b8">4.3.1. <code>refresh()</code> 方法总览</a></li>
+<li><a href="#orgd803a5c">4.3.2. 环境准备</a></li>
+<li><a href="#org8f41d56">4.3.3. 加载 BeanFactory</a></li>
+<li><a href="#org17d2693">4.3.4. BeanFactory 准备工作</a></li>
+<li><a href="#org67ae7dc">4.3.5. BeanFactory 后续处理工作</a></li>
+<li><a href="#org64efd30">4.3.6. 初始化非延迟加载单例</a></li>
+<li><a href="#org8dd4055">4.3.7. 完成上下文刷新</a></li>
 </ul>
 </li>
-<li><a href="#org38a4880">5. AOP</a></li>
-<li><a href="#org636cda6">6. SpringBoot 自动装配</a></li>
-<li><a href="#org535ccd9">7. 参考链接</a></li>
+</ul>
+</li>
+<li><a href="#org650bdd7">5. AOP</a></li>
+<li><a href="#org68baeaf">6. SpringBoot 自动装配</a></li>
+<li><a href="#orgf71e20c">7. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org53d152e" class="outline-2">
-<h2 id="org53d152e"><span class="section-number-2">1</span> Spring 核心类梳理</h2>
+<div id="outline-container-org8ea41bc" class="outline-2">
+<h2 id="org8ea41bc"><span class="section-number-2">1</span> Spring 核心类梳理</h2>
 <div class="outline-text-2" id="text-1">
 <ol class="org-ol">
 <li>ApplicationContext
@@ -340,12 +350,12 @@
 </div>
 </div>
 
-<div id="outline-container-org57913a5" class="outline-2">
-<h2 id="org57913a5"><span class="section-number-2">2</span> 容器实现原理</h2>
+<div id="outline-container-org80c9041" class="outline-2">
+<h2 id="org80c9041"><span class="section-number-2">2</span> 容器实现原理</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org2294b24" class="outline-3">
-<h3 id="org2294b24"><span class="section-number-3">2.1</span> Bean 工厂接口: BeanFactory</h3>
+<div id="outline-container-orgc634384" class="outline-3">
+<h3 id="orgc634384"><span class="section-number-3">2.1</span> Bean 工厂接口: BeanFactory</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 <code>BeanFactory</code> 是 Spring 的 Bean 工厂的接口定义，它定义对 Spring Bean 容器访问的
@@ -387,8 +397,8 @@
 </div>
 </div>
 
-<div id="outline-container-org0ac9916" class="outline-3">
-<h3 id="org0ac9916"><span class="section-number-3">2.2</span> Bean 工厂的实现类: DefaultListableBeanFactory</h3>
+<div id="outline-container-org1029bec" class="outline-3">
+<h3 id="org1029bec"><span class="section-number-3">2.2</span> Bean 工厂的实现类: DefaultListableBeanFactory</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 <code>DefaultListableBeanFactory</code> 是实现 <code>BeanFactory</code> 接口的核心类，熟悉它的类继
@@ -468,8 +478,8 @@ BeanDefinition, 直接通过实现 <code>T getObject()</code> 方法来返回创
 </div>
 </div>
 
-<div id="outline-container-orga34ccb6" class="outline-3">
-<h3 id="orga34ccb6"><span class="section-number-3">2.3</span> Bean 定义的读取器: XmlBeanDefinitionReader</h3>
+<div id="outline-container-org66a182e" class="outline-3">
+<h3 id="org66a182e"><span class="section-number-3">2.3</span> Bean 定义的读取器: XmlBeanDefinitionReader</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 <code>XmlBeanDefinitionReader</code> 是实现读取 BeanDefinition 的类，它的继承关系如下
@@ -522,8 +532,8 @@ Class XmlBeanDefinitionReader
 </div>
 </div>
 
-<div id="outline-container-orgf31efe7" class="outline-3">
-<h3 id="orgf31efe7"><span class="section-number-3">2.4</span> BeanDefinition 自动加载流程</h3>
+<div id="outline-container-orgf45b0a8" class="outline-3">
+<h3 id="orgf45b0a8"><span class="section-number-3">2.4</span> BeanDefinition 自动加载流程</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 <code>DefaultListableBeanFactory</code> 类定义了存储 BeanDefinition 类的哈希表, 具体定义如下
@@ -689,8 +699,8 @@ BeanDefinition</li>
 </div>
 </div>
 
-<div id="outline-container-orgccff8a6" class="outline-3">
-<h3 id="orgccff8a6"><span class="section-number-3">2.5</span> BeanDefinition 注册的实现</h3>
+<div id="outline-container-org3c32f00" class="outline-3">
+<h3 id="org3c32f00"><span class="section-number-3">2.5</span> BeanDefinition 注册的实现</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 <code>DefaultListableBeanFactory</code> 的 <code>registerBeanDefinition(...)</code> 才是真正实现注
@@ -837,8 +847,8 @@ BeanDefinition</li>
 </div>
 </div>
 
-<div id="outline-container-org999c48a" class="outline-3">
-<h3 id="org999c48a"><span class="section-number-3">2.6</span> BeanDefinition 移除的实现</h3>
+<div id="outline-container-org317e139" class="outline-3">
+<h3 id="org317e139"><span class="section-number-3">2.6</span> BeanDefinition 移除的实现</h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</code> 方法
@@ -924,8 +934,8 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-orgf283d67" class="outline-3">
-<h3 id="orgf283d67"><span class="section-number-3">2.7</span> BeanDefinition 获取的实现</h3>
+<div id="outline-container-org18620b2" class="outline-3">
+<h3 id="org18620b2"><span class="section-number-3">2.7</span> BeanDefinition 获取的实现</h3>
 <div class="outline-text-3" id="text-2-7">
 <p>
 <code>DefaultListableBeanFactory</code> 的实现获取 BeanDefinition 的逻辑如下
@@ -947,8 +957,8 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-org166bd64" class="outline-3">
-<h3 id="org166bd64"><span class="section-number-3">2.8</span> <code>&lt;bean/&gt;</code> 标签解析</h3>
+<div id="outline-container-org4e1fbd6" class="outline-3">
+<h3 id="org4e1fbd6"><span class="section-number-3">2.8</span> <code>&lt;bean/&gt;</code> 标签解析</h3>
 <div class="outline-text-3" id="text-2-8">
 <p>
 之前在 BeanDefinition 自动加载流程中忽略了对 <code>&lt;bean/&gt;</code> 标签的解析，其核心实现
@@ -1053,12 +1063,12 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-org8064239" class="outline-2">
-<h2 id="org8064239"><span class="section-number-2">3</span> Bean 实现原理</h2>
+<div id="outline-container-org202d6a6" class="outline-2">
+<h2 id="org202d6a6"><span class="section-number-2">3</span> Bean 实现原理</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orge25da59" class="outline-3">
-<h3 id="orge25da59"><span class="section-number-3">3.1</span> Bean 的生命周期</h3>
+<div id="outline-container-org3f3dd28" class="outline-3">
+<h3 id="org3f3dd28"><span class="section-number-3">3.1</span> Bean 的生命周期</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 <code>BeanFactory</code> 的注释中完整地说明的实现标准 BeanFactory 的代码
@@ -1094,8 +1104,8 @@ ApplicationContext 中</li>
 </div>
 </div>
 
-<div id="outline-container-org03ecee6" class="outline-3">
-<h3 id="org03ecee6"><span class="section-number-3">3.2</span> Bean 的流程分析</h3>
+<div id="outline-container-org06c3bc5" class="outline-3">
+<h3 id="org06c3bc5"><span class="section-number-3">3.2</span> Bean 的流程分析</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 实例化 Bean 的方法为 <code>BeanUtils#instantiateClass(...)</code>, 先添加断点获取调用栈
@@ -1130,8 +1140,8 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </ol>
 </div>
 
-<div id="outline-container-orgee84b3c" class="outline-4">
-<h4 id="orgee84b3c"><span class="section-number-4">3.2.1</span> 实例化 Bean: <code>instantiateBean()</code> 方法</h4>
+<div id="outline-container-orgfe23c54" class="outline-4">
+<h4 id="orgfe23c54"><span class="section-number-4">3.2.1</span> 实例化 Bean: <code>instantiateBean()</code> 方法</h4>
 <div class="outline-text-4" id="text-3-2-1">
 <p>
 <code>instantiateBean(...)</code> 实例化 Bean 主要完成如下工作
@@ -1184,8 +1194,8 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </div>
 </div>
 
-<div id="outline-container-orgaa70b82" class="outline-4">
-<h4 id="orgaa70b82"><span class="section-number-4">3.2.2</span> 获取 Bean 实例: <code>doGetBean()</code> 方法</h4>
+<div id="outline-container-org5b3ae48" class="outline-4">
+<h4 id="org5b3ae48"><span class="section-number-4">3.2.2</span> 获取 Bean 实例: <code>doGetBean()</code> 方法</h4>
 <div class="outline-text-4" id="text-3-2-2">
 <p>
 <code>doGetBean(...)</code> 方法是获取 Bean 的最终处理函数，它的逻辑比较复杂，可以分成
@@ -1412,8 +1422,8 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </div>
 </div>
 </div>
-<div id="outline-container-org364febe" class="outline-3">
-<h3 id="org364febe"><span class="section-number-3">3.3</span> 特殊的 Spring Bean: FactoryBean</h3>
+<div id="outline-container-org602c549" class="outline-3">
+<h3 id="org602c549"><span class="section-number-3">3.3</span> 特殊的 Spring Bean: FactoryBean</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 FactoryBean 不同于普通的 Bean， FactoryBean 自身就是一个组装 Bean 的微型工厂，
@@ -1443,12 +1453,12 @@ FactoryBean 不同于普通的 Bean， FactoryBean 自身就是一个组装 Bean
 </div>
 </div>
 
-<div id="outline-container-orgde31f43" class="outline-3">
-<h3 id="orgde31f43"><span class="section-number-3">3.4</span> 单例 Bean 工厂的实现</h3>
+<div id="outline-container-orgea5dfca" class="outline-3">
+<h3 id="orgea5dfca"><span class="section-number-3">3.4</span> 单例 Bean 工厂的实现</h3>
 <div class="outline-text-3" id="text-3-4">
 </div>
-<div id="outline-container-org3c53e19" class="outline-4">
-<h4 id="org3c53e19"><span class="section-number-4">3.4.1</span> 单例 Bean 工厂的三级缓存: <code>DefaultSingletonBeanRegistry</code> 类的缓存</h4>
+<div id="outline-container-orge22e724" class="outline-4">
+<h4 id="orge22e724"><span class="section-number-4">3.4.1</span> 单例 Bean 工厂的三级缓存: <code>DefaultSingletonBeanRegistry</code> 类的缓存</h4>
 <div class="outline-text-4" id="text-3-4-1">
 <p>
 <code>DefaultSingletonBeanRegistry</code> 是对单例 Bean 注册的实现类，它的继承关系如下
@@ -1550,8 +1560,8 @@ singletonFactories: 三级缓存单例对象工厂 ObjectFactory
 </div>
 </div>
 
-<div id="outline-container-orgc149b82" class="outline-4">
-<h4 id="orgc149b82"><span class="section-number-4">3.4.2</span> 获取单例 Bean 方法: <code>getSingleton(...)</code> 方法</h4>
+<div id="outline-container-org42e7190" class="outline-4">
+<h4 id="org42e7190"><span class="section-number-4">3.4.2</span> 获取单例 Bean 方法: <code>getSingleton(...)</code> 方法</h4>
 <div class="outline-text-4" id="text-3-4-2">
 <p>
 <code>getSingleton()</code> 方法是获取 Bean 的核心方法, 它的实现如下
@@ -1696,8 +1706,8 @@ singletonObject 对象</li>
 </div>
 </div>
 
-<div id="outline-container-orgf0ced63" class="outline-4">
-<h4 id="orgf0ced63"><span class="section-number-4">3.4.3</span> beanInstance 到 beanOject 过程: <code>getObjectForBeanInstance(...)</code> 方法</h4>
+<div id="outline-container-org03813b8" class="outline-4">
+<h4 id="org03813b8"><span class="section-number-4">3.4.3</span> beanInstance 到 beanOject 过程: <code>getObjectForBeanInstance(...)</code> 方法</h4>
 <div class="outline-text-4" id="text-3-4-3">
 <p>
 beanInstance -&gt; beanOject 是将缓存中的 Bean 实例转化成最终用户所需对象的过程，
@@ -1873,12 +1883,12 @@ main:25, MyApp04 (io.github.jeanhwea.app04_factory_bean)
 </div>
 </div>
 
-<div id="outline-container-org476a33e" class="outline-3">
-<h3 id="org476a33e"><span class="section-number-3">3.5</span> Bean 生命周期的实现</h3>
+<div id="outline-container-orgdd1d4c2" class="outline-3">
+<h3 id="orgdd1d4c2"><span class="section-number-3">3.5</span> Bean 生命周期的实现</h3>
 <div class="outline-text-3" id="text-3-5">
 </div>
-<div id="outline-container-orgf88a21f" class="outline-4">
-<h4 id="orgf88a21f"><span class="section-number-4">3.5.1</span> Bean 创建的实现类: <code>AbstractAutowireCapableBeanFactory</code></h4>
+<div id="outline-container-orgc501a11" class="outline-4">
+<h4 id="orgc501a11"><span class="section-number-4">3.5.1</span> Bean 创建的实现类: <code>AbstractAutowireCapableBeanFactory</code></h4>
 <div class="outline-text-4" id="text-3-5-1">
 <p>
 先看 <code>AbstractAutowireCapableBeanFactory</code> 的类继承关系
@@ -1951,8 +1961,8 @@ Class AbstractAutowireCapableBeanFactory
 </ol>
 </div>
 </div>
-<div id="outline-container-orgd22e441" class="outline-4">
-<h4 id="orgd22e441"><span class="section-number-4">3.5.2</span> Bean 的实例化: <code>createBean(...)</code> 方法</h4>
+<div id="outline-container-orgd9311cd" class="outline-4">
+<h4 id="orgd9311cd"><span class="section-number-4">3.5.2</span> Bean 的实例化: <code>createBean(...)</code> 方法</h4>
 <div class="outline-text-4" id="text-3-5-2">
 <p>
 实际实例化 Bean 是在 <code>doCreateBean(...)</code> 方法中完成的，先准备一下调用栈
@@ -2241,8 +2251,8 @@ singletonFactories 缓存中</li>
 </div>
 </div>
 
-<div id="outline-container-orga5848a1" class="outline-4">
-<h4 id="orga5848a1"><span class="section-number-4">3.5.3</span> Bean 的初始化: <code>initializeBean(...)</code> 方法</h4>
+<div id="outline-container-org2080711" class="outline-4">
+<h4 id="org2080711"><span class="section-number-4">3.5.3</span> Bean 的初始化: <code>initializeBean(...)</code> 方法</h4>
 <div class="outline-text-4" id="text-3-5-3">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #d33682;">/**</span>
@@ -2318,8 +2328,8 @@ singletonFactories 缓存中</li>
 </div>
 </div>
 
-<div id="outline-container-org2ae9cb9" class="outline-4">
-<h4 id="org2ae9cb9"><span class="section-number-4">3.5.4</span> Bean 的销毁</h4>
+<div id="outline-container-org07a784c" class="outline-4">
+<h4 id="org07a784c"><span class="section-number-4">3.5.4</span> Bean 的销毁</h4>
 <div class="outline-text-4" id="text-3-5-4">
 <p>
 在 <code>doCreateBean(...)</code> 方法中调用了 <code>registerDisposableBeanIfNecessary(...)</code>
@@ -2366,12 +2376,12 @@ singletonFactories 缓存中</li>
 </div>
 </div>
 
-<div id="outline-container-orge794f64" class="outline-2">
-<h2 id="orge794f64"><span class="section-number-2">4</span> 容器功能扩展</h2>
+<div id="outline-container-orgd96d228" class="outline-2">
+<h2 id="orgd96d228"><span class="section-number-2">4</span> 容器功能扩展</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-orgd45530e" class="outline-3">
-<h3 id="orgd45530e"><span class="section-number-3">4.1</span> 应用上下文: ApplicationContext</h3>
+<div id="outline-container-org26d85db" class="outline-3">
+<h3 id="org26d85db"><span class="section-number-3">4.1</span> 应用上下文: ApplicationContext</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 首先查看 <code>ApplicationContext</code> 接口的相关信息
@@ -2404,12 +2414,12 @@ Interface ApplicationContext
 </div>
 </div>
 
-<div id="outline-container-org6d1529d" class="outline-3">
-<h3 id="org6d1529d"><span class="section-number-3">4.2</span> ApplicationContext 接口的常见实现类</h3>
+<div id="outline-container-org4822aa0" class="outline-3">
+<h3 id="org4822aa0"><span class="section-number-3">4.2</span> ApplicationContext 接口的常见实现类</h3>
 <div class="outline-text-3" id="text-4-2">
 </div>
-<div id="outline-container-org8b8ddd6" class="outline-4">
-<h4 id="org8b8ddd6"><span class="section-number-4">4.2.1</span> ClassPathXmlApplicationContext</h4>
+<div id="outline-container-org231995a" class="outline-4">
+<h4 id="org231995a"><span class="section-number-4">4.2.1</span> ClassPathXmlApplicationContext</h4>
 <div class="outline-text-4" id="text-4-2-1">
 <p>
 读取 ClassPath 中 XML 配置文件的 Bean 定义的容器
@@ -2472,8 +2482,8 @@ Class ClassPathXmlApplicationContext
 </div>
 </div>
 
-<div id="outline-container-orgd062ff1" class="outline-4">
-<h4 id="orgd062ff1"><span class="section-number-4">4.2.2</span> AnnotationConfigApplicationContext</h4>
+<div id="outline-container-org822e20c" class="outline-4">
+<h4 id="org822e20c"><span class="section-number-4">4.2.2</span> AnnotationConfigApplicationContext</h4>
 <div class="outline-text-4" id="text-4-2-2">
 <p>
 读取注解类型 Bean 定义的容器, <code>@Component</code>, <code>@Service</code> 等
@@ -2563,12 +2573,16 @@ Class AnnotationConfigApplicationContext
 </div>
 </div>
 
-<div id="outline-container-orgf4faae6" class="outline-3">
-<h3 id="orgf4faae6"><span class="section-number-3">4.3</span> 刷新应用上下文: <code>refresh()</code> 方法</h3>
+<div id="outline-container-orgf0e81a4" class="outline-3">
+<h3 id="orgf0e81a4"><span class="section-number-3">4.3</span> 刷新应用上下文: <code>refresh()</code> 方法</h3>
 <div class="outline-text-3" id="text-4-3">
+</div>
+<div id="outline-container-org11211b8" class="outline-4">
+<h4 id="org11211b8"><span class="section-number-4">4.3.1</span> <code>refresh()</code> 方法总览</h4>
+<div class="outline-text-4" id="text-4-3-1">
 <p>
-该 <code>refresh()</code> 方法实现了 Spring 的 Bean 管理的全周期的流程，其中调用了 15 个
-辅助方法，它的主要实现如下
+该 <code>refresh()</code> 方法实现了 Spring 的 Bean 管理的全周期的流程，其中调用了 15
+个辅助方法，它的主要实现如下
 </p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@Override</span>
@@ -2646,13 +2660,17 @@ Class AnnotationConfigApplicationContext
 <ul class="org-ul">
 <li>验证系统变量等</li>
 </ul></li>
-<li><code>obtainFreshBeanFactory()</code> 初始化 BeanFactory, 填充 BeanFactory 的属性</li>
+<li><code>obtainFreshBeanFactory()</code> 初始化 BeanFactory, 填充 BeanFactory 的属性
+<ul class="org-ul">
+<li>创建 BeanFactory</li>
+<li>加载 BeanDefinition</li>
+</ul></li>
 <li><code>prepareBeanFactory(beanFactory)</code> 准备当前上下文的 BeanFactory
 <ul class="org-ul">
-<li><code>Qualifier</code>, <code>@Autowired</code> 注解支持</li>
+<li><code>@Qualifier</code>, <code>@Autowired</code> 注解支持</li>
 </ul></li>
-<li><code>postProcessBeanFactory(beanFactory)</code>  的实现
-该方法来扩展其功能，即子类重写当前方法来改变 BeanFactory 的功能</li>
+<li><code>postProcessBeanFactory(beanFactory)</code> 的实现该方法来扩展其功能，即子类重
+写当前方法来改变 BeanFactory 的功能</li>
 <li><code>invokeBeanFactoryPostProcessors(beanFactory)</code> 唤醒
 BeanFactoryPostProcessor 的后置处理方法
 <ul class="org-ul">
@@ -2671,8 +2689,8 @@ BeanFactoryPostProcessor 的后置处理方法
 <li><code>onRefresh()</code> 提供子类的扩展接入点</li>
 <li><code>registerListeners()</code> 注册监听器，在所有注册的 Bean 中查找 listenerBean,
 并将 listenerBean 添加到 applicationEventMulticaster 中</li>
-<li><code>finishBeanFactoryInitialization(beanFactory)</code> 初始化剩下的单例（非懒加载
-的）</li>
+<li><code>finishBeanFactoryInitialization(beanFactory)</code> 初始化剩下的单例（非懒加
+载的）</li>
 <li><code>finishRefresh()</code> 完成刷新过程，发布 ContextRefreshedEvent</li>
 <li>如果出现异常
 <ul class="org-ul">
@@ -2683,10 +2701,828 @@ BeanFactoryPostProcessor 的后置处理方法
 </ol>
 </div>
 </div>
+<div id="outline-container-orgd803a5c" class="outline-4">
+<h4 id="orgd803a5c"><span class="section-number-4">4.3.2</span> 环境准备</h4>
+<div class="outline-text-4" id="text-4-3-2">
+<p>
+该部分主要包括以下几类工作
+</p>
+<ol class="org-ol">
+<li>设置一下系统启动时间</li>
+<li><code>initPropertySources()</code> 提供个性化初始属性功能</li>
+<li><code>getEnvironment().validateRequiredProperties()</code> 对系统属性进行校验</li>
+<li>准备一些监听器 ApplicationListener</li>
+</ol>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Prepare this context for refreshing, setting its startup date and</span>
+<span style="color: #d33682;"> * active flag as well as performing any initialization of property sources.</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">prepareRefresh</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Switch to active.</span>
+    <span style="color: #859900;">this</span>.startupDate = System.currentTimeMillis<span style="color: #d8241f;">()</span>;
+    <span style="color: #859900;">this</span>.closed.set<span style="color: #d8241f;">(</span><span style="color: #268bd2;">false</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">this</span>.active.set<span style="color: #d8241f;">(</span><span style="color: #268bd2;">true</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>logger.isDebugEnabled<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>logger.isTraceEnabled<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            logger.trace<span style="color: #24a222;">(</span><span style="color: #2aa198;">"Refreshing "</span> + <span style="color: #859900;">this</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #9564bf;">{</span>
+            logger.debug<span style="color: #24a222;">(</span><span style="color: #2aa198;">"Refreshing "</span> + getDisplayName<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Initialize any placeholder property sources in the context environment.</span>
+    initPropertySources<span style="color: #d8241f;">()</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Validate that all properties marked as required are resolvable:</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">see ConfigurablePropertyResolver#setRequiredProperties</span>
+    getEnvironment<span style="color: #d8241f;">()</span>.validateRequiredProperties<span style="color: #d8241f;">()</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Store pre-refresh ApplicationListeners...</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span><span style="color: #859900;">this</span>.earlyApplicationListeners == <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">this</span>.earlyApplicationListeners = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedHashSet</span><span style="color: #9564bf;">&lt;&gt;(</span><span style="color: #859900;">this</span>.applicationListeners<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Reset local application listeners to pre-refresh state.</span>
+        <span style="color: #859900;">this</span>.applicationListeners.clear<span style="color: #9564bf;">()</span>;
+        <span style="color: #859900;">this</span>.applicationListeners.addAll<span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.earlyApplicationListeners<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Allow for the collection of early ApplicationEvents,</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">to be published once the multicaster is available...</span>
+    <span style="color: #859900;">this</span>.earlyApplicationEvents = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedHashSet</span><span style="color: #d8241f;">&lt;&gt;()</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
 </div>
 
-<div id="outline-container-org38a4880" class="outline-2">
-<h2 id="org38a4880"><span class="section-number-2">5</span> AOP</h2>
+<div id="outline-container-org8f41d56" class="outline-4">
+<h4 id="org8f41d56"><span class="section-number-4">4.3.3</span> 加载 BeanFactory</h4>
+<div class="outline-text-4" id="text-4-3-3">
+<p>
+ApplicationContext 是对 BeanFactory 的扩展，这里调用
+<code>obtainFreshBeanFactory()</code> 方法获取 BeanFactory，但实际加载 BeanFactory 的实
+现在 BeanFactory 中已经实现，通过之前对 BeanDefinition 加载分析知道
+<code>AbstractRefreshableApplicationContext</code> 中的 <code>refreshBeanFactory()</code> 方法实现
+了初始化 BeanFactory 的功能
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * This implementation performs an actual refresh of this context's underlying</span>
+<span style="color: #d33682;"> * bean factory, shutting down the previous bean factory (if any) and</span>
+<span style="color: #d33682;"> * initializing a fresh bean factory for the next phase of the context's lifecycle.</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #268bd2;">@Override</span>
+<span style="color: #859900;">protected</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">refreshBeanFactory</span><span style="color: #8d5649;">()</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeansException</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>hasBeanFactory<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        destroyBeans<span style="color: #9564bf;">()</span>;
+        closeBeanFactory<span style="color: #9564bf;">()</span>;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">try</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #268bd2;">DefaultListableBeanFactory</span> <span style="color: #6c71c4;">beanFactory</span> = createBeanFactory<span style="color: #9564bf;">()</span>;
+        beanFactory.setSerializationId<span style="color: #9564bf;">(</span>getId<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+        customizeBeanFactory<span style="color: #9564bf;">(</span>beanFactory<span style="color: #9564bf;">)</span>;
+        loadBeanDefinitions<span style="color: #9564bf;">(</span>beanFactory<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">synchronized</span> <span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.beanFactoryMonitor<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">this</span>.beanFactory = beanFactory;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">IOException</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">ApplicationContextException</span><span style="color: #9564bf;">(</span><span style="color: #2aa198;">"I/O error parsing bean definition source for "</span> + getDisplayName<span style="color: #24a222;">()</span>, ex<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+该方法功能如下
+</p>
+<ol class="org-ol">
+<li>调用 <code>createBeanFactory()</code> 方法创建 <code>DefaultListableBeanFactory</code></li>
+<li>指定序列化 ID</li>
+<li>配置自定义的 BeanFactory 参数</li>
+<li>加载 BeanDefinition</li>
+<li>设置全局的 beanFactory 类实例</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org17d2693" class="outline-4">
+<h4 id="org17d2693"><span class="section-number-4">4.3.4</span> BeanFactory 准备工作</h4>
+<div class="outline-text-4" id="text-4-3-4">
+<p>
+该项功能在 <code>prepareBeanFactory(beanFactory)</code> 函数中完成，它的实现如下
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Configure the factory's standard context characteristics,</span>
+<span style="color: #d33682;"> * such as the context's ClassLoader and post-processors.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> beanFactory the BeanFactory to configure</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">prepareBeanFactory</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ConfigurableListableBeanFactory</span> <span style="color: #6c71c4;">beanFactory</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Tell the internal bean factory to use the context's class loader etc.</span>
+    beanFactory.setBeanClassLoader<span style="color: #d8241f;">(</span>getClassLoader<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span>;
+    beanFactory.setBeanExpressionResolver<span style="color: #d8241f;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">StandardBeanExpressionResolver</span><span style="color: #9564bf;">(</span>beanFactory.getBeanClassLoader<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span>;
+    beanFactory.addPropertyEditorRegistrar<span style="color: #d8241f;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">ResourceEditorRegistrar</span><span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>, getEnvironment<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Configure the bean factory with context callbacks.</span>
+    beanFactory.addBeanPostProcessor<span style="color: #d8241f;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">ApplicationContextAwareProcessor</span><span style="color: #9564bf;">(</span><span style="color: #859900;">this</span><span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span>;
+    beanFactory.ignoreDependencyInterface<span style="color: #d8241f;">(</span>EnvironmentAware.<span style="color: #859900;">class</span><span style="color: #d8241f;">)</span>;
+    beanFactory.ignoreDependencyInterface<span style="color: #d8241f;">(</span>EmbeddedValueResolverAware.<span style="color: #859900;">class</span><span style="color: #d8241f;">)</span>;
+    beanFactory.ignoreDependencyInterface<span style="color: #d8241f;">(</span>ResourceLoaderAware.<span style="color: #859900;">class</span><span style="color: #d8241f;">)</span>;
+    beanFactory.ignoreDependencyInterface<span style="color: #d8241f;">(</span>ApplicationEventPublisherAware.<span style="color: #859900;">class</span><span style="color: #d8241f;">)</span>;
+    beanFactory.ignoreDependencyInterface<span style="color: #d8241f;">(</span>MessageSourceAware.<span style="color: #859900;">class</span><span style="color: #d8241f;">)</span>;
+    beanFactory.ignoreDependencyInterface<span style="color: #d8241f;">(</span>ApplicationContextAware.<span style="color: #859900;">class</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">BeanFactory interface not registered as resolvable type in a plain factory.</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">MessageSource registered (and found for autowiring) as a bean.</span>
+    beanFactory.registerResolvableDependency<span style="color: #d8241f;">(</span>BeanFactory.<span style="color: #859900;">class</span>, beanFactory<span style="color: #d8241f;">)</span>;
+    beanFactory.registerResolvableDependency<span style="color: #d8241f;">(</span>ResourceLoader.<span style="color: #859900;">class</span>, <span style="color: #859900;">this</span><span style="color: #d8241f;">)</span>;
+    beanFactory.registerResolvableDependency<span style="color: #d8241f;">(</span>ApplicationEventPublisher.<span style="color: #859900;">class</span>, <span style="color: #859900;">this</span><span style="color: #d8241f;">)</span>;
+    beanFactory.registerResolvableDependency<span style="color: #d8241f;">(</span>ApplicationContext.<span style="color: #859900;">class</span>, <span style="color: #859900;">this</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Register early post-processor for detecting inner beans as ApplicationListeners.</span>
+    beanFactory.addBeanPostProcessor<span style="color: #d8241f;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">ApplicationListenerDetector</span><span style="color: #9564bf;">(</span><span style="color: #859900;">this</span><span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Detect a LoadTimeWeaver and prepare for weaving, if found.</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>beanFactory.containsBean<span style="color: #9564bf;">(</span>LOAD_TIME_WEAVER_BEAN_NAME<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        beanFactory.addBeanPostProcessor<span style="color: #9564bf;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">LoadTimeWeaverAwareProcessor</span><span style="color: #24a222;">(</span>beanFactory<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Set a temporary ClassLoader for type matching.</span>
+        beanFactory.setTempClassLoader<span style="color: #9564bf;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">ContextTypeMatchClassLoader</span><span style="color: #24a222;">(</span>beanFactory.getBeanClassLoader<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Register default environment beans.</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">!</span>beanFactory.containsLocalBean<span style="color: #9564bf;">(</span>ENVIRONMENT_BEAN_NAME<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        beanFactory.registerSingleton<span style="color: #9564bf;">(</span>ENVIRONMENT_BEAN_NAME, getEnvironment<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">!</span>beanFactory.containsLocalBean<span style="color: #9564bf;">(</span>SYSTEM_PROPERTIES_BEAN_NAME<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        beanFactory.registerSingleton<span style="color: #9564bf;">(</span>SYSTEM_PROPERTIES_BEAN_NAME, getEnvironment<span style="color: #24a222;">()</span>.getSystemProperties<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">!</span>beanFactory.containsLocalBean<span style="color: #9564bf;">(</span>SYSTEM_ENVIRONMENT_BEAN_NAME<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        beanFactory.registerSingleton<span style="color: #9564bf;">(</span>SYSTEM_ENVIRONMENT_BEAN_NAME, getEnvironment<span style="color: #24a222;">()</span>.getSystemEnvironment<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+该方法做了以下工作
+</p>
+<ol class="org-ol">
+<li>配置 beanFactory 的内部环境，使 beanFactory 使用当前 ApplicationContext
+的上下文，具体包括
+<ul class="org-ul">
+<li>设置 beanFactory 的类加载器</li>
+<li>设置 beanFactory 对 SPEL 语言的支持</li>
+<li>设置 beanFactory 对属性编辑器的支持</li>
+</ul></li>
+<li>配置 beanFactory 的 ApplicationContext 回调函数
+<ul class="org-ul">
+<li>设置 <code>ApplicationContextAwareProcessor</code> 后置处理器</li>
+<li>忽略下列自动装配忽略的 Aware 接口，因为这些接口在
+<code>ApplicationContextAwareProcessor</code> 已经进行处理
+<ul class="org-ul">
+<li>EnvironmentAware</li>
+<li>EmbeddedValueResolverAware</li>
+<li>ResourceLoaderAware</li>
+<li>ApplicationEventPublisherAware</li>
+<li>MessageSourceAware</li>
+<li>ApplicationContextAware</li>
+</ul></li>
+</ul></li>
+<li>配置几个特殊装配的规则</li>
+<li>添加 ApplicationListenerDetector</li>
+<li>添加对 AspectJ 的支持</li>
+<li>将相关环境变量及系统属性以单例模式注册</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org67ae7dc" class="outline-4">
+<h4 id="org67ae7dc"><span class="section-number-4">4.3.5</span> BeanFactory 后续处理工作</h4>
+<div class="outline-text-4" id="text-4-3-5">
+<p>
+调用 <code>postProcessBeanFactory</code>, 其中 <code>postProcessBeanFactory</code> 是一个空方法，
+目的是为 BeanFactory 的后置处理器提供扩展接口
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Modify the application context's internal bean factory after its standard</span>
+<span style="color: #d33682;"> * initialization. All bean definitions will have been loaded, but no beans</span>
+<span style="color: #d33682;"> * will have been instantiated yet. This allows for registering special</span>
+<span style="color: #d33682;"> * BeanPostProcessors etc in certain ApplicationContext implementations.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> beanFactory the bean factory used by the application context</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">postProcessBeanFactory</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ConfigurableListableBeanFactory</span> <span style="color: #6c71c4;">beanFactory</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+调用 <code>invokeBeanFactoryPostProcessors()</code> 唤醒注册的 BeanFactoryPostProcessor
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Instantiate and invoke all registered BeanFactoryPostProcessor beans,</span>
+<span style="color: #d33682;"> * respecting explicit order if given.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">&lt;p&gt;</span><span style="color: #d33682;">Must be called before singleton instantiation.</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">invokeBeanFactoryPostProcessors</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ConfigurableListableBeanFactory</span> <span style="color: #6c71c4;">beanFactory</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors<span style="color: #d8241f;">(</span>beanFactory, getBeanFactoryPostProcessors<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">(e.g. through an @Bean method registered by ConfigurationClassPostProcessor)</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>beanFactory.getTempClassLoader<span style="color: #9564bf;">()</span> == <span style="color: #268bd2;">null</span> &amp;&amp; beanFactory.containsBean<span style="color: #9564bf;">(</span>LOAD_TIME_WEAVER_BEAN_NAME<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        beanFactory.addBeanPostProcessor<span style="color: #9564bf;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">LoadTimeWeaverAwareProcessor</span><span style="color: #24a222;">(</span>beanFactory<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+        beanFactory.setTempClassLoader<span style="color: #9564bf;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">ContextTypeMatchClassLoader</span><span style="color: #24a222;">(</span>beanFactory.getBeanClassLoader<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">invokeBeanFactoryPostProcessors</span><span style="color: #8d5649;">(</span>
+        <span style="color: #268bd2;">ConfigurableListableBeanFactory</span> <span style="color: #6c71c4;">beanFactory</span>, <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">BeanFactoryPostProcessor</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">beanFactoryPostProcessors</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Invoke BeanDefinitionRegistryPostProcessors first, if any.</span>
+    <span style="color: #268bd2;">Set</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">processedBeans</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">HashSet</span><span style="color: #d8241f;">&lt;&gt;()</span>;
+
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>beanFactory <span style="color: #859900;">instanceof</span> BeanDefinitionRegistry<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #268bd2;">BeanDefinitionRegistry</span> <span style="color: #6c71c4;">registry</span> = <span style="color: #9564bf;">(</span><span style="color: #268bd2;">BeanDefinitionRegistry</span><span style="color: #9564bf;">)</span> beanFactory;
+        <span style="color: #268bd2;">List</span><span style="color: #9564bf;">&lt;</span><span style="color: #268bd2;">BeanFactoryPostProcessor</span><span style="color: #9564bf;">&gt;</span> <span style="color: #6c71c4;">regularPostProcessors</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #9564bf;">&lt;&gt;()</span>;
+        <span style="color: #268bd2;">List</span><span style="color: #9564bf;">&lt;</span><span style="color: #268bd2;">BeanDefinitionRegistryPostProcessor</span><span style="color: #9564bf;">&gt;</span> <span style="color: #6c71c4;">registryProcessors</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #9564bf;">&lt;&gt;()</span>;
+
+        <span style="color: #859900;">for</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">BeanFactoryPostProcessor</span> <span style="color: #6c71c4;">postProcessor</span> : beanFactoryPostProcessors<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>postProcessor <span style="color: #859900;">instanceof</span> BeanDefinitionRegistryPostProcessor<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #268bd2;">BeanDefinitionRegistryPostProcessor</span> <span style="color: #6c71c4;">registryProcessor</span> =
+                        <span style="color: #ff7f00;">(</span><span style="color: #268bd2;">BeanDefinitionRegistryPostProcessor</span><span style="color: #ff7f00;">)</span> postProcessor;
+                registryProcessor.postProcessBeanDefinitionRegistry<span style="color: #ff7f00;">(</span>registry<span style="color: #ff7f00;">)</span>;
+                registryProcessors.add<span style="color: #ff7f00;">(</span>registryProcessor<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">else</span> <span style="color: #24a222;">{</span>
+                regularPostProcessors.add<span style="color: #ff7f00;">(</span>postProcessor<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Do not initialize FactoryBeans here: We need to leave all regular beans</span>
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">uninitialized to let the bean factory post-processors apply to them!</span>
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Separate between BeanDefinitionRegistryPostProcessors that implement</span>
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">PriorityOrdered, Ordered, and the rest.</span>
+        <span style="color: #268bd2;">List</span><span style="color: #9564bf;">&lt;</span><span style="color: #268bd2;">BeanDefinitionRegistryPostProcessor</span><span style="color: #9564bf;">&gt;</span> <span style="color: #6c71c4;">currentRegistryProcessors</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #9564bf;">&lt;&gt;()</span>;
+
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.</span>
+        <span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">postProcessorNames</span> =
+                beanFactory.getBeanNamesForType<span style="color: #9564bf;">(</span>BeanDefinitionRegistryPostProcessor.<span style="color: #859900;">class</span>, <span style="color: #268bd2;">true</span>, <span style="color: #268bd2;">false</span><span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">for</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">ppName</span> : postProcessorNames<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>beanFactory.isTypeMatch<span style="color: #ff7f00;">(</span>ppName, PriorityOrdered.<span style="color: #859900;">class</span><span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                currentRegistryProcessors.add<span style="color: #ff7f00;">(</span>beanFactory.getBean<span style="color: #1776b6;">(</span>ppName, BeanDefinitionRegistryPostProcessor.<span style="color: #859900;">class</span><span style="color: #1776b6;">)</span><span style="color: #ff7f00;">)</span>;
+                processedBeans.add<span style="color: #ff7f00;">(</span>ppName<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+        sortPostProcessors<span style="color: #9564bf;">(</span>currentRegistryProcessors, beanFactory<span style="color: #9564bf;">)</span>;
+        registryProcessors.addAll<span style="color: #9564bf;">(</span>currentRegistryProcessors<span style="color: #9564bf;">)</span>;
+        invokeBeanDefinitionRegistryPostProcessors<span style="color: #9564bf;">(</span>currentRegistryProcessors, registry<span style="color: #9564bf;">)</span>;
+        currentRegistryProcessors.clear<span style="color: #9564bf;">()</span>;
+
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Next, invoke the BeanDefinitionRegistryPostProcessors that implement Ordered.</span>
+        postProcessorNames = beanFactory.getBeanNamesForType<span style="color: #9564bf;">(</span>BeanDefinitionRegistryPostProcessor.<span style="color: #859900;">class</span>, <span style="color: #268bd2;">true</span>, <span style="color: #268bd2;">false</span><span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">for</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">ppName</span> : postProcessorNames<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span><span style="color: #268bd2;">!</span>processedBeans.contains<span style="color: #ff7f00;">(</span>ppName<span style="color: #ff7f00;">)</span> &amp;&amp; beanFactory.isTypeMatch<span style="color: #ff7f00;">(</span>ppName, Ordered.<span style="color: #859900;">class</span><span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                currentRegistryProcessors.add<span style="color: #ff7f00;">(</span>beanFactory.getBean<span style="color: #1776b6;">(</span>ppName, BeanDefinitionRegistryPostProcessor.<span style="color: #859900;">class</span><span style="color: #1776b6;">)</span><span style="color: #ff7f00;">)</span>;
+                processedBeans.add<span style="color: #ff7f00;">(</span>ppName<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+        sortPostProcessors<span style="color: #9564bf;">(</span>currentRegistryProcessors, beanFactory<span style="color: #9564bf;">)</span>;
+        registryProcessors.addAll<span style="color: #9564bf;">(</span>currentRegistryProcessors<span style="color: #9564bf;">)</span>;
+        invokeBeanDefinitionRegistryPostProcessors<span style="color: #9564bf;">(</span>currentRegistryProcessors, registry<span style="color: #9564bf;">)</span>;
+        currentRegistryProcessors.clear<span style="color: #9564bf;">()</span>;
+
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Finally, invoke all other BeanDefinitionRegistryPostProcessors until no further ones appear.</span>
+        <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">reiterate</span> = <span style="color: #268bd2;">true</span>;
+        <span style="color: #859900;">while</span> <span style="color: #9564bf;">(</span>reiterate<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            reiterate = <span style="color: #268bd2;">false</span>;
+            postProcessorNames = beanFactory.getBeanNamesForType<span style="color: #24a222;">(</span>BeanDefinitionRegistryPostProcessor.<span style="color: #859900;">class</span>, <span style="color: #268bd2;">true</span>, <span style="color: #268bd2;">false</span><span style="color: #24a222;">)</span>;
+            <span style="color: #859900;">for</span> <span style="color: #24a222;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">ppName</span> : postProcessorNames<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #859900;">if</span> <span style="color: #ff7f00;">(</span><span style="color: #268bd2;">!</span>processedBeans.contains<span style="color: #1776b6;">(</span>ppName<span style="color: #1776b6;">)</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                    currentRegistryProcessors.add<span style="color: #1776b6;">(</span>beanFactory.getBean<span style="color: #00bed1;">(</span>ppName, BeanDefinitionRegistryPostProcessor.<span style="color: #859900;">class</span><span style="color: #00bed1;">)</span><span style="color: #1776b6;">)</span>;
+                    processedBeans.add<span style="color: #1776b6;">(</span>ppName<span style="color: #1776b6;">)</span>;
+                    reiterate = <span style="color: #268bd2;">true</span>;
+                <span style="color: #ff7f00;">}</span>
+            <span style="color: #24a222;">}</span>
+            sortPostProcessors<span style="color: #24a222;">(</span>currentRegistryProcessors, beanFactory<span style="color: #24a222;">)</span>;
+            registryProcessors.addAll<span style="color: #24a222;">(</span>currentRegistryProcessors<span style="color: #24a222;">)</span>;
+            invokeBeanDefinitionRegistryPostProcessors<span style="color: #24a222;">(</span>currentRegistryProcessors, registry<span style="color: #24a222;">)</span>;
+            currentRegistryProcessors.clear<span style="color: #24a222;">()</span>;
+        <span style="color: #9564bf;">}</span>
+
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Now, invoke the postProcessBeanFactory callback of all processors handled so far.</span>
+        invokeBeanFactoryPostProcessors<span style="color: #9564bf;">(</span>registryProcessors, beanFactory<span style="color: #9564bf;">)</span>;
+        invokeBeanFactoryPostProcessors<span style="color: #9564bf;">(</span>regularPostProcessors, beanFactory<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Invoke factory processors registered with the context instance.</span>
+        invokeBeanFactoryPostProcessors<span style="color: #9564bf;">(</span>beanFactoryPostProcessors, beanFactory<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Do not initialize FactoryBeans here: We need to leave all regular beans</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">uninitialized to let the bean factory post-processors apply to them!</span>
+    <span style="color: #268bd2;">String</span><span style="color: #d8241f;">[]</span> <span style="color: #6c71c4;">postProcessorNames</span> =
+            beanFactory.getBeanNamesForType<span style="color: #d8241f;">(</span>BeanFactoryPostProcessor.<span style="color: #859900;">class</span>, <span style="color: #268bd2;">true</span>, <span style="color: #268bd2;">false</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Separate between BeanFactoryPostProcessors that implement PriorityOrdered,</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Ordered, and the rest.</span>
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">BeanFactoryPostProcessor</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">priorityOrderedPostProcessors</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;()</span>;
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">orderedPostProcessorNames</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;()</span>;
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">nonOrderedPostProcessorNames</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;()</span>;
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">ppName</span> : postProcessorNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>processedBeans.contains<span style="color: #24a222;">(</span>ppName<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">skip - already processed in first phase above</span>
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>beanFactory.isTypeMatch<span style="color: #24a222;">(</span>ppName, PriorityOrdered.<span style="color: #859900;">class</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            priorityOrderedPostProcessors.add<span style="color: #24a222;">(</span>beanFactory.getBean<span style="color: #ff7f00;">(</span>ppName, BeanFactoryPostProcessor.<span style="color: #859900;">class</span><span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>beanFactory.isTypeMatch<span style="color: #24a222;">(</span>ppName, Ordered.<span style="color: #859900;">class</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            orderedPostProcessorNames.add<span style="color: #24a222;">(</span>ppName<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #9564bf;">{</span>
+            nonOrderedPostProcessorNames.add<span style="color: #24a222;">(</span>ppName<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">First, invoke the BeanFactoryPostProcessors that implement PriorityOrdered.</span>
+    sortPostProcessors<span style="color: #d8241f;">(</span>priorityOrderedPostProcessors, beanFactory<span style="color: #d8241f;">)</span>;
+    invokeBeanFactoryPostProcessors<span style="color: #d8241f;">(</span>priorityOrderedPostProcessors, beanFactory<span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Next, invoke the BeanFactoryPostProcessors that implement Ordered.</span>
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">BeanFactoryPostProcessor</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">orderedPostProcessors</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;(</span>orderedPostProcessorNames.size<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">postProcessorName</span> : orderedPostProcessorNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        orderedPostProcessors.add<span style="color: #9564bf;">(</span>beanFactory.getBean<span style="color: #24a222;">(</span>postProcessorName, BeanFactoryPostProcessor.<span style="color: #859900;">class</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+    sortPostProcessors<span style="color: #d8241f;">(</span>orderedPostProcessors, beanFactory<span style="color: #d8241f;">)</span>;
+    invokeBeanFactoryPostProcessors<span style="color: #d8241f;">(</span>orderedPostProcessors, beanFactory<span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Finally, invoke all other BeanFactoryPostProcessors.</span>
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">BeanFactoryPostProcessor</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">nonOrderedPostProcessors</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;(</span>nonOrderedPostProcessorNames.size<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">postProcessorName</span> : nonOrderedPostProcessorNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        nonOrderedPostProcessors.add<span style="color: #9564bf;">(</span>beanFactory.getBean<span style="color: #24a222;">(</span>postProcessorName, BeanFactoryPostProcessor.<span style="color: #859900;">class</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+    invokeBeanFactoryPostProcessors<span style="color: #d8241f;">(</span>nonOrderedPostProcessors, beanFactory<span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Clear cached merged bean definitions since the post-processors might have</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">modified the original metadata, e.g. replacing placeholders in values...</span>
+    beanFactory.clearMetadataCache<span style="color: #d8241f;">()</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+<p>
+<code>PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(...)</code> 方
+法完成唤醒后置处理，它将 BeanFactoryPostProcessor 分成两类
+</p>
+<ol class="org-ol">
+<li>regularPostProcessors 记录的 <code>BeanFactoryPostProcessor</code> 后置处理器</li>
+<li>registryProcessors 记录的 <code>BeanDefinitionRegistry</code> 后置处理器</li>
+<li>在唤醒时还需要考虑后置处理器的顺序
+<ul class="org-ul">
+<li>PriorityOrdered 优先序的</li>
+<li>Ordered 有序的</li>
+<li>Non-Ordered 无序的</li>
+</ul></li>
+</ol>
+
+<p>
+注册 BeanPostProcessor <code>registerBeanPostProcessors(beanFactory)</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">registerBeanPostProcessors</span><span style="color: #8d5649;">(</span>
+        <span style="color: #268bd2;">ConfigurableListableBeanFactory</span> <span style="color: #6c71c4;">beanFactory</span>, <span style="color: #268bd2;">AbstractApplicationContext</span> <span style="color: #6c71c4;">applicationContext</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+
+    <span style="color: #268bd2;">String</span><span style="color: #d8241f;">[]</span> <span style="color: #6c71c4;">postProcessorNames</span> = beanFactory.getBeanNamesForType<span style="color: #d8241f;">(</span>BeanPostProcessor.<span style="color: #859900;">class</span>, <span style="color: #268bd2;">true</span>, <span style="color: #268bd2;">false</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Register BeanPostProcessorChecker that logs an info message when</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">a bean is created during BeanPostProcessor instantiation, i.e. when</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">a bean is not eligible for getting processed by all BeanPostProcessors.</span>
+    <span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">beanProcessorTargetCount</span> = beanFactory.getBeanPostProcessorCount<span style="color: #d8241f;">()</span> + 1 + postProcessorNames.length;
+    beanFactory.addBeanPostProcessor<span style="color: #d8241f;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">BeanPostProcessorChecker</span><span style="color: #9564bf;">(</span>beanFactory, beanProcessorTargetCount<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Separate between BeanPostProcessors that implement PriorityOrdered,</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Ordered, and the rest.</span>
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">BeanPostProcessor</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">priorityOrderedPostProcessors</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;()</span>;
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">BeanPostProcessor</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">internalPostProcessors</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;()</span>;
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">orderedPostProcessorNames</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;()</span>;
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">nonOrderedPostProcessorNames</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;()</span>;
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">ppName</span> : postProcessorNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>beanFactory.isTypeMatch<span style="color: #24a222;">(</span>ppName, PriorityOrdered.<span style="color: #859900;">class</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #268bd2;">BeanPostProcessor</span> <span style="color: #6c71c4;">pp</span> = beanFactory.getBean<span style="color: #24a222;">(</span>ppName, BeanPostProcessor.<span style="color: #859900;">class</span><span style="color: #24a222;">)</span>;
+            priorityOrderedPostProcessors.add<span style="color: #24a222;">(</span>pp<span style="color: #24a222;">)</span>;
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>pp <span style="color: #859900;">instanceof</span> MergedBeanDefinitionPostProcessor<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                internalPostProcessors.add<span style="color: #ff7f00;">(</span>pp<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>beanFactory.isTypeMatch<span style="color: #24a222;">(</span>ppName, Ordered.<span style="color: #859900;">class</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            orderedPostProcessorNames.add<span style="color: #24a222;">(</span>ppName<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #9564bf;">{</span>
+            nonOrderedPostProcessorNames.add<span style="color: #24a222;">(</span>ppName<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">First, register the BeanPostProcessors that implement PriorityOrdered.</span>
+    sortPostProcessors<span style="color: #d8241f;">(</span>priorityOrderedPostProcessors, beanFactory<span style="color: #d8241f;">)</span>;
+    registerBeanPostProcessors<span style="color: #d8241f;">(</span>beanFactory, priorityOrderedPostProcessors<span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Next, register the BeanPostProcessors that implement Ordered.</span>
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">BeanPostProcessor</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">orderedPostProcessors</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;(</span>orderedPostProcessorNames.size<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">ppName</span> : orderedPostProcessorNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #268bd2;">BeanPostProcessor</span> <span style="color: #6c71c4;">pp</span> = beanFactory.getBean<span style="color: #9564bf;">(</span>ppName, BeanPostProcessor.<span style="color: #859900;">class</span><span style="color: #9564bf;">)</span>;
+        orderedPostProcessors.add<span style="color: #9564bf;">(</span>pp<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>pp <span style="color: #859900;">instanceof</span> MergedBeanDefinitionPostProcessor<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            internalPostProcessors.add<span style="color: #24a222;">(</span>pp<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+    sortPostProcessors<span style="color: #d8241f;">(</span>orderedPostProcessors, beanFactory<span style="color: #d8241f;">)</span>;
+    registerBeanPostProcessors<span style="color: #d8241f;">(</span>beanFactory, orderedPostProcessors<span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Now, register all regular BeanPostProcessors.</span>
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">BeanPostProcessor</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">nonOrderedPostProcessors</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;(</span>nonOrderedPostProcessorNames.size<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">ppName</span> : nonOrderedPostProcessorNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #268bd2;">BeanPostProcessor</span> <span style="color: #6c71c4;">pp</span> = beanFactory.getBean<span style="color: #9564bf;">(</span>ppName, BeanPostProcessor.<span style="color: #859900;">class</span><span style="color: #9564bf;">)</span>;
+        nonOrderedPostProcessors.add<span style="color: #9564bf;">(</span>pp<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>pp <span style="color: #859900;">instanceof</span> MergedBeanDefinitionPostProcessor<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            internalPostProcessors.add<span style="color: #24a222;">(</span>pp<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+    registerBeanPostProcessors<span style="color: #d8241f;">(</span>beanFactory, nonOrderedPostProcessors<span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Finally, re-register all internal BeanPostProcessors.</span>
+    sortPostProcessors<span style="color: #d8241f;">(</span>internalPostProcessors, beanFactory<span style="color: #d8241f;">)</span>;
+    registerBeanPostProcessors<span style="color: #d8241f;">(</span>beanFactory, internalPostProcessors<span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Re-register post-processor for detecting inner beans as ApplicationListeners,</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">moving it to the end of the processor chain (for picking up proxies etc).</span>
+    beanFactory.addBeanPostProcessor<span style="color: #d8241f;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">ApplicationListenerDetector</span><span style="color: #9564bf;">(</span>applicationContext<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+处理国际化消息 <code>initMessageSource()</code>, 这部分不重要，可以跳过
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Initialize the MessageSource.</span>
+<span style="color: #d33682;"> * Use parent's if none defined in this context.</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">initMessageSource</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #268bd2;">ConfigurableListableBeanFactory</span> <span style="color: #6c71c4;">beanFactory</span> = getBeanFactory<span style="color: #d8241f;">()</span>;
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>beanFactory.containsLocalBean<span style="color: #9564bf;">(</span>MESSAGE_SOURCE_BEAN_NAME<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">this</span>.messageSource = beanFactory.getBean<span style="color: #9564bf;">(</span>MESSAGE_SOURCE_BEAN_NAME, MessageSource.<span style="color: #859900;">class</span><span style="color: #9564bf;">)</span>;
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Make MessageSource aware of parent MessageSource.</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.parent != <span style="color: #268bd2;">null</span> &amp;&amp; <span style="color: #859900;">this</span>.messageSource <span style="color: #859900;">instanceof</span> HierarchicalMessageSource<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #268bd2;">HierarchicalMessageSource</span> <span style="color: #6c71c4;">hms</span> = <span style="color: #24a222;">(</span><span style="color: #268bd2;">HierarchicalMessageSource</span><span style="color: #24a222;">)</span> <span style="color: #859900;">this</span>.messageSource;
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>hms.getParentMessageSource<span style="color: #ff7f00;">()</span> == <span style="color: #268bd2;">null</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Only set parent context as parent MessageSource if no parent MessageSource</span>
+                <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">registered already.</span>
+                hms.setParentMessageSource<span style="color: #ff7f00;">(</span>getInternalParentMessageSource<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>logger.isTraceEnabled<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            logger.trace<span style="color: #24a222;">(</span><span style="color: #2aa198;">"Using MessageSource ["</span> + <span style="color: #859900;">this</span>.messageSource + <span style="color: #2aa198;">"]"</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Use empty MessageSource to be able to accept getMessage calls.</span>
+        <span style="color: #268bd2;">DelegatingMessageSource</span> <span style="color: #6c71c4;">dms</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">DelegatingMessageSource</span><span style="color: #9564bf;">()</span>;
+        dms.setParentMessageSource<span style="color: #9564bf;">(</span>getInternalParentMessageSource<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">this</span>.messageSource = dms;
+        beanFactory.registerSingleton<span style="color: #9564bf;">(</span>MESSAGE_SOURCE_BEAN_NAME, <span style="color: #859900;">this</span>.messageSource<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>logger.isTraceEnabled<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            logger.trace<span style="color: #24a222;">(</span><span style="color: #2aa198;">"No '"</span> + MESSAGE_SOURCE_BEAN_NAME + <span style="color: #2aa198;">"' bean, using ["</span> + <span style="color: #859900;">this</span>.messageSource + <span style="color: #2aa198;">"]"</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+调用 <code>initApplicationEventMulticaster()</code> 初始化多播，初始化多播属性
+applicationEventMulticaster, 如果存在直接设置多播器，如果不存在则创建
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Initialize the ApplicationEventMulticaster.</span>
+<span style="color: #d33682;"> * Uses SimpleApplicationEventMulticaster if none defined in the context.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@see</span><span style="color: #d33682;"> org.springframework.context.event.SimpleApplicationEventMulticaster</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">initApplicationEventMulticaster</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #268bd2;">ConfigurableListableBeanFactory</span> <span style="color: #6c71c4;">beanFactory</span> = getBeanFactory<span style="color: #d8241f;">()</span>;
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>beanFactory.containsLocalBean<span style="color: #9564bf;">(</span>APPLICATION_EVENT_MULTICASTER_BEAN_NAME<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">this</span>.applicationEventMulticaster =
+                beanFactory.getBean<span style="color: #9564bf;">(</span>APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.<span style="color: #859900;">class</span><span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>logger.isTraceEnabled<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            logger.trace<span style="color: #24a222;">(</span><span style="color: #2aa198;">"Using ApplicationEventMulticaster ["</span> + <span style="color: #859900;">this</span>.applicationEventMulticaster + <span style="color: #2aa198;">"]"</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">this</span>.applicationEventMulticaster = <span style="color: #859900;">new</span> <span style="color: #268bd2;">SimpleApplicationEventMulticaster</span><span style="color: #9564bf;">(</span>beanFactory<span style="color: #9564bf;">)</span>;
+        beanFactory.registerSingleton<span style="color: #9564bf;">(</span>APPLICATION_EVENT_MULTICASTER_BEAN_NAME, <span style="color: #859900;">this</span>.applicationEventMulticaster<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>logger.isTraceEnabled<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            logger.trace<span style="color: #24a222;">(</span><span style="color: #2aa198;">"No '"</span> + APPLICATION_EVENT_MULTICASTER_BEAN_NAME + <span style="color: #2aa198;">"' bean, using "</span> +
+                    <span style="color: #2aa198;">"["</span> + <span style="color: #859900;">this</span>.applicationEventMulticaster.getClass<span style="color: #ff7f00;">()</span>.getSimpleName<span style="color: #ff7f00;">()</span> + <span style="color: #2aa198;">"]"</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+<code>onRefresh()</code> 是一个空方法，提供子类刷新的扩展点
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">onRefresh</span><span style="color: #8d5649;">()</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeansException</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">For subclasses: do nothing by default.</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+<code>registerListeners()</code> 获取多播器，然后注册 listener 监听器
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Add beans that implement ApplicationListener as listeners.</span>
+<span style="color: #d33682;"> * Doesn't affect other listeners, which can be added without being beans.</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">registerListeners</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Register statically specified listeners first.</span>
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">ApplicationListener</span><span style="color: #9564bf;">&lt;</span>?<span style="color: #9564bf;">&gt;</span> <span style="color: #6c71c4;">listener</span> : getApplicationListeners<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        getApplicationEventMulticaster<span style="color: #9564bf;">()</span>.addApplicationListener<span style="color: #9564bf;">(</span>listener<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Do not initialize FactoryBeans here: We need to leave all regular beans</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">uninitialized to let post-processors apply to them!</span>
+    <span style="color: #268bd2;">String</span><span style="color: #d8241f;">[]</span> <span style="color: #6c71c4;">listenerBeanNames</span> = getBeanNamesForType<span style="color: #d8241f;">(</span>ApplicationListener.<span style="color: #859900;">class</span>, <span style="color: #268bd2;">true</span>, <span style="color: #268bd2;">false</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">listenerBeanName</span> : listenerBeanNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        getApplicationEventMulticaster<span style="color: #9564bf;">()</span>.addApplicationListenerBean<span style="color: #9564bf;">(</span>listenerBeanName<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Publish early application events now that we finally have a multicaster...</span>
+    <span style="color: #268bd2;">Set</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">ApplicationEvent</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">earlyEventsToProcess</span> = <span style="color: #859900;">this</span>.earlyApplicationEvents;
+    <span style="color: #859900;">this</span>.earlyApplicationEvents = <span style="color: #268bd2;">null</span>;
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>earlyEventsToProcess != <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">for</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">ApplicationEvent</span> <span style="color: #6c71c4;">earlyEvent</span> : earlyEventsToProcess<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            getApplicationEventMulticaster<span style="color: #24a222;">()</span>.multicastEvent<span style="color: #24a222;">(</span>earlyEvent<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org64efd30" class="outline-4">
+<h4 id="org64efd30"><span class="section-number-4">4.3.6</span> 初始化非延迟加载单例</h4>
+<div class="outline-text-4" id="text-4-3-6">
+<p>
+非延迟加载单例可以在 Spring 启动后就进行创建，然后下次加载可以快速获取，减少
+创建的时间
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Finish the initialization of this context's bean factory,</span>
+<span style="color: #d33682;"> * initializing all remaining singleton beans.</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">finishBeanFactoryInitialization</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ConfigurableListableBeanFactory</span> <span style="color: #6c71c4;">beanFactory</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Initialize conversion service for this context.</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>beanFactory.containsBean<span style="color: #9564bf;">(</span>CONVERSION_SERVICE_BEAN_NAME<span style="color: #9564bf;">)</span> &amp;&amp;
+            beanFactory.isTypeMatch<span style="color: #9564bf;">(</span>CONVERSION_SERVICE_BEAN_NAME, ConversionService.<span style="color: #859900;">class</span><span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        beanFactory.setConversionService<span style="color: #9564bf;">(</span>
+                beanFactory.getBean<span style="color: #24a222;">(</span>CONVERSION_SERVICE_BEAN_NAME, ConversionService.<span style="color: #859900;">class</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Register a default embedded value resolver if no bean post-processor</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">(such as a PropertyPlaceholderConfigurer bean) registered any before:</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">at this point, primarily for resolution in annotation attribute values.</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">!</span>beanFactory.hasEmbeddedValueResolver<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        beanFactory.addEmbeddedValueResolver<span style="color: #9564bf;">(</span>strVal -&gt; getEnvironment<span style="color: #24a222;">()</span>.resolvePlaceholders<span style="color: #24a222;">(</span>strVal<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.</span>
+    <span style="color: #268bd2;">String</span><span style="color: #d8241f;">[]</span> <span style="color: #6c71c4;">weaverAwareNames</span> = beanFactory.getBeanNamesForType<span style="color: #d8241f;">(</span>LoadTimeWeaverAware.<span style="color: #859900;">class</span>, <span style="color: #268bd2;">false</span>, <span style="color: #268bd2;">false</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">weaverAwareName</span> : weaverAwareNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        getBean<span style="color: #9564bf;">(</span>weaverAwareName<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Stop using the temporary ClassLoader for type matching.</span>
+    beanFactory.setTempClassLoader<span style="color: #d8241f;">(</span><span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Allow for caching all bean definition metadata, not expecting further changes.</span>
+    beanFactory.freezeConfiguration<span style="color: #d8241f;">()</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Instantiate all remaining (non-lazy-init) singletons.</span>
+    beanFactory.preInstantiateSingletons<span style="color: #d8241f;">()</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+<code>preInstantiateSingletons()</code> 方法一次性初始化所有的初始化非延迟加载单例
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #268bd2;">@Override</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">preInstantiateSingletons</span><span style="color: #8d5649;">()</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">BeansException</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>logger.isTraceEnabled<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        logger.trace<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"Pre-instantiating singletons in "</span> + <span style="color: #859900;">this</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Iterate over a copy to allow for init methods which in turn register new bean definitions.</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">While this may not be part of the regular factory bootstrap, it does otherwise work fine.</span>
+    <span style="color: #268bd2;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">beanNames</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">ArrayList</span><span style="color: #d8241f;">&lt;&gt;(</span><span style="color: #859900;">this</span>.beanDefinitionNames<span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Trigger initialization of all non-lazy singleton beans...</span>
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span> : beanNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #268bd2;">RootBeanDefinition</span> <span style="color: #6c71c4;">bd</span> = getMergedLocalBeanDefinition<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">!</span>bd.isAbstract<span style="color: #24a222;">()</span> &amp;&amp; bd.isSingleton<span style="color: #24a222;">()</span> &amp;&amp; <span style="color: #268bd2;">!</span>bd.isLazyInit<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>isFactoryBean<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">bean</span> = getBean<span style="color: #ff7f00;">(</span>FACTORY_BEAN_PREFIX + beanName<span style="color: #ff7f00;">)</span>;
+                <span style="color: #859900;">if</span> <span style="color: #ff7f00;">(</span>bean <span style="color: #859900;">instanceof</span> FactoryBean<span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                    <span style="color: #859900;">final</span> <span style="color: #268bd2;">FactoryBean</span><span style="color: #1776b6;">&lt;</span>?<span style="color: #1776b6;">&gt;</span> <span style="color: #6c71c4;">factory</span> = <span style="color: #1776b6;">(</span><span style="color: #268bd2;">FactoryBean</span><span style="color: #00bed1;">&lt;</span>?<span style="color: #00bed1;">&gt;</span><span style="color: #1776b6;">)</span> bean;
+                    <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">isEagerInit</span>;
+                    <span style="color: #859900;">if</span> <span style="color: #1776b6;">(</span>System.getSecurityManager<span style="color: #00bed1;">()</span> != <span style="color: #268bd2;">null</span> &amp;&amp; factory <span style="color: #859900;">instanceof</span> SmartFactoryBean<span style="color: #1776b6;">)</span> <span style="color: #1776b6;">{</span>
+                        isEagerInit = AccessController.doPrivileged<span style="color: #00bed1;">(</span><span style="color: #bcbf00;">(</span><span style="color: #268bd2;">PrivilegedAction</span><span style="color: #e574c3;">&lt;</span><span style="color: #268bd2;">Boolean</span><span style="color: #e574c3;">&gt;</span><span style="color: #bcbf00;">)</span>
+                                        <span style="color: #bcbf00;">(</span><span style="color: #e574c3;">(</span><span style="color: #268bd2;">SmartFactoryBean</span><span style="color: #8d5649;">&lt;</span>?<span style="color: #8d5649;">&gt;</span><span style="color: #e574c3;">)</span> factory<span style="color: #bcbf00;">)</span>::isEagerInit,
+                                getAccessControlContext<span style="color: #bcbf00;">()</span><span style="color: #00bed1;">)</span>;
+                    <span style="color: #1776b6;">}</span>
+                    <span style="color: #859900;">else</span> <span style="color: #1776b6;">{</span>
+                        isEagerInit = <span style="color: #00bed1;">(</span>factory <span style="color: #859900;">instanceof</span> SmartFactoryBean &amp;&amp;
+                                <span style="color: #bcbf00;">(</span><span style="color: #e574c3;">(</span><span style="color: #268bd2;">SmartFactoryBean</span><span style="color: #8d5649;">&lt;</span>?<span style="color: #8d5649;">&gt;</span><span style="color: #e574c3;">)</span> factory<span style="color: #bcbf00;">)</span>.isEagerInit<span style="color: #bcbf00;">()</span><span style="color: #00bed1;">)</span>;
+                    <span style="color: #1776b6;">}</span>
+                    <span style="color: #859900;">if</span> <span style="color: #1776b6;">(</span>isEagerInit<span style="color: #1776b6;">)</span> <span style="color: #1776b6;">{</span>
+                        getBean<span style="color: #00bed1;">(</span>beanName<span style="color: #00bed1;">)</span>;
+                    <span style="color: #1776b6;">}</span>
+                <span style="color: #ff7f00;">}</span>
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">else</span> <span style="color: #24a222;">{</span>
+                getBean<span style="color: #ff7f00;">(</span>beanName<span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Trigger post-initialization callback for all applicable beans...</span>
+    <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span> : beanNames<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">singletonInstance</span> = getSingleton<span style="color: #9564bf;">(</span>beanName<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>singletonInstance <span style="color: #859900;">instanceof</span> SmartInitializingSingleton<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">final</span> <span style="color: #268bd2;">SmartInitializingSingleton</span> <span style="color: #6c71c4;">smartSingleton</span> = <span style="color: #24a222;">(</span><span style="color: #268bd2;">SmartInitializingSingleton</span><span style="color: #24a222;">)</span> singletonInstance;
+            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>System.getSecurityManager<span style="color: #ff7f00;">()</span> != <span style="color: #268bd2;">null</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                AccessController.doPrivileged<span style="color: #ff7f00;">(</span><span style="color: #1776b6;">(</span><span style="color: #268bd2;">PrivilegedAction</span><span style="color: #00bed1;">&lt;</span><span style="color: #268bd2;">Object</span><span style="color: #00bed1;">&gt;</span><span style="color: #1776b6;">)</span> <span style="color: #1776b6;">()</span> -&gt; <span style="color: #1776b6;">{</span>
+                    smartSingleton.afterSingletonsInstantiated<span style="color: #00bed1;">()</span>;
+                    <span style="color: #859900;">return</span> <span style="color: #268bd2;">null</span>;
+                <span style="color: #1776b6;">}</span>, getAccessControlContext<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span>;
+            <span style="color: #24a222;">}</span>
+            <span style="color: #859900;">else</span> <span style="color: #24a222;">{</span>
+                smartSingleton.afterSingletonsInstantiated<span style="color: #ff7f00;">()</span>;
+            <span style="color: #24a222;">}</span>
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8dd4055" class="outline-4">
+<h4 id="org8dd4055"><span class="section-number-4">4.3.7</span> 完成上下文刷新</h4>
+<div class="outline-text-4" id="text-4-3-7">
+<p>
+<code>finishRefresh()</code> 完成上下文的刷新
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Finish the refresh of this context, invoking the LifecycleProcessor's</span>
+<span style="color: #d33682;"> * onRefresh() method and publishing the</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">{@link org.springframework.context.event.ContextRefreshedEvent}</span><span style="color: #d33682;">.</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">finishRefresh</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Clear context-level resource caches (such as ASM metadata from scanning).</span>
+    clearResourceCaches<span style="color: #d8241f;">()</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Initialize lifecycle processor for this context.</span>
+    initLifecycleProcessor<span style="color: #d8241f;">()</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Propagate refresh to lifecycle processor first.</span>
+    getLifecycleProcessor<span style="color: #d8241f;">()</span>.onRefresh<span style="color: #d8241f;">()</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Publish the final event.</span>
+    publishEvent<span style="color: #d8241f;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">ContextRefreshedEvent</span><span style="color: #9564bf;">(</span><span style="color: #859900;">this</span><span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Participate in LiveBeansView MBean, if active.</span>
+    LiveBeansView.registerApplicationContext<span style="color: #d8241f;">(</span><span style="color: #859900;">this</span><span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+首先调用 <code>clearResourceCaches()</code> 方法清理资源的缓存
+</p>
+
+<p>
+接着 <code>initLifecycleProcessor()</code> 初始化生命周期的处理器，该方法主要是初始化了
+<code>LifecycleProcessor</code> 类
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Initialize the LifecycleProcessor.</span>
+<span style="color: #d33682;"> * Uses DefaultLifecycleProcessor if none defined in the context.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@see</span><span style="color: #d33682;"> org.springframework.context.support.DefaultLifecycleProcessor</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">initLifecycleProcessor</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #268bd2;">ConfigurableListableBeanFactory</span> <span style="color: #6c71c4;">beanFactory</span> = getBeanFactory<span style="color: #d8241f;">()</span>;
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>beanFactory.containsLocalBean<span style="color: #9564bf;">(</span>LIFECYCLE_PROCESSOR_BEAN_NAME<span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">this</span>.lifecycleProcessor =
+                beanFactory.getBean<span style="color: #9564bf;">(</span>LIFECYCLE_PROCESSOR_BEAN_NAME, LifecycleProcessor.<span style="color: #859900;">class</span><span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>logger.isTraceEnabled<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            logger.trace<span style="color: #24a222;">(</span><span style="color: #2aa198;">"Using LifecycleProcessor ["</span> + <span style="color: #859900;">this</span>.lifecycleProcessor + <span style="color: #2aa198;">"]"</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #268bd2;">DefaultLifecycleProcessor</span> <span style="color: #6c71c4;">defaultProcessor</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">DefaultLifecycleProcessor</span><span style="color: #9564bf;">()</span>;
+        defaultProcessor.setBeanFactory<span style="color: #9564bf;">(</span>beanFactory<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">this</span>.lifecycleProcessor = defaultProcessor;
+        beanFactory.registerSingleton<span style="color: #9564bf;">(</span>LIFECYCLE_PROCESSOR_BEAN_NAME, <span style="color: #859900;">this</span>.lifecycleProcessor<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>logger.isTraceEnabled<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            logger.trace<span style="color: #24a222;">(</span><span style="color: #2aa198;">"No '"</span> + LIFECYCLE_PROCESSOR_BEAN_NAME + <span style="color: #2aa198;">"' bean, using "</span> +
+                    <span style="color: #2aa198;">"["</span> + <span style="color: #859900;">this</span>.lifecycleProcessor.getClass<span style="color: #ff7f00;">()</span>.getSimpleName<span style="color: #ff7f00;">()</span> + <span style="color: #2aa198;">"]"</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+调用 <code>getLifecycleProcessor().onRefresh()</code> 方法传播更新状态
+</p>
+
+<p>
+调用 <code>publishEvent(...)</code> 方法发布事件
+</p>
+<ol class="org-ol">
+<li>发布 ContextRefreshedEvent 事件</li>
+<li>如果父 ApplicationContext 存在，将事件传播到父 ApplicationContext 中</li>
+</ol>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #d33682;">/**</span>
+<span style="color: #d33682;"> * Publish the given event to all listeners.</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> event the event to publish (may be an </span><span style="color: #268bd2;">{@link ApplicationEvent}</span>
+<span style="color: #d33682;"> * or a payload object to be turned into a </span><span style="color: #268bd2;">{@link PayloadApplicationEvent}</span><span style="color: #d33682;">)</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@param</span><span style="color: #d33682;"> eventType the resolved event type, if known</span>
+<span style="color: #d33682;"> * </span><span style="color: #268bd2;">@since</span><span style="color: #d33682;"> 4.2</span>
+<span style="color: #d33682;"> */</span>
+<span style="color: #859900;">protected</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">publishEvent</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">event</span>, <span style="color: #268bd2;">@Nullable</span> <span style="color: #268bd2;">ResolvableType</span> <span style="color: #6c71c4;">eventType</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
+    Assert.notNull<span style="color: #d8241f;">(</span>event, <span style="color: #2aa198;">"Event must not be null"</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Decorate event as an ApplicationEvent if necessary</span>
+    <span style="color: #268bd2;">ApplicationEvent</span> <span style="color: #6c71c4;">applicationEvent</span>;
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>event <span style="color: #859900;">instanceof</span> ApplicationEvent<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        applicationEvent = <span style="color: #9564bf;">(</span><span style="color: #268bd2;">ApplicationEvent</span><span style="color: #9564bf;">)</span> event;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
+        applicationEvent = <span style="color: #859900;">new</span> <span style="color: #268bd2;">PayloadApplicationEvent</span><span style="color: #9564bf;">&lt;&gt;(</span><span style="color: #859900;">this</span>, event<span style="color: #9564bf;">)</span>;
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>eventType == <span style="color: #268bd2;">null</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            eventType = <span style="color: #24a222;">(</span><span style="color: #ff7f00;">(</span><span style="color: #268bd2;">PayloadApplicationEvent</span><span style="color: #1776b6;">&lt;</span>?<span style="color: #1776b6;">&gt;</span><span style="color: #ff7f00;">)</span> applicationEvent<span style="color: #24a222;">)</span>.getResolvableType<span style="color: #24a222;">()</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Multicast right now if possible - or lazily once the multicaster is initialized</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span><span style="color: #859900;">this</span>.earlyApplicationEvents != <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">this</span>.earlyApplicationEvents.add<span style="color: #9564bf;">(</span>applicationEvent<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+    <span style="color: #859900;">else</span> <span style="color: #d8241f;">{</span>
+        getApplicationEventMulticaster<span style="color: #9564bf;">()</span>.multicastEvent<span style="color: #9564bf;">(</span>applicationEvent, eventType<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Publish event via parent context as well...</span>
+    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span><span style="color: #859900;">this</span>.parent != <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.parent <span style="color: #859900;">instanceof</span> AbstractApplicationContext<span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #24a222;">(</span><span style="color: #ff7f00;">(</span><span style="color: #268bd2;">AbstractApplicationContext</span><span style="color: #ff7f00;">)</span> <span style="color: #859900;">this</span>.parent<span style="color: #24a222;">)</span>.publishEvent<span style="color: #24a222;">(</span>event, eventType<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+        <span style="color: #859900;">else</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #859900;">this</span>.parent.publishEvent<span style="color: #24a222;">(</span>event<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org650bdd7" class="outline-2">
+<h2 id="org650bdd7"><span class="section-number-2">5</span> AOP</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 使用动态代理实现
@@ -2698,11 +3534,11 @@ BeanFactoryPostProcessor 的后置处理方法
 </div>
 </div>
 
-<div id="outline-container-org636cda6" class="outline-2">
-<h2 id="org636cda6"><span class="section-number-2">6</span> SpringBoot 自动装配</h2>
+<div id="outline-container-org68baeaf" class="outline-2">
+<h2 id="org68baeaf"><span class="section-number-2">6</span> SpringBoot 自动装配</h2>
 </div>
-<div id="outline-container-org535ccd9" class="outline-2">
-<h2 id="org535ccd9"><span class="section-number-2">7</span> 参考链接</h2>
+<div id="outline-container-orgf71e20c" class="outline-2">
+<h2 id="orgf71e20c"><span class="section-number-2">7</span> 参考链接</h2>
 <div class="outline-text-2" id="text-7">
 <ol class="org-ol">
 <li><a href="https://github.com/spring-projects/spring-framework">Spring Framework on Github</a></li>
@@ -2713,7 +3549,7 @@ BeanFactoryPostProcessor 的后置处理方法
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-19 Mon 09:48. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
+<p class="author">Last Updated 2021-07-19 Mon 16:32. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
 </div>
 </body>
 </html>
