@@ -8,29 +8,43 @@
 #+TAGS: java spring source
 
 * Spring 核心类梳理
-  1. BeanFactory
+  1. BeanFactory =Bean工厂=
      - ~getBean(...)~
      - AbstractBeanFactory
        + ~doGetBean(...)~
      - DefaultListableBeanFactory
-  2. BeanDefinition
-     - AbstractBeanDefinition
-     - BeanDefinitionReader
-       + ~loadBeanDefinitions(...)~
+  2. BeanDefinition =Bean定义=
+     - BeanDefinition 描述 Bean 实例定义的相关信息
+     - BeanDefinition 提供 BeanFactoryPostProcessor 操作属性的最小接口
+     - 抽象类 ~AbstractBeanDefinition~ 实现了一些常用的方法
+       + ~setBeanClassName(...)~
+       + ~isSingleton(...)~
+     - BeanDefinitionReader 接口提供 ~loadBeanDefinitions(...)~ 方法
        + 读取 BeanDefinition 对象
-  3. SingletonBeanRegistry
-     - DefaultSingletonBeanRegistry
+       + 在 ~XmlBeanDefinitionReader~ 具体实现 ~doLoadBeanDefinitions(...)~ 读取
+         XML 中定义的 Bean 数据
+  3. SingletonBeanRegistry =单例 Bean 注册=
+     - ~registerSingleton(...)~ 方法提供注册单例 Bean 入口
+     - 常见的实现类 ~DefaultSingletonBeanRegistry~
+       + ~registerBeanDefinition(...)~ 注册 BeanDefinition
+         - ~Map<String, BeanDefinition> beanDefinitionMap~
+         - ~registerBeanDefinition(...)~ 添加 BeanDefinition 到
+           beanDefinitionMap
        + 三级缓存解决循环依赖
-       + ~Map<String, Object> singletonObjects~
-       + ~Map<String, Object> earlySingletonObjects~
-       + ~Map<String, ObjectFactory<?>> singletonFactories~
-  4. ApplicationContext
+         - ~Map<String, Object> singletonObjects~
+         - ~Map<String, Object> earlySingletonObjects~
+         - ~Map<String, ObjectFactory<?>> singletonFactories~
+  4. ApplicationContext =应用上下文=
      - AbstractApplicationContext
        + ~refresh()~ 实现 Spring Bean 加载的核心逻辑
-  5. BeanFactoryPostProcessor
+       + 包含 15 个子函数处理 Bean 全生命周期的事情
+     - ~ClassPathXmlApplicationContext~ 读取 XML 文件中的 BeanDefinition
+     - ~AnnotationConfigApplicationContext~ 扫描包含 ~@Component~ 注解的
+       BeanDefinition
+  5. BeanFactoryPostProcessor =Bean工厂后置处理器=
      - 函数式接口 ~@FunctionalInterface~
      - 提交工厂创建的后置处理入口
-  6. BeanPostProcessor
+  6. BeanPostProcessor =Bean后置处理器=
      - 提供自定义 Bean 实例化的处理接口扩展
      - ~postProcessBeforeInitialization(Object bean, String beanName)~
        + Bean 实例化前置处理方法
