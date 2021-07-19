@@ -70,6 +70,51 @@
    14. ~initializeBean()~ 初始化 Bean
    15. ~addSingleton()~ 添加单例 Bean
 
+   添加单例的典型调用栈
+   #+BEGIN_SRC text
+     addSingleton:134, DefaultSingletonBeanRegistry (org.springframework.beans.factory.support)
+     registerSingleton:123, DefaultSingletonBeanRegistry (org.springframework.beans.factory.support)
+     registerSingleton:1061, DefaultListableBeanFactory (org.springframework.beans.factory.support)
+     prepareBeanFactory:680, AbstractApplicationContext (org.springframework.context.support)
+     refresh:525, AbstractApplicationContext (org.springframework.context.support)
+     <init>:101, AnnotationConfigApplicationContext (org.springframework.context.annotation)
+     main:29, MyApp02 (io.github.jeanhwea.app02_bean_lifecycle)
+   #+END_SRC
+
+   添加单例工厂的典型调用栈
+   #+BEGIN_SRC text
+     addSingletonFactory:152, DefaultSingletonBeanRegistry (org.springframework.beans.factory.support)
+     doCreateBean:588, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     createBean:517, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     lambda$doGetBean$0:323, AbstractBeanFactory (org.springframework.beans.factory.support)
+     getObject:-1, 1519736165 (org.springframework.beans.factory.support.AbstractBeanFactory$$Lambda$36)
+     getSingleton:222, DefaultSingletonBeanRegistry (org.springframework.beans.factory.support)
+     doGetBean:321, AbstractBeanFactory (org.springframework.beans.factory.support)
+     getBean:207, AbstractBeanFactory (org.springframework.beans.factory.support)
+     invokeBeanFactoryPostProcessors:89, PostProcessorRegistrationDelegate (org.springframework.context.support)
+     invokeBeanFactoryPostProcessors:706, AbstractApplicationContext (org.springframework.context.support)
+     refresh:532, AbstractApplicationContext (org.springframework.context.support)
+     <init>:101, AnnotationConfigApplicationContext (org.springframework.context.annotation)
+     main:29, MyApp02 (io.github.jeanhwea.app02_bean_lifecycle)
+   #+END_SRC
+
+   填充 Bean 的典型调用栈
+   #+BEGIN_SRC text
+     populateBean:1370, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     doCreateBean:594, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     createBean:517, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     lambda$doGetBean$0:323, AbstractBeanFactory (org.springframework.beans.factory.support)
+     getObject:-1, 1519736165 (org.springframework.beans.factory.support.AbstractBeanFactory$$Lambda$36)
+     getSingleton:222, DefaultSingletonBeanRegistry (org.springframework.beans.factory.support)
+     doGetBean:321, AbstractBeanFactory (org.springframework.beans.factory.support)
+     getBean:207, AbstractBeanFactory (org.springframework.beans.factory.support)
+     invokeBeanFactoryPostProcessors:89, PostProcessorRegistrationDelegate (org.springframework.context.support)
+     invokeBeanFactoryPostProcessors:706, AbstractApplicationContext (org.springframework.context.support)
+     refresh:532, AbstractApplicationContext (org.springframework.context.support)
+     <init>:101, AnnotationConfigApplicationContext (org.springframework.context.annotation)
+     main:29, MyApp02 (io.github.jeanhwea.app02_bean_lifecycle)
+   #+END_SRC
+
 * 容器实现原理
 ** Bean 工厂接口: BeanFactory
    ~BeanFactory~ 是 Spring 的 Bean 工厂的接口定义，它定义对 Spring Bean 容器访问的
