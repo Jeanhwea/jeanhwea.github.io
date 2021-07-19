@@ -1846,6 +1846,104 @@
       }
     #+END_SRC
 
+** 刷新应用上下文: ~refresh()~ 方法
+   该 ~refresh()~ 方法实现了 Spring 的 Bean 管理的全周期的流程，其中调用了 15 个
+   辅助方法，它的主要实现如下
+   #+BEGIN_SRC java
+     @Override
+     public void refresh() throws BeansException, IllegalStateException {
+         synchronized (this.startupShutdownMonitor) {
+             // Prepare this context for refreshing.
+             prepareRefresh();
+
+             // Tell the subclass to refresh the internal bean factory.
+             ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+
+             // Prepare the bean factory for use in this context.
+             prepareBeanFactory(beanFactory);
+
+             try {
+                 // Allows post-processing of the bean factory in context subclasses.
+                 postProcessBeanFactory(beanFactory);
+
+                 // Invoke factory processors registered as beans in the context.
+                 invokeBeanFactoryPostProcessors(beanFactory);
+
+                 // Register bean processors that intercept bean creation.
+                 registerBeanPostProcessors(beanFactory);
+
+                 // Initialize message source for this context.
+                 initMessageSource();
+
+                 // Initialize event multicaster for this context.
+                 initApplicationEventMulticaster();
+
+                 // Initialize other special beans in specific context subclasses.
+                 onRefresh();
+
+                 // Check for listener beans and register them.
+                 registerListeners();
+
+                 // Instantiate all remaining (non-lazy-init) singletons.
+                 finishBeanFactoryInitialization(beanFactory);
+
+                 // Last step: publish corresponding event.
+                 finishRefresh();
+             }
+
+             catch (BeansException ex) {
+                 if (logger.isWarnEnabled()) {
+                     logger.warn("Exception encountered during context initialization - " +
+                             "cancelling refresh attempt: " + ex);
+                 }
+
+                 // Destroy already created singletons to avoid dangling resources.
+                 destroyBeans();
+
+                 // Reset 'active' flag.
+                 cancelRefresh(ex);
+
+                 // Propagate exception to caller.
+                 throw ex;
+             }
+
+             finally {
+                 // Reset common introspection caches in Spring's core, since we
+                 // might not ever need metadata for singleton beans anymore...
+                 resetCommonCaches();
+             }
+         }
+     }
+   #+END_SRC
+
+   每个方法的解释如下
+   1. ~prepareRefresh()~ 刷新应用上下文的准备工作
+      - 验证系统变量等
+   2. ~obtainFreshBeanFactory()~ 初始化 BeanFactory, 填充 BeanFactory 的属性
+   3. ~prepareBeanFactory(beanFactory)~ 准备当前上下文的 BeanFactory
+      - ~Qualifier~, ~@Autowired~ 注解支持
+   4. ~postProcessBeanFactory(beanFactory)~  的实现
+      该方法来扩展其功能，即子类重写当前方法来改变 BeanFactory 的功能
+   5. ~invokeBeanFactoryPostProcessors(beanFactory)~ 唤醒
+      BeanFactoryPostProcessor 的后置处理方法
+      - 调用 ~postProcessBeanFactory(...)~ 方法
+   6. ~registerBeanPostProcessors(beanFactory)~ 注册 BeanPostProcessor 的拦截器
+      - 拦截器在这里只是注册
+      - 调用拦截器在 ~getBean(...)~ 中实现
+   7. ~initMessageSource()~ 初始化不同语言的消息，提供国际化支持
+   8. ~initApplicationEventMulticaster()~ 初始化消息多播器
+      - 将 Bean 放入 ~applicationEventMulticaster~ 中
+   9. ~onRefresh()~ 提供子类的扩展接入点
+   10. ~registerListeners()~ 注册监听器，在所有注册的 Bean 中查找 listenerBean,
+       并将 listenerBean 添加到 applicationEventMulticaster 中
+   11. ~finishBeanFactoryInitialization(beanFactory)~ 初始化剩下的单例（非懒加载
+       的）
+   12. ~finishRefresh()~ 完成刷新过程，发布 ContextRefreshedEvent
+   13. 如果出现异常
+       - ~destroyBeans()~ 销毁 Bean
+       - ~cancelRefresh(ex)~ 重置 active 标注
+   14. 最终结束, ~resetCommonCaches()~ 清空缓存
+
 * AOP
   使用动态代理实现
   - JDK 代理
