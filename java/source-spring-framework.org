@@ -1601,7 +1601,7 @@
       - 只检测单例 Bean 的循环依赖
       - 原型 Bean 的循环检测很难做到，Spring 做法是直接抛出异常
    8. 注册 DisposableBean
-      - 便于 destroy-method 在Bean销毁时调用
+      - 便于 destroy-method 在 Bean 销毁时调用
    9. 完成创建并返回
 
 *** Bean 的初始化: ~initializeBean(...)~ 方法
@@ -1706,7 +1706,7 @@
     #+END_SRC
 
 * 容器功能扩展
-** 应用上下文 ApplicationContext
+** 应用上下文: ApplicationContext
    首先查看 ~ApplicationContext~ 接口的相关信息
    #+BEGIN_SRC text
      org.springframework.context
@@ -1729,9 +1729,8 @@
    4. ~HierarchicalBeanFactory~ 继承父的上下文功能
    5. ~EnvironmentCapable~ 系统环境变量和 Java 属性支持
 
-** ApplicationContext 的常见实现类
+** ApplicationContext 接口的常见实现类
 *** ClassPathXmlApplicationContext
-
     读取 ClassPath 中 XML 配置文件的 Bean 定义的容器
     #+BEGIN_SRC text
       org.springframework.context.support
@@ -1759,9 +1758,34 @@
               org.springframework.core.io.support.ResourcePatternResolver
     #+END_SRC
 
+    ~ClassPathXmlApplicationContext~ 的构造器的实现如下，该构造器实现逻辑比较清
+    晰，需要注意的是这里后面调用了刷新上下文的 ~refresh()~ 方法
+    #+BEGIN_SRC java
+      /**
+       ,* Create a new ClassPathXmlApplicationContext with the given parent,
+       ,* loading the definitions from the given XML files.
+       ,* @param configLocations array of resource locations
+       ,* @param refresh whether to automatically refresh the context,
+       ,* loading all bean definitions and creating all singletons.
+       ,* Alternatively, call refresh manually after further configuring the context.
+       ,* @param parent the parent context
+       ,* @throws BeansException if context creation failed
+       ,* @see #refresh()
+       ,*/
+      public ClassPathXmlApplicationContext(
+              String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
+              throws BeansException {
+
+          super(parent);
+          setConfigLocations(configLocations);
+          if (refresh) {
+              refresh();
+          }
+      }
+    #+END_SRC
+
 *** AnnotationConfigApplicationContext
     读取注解类型 Bean 定义的容器, ~@Component~, ~@Service~ 等
-
     #+BEGIN_SRC text
       org.springframework.context.annotation
       Class AnnotationConfigApplicationContext
@@ -1805,6 +1829,22 @@
     5. 上下文的接口:
        - ~ApplicationContext~ 作为主导接口
          - ~AbstractApplicationContext~
+
+    ~AnnotationConfigApplicationContext~ 的构造器的实现如下，扫描包过后，然后调
+    用了刷新上下文的 ~refresh()~ 方法
+    #+BEGIN_SRC java
+      /**
+       ,* Create a new AnnotationConfigApplicationContext, scanning for components
+       ,* in the given packages, registering bean definitions for those components,
+       ,* and automatically refreshing the context.
+       ,* @param basePackages the packages to scan for component classes
+       ,*/
+      public AnnotationConfigApplicationContext(String... basePackages) {
+          this();
+          scan(basePackages);
+          refresh();
+      }
+    #+END_SRC
 
 * AOP
   使用动态代理实现
