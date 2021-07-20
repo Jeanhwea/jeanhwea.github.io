@@ -4,9 +4,9 @@
 TAG   := $(shell git describe --tags --always --dirty="-dev")
 TODAY := $(shell date +'%Y-%m-%d')
 # ORGS  := $(shell find . -iname '*.org')
-ORGS  := $(wildcard java/*.org)
-DOCS  := $(patsubst %.org,%.pdf,$(ORGS))
-# DOCS  := $(ORGS:%.org=%.pdf)
+ORGS  := $(wildcard *.org)
+# DOCS  := $(patsubst %.org,%.pdf,$(ORGS))
+DOCS  := $(ORGS:%.org=%.pdf)
 
 ################################################################################
 # Setup PDF Flags
@@ -30,14 +30,11 @@ CFLAG += -V geometry:margin='.8in'
 # |____/ \___/ \___|\__,_|_| |_| |_|\___|_| |_|\__|
 #
 ################################################################################
-all: $(DOCS)
+all: clean $(DOCS)
 	echo $(ORGS)
 
 %.pdf: %.org
 	pandoc $(CFLAG) $< -o $@
-
-list-fonts:
-	@fc-list :lang=zh
 
 clean:
 	@rm *.pdf
@@ -48,5 +45,5 @@ clean:
 # sed '/^[-0-9A-Za-z]*:/!d;s/:.*$//' Makefile | sort | tr '\n' ' ' | xargs -I {} printf ".PHONY:\n\t{}\n"
 # codetta: output
 .PHONY:
-	abbr
+	all clean
 # codetta: end
