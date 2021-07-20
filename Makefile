@@ -3,7 +3,8 @@
 ################################################################################
 TAG   := $(shell git describe --tags --always --dirty="-dev")
 TODAY := $(shell date +'%Y-%m-%d')
-DOCS  := $(wildcard *.org)
+ORGS  := $(wildcard *.org)
+DOCS  := $(patsubst %.org,%.pdf,$(ORGS))
 
 ################################################################################
 # Setup PDF Flags
@@ -28,9 +29,9 @@ CFLAG += -V geometry:margin='.8in'
 #
 ################################################################################
 all: $(DOCS)
+	echo $(DOCS)
 
-
-$(DOCS): %.pdf:%.org
+.org:.pdf:
 	echo pandoc $(CFLAG) $< -o $@
 
 list-fonts:
@@ -40,6 +41,7 @@ clean:
 	@rm *.pdf
 
 
+.SUFFIXES:.pdf .org
 
 # codetta: start
 # sed '/^[-0-9A-Za-z]*:/!d;s/:.*$//' Makefile | sort | tr '\n' ' ' | xargs -I {} printf ".PHONY:\n\t{}\n"
