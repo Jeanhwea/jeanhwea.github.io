@@ -44,7 +44,7 @@ docs: $(DOCS)
 	pandoc $< -o $@
 
 clean:
-	@rm *.pdf
+	@rm *.pdf *.docx
 
 .SUFFIXES: .docx .pdf .org
 
