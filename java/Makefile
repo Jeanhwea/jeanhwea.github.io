@@ -5,8 +5,9 @@ TAG   := $(shell git describe --tags --always --dirty="-dev")
 TODAY := $(shell date +'%Y-%m-%d')
 # ORGS  := $(shell find . -iname '*.org')
 ORGS  := $(wildcard *.org)
-# DOCS  := $(patsubst %.org,%.pdf,$(ORGS))
-DOCS  := $(ORGS:%.org=%.pdf)
+# PDFS  := $(patsubst %.org,%.pdf,$(ORGS))
+PDFS  := $(ORGS:%.org=%.pdf)
+DOCS  := $(ORGS:%.org=%.docx)
 
 ################################################################################
 # Setup PDF Flags
@@ -30,16 +31,22 @@ CFLAG += -V geometry:margin='.8in'
 # |____/ \___/ \___|\__,_|_| |_| |_|\___|_| |_|\__|
 #
 ################################################################################
-all: $(DOCS)
-	@echo "Finish:[$(ORGS)]"
+all: $(PDFS)
+	@echo "Finish:[$(PDFS)]"
+
+docs: $(DOCS)
+	@echo "Finish:[$(DOCS)]"
 
 %.pdf: %.org
 	pandoc $(CFLAG) $< -o $@
 
+%.docx: %.org
+	pandoc $< -o $@
+
 clean:
 	@rm *.pdf
 
-.SUFFIXES: .pdf .org
+.SUFFIXES: .docx .pdf .org
 
 # codetta: start
 # sed '/^[-0-9A-Za-z]*:/!d;s/:.*$//' Makefile | sort | tr '\n' ' ' | xargs -I {} printf ".PHONY:\n\t{}\n"
