@@ -30,8 +30,8 @@ CFLAG += -V geometry:margin='.8in'
 # |____/ \___/ \___|\__,_|_| |_| |_|\___|_| |_|\__|
 #
 ################################################################################
-all: clean $(DOCS)
-	echo $(ORGS)
+all: $(DOCS)
+	echo "Finish:[$(ORGS)]"
 
 %.pdf: %.org
 	pandoc $(CFLAG) $< -o $@
