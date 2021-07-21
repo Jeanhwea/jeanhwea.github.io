@@ -2760,6 +2760,13 @@
     使用动态代理实现主要使用下面两种方法
     1. JDK 动态代理
        - 其代理对象必须是某个接口的实现
+         #+BEGIN_SRC java
+           @CallerSensitive
+           public static Object newProxyInstance(ClassLoader loader,
+                                                 Class<?>[] interfaces,
+                                                 InvocationHandler h)
+             throws IllegalArgumentException {...}
+         #+END_SRC
        - 它是通过运行期间创建一个接口的实现类来完成对目标对象的代理
     2. cglib 动态代理
        - 原理类似 JDK 动态代理，只是它在运行期间创建的代理对象是针对目标类扩展的
@@ -3247,6 +3254,71 @@
 
 ** 创建 AOP 代理
 *** 抽象代理创建器 AbstractAutoProxyCreator
+    创建代理类的调用栈如下，最终通过 ~createAopProxy~ 方法创建 JDK 动态代理或
+    cglib 动态代理
+    #+BEGIN_SRC text
+      createAopProxy:51, DefaultAopProxyFactory (org.springframework.aop.framework)
+      createAopProxy:105, ProxyCreatorSupport (org.springframework.aop.framework)
+      getProxy:110, ProxyFactory (org.springframework.aop.framework)
+      createProxy:471, AbstractAutoProxyCreator (org.springframework.aop.framework.autoproxy)
+      wrapIfNecessary:350, AbstractAutoProxyCreator (org.springframework.aop.framework.autoproxy)
+      postProcessAfterInitialization:299, AbstractAutoProxyCreator (org.springframework.aop.framework.autoproxy)
+      applyBeanPostProcessorsAfterInitialization:431, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+      initializeBean:1800, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+      doCreateBean:595, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+      createBean:517, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+      lambda$doGetBean$0:323, AbstractBeanFactory (org.springframework.beans.factory.support)
+      getObject:-1, 1625082366 (org.springframework.beans.factory.support.AbstractBeanFactory$$Lambda$37)
+      getSingleton:222, DefaultSingletonBeanRegistry (org.springframework.beans.factory.support)
+      doGetBean:321, AbstractBeanFactory (org.springframework.beans.factory.support)
+      getBean:202, AbstractBeanFactory (org.springframework.beans.factory.support)
+      preInstantiateSingletons:882, DefaultListableBeanFactory (org.springframework.beans.factory.support)
+      finishBeanFactoryInitialization:878, AbstractApplicationContext (org.springframework.context.support)
+      refresh:550, AbstractApplicationContext (org.springframework.context.support)
+      <init>:101, AnnotationConfigApplicationContext (org.springframework.context.annotation)
+      main:9, MyApp07 (io.github.jeanhwea.app07_aop)
+    #+END_SRC
+
+    创建 AOP 代理嵌套了好几层，最终调用 ~DefaultAopProxyFactory~ 的
+    ~createAopProxy(...)~ 方法的实现，这里可以
+    1. 如果目标对象是接口类或者本身就是一个 Proxy 生成的代理类，那么使用 JDK 来
+       生成代理对象
+    2. 否则使用 cglib 来生成代理对象
+    #+BEGIN_SRC java
+      @SuppressWarnings("serial")
+      public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
+
+          @Override
+          public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+              if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
+                  Class<?> targetClass = config.getTargetClass();
+                  if (targetClass == null) {
+                      throw new AopConfigException("TargetSource cannot determine target class: " +
+                              "Either an interface or a target is required for proxy creation.");
+                  }
+                  if (targetClass.isInterface() || Proxy.isProxyClass(targetClass)) {
+                      return new JdkDynamicAopProxy(config);
+                  }
+                  return new ObjenesisCglibAopProxy(config);
+              }
+              else {
+                  return new JdkDynamicAopProxy(config);
+              }
+          }
+
+          /**
+           ,* Determine whether the supplied {@link AdvisedSupport} has only the
+           ,* {@link org.springframework.aop.SpringProxy} interface specified
+           ,* (or no proxy interfaces specified at all).
+           ,*/
+          private boolean hasNoUserSuppliedProxyInterfaces(AdvisedSupport config) {
+              Class<?>[] ifcs = config.getProxiedInterfaces();
+              return (ifcs.length == 0 || (ifcs.length == 1 && SpringProxy.class.isAssignableFrom(ifcs[0])));
+          }
+
+      }
+    #+END_SRC
+
     ~postProcessAfterInitialization(...)~ 方法中调用了 ~wrapIfNecessary(...)~ 方
     法获取包裹 Bean 对象，该方法有以下作用
     1. 前置判断是否需要创建增强器
@@ -3289,26 +3361,6 @@
       }
     #+END_SRC
 
-    创建代理类的调用栈如下
-    #+BEGIN_SRC text
-      createProxy:445, AbstractAutoProxyCreator (org.springframework.aop.framework.autoproxy)
-      wrapIfNecessary:350, AbstractAutoProxyCreator (org.springframework.aop.framework.autoproxy)
-      postProcessAfterInitialization:299, AbstractAutoProxyCreator (org.springframework.aop.framework.autoproxy)
-      applyBeanPostProcessorsAfterInitialization:431, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
-      initializeBean:1800, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
-      doCreateBean:595, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
-      createBean:517, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
-      lambda$doGetBean$0:323, AbstractBeanFactory (org.springframework.beans.factory.support)
-      getObject:-1, 343856911 (org.springframework.beans.factory.support.AbstractBeanFactory$$Lambda$37)
-      getSingleton:222, DefaultSingletonBeanRegistry (org.springframework.beans.factory.support)
-      doGetBean:321, AbstractBeanFactory (org.springframework.beans.factory.support)
-      getBean:202, AbstractBeanFactory (org.springframework.beans.factory.support)
-      preInstantiateSingletons:882, DefaultListableBeanFactory (org.springframework.beans.factory.support)
-      finishBeanFactoryInitialization:878, AbstractApplicationContext (org.springframework.context.support)
-      refresh:550, AbstractApplicationContext (org.springframework.context.support)
-      <init>:101, AnnotationConfigApplicationContext (org.springframework.context.annotation)
-      main:9, MyApp07 (io.github.jeanhwea.app07_aop)
-    #+END_SRC
 
     ~createProxy(...)~ 方法逻辑如下
     1. 获取增强方法或者增强器
