@@ -3129,6 +3129,137 @@
    #+END_SRC
 
 ** 创建 AOP 代理
+*** 抽象代理创建器 AbstractAutoProxyCreator
+    ~postProcessAfterInitialization(...)~ 方法中调用了包裹 bean 的
+    ~wrapIfNecessary(...)~ 方法
+    #+BEGIN_SRC java
+      /**
+       ,* Create a proxy with the configured interceptors if the bean is
+       ,* identified as one to proxy by the subclass.
+       ,* @see #getAdvicesAndAdvisorsForBean
+       ,*/
+      @Override
+      public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
+          if (bean != null) {
+              Object cacheKey = getCacheKey(bean.getClass(), beanName);
+              if (this.earlyProxyReferences.remove(cacheKey) != bean) {
+                  return wrapIfNecessary(bean, beanName, cacheKey);
+              }
+          }
+          return bean;
+      }
+    #+END_SRC
+
+    ~wrapIfNecessary(...)~ 方法
+    1. 前置判断是否需要创建增强器
+    2. 如果存在增强方法
+       - ~getAdvicesAndAdvisorsForBean(...)~ 获取拦截器，如果有拦截器说明该方法
+         需要增强
+    3. 调用 ~createProxy(...)~ 方法创建代理类
+    #+BEGIN_SRC java
+      /**
+       ,* Wrap the given bean if necessary, i.e. if it is eligible for being proxied.
+       ,* @param bean the raw bean instance
+       ,* @param beanName the name of the bean
+       ,* @param cacheKey the cache key for metadata access
+       ,* @return a proxy wrapping the bean, or the raw bean instance as-is
+       ,*/
+      protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
+          if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
+              return bean;
+          }
+          if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
+              return bean;
+          }
+          if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
+              this.advisedBeans.put(cacheKey, Boolean.FALSE);
+              return bean;
+          }
+
+          // Create proxy if we have advice.
+          Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
+          if (specificInterceptors != DO_NOT_PROXY) {
+              this.advisedBeans.put(cacheKey, Boolean.TRUE);
+              Object proxy = createProxy(
+                      bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
+              this.proxyTypes.put(cacheKey, proxy.getClass());
+              return proxy;
+          }
+
+          this.advisedBeans.put(cacheKey, Boolean.FALSE);
+          return bean;
+      }
+    #+END_SRC
+
+    创建代理类的调用栈如下
+    #+BEGIN_SRC text
+      createProxy:445, AbstractAutoProxyCreator (org.springframework.aop.framework.autoproxy)
+      wrapIfNecessary:350, AbstractAutoProxyCreator (org.springframework.aop.framework.autoproxy)
+      postProcessAfterInitialization:299, AbstractAutoProxyCreator (org.springframework.aop.framework.autoproxy)
+      applyBeanPostProcessorsAfterInitialization:431, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+      initializeBean:1800, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+      doCreateBean:595, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+      createBean:517, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+      lambda$doGetBean$0:323, AbstractBeanFactory (org.springframework.beans.factory.support)
+      getObject:-1, 343856911 (org.springframework.beans.factory.support.AbstractBeanFactory$$Lambda$37)
+      getSingleton:222, DefaultSingletonBeanRegistry (org.springframework.beans.factory.support)
+      doGetBean:321, AbstractBeanFactory (org.springframework.beans.factory.support)
+      getBean:202, AbstractBeanFactory (org.springframework.beans.factory.support)
+      preInstantiateSingletons:882, DefaultListableBeanFactory (org.springframework.beans.factory.support)
+      finishBeanFactoryInitialization:878, AbstractApplicationContext (org.springframework.context.support)
+      refresh:550, AbstractApplicationContext (org.springframework.context.support)
+      <init>:101, AnnotationConfigApplicationContext (org.springframework.context.annotation)
+      main:9, MyApp07 (io.github.jeanhwea.app07_aop)
+    #+END_SRC
+
+    ~createProxy(...)~ 方法逻辑如下
+    1. 获取增强方法或者增强器
+    2. 根据获取的增强进行代理
+    #+BEGIN_SRC java
+      /**
+       ,* Create an AOP proxy for the given bean.
+       ,* @param beanClass the class of the bean
+       ,* @param beanName the name of the bean
+       ,* @param specificInterceptors the set of interceptors that is
+       ,* specific to this bean (may be empty, but not null)
+       ,* @param targetSource the TargetSource for the proxy,
+       ,* already pre-configured to access the bean
+       ,* @return the AOP proxy for the bean
+       ,* @see #buildAdvisors
+       ,*/
+      protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
+              @Nullable Object[] specificInterceptors, TargetSource targetSource) {
+
+          if (this.beanFactory instanceof ConfigurableListableBeanFactory) {
+              AutoProxyUtils.exposeTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName, beanClass);
+          }
+
+          ProxyFactory proxyFactory = new ProxyFactory();
+          proxyFactory.copyFrom(this);
+
+          if (!proxyFactory.isProxyTargetClass()) {
+              if (shouldProxyTargetClass(beanClass, beanName)) {
+                  proxyFactory.setProxyTargetClass(true);
+              }
+              else {
+                  evaluateProxyInterfaces(beanClass, proxyFactory);
+              }
+          }
+
+          Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
+          proxyFactory.addAdvisors(advisors);
+          proxyFactory.setTargetSource(targetSource);
+          customizeProxyFactory(proxyFactory);
+
+          proxyFactory.setFrozen(this.freezeProxy);
+          if (advisorsPreFiltered()) {
+              proxyFactory.setPreFiltered(true);
+          }
+
+          return proxyFactory.getProxy(getProxyClassLoader());
+      }
+    #+END_SRC
+
 *** 获取增强器 AspectJAwareAdvisorAutoProxyCreator
     ~AspectJAwareAdvisorAutoProxyCreator~ 是增强器自动代理创建器
     #+BEGIN_SRC text
@@ -3163,7 +3294,7 @@
 
 *** 自定义标签
 
-*** 织入
+*** 织入 Weaving
 
 * SpringBoot 自动装配
 * 参考链接
