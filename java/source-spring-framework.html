@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-21 Wed 22:30 -->
+<!-- 2021-07-21 Wed 22:34 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Spring Framework 源码赏析</title>
@@ -233,120 +233,119 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orga49eb34">1. Spring 核心类和方法</a>
+<li><a href="#org0d9159a">1. Spring 核心类和方法</a>
 <ul>
-<li><a href="#orgb54e85d">1.1. 核心类</a></li>
-<li><a href="#orgf61ec5f">1.2. IoC 核心方法</a></li>
+<li><a href="#org1e3b0f8">1.1. 核心类</a></li>
+<li><a href="#orgd875f7e">1.2. IoC 核心方法</a></li>
 </ul>
 </li>
-<li><a href="#org50431de">2. 容器实现原理</a>
+<li><a href="#org5e113d8">2. 容器实现原理</a>
 <ul>
-<li><a href="#org482ce77">2.1. Bean 工厂接口: BeanFactory</a></li>
-<li><a href="#orgebdeea4">2.2. Bean 工厂的实现类: DefaultListableBeanFactory</a></li>
-<li><a href="#orge36a5b4">2.3. Bean 定义的读取器: XmlBeanDefinitionReader</a></li>
-<li><a href="#org5f7a28b">2.4. BeanDefinition 自动加载流程</a></li>
-<li><a href="#org7883aec">2.5. BeanDefinition 注册的实现</a></li>
-<li><a href="#orgd4a3a5c">2.6. BeanDefinition 移除的实现</a></li>
-<li><a href="#org9165b4d">2.7. BeanDefinition 获取的实现</a></li>
-<li><a href="#orge762a7c">2.8. <code>&lt;bean/&gt;</code> 标签解析</a></li>
+<li><a href="#org531f9fc">2.1. Bean 工厂接口: BeanFactory</a></li>
+<li><a href="#orgc6b34f3">2.2. Bean 工厂的实现类: DefaultListableBeanFactory</a></li>
+<li><a href="#orgb888dcf">2.3. Bean 定义的读取器: XmlBeanDefinitionReader</a></li>
+<li><a href="#org4452528">2.4. BeanDefinition 自动加载流程</a></li>
+<li><a href="#org2f07683">2.5. BeanDefinition 注册的实现</a></li>
+<li><a href="#org7a49594">2.6. BeanDefinition 移除的实现</a></li>
+<li><a href="#orgb80c167">2.7. BeanDefinition 获取的实现</a></li>
+<li><a href="#org657c2ae">2.8. <code>&lt;bean/&gt;</code> 标签解析</a></li>
 </ul>
 </li>
-<li><a href="#org4c47fbe">3. Bean 实现原理</a>
+<li><a href="#org006179e">3. Bean 实现原理</a>
 <ul>
-<li><a href="#orgf87bb50">3.1. Bean 的生命周期</a></li>
-<li><a href="#orgae8ba40">3.2. Bean 的流程分析</a>
+<li><a href="#org9de7bb8">3.1. Bean 的生命周期</a></li>
+<li><a href="#org53f6614">3.2. Bean 的流程分析</a>
 <ul>
-<li><a href="#org3a3389c">3.2.1. 实例化 Bean: <code>instantiateBean()</code> 方法</a></li>
-<li><a href="#org4190f92">3.2.2. 获取 Bean 实例: <code>doGetBean()</code> 方法</a></li>
+<li><a href="#org1b1dc79">3.2.1. 实例化 Bean: <code>instantiateBean()</code> 方法</a></li>
+<li><a href="#org2a935a2">3.2.2. 获取 Bean 实例: <code>doGetBean()</code> 方法</a></li>
 </ul>
 </li>
-<li><a href="#org0caddfd">3.3. 特殊的 Spring Bean: FactoryBean</a></li>
-<li><a href="#org1d02af7">3.4. 单例 Bean 工厂的实现</a>
+<li><a href="#org94b8b02">3.3. 特殊的 Spring Bean: FactoryBean</a></li>
+<li><a href="#org89937b6">3.4. 单例 Bean 工厂的实现</a>
 <ul>
-<li><a href="#org630fb80">3.4.1. 单例 Bean 工厂的三级缓存: <code>DefaultSingletonBeanRegistry</code> 类的缓存</a></li>
-<li><a href="#org009cb7e">3.4.2. 获取单例 Bean 方法: <code>getSingleton(...)</code> 方法</a></li>
-<li><a href="#orgd9284f7">3.4.3. beanInstance 到 beanOject 过程: <code>getObjectForBeanInstance(...)</code> 方法</a></li>
+<li><a href="#orgb0fda6d">3.4.1. 单例 Bean 工厂的三级缓存: <code>DefaultSingletonBeanRegistry</code> 类的缓存</a></li>
+<li><a href="#orgcb30880">3.4.2. 获取单例 Bean 方法: <code>getSingleton(...)</code> 方法</a></li>
+<li><a href="#org9324bba">3.4.3. beanInstance 到 beanOject 过程: <code>getObjectForBeanInstance(...)</code> 方法</a></li>
 </ul>
 </li>
-<li><a href="#org452da8b">3.5. Bean 生命周期的实现</a>
+<li><a href="#org49becdc">3.5. Bean 生命周期的实现</a>
 <ul>
-<li><a href="#orgbab64b6">3.5.1. Bean 创建的实现类: <code>AbstractAutowireCapableBeanFactory</code></a></li>
-<li><a href="#org1a9e3b3">3.5.2. Bean 的实例化: <code>createBean(...)</code> 方法</a></li>
-<li><a href="#org36c07dc">3.5.3. Bean 的初始化: <code>initializeBean(...)</code> 方法</a></li>
-<li><a href="#orgfcb7184">3.5.4. Bean 的销毁</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org7901f1a">4. 容器功能扩展</a>
-<ul>
-<li><a href="#orgcf158db">4.1. 应用上下文: ApplicationContext</a></li>
-<li><a href="#org0c8d479">4.2. ApplicationContext 接口的常见实现类</a>
-<ul>
-<li><a href="#org5721b61">4.2.1. ClassPathXmlApplicationContext</a></li>
-<li><a href="#orgbf6fd2c">4.2.2. AnnotationConfigApplicationContext</a></li>
-</ul>
-</li>
-<li><a href="#org4c0dca3">4.3. 刷新应用上下文: <code>refresh()</code> 方法</a>
-<ul>
-<li><a href="#org273d8c3">4.3.1. <code>refresh()</code> 方法总览</a></li>
-<li><a href="#org07945bd">4.3.2. 环境准备</a></li>
-<li><a href="#org814d1c8">4.3.3. 加载 BeanFactory</a></li>
-<li><a href="#org292cd73">4.3.4. BeanFactory 准备工作</a></li>
-<li><a href="#org384f397">4.3.5. BeanFactory 后续处理工作</a></li>
-<li><a href="#org5041d91">4.3.6. 初始化非延迟加载单例</a></li>
-<li><a href="#org64320cc">4.3.7. 完成上下文刷新</a></li>
+<li><a href="#org2468533">3.5.1. Bean 创建的实现类: <code>AbstractAutowireCapableBeanFactory</code></a></li>
+<li><a href="#org15ae77b">3.5.2. Bean 的实例化: <code>createBean(...)</code> 方法</a></li>
+<li><a href="#org1d501e9">3.5.3. Bean 的初始化: <code>initializeBean(...)</code> 方法</a></li>
+<li><a href="#org8f9bc83">3.5.4. Bean 的销毁</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org1ee69fb">5. AOP 面向切面编程</a>
+<li><a href="#orga090b85">4. 容器功能扩展</a>
 <ul>
-<li><a href="#orgbabfde7">5.1. AOP 预备知识</a>
+<li><a href="#org623e28f">4.1. 应用上下文: ApplicationContext</a></li>
+<li><a href="#org453019b">4.2. ApplicationContext 接口的常见实现类</a>
 <ul>
-<li><a href="#orgda4c138">5.1.1. JDK 动态代理和 cglib 动态代理</a></li>
-<li><a href="#org521ffcf">5.1.2. AOP 组件</a></li>
-<li><a href="#org0336599">5.1.3. AOP 实践案例</a></li>
+<li><a href="#org087c061">4.2.1. ClassPathXmlApplicationContext</a></li>
+<li><a href="#orgda45a4d">4.2.2. AnnotationConfigApplicationContext</a></li>
 </ul>
 </li>
-<li><a href="#org4418fe0">5.2. AOP 实现原理</a>
+<li><a href="#org7ebb620">4.3. 刷新应用上下文: <code>refresh()</code> 方法</a>
 <ul>
-<li><a href="#orgba68641">5.2.1. AOP 的工具类 <code>AopNamespaceUtils</code></a></li>
-<li><a href="#orga02ff2e">5.2.2. AOP 代理是否开启 <code>AspectJAutoProxyRegistrar</code></a></li>
-<li><a href="#orgc98c7dc">5.2.3. AspectJ 创建器 <code>AnnotationAwareAspectJAutoProxyCreator</code></a></li>
-<li><a href="#orgf99be68">5.2.4. <code>AbstractAutoProxyCreator</code> 埋点</a></li>
-<li><a href="#org8b33d18">5.2.5. XML 方式的 AOP</a></li>
-</ul>
-</li>
-<li><a href="#org65c80c1">5.3. 创建 AOP 代理</a>
-<ul>
-<li><a href="#orgc0097e2">5.3.1. 抽象代理创建器 AbstractAutoProxyCreator</a></li>
-<li><a href="#org9a24d15">5.3.2. 获取增强器 AspectJAwareAdvisorAutoProxyCreator</a></li>
-<li><a href="#org0230cd6">5.3.3. 寻找增强器</a></li>
-<li><a href="#orgba1b814">5.3.4. 创建代理</a></li>
-</ul>
-</li>
-<li><a href="#org77f4cdf">5.4. 创建 AOP 静态代理</a>
-<ul>
-<li><a href="#org539eb98">5.4.1. Instrumentation 使用</a></li>
-<li><a href="#org4d21cbe">5.4.2. 自定义标签</a></li>
-<li><a href="#org9c8d79b">5.4.3. 织入 Weaving</a></li>
+<li><a href="#org51eafcd">4.3.1. <code>refresh()</code> 方法总览</a></li>
+<li><a href="#orga0de1bb">4.3.2. 环境准备</a></li>
+<li><a href="#org2a92710">4.3.3. 加载 BeanFactory</a></li>
+<li><a href="#orga338308">4.3.4. BeanFactory 准备工作</a></li>
+<li><a href="#org90b8509">4.3.5. BeanFactory 后续处理工作</a></li>
+<li><a href="#org44350e7">4.3.6. 初始化非延迟加载单例</a></li>
+<li><a href="#orgdbd4354">4.3.7. 完成上下文刷新</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org6a9d5dc">6. SpringBoot 自动装配</a></li>
-<li><a href="#orgebe3422">7. 参考链接</a></li>
+<li><a href="#orgcb7ab92">5. AOP 面向切面编程</a>
+<ul>
+<li><a href="#org23efc25">5.1. AOP 预备知识</a>
+<ul>
+<li><a href="#org6430ec2">5.1.1. JDK 动态代理和 cglib 动态代理</a></li>
+<li><a href="#org8263b48">5.1.2. AOP 组件</a></li>
+<li><a href="#orgbdffdcd">5.1.3. AOP 实践案例</a></li>
+</ul>
+</li>
+<li><a href="#orga06a6e5">5.2. AOP 实现原理</a>
+<ul>
+<li><a href="#orgdfb0c13">5.2.1. AOP 的工具类 <code>AopNamespaceUtils</code></a></li>
+<li><a href="#orga7e9877">5.2.2. AOP 代理是否开启 <code>AspectJAutoProxyRegistrar</code></a></li>
+<li><a href="#orga483f92">5.2.3. AspectJ 创建器 <code>AnnotationAwareAspectJAutoProxyCreator</code></a></li>
+<li><a href="#orga668400">5.2.4. <code>AbstractAutoProxyCreator</code> 提前埋点</a></li>
+<li><a href="#org9a961bc">5.2.5. XML 方式的 AOP 读取</a></li>
+</ul>
+</li>
+<li><a href="#orgeaf0978">5.3. 创建 AOP 代理</a>
+<ul>
+<li><a href="#orga7e38da">5.3.1. 创建 AOP 代理类真实过程</a></li>
+<li><a href="#orgc10dfea">5.3.2. 寻找增强器</a></li>
+<li><a href="#orga57e729">5.3.3. 创建代理</a></li>
+</ul>
+</li>
+<li><a href="#org50fc504">5.4. 创建 AOP 静态代理</a>
+<ul>
+<li><a href="#org7995279">5.4.1. Instrumentation 使用</a></li>
+<li><a href="#org27abcda">5.4.2. 自定义标签</a></li>
+<li><a href="#orgb5d9005">5.4.3. 织入 Weaving</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org6644bd2">6. SpringBoot 自动装配</a></li>
+<li><a href="#orgcc2371c">7. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orga49eb34" class="outline-2">
-<h2 id="orga49eb34"><span class="section-number-2">1</span> Spring 核心类和方法</h2>
+<div id="outline-container-org0d9159a" class="outline-2">
+<h2 id="org0d9159a"><span class="section-number-2">1</span> Spring 核心类和方法</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgb54e85d" class="outline-3">
-<h3 id="orgb54e85d"><span class="section-number-3">1.1</span> 核心类</h3>
+<div id="outline-container-org1e3b0f8" class="outline-3">
+<h3 id="org1e3b0f8"><span class="section-number-3">1.1</span> 核心类</h3>
 <div class="outline-text-3" id="text-1-1">
 <ol class="org-ol">
 <li>BeanFactory <code>Bean工厂</code>
@@ -426,8 +425,8 @@ BeanDefinition</li>
 </div>
 </div>
 
-<div id="outline-container-orgf61ec5f" class="outline-3">
-<h3 id="orgf61ec5f"><span class="section-number-3">1.2</span> IoC 核心方法</h3>
+<div id="outline-container-orgd875f7e" class="outline-3">
+<h3 id="orgd875f7e"><span class="section-number-3">1.2</span> IoC 核心方法</h3>
 <div class="outline-text-3" id="text-1-2">
 <ol class="org-ol">
 <li><code>getBean()</code> 获取 Bean</li>
@@ -504,12 +503,12 @@ main:29, MyApp02 (io.github.jeanhwea.app02_bean_lifecycle)
 </div>
 </div>
 
-<div id="outline-container-org50431de" class="outline-2">
-<h2 id="org50431de"><span class="section-number-2">2</span> 容器实现原理</h2>
+<div id="outline-container-org5e113d8" class="outline-2">
+<h2 id="org5e113d8"><span class="section-number-2">2</span> 容器实现原理</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org482ce77" class="outline-3">
-<h3 id="org482ce77"><span class="section-number-3">2.1</span> Bean 工厂接口: BeanFactory</h3>
+<div id="outline-container-org531f9fc" class="outline-3">
+<h3 id="org531f9fc"><span class="section-number-3">2.1</span> Bean 工厂接口: BeanFactory</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 <code>BeanFactory</code> 是 Spring 的 Bean 工厂的接口定义，它定义对 Spring Bean 容器访问的
@@ -551,8 +550,8 @@ main:29, MyApp02 (io.github.jeanhwea.app02_bean_lifecycle)
 </div>
 </div>
 
-<div id="outline-container-orgebdeea4" class="outline-3">
-<h3 id="orgebdeea4"><span class="section-number-3">2.2</span> Bean 工厂的实现类: DefaultListableBeanFactory</h3>
+<div id="outline-container-orgc6b34f3" class="outline-3">
+<h3 id="orgc6b34f3"><span class="section-number-3">2.2</span> Bean 工厂的实现类: DefaultListableBeanFactory</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 <code>DefaultListableBeanFactory</code> 是实现 <code>BeanFactory</code> 接口的核心类，熟悉它的类继
@@ -632,8 +631,8 @@ BeanDefinition, 直接通过实现 <code>T getObject()</code> 方法来返回创
 </div>
 </div>
 
-<div id="outline-container-orge36a5b4" class="outline-3">
-<h3 id="orge36a5b4"><span class="section-number-3">2.3</span> Bean 定义的读取器: XmlBeanDefinitionReader</h3>
+<div id="outline-container-orgb888dcf" class="outline-3">
+<h3 id="orgb888dcf"><span class="section-number-3">2.3</span> Bean 定义的读取器: XmlBeanDefinitionReader</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 <code>XmlBeanDefinitionReader</code> 是实现读取 BeanDefinition 的类，它的继承关系如下
@@ -686,8 +685,8 @@ Class XmlBeanDefinitionReader
 </div>
 </div>
 
-<div id="outline-container-org5f7a28b" class="outline-3">
-<h3 id="org5f7a28b"><span class="section-number-3">2.4</span> BeanDefinition 自动加载流程</h3>
+<div id="outline-container-org4452528" class="outline-3">
+<h3 id="org4452528"><span class="section-number-3">2.4</span> BeanDefinition 自动加载流程</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 <code>DefaultListableBeanFactory</code> 类定义了存储 BeanDefinition 类的哈希表, 具体定义如下
@@ -853,8 +852,8 @@ BeanDefinition</li>
 </div>
 </div>
 
-<div id="outline-container-org7883aec" class="outline-3">
-<h3 id="org7883aec"><span class="section-number-3">2.5</span> BeanDefinition 注册的实现</h3>
+<div id="outline-container-org2f07683" class="outline-3">
+<h3 id="org2f07683"><span class="section-number-3">2.5</span> BeanDefinition 注册的实现</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 <code>DefaultListableBeanFactory</code> 的 <code>registerBeanDefinition(...)</code> 才是真正实现注
@@ -1001,8 +1000,8 @@ BeanDefinition</li>
 </div>
 </div>
 
-<div id="outline-container-orgd4a3a5c" class="outline-3">
-<h3 id="orgd4a3a5c"><span class="section-number-3">2.6</span> BeanDefinition 移除的实现</h3>
+<div id="outline-container-org7a49594" class="outline-3">
+<h3 id="org7a49594"><span class="section-number-3">2.6</span> BeanDefinition 移除的实现</h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</code> 方法
@@ -1088,8 +1087,8 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-org9165b4d" class="outline-3">
-<h3 id="org9165b4d"><span class="section-number-3">2.7</span> BeanDefinition 获取的实现</h3>
+<div id="outline-container-orgb80c167" class="outline-3">
+<h3 id="orgb80c167"><span class="section-number-3">2.7</span> BeanDefinition 获取的实现</h3>
 <div class="outline-text-3" id="text-2-7">
 <p>
 <code>DefaultListableBeanFactory</code> 的实现获取 BeanDefinition 的逻辑如下
@@ -1111,8 +1110,8 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-orge762a7c" class="outline-3">
-<h3 id="orge762a7c"><span class="section-number-3">2.8</span> <code>&lt;bean/&gt;</code> 标签解析</h3>
+<div id="outline-container-org657c2ae" class="outline-3">
+<h3 id="org657c2ae"><span class="section-number-3">2.8</span> <code>&lt;bean/&gt;</code> 标签解析</h3>
 <div class="outline-text-3" id="text-2-8">
 <p>
 之前在 BeanDefinition 自动加载流程中忽略了对 <code>&lt;bean/&gt;</code> 标签的解析，其核心实现
@@ -1217,12 +1216,12 @@ BeanDefinition 的移除方法如下，通过 <code>removeBeanDefinition(...)</c
 </div>
 </div>
 
-<div id="outline-container-org4c47fbe" class="outline-2">
-<h2 id="org4c47fbe"><span class="section-number-2">3</span> Bean 实现原理</h2>
+<div id="outline-container-org006179e" class="outline-2">
+<h2 id="org006179e"><span class="section-number-2">3</span> Bean 实现原理</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgf87bb50" class="outline-3">
-<h3 id="orgf87bb50"><span class="section-number-3">3.1</span> Bean 的生命周期</h3>
+<div id="outline-container-org9de7bb8" class="outline-3">
+<h3 id="org9de7bb8"><span class="section-number-3">3.1</span> Bean 的生命周期</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 <code>BeanFactory</code> 的注释中完整地说明的实现标准 BeanFactory 的代码
@@ -1258,8 +1257,8 @@ ApplicationContext 中</li>
 </div>
 </div>
 
-<div id="outline-container-orgae8ba40" class="outline-3">
-<h3 id="orgae8ba40"><span class="section-number-3">3.2</span> Bean 的流程分析</h3>
+<div id="outline-container-org53f6614" class="outline-3">
+<h3 id="org53f6614"><span class="section-number-3">3.2</span> Bean 的流程分析</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 实例化 Bean 的方法为 <code>BeanUtils#instantiateClass(...)</code>, 先添加断点获取调用栈
@@ -1294,8 +1293,8 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </ol>
 </div>
 
-<div id="outline-container-org3a3389c" class="outline-4">
-<h4 id="org3a3389c"><span class="section-number-4">3.2.1</span> 实例化 Bean: <code>instantiateBean()</code> 方法</h4>
+<div id="outline-container-org1b1dc79" class="outline-4">
+<h4 id="org1b1dc79"><span class="section-number-4">3.2.1</span> 实例化 Bean: <code>instantiateBean()</code> 方法</h4>
 <div class="outline-text-4" id="text-3-2-1">
 <p>
 <code>instantiateBean(...)</code> 实例化 Bean 主要完成如下工作
@@ -1348,8 +1347,8 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </div>
 </div>
 
-<div id="outline-container-org4190f92" class="outline-4">
-<h4 id="org4190f92"><span class="section-number-4">3.2.2</span> 获取 Bean 实例: <code>doGetBean()</code> 方法</h4>
+<div id="outline-container-org2a935a2" class="outline-4">
+<h4 id="org2a935a2"><span class="section-number-4">3.2.2</span> 获取 Bean 实例: <code>doGetBean()</code> 方法</h4>
 <div class="outline-text-4" id="text-3-2-2">
 <p>
 <code>doGetBean(...)</code> 方法是获取 Bean 的最终处理函数，它的逻辑比较复杂，可以分成
@@ -1576,8 +1575,8 @@ main:18, MyApp02 (io.github.jeanhwea.app02)
 </div>
 </div>
 </div>
-<div id="outline-container-org0caddfd" class="outline-3">
-<h3 id="org0caddfd"><span class="section-number-3">3.3</span> 特殊的 Spring Bean: FactoryBean</h3>
+<div id="outline-container-org94b8b02" class="outline-3">
+<h3 id="org94b8b02"><span class="section-number-3">3.3</span> 特殊的 Spring Bean: FactoryBean</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 FactoryBean 不同于普通的 Bean， FactoryBean 自身就是一个组装 Bean 的微型工厂，
@@ -1607,12 +1606,12 @@ FactoryBean 不同于普通的 Bean， FactoryBean 自身就是一个组装 Bean
 </div>
 </div>
 
-<div id="outline-container-org1d02af7" class="outline-3">
-<h3 id="org1d02af7"><span class="section-number-3">3.4</span> 单例 Bean 工厂的实现</h3>
+<div id="outline-container-org89937b6" class="outline-3">
+<h3 id="org89937b6"><span class="section-number-3">3.4</span> 单例 Bean 工厂的实现</h3>
 <div class="outline-text-3" id="text-3-4">
 </div>
-<div id="outline-container-org630fb80" class="outline-4">
-<h4 id="org630fb80"><span class="section-number-4">3.4.1</span> 单例 Bean 工厂的三级缓存: <code>DefaultSingletonBeanRegistry</code> 类的缓存</h4>
+<div id="outline-container-orgb0fda6d" class="outline-4">
+<h4 id="orgb0fda6d"><span class="section-number-4">3.4.1</span> 单例 Bean 工厂的三级缓存: <code>DefaultSingletonBeanRegistry</code> 类的缓存</h4>
 <div class="outline-text-4" id="text-3-4-1">
 <p>
 <code>DefaultSingletonBeanRegistry</code> 是对单例 Bean 注册的实现类，它的继承关系如下
@@ -1714,8 +1713,8 @@ singletonFactories: 三级缓存单例对象工厂 ObjectFactory
 </div>
 </div>
 
-<div id="outline-container-org009cb7e" class="outline-4">
-<h4 id="org009cb7e"><span class="section-number-4">3.4.2</span> 获取单例 Bean 方法: <code>getSingleton(...)</code> 方法</h4>
+<div id="outline-container-orgcb30880" class="outline-4">
+<h4 id="orgcb30880"><span class="section-number-4">3.4.2</span> 获取单例 Bean 方法: <code>getSingleton(...)</code> 方法</h4>
 <div class="outline-text-4" id="text-3-4-2">
 <p>
 <code>getSingleton()</code> 方法是获取 Bean 的核心方法, 它的实现如下
@@ -1860,8 +1859,8 @@ singletonObject 对象</li>
 </div>
 </div>
 
-<div id="outline-container-orgd9284f7" class="outline-4">
-<h4 id="orgd9284f7"><span class="section-number-4">3.4.3</span> beanInstance 到 beanOject 过程: <code>getObjectForBeanInstance(...)</code> 方法</h4>
+<div id="outline-container-org9324bba" class="outline-4">
+<h4 id="org9324bba"><span class="section-number-4">3.4.3</span> beanInstance 到 beanOject 过程: <code>getObjectForBeanInstance(...)</code> 方法</h4>
 <div class="outline-text-4" id="text-3-4-3">
 <p>
 beanInstance -&gt; beanOject 是将缓存中的 Bean 实例转化成最终用户所需对象的过程，
@@ -2037,12 +2036,12 @@ main:25, MyApp04 (io.github.jeanhwea.app04_factory_bean)
 </div>
 </div>
 
-<div id="outline-container-org452da8b" class="outline-3">
-<h3 id="org452da8b"><span class="section-number-3">3.5</span> Bean 生命周期的实现</h3>
+<div id="outline-container-org49becdc" class="outline-3">
+<h3 id="org49becdc"><span class="section-number-3">3.5</span> Bean 生命周期的实现</h3>
 <div class="outline-text-3" id="text-3-5">
 </div>
-<div id="outline-container-orgbab64b6" class="outline-4">
-<h4 id="orgbab64b6"><span class="section-number-4">3.5.1</span> Bean 创建的实现类: <code>AbstractAutowireCapableBeanFactory</code></h4>
+<div id="outline-container-org2468533" class="outline-4">
+<h4 id="org2468533"><span class="section-number-4">3.5.1</span> Bean 创建的实现类: <code>AbstractAutowireCapableBeanFactory</code></h4>
 <div class="outline-text-4" id="text-3-5-1">
 <p>
 先看 <code>AbstractAutowireCapableBeanFactory</code> 的类继承关系
@@ -2115,8 +2114,8 @@ Class AbstractAutowireCapableBeanFactory
 </ol>
 </div>
 </div>
-<div id="outline-container-org1a9e3b3" class="outline-4">
-<h4 id="org1a9e3b3"><span class="section-number-4">3.5.2</span> Bean 的实例化: <code>createBean(...)</code> 方法</h4>
+<div id="outline-container-org15ae77b" class="outline-4">
+<h4 id="org15ae77b"><span class="section-number-4">3.5.2</span> Bean 的实例化: <code>createBean(...)</code> 方法</h4>
 <div class="outline-text-4" id="text-3-5-2">
 <p>
 实际实例化 Bean 是在 <code>doCreateBean(...)</code> 方法中完成的，先准备一下调用栈
@@ -2405,8 +2404,8 @@ singletonFactories 缓存中</li>
 </div>
 </div>
 
-<div id="outline-container-org36c07dc" class="outline-4">
-<h4 id="org36c07dc"><span class="section-number-4">3.5.3</span> Bean 的初始化: <code>initializeBean(...)</code> 方法</h4>
+<div id="outline-container-org1d501e9" class="outline-4">
+<h4 id="org1d501e9"><span class="section-number-4">3.5.3</span> Bean 的初始化: <code>initializeBean(...)</code> 方法</h4>
 <div class="outline-text-4" id="text-3-5-3">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #d33682;">/**</span>
@@ -2482,8 +2481,8 @@ singletonFactories 缓存中</li>
 </div>
 </div>
 
-<div id="outline-container-orgfcb7184" class="outline-4">
-<h4 id="orgfcb7184"><span class="section-number-4">3.5.4</span> Bean 的销毁</h4>
+<div id="outline-container-org8f9bc83" class="outline-4">
+<h4 id="org8f9bc83"><span class="section-number-4">3.5.4</span> Bean 的销毁</h4>
 <div class="outline-text-4" id="text-3-5-4">
 <p>
 在 <code>doCreateBean(...)</code> 方法中调用了 <code>registerDisposableBeanIfNecessary(...)</code>
@@ -2530,12 +2529,12 @@ singletonFactories 缓存中</li>
 </div>
 </div>
 
-<div id="outline-container-org7901f1a" class="outline-2">
-<h2 id="org7901f1a"><span class="section-number-2">4</span> 容器功能扩展</h2>
+<div id="outline-container-orga090b85" class="outline-2">
+<h2 id="orga090b85"><span class="section-number-2">4</span> 容器功能扩展</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-orgcf158db" class="outline-3">
-<h3 id="orgcf158db"><span class="section-number-3">4.1</span> 应用上下文: ApplicationContext</h3>
+<div id="outline-container-org623e28f" class="outline-3">
+<h3 id="org623e28f"><span class="section-number-3">4.1</span> 应用上下文: ApplicationContext</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 首先查看 <code>ApplicationContext</code> 接口的相关信息
@@ -2568,12 +2567,12 @@ Interface ApplicationContext
 </div>
 </div>
 
-<div id="outline-container-org0c8d479" class="outline-3">
-<h3 id="org0c8d479"><span class="section-number-3">4.2</span> ApplicationContext 接口的常见实现类</h3>
+<div id="outline-container-org453019b" class="outline-3">
+<h3 id="org453019b"><span class="section-number-3">4.2</span> ApplicationContext 接口的常见实现类</h3>
 <div class="outline-text-3" id="text-4-2">
 </div>
-<div id="outline-container-org5721b61" class="outline-4">
-<h4 id="org5721b61"><span class="section-number-4">4.2.1</span> ClassPathXmlApplicationContext</h4>
+<div id="outline-container-org087c061" class="outline-4">
+<h4 id="org087c061"><span class="section-number-4">4.2.1</span> ClassPathXmlApplicationContext</h4>
 <div class="outline-text-4" id="text-4-2-1">
 <p>
 读取 ClassPath 中 XML 配置文件的 Bean 定义的容器
@@ -2636,8 +2635,8 @@ Class ClassPathXmlApplicationContext
 </div>
 </div>
 
-<div id="outline-container-orgbf6fd2c" class="outline-4">
-<h4 id="orgbf6fd2c"><span class="section-number-4">4.2.2</span> AnnotationConfigApplicationContext</h4>
+<div id="outline-container-orgda45a4d" class="outline-4">
+<h4 id="orgda45a4d"><span class="section-number-4">4.2.2</span> AnnotationConfigApplicationContext</h4>
 <div class="outline-text-4" id="text-4-2-2">
 <p>
 读取注解类型 Bean 定义的容器, <code>@Component</code>, <code>@Service</code> 等
@@ -2727,12 +2726,12 @@ Class AnnotationConfigApplicationContext
 </div>
 </div>
 
-<div id="outline-container-org4c0dca3" class="outline-3">
-<h3 id="org4c0dca3"><span class="section-number-3">4.3</span> 刷新应用上下文: <code>refresh()</code> 方法</h3>
+<div id="outline-container-org7ebb620" class="outline-3">
+<h3 id="org7ebb620"><span class="section-number-3">4.3</span> 刷新应用上下文: <code>refresh()</code> 方法</h3>
 <div class="outline-text-3" id="text-4-3">
 </div>
-<div id="outline-container-org273d8c3" class="outline-4">
-<h4 id="org273d8c3"><span class="section-number-4">4.3.1</span> <code>refresh()</code> 方法总览</h4>
+<div id="outline-container-org51eafcd" class="outline-4">
+<h4 id="org51eafcd"><span class="section-number-4">4.3.1</span> <code>refresh()</code> 方法总览</h4>
 <div class="outline-text-4" id="text-4-3-1">
 <p>
 该 <code>refresh()</code> 方法实现了 Spring 的 Bean 管理的全周期的流程，其中调用了 15
@@ -2856,8 +2855,8 @@ BeanFactoryPostProcessor 的后置处理方法
 </div>
 </div>
 
-<div id="outline-container-org07945bd" class="outline-4">
-<h4 id="org07945bd"><span class="section-number-4">4.3.2</span> 环境准备</h4>
+<div id="outline-container-orga0de1bb" class="outline-4">
+<h4 id="orga0de1bb"><span class="section-number-4">4.3.2</span> 环境准备</h4>
 <div class="outline-text-4" id="text-4-3-2">
 <p>
 该部分主要包括以下几类工作
@@ -2914,8 +2913,8 @@ BeanFactoryPostProcessor 的后置处理方法
 </div>
 </div>
 
-<div id="outline-container-org814d1c8" class="outline-4">
-<h4 id="org814d1c8"><span class="section-number-4">4.3.3</span> 加载 BeanFactory</h4>
+<div id="outline-container-org2a92710" class="outline-4">
+<h4 id="org2a92710"><span class="section-number-4">4.3.3</span> 加载 BeanFactory</h4>
 <div class="outline-text-4" id="text-4-3-3">
 <p>
 ApplicationContext 是对 BeanFactory 的扩展，这里调用
@@ -2966,8 +2965,8 @@ ApplicationContext 是对 BeanFactory 的扩展，这里调用
 </div>
 </div>
 
-<div id="outline-container-org292cd73" class="outline-4">
-<h4 id="org292cd73"><span class="section-number-4">4.3.4</span> BeanFactory 准备工作</h4>
+<div id="outline-container-orga338308" class="outline-4">
+<h4 id="orga338308"><span class="section-number-4">4.3.4</span> BeanFactory 准备工作</h4>
 <div class="outline-text-4" id="text-4-3-4">
 <p>
 该项功能在 <code>prepareBeanFactory(beanFactory)</code> 函数中完成，它的实现如下
@@ -3057,8 +3056,8 @@ ApplicationContext 是对 BeanFactory 的扩展，这里调用
 </div>
 </div>
 
-<div id="outline-container-org384f397" class="outline-4">
-<h4 id="org384f397"><span class="section-number-4">4.3.5</span> BeanFactory 后续处理工作</h4>
+<div id="outline-container-org90b8509" class="outline-4">
+<h4 id="org90b8509"><span class="section-number-4">4.3.5</span> BeanFactory 后续处理工作</h4>
 <div class="outline-text-4" id="text-4-3-5">
 <p>
 调用 <code>postProcessBeanFactory</code>, 其中 <code>postProcessBeanFactory</code> 是一个空方法，
@@ -3439,8 +3438,8 @@ applicationEventMulticaster, 如果存在直接设置多播器，如果不存在
 </div>
 </div>
 
-<div id="outline-container-org5041d91" class="outline-4">
-<h4 id="org5041d91"><span class="section-number-4">4.3.6</span> 初始化非延迟加载单例</h4>
+<div id="outline-container-org44350e7" class="outline-4">
+<h4 id="org44350e7"><span class="section-number-4">4.3.6</span> 初始化非延迟加载单例</h4>
 <div class="outline-text-4" id="text-4-3-6">
 <p>
 非延迟加载单例可以在 Spring 启动后就进行创建，然后下次加载可以快速获取，减少
@@ -3549,8 +3548,8 @@ applicationEventMulticaster, 如果存在直接设置多播器，如果不存在
 </div>
 </div>
 
-<div id="outline-container-org64320cc" class="outline-4">
-<h4 id="org64320cc"><span class="section-number-4">4.3.7</span> 完成上下文刷新</h4>
+<div id="outline-container-orgdbd4354" class="outline-4">
+<h4 id="orgdbd4354"><span class="section-number-4">4.3.7</span> 完成上下文刷新</h4>
 <div class="outline-text-4" id="text-4-3-7">
 <p>
 <code>finishRefresh()</code> 完成上下文的刷新
@@ -3676,16 +3675,16 @@ applicationEventMulticaster, 如果存在直接设置多播器，如果不存在
 </div>
 </div>
 
-<div id="outline-container-org1ee69fb" class="outline-2">
-<h2 id="org1ee69fb"><span class="section-number-2">5</span> AOP 面向切面编程</h2>
+<div id="outline-container-orgcb7ab92" class="outline-2">
+<h2 id="orgcb7ab92"><span class="section-number-2">5</span> AOP 面向切面编程</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-orgbabfde7" class="outline-3">
-<h3 id="orgbabfde7"><span class="section-number-3">5.1</span> AOP 预备知识</h3>
+<div id="outline-container-org23efc25" class="outline-3">
+<h3 id="org23efc25"><span class="section-number-3">5.1</span> AOP 预备知识</h3>
 <div class="outline-text-3" id="text-5-1">
 </div>
-<div id="outline-container-orgda4c138" class="outline-4">
-<h4 id="orgda4c138"><span class="section-number-4">5.1.1</span> JDK 动态代理和 cglib 动态代理</h4>
+<div id="outline-container-org6430ec2" class="outline-4">
+<h4 id="org6430ec2"><span class="section-number-4">5.1.1</span> JDK 动态代理和 cglib 动态代理</h4>
 <div class="outline-text-4" id="text-5-1-1">
 <p>
 使用动态代理实现主要使用下面两种方法
@@ -3732,8 +3731,8 @@ applicationEventMulticaster, 如果存在直接设置多播器，如果不存在
 </ol>
 </div>
 </div>
-<div id="outline-container-org521ffcf" class="outline-4">
-<h4 id="org521ffcf"><span class="section-number-4">5.1.2</span> AOP 组件</h4>
+<div id="outline-container-org8263b48" class="outline-4">
+<h4 id="org8263b48"><span class="section-number-4">5.1.2</span> AOP 组件</h4>
 <div class="outline-text-4" id="text-5-1-2">
 <p>
 切入点 PointCut 的定义
@@ -3779,8 +3778,8 @@ applicationEventMulticaster, 如果存在直接设置多播器，如果不存在
 </div>
 </div>
 
-<div id="outline-container-org0336599" class="outline-4">
-<h4 id="org0336599"><span class="section-number-4">5.1.3</span> AOP 实践案例</h4>
+<div id="outline-container-orgbdffdcd" class="outline-4">
+<h4 id="orgbdffdcd"><span class="section-number-4">5.1.3</span> AOP 实践案例</h4>
 <div class="outline-text-4" id="text-5-1-3">
 <p>
 添加日志的 Bean 对象
@@ -3871,12 +3870,12 @@ applicationEventMulticaster, 如果存在直接设置多播器，如果不存在
 </div>
 </div>
 
-<div id="outline-container-org4418fe0" class="outline-3">
-<h3 id="org4418fe0"><span class="section-number-3">5.2</span> AOP 实现原理</h3>
+<div id="outline-container-orga06a6e5" class="outline-3">
+<h3 id="orga06a6e5"><span class="section-number-3">5.2</span> AOP 实现原理</h3>
 <div class="outline-text-3" id="text-5-2">
 </div>
-<div id="outline-container-orgba68641" class="outline-4">
-<h4 id="orgba68641"><span class="section-number-4">5.2.1</span> AOP 的工具类 <code>AopNamespaceUtils</code></h4>
+<div id="outline-container-orgdfb0c13" class="outline-4">
+<h4 id="orgdfb0c13"><span class="section-number-4">5.2.1</span> AOP 的工具类 <code>AopNamespaceUtils</code></h4>
 <div class="outline-text-4" id="text-5-2-1">
 <p>
 <code>AopNamespaceUtils</code> 实现了 AOP 的常用方法
@@ -3952,8 +3951,8 @@ applicationEventMulticaster, 如果存在直接设置多播器，如果不存在
 </div>
 </div>
 
-<div id="outline-container-orga02ff2e" class="outline-4">
-<h4 id="orga02ff2e"><span class="section-number-4">5.2.2</span> AOP 代理是否开启 <code>AspectJAutoProxyRegistrar</code></h4>
+<div id="outline-container-orga7e9877" class="outline-4">
+<h4 id="orga7e9877"><span class="section-number-4">5.2.2</span> AOP 代理是否开启 <code>AspectJAutoProxyRegistrar</code></h4>
 <div class="outline-text-4" id="text-5-2-2">
 <p>
 <code>AspectJAutoProxyRegistrar</code> 类实现了扫描是否开启自动进行 AOP 代理其实现如下
@@ -4076,8 +4075,8 @@ main:9, MyApp07 (io.github.jeanhwea.app07_aop)
 </div>
 </div>
 
-<div id="outline-container-orgc98c7dc" class="outline-4">
-<h4 id="orgc98c7dc"><span class="section-number-4">5.2.3</span> AspectJ 创建器 <code>AnnotationAwareAspectJAutoProxyCreator</code></h4>
+<div id="outline-container-orga483f92" class="outline-4">
+<h4 id="orga483f92"><span class="section-number-4">5.2.3</span> AspectJ 创建器 <code>AnnotationAwareAspectJAutoProxyCreator</code></h4>
 <div class="outline-text-4" id="text-5-2-3">
 <p>
 <code>AnnotationAwareAspectJAutoProxyCreator</code> 是自动创建 AspectJ 代理类的创建器，
@@ -4146,9 +4145,12 @@ Class AnnotationAwareAspectJAutoProxyCreator
 </div>
 </div>
 
-<div id="outline-container-orgf99be68" class="outline-4">
-<h4 id="orgf99be68"><span class="section-number-4">5.2.4</span> <code>AbstractAutoProxyCreator</code> 埋点</h4>
+<div id="outline-container-orga668400" class="outline-4">
+<h4 id="orga668400"><span class="section-number-4">5.2.4</span> <code>AbstractAutoProxyCreator</code> 提前埋点</h4>
 <div class="outline-text-4" id="text-5-2-4">
+<p>
+实例化前 <code>getAdvicesAndAdvisorsForBean(...)</code> 创建 Bean 的增强器
+</p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@Override</span>
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">postProcessBeforeInstantiation</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">Class</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">beanClass</span>, <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">beanName</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
@@ -4182,10 +4184,11 @@ Class AnnotationAwareAspectJAutoProxyCreator
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
-<p>
-实例化前 <code>getAdvicesAndAdvisorsForBean(...)</code> 创建 Bean 的增强器
-</p>
 
+<p>
+初始化后调用 <code>wrapIfNecessary(...)</code> 进行 Bean 的包裹，这里会调用
+<code>createProxy(...)</code> 方法创建代理类
+</p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #d33682;">/**</span>
 <span style="color: #d33682;"> * Create a proxy with the configured interceptors if the bean is</span>
@@ -4204,14 +4207,11 @@ Class AnnotationAwareAspectJAutoProxyCreator
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
-<p>
-初始化后调用 <code>wrapIfNecessary(...)</code> 进行 Bean 的包裹，如果需要的话
-</p>
 </div>
 </div>
 
-<div id="outline-container-org8b33d18" class="outline-4">
-<h4 id="org8b33d18"><span class="section-number-4">5.2.5</span> XML 方式的 AOP</h4>
+<div id="outline-container-org9a961bc" class="outline-4">
+<h4 id="org9a961bc"><span class="section-number-4">5.2.5</span> XML 方式的 AOP 读取</h4>
 <div class="outline-text-4" id="text-5-2-5">
 <p>
 <code>&lt;aspectj-autoproxy/&gt;</code> 自动注解 <code>AopNamespaceHandler</code> 类中添加自动注解标签
@@ -4310,12 +4310,12 @@ Class AnnotationAwareAspectJAutoProxyCreator
 </div>
 </div>
 
-<div id="outline-container-org65c80c1" class="outline-3">
-<h3 id="org65c80c1"><span class="section-number-3">5.3</span> 创建 AOP 代理</h3>
+<div id="outline-container-orgeaf0978" class="outline-3">
+<h3 id="orgeaf0978"><span class="section-number-3">5.3</span> 创建 AOP 代理</h3>
 <div class="outline-text-3" id="text-5-3">
 </div>
-<div id="outline-container-orgc0097e2" class="outline-4">
-<h4 id="orgc0097e2"><span class="section-number-4">5.3.1</span> 抽象代理创建器 AbstractAutoProxyCreator</h4>
+<div id="outline-container-orga7e38da" class="outline-4">
+<h4 id="orga7e38da"><span class="section-number-4">5.3.1</span> 创建 AOP 代理类真实过程</h4>
 <div class="outline-text-4" id="text-5-3-1">
 <p>
 创建代理类的调用栈如下，最终通过 <code>createAopProxy</code> 方法创建 JDK 动态代理或
@@ -4495,47 +4495,38 @@ main:9, MyApp07 (io.github.jeanhwea.app07_aop)
 </div>
 </div>
 
-<div id="outline-container-org9a24d15" class="outline-4">
-<h4 id="org9a24d15"><span class="section-number-4">5.3.2</span> 获取增强器 AspectJAwareAdvisorAutoProxyCreator</h4>
-<div class="outline-text-4" id="text-5-3-2">
-<p>
-<code>AspectJAwareAdvisorAutoProxyCreator</code> 是增强器自动代理创建器
-</p>
+<div id="outline-container-orgc10dfea" class="outline-4">
+<h4 id="orgc10dfea"><span class="section-number-4">5.3.2</span> 寻找增强器</h4>
+</div>
+
+<div id="outline-container-orga57e729" class="outline-4">
+<h4 id="orga57e729"><span class="section-number-4">5.3.3</span> 创建代理</h4>
 </div>
 </div>
 
-<div id="outline-container-org0230cd6" class="outline-4">
-<h4 id="org0230cd6"><span class="section-number-4">5.3.3</span> 寻找增强器</h4>
-</div>
-
-<div id="outline-container-orgba1b814" class="outline-4">
-<h4 id="orgba1b814"><span class="section-number-4">5.3.4</span> 创建代理</h4>
-</div>
-</div>
-
-<div id="outline-container-org77f4cdf" class="outline-3">
-<h3 id="org77f4cdf"><span class="section-number-3">5.4</span> 创建 AOP 静态代理</h3>
+<div id="outline-container-org50fc504" class="outline-3">
+<h3 id="org50fc504"><span class="section-number-3">5.4</span> 创建 AOP 静态代理</h3>
 <div class="outline-text-3" id="text-5-4">
 </div>
-<div id="outline-container-org539eb98" class="outline-4">
-<h4 id="org539eb98"><span class="section-number-4">5.4.1</span> Instrumentation 使用</h4>
+<div id="outline-container-org7995279" class="outline-4">
+<h4 id="org7995279"><span class="section-number-4">5.4.1</span> Instrumentation 使用</h4>
 </div>
 
-<div id="outline-container-org4d21cbe" class="outline-4">
-<h4 id="org4d21cbe"><span class="section-number-4">5.4.2</span> 自定义标签</h4>
+<div id="outline-container-org27abcda" class="outline-4">
+<h4 id="org27abcda"><span class="section-number-4">5.4.2</span> 自定义标签</h4>
 </div>
 
-<div id="outline-container-org9c8d79b" class="outline-4">
-<h4 id="org9c8d79b"><span class="section-number-4">5.4.3</span> 织入 Weaving</h4>
+<div id="outline-container-orgb5d9005" class="outline-4">
+<h4 id="orgb5d9005"><span class="section-number-4">5.4.3</span> 织入 Weaving</h4>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org6a9d5dc" class="outline-2">
-<h2 id="org6a9d5dc"><span class="section-number-2">6</span> SpringBoot 自动装配</h2>
+<div id="outline-container-org6644bd2" class="outline-2">
+<h2 id="org6644bd2"><span class="section-number-2">6</span> SpringBoot 自动装配</h2>
 </div>
-<div id="outline-container-orgebe3422" class="outline-2">
-<h2 id="orgebe3422"><span class="section-number-2">7</span> 参考链接</h2>
+<div id="outline-container-orgcc2371c" class="outline-2">
+<h2 id="orgcc2371c"><span class="section-number-2">7</span> 参考链接</h2>
 <div class="outline-text-2" id="text-7">
 <ol class="org-ol">
 <li><a href="https://github.com/spring-projects/spring-framework">Spring Framework on Github</a></li>
@@ -4546,7 +4537,7 @@ main:9, MyApp07 (io.github.jeanhwea.app07_aop)
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-21 Wed 22:30. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
+<p class="author">Last Updated 2021-07-21 Wed 22:34. Created by Jinghui Hu at 2021-07-14 Wed 12:16.</p>
 </div>
 </body>
 </html>

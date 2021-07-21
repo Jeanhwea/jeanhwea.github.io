@@ -3115,7 +3115,8 @@
     4. ~AnnotationAwareAspectJAutoProxyCreator~
        - 添加对注解 Aspect 的扩展
 
-*** ~AbstractAutoProxyCreator~ 埋点
+*** ~AbstractAutoProxyCreator~ 提前埋点
+    实例化前 ~getAdvicesAndAdvisorsForBean(...)~ 创建 Bean 的增强器
     #+BEGIN_SRC java
       @Override
       public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
@@ -3148,8 +3149,9 @@
           return null;
       }
     #+END_SRC
-    实例化前 ~getAdvicesAndAdvisorsForBean(...)~ 创建 Bean 的增强器
 
+    初始化后调用 ~wrapIfNecessary(...)~ 进行 Bean 的包裹，这里会调用
+    ~createProxy(...)~ 方法创建代理类
     #+BEGIN_SRC java
       /**
        ,* Create a proxy with the configured interceptors if the bean is
@@ -3167,9 +3169,8 @@
           return bean;
       }
     #+END_SRC
-    初始化后调用 ~wrapIfNecessary(...)~ 进行 Bean 的包裹，如果需要的话
 
-*** XML 方式的 AOP
+*** XML 方式的 AOP 读取
     ~<aspectj-autoproxy/>~ 自动注解 ~AopNamespaceHandler~ 类中添加自动注解标签
     #+BEGIN_SRC java
       public class AopNamespaceHandler extends NamespaceHandlerSupport {
@@ -3253,7 +3254,7 @@
     #+END_SRC
 
 ** 创建 AOP 代理
-*** 抽象代理创建器 AbstractAutoProxyCreator
+*** 创建 AOP 代理类真实过程
     创建代理类的调用栈如下，最终通过 ~createAopProxy~ 方法创建 JDK 动态代理或
     cglib 动态代理
     #+BEGIN_SRC text
@@ -3409,9 +3410,6 @@
           return proxyFactory.getProxy(getProxyClassLoader());
       }
     #+END_SRC
-
-*** 获取增强器 AspectJAwareAdvisorAutoProxyCreator
-    ~AspectJAwareAdvisorAutoProxyCreator~ 是增强器自动代理创建器
 
 *** 寻找增强器
 
