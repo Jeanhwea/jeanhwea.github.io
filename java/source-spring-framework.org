@@ -5,6 +5,7 @@
 #+HTML_LINK_UP: ../readme.html
 #+HTML_LINK_HOME: ../index.html
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+OPTIONS: ^:nil
 #+TAGS: java spring source
 
 * Spring 核心类和方法
@@ -2958,7 +2959,7 @@
       }
     #+END_SRC
 
-*** 开启 AOP 代理是否开启
+*** AOP 代理是否开启 ~AspectJAutoProxyRegistrar~
     ~AspectJAutoProxyRegistrar~ 类实现了扫描是否开启自动进行 AOP 代理其实现如下
     #+BEGIN_SRC java
       class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
@@ -3083,12 +3084,31 @@
               org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor,
               org.springframework.core.Ordered
     #+END_SRC
-    1. 该类实现里 ~BeanPostProcessor~ 接口，在 Bean 的注册时创建添加增强器
-    2. ~AbstractAutoProxyCreator~ 实现了一些 AOP 的常见方法
+    1. ~AbstractAutoProxyCreator~ 实现了 AOP 的核心方法
+       - 实现了 ~BeanFactoryAware~ 和 ~BeanPostProcessor~ 接口
+       - ~createProxy(...)~ 创建代理类
+       - ~buildAdvisors(...)~ 通过传入的 Bean 来创建 Advisor
        - ~postProcessBeforeInstantiation(...)~ 实例化前调用的代理类创建方法
        - ~postProcessAfterInitialization(...)~ 初始化后调用的代理类创建方法
          + 由子类声明的代理类，在改方法中调用并创建代理类
+       - ~postProcessAfterInstantiation(...)~ 实例化后调用的代理类创建方法
+       - ~postProcessBeforeInitialization(...)~ 初始化前调用的代理类创建方法
+       - ~wrapIfNecessary(...)~ 包裹 Bean 方法，添加代理包裹信息
+       - ~isInfrastructureClass(...)~
+         + 判断是否是 ~Advice~, ~PointCut~, ~Advisor~ 或 ~AopInfrastructureBean~
+         + InfrastructureClass 需要添加 AOP 代理
+    2. ~AbstractAdvisorAutoProxyCreator~ 包括 Advisor 的创建方法
+       - ~getAdvicesAndAdvisorsForBean(...)~ 查找 Bean 的 Advisor
+       - ~findEligibleAdvisors(...)~ 获取 Bean 所需的合适的 Advisor
+       - ~findAdvisorsThatCanApply(...)~ 获取可以应用的 Advisor
+    3. ~AspectJAwareAdvisorAutoProxyCreator~
+       - 类似 ~AbstractAdvisorAutoProxyCreator~, 针对 AspectJ 进行扩展
+       - ~AbstractAdvisorAutoProxyCreator~ 是抽象类,
+         ~AspectJAwareAdvisorAutoProxyCreator~ 是类
+    4. ~AnnotationAwareAspectJAutoProxyCreator~
+       - 添加对注解 Aspect 的扩展
 
+*** ~AbstractAutoProxyCreator~ 埋点
     #+BEGIN_SRC java
       @Override
       public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
@@ -3227,13 +3247,13 @@
 
 ** 创建 AOP 代理
 *** 抽象代理创建器 AbstractAutoProxyCreator
-    ~postProcessAfterInitialization(...)~ 方法中调用了包裹 Bean 的
-    ~wrapIfNecessary(...)~ 方法，该方法有以下作用
+    ~postProcessAfterInitialization(...)~ 方法中调用了 ~wrapIfNecessary(...)~ 方
+    法获取包裹 Bean 对象，该方法有以下作用
     1. 前置判断是否需要创建增强器
     2. 如果存在增强方法
        - ~getAdvicesAndAdvisorsForBean(...)~ 获取拦截器，如果有拦截器说明该方法
          需要增强
-    3. 调用 ~createProxy(...)~ 方法创建代理类
+    3. 调用 ~createProxy(...)~ 方法创建代理类，并返回代理对象
     #+BEGIN_SRC java
       /**
        ,* Wrap the given bean if necessary, i.e. if it is eligible for being proxied.
@@ -3340,27 +3360,6 @@
 
 *** 获取增强器 AspectJAwareAdvisorAutoProxyCreator
     ~AspectJAwareAdvisorAutoProxyCreator~ 是增强器自动代理创建器
-    #+BEGIN_SRC text
-      org.springframework.aop.aspectj.autoproxy
-      Class AspectJAwareAdvisorAutoProxyCreator
-
-          java.lang.Object
-              org.springframework.aop.framework.ProxyConfig
-                  org.springframework.aop.framework.ProxyProcessorSupport
-                      org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator
-                          org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator
-                              org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator
-
-       All Implemented Interfaces:
-           Serializable, AopInfrastructureBean,
-           org.springframework.beans.factory.Aware,
-           org.springframework.beans.factory.BeanClassLoaderAware,
-           org.springframework.beans.factory.BeanFactoryAware,
-           org.springframework.beans.factory.config.BeanPostProcessor,
-           org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor,
-           org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor,
-           org.springframework.core.Ordered
-    #+END_SRC
 
 *** 寻找增强器
 

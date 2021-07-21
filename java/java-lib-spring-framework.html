@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-03-15 Sun 22:29 -->
+<!-- 2021-07-21 Wed 22:09 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Spring Framework</title>
@@ -40,7 +40,7 @@
   }
   pre.src {
     position: relative;
-    overflow: visible;
+    overflow: auto;
     padding-top: 1.2em;
   }
   pre.src:before {
@@ -52,7 +52,7 @@
     padding: 3px;
     border: 1px solid black;
   }
-  pre.src:hover:before { display: inline;}
+  pre.src:hover:before { display: inline; margin-top: 14px;}
   /* Languages per Org manual */
   pre.src-asymptote:before { content: 'Asymptote'; }
   pre.src-awk:before { content: 'Awk'; }
@@ -161,6 +161,19 @@
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
   .inlinetask {
     padding: 10px;
     border: 2px solid gray;
@@ -187,50 +200,26 @@
 <script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
 <script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
 <script type="text/javascript">
-/*
-@licstart  The following is the entire license notice for the
-JavaScript code in this tag.
-
-Copyright (C) 2012-2019 Free Software Foundation, Inc.
-
-The JavaScript code in this tag is free software: you can
-redistribute it and/or modify it under the terms of the GNU
-General Public License (GNU GPL) as published by the Free Software
-Foundation, either version 3 of the License, or (at your option)
-any later version.  The code is distributed WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
-
-As additional permission under GNU GPL version 3 section 7, you
-may distribute non-source (e.g., minimized or compacted) forms of
-that code without the copy of the GNU GPL normally required by
-section 4, provided you include this license notice and a URL
-through which recipients can access the Corresponding Source.
-
-
-@licend  The above is the entire license notice
-for the JavaScript code in this tag.
-*/
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
 <!--/*--><![CDATA[/*><!--*/
- function CodeHighlightOn(elem, id)
- {
-   var target = document.getElementById(id);
-   if(null != target) {
-     elem.cacheClassElem = elem.className;
-     elem.cacheClassTarget = target.className;
-     target.className = "code-highlighted";
-     elem.className   = "code-highlighted";
-   }
- }
- function CodeHighlightOff(elem, id)
- {
-   var target = document.getElementById(id);
-   if(elem.cacheClassElem)
-     elem.className = elem.cacheClassElem;
-   if(elem.cacheClassTarget)
-     target.className = elem.cacheClassTarget;
- }
-/*]]>*///-->
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
 </script>
 </head>
 <body>
@@ -244,73 +233,73 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org5974a48">1. 简介</a></li>
-<li><a href="#org0d7d9bc">2. Spring 的技术点和优点</a></li>
-<li><a href="#orgb53264f">3. IoC (Inversion of Control)</a></li>
-<li><a href="#org020ce77">4. 创建 Spring 项目</a></li>
-<li><a href="#org67d6cd2">5. 容器 Container 和 Bean</a></li>
-<li><a href="#orge862569">6. 资源 Resource</a></li>
-<li><a href="#orgbdfc167">7. 面向切面编程 AOP</a></li>
-<li><a href="#org32586a7">8. 事务 <code>@Transactional</code></a>
+<li><a href="#orgef57451">1. 简介</a></li>
+<li><a href="#orgda6f519">2. Spring 的技术点和优点</a></li>
+<li><a href="#orga89193a">3. IoC (Inversion of Control)</a></li>
+<li><a href="#orgeb4984d">4. 创建 Spring 项目</a></li>
+<li><a href="#orgf8d4bb7">5. 容器 Container 和 Bean</a></li>
+<li><a href="#org7da8d76">6. 资源 Resource</a></li>
+<li><a href="#org67ec835">7. 面向切面编程 AOP</a></li>
+<li><a href="#org5eaf084">8. 事务 <code>@Transactional</code></a>
 <ul>
-<li><a href="#org40111b3">8.1. <code>@Transactional</code></a></li>
-<li><a href="#org2c2ba64">8.2. <code>TransactionTemplate</code></a></li>
+<li><a href="#orgbf139db">8.1. <code>@Transactional</code></a></li>
+<li><a href="#orgec8e98a">8.2. <code>TransactionTemplate</code></a></li>
 </ul>
 </li>
-<li><a href="#org6aba798">9. 测试</a></li>
-<li><a href="#orgf06c356">10. Spring MVC</a>
+<li><a href="#orgbf5a24e">9. 测试</a></li>
+<li><a href="#orgf954406">10. Spring MVC</a>
 <ul>
-<li><a href="#orgedc049c">10.1. 简介</a></li>
-<li><a href="#orgeb4c8a2">10.2. 核心组件</a></li>
-<li><a href="#orgb13c59b">10.3. Servlet 配置</a></li>
-<li><a href="#org148664e">10.4. 控制器</a></li>
+<li><a href="#orgcf2f4f5">10.1. 简介</a></li>
+<li><a href="#org7be8db3">10.2. 核心组件</a></li>
+<li><a href="#org81f587c">10.3. Servlet 配置</a></li>
+<li><a href="#org474b446">10.4. 控制器</a></li>
 </ul>
 </li>
-<li><a href="#org0cc4366">11. HTTP 请求映射</a></li>
-<li><a href="#org61e872e">12. 响应函数参数和返回值</a></li>
-<li><a href="#org9817e62">13. 跨越 CORS <code>@CrossOrigin</code></a></li>
-<li><a href="#org4200ecc">14. MVC 配置 <code>@EnableWebMvc</code></a>
+<li><a href="#org89b8baa">11. HTTP 请求映射</a></li>
+<li><a href="#org160c1cc">12. 响应函数参数和返回值</a></li>
+<li><a href="#org0f8ac4f">13. 跨越 CORS <code>@CrossOrigin</code></a></li>
+<li><a href="#org4afe5fa">14. MVC 配置 <code>@EnableWebMvc</code></a>
 <ul>
-<li><a href="#org9a8c588">14.1. 类型转换配置</a></li>
-<li><a href="#org90f2dd9">14.2. 静态资源配置</a></li>
+<li><a href="#org5677086">14.1. 类型转换配置</a></li>
+<li><a href="#org710c49d">14.2. 静态资源配置</a></li>
 </ul>
 </li>
-<li><a href="#orga3c133e">15. 异步请求</a>
+<li><a href="#org73f96d4">15. 异步请求</a>
 <ul>
-<li><a href="#org02985da">15.1. DeferredResult</a></li>
-<li><a href="#org54483e5">15.2. Callable</a></li>
+<li><a href="#org46ddeeb">15.1. DeferredResult</a></li>
+<li><a href="#org40a268a">15.2. Callable</a></li>
 </ul>
 </li>
-<li><a href="#org816bdd2">16. 远端过程调用</a></li>
-<li><a href="#org2830ba9">17. 客户端请求 RestTemplate</a>
+<li><a href="#orgc666c1f">16. 远端过程调用</a></li>
+<li><a href="#orgb36a92a">17. 客户端请求 RestTemplate</a>
 <ul>
-<li><a href="#orgae8557f">17.1. 初始化</a></li>
-<li><a href="#orga2d3772">17.2. UriComponents 构造 URI 对象</a></li>
-<li><a href="#org0ff543a">17.3. URI 编码</a></li>
-<li><a href="#org998021a">17.4. URI</a></li>
-<li><a href="#org9a37237">17.5. 请求头</a></li>
-<li><a href="#org3b44e2a">17.6. 请求体</a></li>
-<li><a href="#org5c8456a">17.7. Jackson JSON</a></li>
-<li><a href="#org3379e1a">17.8. Multipart</a></li>
+<li><a href="#orgd68907f">17.1. 初始化</a></li>
+<li><a href="#orgc5f7aab">17.2. UriComponents 构造 URI 对象</a></li>
+<li><a href="#orga89f8c2">17.3. URI 编码</a></li>
+<li><a href="#org3f14b5a">17.4. URI</a></li>
+<li><a href="#org133c830">17.5. 请求头</a></li>
+<li><a href="#orgcdf76a4">17.6. 请求体</a></li>
+<li><a href="#org1c25e1a">17.7. Jackson JSON</a></li>
+<li><a href="#orgbb31b99">17.8. Multipart</a></li>
 </ul>
 </li>
-<li><a href="#org277f4d9">18. 发送邮件 Email</a></li>
-<li><a href="#org83dfbd3">19. 执行任务和任务调度</a></li>
-<li><a href="#org3ac94fb">20. 缓存 Cache</a>
+<li><a href="#org7cb958a">18. 发送邮件 Email</a></li>
+<li><a href="#org5833577">19. 执行任务和任务调度</a></li>
+<li><a href="#orgd2b40f0">20. 缓存 Cache</a>
 <ul>
-<li><a href="#orga523177">20.1. 开启缓存</a></li>
-<li><a href="#orgd93a273">20.2. <code>@Cacheable</code></a></li>
-<li><a href="#orgaf3d32a">20.3. 其它注解</a></li>
+<li><a href="#orge9d796b">20.1. 开启缓存</a></li>
+<li><a href="#org85ca3a7">20.2. <code>@Cacheable</code></a></li>
+<li><a href="#org903683c">20.3. 其它注解</a></li>
 </ul>
 </li>
-<li><a href="#orgcbfbca4">21. 参考链接</a></li>
+<li><a href="#org3478b97">21. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org5974a48" class="outline-2">
-<h2 id="org5974a48"><span class="section-number-2">1</span> 简介</h2>
+<div id="outline-container-orgef57451" class="outline-2">
+<h2 id="orgef57451"><span class="section-number-2">1</span> 简介</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 <a href="https://spring.io/projects/spring-framework">Spring Framework</a> 是一个开源框架，是为了解决企业应用程序开发复杂性而创建的。框
@@ -319,15 +308,15 @@ for the JavaScript code in this tag.
 </p>
 
 
-<div class="figure">
+<div id="orgdc47da1" class="figure">
 <p><img src="../static/image/2019/07/spring-projects.png" alt="spring-projects.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org0d7d9bc" class="outline-2">
-<h2 id="org0d7d9bc"><span class="section-number-2">2</span> Spring 的技术点和优点</h2>
+<div id="outline-container-orgda6f519" class="outline-2">
+<h2 id="orgda6f519"><span class="section-number-2">2</span> Spring 的技术点和优点</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 作为 Java Web 开发的龙头老大， Spring 的优点是不需要打广告了，Spring
@@ -343,7 +332,7 @@ Framework 官网上给出了一下技术要点
 <li>语言：Kotlin，Groovy，动态语言</li>
 </ol>
 
-<div class="figure">
+<div id="org542de4f" class="figure">
 <p><img src="../static/image/2019/08/springmvc-documentation.png" alt="springmvc-documentation.png" />
 </p>
 </div>
@@ -369,8 +358,8 @@ JDO 抛出)转化为一致的、Unchecked 异常</li>
 </div>
 </div>
 
-<div id="outline-container-orgb53264f" class="outline-2">
-<h2 id="orgb53264f"><span class="section-number-2">3</span> IoC (Inversion of Control)</h2>
+<div id="outline-container-orga89193a" class="outline-2">
+<h2 id="orga89193a"><span class="section-number-2">3</span> IoC (Inversion of Control)</h2>
 <div class="outline-text-2" id="text-3">
 <ul class="org-ul">
 <li>IoC 也被称为 DI (dependency injection)，是实现 bean 的依赖关系，即在初始化
@@ -389,8 +378,8 @@ Spring 都用 XML 来配置类，但是由于太复杂，现在已经被 Java �
 </div>
 </div>
 
-<div id="outline-container-org020ce77" class="outline-2">
-<h2 id="org020ce77"><span class="section-number-2">4</span> 创建 Spring 项目</h2>
+<div id="outline-container-orgeb4984d" class="outline-2">
+<h2 id="orgeb4984d"><span class="section-number-2">4</span> 创建 Spring 项目</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 创建一个 Maven 项目项目工程
@@ -424,8 +413,8 @@ Spring 都用 XML 来配置类，但是由于太复杂，现在已经被 Java �
 </div>
 </div>
 
-<div id="outline-container-org67d6cd2" class="outline-2">
-<h2 id="org67d6cd2"><span class="section-number-2">5</span> 容器 Container 和 Bean</h2>
+<div id="outline-container-orgf8d4bb7" class="outline-2">
+<h2 id="orgf8d4bb7"><span class="section-number-2">5</span> 容器 Container 和 Bean</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 Spring Framework 提供了管理 Bean 的接口 ApplicationContext，也就是说 Bean 的
@@ -464,8 +453,8 @@ BeanFactoryAware</li>
 </div>
 </div>
 
-<div id="outline-container-orge862569" class="outline-2">
-<h2 id="orge862569"><span class="section-number-2">6</span> 资源 Resource</h2>
+<div id="outline-container-org7da8d76" class="outline-2">
+<h2 id="org7da8d76"><span class="section-number-2">6</span> 资源 Resource</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 Spring 秉承着一切皆资源，将可以被访问的东西都囊括在 Resource 接口中。并提供了
@@ -483,8 +472,8 @@ Spring 秉承着一切皆资源，将可以被访问的东西都囊括在 Resour
 </div>
 </div>
 
-<div id="outline-container-orgbdfc167" class="outline-2">
-<h2 id="orgbdfc167"><span class="section-number-2">7</span> 面向切面编程 AOP</h2>
+<div id="outline-container-org67ec835" class="outline-2">
+<h2 id="org67ec835"><span class="section-number-2">7</span> 面向切面编程 AOP</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 AOP 框架创建的对象，代理就是目标对象的加强。Spring 中的 AOP 代理可以使 JDK 动态代理，
@@ -547,11 +536,11 @@ AOP 框架创建的对象，代理就是目标对象的加强。Spring 中的 AO
     <span style="color: #268bd2;">@Pointcut</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"execution( com.xyz.someapp..service..(..))"</span><span style="color: #d8241f;">)</span>
     <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> businessService<span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{}</span>
 
-    <span style="color: #93a1a1; font-style: italic;">/*</span>
-<span style="color: #93a1a1; font-style: italic;">     * A data access operation is the execution of any method defined on a</span>
-<span style="color: #93a1a1; font-style: italic;">     * dao interface. This definition assumes that interfaces are placed in the</span>
-<span style="color: #93a1a1; font-style: italic;">     * "dao" package, and that implementation types are in sub-packages.</span>
-<span style="color: #93a1a1; font-style: italic;">     */</span>
+    <span style="color: #586e75; font-style: italic;">/*</span>
+<span style="color: #586e75; font-style: italic;">     * A data access operation is the execution of any method defined on a</span>
+<span style="color: #586e75; font-style: italic;">     * dao interface. This definition assumes that interfaces are placed in the</span>
+<span style="color: #586e75; font-style: italic;">     * "dao" package, and that implementation types are in sub-packages.</span>
+<span style="color: #586e75; font-style: italic;">     */</span>
     <span style="color: #268bd2;">@Pointcut</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"execution( com.xyz.someapp.dao..(..))"</span><span style="color: #d8241f;">)</span>
     <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">dataAccessOperation</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{}</span>
 
@@ -561,12 +550,12 @@ AOP 框架创建的对象，代理就是目标对象的加强。Spring 中的 AO
 </div>
 </div>
 
-<div id="outline-container-org32586a7" class="outline-2">
-<h2 id="org32586a7"><span class="section-number-2">8</span> 事务 <code>@Transactional</code></h2>
+<div id="outline-container-org5eaf084" class="outline-2">
+<h2 id="org5eaf084"><span class="section-number-2">8</span> 事务 <code>@Transactional</code></h2>
 <div class="outline-text-2" id="text-8">
 </div>
-<div id="outline-container-org40111b3" class="outline-3">
-<h3 id="org40111b3"><span class="section-number-3">8.1</span> <code>@Transactional</code></h3>
+<div id="outline-container-orgbf139db" class="outline-3">
+<h3 id="orgbf139db"><span class="section-number-3">8.1</span> <code>@Transactional</code></h3>
 <div class="outline-text-3" id="text-8-1">
 <p>
 事务不仅仅是 Spring 特有的特性，在数据库并发中普遍存在，具体事务的特性我在
@@ -583,10 +572,10 @@ Spring 也支持 XML 方式配置事务，但是比较麻烦，尽量避免使�
 <pre class="src src-java"><span style="color: #268bd2;">@Transactional</span>
 <span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">DefaultFooService</span> <span style="color: #859900;">implements</span> <span style="color: #268bd2;">FooService</span> <span style="color: #8d5649;">{</span>
 
-  <span style="color: #268bd2;">Foo</span> <span style="color: #b58900;">getFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">fooName</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
-  <span style="color: #268bd2;">Foo</span> <span style="color: #b58900;">getFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">fooName</span>, <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">barName</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
-  <span style="color: #268bd2;">void</span> <span style="color: #b58900;">insertFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Foo</span> <span style="color: #6c71c4;">foo</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
-  <span style="color: #268bd2;">void</span> <span style="color: #b58900;">updateFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Foo</span> <span style="color: #6c71c4;">foo</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #268bd2;">Foo</span> <span style="color: #b58900;">getFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">fooName</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #268bd2;">Foo</span> <span style="color: #b58900;">getFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">fooName</span>, <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">barName</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #268bd2;">void</span> <span style="color: #b58900;">insertFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Foo</span> <span style="color: #6c71c4;">foo</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #268bd2;">void</span> <span style="color: #b58900;">updateFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Foo</span> <span style="color: #6c71c4;">foo</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 
 <span style="color: #8d5649;">}</span>
 </pre>
@@ -599,11 +588,11 @@ Spring 也支持 XML 方式配置事务，但是比较麻烦，尽量避免使�
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@Transactional</span><span style="color: #8d5649;">(</span>readOnly = <span style="color: #268bd2;">true</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">DefaultFooService</span> <span style="color: #859900;">implements</span> <span style="color: #268bd2;">FooService</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Foo</span> <span style="color: #b58900;">getFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">fooName</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Foo</span> <span style="color: #b58900;">getFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">fooName</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">these settings have precedence for this method</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">these settings have precedence for this method</span>
   <span style="color: #268bd2;">@Transactional</span><span style="color: #d8241f;">(</span>readOnly = <span style="color: #268bd2;">false</span>, propagation = <span style="color: #268bd2;">Propagation</span>.REQUIRES_NEW<span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">updateFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Foo</span> <span style="color: #6c71c4;">foo</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">updateFoo</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Foo</span> <span style="color: #6c71c4;">foo</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
@@ -625,10 +614,10 @@ Spring 也支持多事务管理员角色的注解，使用方法参考下面例�
 <pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">TransactionalService</span> <span style="color: #8d5649;">{</span>
 
   <span style="color: #268bd2;">@Transactional</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"order"</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setSomething</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setSomething</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 
   <span style="color: #268bd2;">@Transactional</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"account"</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">doSomething</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">doSomething</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
@@ -654,17 +643,17 @@ Spring 也支持多事务管理员角色的注解，使用方法参考下面例�
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">TransactionalService</span> <span style="color: #8d5649;">{</span>
   <span style="color: #268bd2;">@OrderTx</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setSomething</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">setSomething</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
   <span style="color: #268bd2;">@AccountTx</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">doSomething</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">doSomething</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org2c2ba64" class="outline-3">
-<h3 id="org2c2ba64"><span class="section-number-3">8.2</span> <code>TransactionTemplate</code></h3>
+<div id="outline-container-orgec8e98a" class="outline-3">
+<h3 id="orgec8e98a"><span class="section-number-3">8.2</span> <code>TransactionTemplate</code></h3>
 <div class="outline-text-3" id="text-8-2">
 <p>
 Spring 实现了 TransactionTemplate 模版类，也可以很方便的操纵事务相关的业务
@@ -672,17 +661,17 @@ Spring 实现了 TransactionTemplate 模版类，也可以很方便的操纵事�
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">SimpleService</span> <span style="color: #859900;">implements</span> <span style="color: #268bd2;">Service</span> <span style="color: #8d5649;">{</span>
 
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">single TransactionTemplate shared amongst all methods in this instance</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">single TransactionTemplate shared amongst all methods in this instance</span>
   <span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #268bd2;">TransactionTemplate</span> <span style="color: #6c71c4;">transactionTemplate</span>;
 
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">use constructor-injection to supply the PlatformTransactionManager</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">use constructor-injection to supply the PlatformTransactionManager</span>
   <span style="color: #859900;">public</span> <span style="color: #b58900;">SimpleService</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">PlatformTransactionManager</span> <span style="color: #6c71c4;">transactionManager</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
     <span style="color: #859900;">this</span>.transactionTemplate = <span style="color: #859900;">new</span> <span style="color: #268bd2;">TransactionTemplate</span><span style="color: #9564bf;">(</span>transactionManager<span style="color: #9564bf;">)</span>;
   <span style="color: #d8241f;">}</span>
 
   <span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">someServiceMethod</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
     <span style="color: #859900;">return</span> transactionTemplate.execute<span style="color: #9564bf;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">TransactionCallback</span><span style="color: #24a222;">()</span> <span style="color: #24a222;">{</span>
-        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">the code in this method executes in a transactional context</span>
+        <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">the code in this method executes in a transactional context</span>
         <span style="color: #859900;">public</span> <span style="color: #268bd2;">Object</span> <span style="color: #b58900;">doInTransaction</span><span style="color: #ff7f00;">(</span><span style="color: #268bd2;">TransactionStatus</span> <span style="color: #6c71c4;">status</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
           updateOperation1<span style="color: #1776b6;">()</span>;
           <span style="color: #859900;">return</span> resultOfUpdateOperation2<span style="color: #1776b6;">()</span>;
@@ -696,8 +685,8 @@ Spring 实现了 TransactionTemplate 模版类，也可以很方便的操纵事�
 </div>
 </div>
 
-<div id="outline-container-org6aba798" class="outline-2">
-<h2 id="org6aba798"><span class="section-number-2">9</span> 测试</h2>
+<div id="outline-container-orgbf5a24e" class="outline-2">
+<h2 id="orgbf5a24e"><span class="section-number-2">9</span> 测试</h2>
 <div class="outline-text-2" id="text-9">
 <p>
 Spring 框架的一个特色就是提供测试 <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/testing.html">Spring Testing</a> 的功能，对于日常工作测试，主
@@ -706,12 +695,12 @@ Spring 框架的一个特色就是提供测试 <a href="https://docs.spring.io/s
 </p>
 </div>
 </div>
-<div id="outline-container-orgf06c356" class="outline-2">
-<h2 id="orgf06c356"><span class="section-number-2">10</span> Spring MVC</h2>
+<div id="outline-container-orgf954406" class="outline-2">
+<h2 id="orgf954406"><span class="section-number-2">10</span> Spring MVC</h2>
 <div class="outline-text-2" id="text-10">
 </div>
-<div id="outline-container-orgedc049c" class="outline-3">
-<h3 id="orgedc049c"><span class="section-number-3">10.1</span> 简介</h3>
+<div id="outline-container-orgcf2f4f5" class="outline-3">
+<h3 id="orgcf2f4f5"><span class="section-number-3">10.1</span> 简介</h3>
 <div class="outline-text-3" id="text-10-1">
 <p>
 <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc">Spring MVC</a> 是 Spring Web MVC 通用叫法，由于 <code>spring-webmvc</code> 包的缘故，之前才被
@@ -720,15 +709,15 @@ Spring 框架的一个特色就是提供测试 <a href="https://docs.spring.io/s
 </p>
 
 
-<div class="figure">
+<div id="org4d74e5b" class="figure">
 <p><img src="../static/image/2019/07/spring-mvc-module.png" alt="spring-mvc-module.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgeb4c8a2" class="outline-3">
-<h3 id="orgeb4c8a2"><span class="section-number-3">10.2</span> 核心组件</h3>
+<div id="outline-container-org7be8db3" class="outline-3">
+<h3 id="org7be8db3"><span class="section-number-3">10.2</span> 核心组件</h3>
 <div class="outline-text-3" id="text-10-2">
 <p>
 Spring MVC 是对通用 Servlet 的一个代理，其实现的 DispatcherServlet 提供对请
@@ -738,8 +727,8 @@ Spring MVC 是对通用 Servlet 的一个代理，其实现的 DispatcherServlet
 </div>
 </div>
 
-<div id="outline-container-orgb13c59b" class="outline-3">
-<h3 id="orgb13c59b"><span class="section-number-3">10.3</span> Servlet 配置</h3>
+<div id="outline-container-org81f587c" class="outline-3">
+<h3 id="org81f587c"><span class="section-number-3">10.3</span> Servlet 配置</h3>
 <div class="outline-text-3" id="text-10-3">
 <p>
 Spring MVC 提供了配置 Servlet 的方法。实现 WebApplicationinitializer 接口的
@@ -764,8 +753,8 @@ Spring MVC 提供了配置 Servlet 的方法。实现 WebApplicationinitializer 
 </div>
 </div>
 
-<div id="outline-container-org148664e" class="outline-3">
-<h3 id="org148664e"><span class="section-number-3">10.4</span> 控制器</h3>
+<div id="outline-container-org474b446" class="outline-3">
+<h3 id="org474b446"><span class="section-number-3">10.4</span> 控制器</h3>
 <div class="outline-text-3" id="text-10-4">
 <p>
 Spring MVC 默认使用 <code>@Controller</code> 来表示控制器，如果后台开发的大部分返回
@@ -789,8 +778,8 @@ Json 的话，我们可以使用 <code>@RestController</code> 来注解，他相
 </div>
 </div>
 
-<div id="outline-container-org0cc4366" class="outline-2">
-<h2 id="org0cc4366"><span class="section-number-2">11</span> HTTP 请求映射</h2>
+<div id="outline-container-org89b8baa" class="outline-2">
+<h2 id="org89b8baa"><span class="section-number-2">11</span> HTTP 请求映射</h2>
 <div class="outline-text-2" id="text-11">
 <p>
 通常，可以通过二级路由的方法管理控制器类，详见如下例子：
@@ -801,11 +790,11 @@ Json 的话，我们可以使用 <code>@RestController</code> 来注解，他相
 <span style="color: #859900;">class</span> <span style="color: #268bd2;">PersonController</span> <span style="color: #8d5649;">{</span>
 
   <span style="color: #268bd2;">@GetMapping</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"/{id}"</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Person</span> <span style="color: #b58900;">getPerson</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Person</span> <span style="color: #b58900;">getPerson</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 
   <span style="color: #268bd2;">@PostMapping</span>
   <span style="color: #268bd2;">@ResponseStatus</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">HttpStatus</span>.<span style="color: #268bd2;">CREATED</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">add</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@RequestBody</span> <span style="color: #268bd2;">Person</span> <span style="color: #6c71c4;">person</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">add</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@RequestBody</span> <span style="color: #268bd2;">Person</span> <span style="color: #6c71c4;">person</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 
 <span style="color: #8d5649;">}</span>
 </pre>
@@ -821,16 +810,16 @@ Json 的话，我们可以使用 <code>@RestController</code> 来注解，他相
 </ul>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/owners/{ownerId}/pets/{petId}"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Pet</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">ownerId</span>, <span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">petId</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Pet</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">ownerId</span>, <span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">petId</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/pets/{petId}"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Pet</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"petId"</span><span style="color: #d8241f;">)</span> <span style="color: #268bd2;">id</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Pet</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"petId"</span><span style="color: #d8241f;">)</span> <span style="color: #268bd2;">id</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/{name:[a-z-]+}-{version:\\d\\.\\d\\.\\d}{ext:\\.[a-z]+}"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">handle</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">version</span>, <span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">ext</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">handle</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">version</span>, <span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">ext</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/pets/{petId}"</span><span style="color: #8d5649;">)</span>
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">same as</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">same as</span>
 <span style="color: #268bd2;">@RequestMapping</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/pets/{petId}"</span>, method=<span style="color: #268bd2;">HttpMethod</span>.GET<span style="color: #8d5649;">)</span>
 </pre>
 </div>
@@ -840,10 +829,10 @@ Json 的话，我们可以使用 <code>@RestController</code> 来注解，他相
 </p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@PostMapping</span><span style="color: #8d5649;">(</span>path = <span style="color: #2aa198;">"/pets"</span>, consumes = <span style="color: #2aa198;">"application/json"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">addPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@RequestBody</span> <span style="color: #268bd2;">Pet</span> <span style="color: #6c71c4;">pet</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">addPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@RequestBody</span> <span style="color: #268bd2;">Pet</span> <span style="color: #6c71c4;">pet</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@PostMapping</span><span style="color: #8d5649;">(</span>path = <span style="color: #2aa198;">"/pets"</span>, consumes = <span style="color: #2aa198;">"!text/plain"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">addPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@RequestBody</span> <span style="color: #268bd2;">Pet</span> <span style="color: #6c71c4;">pet</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">addPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@RequestBody</span> <span style="color: #268bd2;">Pet</span> <span style="color: #6c71c4;">pet</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 </pre>
 </div>
 
@@ -853,7 +842,7 @@ Json 的话，我们可以使用 <code>@RestController</code> 来注解，他相
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span>path = <span style="color: #2aa198;">"/pets/{petId}"</span>, produces = <span style="color: #2aa198;">"application/json"</span><span style="color: #8d5649;">)</span>
 <span style="color: #268bd2;">@ResponseBody</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Pet</span> <span style="color: #b58900;">getPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">petId</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Pet</span> <span style="color: #b58900;">getPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">petId</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 </pre>
 </div>
 
@@ -862,10 +851,10 @@ Json 的话，我们可以使用 <code>@RestController</code> 来注解，他相
 </p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span>path = <span style="color: #2aa198;">"/pets/{petId}"</span>, params = <span style="color: #2aa198;">"myParam=myValue"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">petId</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">petId</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span>path = <span style="color: #2aa198;">"/pets"</span>, headers = <span style="color: #2aa198;">"myHeader=myValue"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">petId</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span><span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">petId</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span><span style="color: #8d5649;">}</span>
 </pre>
 </div>
 
@@ -893,8 +882,8 @@ Json 的话，我们可以使用 <code>@RestController</code> 来注解，他相
 </div>
 </div>
 
-<div id="outline-container-org61e872e" class="outline-2">
-<h2 id="org61e872e"><span class="section-number-2">12</span> 响应函数参数和返回值</h2>
+<div id="outline-container-org160c1cc" class="outline-2">
+<h2 id="org160c1cc"><span class="section-number-2">12</span> 响应函数参数和返回值</h2>
 <div class="outline-text-2" id="text-12">
 <p>
 <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc-ann-methods">Method Handler</a> 包括方法参数和返回值注解。其中请求的方法输入参数包括：
@@ -910,33 +899,33 @@ Json 的话，我们可以使用 <code>@RestController</code> 来注解，他相
 矩阵变量
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">GET /pets/42;q=11;r=22</span>
+<pre class="src src-java"><span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">GET /pets/42;q=11;r=22</span>
 <span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/pets/{petId}"</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">petId</span>, <span style="color: #268bd2;">@MatrixVariable</span> <span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">q</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">petId == 42</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">q == 11</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">petId == 42</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">q == 11</span>
 <span style="color: #8d5649;">}</span>
 
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">GET /owners/42;q=11/pets/21;q=22</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">GET /owners/42;q=11/pets/21;q=22</span>
 <span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/owners/{ownerId}/pets/{petId}"</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@MatrixVariable</span><span style="color: #d8241f;">(</span>name=<span style="color: #2aa198;">"q"</span>, pathVar=<span style="color: #2aa198;">"ownerId"</span><span style="color: #d8241f;">)</span> <span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">q1</span>,
                <span style="color: #268bd2;">@MatrixVariable</span><span style="color: #d8241f;">(</span>name=<span style="color: #2aa198;">"q"</span>, pathVar=<span style="color: #2aa198;">"petId"</span><span style="color: #d8241f;">)</span> <span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">q2</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">q1 == 11</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">q2 == 22</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">q1 == 11</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">q2 == 22</span>
 <span style="color: #8d5649;">}</span>
 
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">GET /pets/42</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">GET /pets/42</span>
 <span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/pets/{petId}"</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@MatrixVariable</span><span style="color: #d8241f;">(</span>required=<span style="color: #268bd2;">false</span>, defaultValue=<span style="color: #2aa198;">"1"</span><span style="color: #d8241f;">)</span> <span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">q</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">q == 1</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">q == 1</span>
 <span style="color: #8d5649;">}</span>
 
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">GET /owners/42;q=11;r=12/pets/21;q=22;s=23</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">GET /owners/42;q=11;r=12/pets/21;q=22;s=23</span>
 <span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/owners/{ownerId}/pets/{petId}"</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">findPet</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">@MatrixVariable</span> <span style="color: #268bd2;">MultiValueMap</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">matrixVars</span>,
                <span style="color: #268bd2;">@MatrixVariable</span><span style="color: #d8241f;">(</span>pathVar=<span style="color: #2aa198;">"petId"</span><span style="color: #d8241f;">)</span> <span style="color: #268bd2;">MultiValueMap</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">petMatrixVars</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">matrixVars: ["q" : [11,22], "r" : 12, "s" : 23]</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">petMatrixVars: ["q" : 22, "s" : 23]</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">matrixVars: ["q" : [11,22], "r" : 12, "s" : 23]</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">petMatrixVars: ["q" : 22, "s" : 23]</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
@@ -991,7 +980,7 @@ Cookie 值
                             <span style="color: #268bd2;">@RequestParam</span><span style="color: #9564bf;">(</span><span style="color: #2aa198;">"file"</span><span style="color: #9564bf;">)</span> <span style="color: #268bd2;">MultipartFile</span> <span style="color: #6c71c4;">file</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
     <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">!</span>file.isEmpty<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
       <span style="color: #268bd2;">byte</span><span style="color: #24a222;">[]</span> <span style="color: #6c71c4;">bytes</span> = file.getBytes<span style="color: #24a222;">()</span>;
-      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">store the bytes somewhere</span>
+      <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">store the bytes somewhere</span>
       <span style="color: #859900;">return</span> <span style="color: #2aa198;">"redirect:uploadSuccess"</span>;
     <span style="color: #9564bf;">}</span>
     <span style="color: #859900;">return</span> <span style="color: #2aa198;">"redirect:uploadFailure"</span>;
@@ -1007,13 +996,13 @@ Cookie 值
 <pre class="src src-java"><span style="color: #268bd2;">@Controller</span>
 <span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">SimpleController</span> <span style="color: #8d5649;">{</span>
   <span style="color: #268bd2;">@ExceptionHandler</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">ResponseEntity</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #b58900;">handle01</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">IOException</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">ResponseEntity</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #b58900;">handle01</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">IOException</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 
   <span style="color: #268bd2;">@ExceptionHandler</span><span style="color: #d8241f;">(</span><span style="color: #9564bf;">{</span>FileSystemException.<span style="color: #859900;">class</span>, RemoteException.<span style="color: #859900;">class</span><span style="color: #9564bf;">}</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">ResponseEntity</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #b58900;">handle02</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">IOException</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">ResponseEntity</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #b58900;">handle02</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">IOException</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 
   <span style="color: #268bd2;">@ExceptionHandler</span><span style="color: #d8241f;">(</span><span style="color: #9564bf;">{</span>FileSystemException.<span style="color: #859900;">class</span>, RemoteException.<span style="color: #859900;">class</span><span style="color: #9564bf;">}</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">ResponseEntity</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #b58900;">handle</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Exception</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">ResponseEntity</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #b58900;">handle</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Exception</span> <span style="color: #6c71c4;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
@@ -1025,15 +1014,15 @@ Cookie 值
 <code>ResponseEntityExceptionHandler</code> 类。
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Target all Controllers annotated with @RestController</span>
+<pre class="src src-java"><span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Target all Controllers annotated with @RestController</span>
 <span style="color: #268bd2;">@ControllerAdvice</span><span style="color: #8d5649;">(</span>annotations = RestController.<span style="color: #859900;">class</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">ExampleAdvice1</span> <span style="color: #8d5649;">{}</span>
 
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Target all Controllers within specific packages</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Target all Controllers within specific packages</span>
 <span style="color: #268bd2;">@ControllerAdvice</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"org.example.controllers"</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">ExampleAdvice2</span> <span style="color: #8d5649;">{}</span>
 
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Target all Controllers assignable to specific classes</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Target all Controllers assignable to specific classes</span>
 <span style="color: #268bd2;">@ControllerAdvice</span><span style="color: #8d5649;">(</span>assignableTypes = <span style="color: #d8241f;">{</span>ControllerInterface.<span style="color: #859900;">class</span>, AbstractController.<span style="color: #859900;">class</span><span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">ExampleAdvice3</span> <span style="color: #8d5649;">{}</span>
 </pre>
@@ -1041,8 +1030,8 @@ Cookie 值
 </div>
 </div>
 
-<div id="outline-container-org9817e62" class="outline-2">
-<h2 id="org9817e62"><span class="section-number-2">13</span> 跨越 CORS <code>@CrossOrigin</code></h2>
+<div id="outline-container-org0f8ac4f" class="outline-2">
+<h2 id="org0f8ac4f"><span class="section-number-2">13</span> 跨越 CORS <code>@CrossOrigin</code></h2>
 <div class="outline-text-2" id="text-13">
 <p>
 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">CORS</a> 在 MDN 中有详细的介绍，下面只展示 Spring 中如何配置 CORS。允许单个 URL 和处
@@ -1055,10 +1044,10 @@ Cookie 值
 
   <span style="color: #268bd2;">@CrossOrigin</span>
   <span style="color: #268bd2;">@GetMapping</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"/{id}"</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Account</span> <span style="color: #b58900;">retrieve</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Account</span> <span style="color: #b58900;">retrieve</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 
   <span style="color: #268bd2;">@DeleteMapping</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"/{id}"</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">remove</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">remove</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
@@ -1073,10 +1062,10 @@ Cookie 值
 <span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">AccountController</span> <span style="color: #8d5649;">{</span>
 
   <span style="color: #268bd2;">@GetMapping</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"/{id}"</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Account</span> <span style="color: #b58900;">retrieve</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Account</span> <span style="color: #b58900;">retrieve</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 
   <span style="color: #268bd2;">@DeleteMapping</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"/{id}"</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">remove</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">remove</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
@@ -1092,10 +1081,10 @@ Cookie 值
 
   <span style="color: #268bd2;">@CrossOrigin</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"https://domain2.com"</span><span style="color: #d8241f;">)</span>
   <span style="color: #268bd2;">@GetMapping</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"/{id}"</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Account</span> <span style="color: #b58900;">retrieve</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Account</span> <span style="color: #b58900;">retrieve</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 
   <span style="color: #268bd2;">@DeleteMapping</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"/{id}"</span><span style="color: #d8241f;">)</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">remove</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">remove</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">@PathVariable</span> <span style="color: #268bd2;">Long</span> <span style="color: #6c71c4;">id</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
@@ -1118,7 +1107,7 @@ Cookie 值
       .exposedHeaders<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"header1"</span>, <span style="color: #2aa198;">"header2"</span><span style="color: #9564bf;">)</span>
       .allowCredentials<span style="color: #9564bf;">(</span><span style="color: #268bd2;">true</span><span style="color: #9564bf;">)</span>.maxAge<span style="color: #9564bf;">(</span>3600<span style="color: #9564bf;">)</span>;
 
-    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Add more mappings...</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Add more mappings...</span>
   <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
@@ -1126,12 +1115,12 @@ Cookie 值
 </div>
 </div>
 
-<div id="outline-container-org4200ecc" class="outline-2">
-<h2 id="org4200ecc"><span class="section-number-2">14</span> MVC 配置 <code>@EnableWebMvc</code></h2>
+<div id="outline-container-org4afe5fa" class="outline-2">
+<h2 id="org4afe5fa"><span class="section-number-2">14</span> MVC 配置 <code>@EnableWebMvc</code></h2>
 <div class="outline-text-2" id="text-14">
 </div>
-<div id="outline-container-org9a8c588" class="outline-3">
-<h3 id="org9a8c588"><span class="section-number-3">14.1</span> 类型转换配置</h3>
+<div id="outline-container-org5677086" class="outline-3">
+<h3 id="org5677086"><span class="section-number-3">14.1</span> 类型转换配置</h3>
 <div class="outline-text-3" id="text-14-1">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@Configuration</span>
@@ -1149,8 +1138,8 @@ Cookie 值
 </div>
 </div>
 </div>
-<div id="outline-container-org90f2dd9" class="outline-3">
-<h3 id="org90f2dd9"><span class="section-number-3">14.2</span> 静态资源配置</h3>
+<div id="outline-container-org710c49d" class="outline-3">
+<h3 id="org710c49d"><span class="section-number-3">14.2</span> 静态资源配置</h3>
 <div class="outline-text-3" id="text-14-2">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@Configuration</span>
@@ -1169,30 +1158,30 @@ Cookie 值
 </div>
 </div>
 </div>
-<div id="outline-container-orga3c133e" class="outline-2">
-<h2 id="orga3c133e"><span class="section-number-2">15</span> 异步请求</h2>
+<div id="outline-container-org73f96d4" class="outline-2">
+<h2 id="org73f96d4"><span class="section-number-2">15</span> 异步请求</h2>
 <div class="outline-text-2" id="text-15">
 </div>
-<div id="outline-container-org02985da" class="outline-3">
-<h3 id="org02985da"><span class="section-number-3">15.1</span> DeferredResult</h3>
+<div id="outline-container-org46ddeeb" class="outline-3">
+<h3 id="org46ddeeb"><span class="section-number-3">15.1</span> DeferredResult</h3>
 <div class="outline-text-3" id="text-15-1">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@GetMapping</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/quotes"</span><span style="color: #8d5649;">)</span>
 <span style="color: #268bd2;">@ResponseBody</span>
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">DeferredResult</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #8d5649;">&gt;</span> <span style="color: #b58900;">quotes</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
   <span style="color: #268bd2;">DeferredResult</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">deferredResult</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">DeferredResult</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;()</span>;
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Save the deferredResult somewhere..</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Save the deferredResult somewhere..</span>
   <span style="color: #859900;">return</span> deferredResult;
 <span style="color: #8d5649;">}</span>
 
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">From some other thread...</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">From some other thread...</span>
 deferredResult.setResult<span style="color: #8d5649;">(</span>result<span style="color: #8d5649;">)</span>;
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org54483e5" class="outline-3">
-<h3 id="org54483e5"><span class="section-number-3">15.2</span> Callable</h3>
+<div id="outline-container-org40a268a" class="outline-3">
+<h3 id="org40a268a"><span class="section-number-3">15.2</span> Callable</h3>
 <div class="outline-text-3" id="text-15-2">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@PostMapping</span>
@@ -1200,7 +1189,7 @@ deferredResult.setResult<span style="color: #8d5649;">(</span>result<span style=
 
   <span style="color: #859900;">return</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">Callable</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">&gt;()</span> <span style="color: #d8241f;">{</span>
     <span style="color: #859900;">public</span> <span style="color: #268bd2;">String</span> <span style="color: #b58900;">call</span><span style="color: #9564bf;">()</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">Exception</span> <span style="color: #9564bf;">{</span>
-      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">...</span>
+      <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">...</span>
       <span style="color: #859900;">return</span> <span style="color: #2aa198;">"someView"</span>;
     <span style="color: #9564bf;">}</span>
   <span style="color: #d8241f;">}</span>;
@@ -1210,8 +1199,8 @@ deferredResult.setResult<span style="color: #8d5649;">(</span>result<span style=
 </div>
 </div>
 </div>
-<div id="outline-container-org816bdd2" class="outline-2">
-<h2 id="org816bdd2"><span class="section-number-2">16</span> 远端过程调用</h2>
+<div id="outline-container-orgc666c1f" class="outline-2">
+<h2 id="orgc666c1f"><span class="section-number-2">16</span> 远端过程调用</h2>
 <div class="outline-text-2" id="text-16">
 <p>
 Spring 集成了许多常用的远端过程调用的方法，在选取的时候需要根据各自的优缺点来
@@ -1227,8 +1216,8 @@ Spring 集成了许多常用的远端过程调用的方法，在选取的时候�
 </ul>
 </div>
 </div>
-<div id="outline-container-org2830ba9" class="outline-2">
-<h2 id="org2830ba9"><span class="section-number-2">17</span> 客户端请求 RestTemplate</h2>
+<div id="outline-container-orgb36a92a" class="outline-2">
+<h2 id="orgb36a92a"><span class="section-number-2">17</span> 客户端请求 RestTemplate</h2>
 <div class="outline-text-2" id="text-17">
 <p>
 Spring 提供了两种 Rest 客户端来进行客户端请求， RestTemplate 和 WebClient。在
@@ -1239,8 +1228,8 @@ Spring 提供了两种 Rest 客户端来进行客户端请求， RestTemplate �
 <li>WebClient 处理异步调用</li>
 </ul>
 </div>
-<div id="outline-container-orgae8557f" class="outline-3">
-<h3 id="orgae8557f"><span class="section-number-3">17.1</span> 初始化</h3>
+<div id="outline-container-orgd68907f" class="outline-3">
+<h3 id="orgd68907f"><span class="section-number-3">17.1</span> 初始化</h3>
 <div class="outline-text-3" id="text-17-1">
 <p>
 直接使用 Apache HttpComponents 来作为 Spring 的代理来初始化一个 RestTemplate
@@ -1262,8 +1251,8 @@ factory.setConnectTimeout<span style="color: #8d5649;">(</span>3000<span style="
 </div>
 </div>
 </div>
-<div id="outline-container-orga2d3772" class="outline-3">
-<h3 id="orga2d3772"><span class="section-number-3">17.2</span> UriComponents 构造 URI 对象</h3>
+<div id="outline-container-orgc5f7aab" class="outline-3">
+<h3 id="orgc5f7aab"><span class="section-number-3">17.2</span> UriComponents 构造 URI 对象</h3>
 <div class="outline-text-3" id="text-17-2">
 <p>
 UriComponentsBuilder 可以新建一个 UriComponents 的实例，示例程序如下
@@ -1285,8 +1274,8 @@ UriComponentsBuilder 可以新建一个 UriComponents 的实例，示例程序�
 </div>
 </div>
 
-<div id="outline-container-org0ff543a" class="outline-3">
-<h3 id="org0ff543a"><span class="section-number-3">17.3</span> URI 编码</h3>
+<div id="outline-container-orga89f8c2" class="outline-3">
+<h3 id="orga89f8c2"><span class="section-number-3">17.3</span> URI 编码</h3>
 <div class="outline-text-3" id="text-17-3">
 <p>
 Spring 的 UriComponentsBuilder 自带 encode 方法，方便对 URL 编码
@@ -1297,9 +1286,9 @@ Spring 的 UriComponentsBuilder 自带 encode 方法，方便对 URL 编码
   .encode<span style="color: #8d5649;">()</span>
   .buildAndExpand<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"New York"</span>, <span style="color: #2aa198;">"foo+bar"</span><span style="color: #8d5649;">)</span>
   .toUri<span style="color: #8d5649;">()</span>;
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Result is "/hotel%20list/New%20York?q=foo%2Bbar"</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Result is "/hotel%20list/New%20York?q=foo%2Bbar"</span>
 
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">queryParam &#21487;&#20197;&#22788;&#29702; query string</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">queryParam &#21487;&#20197;&#22788;&#29702; query string</span>
 <span style="color: #268bd2;">URI</span> <span style="color: #6c71c4;">uri</span> = UriComponentsBuilder.fromPath<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/hotel list/{city}"</span><span style="color: #8d5649;">)</span>
   .queryParam<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"q"</span>, <span style="color: #2aa198;">"{q}"</span><span style="color: #8d5649;">)</span>
   .build<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"New York"</span>, <span style="color: #2aa198;">"foo+bar"</span><span style="color: #8d5649;">)</span>;
@@ -1307,39 +1296,39 @@ Spring 的 UriComponentsBuilder 自带 encode 方法，方便对 URL 编码
 <span style="color: #268bd2;">URI</span> <span style="color: #6c71c4;">uri</span> = UriComponentsBuilder.fromPath<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"/hotel list/{city}?q={q}"</span><span style="color: #8d5649;">)</span>
   .build<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"New York"</span>, <span style="color: #2aa198;">"foo+bar"</span><span style="color: #8d5649;">)</span>;
 
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#20256;&#36882; Map&lt;String, Object&gt; params &#23545;&#35937;&#30340; query string</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#20256;&#36882; Map&lt;String, Object&gt; params &#23545;&#35937;&#30340; query string</span>
 <span style="color: #268bd2;">UriComponentsBuilder</span> <span style="color: #6c71c4;">builder</span> = UriComponentsBuilder.fromHttpUrl<span style="color: #8d5649;">(</span>uriTemplate<span style="color: #8d5649;">)</span>;
 params.forEach<span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>k, v<span style="color: #d8241f;">)</span> -&gt; <span style="color: #d8241f;">{</span> builder.queryParam<span style="color: #9564bf;">(</span>k, <span style="color: #2aa198;">"{"</span> + k + <span style="color: #2aa198;">"}"</span><span style="color: #9564bf;">)</span>; <span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>;
-builder.encode<span style="color: #8d5649;">()</span>.buildAndExpand<span style="color: #8d5649;">(</span>params<span style="color: #8d5649;">)</span>.toUri<span style="color: #8d5649;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#21040; URI</span>
+builder.encode<span style="color: #8d5649;">()</span>.buildAndExpand<span style="color: #8d5649;">(</span>params<span style="color: #8d5649;">)</span>.toUri<span style="color: #8d5649;">()</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#33719;&#21462;&#21040; URI</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org998021a" class="outline-3">
-<h3 id="org998021a"><span class="section-number-3">17.4</span> URI</h3>
+<div id="outline-container-org3f14b5a" class="outline-3">
+<h3 id="org3f14b5a"><span class="section-number-3">17.4</span> URI</h3>
 <div class="outline-text-3" id="text-17-4">
 <p>
 restTemplate 支持多种请求模式，例如 GET 请求可以使用下面的方式来出来发送
 HTTP 请求来获取数据
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#30452;&#25509;&#20256;&#36882;&#21442;&#25968;</span>
+<pre class="src src-java"><span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#30452;&#25509;&#20256;&#36882;&#21442;&#25968;</span>
 <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">result</span> = restTemplate.getForObject<span style="color: #8d5649;">(</span>
     <span style="color: #2aa198;">"https://example.com/hotels/{hotel}/bookings/{booking}"</span>, String.<span style="color: #859900;">class</span>, <span style="color: #2aa198;">"42"</span>, <span style="color: #2aa198;">"21"</span><span style="color: #8d5649;">)</span>;
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#25226;&#21442;&#25968;&#23553;&#35013;&#22312; Map &#23545;&#35937;&#20013;</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#25226;&#21442;&#25968;&#23553;&#35013;&#22312; Map &#23545;&#35937;&#20013;</span>
 <span style="color: #268bd2;">Map</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">String</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">vars</span> = Collections.singletonMap<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"hotel"</span>, <span style="color: #2aa198;">"42"</span><span style="color: #8d5649;">)</span>;
 <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">result</span> = restTemplate.getForObject<span style="color: #8d5649;">(</span>
     <span style="color: #2aa198;">"https://example.com/hotels/{hotel}/rooms/{hotel}"</span>, String.<span style="color: #859900;">class</span>, vars<span style="color: #8d5649;">)</span>;
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33258;&#21160;&#32534;&#30721;&#31354;&#26684;</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#33258;&#21160;&#32534;&#30721;&#31354;&#26684;</span>
 restTemplate.getForObject<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"https://example.com/hotel list"</span>, String.<span style="color: #859900;">class</span><span style="color: #8d5649;">)</span>;
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Results in request to "https://example.com/hotel%20list"</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">Results in request to "https://example.com/hotel%20list"</span>
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org9a37237" class="outline-3">
-<h3 id="org9a37237"><span class="section-number-3">17.5</span> 请求头</h3>
+<div id="outline-container-org133c830" class="outline-3">
+<h3 id="org133c830"><span class="section-number-3">17.5</span> 请求头</h3>
 <div class="outline-text-3" id="text-17-5">
 <p>
 使用 <code>exchange()</code> 可以在请求中添加请求头，参考如下示例
@@ -1360,8 +1349,8 @@ restTemplate.getForObject<span style="color: #8d5649;">(</span><span style="colo
 </div>
 </div>
 </div>
-<div id="outline-container-org3b44e2a" class="outline-3">
-<h3 id="org3b44e2a"><span class="section-number-3">17.6</span> 请求体</h3>
+<div id="outline-container-orgcdf76a4" class="outline-3">
+<h3 id="orgcdf76a4"><span class="section-number-3">17.6</span> 请求体</h3>
 <div class="outline-text-3" id="text-17-6">
 <p>
 直接传递第一个参数作为请求体，在 POST 请求中，输入对象直接被序列化成请求体
@@ -1380,8 +1369,8 @@ restTemplate.getForObject<span style="color: #8d5649;">(</span><span style="colo
 </div>
 </div>
 </div>
-<div id="outline-container-org5c8456a" class="outline-3">
-<h3 id="org5c8456a"><span class="section-number-3">17.7</span> Jackson JSON</h3>
+<div id="outline-container-org1c25e1a" class="outline-3">
+<h3 id="org1c25e1a"><span class="section-number-3">17.7</span> Jackson JSON</h3>
 <div class="outline-text-3" id="text-17-7">
 <p>
 有时候需要修改一下默认请求的序列化方式，例如我们序列化用户是不希望将用户的密
@@ -1390,28 +1379,28 @@ restTemplate.getForObject<span style="color: #8d5649;">(</span><span style="colo
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">MappingJacksonValue</span> <span style="color: #6c71c4;">value</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">MappingJacksonValue</span><span style="color: #8d5649;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">User</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"eric"</span>, <span style="color: #2aa198;">"7!jd#h23"</span><span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>;
 value.setSerializationView<span style="color: #8d5649;">(</span><span style="color: #268bd2;">User</span>.WithoutPasswordView.<span style="color: #859900;">class</span><span style="color: #8d5649;">)</span>;
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26500;&#36896;&#35831;&#27714;&#23454;&#20307;</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#26500;&#36896;&#35831;&#27714;&#23454;&#20307;</span>
 <span style="color: #268bd2;">RequestEntity</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">MappingJacksonValue</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">requestEntity</span> =
     RequestEntity.post<span style="color: #8d5649;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">URI</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"https://example.com/user"</span><span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>.body<span style="color: #8d5649;">(</span>value<span style="color: #8d5649;">)</span>;
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#21457;&#36865;&#35831;&#27714;&#65292;&#33719;&#21462;&#22238;&#22797;</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#21457;&#36865;&#35831;&#27714;&#65292;&#33719;&#21462;&#22238;&#22797;</span>
 <span style="color: #268bd2;">ResponseEntity</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">response</span> = template.exchange<span style="color: #8d5649;">(</span>requestEntity, String.<span style="color: #859900;">class</span><span style="color: #8d5649;">)</span>;
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org3379e1a" class="outline-3">
-<h3 id="org3379e1a"><span class="section-number-3">17.8</span> Multipart</h3>
+<div id="outline-container-orgbb31b99" class="outline-3">
+<h3 id="orgbb31b99"><span class="section-number-3">17.8</span> Multipart</h3>
 <div class="outline-text-3" id="text-17-8">
 <p>
 Spring 还提供了发送多部分请求的方法，使用 <code>MultiValueMap</code> 对象可以构造请求参数
 </p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">MultiValueMap</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span>, <span style="color: #268bd2;">Object</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">parts</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">LinkedMultiValueMap</span><span style="color: #8d5649;">&lt;&gt;()</span>;
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26500;&#36896;&#35831;&#27714;&#30340;&#22810;&#37096;&#20998;&#30340;&#35831;&#27714;&#21442;&#25968;</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#26500;&#36896;&#35831;&#27714;&#30340;&#22810;&#37096;&#20998;&#30340;&#35831;&#27714;&#21442;&#25968;</span>
 parts.add<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"fieldPart"</span>, <span style="color: #2aa198;">"fieldValue"</span><span style="color: #8d5649;">)</span>;
 parts.add<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"filePart"</span>, <span style="color: #859900;">new</span> <span style="color: #268bd2;">FileSystemResource</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"...logo.png"</span><span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>;
 parts.add<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"jsonPart"</span>, <span style="color: #859900;">new</span> <span style="color: #268bd2;">Person</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"Jason"</span><span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>;
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26500;&#36896;&#35831;&#27714;&#22836;&#21644;&#28155;&#21152;&#21478;&#22806;&#30340;&#21442;&#25968;</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#26500;&#36896;&#35831;&#27714;&#22836;&#21644;&#28155;&#21152;&#21478;&#22806;&#30340;&#21442;&#25968;</span>
 <span style="color: #268bd2;">HttpHeaders</span> <span style="color: #6c71c4;">headers</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">HttpHeaders</span><span style="color: #8d5649;">()</span>;
 headers.setContentType<span style="color: #8d5649;">(</span><span style="color: #268bd2;">MediaType</span>.APPLICATION_XML<span style="color: #8d5649;">)</span>;
 parts.add<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"xmlPart"</span>, <span style="color: #859900;">new</span> <span style="color: #268bd2;">HttpEntity</span><span style="color: #d8241f;">&lt;&gt;(</span>myBean, headers<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>;
@@ -1429,8 +1418,8 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 </div>
 </div>
 
-<div id="outline-container-org277f4d9" class="outline-2">
-<h2 id="org277f4d9"><span class="section-number-2">18</span> 发送邮件 Email</h2>
+<div id="outline-container-org7cb958a" class="outline-2">
+<h2 id="org7cb958a"><span class="section-number-2">18</span> 发送邮件 Email</h2>
 <div class="outline-text-2" id="text-18">
 <p>
 在发送邮件前，先准备业务中涉及到邮件的接口，例如定义好订单接口
@@ -1464,9 +1453,9 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
   <span style="color: #d8241f;">}</span>
 
   <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">placeOrder</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Order</span> <span style="color: #6c71c4;">order</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">1. &#22788;&#29702;&#19994;&#21153;&#36923;&#36753; ...</span>
-    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">2. &#35843;&#29992;&#21327;&#35843;&#27169;&#22359;&#65292;&#22788;&#29702;&#21457;&#36865;&#30340;&#39034;&#24207; ...</span>
-    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">3. &#22797;&#21046;&#27169;&#26495;&#65292;&#20351;&#29992;&#32447;&#31243;&#23433;&#20840;&#30340;&#27169;&#26495;&#36827;&#20837;&#21457;&#36865;&#38431;&#21015;</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">1. &#22788;&#29702;&#19994;&#21153;&#36923;&#36753; ...</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">2. &#35843;&#29992;&#21327;&#35843;&#27169;&#22359;&#65292;&#22788;&#29702;&#21457;&#36865;&#30340;&#39034;&#24207; ...</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">3. &#22797;&#21046;&#27169;&#26495;&#65292;&#20351;&#29992;&#32447;&#31243;&#23433;&#20840;&#30340;&#27169;&#26495;&#36827;&#20837;&#21457;&#36865;&#38431;&#21015;</span>
     <span style="color: #268bd2;">SimpleMailMessage</span> <span style="color: #6c71c4;">msg</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">SimpleMailMessage</span><span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.templateMessage<span style="color: #9564bf;">)</span>;
     msg.setTo<span style="color: #9564bf;">(</span>order.getCustomer<span style="color: #24a222;">()</span>.getEmailAddress<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
     msg.setText<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"Dear "</span> + order.getCustomer<span style="color: #24a222;">()</span>.getFirstName<span style="color: #24a222;">()</span>
@@ -1476,7 +1465,7 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
     <span style="color: #859900;">try</span><span style="color: #9564bf;">{</span>
       <span style="color: #859900;">this</span>.mailSender.send<span style="color: #24a222;">(</span>msg<span style="color: #24a222;">)</span>;
     <span style="color: #9564bf;">}</span> <span style="color: #859900;">catch</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">MailException</span> <span style="color: #6c71c4;">ex</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">simply log it and go on...</span>
+      <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">simply log it and go on...</span>
       System.err.println<span style="color: #24a222;">(</span>ex.getMessage<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span>;
     <span style="color: #9564bf;">}</span>
   <span style="color: #d8241f;">}</span>
@@ -1487,8 +1476,8 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 </div>
 </div>
 
-<div id="outline-container-org83dfbd3" class="outline-2">
-<h2 id="org83dfbd3"><span class="section-number-2">19</span> 执行任务和任务调度</h2>
+<div id="outline-container-org5833577" class="outline-2">
+<h2 id="org5833577"><span class="section-number-2">19</span> 执行任务和任务调度</h2>
 <div class="outline-text-2" id="text-19">
 <p>
 传统的 Spring 中的任务调度通过实现 <code>TaskExecutor</code> 和 <code>TaskScheduler</code> 接口来控
@@ -1510,17 +1499,17 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@Scheduled</span><span style="color: #8d5649;">(</span>fixedDelay=5000<span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">doSomething</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">something that should execute periodically</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">something that should execute periodically</span>
 <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@Scheduled</span><span style="color: #8d5649;">(</span>initialDelay=1000, fixedRate=5000<span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">doSomething</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">something that should execute periodically</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">something that should execute periodically</span>
 <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@Scheduled</span><span style="color: #8d5649;">(</span>cron=<span style="color: #2aa198;">"*/5 * * * * MON-FRI"</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">doSomething</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">something that should execute on weekdays only</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">something that should execute on weekdays only</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
@@ -1531,17 +1520,17 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@Async</span>
 <span style="color: #268bd2;">void</span> <span style="color: #b58900;">doSomething</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">this will be executed asynchronously</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">this will be executed asynchronously</span>
 <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@Async</span>
 <span style="color: #268bd2;">void</span> <span style="color: #b58900;">doSomething</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">s</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">this will be executed asynchronously</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">this will be executed asynchronously</span>
 <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@Async</span>
 <span style="color: #268bd2;">Future</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">String</span><span style="color: #8d5649;">&gt;</span> <span style="color: #b58900;">returnSomething</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">i</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">this will be executed asynchronously</span>
+  <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">this will be executed asynchronously</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
@@ -1553,7 +1542,7 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 <pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">MyAsyncUncaughtExceptionHandler</span> <span style="color: #859900;">implements</span> <span style="color: #268bd2;">AsyncUncaughtExceptionHandler</span> <span style="color: #8d5649;">{</span>
   <span style="color: #268bd2;">@Override</span>
   <span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">handleUncaughtException</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">Throwable</span> <span style="color: #6c71c4;">ex</span>, <span style="color: #268bd2;">Method</span> <span style="color: #6c71c4;">method</span>, <span style="color: #268bd2;">Object</span>... <span style="color: #6c71c4;">params</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#22788;&#29702;&#24322;&#24120;&#36923;&#36753;</span>
+    <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#22788;&#29702;&#24322;&#24120;&#36923;&#36753;</span>
   <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
@@ -1561,8 +1550,8 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 </div>
 </div>
 
-<div id="outline-container-org3ac94fb" class="outline-2">
-<h2 id="org3ac94fb"><span class="section-number-2">20</span> 缓存 Cache</h2>
+<div id="outline-container-orgd2b40f0" class="outline-2">
+<h2 id="orgd2b40f0"><span class="section-number-2">20</span> 缓存 Cache</h2>
 <div class="outline-text-2" id="text-20">
 <p>
 缓存 <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#cache-annotations">Cache</a> 使用如下的注解俩定义
@@ -1575,8 +1564,8 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 <li><code>@CacheConfig</code>: 标注在类上，定义类级别共享的缓存</li>
 </ul>
 </div>
-<div id="outline-container-orga523177" class="outline-3">
-<h3 id="orga523177"><span class="section-number-3">20.1</span> 开启缓存</h3>
+<div id="outline-container-orge9d796b" class="outline-3">
+<h3 id="orge9d796b"><span class="section-number-3">20.1</span> 开启缓存</h3>
 <div class="outline-text-3" id="text-20-1">
 <p>
 通过配置类的方式开启缓存
@@ -1591,8 +1580,8 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 </div>
 </div>
 
-<div id="outline-container-orgd93a273" class="outline-3">
-<h3 id="orgd93a273"><span class="section-number-3">20.2</span> <code>@Cacheable</code></h3>
+<div id="outline-container-org85ca3a7" class="outline-3">
+<h3 id="org85ca3a7"><span class="section-number-3">20.2</span> <code>@Cacheable</code></h3>
 <div class="outline-text-3" id="text-20-2">
 <p>
 <code>@Cacheable</code> 是用来声明方法是可缓存的。将结果存储到缓存中以便后续使用相同参
@@ -1604,18 +1593,18 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 </p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@Cacheable</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"books"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@Cacheable</span><span style="color: #8d5649;">(</span><span style="color: #d8241f;">{</span><span style="color: #2aa198;">"books"</span>, <span style="color: #2aa198;">"isbns"</span><span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 
-<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">SpEL</span>
+<span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">SpEL</span>
 <span style="color: #268bd2;">@Cacheable</span><span style="color: #8d5649;">(</span>cacheNames=<span style="color: #2aa198;">"books"</span>, key=<span style="color: #2aa198;">"#isbn"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">checkWarehouse</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">includeUsed</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span><span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">checkWarehouse</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">includeUsed</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span><span style="color: #8d5649;">}</span>
 <span style="color: #268bd2;">@Cacheable</span><span style="color: #8d5649;">(</span>cacheNames=<span style="color: #2aa198;">"books"</span>, key=<span style="color: #2aa198;">"#isbn.rawNumber"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">checkWarehouse</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">includeUsed</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span><span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">checkWarehouse</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">includeUsed</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span><span style="color: #8d5649;">}</span>
 <span style="color: #268bd2;">@Cacheable</span><span style="color: #8d5649;">(</span>cacheNames=<span style="color: #2aa198;">"books"</span>, key=<span style="color: #2aa198;">"T(someType).hash(#isbn)"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">checkWarehouse</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">includeUsed</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span><span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">checkWarehouse</span>, <span style="color: #268bd2;">boolean</span> <span style="color: #6c71c4;">includeUsed</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span><span style="color: #8d5649;">}</span>
 </pre>
 </div>
 
@@ -1624,7 +1613,7 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 </p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@Cacheable</span><span style="color: #8d5649;">(</span>cacheNames=<span style="color: #2aa198;">"foos"</span>, sync=<span style="color: #268bd2;">true</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Foo</span> <span style="color: #b58900;">executeExpensiveOperation</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">id</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Foo</span> <span style="color: #b58900;">executeExpensiveOperation</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">id</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 </pre>
 </div>
 <p>
@@ -1632,20 +1621,20 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 </p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@Cacheable</span><span style="color: #8d5649;">(</span>cacheNames=<span style="color: #2aa198;">"book"</span>, condition=<span style="color: #2aa198;">"#name.length() &lt; 32"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@Cacheable</span><span style="color: #8d5649;">(</span>cacheNames=<span style="color: #2aa198;">"book"</span>, condition=<span style="color: #2aa198;">"#name.length() &lt; 32"</span>, unless=<span style="color: #2aa198;">"#result.hardback"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 
 <span style="color: #268bd2;">@Cacheable</span><span style="color: #8d5649;">(</span>cacheNames=<span style="color: #2aa198;">"book"</span>, condition=<span style="color: #2aa198;">"#name.length() &lt; 32"</span>, unless=<span style="color: #2aa198;">"#result?.hardback"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Optional</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Book</span><span style="color: #8d5649;">&gt;</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Optional</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">Book</span><span style="color: #8d5649;">&gt;</span> <span style="color: #b58900;">findBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #8d5649;">}</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgaf3d32a" class="outline-3">
-<h3 id="orgaf3d32a"><span class="section-number-3">20.3</span> 其它注解</h3>
+<div id="outline-container-org903683c" class="outline-3">
+<h3 id="org903683c"><span class="section-number-3">20.3</span> 其它注解</h3>
 <div class="outline-text-3" id="text-20-3">
 <p>
 <code>@CachePut</code> 也可以声明一个方法支持缓存功能。与 <code>@Cacheable</code> 不同的是使用
@@ -1654,7 +1643,7 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 </p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@CachePut</span><span style="color: #8d5649;">(</span>cacheNames=<span style="color: #2aa198;">"book"</span>, key=<span style="color: #2aa198;">"#isbn"</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">updateBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span>, <span style="color: #268bd2;">BookDescriptor</span> <span style="color: #6c71c4;">descriptor</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span><span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">updateBook</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span>, <span style="color: #268bd2;">BookDescriptor</span> <span style="color: #6c71c4;">descriptor</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span><span style="color: #8d5649;">}</span>
 </pre>
 </div>
 
@@ -1663,9 +1652,9 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 表示其中所有的方法的执行都会触发缓存的清除操作
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">allEntries &#34920;&#31034;&#21024;&#38500;&#25152;&#26377;&#39033;&#30446;</span>
+<pre class="src src-java"><span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">allEntries &#34920;&#31034;&#21024;&#38500;&#25152;&#26377;&#39033;&#30446;</span>
 <span style="color: #268bd2;">@CacheEvict</span><span style="color: #8d5649;">(</span>cacheNames=<span style="color: #2aa198;">"books"</span>, allEntries=<span style="color: #268bd2;">true</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">loadBooks</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">InputStream</span> <span style="color: #6c71c4;">batch</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span><span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">loadBooks</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">InputStream</span> <span style="color: #6c71c4;">batch</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span><span style="color: #8d5649;">}</span>
 </pre>
 </div>
 
@@ -1675,7 +1664,7 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 </p>
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #268bd2;">@Caching</span><span style="color: #8d5649;">(</span>evict = <span style="color: #d8241f;">{</span> <span style="color: #268bd2;">@CacheEvict</span><span style="color: #9564bf;">(</span><span style="color: #2aa198;">"primary"</span><span style="color: #9564bf;">)</span>, <span style="color: #268bd2;">@CacheEvict</span><span style="color: #9564bf;">(</span>cacheNames=<span style="color: #2aa198;">"secondary"</span>, key=<span style="color: #2aa198;">"#p0"</span><span style="color: #9564bf;">)</span> <span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>
-<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">importBooks</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">deposit</span>, <span style="color: #268bd2;">Date</span> <span style="color: #6c71c4;">date</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span><span style="color: #8d5649;">}</span>
+<span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">importBooks</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">deposit</span>, <span style="color: #268bd2;">Date</span> <span style="color: #6c71c4;">date</span><span style="color: #8d5649;">)</span> <span style="color: #8d5649;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span><span style="color: #8d5649;">}</span>
 </pre>
 </div>
 
@@ -1687,7 +1676,7 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 <pre class="src src-java"><span style="color: #268bd2;">@CacheConfig</span><span style="color: #8d5649;">(</span><span style="color: #2aa198;">"books"</span><span style="color: #8d5649;">)</span>
 <span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">BookRepositoryImpl</span> <span style="color: #859900;">implements</span> <span style="color: #268bd2;">BookRepository</span> <span style="color: #8d5649;">{</span>
   <span style="color: #268bd2;">@Cacheable</span>
-  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">... */</span> <span style="color: #d8241f;">}</span>
+  <span style="color: #859900;">public</span> <span style="color: #268bd2;">Book</span> <span style="color: #b58900;">findBook</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">ISBN</span> <span style="color: #6c71c4;">isbn</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span> <span style="color: #586e75; font-style: italic;">/* </span><span style="color: #586e75; font-style: italic;">...</span><span style="color: #586e75; font-style: italic;"> */</span> <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
@@ -1695,8 +1684,8 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 </div>
 </div>
 
-<div id="outline-container-orgcbfbca4" class="outline-2">
-<h2 id="orgcbfbca4"><span class="section-number-2">21</span> 参考链接</h2>
+<div id="outline-container-org3478b97" class="outline-2">
+<h2 id="org3478b97"><span class="section-number-2">21</span> 参考链接</h2>
 <div class="outline-text-2" id="text-21">
 <ol class="org-ol">
 <li><a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/">Spring Framework 文档</a></li>
@@ -1709,7 +1698,7 @@ template.postForObject<span style="color: #8d5649;">(</span><span style="color: 
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-03-15 Sun 22:29. Created by Jinghui Hu at 2020-03-15 Sun 22:27.</p>
+<p class="author">Last Updated 2021-07-21 Wed 22:09. Created by Jinghui Hu at 2020-03-15 Sun 22:27.</p>
 </div>
 </body>
 </html>
