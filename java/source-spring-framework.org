@@ -2956,7 +2956,42 @@
    #+END_SRC
    1. 该类实现里 ~BeanPostProcessor~ 接口，在 Bean 的注册时创建添加增强器
    2. ~AbstractAutoProxyCreator~ 实现了一些 AOP 的常见方法
-      - ~postProcessBeforeInstantiation(...)~
+      - ~postProcessBeforeInstantiation(...)~ 实例化前调用的代理类创建方法
+      - ~postProcessAfterInitialization(...)~ 初始化后调用的代理类创建方法
+        + 由子类声明的代理类，在改方法中调用并创建代理类
+
+   #+BEGIN_SRC java
+     @Override
+     public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
+         Object cacheKey = getCacheKey(beanClass, beanName);
+
+         if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
+             if (this.advisedBeans.containsKey(cacheKey)) {
+                 return null;
+             }
+             if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
+                 this.advisedBeans.put(cacheKey, Boolean.FALSE);
+                 return null;
+             }
+         }
+
+         // Create proxy here if we have a custom TargetSource.
+         // Suppresses unnecessary default instantiation of the target bean:
+         // The TargetSource will handle target instances in a custom fashion.
+         TargetSource targetSource = getCustomTargetSource(beanClass, beanName);
+         if (targetSource != null) {
+             if (StringUtils.hasLength(beanName)) {
+                 this.targetSourcedBeans.add(beanName);
+             }
+             Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(beanClass, beanName, targetSource);
+             Object proxy = createProxy(beanClass, beanName, specificInterceptors, targetSource);
+             this.proxyTypes.put(cacheKey, proxy.getClass());
+             return proxy;
+         }
+
+         return null;
+     }
+   #+END_SRC
 
    Advisor 的创建的方法调用路径如下：
    #+BEGIN_SRC text
@@ -2976,6 +3011,24 @@
      refresh:550, AbstractApplicationContext (org.springframework.context.support)
      <init>:101, AnnotationConfigApplicationContext (org.springframework.context.annotation)
      main:9, MyApp07 (io.github.jeanhwea.app07_aop)
+   #+END_SRC
+
+   #+BEGIN_SRC java
+     /**
+      ,* Create a proxy with the configured interceptors if the bean is
+      ,* identified as one to proxy by the subclass.
+      ,* @see #getAdvicesAndAdvisorsForBean
+      ,*/
+     @Override
+     public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
+         if (bean != null) {
+             Object cacheKey = getCacheKey(bean.getClass(), beanName);
+             if (this.earlyProxyReferences.remove(cacheKey) != bean) {
+                 return wrapIfNecessary(bean, beanName, cacheKey);
+             }
+         }
+         return bean;
+     }
    #+END_SRC
 
 ** Creator 的注册
