@@ -2754,9 +2754,46 @@
     #+END_SRC
 
 * AOP 面向切面编程
-  使用动态代理实现
-  - JDK 代理
-  - cglib 代理
+** AOP 实现原理
+   使用动态代理实现主要使用下面两种方法
+   - JDK 代理
+   - cglib 代理
+
+   切入点的定义
+   #+BEGIN_SRC java
+     // 切入点
+     public interface Pointcut {
+       ClassFilter getClassFilter();
+       MethodMatcher getMethodMatcher();
+     }
+
+     // 类过滤器
+     public interface ClassFilter {
+       boolean matches(Class clazz);
+     }
+
+     // 方法过滤器
+     public interface MethodMatcher {
+       boolean matches(Method m, Class targetClass);
+       boolean isRuntime();
+       boolean matches(Method m, Class targetClass, Object[] args);
+     }
+   #+END_SRC
+
+   增强的接口定义
+   #+BEGIN_SRC java
+     // 增加器
+     public interface Advisor {
+       Advice EMPTY_ADVICE = new Advice() {};
+       Advice getAdvice();
+       boolean isPerInstance();
+     }
+
+     // 增强
+     public interface Advice {}
+     public interface BeforeAdvice extends Advice {}
+     public interface AfterAdvice extends Advice {}
+   #+END_SRC
 
 * SpringBoot 自动装配
 * 参考链接
