@@ -2930,6 +2930,55 @@
    #+END_SRC
 
 ** AOP 实现原理: 注册 ~AnnotationAwareAspectJAutoProxyCreator~
+   ~AnnotationAwareAspectJAutoProxyCreator~ 是自动创建 AspectJ 代理类的创建器，
+   该类的概览如下
+   #+BEGIN_SRC text
+     org.springframework.aop.aspectj.annotation
+     Class AnnotationAwareAspectJAutoProxyCreator
+
+         java.lang.Object
+             org.springframework.aop.framework.ProxyConfig
+                 org.springframework.aop.framework.ProxyProcessorSupport
+                     org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator
+                         org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator
+                             org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator
+                                 org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator
+
+          All Implemented Interfaces:
+             Serializable, AopInfrastructureBean,
+             org.springframework.beans.factory.Aware,
+             org.springframework.beans.factory.BeanClassLoaderAware,
+             org.springframework.beans.factory.BeanFactoryAware,
+             org.springframework.beans.factory.config.BeanPostProcessor,
+             org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor,
+             org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor,
+             org.springframework.core.Ordered
+   #+END_SRC
+   1. 该类实现里 ~BeanPostProcessor~ 接口，在 Bean 的注册时创建添加增强器
+   2. ~AbstractAutoProxyCreator~ 实现了一些 AOP 的常见方法
+      - ~postProcessBeforeInstantiation(...)~
+
+   Advisor 的创建的方法调用路径如下：
+   #+BEGIN_SRC text
+     findCandidateAdvisors:97, AnnotationAwareAspectJAutoProxyCreator (org.springframework.aop.aspectj.annotation)
+     shouldSkip:101, AspectJAwareAdvisorAutoProxyCreator (org.springframework.aop.aspectj.autoproxy)
+     postProcessBeforeInstantiation:251, AbstractAutoProxyCreator (org.springframework.aop.framework.autoproxy)
+     applyBeanPostProcessorsBeforeInstantiation:1141, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     resolveBeforeInstantiation:1114, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     createBean:506, AbstractAutowireCapableBeanFactory (org.springframework.beans.factory.support)
+     lambda$doGetBean$0:323, AbstractBeanFactory (org.springframework.beans.factory.support)
+     getObject:-1, 343856911 (org.springframework.beans.factory.support.AbstractBeanFactory$$Lambda$37)
+     getSingleton:222, DefaultSingletonBeanRegistry (org.springframework.beans.factory.support)
+     doGetBean:321, AbstractBeanFactory (org.springframework.beans.factory.support)
+     getBean:202, AbstractBeanFactory (org.springframework.beans.factory.support)
+     preInstantiateSingletons:882, DefaultListableBeanFactory (org.springframework.beans.factory.support)
+     finishBeanFactoryInitialization:878, AbstractApplicationContext (org.springframework.context.support)
+     refresh:550, AbstractApplicationContext (org.springframework.context.support)
+     <init>:101, AnnotationConfigApplicationContext (org.springframework.context.annotation)
+     main:9, MyApp07 (io.github.jeanhwea.app07_aop)
+   #+END_SRC
+
+** Creator 的注册
    所有的解析器需要实现 ~BeanDefinitionParser~ 接口，入口函数为 ~parse(...)~ 方
    法，而对 AspectJ 的解析器实现的源码如下
    #+BEGIN_SRC java
