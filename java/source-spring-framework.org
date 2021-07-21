@@ -2795,6 +2795,83 @@
      public interface AfterAdvice extends Advice {}
    #+END_SRC
 
+** AOP 的实验案例
+   添加日志的 Bean 对象
+   #+BEGIN_SRC java
+     package io.github.jeanhwea.app07_aop.beans;
+
+     import org.springframework.beans.factory.annotation.Value;
+     import org.springframework.stereotype.Component;
+
+     @Component
+     public class LogEntry {
+
+       @Value("Hello in LogEntry")
+       private String message;
+
+       public String getMessage() {
+         return message;
+       }
+
+       public void setMessage(String message) {
+         this.message = message;
+       }
+
+       public void say() {
+         System.out.println("say: " + message);
+       }
+     }
+   #+END_SRC
+
+   添加 Aspect 对象，对象中包含如下组件
+   1. ~@Aspect~ 注解当前类为 Aspect
+   2. ~@EnableAspectJAutoProxy~ 需要开启自动 Aspect 代理
+   3. ~@Pointcut("execution(* *.say(..))")~ 添加切入点
+   4. 添加增强方法
+      - ~@Before("say()")~ 前置执行函数
+      - ~@After("say()")~ 后置执行函数
+      - ~@Around("say()")~ 环绕执行函数
+   #+BEGIN_SRC java
+     package io.github.jeanhwea.app07_aop.beans;
+
+     import org.aspectj.lang.ProceedingJoinPoint;
+     import org.aspectj.lang.annotation.*;
+     import org.springframework.context.annotation.EnableAspectJAutoProxy;
+     import org.springframework.stereotype.Component;
+
+     @Aspect
+     @Component
+     @EnableAspectJAutoProxy
+     public class LogEntryAspect {
+
+       @Pointcut("execution(* *.say(..))")
+       public void say() {}
+
+       @Before("say()")
+       public void beforeSay() {
+         System.out.println("beforeSay");
+       }
+
+       @After("say()")
+       public void afterSay() {
+         System.out.println("afterSay");
+       }
+
+       @Around("say()")
+       public Object aroundSay(ProceedingJoinPoint point) {
+         System.out.println("aroundSay/preActions");
+         Object obj = null;
+         try {
+           obj = point.proceed();
+         } catch (Throwable e) {
+           e.printStackTrace();
+         }
+         System.out.println("aroundSay/postActions");
+         return obj;
+       }
+     }
+   #+END_SRC
+
 * SpringBoot 自动装配
 * 参考链接
   1. [[https://github.com/spring-projects/spring-framework][Spring Framework on Github]]
