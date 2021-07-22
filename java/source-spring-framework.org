@@ -3304,9 +3304,10 @@
 
     创建 AOP 代理嵌套了好几层，最终调用 ~DefaultAopProxyFactory~ 的
     ~createAopProxy(...)~ 方法的实现，这里可以
-    1. 如果目标对象是接口类或者本身就是一个 Proxy 生成的代理类，那么使用 JDK 来
-       生成代理对象
-    2. 否则使用 cglib 来生成代理对象
+    1. 如果目标对象实现了接口，默认采用 JDK 动态代理实现 AOP
+    2. 如果目标对象实现了接口，可以强制使用 cglib 实现 AOP
+    3. 如果目标对象没有实现了接口，必须采用 cglib 实现 AOP，Spring 会自动在 JDK
+       动态代理和 cglib 中切换
     #+BEGIN_SRC java
       @SuppressWarnings("serial")
       public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
