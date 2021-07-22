@@ -45,16 +45,38 @@
         BeanDefinition
    5. BeanFactoryPostProcessor =Bean工厂后置处理器=
       - 函数式接口 ~@FunctionalInterface~
-      - ~postProcessBeanFactory(...)~  Bean 工厂后置器
-      - 实现
+      - 提供注册 Registration
+      - 处理加载顺序 Ordering
+      - ~postProcessBeanFactory(...)~ beanFactory 初始化过后调用
+      - 常见子接口
+        + ~BeanDefinitionRegistryPostProcessor~
+          - 提交 SPI 机制，提供 BeanDefinition 注册机制
+          - ~postProcessBeanDefinitionRegistry(...)~ 注册器后置处理器
    6. BeanPostProcessor =Bean后置处理器=
       - 提供自定义 Bean 实例化的处理接口扩展
       - ~postProcessBeforeInitialization(Object bean, String beanName)~
         + Bean 实例化前置处理方法
       - ~postProcessAfterInitialization(Object bean, String beanName)~
         + Bean 实例化后置处理方法
+      - 常见子接口
+        + ~InstantiationAwareBeanPostProcessor~
+          - ~postProcessBeforeInstantiation(...)~
+          - ~postProcessAfterInitialization(...)~
+          - ~postProcessAfterInstantiation(...)~
+          - ~postProcessBeforeInitialization(...)~
+        + ~SmartInstantiationAwareBeanPostProcessor~
+          - 继承自 ~InstantiationAwareBeanPostProcessor~
+          - ~determineCandidateConstructors(...)~
+          - ~predictBeanType(...)~
+          - ~getEarlyBeanReference(...)~
+        + ~DestructionAwareBeanPostProcessor~
+          - ~postProcessBeforeDestruction(...)~
+          - ~requiresDestruction(...)~
+        + ~MergedBeanDefinitionPostProcessor~
+          - ~postProcessMergedBeanDefinition(...)~
+          - ~resetBeanDefinition(...)~
 
-** IoC 核心方法
+** ~IoC~ 核心方法
    1. ~getBean()~ 获取 Bean
    2. ~doGetBean()~ 真正获取 Bean
    3. ~transformedBeanName()~ 转换 Bean 名称
@@ -3095,24 +3117,24 @@
        - 实现了 ~BeanFactoryAware~ 和 ~BeanPostProcessor~ 接口
        - ~createProxy(...)~ 创建代理类
        - ~buildAdvisors(...)~ 通过传入的 Bean 来创建 Advisor
-       - ~postProcessBeforeInstantiation(...)~ 实例化前调用的代理类创建方法
-       - ~postProcessAfterInitialization(...)~ 初始化后调用的代理类创建方法
-         + 由子类声明的代理类，在改方法中调用并创建代理类
-       - ~postProcessAfterInstantiation(...)~ 实例化后调用的代理类创建方法
-       - ~postProcessBeforeInitialization(...)~ 初始化前调用的代理类创建方法
        - ~wrapIfNecessary(...)~ 包裹 Bean 方法，添加代理包裹信息
        - ~isInfrastructureClass(...)~
          + 判断是否是 ~Advice~, ~PointCut~, ~Advisor~ 或 ~AopInfrastructureBean~
          + InfrastructureClass 需要添加 AOP 代理
-    2. ~AbstractAdvisorAutoProxyCreator~ 包括 Advisor 的创建方法
+    2. ~InstantiationAwareBeanPostProcessor~ 接口包含类实例化和初始化前后的构造函数
+       - ~postProcessBeforeInstantiation(...)~ 实例化前调用的代理类创建方法
+       - ~postProcessAfterInitialization(...)~ 初始化后调用的代理类创建方法
+       - ~postProcessAfterInstantiation(...)~ 实例化后调用的代理类创建方法
+       - ~postProcessBeforeInitialization(...)~ 初始化前调用的代理类创建方法
+    4. ~AbstractAdvisorAutoProxyCreator~ 包括 Advisor 的创建方法
        - ~getAdvicesAndAdvisorsForBean(...)~ 查找 Bean 的 Advisor
        - ~findEligibleAdvisors(...)~ 获取 Bean 所需的合适的 Advisor
        - ~findAdvisorsThatCanApply(...)~ 获取可以应用的 Advisor
-    3. ~AspectJAwareAdvisorAutoProxyCreator~
+    5. ~AspectJAwareAdvisorAutoProxyCreator~
        - 类似 ~AbstractAdvisorAutoProxyCreator~, 针对 AspectJ 进行扩展
        - ~AbstractAdvisorAutoProxyCreator~ 是抽象类,
          ~AspectJAwareAdvisorAutoProxyCreator~ 是类
-    4. ~AnnotationAwareAspectJAutoProxyCreator~
+    6. ~AnnotationAwareAspectJAutoProxyCreator~
        - 添加对注解 Aspect 的扩展
 
 *** ~AbstractAutoProxyCreator~ 提前埋点
