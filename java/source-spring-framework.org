@@ -2778,6 +2778,26 @@
 
 * AOP 面向切面编程
 ** AOP 预备知识
+*** AOP 核心概念
+    1. Aspect: 切面，由一系列切点、增强和引入组成的模块对象，可定义优先级，从而
+       影响增强和引入的执行顺序。事务管理在 Java 企业应用中就是一个很好的切面样例
+    2. Join point: 接入点，程序执行期的一个点，例如方法执行、类初始化、异常处理。
+       在 Spring AOP 中，接入点始终表示方法执行
+    3. Advice: 增强，切面在特定接入点的执行动作，包括 Around, Before 和 After 等
+       多种类型。包含 Spring 在内的许多 AOP 框架，通常会使用拦截器来实现增强，围
+       绕着接入点维护着一个拦截器链
+    4. Pointcut: 切点，用来匹配特定接入点的谓词表达式，增强将会与切点表达式产生
+       关联，并运行在任何切点匹配到的接入点上。通过切点表达式匹配接入点是 AOP 的
+       核心，Spring 默认使用 AspectJ 的切点表达式
+    5. Introduction: 引入，为某个 Type 声明额外的方法和字段。Spring AOP 允许你引
+       入任何接口以及它的默认实现到被增强对象上
+    6. Target object: 目标对象，被一个或多个切面增强的对象。也叫作被增强对象。既
+       然 Spring AOP 使用运行时代理，那么目标对象就总是代理对象
+    7. AOP proxy: AOP 代理，为了实现切面功能一个对象会被 AOP 框架创建出来。
+    8. Weaving：织入，将一个或多个切面与类或对象链接在一起创建一个被增强对象。织
+       入能发生在编译时 ，加载时或运行时。Spring AOP 默认就是运行时织入，可以通
+       过枚举 AdviceMode 来设置
+
 *** JDK 动态代理和 cglib 动态代理
     使用动态代理实现主要使用下面两种方法
     1. JDK 动态代理
@@ -2805,8 +2825,9 @@
          + ~this.b();~ 修改为 ~((AService) AopContext.currentProxy()).b();~ 来显
            示调用
          + 开启新的事务最好写在另外一个 Service 中, 将传播机制设为 ~REQUIRE_NEW~
+
 *** AOP 组件
-    切入点 PointCut 的定义
+    PointCut 接口的定义如下
     #+BEGIN_SRC java
       // 切入点
       public interface Pointcut {
@@ -2827,7 +2848,7 @@
       }
     #+END_SRC
 
-    增强 Advice 的接口定义
+    Advisor 及 Advice 的接口定义如下
     #+BEGIN_SRC java
       // 增加器
       public interface Advisor {
@@ -3276,7 +3297,7 @@
     #+END_SRC
 
 ** 创建 AOP 代理
-*** 创建 AOP 代理类真实过程
+*** 创建 AOP 代理
     创建代理类的调用栈如下，最终通过 ~createAopProxy~ 方法创建 JDK 动态代理或
     cglib 动态代理
     #+BEGIN_SRC text
@@ -3584,16 +3605,6 @@
           return advisors;
       }
     #+END_SRC
-
-*** 创建代理
-
-** 创建 AOP 静态代理
-
-*** Instrumentation 使用
-
-*** 自定义标签
-
-*** 织入 Weaving
 
 * SpringBoot 自动装配
 * 参考链接
