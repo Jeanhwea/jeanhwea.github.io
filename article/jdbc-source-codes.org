@@ -8,7 +8,7 @@
 #+TAGS: jdbc source
 
 
-* 实现原理
+* JDBC 使用方法
 ** JDBC 连接数据库流程
    Java 中定义了 JDBC 的连接操作数据库的基本流程
    1. JDK 的实现包在 ~java.sql.*~ 下
@@ -104,63 +104,63 @@
       #+BEGIN_SRC java
         //  Worker method called by the public getConnection() methods.
         private static Connection getConnection(
-            String url, java.util.Properties info, Class<?> caller) throws SQLException {
-            /*
-             ,* When callerCl is null, we should check the application's
-             ,* (which is invoking this class indirectly)
-             ,* classloader, so that the JDBC driver class outside rt.jar
-             ,* can be loaded from here.
-             ,*/
-            ClassLoader callerCL = caller != null ? caller.getClassLoader() : null;
-            synchronized(DriverManager.class) {
-                // synchronize loading of the correct classloader.
-                if (callerCL == null) {
-                    callerCL = Thread.currentThread().getContextClassLoader();
+                                                String url, java.util.Properties info, Class<?> caller) throws SQLException {
+          /*
+           ,* When callerCl is null, we should check the application's
+           ,* (which is invoking this class indirectly)
+           ,* classloader, so that the JDBC driver class outside rt.jar
+           ,* can be loaded from here.
+           ,*/
+          ClassLoader callerCL = caller != null ? caller.getClassLoader() : null;
+          synchronized(DriverManager.class) {
+            // synchronize loading of the correct classloader.
+            if (callerCL == null) {
+              callerCL = Thread.currentThread().getContextClassLoader();
+            }
+          }
+
+          if(url == null) {
+            throw new SQLException("The url cannot be null", "08001");
+          }
+
+          println("DriverManager.getConnection(\"" + url + "\")");
+
+          // Walk through the loaded registeredDrivers attempting to make a connection.
+          // Remember the first exception that gets raised so we can reraise it.
+          SQLException reason = null;
+
+          for(DriverInfo aDriver : registeredDrivers) {
+            // If the caller does not have permission to load the driver then
+            // skip it.
+            if(isDriverAllowed(aDriver.driver, callerCL)) {
+              try {
+                println("    trying " + aDriver.driver.getClass().getName());
+                Connection con = aDriver.driver.connect(url, info);
+                if (con != null) {
+                  // Success!
+                  println("getConnection returning " + aDriver.driver.getClass().getName());
+                  return (con);
                 }
-            }
-
-            if(url == null) {
-                throw new SQLException("The url cannot be null", "08001");
-            }
-
-            println("DriverManager.getConnection(\"" + url + "\")");
-
-            // Walk through the loaded registeredDrivers attempting to make a connection.
-            // Remember the first exception that gets raised so we can reraise it.
-            SQLException reason = null;
-
-            for(DriverInfo aDriver : registeredDrivers) {
-                // If the caller does not have permission to load the driver then
-                // skip it.
-                if(isDriverAllowed(aDriver.driver, callerCL)) {
-                    try {
-                        println("    trying " + aDriver.driver.getClass().getName());
-                        Connection con = aDriver.driver.connect(url, info);
-                        if (con != null) {
-                            // Success!
-                            println("getConnection returning " + aDriver.driver.getClass().getName());
-                            return (con);
-                        }
-                    } catch (SQLException ex) {
-                        if (reason == null) {
-                            reason = ex;
-                        }
-                    }
-
-                } else {
-                    println("    skipping: " + aDriver.getClass().getName());
+              } catch (SQLException ex) {
+                if (reason == null) {
+                  reason = ex;
                 }
+              }
 
+            } else {
+              println("    skipping: " + aDriver.getClass().getName());
             }
 
-            // if we got here nobody could connect.
-            if (reason != null)    {
-                println("getConnection failed: " + reason);
-                throw reason;
-            }
+          }
 
-            println("getConnection: no suitable driver found for "+ url);
-            throw new SQLException("No suitable driver found for "+ url, "08001");
+          // if we got here nobody could connect.
+          if (reason != null)    {
+            println("getConnection failed: " + reason);
+            throw reason;
+          }
+
+          println("getConnection: no suitable driver found for "+ url);
+          throw new SQLException("No suitable driver found for "+ url, "08001");
         }
       #+END_SRC
 
@@ -294,5 +294,197 @@
          List<Employee> employeeList = employeeService.getAll();
          System.out.println(employeeList);
        }
+     }
+   #+END_SRC
+
+* 代码实现
+** ~JdbcTemplate~ 类
+   ~JdbcTemplate~ 是操作数据的主要类，它的继承关系如下
+   #+BEGIN_SRC java
+     org.springframework.jdbc.core
+     Class JdbcTemplate
+
+         java.lang.Object
+             org.springframework.jdbc.support.JdbcAccessor
+                 org.springframework.jdbc.core.JdbcTemplate
+
+         All Implemented Interfaces:
+             org.springframework.beans.factory.InitializingBean, JdbcOperations
+   #+END_SRC
+   1. ~JdbcAccessor~ 类实现了 ~InitializingBean~ 接口
+      - 该类中包含数据库的连接 DataSource
+      - 该类实现了对数据库连接的操作
+        + ~getDataSource()~ 获取 DataSource
+        + ~setDataSource()~ 设置 DataSource
+   2. ~JdbcTemplate~ 类实现了操作数据方法，提供 SQL 交互方法
+      - ~execute(...)~ 系列方法
+      - ~update(...)~ 系列方法
+      - ~query(...)~, ~queryForMap(...)~, ~queryForObject(...)~ 方法
+
+** 获取数据库连接
+   在数据库中获取连接的调用栈如下
+   #+BEGIN_SRC text
+     doGetConnection:104, DataSourceUtils (org.springframework.jdbc.datasource)
+     getConnection:79, DataSourceUtils (org.springframework.jdbc.datasource)
+     execute:371, JdbcTemplate (org.springframework.jdbc.core)
+     query:452, JdbcTemplate (org.springframework.jdbc.core)
+     query:462, JdbcTemplate (org.springframework.jdbc.core)
+     getAll:25, EmployeeServiceImpl (io.github.jeanhwea.app09_jdbc.beans)
+     main:15, MyApp09 (io.github.jeanhwea.app09_jdbc)
+   #+END_SRC
+
+   其中的 ~doGetConnection(...)~ 方法完成对连接获取操作
+   #+BEGIN_SRC java
+     /**
+      ,* Actually obtain a JDBC Connection from the given DataSource.
+      ,* Same as {@link #getConnection}, but throwing the original SQLException.
+      ,* <p>Is aware of a corresponding Connection bound to the current thread, for example
+      ,* when using {@link DataSourceTransactionManager}. Will bind a Connection to the thread
+      ,* if transaction synchronization is active (e.g. if in a JTA transaction).
+      ,* <p>Directly accessed by {@link TransactionAwareDataSourceProxy}.
+      ,* @param dataSource the DataSource to obtain Connections from
+      ,* @return a JDBC Connection from the given DataSource
+      ,* @throws SQLException if thrown by JDBC methods
+      ,* @see #doReleaseConnection
+      ,*/
+     public static Connection doGetConnection(DataSource dataSource) throws SQLException {
+       Assert.notNull(dataSource, "No DataSource specified");
+
+       ConnectionHolder conHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource);
+       if (conHolder != null && (conHolder.hasConnection() || conHolder.isSynchronizedWithTransaction())) {
+         conHolder.requested();
+         if (!conHolder.hasConnection()) {
+           logger.debug("Fetching resumed JDBC Connection from DataSource");
+           conHolder.setConnection(fetchConnection(dataSource));
+         }
+         return conHolder.getConnection();
+       }
+       // Else we either got no holder or an empty thread-bound holder here.
+
+       logger.debug("Fetching JDBC Connection from DataSource");
+       Connection con = fetchConnection(dataSource);
+
+       // 当前线程是否支持同步
+       if (TransactionSynchronizationManager.isSynchronizationActive()) {
+         try {
+           // Use same Connection for further JDBC actions within the transaction.
+           // Thread-bound object will get removed by synchronization at transaction completion.
+           // 在同一事务中，JDBC 的连接需要保持一致
+           ConnectionHolder holderToUse = conHolder;
+           if (holderToUse == null) {
+             holderToUse = new ConnectionHolder(con);
+           }
+           else {
+             holderToUse.setConnection(con);
+           }
+           // 这里记录数据连接的引用数量
+           holderToUse.requested();
+           TransactionSynchronizationManager.registerSynchronization(
+                                                                     new ConnectionSynchronization(holderToUse, dataSource));
+           holderToUse.setSynchronizedWithTransaction(true);
+           if (holderToUse != conHolder) {
+             TransactionSynchronizationManager.bindResource(dataSource, holderToUse);
+           }
+         }
+         catch (RuntimeException ex) {
+           // Unexpected exception from external delegation call -> close Connection and rethrow.
+           releaseConnection(con, dataSource);
+           throw ex;
+         }
+       }
+
+       return con;
+     }
+   #+END_SRC
+
+** 执行 SQL: ~execute(...)~ 方法
+   在数据库中执行 SQL 的逻辑如下
+   #+BEGIN_SRC java
+     //-------------------------------------------------------------------------
+     // Methods dealing with static SQL (java.sql.Statement)
+     //-------------------------------------------------------------------------
+
+     @Override
+     @Nullable
+     public <T> T execute(StatementCallback<T> action) throws DataAccessException {
+       Assert.notNull(action, "Callback object must not be null");
+
+       Connection con = DataSourceUtils.getConnection(obtainDataSource());
+       Statement stmt = null;
+       try {
+         // 执行 SQL, 并返回结果
+         stmt = con.createStatement();
+         applyStatementSettings(stmt);
+         T result = action.doInStatement(stmt);
+         handleWarnings(stmt);
+         return result;
+       }
+       catch (SQLException ex) {
+         // Release Connection early, to avoid potential connection pool deadlock
+         // in the case when the exception translator hasn't been initialized yet.
+         String sql = getSql(action);
+         JdbcUtils.closeStatement(stmt);
+         stmt = null;
+         DataSourceUtils.releaseConnection(con, getDataSource());
+         con = null;
+         throw translateException("StatementCallback", sql, ex);
+       }
+       finally {
+         JdbcUtils.closeStatement(stmt);
+         DataSourceUtils.releaseConnection(con, getDataSource());
+       }
+     }
+   #+END_SRC
+   1. ~applyStatementSettings(...)~ 用户设置输入参数
+      - fectchSize 减少网络交互次数
+      - maxRows 获取结果集的最大行数
+   2. ~action.doInStatement(...)~ 是调用 ~StatementCallback~ 类型的回调函数
+      #+BEGIN_SRC java
+        @FunctionalInterface
+        public interface StatementCallback<T> {
+          @Nullable
+          T doInStatement(Statement stmt) throws SQLException, DataAccessException;
+        }
+      #+END_SRC
+   3. ~handleWarnings(...)~ 进行告警处理
+      - 这里的告警默认输出异常信息
+      - 可以通过配置抛出 ~SQLWarningException~ 异常
+   4. ~DataSourceUtils.releaseConnection(...)~ 释放连接
+
+** 数据库更新: ~update(...)~ 方法
+   数据库更新和执行 SQL 类似，这里需要熟悉 ~PreparedStatement~ 接口，它是一预编
+   译的 SQL 语句
+   #+BEGIN_SRC java
+     PreparedStatement pstmt = con.prepareStatement("UPDATE EMPLOYEES SET SALARY = ? WHERE ID = ?");
+     pstmt.setBigDecimal(1, 153833.00);
+     pstmt.setInt(2, 110592);
+   #+END_SRC
+
+   实际的 ~update(...)~ 方法实现如下
+   #+BEGIN_SRC java
+     protected int update(final PreparedStatementCreator psc, @Nullable final PreparedStatementSetter pss)
+       throws DataAccessException {
+
+       logger.debug("Executing prepared SQL update");
+
+       return updateCount(execute(psc, ps -> {
+             try {
+               if (pss != null) {
+                 // 设置 PreparedStatement 的实际值
+                 pss.setValues(ps);
+               }
+               // 调用更新语句
+               int rows = ps.executeUpdate();
+               if (logger.isTraceEnabled()) {
+                 logger.trace("SQL update affected " + rows + " rows");
+               }
+               return rows;
+             }
+             finally {
+               if (pss instanceof ParameterDisposer) {
+                 ((ParameterDisposer) pss).cleanupParameters();
+               }
+             }
+           }));
      }
    #+END_SRC
