@@ -166,3 +166,131 @@
 
 * Spring 中的 ~JdbcTemplate~
   Spring 框架中对 JDBC 的操作进行了封装，提供可以方便操作数据库的 ~JdbcTemplate~ 类
+** 数据库配置类
+   #+BEGIN_SRC java
+     package io.github.jeanhwea.app09_jdbc.beans;
+
+     import javax.sql.DataSource;
+     import org.springframework.context.annotation.Bean;
+     import org.springframework.context.annotation.Configuration;
+     import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
+     @Configuration
+     public class DataSourceConfig {
+
+       @Bean
+       public DataSource getDataSource() {
+         DriverManagerDataSource dataSource = new DriverManagerDataSource();
+         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+         dataSource.setUrl("jdbc:mysql://localhost:3306/db01");
+         dataSource.setUsername("user01");
+         dataSource.setPassword("pass01");
+         return dataSource;
+       }
+     }
+   #+END_SRC
+
+** 添加实体及 Mapper
+   实体类
+   #+BEGIN_SRC java
+     package io.github.jeanhwea.app09_jdbc.beans;
+
+     public class Employee {
+       private Long id;
+       private String name;
+
+       public Employee(Long id, String name) {
+         this.id = id;
+         this.name = name;
+       }
+
+         @Override
+         public String toString() {
+             return "Employee[" + this.id +"]";
+         }
+     }
+   #+END_SRC
+
+   对象的 Mapper
+   #+BEGIN_SRC java
+     package io.github.jeanhwea.app09_jdbc.beans;
+
+     import java.sql.ResultSet;
+     import java.sql.SQLException;
+     import org.springframework.jdbc.core.RowMapper;
+
+     public class EmployeeRowMapper implements RowMapper<Employee> {
+       @Override
+       public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
+         Employee empl = new Employee(rs.getLong("G_ID"), rs.getString("EMPL_NAME"));
+         return empl;
+       }
+     }
+   #+END_SRC
+
+** 服务类 Service
+   #+BEGIN_SRC java
+     ////////////////////////////////////////////////////////////////////////////////
+     // 服务接口
+     ////////////////////////////////////////////////////////////////////////////////
+     package io.github.jeanhwea.app09_jdbc.beans;
+
+     import java.util.List;
+     import org.springframework.stereotype.Component;
+
+     @Component
+     public interface EmployeeService {
+       List<Employee> getAll();
+     }
+
+     ////////////////////////////////////////////////////////////////////////////////
+     // 实现类
+     ////////////////////////////////////////////////////////////////////////////////
+     package io.github.jeanhwea.app09_jdbc.beans;
+
+     import java.util.List;
+     import javax.sql.DataSource;
+     import org.springframework.jdbc.core.JdbcTemplate;
+
+     public class EmployeeServiceImpl implements EmployeeService {
+
+       private JdbcTemplate jdbcTemplate;
+
+       public void setDataSource(DataSource dataSource) {
+         this.jdbcTemplate = new JdbcTemplate(dataSource);
+       }
+
+       public EmployeeServiceImpl(DataSource dataSource) {
+         this.setDataSource(dataSource);
+       }
+
+       @Override
+       @SuppressWarnings("unchecked")
+       public List<Employee> getAll() {
+         List<Employee> employees =
+             jdbcTemplate.query("select * from TB_BASE_EMPL", new EmployeeRowMapper());
+         return employees;
+       }
+     }
+   #+END_SRC
+** 主函数
+   #+BEGIN_SRC java
+     package io.github.jeanhwea.app09_jdbc;
+
+     import io.github.jeanhwea.app09_jdbc.beans.Employee;
+     import io.github.jeanhwea.app09_jdbc.beans.EmployeeService;
+     import java.util.List;
+     import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+     public class MyApp09 {
+
+       public static void main(String[] args) {
+         String pkgname = MyApp09.class.getPackage().getName();
+         System.out.println(pkgname);
+         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(pkgname);
+         EmployeeService employeeService = ctx.getBean("employeeServiceImpl", EmployeeService.class);
+         List<Employee> employeeList = employeeService.getAll();
+         System.out.println(employeeList);
+       }
+     }
+   #+END_SRC
