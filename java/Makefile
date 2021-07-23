@@ -32,10 +32,10 @@ CFLAG += -V geometry:margin='.8in'
 #
 ################################################################################
 all: $(PDFS)
-	@echo "Finish:[$(PDFS)]"
+	@echo "Finish: [$(PDFS)]"
 
 docs: $(DOCS)
-	@echo "Finish:[$(DOCS)]"
+	@echo "Finish: [$(DOCS)]"
 
 %.pdf: %.org
 	pandoc $(CFLAG) $< -o $@
