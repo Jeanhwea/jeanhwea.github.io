@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-23 Fri 13:42 -->
+<!-- 2021-07-23 Fri 15:14 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JDBC 连接数据库</title>
@@ -233,24 +233,31 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgf4e085d">1. 实现原理</a>
+<li><a href="#org2d1f665">1. 实现原理</a>
 <ul>
-<li><a href="#org25af4b8">1.1. JDBC 连接数据库流程</a></li>
-<li><a href="#org7376fde">1.2. SPI 连接数据库流程</a></li>
+<li><a href="#org4276d3f">1.1. JDBC 连接数据库流程</a></li>
+<li><a href="#orgc012a1f">1.2. SPI 连接数据库流程</a></li>
 </ul>
 </li>
-<li><a href="#orgf9e2c2d">2. Spring 中的 <code>JdbcTemplate</code></a></li>
+<li><a href="#org43a9e38">2. Spring 中的 <code>JdbcTemplate</code></a>
+<ul>
+<li><a href="#org0c87ed1">2.1. 数据库配置类</a></li>
+<li><a href="#org3f1b82d">2.2. 添加实体及 Mapper</a></li>
+<li><a href="#orgf27a5b5">2.3. 服务类 Service</a></li>
+<li><a href="#org7c37df5">2.4. 主函数</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgf4e085d" class="outline-2">
-<h2 id="orgf4e085d"><span class="section-number-2">1</span> 实现原理</h2>
+<div id="outline-container-org2d1f665" class="outline-2">
+<h2 id="org2d1f665"><span class="section-number-2">1</span> 实现原理</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org25af4b8" class="outline-3">
-<h3 id="org25af4b8"><span class="section-number-3">1.1</span> JDBC 连接数据库流程</h3>
+<div id="outline-container-org4276d3f" class="outline-3">
+<h3 id="org4276d3f"><span class="section-number-3">1.1</span> JDBC 连接数据库流程</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Java 中定义了 JDBC 的连接操作数据库的基本流程
@@ -294,8 +301,8 @@ Java 中定义了 JDBC 的连接操作数据库的基本流程
 </div>
 </div>
 
-<div id="outline-container-org7376fde" class="outline-3">
-<h3 id="org7376fde"><span class="section-number-3">1.2</span> SPI 连接数据库流程</h3>
+<div id="outline-container-orgc012a1f" class="outline-3">
+<h3 id="orgc012a1f"><span class="section-number-3">1.2</span> SPI 连接数据库流程</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式和配置文件组
@@ -436,17 +443,170 @@ SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式
 </div>
 </div>
 
-<div id="outline-container-orgf9e2c2d" class="outline-2">
-<h2 id="orgf9e2c2d"><span class="section-number-2">2</span> Spring 中的 <code>JdbcTemplate</code></h2>
+<div id="outline-container-org43a9e38" class="outline-2">
+<h2 id="org43a9e38"><span class="section-number-2">2</span> Spring 中的 <code>JdbcTemplate</code></h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Spring 框架中对 JDBC 的操作进行了封装，提供可以方便操作数据库的 <code>JdbcTemplate</code> 类
 </p>
 </div>
+<div id="outline-container-org0c87ed1" class="outline-3">
+<h3 id="org0c87ed1"><span class="section-number-3">2.1</span> 数据库配置类</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #99cc99;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #6699cc;">beans</span>;
+
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">javax</span>.<span style="color: #6699cc;">sql</span>.<span style="color: #6699cc;">DataSource</span>;
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">context</span>.<span style="color: #6699cc;">annotation</span>.<span style="color: #6699cc;">Bean</span>;
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">context</span>.<span style="color: #6699cc;">annotation</span>.<span style="color: #6699cc;">Configuration</span>;
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">jdbc</span>.<span style="color: #6699cc;">datasource</span>.<span style="color: #6699cc;">DriverManagerDataSource</span>;
+
+<span style="color: #6699cc;">@Configuration</span>
+<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">class</span> <span style="color: #6699cc;">DataSourceConfig</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #6699cc;">@Bean</span>
+  <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">DataSource</span> <span style="color: #f99157;">getDataSource</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #6699cc;">DriverManagerDataSource</span> <span style="color: #ffcc66;">dataSource</span> = <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">DriverManagerDataSource</span><span style="color: #9564bf;">()</span>;
+    dataSource.setDriverClassName<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"com.mysql.jdbc.Driver"</span><span style="color: #9564bf;">)</span>;
+    dataSource.setUrl<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"jdbc:mysql://localhost:3306/db01"</span><span style="color: #9564bf;">)</span>;
+    dataSource.setUsername<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"user01"</span><span style="color: #9564bf;">)</span>;
+    dataSource.setPassword<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"pass01"</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #99cc99;">return</span> dataSource;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3f1b82d" class="outline-3">
+<h3 id="org3f1b82d"><span class="section-number-3">2.2</span> 添加实体及 Mapper</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+实体类
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #99cc99;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #6699cc;">beans</span>;
+
+<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">class</span> <span style="color: #6699cc;">Employee</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #99cc99;">private</span> <span style="color: #6699cc;">Long</span> <span style="color: #ffcc66;">id</span>;
+  <span style="color: #99cc99;">private</span> <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">name</span>;
+
+  <span style="color: #99cc99;">public</span> <span style="color: #f99157;">Employee</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">Long</span> <span style="color: #ffcc66;">id</span>, <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">name</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #99cc99;">this</span>.id = id;
+    <span style="color: #99cc99;">this</span>.name = name;
+  <span style="color: #d8241f;">}</span>
+
+    <span style="color: #6699cc;">@Override</span>
+    <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">String</span> <span style="color: #f99157;">toString</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #99cc99;">return</span> <span style="color: #66cccc;">"Employee["</span> + <span style="color: #99cc99;">this</span>.id +<span style="color: #66cccc;">"]"</span>;
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+
+<p>
+对象的 Mapper
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #99cc99;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #6699cc;">beans</span>;
+
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">sql</span>.<span style="color: #6699cc;">ResultSet</span>;
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">sql</span>.<span style="color: #6699cc;">SQLException</span>;
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">jdbc</span>.<span style="color: #6699cc;">core</span>.<span style="color: #6699cc;">RowMapper</span>;
+
+<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">class</span> <span style="color: #6699cc;">EmployeeRowMapper</span> <span style="color: #99cc99;">implements</span> <span style="color: #6699cc;">RowMapper</span><span style="color: #8d5649;">&lt;</span><span style="color: #6699cc;">Employee</span><span style="color: #8d5649;">&gt;</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #6699cc;">@Override</span>
+  <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">Employee</span> <span style="color: #f99157;">mapRow</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">ResultSet</span> <span style="color: #ffcc66;">rs</span>, <span style="color: #6699cc;">int</span> <span style="color: #ffcc66;">rowNum</span><span style="color: #d8241f;">)</span> <span style="color: #99cc99;">throws</span> <span style="color: #6699cc;">SQLException</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #6699cc;">Employee</span> <span style="color: #ffcc66;">empl</span> = <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">Employee</span><span style="color: #9564bf;">(</span>rs.getLong<span style="color: #24a222;">(</span><span style="color: #66cccc;">"G_ID"</span><span style="color: #24a222;">)</span>, rs.getString<span style="color: #24a222;">(</span><span style="color: #66cccc;">"EMPL_NAME"</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #99cc99;">return</span> empl;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf27a5b5" class="outline-3">
+<h3 id="orgf27a5b5"><span class="section-number-3">2.3</span> 服务类 Service</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #999999; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
+<span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#26381;&#21153;&#25509;&#21475;</span>
+<span style="color: #999999; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
+<span style="color: #99cc99;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #6699cc;">beans</span>;
+
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">util</span>.<span style="color: #6699cc;">List</span>;
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">stereotype</span>.<span style="color: #6699cc;">Component</span>;
+
+<span style="color: #6699cc;">@Component</span>
+<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">interface</span> <span style="color: #6699cc;">EmployeeService</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #6699cc;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #6699cc;">Employee</span><span style="color: #d8241f;">&gt;</span> <span style="color: #f99157;">getAll</span><span style="color: #d8241f;">()</span>;
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #999999; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
+<span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#23454;&#29616;&#31867;</span>
+<span style="color: #999999; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
+<span style="color: #99cc99;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #6699cc;">beans</span>;
+
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">util</span>.<span style="color: #6699cc;">List</span>;
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">javax</span>.<span style="color: #6699cc;">sql</span>.<span style="color: #6699cc;">DataSource</span>;
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">jdbc</span>.<span style="color: #6699cc;">core</span>.<span style="color: #6699cc;">JdbcTemplate</span>;
+
+<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">class</span> <span style="color: #6699cc;">EmployeeServiceImpl</span> <span style="color: #99cc99;">implements</span> <span style="color: #6699cc;">EmployeeService</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #99cc99;">private</span> <span style="color: #6699cc;">JdbcTemplate</span> <span style="color: #ffcc66;">jdbcTemplate</span>;
+
+  <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">void</span> <span style="color: #f99157;">setDataSource</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">DataSource</span> <span style="color: #ffcc66;">dataSource</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #99cc99;">this</span>.jdbcTemplate = <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">JdbcTemplate</span><span style="color: #9564bf;">(</span>dataSource<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #99cc99;">public</span> <span style="color: #f99157;">EmployeeServiceImpl</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">DataSource</span> <span style="color: #ffcc66;">dataSource</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #99cc99;">this</span>.setDataSource<span style="color: #9564bf;">(</span>dataSource<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #6699cc;">@Override</span>
+  <span style="color: #6699cc;">@SuppressWarnings</span><span style="color: #d8241f;">(</span><span style="color: #66cccc;">"unchecked"</span><span style="color: #d8241f;">)</span>
+  <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #6699cc;">Employee</span><span style="color: #d8241f;">&gt;</span> <span style="color: #f99157;">getAll</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #6699cc;">List</span><span style="color: #9564bf;">&lt;</span><span style="color: #6699cc;">Employee</span><span style="color: #9564bf;">&gt;</span> <span style="color: #ffcc66;">employees</span> =
+        jdbcTemplate.query<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"select * from TB_BASE_EMPL"</span>, <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">EmployeeRowMapper</span><span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #99cc99;">return</span> employees;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7c37df5" class="outline-3">
+<h3 id="org7c37df5"><span class="section-number-3">2.4</span> 主函数</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #99cc99;">package</span> io.github.jeanhwea.<span style="color: #6699cc;">app09_jdbc</span>;
+
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">io</span>.<span style="color: #6699cc;">github</span>.<span style="color: #6699cc;">jeanhwea</span>.<span style="color: #6699cc;">app09_jdbc</span>.<span style="color: #6699cc;">beans</span>.<span style="color: #6699cc;">Employee</span>;
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">io</span>.<span style="color: #6699cc;">github</span>.<span style="color: #6699cc;">jeanhwea</span>.<span style="color: #6699cc;">app09_jdbc</span>.<span style="color: #6699cc;">beans</span>.<span style="color: #6699cc;">EmployeeService</span>;
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">util</span>.<span style="color: #6699cc;">List</span>;
+<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">context</span>.<span style="color: #6699cc;">annotation</span>.<span style="color: #6699cc;">AnnotationConfigApplicationContext</span>;
+
+<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">class</span> <span style="color: #6699cc;">MyApp09</span> <span style="color: #8d5649;">{</span>
+
+  <span style="color: #99cc99;">public</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">void</span> <span style="color: #f99157;">main</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #ffcc66;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">pkgname</span> = MyApp09.<span style="color: #99cc99;">class</span>.getPackage<span style="color: #9564bf;">()</span>.getName<span style="color: #9564bf;">()</span>;
+    System.out.println<span style="color: #9564bf;">(</span>pkgname<span style="color: #9564bf;">)</span>;
+    <span style="color: #6699cc;">AnnotationConfigApplicationContext</span> <span style="color: #ffcc66;">ctx</span> = <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">AnnotationConfigApplicationContext</span><span style="color: #9564bf;">(</span>pkgname<span style="color: #9564bf;">)</span>;
+    <span style="color: #6699cc;">EmployeeService</span> <span style="color: #ffcc66;">employeeService</span> = ctx.getBean<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"employeeServiceImpl"</span>, EmployeeService.<span style="color: #99cc99;">class</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #6699cc;">List</span><span style="color: #9564bf;">&lt;</span><span style="color: #6699cc;">Employee</span><span style="color: #9564bf;">&gt;</span> <span style="color: #ffcc66;">employeeList</span> = employeeService.getAll<span style="color: #9564bf;">()</span>;
+    System.out.println<span style="color: #9564bf;">(</span>employeeList<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-23 Fri 13:42. Created by Jinghui Hu at 2021-07-23 Fri 11:43.</p>
+<p class="author">Last Updated 2021-07-23 Fri 15:14. Created by Jinghui Hu at 2021-07-23 Fri 11:43.</p>
 </div>
 </body>
 </html>
