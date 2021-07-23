@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-23 Fri 15:14 -->
+<!-- 2021-07-24 Sat 00:57 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JDBC 连接数据库</title>
@@ -233,18 +233,26 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org2d1f665">1. 实现原理</a>
+<li><a href="#orge40788f">1. JDBC 使用方法</a>
 <ul>
-<li><a href="#org4276d3f">1.1. JDBC 连接数据库流程</a></li>
-<li><a href="#orgc012a1f">1.2. SPI 连接数据库流程</a></li>
+<li><a href="#org7d1dc45">1.1. JDBC 连接数据库流程</a></li>
+<li><a href="#org8b22049">1.2. SPI 连接数据库流程</a></li>
 </ul>
 </li>
-<li><a href="#org43a9e38">2. Spring 中的 <code>JdbcTemplate</code></a>
+<li><a href="#orgd93aa4e">2. Spring 中的 <code>JdbcTemplate</code></a>
 <ul>
-<li><a href="#org0c87ed1">2.1. 数据库配置类</a></li>
-<li><a href="#org3f1b82d">2.2. 添加实体及 Mapper</a></li>
-<li><a href="#orgf27a5b5">2.3. 服务类 Service</a></li>
-<li><a href="#org7c37df5">2.4. 主函数</a></li>
+<li><a href="#orgc59eab2">2.1. 数据库配置类</a></li>
+<li><a href="#org0da55a1">2.2. 添加实体及 Mapper</a></li>
+<li><a href="#orgdce52d8">2.3. 服务类 Service</a></li>
+<li><a href="#org0bab6a5">2.4. 主函数</a></li>
+</ul>
+</li>
+<li><a href="#org77b33d6">3. 代码实现</a>
+<ul>
+<li><a href="#org2c91a3d">3.1. <code>JdbcTemplate</code> 类</a></li>
+<li><a href="#org5678806">3.2. 获取数据库连接</a></li>
+<li><a href="#orgfeb88d7">3.3. 执行 SQL: <code>execute(...)</code> 方法</a></li>
+<li><a href="#orga64b5bc">3.4. 数据库更新: <code>update(...)</code> 方法</a></li>
 </ul>
 </li>
 </ul>
@@ -252,12 +260,12 @@
 </div>
 
 
-<div id="outline-container-org2d1f665" class="outline-2">
-<h2 id="org2d1f665"><span class="section-number-2">1</span> 实现原理</h2>
+<div id="outline-container-orge40788f" class="outline-2">
+<h2 id="orge40788f"><span class="section-number-2">1</span> JDBC 使用方法</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org4276d3f" class="outline-3">
-<h3 id="org4276d3f"><span class="section-number-3">1.1</span> JDBC 连接数据库流程</h3>
+<div id="outline-container-org7d1dc45" class="outline-3">
+<h3 id="org7d1dc45"><span class="section-number-3">1.1</span> JDBC 连接数据库流程</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Java 中定义了 JDBC 的连接操作数据库的基本流程
@@ -273,27 +281,27 @@ Java 中定义了 JDBC 的连接操作数据库的基本流程
 </ul></li>
 </ol>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #99cc99;">private</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">url</span> = <span style="color: #66cccc;">"jdbc:mysql://localhost:3306/database?useSSL=false"</span>;
-<span style="color: #99cc99;">private</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">username</span> = <span style="color: #66cccc;">"user01"</span>;
-<span style="color: #99cc99;">private</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">password</span> = <span style="color: #66cccc;">"pass01"</span>;
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">url</span> = <span style="color: #2d9574;">"jdbc:mysql://localhost:3306/database?useSSL=false"</span>;
+<span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">username</span> = <span style="color: #2d9574;">"user01"</span>;
+<span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">password</span> = <span style="color: #2d9574;">"pass01"</span>;
 
-<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">void</span> <span style="color: #f99157;">testMySQL</span><span style="color: #8d5649;">()</span> <span style="color: #99cc99;">throws</span> <span style="color: #6699cc;">Exception</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#21152;&#36733;&#39537;&#21160;</span>
-  Class.forName<span style="color: #d8241f;">(</span><span style="color: #66cccc;">"com.mysql.jdbc.Driver"</span><span style="color: #d8241f;">)</span>;
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">testMySQL</span><span style="color: #8d5649;">()</span> <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">Exception</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#21152;&#36733;&#39537;&#21160;</span>
+  Class.forName<span style="color: #d8241f;">(</span><span style="color: #2d9574;">"com.mysql.jdbc.Driver"</span><span style="color: #d8241f;">)</span>;
 
-  <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#21019;&#24314;&#36830;&#25509;</span>
-  <span style="color: #6699cc;">Connection</span> <span style="color: #ffcc66;">conn</span> = DriverManager.getConnection<span style="color: #d8241f;">(</span>url, username, password<span style="color: #d8241f;">)</span>;
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#21019;&#24314;&#36830;&#25509;</span>
+  <span style="color: #ce537a; font-weight: bold;">Connection</span> <span style="color: #7590db;">conn</span> = DriverManager.getConnection<span style="color: #d8241f;">(</span>url, username, password<span style="color: #d8241f;">)</span>;
 
-  <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#21457;&#36865; SQL &#35821;&#21477;</span>
-  <span style="color: #6699cc;">Statement</span> <span style="color: #ffcc66;">stmt</span> = conn.createStatement<span style="color: #d8241f;">()</span>;
-  <span style="color: #6699cc;">ResultSet</span> <span style="color: #ffcc66;">rs</span> = stmt.executeQuery<span style="color: #d8241f;">(</span><span style="color: #66cccc;">"SELECT 'Hello'"</span><span style="color: #d8241f;">)</span>;
-  <span style="color: #99cc99;">while</span> <span style="color: #d8241f;">(</span>rs.next<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">rs.getObject(1);</span>
-    <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">message</span> = rs.getString<span style="color: #9564bf;">(</span>1<span style="color: #9564bf;">)</span>;
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#21457;&#36865; SQL &#35821;&#21477;</span>
+  <span style="color: #ce537a; font-weight: bold;">Statement</span> <span style="color: #7590db;">stmt</span> = conn.createStatement<span style="color: #d8241f;">()</span>;
+  <span style="color: #ce537a; font-weight: bold;">ResultSet</span> <span style="color: #7590db;">rs</span> = stmt.executeQuery<span style="color: #d8241f;">(</span><span style="color: #2d9574;">"SELECT 'Hello'"</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #4f97d7; font-weight: bold;">while</span> <span style="color: #d8241f;">(</span>rs.next<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">rs.getObject(1);</span>
+    <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">message</span> = rs.getString<span style="color: #9564bf;">(</span>1<span style="color: #9564bf;">)</span>;
     System.out.println<span style="color: #9564bf;">(</span>message<span style="color: #9564bf;">)</span>;
   <span style="color: #d8241f;">}</span>
 
-  <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#20851;&#38381;&#36830;&#25509;</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#20851;&#38381;&#36830;&#25509;</span>
   conn.close<span style="color: #d8241f;">()</span>;
 <span style="color: #8d5649;">}</span>
 </pre>
@@ -301,8 +309,8 @@ Java 中定义了 JDBC 的连接操作数据库的基本流程
 </div>
 </div>
 
-<div id="outline-container-orgc012a1f" class="outline-3">
-<h3 id="orgc012a1f"><span class="section-number-3">1.2</span> SPI 连接数据库流程</h3>
+<div id="outline-container-org8b22049" class="outline-3">
+<h3 id="org8b22049"><span class="section-number-3">1.2</span> SPI 连接数据库流程</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式和配置文件组
@@ -317,13 +325,13 @@ SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式
 用驱动信息
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #cc99cc;">/**</span>
-<span style="color: #cc99cc;"> * Load the initial JDBC drivers by checking the System property</span>
-<span style="color: #cc99cc;"> * jdbc.properties and then use the </span><span style="color: #6699cc;">{@code ServiceLoader}</span><span style="color: #cc99cc;"> mechanism</span>
-<span style="color: #cc99cc;"> */</span>
-<span style="color: #99cc99;">static</span> <span style="color: #8d5649;">{</span>
+<pre class="src src-java"><span style="color: #9f8766;">/**</span>
+<span style="color: #9f8766;"> * Load the initial JDBC drivers by checking the System property</span>
+<span style="color: #9f8766;"> * jdbc.properties and then use the </span><span style="color: #a45bad;">{@code ServiceLoader}</span><span style="color: #9f8766;"> mechanism</span>
+<span style="color: #9f8766;"> */</span>
+<span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #8d5649;">{</span>
     loadInitialDrivers<span style="color: #d8241f;">()</span>;
-    println<span style="color: #d8241f;">(</span><span style="color: #66cccc;">"JDBC DriverManager initialized"</span><span style="color: #d8241f;">)</span>;
+    println<span style="color: #d8241f;">(</span><span style="color: #2d9574;">"JDBC DriverManager initialized"</span><span style="color: #d8241f;">)</span>;
 <span style="color: #8d5649;">}</span>
 </pre>
 </div></li>
@@ -333,32 +341,32 @@ SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式
 加载到 JVM
 </p>
 <div class="org-src-container">
-<pre class="src src-java">AccessController.doPrivileged<span style="color: #8d5649;">(</span><span style="color: #99cc99;">new</span> <span style="color: #6699cc;">PrivilegedAction</span><span style="color: #d8241f;">&lt;</span><span style="color: #6699cc;">Void</span><span style="color: #d8241f;">&gt;()</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">Void</span> <span style="color: #f99157;">run</span><span style="color: #9564bf;">()</span> <span style="color: #9564bf;">{</span>
-      <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#36825;&#37324;&#21152;&#36733;&#36890;&#36807; ServiceLoader &#35843;&#29992; AppClassLoader &#21152;&#36733; JDBC &#39537;&#21160;</span>
-      <span style="color: #6699cc;">ServiceLoader</span><span style="color: #24a222;">&lt;</span><span style="color: #6699cc;">Driver</span><span style="color: #24a222;">&gt;</span> <span style="color: #ffcc66;">loadedDrivers</span> = ServiceLoader.load<span style="color: #24a222;">(</span>Driver.<span style="color: #99cc99;">class</span><span style="color: #24a222;">)</span>;
-      <span style="color: #6699cc;">Iterator</span><span style="color: #24a222;">&lt;</span><span style="color: #6699cc;">Driver</span><span style="color: #24a222;">&gt;</span> <span style="color: #ffcc66;">driversIterator</span> = loadedDrivers.iterator<span style="color: #24a222;">()</span>;
+<pre class="src src-java">AccessController.doPrivileged<span style="color: #8d5649;">(</span><span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">PrivilegedAction</span><span style="color: #d8241f;">&lt;</span><span style="color: #ce537a; font-weight: bold;">Void</span><span style="color: #d8241f;">&gt;()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">Void</span> <span style="color: #bc6ec5; font-weight: bold;">run</span><span style="color: #9564bf;">()</span> <span style="color: #9564bf;">{</span>
+      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#36825;&#37324;&#21152;&#36733;&#36890;&#36807; ServiceLoader &#35843;&#29992; AppClassLoader &#21152;&#36733; JDBC &#39537;&#21160;</span>
+      <span style="color: #ce537a; font-weight: bold;">ServiceLoader</span><span style="color: #24a222;">&lt;</span><span style="color: #ce537a; font-weight: bold;">Driver</span><span style="color: #24a222;">&gt;</span> <span style="color: #7590db;">loadedDrivers</span> = ServiceLoader.load<span style="color: #24a222;">(</span>Driver.<span style="color: #4f97d7; font-weight: bold;">class</span><span style="color: #24a222;">)</span>;
+      <span style="color: #ce537a; font-weight: bold;">Iterator</span><span style="color: #24a222;">&lt;</span><span style="color: #ce537a; font-weight: bold;">Driver</span><span style="color: #24a222;">&gt;</span> <span style="color: #7590db;">driversIterator</span> = loadedDrivers.iterator<span style="color: #24a222;">()</span>;
 
-      <span style="color: #999999; font-style: italic;">/* </span><span style="color: #999999; font-style: italic;">Load these drivers, so that they can be instantiated.</span>
-<span style="color: #999999; font-style: italic;">       * It may be the case that the driver class may not be there</span>
-<span style="color: #999999; font-style: italic;">       * i.e. there may be a packaged driver with the service class</span>
-<span style="color: #999999; font-style: italic;">       * as implementation of java.sql.Driver but the actual class</span>
-<span style="color: #999999; font-style: italic;">       * may be missing. In that case a java.util.ServiceConfigurationError</span>
-<span style="color: #999999; font-style: italic;">       * will be thrown at runtime by the VM trying to locate</span>
-<span style="color: #999999; font-style: italic;">       * and load the service.</span>
-<span style="color: #999999; font-style: italic;">       *</span>
-<span style="color: #999999; font-style: italic;">       * Adding a try catch block to catch those runtime errors</span>
-<span style="color: #999999; font-style: italic;">       * if driver not available in classpath but it's</span>
-<span style="color: #999999; font-style: italic;">       * packaged as service and that service is there in classpath.</span>
-<span style="color: #999999; font-style: italic;">       */</span>
-      <span style="color: #99cc99;">try</span><span style="color: #24a222;">{</span>
-        <span style="color: #99cc99;">while</span><span style="color: #ff7f00;">(</span>driversIterator.hasNext<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+      <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">Load these drivers, so that they can be instantiated.</span>
+<span style="color: #2aa1ae; background-color: #292e34;">       * It may be the case that the driver class may not be there</span>
+<span style="color: #2aa1ae; background-color: #292e34;">       * i.e. there may be a packaged driver with the service class</span>
+<span style="color: #2aa1ae; background-color: #292e34;">       * as implementation of java.sql.Driver but the actual class</span>
+<span style="color: #2aa1ae; background-color: #292e34;">       * may be missing. In that case a java.util.ServiceConfigurationError</span>
+<span style="color: #2aa1ae; background-color: #292e34;">       * will be thrown at runtime by the VM trying to locate</span>
+<span style="color: #2aa1ae; background-color: #292e34;">       * and load the service.</span>
+<span style="color: #2aa1ae; background-color: #292e34;">       *</span>
+<span style="color: #2aa1ae; background-color: #292e34;">       * Adding a try catch block to catch those runtime errors</span>
+<span style="color: #2aa1ae; background-color: #292e34;">       * if driver not available in classpath but it's</span>
+<span style="color: #2aa1ae; background-color: #292e34;">       * packaged as service and that service is there in classpath.</span>
+<span style="color: #93a1a1; font-style: italic;">       */</span>
+      <span style="color: #4f97d7; font-weight: bold;">try</span><span style="color: #24a222;">{</span>
+        <span style="color: #4f97d7; font-weight: bold;">while</span><span style="color: #ff7f00;">(</span>driversIterator.hasNext<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
           driversIterator.next<span style="color: #1776b6;">()</span>;
         <span style="color: #ff7f00;">}</span>
-      <span style="color: #24a222;">}</span> <span style="color: #99cc99;">catch</span><span style="color: #24a222;">(</span><span style="color: #6699cc;">Throwable</span> <span style="color: #ffcc66;">t</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
-        <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">Do nothing</span>
+      <span style="color: #24a222;">}</span> <span style="color: #4f97d7; font-weight: bold;">catch</span><span style="color: #24a222;">(</span><span style="color: #ce537a; font-weight: bold;">Throwable</span> <span style="color: #7590db;">t</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Do nothing</span>
       <span style="color: #24a222;">}</span>
-      <span style="color: #99cc99;">return</span> <span style="color: #6699cc;">null</span>;
+      <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">null</span>;
     <span style="color: #9564bf;">}</span>
   <span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>;
 </pre>
@@ -368,73 +376,73 @@ SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式
 信息
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">List of registered JDBC drivers</span>
-<span style="color: #99cc99;">private</span> <span style="color: #99cc99;">final</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">CopyOnWriteArrayList</span><span style="color: #8d5649;">&lt;</span><span style="color: #6699cc;">DriverInfo</span><span style="color: #8d5649;">&gt;</span> <span style="color: #ffcc66;">registeredDrivers</span> = <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">CopyOnWriteArrayList</span><span style="color: #8d5649;">&lt;&gt;()</span>;
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">List of registered JDBC drivers</span>
+<span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #4f97d7; font-weight: bold;">final</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">CopyOnWriteArrayList</span><span style="color: #8d5649;">&lt;</span><span style="color: #ce537a; font-weight: bold;">DriverInfo</span><span style="color: #8d5649;">&gt;</span> <span style="color: #7590db;">registeredDrivers</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">CopyOnWriteArrayList</span><span style="color: #8d5649;">&lt;&gt;()</span>;
 </pre>
 </div></li>
 <li><p>
 调用 <code>getConnection</code> 方法时通过变量所有注册的驱动来获取连接信息
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #999999; font-style: italic;">//  </span><span style="color: #999999; font-style: italic;">Worker method called by the public getConnection() methods.</span>
-<span style="color: #99cc99;">private</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">Connection</span> <span style="color: #f99157;">getConnection</span><span style="color: #8d5649;">(</span>
-    <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">url</span>, <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">util</span>.<span style="color: #6699cc;">Properties</span> <span style="color: #ffcc66;">info</span>, <span style="color: #6699cc;">Class</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #ffcc66;">caller</span><span style="color: #8d5649;">)</span> <span style="color: #99cc99;">throws</span> <span style="color: #6699cc;">SQLException</span> <span style="color: #8d5649;">{</span>
-    <span style="color: #999999; font-style: italic;">/*</span>
-<span style="color: #999999; font-style: italic;">     * When callerCl is null, we should check the application's</span>
-<span style="color: #999999; font-style: italic;">     * (which is invoking this class indirectly)</span>
-<span style="color: #999999; font-style: italic;">     * classloader, so that the JDBC driver class outside rt.jar</span>
-<span style="color: #999999; font-style: italic;">     * can be loaded from here.</span>
-<span style="color: #999999; font-style: italic;">     */</span>
-    <span style="color: #6699cc;">ClassLoader</span> <span style="color: #ffcc66;">callerCL</span> = caller != <span style="color: #6699cc;">null</span> ? caller.getClassLoader<span style="color: #d8241f;">()</span> : <span style="color: #6699cc;">null</span>;
-    <span style="color: #99cc99;">synchronized</span><span style="color: #d8241f;">(</span>DriverManager.<span style="color: #99cc99;">class</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">synchronize loading of the correct classloader.</span>
-        <span style="color: #99cc99;">if</span> <span style="color: #9564bf;">(</span>callerCL == <span style="color: #6699cc;">null</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            callerCL = Thread.currentThread<span style="color: #24a222;">()</span>.getContextClassLoader<span style="color: #24a222;">()</span>;
-        <span style="color: #9564bf;">}</span>
-    <span style="color: #d8241f;">}</span>
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">//  </span><span style="color: #2aa1ae; background-color: #292e34;">Worker method called by the public getConnection() methods.</span>
+<span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">Connection</span> <span style="color: #bc6ec5; font-weight: bold;">getConnection</span><span style="color: #8d5649;">(</span>
+                                        <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">url</span>, <span style="color: #a45bad;">java</span>.<span style="color: #a45bad;">util</span>.<span style="color: #ce537a; font-weight: bold;">Properties</span> <span style="color: #7590db;">info</span>, <span style="color: #ce537a; font-weight: bold;">Class</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #7590db;">caller</span><span style="color: #8d5649;">)</span> <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">SQLException</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #93a1a1; font-style: italic;">/*</span>
+<span style="color: #2aa1ae; background-color: #292e34;">   * When callerCl is null, we should check the application's</span>
+<span style="color: #2aa1ae; background-color: #292e34;">   * (which is invoking this class indirectly)</span>
+<span style="color: #2aa1ae; background-color: #292e34;">   * classloader, so that the JDBC driver class outside rt.jar</span>
+<span style="color: #2aa1ae; background-color: #292e34;">   * can be loaded from here.</span>
+<span style="color: #93a1a1; font-style: italic;">   */</span>
+  <span style="color: #ce537a; font-weight: bold;">ClassLoader</span> <span style="color: #7590db;">callerCL</span> = caller != <span style="color: #a45bad;">null</span> ? caller.getClassLoader<span style="color: #d8241f;">()</span> : <span style="color: #a45bad;">null</span>;
+  <span style="color: #4f97d7; font-weight: bold;">synchronized</span><span style="color: #d8241f;">(</span>DriverManager.<span style="color: #4f97d7; font-weight: bold;">class</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">synchronize loading of the correct classloader.</span>
+    <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #9564bf;">(</span>callerCL == <span style="color: #a45bad;">null</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+      callerCL = Thread.currentThread<span style="color: #24a222;">()</span>.getContextClassLoader<span style="color: #24a222;">()</span>;
+    <span style="color: #9564bf;">}</span>
+  <span style="color: #d8241f;">}</span>
 
-    <span style="color: #99cc99;">if</span><span style="color: #d8241f;">(</span>url == <span style="color: #6699cc;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #99cc99;">throw</span> <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">SQLException</span><span style="color: #9564bf;">(</span><span style="color: #66cccc;">"The url cannot be null"</span>, <span style="color: #66cccc;">"08001"</span><span style="color: #9564bf;">)</span>;
-    <span style="color: #d8241f;">}</span>
+  <span style="color: #4f97d7; font-weight: bold;">if</span><span style="color: #d8241f;">(</span>url == <span style="color: #a45bad;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #4f97d7; font-weight: bold;">throw</span> <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">SQLException</span><span style="color: #9564bf;">(</span><span style="color: #2d9574;">"The url cannot be null"</span>, <span style="color: #2d9574;">"08001"</span><span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
 
-    println<span style="color: #d8241f;">(</span><span style="color: #66cccc;">"DriverManager.getConnection(\""</span> + url + <span style="color: #66cccc;">"\")"</span><span style="color: #d8241f;">)</span>;
+  println<span style="color: #d8241f;">(</span><span style="color: #2d9574;">"DriverManager.getConnection(\""</span> + url + <span style="color: #2d9574;">"\")"</span><span style="color: #d8241f;">)</span>;
 
-    <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">Walk through the loaded registeredDrivers attempting to make a connection.</span>
-    <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">Remember the first exception that gets raised so we can reraise it.</span>
-    <span style="color: #6699cc;">SQLException</span> <span style="color: #ffcc66;">reason</span> = <span style="color: #6699cc;">null</span>;
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Walk through the loaded registeredDrivers attempting to make a connection.</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Remember the first exception that gets raised so we can reraise it.</span>
+  <span style="color: #ce537a; font-weight: bold;">SQLException</span> <span style="color: #7590db;">reason</span> = <span style="color: #a45bad;">null</span>;
 
-    <span style="color: #99cc99;">for</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">DriverInfo</span> <span style="color: #ffcc66;">aDriver</span> : registeredDrivers<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">If the caller does not have permission to load the driver then</span>
-        <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">skip it.</span>
-        <span style="color: #99cc99;">if</span><span style="color: #9564bf;">(</span>isDriverAllowed<span style="color: #24a222;">(</span>aDriver.driver, callerCL<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #99cc99;">try</span> <span style="color: #24a222;">{</span>
-                println<span style="color: #ff7f00;">(</span><span style="color: #66cccc;">"    trying "</span> + aDriver.driver.getClass<span style="color: #1776b6;">()</span>.getName<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span>;
-                <span style="color: #6699cc;">Connection</span> <span style="color: #ffcc66;">con</span> = aDriver.driver.connect<span style="color: #ff7f00;">(</span>url, info<span style="color: #ff7f00;">)</span>;
-                <span style="color: #99cc99;">if</span> <span style="color: #ff7f00;">(</span>con != <span style="color: #6699cc;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
-                    <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">Success!</span>
-                    println<span style="color: #1776b6;">(</span><span style="color: #66cccc;">"getConnection returning "</span> + aDriver.driver.getClass<span style="color: #00bed1;">()</span>.getName<span style="color: #00bed1;">()</span><span style="color: #1776b6;">)</span>;
-                    <span style="color: #99cc99;">return</span> <span style="color: #1776b6;">(</span>con<span style="color: #1776b6;">)</span>;
-                <span style="color: #ff7f00;">}</span>
-            <span style="color: #24a222;">}</span> <span style="color: #99cc99;">catch</span> <span style="color: #24a222;">(</span><span style="color: #6699cc;">SQLException</span> <span style="color: #ffcc66;">ex</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
-                <span style="color: #99cc99;">if</span> <span style="color: #ff7f00;">(</span>reason == <span style="color: #6699cc;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
-                    reason = ex;
-                <span style="color: #ff7f00;">}</span>
-            <span style="color: #24a222;">}</span>
+  <span style="color: #4f97d7; font-weight: bold;">for</span><span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">DriverInfo</span> <span style="color: #7590db;">aDriver</span> : registeredDrivers<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">If the caller does not have permission to load the driver then</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">skip it.</span>
+    <span style="color: #4f97d7; font-weight: bold;">if</span><span style="color: #9564bf;">(</span>isDriverAllowed<span style="color: #24a222;">(</span>aDriver.driver, callerCL<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+      <span style="color: #4f97d7; font-weight: bold;">try</span> <span style="color: #24a222;">{</span>
+        println<span style="color: #ff7f00;">(</span><span style="color: #2d9574;">"    trying "</span> + aDriver.driver.getClass<span style="color: #1776b6;">()</span>.getName<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span>;
+        <span style="color: #ce537a; font-weight: bold;">Connection</span> <span style="color: #7590db;">con</span> = aDriver.driver.connect<span style="color: #ff7f00;">(</span>url, info<span style="color: #ff7f00;">)</span>;
+        <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #ff7f00;">(</span>con != <span style="color: #a45bad;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+          <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Success!</span>
+          println<span style="color: #1776b6;">(</span><span style="color: #2d9574;">"getConnection returning "</span> + aDriver.driver.getClass<span style="color: #00bed1;">()</span>.getName<span style="color: #00bed1;">()</span><span style="color: #1776b6;">)</span>;
+          <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #1776b6;">(</span>con<span style="color: #1776b6;">)</span>;
+        <span style="color: #ff7f00;">}</span>
+      <span style="color: #24a222;">}</span> <span style="color: #4f97d7; font-weight: bold;">catch</span> <span style="color: #24a222;">(</span><span style="color: #ce537a; font-weight: bold;">SQLException</span> <span style="color: #7590db;">ex</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+        <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #ff7f00;">(</span>reason == <span style="color: #a45bad;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+          reason = ex;
+        <span style="color: #ff7f00;">}</span>
+      <span style="color: #24a222;">}</span>
 
-        <span style="color: #9564bf;">}</span> <span style="color: #99cc99;">else</span> <span style="color: #9564bf;">{</span>
-            println<span style="color: #24a222;">(</span><span style="color: #66cccc;">"    skipping: "</span> + aDriver.getClass<span style="color: #ff7f00;">()</span>.getName<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span>;
-        <span style="color: #9564bf;">}</span>
+    <span style="color: #9564bf;">}</span> <span style="color: #4f97d7; font-weight: bold;">else</span> <span style="color: #9564bf;">{</span>
+      println<span style="color: #24a222;">(</span><span style="color: #2d9574;">"    skipping: "</span> + aDriver.getClass<span style="color: #ff7f00;">()</span>.getName<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span>;
+    <span style="color: #9564bf;">}</span>
 
-    <span style="color: #d8241f;">}</span>
+  <span style="color: #d8241f;">}</span>
 
-    <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">if we got here nobody could connect.</span>
-    <span style="color: #99cc99;">if</span> <span style="color: #d8241f;">(</span>reason != <span style="color: #6699cc;">null</span><span style="color: #d8241f;">)</span>    <span style="color: #d8241f;">{</span>
-        println<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"getConnection failed: "</span> + reason<span style="color: #9564bf;">)</span>;
-        <span style="color: #99cc99;">throw</span> reason;
-    <span style="color: #d8241f;">}</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">if we got here nobody could connect.</span>
+  <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #d8241f;">(</span>reason != <span style="color: #a45bad;">null</span><span style="color: #d8241f;">)</span>    <span style="color: #d8241f;">{</span>
+    println<span style="color: #9564bf;">(</span><span style="color: #2d9574;">"getConnection failed: "</span> + reason<span style="color: #9564bf;">)</span>;
+    <span style="color: #4f97d7; font-weight: bold;">throw</span> reason;
+  <span style="color: #d8241f;">}</span>
 
-    println<span style="color: #d8241f;">(</span><span style="color: #66cccc;">"getConnection: no suitable driver found for "</span>+ url<span style="color: #d8241f;">)</span>;
-    <span style="color: #99cc99;">throw</span> <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">SQLException</span><span style="color: #d8241f;">(</span><span style="color: #66cccc;">"No suitable driver found for "</span>+ url, <span style="color: #66cccc;">"08001"</span><span style="color: #d8241f;">)</span>;
+  println<span style="color: #d8241f;">(</span><span style="color: #2d9574;">"getConnection: no suitable driver found for "</span>+ url<span style="color: #d8241f;">)</span>;
+  <span style="color: #4f97d7; font-weight: bold;">throw</span> <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">SQLException</span><span style="color: #d8241f;">(</span><span style="color: #2d9574;">"No suitable driver found for "</span>+ url, <span style="color: #2d9574;">"08001"</span><span style="color: #d8241f;">)</span>;
 <span style="color: #8d5649;">}</span>
 </pre>
 </div></li>
@@ -443,35 +451,35 @@ SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式
 </div>
 </div>
 
-<div id="outline-container-org43a9e38" class="outline-2">
-<h2 id="org43a9e38"><span class="section-number-2">2</span> Spring 中的 <code>JdbcTemplate</code></h2>
+<div id="outline-container-orgd93aa4e" class="outline-2">
+<h2 id="orgd93aa4e"><span class="section-number-2">2</span> Spring 中的 <code>JdbcTemplate</code></h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Spring 框架中对 JDBC 的操作进行了封装，提供可以方便操作数据库的 <code>JdbcTemplate</code> 类
 </p>
 </div>
-<div id="outline-container-org0c87ed1" class="outline-3">
-<h3 id="org0c87ed1"><span class="section-number-3">2.1</span> 数据库配置类</h3>
+<div id="outline-container-orgc59eab2" class="outline-3">
+<h3 id="orgc59eab2"><span class="section-number-3">2.1</span> 数据库配置类</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #99cc99;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #6699cc;">beans</span>;
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #a45bad;">beans</span>;
 
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">javax</span>.<span style="color: #6699cc;">sql</span>.<span style="color: #6699cc;">DataSource</span>;
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">context</span>.<span style="color: #6699cc;">annotation</span>.<span style="color: #6699cc;">Bean</span>;
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">context</span>.<span style="color: #6699cc;">annotation</span>.<span style="color: #6699cc;">Configuration</span>;
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">jdbc</span>.<span style="color: #6699cc;">datasource</span>.<span style="color: #6699cc;">DriverManagerDataSource</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">javax</span>.<span style="color: #a45bad;">sql</span>.<span style="color: #ce537a; font-weight: bold;">DataSource</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">org</span>.<span style="color: #a45bad;">springframework</span>.<span style="color: #a45bad;">context</span>.<span style="color: #a45bad;">annotation</span>.<span style="color: #ce537a; font-weight: bold;">Bean</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">org</span>.<span style="color: #a45bad;">springframework</span>.<span style="color: #a45bad;">context</span>.<span style="color: #a45bad;">annotation</span>.<span style="color: #ce537a; font-weight: bold;">Configuration</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">org</span>.<span style="color: #a45bad;">springframework</span>.<span style="color: #a45bad;">jdbc</span>.<span style="color: #a45bad;">datasource</span>.<span style="color: #ce537a; font-weight: bold;">DriverManagerDataSource</span>;
 
-<span style="color: #6699cc;">@Configuration</span>
-<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">class</span> <span style="color: #6699cc;">DataSourceConfig</span> <span style="color: #8d5649;">{</span>
+<span style="color: #a45bad;">@Configuration</span>
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">DataSourceConfig</span> <span style="color: #8d5649;">{</span>
 
-  <span style="color: #6699cc;">@Bean</span>
-  <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">DataSource</span> <span style="color: #f99157;">getDataSource</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #6699cc;">DriverManagerDataSource</span> <span style="color: #ffcc66;">dataSource</span> = <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">DriverManagerDataSource</span><span style="color: #9564bf;">()</span>;
-    dataSource.setDriverClassName<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"com.mysql.jdbc.Driver"</span><span style="color: #9564bf;">)</span>;
-    dataSource.setUrl<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"jdbc:mysql://localhost:3306/db01"</span><span style="color: #9564bf;">)</span>;
-    dataSource.setUsername<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"user01"</span><span style="color: #9564bf;">)</span>;
-    dataSource.setPassword<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"pass01"</span><span style="color: #9564bf;">)</span>;
-    <span style="color: #99cc99;">return</span> dataSource;
+  <span style="color: #a45bad;">@Bean</span>
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">DataSource</span> <span style="color: #bc6ec5; font-weight: bold;">getDataSource</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #ce537a; font-weight: bold;">DriverManagerDataSource</span> <span style="color: #7590db;">dataSource</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">DriverManagerDataSource</span><span style="color: #9564bf;">()</span>;
+    dataSource.setDriverClassName<span style="color: #9564bf;">(</span><span style="color: #2d9574;">"com.mysql.jdbc.Driver"</span><span style="color: #9564bf;">)</span>;
+    dataSource.setUrl<span style="color: #9564bf;">(</span><span style="color: #2d9574;">"jdbc:mysql://localhost:3306/db01"</span><span style="color: #9564bf;">)</span>;
+    dataSource.setUsername<span style="color: #9564bf;">(</span><span style="color: #2d9574;">"user01"</span><span style="color: #9564bf;">)</span>;
+    dataSource.setPassword<span style="color: #9564bf;">(</span><span style="color: #2d9574;">"pass01"</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #4f97d7; font-weight: bold;">return</span> dataSource;
   <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
@@ -479,27 +487,27 @@ Spring 框架中对 JDBC 的操作进行了封装，提供可以方便操作数�
 </div>
 </div>
 
-<div id="outline-container-org3f1b82d" class="outline-3">
-<h3 id="org3f1b82d"><span class="section-number-3">2.2</span> 添加实体及 Mapper</h3>
+<div id="outline-container-org0da55a1" class="outline-3">
+<h3 id="org0da55a1"><span class="section-number-3">2.2</span> 添加实体及 Mapper</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 实体类
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #99cc99;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #6699cc;">beans</span>;
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #a45bad;">beans</span>;
 
-<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">class</span> <span style="color: #6699cc;">Employee</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #99cc99;">private</span> <span style="color: #6699cc;">Long</span> <span style="color: #ffcc66;">id</span>;
-  <span style="color: #99cc99;">private</span> <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">name</span>;
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">Employee</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">Long</span> <span style="color: #7590db;">id</span>;
+  <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">name</span>;
 
-  <span style="color: #99cc99;">public</span> <span style="color: #f99157;">Employee</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">Long</span> <span style="color: #ffcc66;">id</span>, <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">name</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #99cc99;">this</span>.id = id;
-    <span style="color: #99cc99;">this</span>.name = name;
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #bc6ec5; font-weight: bold;">Employee</span><span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">Long</span> <span style="color: #7590db;">id</span>, <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">name</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #4f97d7; font-weight: bold;">this</span>.id = id;
+    <span style="color: #4f97d7; font-weight: bold;">this</span>.name = name;
   <span style="color: #d8241f;">}</span>
 
-    <span style="color: #6699cc;">@Override</span>
-    <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">String</span> <span style="color: #f99157;">toString</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #99cc99;">return</span> <span style="color: #66cccc;">"Employee["</span> + <span style="color: #99cc99;">this</span>.id +<span style="color: #66cccc;">"]"</span>;
+    <span style="color: #a45bad;">@Override</span>
+    <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #bc6ec5; font-weight: bold;">toString</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #2d9574;">"Employee["</span> + <span style="color: #4f97d7; font-weight: bold;">this</span>.id +<span style="color: #2d9574;">"]"</span>;
     <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
@@ -509,17 +517,17 @@ Spring 框架中对 JDBC 的操作进行了封装，提供可以方便操作数�
 对象的 Mapper
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #99cc99;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #6699cc;">beans</span>;
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #a45bad;">beans</span>;
 
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">sql</span>.<span style="color: #6699cc;">ResultSet</span>;
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">sql</span>.<span style="color: #6699cc;">SQLException</span>;
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">jdbc</span>.<span style="color: #6699cc;">core</span>.<span style="color: #6699cc;">RowMapper</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">java</span>.<span style="color: #a45bad;">sql</span>.<span style="color: #ce537a; font-weight: bold;">ResultSet</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">java</span>.<span style="color: #a45bad;">sql</span>.<span style="color: #ce537a; font-weight: bold;">SQLException</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">org</span>.<span style="color: #a45bad;">springframework</span>.<span style="color: #a45bad;">jdbc</span>.<span style="color: #a45bad;">core</span>.<span style="color: #ce537a; font-weight: bold;">RowMapper</span>;
 
-<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">class</span> <span style="color: #6699cc;">EmployeeRowMapper</span> <span style="color: #99cc99;">implements</span> <span style="color: #6699cc;">RowMapper</span><span style="color: #8d5649;">&lt;</span><span style="color: #6699cc;">Employee</span><span style="color: #8d5649;">&gt;</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #6699cc;">@Override</span>
-  <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">Employee</span> <span style="color: #f99157;">mapRow</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">ResultSet</span> <span style="color: #ffcc66;">rs</span>, <span style="color: #6699cc;">int</span> <span style="color: #ffcc66;">rowNum</span><span style="color: #d8241f;">)</span> <span style="color: #99cc99;">throws</span> <span style="color: #6699cc;">SQLException</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #6699cc;">Employee</span> <span style="color: #ffcc66;">empl</span> = <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">Employee</span><span style="color: #9564bf;">(</span>rs.getLong<span style="color: #24a222;">(</span><span style="color: #66cccc;">"G_ID"</span><span style="color: #24a222;">)</span>, rs.getString<span style="color: #24a222;">(</span><span style="color: #66cccc;">"EMPL_NAME"</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
-    <span style="color: #99cc99;">return</span> empl;
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">EmployeeRowMapper</span> <span style="color: #4f97d7; font-weight: bold;">implements</span> <span style="color: #ce537a; font-weight: bold;">RowMapper</span><span style="color: #8d5649;">&lt;</span><span style="color: #ce537a; font-weight: bold;">Employee</span><span style="color: #8d5649;">&gt;</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #a45bad;">@Override</span>
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">Employee</span> <span style="color: #bc6ec5; font-weight: bold;">mapRow</span><span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">ResultSet</span> <span style="color: #7590db;">rs</span>, <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">rowNum</span><span style="color: #d8241f;">)</span> <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">SQLException</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #ce537a; font-weight: bold;">Employee</span> <span style="color: #7590db;">empl</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Employee</span><span style="color: #9564bf;">(</span>rs.getLong<span style="color: #24a222;">(</span><span style="color: #2d9574;">"G_ID"</span><span style="color: #24a222;">)</span>, rs.getString<span style="color: #24a222;">(</span><span style="color: #2d9574;">"EMPL_NAME"</span><span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #4f97d7; font-weight: bold;">return</span> empl;
   <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
@@ -527,75 +535,77 @@ Spring 框架中对 JDBC 的操作进行了封装，提供可以方便操作数�
 </div>
 </div>
 
-<div id="outline-container-orgf27a5b5" class="outline-3">
-<h3 id="orgf27a5b5"><span class="section-number-3">2.3</span> 服务类 Service</h3>
+<div id="outline-container-orgdce52d8" class="outline-3">
+<h3 id="orgdce52d8"><span class="section-number-3">2.3</span> 服务类 Service</h3>
 <div class="outline-text-3" id="text-2-3">
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #999999; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
-<span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#26381;&#21153;&#25509;&#21475;</span>
-<span style="color: #999999; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
-<span style="color: #99cc99;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #6699cc;">beans</span>;
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#26381;&#21153;&#25509;&#21475;</span>
+<span style="color: #93a1a1; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
+<span style="color: #4f97d7; font-weight: bold;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #a45bad;">beans</span>;
 
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">util</span>.<span style="color: #6699cc;">List</span>;
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">stereotype</span>.<span style="color: #6699cc;">Component</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">java</span>.<span style="color: #a45bad;">util</span>.<span style="color: #ce537a; font-weight: bold;">List</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">org</span>.<span style="color: #a45bad;">springframework</span>.<span style="color: #a45bad;">stereotype</span>.<span style="color: #ce537a; font-weight: bold;">Component</span>;
 
-<span style="color: #6699cc;">@Component</span>
-<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">interface</span> <span style="color: #6699cc;">EmployeeService</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #6699cc;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #6699cc;">Employee</span><span style="color: #d8241f;">&gt;</span> <span style="color: #f99157;">getAll</span><span style="color: #d8241f;">()</span>;
+<span style="color: #a45bad;">@Component</span>
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">interface</span> <span style="color: #ce537a; font-weight: bold;">EmployeeService</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #ce537a; font-weight: bold;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #ce537a; font-weight: bold;">Employee</span><span style="color: #d8241f;">&gt;</span> <span style="color: #bc6ec5; font-weight: bold;">getAll</span><span style="color: #d8241f;">()</span>;
 <span style="color: #8d5649;">}</span>
 
-<span style="color: #999999; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
-<span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#23454;&#29616;&#31867;</span>
-<span style="color: #999999; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
-<span style="color: #99cc99;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #6699cc;">beans</span>;
+<span style="color: #93a1a1; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#23454;&#29616;&#31867;</span>
+<span style="color: #93a1a1; font-style: italic;">////////////////////////////////////////////////////////////////////////////////</span>
+<span style="color: #4f97d7; font-weight: bold;">package</span> io.github.jeanhwea.app09_jdbc.<span style="color: #a45bad;">beans</span>;
 
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">util</span>.<span style="color: #6699cc;">List</span>;
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">javax</span>.<span style="color: #6699cc;">sql</span>.<span style="color: #6699cc;">DataSource</span>;
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">jdbc</span>.<span style="color: #6699cc;">core</span>.<span style="color: #6699cc;">JdbcTemplate</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">java</span>.<span style="color: #a45bad;">util</span>.<span style="color: #ce537a; font-weight: bold;">List</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">javax</span>.<span style="color: #a45bad;">sql</span>.<span style="color: #ce537a; font-weight: bold;">DataSource</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">org</span>.<span style="color: #a45bad;">springframework</span>.<span style="color: #a45bad;">jdbc</span>.<span style="color: #a45bad;">core</span>.<span style="color: #ce537a; font-weight: bold;">JdbcTemplate</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">org</span>.<span style="color: #a45bad;">springframework</span>.<span style="color: #a45bad;">stereotype</span>.<span style="color: #ce537a; font-weight: bold;">Component</span>;
 
-<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">class</span> <span style="color: #6699cc;">EmployeeServiceImpl</span> <span style="color: #99cc99;">implements</span> <span style="color: #6699cc;">EmployeeService</span> <span style="color: #8d5649;">{</span>
+<span style="color: #a45bad;">@Component</span>
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">EmployeeServiceImpl</span> <span style="color: #4f97d7; font-weight: bold;">implements</span> <span style="color: #ce537a; font-weight: bold;">EmployeeService</span> <span style="color: #8d5649;">{</span>
 
-  <span style="color: #99cc99;">private</span> <span style="color: #6699cc;">JdbcTemplate</span> <span style="color: #ffcc66;">jdbcTemplate</span>;
+  <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">JdbcTemplate</span> <span style="color: #7590db;">jdbcTemplate</span>;
 
-  <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">void</span> <span style="color: #f99157;">setDataSource</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">DataSource</span> <span style="color: #ffcc66;">dataSource</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #99cc99;">this</span>.jdbcTemplate = <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">JdbcTemplate</span><span style="color: #9564bf;">(</span>dataSource<span style="color: #9564bf;">)</span>;
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">setDataSource</span><span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">DataSource</span> <span style="color: #7590db;">dataSource</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #4f97d7; font-weight: bold;">this</span>.jdbcTemplate = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">JdbcTemplate</span><span style="color: #9564bf;">(</span>dataSource<span style="color: #9564bf;">)</span>;
   <span style="color: #d8241f;">}</span>
 
-  <span style="color: #99cc99;">public</span> <span style="color: #f99157;">EmployeeServiceImpl</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">DataSource</span> <span style="color: #ffcc66;">dataSource</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #99cc99;">this</span>.setDataSource<span style="color: #9564bf;">(</span>dataSource<span style="color: #9564bf;">)</span>;
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #bc6ec5; font-weight: bold;">EmployeeServiceImpl</span><span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">DataSource</span> <span style="color: #7590db;">dataSource</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #4f97d7; font-weight: bold;">this</span>.setDataSource<span style="color: #9564bf;">(</span>dataSource<span style="color: #9564bf;">)</span>;
   <span style="color: #d8241f;">}</span>
 
-  <span style="color: #6699cc;">@Override</span>
-  <span style="color: #6699cc;">@SuppressWarnings</span><span style="color: #d8241f;">(</span><span style="color: #66cccc;">"unchecked"</span><span style="color: #d8241f;">)</span>
-  <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #6699cc;">Employee</span><span style="color: #d8241f;">&gt;</span> <span style="color: #f99157;">getAll</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #6699cc;">List</span><span style="color: #9564bf;">&lt;</span><span style="color: #6699cc;">Employee</span><span style="color: #9564bf;">&gt;</span> <span style="color: #ffcc66;">employees</span> =
-        jdbcTemplate.query<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"select * from TB_BASE_EMPL"</span>, <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">EmployeeRowMapper</span><span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
-    <span style="color: #99cc99;">return</span> employees;
+  <span style="color: #a45bad;">@Override</span>
+  <span style="color: #a45bad;">@SuppressWarnings</span><span style="color: #d8241f;">(</span><span style="color: #2d9574;">"unchecked"</span><span style="color: #d8241f;">)</span>
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">List</span><span style="color: #d8241f;">&lt;</span><span style="color: #ce537a; font-weight: bold;">Employee</span><span style="color: #d8241f;">&gt;</span> <span style="color: #bc6ec5; font-weight: bold;">getAll</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #ce537a; font-weight: bold;">List</span><span style="color: #9564bf;">&lt;</span><span style="color: #ce537a; font-weight: bold;">Employee</span><span style="color: #9564bf;">&gt;</span> <span style="color: #7590db;">employees</span> =
+        jdbcTemplate.query<span style="color: #9564bf;">(</span><span style="color: #2d9574;">"select * from TB_BASE_EMPL"</span>, <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">EmployeeRowMapper</span><span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #4f97d7; font-weight: bold;">return</span> employees;
   <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org7c37df5" class="outline-3">
-<h3 id="org7c37df5"><span class="section-number-3">2.4</span> 主函数</h3>
+<div id="outline-container-org0bab6a5" class="outline-3">
+<h3 id="org0bab6a5"><span class="section-number-3">2.4</span> 主函数</h3>
 <div class="outline-text-3" id="text-2-4">
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #99cc99;">package</span> io.github.jeanhwea.<span style="color: #6699cc;">app09_jdbc</span>;
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">package</span> io.github.jeanhwea.<span style="color: #a45bad;">app09_jdbc</span>;
 
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">io</span>.<span style="color: #6699cc;">github</span>.<span style="color: #6699cc;">jeanhwea</span>.<span style="color: #6699cc;">app09_jdbc</span>.<span style="color: #6699cc;">beans</span>.<span style="color: #6699cc;">Employee</span>;
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">io</span>.<span style="color: #6699cc;">github</span>.<span style="color: #6699cc;">jeanhwea</span>.<span style="color: #6699cc;">app09_jdbc</span>.<span style="color: #6699cc;">beans</span>.<span style="color: #6699cc;">EmployeeService</span>;
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">util</span>.<span style="color: #6699cc;">List</span>;
-<span style="color: #99cc99;">import</span> <span style="color: #6699cc;">org</span>.<span style="color: #6699cc;">springframework</span>.<span style="color: #6699cc;">context</span>.<span style="color: #6699cc;">annotation</span>.<span style="color: #6699cc;">AnnotationConfigApplicationContext</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">io</span>.<span style="color: #a45bad;">github</span>.<span style="color: #a45bad;">jeanhwea</span>.<span style="color: #a45bad;">app09_jdbc</span>.<span style="color: #a45bad;">beans</span>.<span style="color: #ce537a; font-weight: bold;">Employee</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">io</span>.<span style="color: #a45bad;">github</span>.<span style="color: #a45bad;">jeanhwea</span>.<span style="color: #a45bad;">app09_jdbc</span>.<span style="color: #a45bad;">beans</span>.<span style="color: #ce537a; font-weight: bold;">EmployeeService</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">java</span>.<span style="color: #a45bad;">util</span>.<span style="color: #ce537a; font-weight: bold;">List</span>;
+<span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">org</span>.<span style="color: #a45bad;">springframework</span>.<span style="color: #a45bad;">context</span>.<span style="color: #a45bad;">annotation</span>.<span style="color: #ce537a; font-weight: bold;">AnnotationConfigApplicationContext</span>;
 
-<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">class</span> <span style="color: #6699cc;">MyApp09</span> <span style="color: #8d5649;">{</span>
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">MyApp09</span> <span style="color: #8d5649;">{</span>
 
-  <span style="color: #99cc99;">public</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">void</span> <span style="color: #f99157;">main</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #ffcc66;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">pkgname</span> = MyApp09.<span style="color: #99cc99;">class</span>.getPackage<span style="color: #9564bf;">()</span>.getName<span style="color: #9564bf;">()</span>;
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">main</span><span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #7590db;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">pkgname</span> = MyApp09.<span style="color: #4f97d7; font-weight: bold;">class</span>.getPackage<span style="color: #9564bf;">()</span>.getName<span style="color: #9564bf;">()</span>;
     System.out.println<span style="color: #9564bf;">(</span>pkgname<span style="color: #9564bf;">)</span>;
-    <span style="color: #6699cc;">AnnotationConfigApplicationContext</span> <span style="color: #ffcc66;">ctx</span> = <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">AnnotationConfigApplicationContext</span><span style="color: #9564bf;">(</span>pkgname<span style="color: #9564bf;">)</span>;
-    <span style="color: #6699cc;">EmployeeService</span> <span style="color: #ffcc66;">employeeService</span> = ctx.getBean<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"employeeServiceImpl"</span>, EmployeeService.<span style="color: #99cc99;">class</span><span style="color: #9564bf;">)</span>;
-    <span style="color: #6699cc;">List</span><span style="color: #9564bf;">&lt;</span><span style="color: #6699cc;">Employee</span><span style="color: #9564bf;">&gt;</span> <span style="color: #ffcc66;">employeeList</span> = employeeService.getAll<span style="color: #9564bf;">()</span>;
+    <span style="color: #ce537a; font-weight: bold;">AnnotationConfigApplicationContext</span> <span style="color: #7590db;">ctx</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">AnnotationConfigApplicationContext</span><span style="color: #9564bf;">(</span>pkgname<span style="color: #9564bf;">)</span>;
+    <span style="color: #ce537a; font-weight: bold;">EmployeeService</span> <span style="color: #7590db;">employeeService</span> = ctx.getBean<span style="color: #9564bf;">(</span><span style="color: #2d9574;">"employeeServiceImpl"</span>, EmployeeService.<span style="color: #4f97d7; font-weight: bold;">class</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #ce537a; font-weight: bold;">List</span><span style="color: #9564bf;">&lt;</span><span style="color: #ce537a; font-weight: bold;">Employee</span><span style="color: #9564bf;">&gt;</span> <span style="color: #7590db;">employeeList</span> = employeeService.getAll<span style="color: #9564bf;">()</span>;
     System.out.println<span style="color: #9564bf;">(</span>employeeList<span style="color: #9564bf;">)</span>;
   <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
@@ -604,9 +614,256 @@ Spring 框架中对 JDBC 的操作进行了封装，提供可以方便操作数�
 </div>
 </div>
 </div>
+
+<div id="outline-container-org77b33d6" class="outline-2">
+<h2 id="org77b33d6"><span class="section-number-2">3</span> 代码实现</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org2c91a3d" class="outline-3">
+<h3 id="org2c91a3d"><span class="section-number-3">3.1</span> <code>JdbcTemplate</code> 类</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+<code>JdbcTemplate</code> 是操作数据的主要类，它的继承关系如下
+</p>
+<div class="org-src-container">
+<pre class="src src-java">org.springframework.jdbc.core
+Class JdbcTemplate
+
+    <span style="color: #a45bad;">java</span>.<span style="color: #a45bad;">lang</span>.Object
+        <span style="color: #a45bad;">org</span>.<span style="color: #a45bad;">springframework</span>.<span style="color: #a45bad;">jdbc</span>.<span style="color: #a45bad;">support</span>.JdbcAccessor
+            <span style="color: #a45bad;">org</span>.<span style="color: #a45bad;">springframework</span>.<span style="color: #a45bad;">jdbc</span>.<span style="color: #a45bad;">core</span>.JdbcTemplate
+
+    All <span style="color: #ce537a; font-weight: bold;">Implemented</span> <span style="color: #7590db;">Interfaces</span>:
+        <span style="color: #a45bad;">org</span>.<span style="color: #a45bad;">springframework</span>.<span style="color: #a45bad;">beans</span>.<span style="color: #a45bad;">factory</span>.InitializingBean, <span style="color: #7590db;">JdbcOperations</span>
+</pre>
+</div>
+<ol class="org-ol">
+<li><code>JdbcAccessor</code> 类实现了 <code>InitializingBean</code> 接口
+<ul class="org-ul">
+<li>该类中包含数据库的连接 DataSource</li>
+<li>该类实现了对数据库连接的操作
+<ul class="org-ul">
+<li><code>getDataSource()</code> 获取 DataSource</li>
+<li><code>setDataSource()</code> 设置 DataSource</li>
+</ul></li>
+</ul></li>
+<li><code>JdbcTemplate</code> 类实现了操作数据方法，提供 SQL 交互方法
+<ul class="org-ul">
+<li><code>execute(...)</code> 系列方法</li>
+<li><code>update(...)</code> 系列方法</li>
+<li><code>query(...)</code>, <code>queryForMap(...)</code>, <code>queryForObject(...)</code> 方法</li>
+</ul></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org5678806" class="outline-3">
+<h3 id="org5678806"><span class="section-number-3">3.2</span> 获取数据库连接</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+在数据库中获取连接的调用栈如下
+</p>
+<div class="org-src-container">
+<pre class="src src-text">doGetConnection:104, DataSourceUtils (org.springframework.jdbc.datasource)
+getConnection:79, DataSourceUtils (org.springframework.jdbc.datasource)
+execute:371, JdbcTemplate (org.springframework.jdbc.core)
+query:452, JdbcTemplate (org.springframework.jdbc.core)
+query:462, JdbcTemplate (org.springframework.jdbc.core)
+getAll:25, EmployeeServiceImpl (io.github.jeanhwea.app09_jdbc.beans)
+main:15, MyApp09 (io.github.jeanhwea.app09_jdbc)
+</pre>
+</div>
+
+<p>
+其中的 <code>doGetConnection(...)</code> 方法完成对连接获取操作
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #9f8766;">/**</span>
+<span style="color: #9f8766;"> * Actually obtain a JDBC Connection from the given DataSource.</span>
+<span style="color: #9f8766;"> * Same as </span><span style="color: #a45bad;">{@link #getConnection}</span><span style="color: #9f8766;">, but throwing the original SQLException.</span>
+<span style="color: #9f8766;"> * </span><span style="color: #a45bad;">&lt;p&gt;</span><span style="color: #9f8766;">Is aware of a corresponding Connection bound to the current thread, for example</span>
+<span style="color: #9f8766;"> * when using </span><span style="color: #a45bad;">{@link DataSourceTransactionManager}</span><span style="color: #9f8766;">. Will bind a Connection to the thread</span>
+<span style="color: #9f8766;"> * if transaction synchronization is active (e.g. if in a JTA transaction).</span>
+<span style="color: #9f8766;"> * </span><span style="color: #a45bad;">&lt;p&gt;</span><span style="color: #9f8766;">Directly accessed by </span><span style="color: #a45bad;">{@link TransactionAwareDataSourceProxy}</span><span style="color: #9f8766;">.</span>
+<span style="color: #9f8766;"> * </span><span style="color: #a45bad;">@param</span><span style="color: #9f8766;"> dataSource the DataSource to obtain Connections from</span>
+<span style="color: #9f8766;"> * </span><span style="color: #a45bad;">@return</span><span style="color: #9f8766;"> a JDBC Connection from the given DataSource</span>
+<span style="color: #9f8766;"> * </span><span style="color: #a45bad;">@throws</span><span style="color: #9f8766;"> SQLException if thrown by JDBC methods</span>
+<span style="color: #9f8766;"> * </span><span style="color: #a45bad;">@see</span><span style="color: #9f8766;"> #doReleaseConnection</span>
+<span style="color: #9f8766;"> */</span>
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">Connection</span> <span style="color: #bc6ec5; font-weight: bold;">doGetConnection</span><span style="color: #8d5649;">(</span><span style="color: #ce537a; font-weight: bold;">DataSource</span> <span style="color: #7590db;">dataSource</span><span style="color: #8d5649;">)</span> <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">SQLException</span> <span style="color: #8d5649;">{</span>
+  Assert.notNull<span style="color: #d8241f;">(</span>dataSource, <span style="color: #2d9574;">"No DataSource specified"</span><span style="color: #d8241f;">)</span>;
+
+  <span style="color: #ce537a; font-weight: bold;">ConnectionHolder</span> <span style="color: #7590db;">conHolder</span> = <span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">ConnectionHolder</span><span style="color: #d8241f;">)</span> TransactionSynchronizationManager.getResource<span style="color: #d8241f;">(</span>dataSource<span style="color: #d8241f;">)</span>;
+  <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #d8241f;">(</span>conHolder != <span style="color: #a45bad;">null</span> &amp;&amp; <span style="color: #9564bf;">(</span>conHolder.hasConnection<span style="color: #24a222;">()</span> || conHolder.isSynchronizedWithTransaction<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    conHolder.requested<span style="color: #9564bf;">()</span>;
+    <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #9564bf;">(</span><span style="color: #a45bad;">!</span>conHolder.hasConnection<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+      logger.debug<span style="color: #24a222;">(</span><span style="color: #2d9574;">"Fetching resumed JDBC Connection from DataSource"</span><span style="color: #24a222;">)</span>;
+      conHolder.setConnection<span style="color: #24a222;">(</span>fetchConnection<span style="color: #ff7f00;">(</span>dataSource<span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span>;
+    <span style="color: #9564bf;">}</span>
+    <span style="color: #4f97d7; font-weight: bold;">return</span> conHolder.getConnection<span style="color: #9564bf;">()</span>;
+  <span style="color: #d8241f;">}</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Else we either got no holder or an empty thread-bound holder here.</span>
+
+  logger.debug<span style="color: #d8241f;">(</span><span style="color: #2d9574;">"Fetching JDBC Connection from DataSource"</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #ce537a; font-weight: bold;">Connection</span> <span style="color: #7590db;">con</span> = fetchConnection<span style="color: #d8241f;">(</span>dataSource<span style="color: #d8241f;">)</span>;
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#24403;&#21069;&#32447;&#31243;&#26159;&#21542;&#25903;&#25345;&#21516;&#27493;</span>
+  <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #d8241f;">(</span>TransactionSynchronizationManager.isSynchronizationActive<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #4f97d7; font-weight: bold;">try</span> <span style="color: #9564bf;">{</span>
+      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Use same Connection for further JDBC actions within the transaction.</span>
+      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Thread-bound object will get removed by synchronization at transaction completion.</span>
+      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#22312;&#21516;&#19968;&#20107;&#21153;&#20013;&#65292;JDBC &#30340;&#36830;&#25509;&#38656;&#35201;&#20445;&#25345;&#19968;&#33268;</span>
+      <span style="color: #ce537a; font-weight: bold;">ConnectionHolder</span> <span style="color: #7590db;">holderToUse</span> = conHolder;
+      <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #24a222;">(</span>holderToUse == <span style="color: #a45bad;">null</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+        holderToUse = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">ConnectionHolder</span><span style="color: #ff7f00;">(</span>con<span style="color: #ff7f00;">)</span>;
+      <span style="color: #24a222;">}</span>
+      <span style="color: #4f97d7; font-weight: bold;">else</span> <span style="color: #24a222;">{</span>
+        holderToUse.setConnection<span style="color: #ff7f00;">(</span>con<span style="color: #ff7f00;">)</span>;
+      <span style="color: #24a222;">}</span>
+      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#36825;&#37324;&#35760;&#24405;&#25968;&#25454;&#36830;&#25509;&#30340;&#24341;&#29992;&#25968;&#37327;</span>
+      holderToUse.requested<span style="color: #24a222;">()</span>;
+      TransactionSynchronizationManager.registerSynchronization<span style="color: #24a222;">(</span>
+                                                                <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">ConnectionSynchronization</span><span style="color: #ff7f00;">(</span>holderToUse, dataSource<span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span>;
+      holderToUse.setSynchronizedWithTransaction<span style="color: #24a222;">(</span><span style="color: #a45bad;">true</span><span style="color: #24a222;">)</span>;
+      <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #24a222;">(</span>holderToUse != conHolder<span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+        TransactionSynchronizationManager.bindResource<span style="color: #ff7f00;">(</span>dataSource, holderToUse<span style="color: #ff7f00;">)</span>;
+      <span style="color: #24a222;">}</span>
+    <span style="color: #9564bf;">}</span>
+    <span style="color: #4f97d7; font-weight: bold;">catch</span> <span style="color: #9564bf;">(</span><span style="color: #ce537a; font-weight: bold;">RuntimeException</span> <span style="color: #7590db;">ex</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+      <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Unexpected exception from external delegation call -&gt; close Connection and rethrow.</span>
+      releaseConnection<span style="color: #24a222;">(</span>con, dataSource<span style="color: #24a222;">)</span>;
+      <span style="color: #4f97d7; font-weight: bold;">throw</span> ex;
+    <span style="color: #9564bf;">}</span>
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #4f97d7; font-weight: bold;">return</span> con;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfeb88d7" class="outline-3">
+<h3 id="orgfeb88d7"><span class="section-number-3">3.3</span> 执行 SQL: <code>execute(...)</code> 方法</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+在数据库中执行 SQL 的逻辑如下
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">//</span><span style="color: #2aa1ae; background-color: #292e34;">-------------------------------------------------------------------------</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Methods dealing with static SQL (java.sql.Statement)</span>
+<span style="color: #93a1a1; font-style: italic;">//</span><span style="color: #2aa1ae; background-color: #292e34;">-------------------------------------------------------------------------</span>
+
+<span style="color: #a45bad;">@Override</span>
+<span style="color: #a45bad;">@Nullable</span>
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #8d5649;">&lt;</span><span style="color: #ce537a; font-weight: bold;">T</span><span style="color: #8d5649;">&gt;</span> <span style="color: #ce537a; font-weight: bold;">T</span> <span style="color: #bc6ec5; font-weight: bold;">execute</span><span style="color: #8d5649;">(</span><span style="color: #ce537a; font-weight: bold;">StatementCallback</span><span style="color: #d8241f;">&lt;</span><span style="color: #ce537a; font-weight: bold;">T</span><span style="color: #d8241f;">&gt;</span> <span style="color: #7590db;">action</span><span style="color: #8d5649;">)</span> <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">DataAccessException</span> <span style="color: #8d5649;">{</span>
+  Assert.notNull<span style="color: #d8241f;">(</span>action, <span style="color: #2d9574;">"Callback object must not be null"</span><span style="color: #d8241f;">)</span>;
+
+  <span style="color: #ce537a; font-weight: bold;">Connection</span> <span style="color: #7590db;">con</span> = DataSourceUtils.getConnection<span style="color: #d8241f;">(</span>obtainDataSource<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #ce537a; font-weight: bold;">Statement</span> <span style="color: #7590db;">stmt</span> = <span style="color: #a45bad;">null</span>;
+  <span style="color: #4f97d7; font-weight: bold;">try</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#25191;&#34892; SQL, &#24182;&#36820;&#22238;&#32467;&#26524;</span>
+    stmt = con.createStatement<span style="color: #9564bf;">()</span>;
+    applyStatementSettings<span style="color: #9564bf;">(</span>stmt<span style="color: #9564bf;">)</span>;
+    <span style="color: #ce537a; font-weight: bold;">T</span> <span style="color: #7590db;">result</span> = action.doInStatement<span style="color: #9564bf;">(</span>stmt<span style="color: #9564bf;">)</span>;
+    handleWarnings<span style="color: #9564bf;">(</span>stmt<span style="color: #9564bf;">)</span>;
+    <span style="color: #4f97d7; font-weight: bold;">return</span> result;
+  <span style="color: #d8241f;">}</span>
+  <span style="color: #4f97d7; font-weight: bold;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">SQLException</span> <span style="color: #7590db;">ex</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Release Connection early, to avoid potential connection pool deadlock</span>
+    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">in the case when the exception translator hasn't been initialized yet.</span>
+    <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">sql</span> = getSql<span style="color: #9564bf;">(</span>action<span style="color: #9564bf;">)</span>;
+    JdbcUtils.closeStatement<span style="color: #9564bf;">(</span>stmt<span style="color: #9564bf;">)</span>;
+    stmt = <span style="color: #a45bad;">null</span>;
+    DataSourceUtils.releaseConnection<span style="color: #9564bf;">(</span>con, getDataSource<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+    con = <span style="color: #a45bad;">null</span>;
+    <span style="color: #4f97d7; font-weight: bold;">throw</span> translateException<span style="color: #9564bf;">(</span><span style="color: #2d9574;">"StatementCallback"</span>, sql, ex<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+  <span style="color: #4f97d7; font-weight: bold;">finally</span> <span style="color: #d8241f;">{</span>
+    JdbcUtils.closeStatement<span style="color: #9564bf;">(</span>stmt<span style="color: #9564bf;">)</span>;
+    DataSourceUtils.releaseConnection<span style="color: #9564bf;">(</span>con, getDataSource<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+<ol class="org-ol">
+<li><code>applyStatementSettings(...)</code> 用户设置输入参数
+<ul class="org-ul">
+<li>fectchSize 减少网络交互次数</li>
+<li>maxRows 获取结果集的最大行数</li>
+</ul></li>
+<li><p>
+<code>action.doInStatement(...)</code> 是调用 <code>StatementCallback</code> 类型的回调函数
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #a45bad;">@FunctionalInterface</span>
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">interface</span> <span style="color: #ce537a; font-weight: bold;">StatementCallback</span><span style="color: #8d5649;">&lt;</span><span style="color: #ce537a; font-weight: bold;">T</span><span style="color: #8d5649;">&gt;</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #a45bad;">@Nullable</span>
+  <span style="color: #ce537a; font-weight: bold;">T</span> <span style="color: #bc6ec5; font-weight: bold;">doInStatement</span><span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">Statement</span> <span style="color: #7590db;">stmt</span><span style="color: #d8241f;">)</span> <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">SQLException</span>, <span style="color: #ce537a; font-weight: bold;">DataAccessException</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div></li>
+<li><code>handleWarnings(...)</code> 进行告警处理
+<ul class="org-ul">
+<li>这里的告警默认输出异常信息</li>
+<li>可以通过配置抛出 <code>SQLWarningException</code> 异常</li>
+</ul></li>
+<li><code>DataSourceUtils.releaseConnection(...)</code> 释放连接</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orga64b5bc" class="outline-3">
+<h3 id="orga64b5bc"><span class="section-number-3">3.4</span> 数据库更新: <code>update(...)</code> 方法</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+数据库更新和执行 SQL 类似，这里需要熟悉 <code>PreparedStatement</code> 接口，它是一预编
+译的 SQL 语句
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">PreparedStatement</span> <span style="color: #7590db;">pstmt</span> = con.prepareStatement<span style="color: #8d5649;">(</span><span style="color: #2d9574;">"UPDATE EMPLOYEES SET SALARY = ? WHERE ID = ?"</span><span style="color: #8d5649;">)</span>;
+pstmt.setBigDecimal<span style="color: #8d5649;">(</span>1, 153833.00<span style="color: #8d5649;">)</span>;
+pstmt.setInt<span style="color: #8d5649;">(</span>2, 110592<span style="color: #8d5649;">)</span>;
+</pre>
+</div>
+
+<p>
+实际的 <code>update(...)</code> 方法实现如下
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">protected</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">update</span><span style="color: #8d5649;">(</span><span style="color: #4f97d7; font-weight: bold;">final</span> <span style="color: #ce537a; font-weight: bold;">PreparedStatementCreator</span> <span style="color: #7590db;">psc</span>, <span style="color: #a45bad;">@Nullable</span> <span style="color: #4f97d7; font-weight: bold;">final</span> <span style="color: #ce537a; font-weight: bold;">PreparedStatementSetter</span> <span style="color: #7590db;">pss</span><span style="color: #8d5649;">)</span>
+  <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">DataAccessException</span> <span style="color: #8d5649;">{</span>
+
+  logger.debug<span style="color: #d8241f;">(</span><span style="color: #2d9574;">"Executing prepared SQL update"</span><span style="color: #d8241f;">)</span>;
+
+  <span style="color: #4f97d7; font-weight: bold;">return</span> updateCount<span style="color: #d8241f;">(</span>execute<span style="color: #9564bf;">(</span>psc, ps -&gt; <span style="color: #24a222;">{</span>
+        <span style="color: #4f97d7; font-weight: bold;">try</span> <span style="color: #ff7f00;">{</span>
+          <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #1776b6;">(</span>pss != <span style="color: #a45bad;">null</span><span style="color: #1776b6;">)</span> <span style="color: #1776b6;">{</span>
+            <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#35774;&#32622; PreparedStatement &#30340;&#23454;&#38469;&#20540;</span>
+            pss.setValues<span style="color: #00bed1;">(</span>ps<span style="color: #00bed1;">)</span>;
+          <span style="color: #1776b6;">}</span>
+          <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#35843;&#29992;&#26356;&#26032;&#35821;&#21477;</span>
+          <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">rows</span> = ps.executeUpdate<span style="color: #1776b6;">()</span>;
+          <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #1776b6;">(</span>logger.isTraceEnabled<span style="color: #00bed1;">()</span><span style="color: #1776b6;">)</span> <span style="color: #1776b6;">{</span>
+            logger.trace<span style="color: #00bed1;">(</span><span style="color: #2d9574;">"SQL update affected "</span> + rows + <span style="color: #2d9574;">" rows"</span><span style="color: #00bed1;">)</span>;
+          <span style="color: #1776b6;">}</span>
+          <span style="color: #4f97d7; font-weight: bold;">return</span> rows;
+        <span style="color: #ff7f00;">}</span>
+        <span style="color: #4f97d7; font-weight: bold;">finally</span> <span style="color: #ff7f00;">{</span>
+          <span style="color: #4f97d7; font-weight: bold;">if</span> <span style="color: #1776b6;">(</span>pss <span style="color: #4f97d7; font-weight: bold;">instanceof</span> ParameterDisposer<span style="color: #1776b6;">)</span> <span style="color: #1776b6;">{</span>
+            <span style="color: #00bed1;">(</span><span style="color: #bcbf00;">(</span><span style="color: #ce537a; font-weight: bold;">ParameterDisposer</span><span style="color: #bcbf00;">)</span> pss<span style="color: #00bed1;">)</span>.cleanupParameters<span style="color: #00bed1;">()</span>;
+          <span style="color: #1776b6;">}</span>
+        <span style="color: #ff7f00;">}</span>
+      <span style="color: #24a222;">}</span><span style="color: #9564bf;">)</span><span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-23 Fri 15:14. Created by Jinghui Hu at 2021-07-23 Fri 11:43.</p>
+<p class="author">Last Updated 2021-07-24 Sat 00:57. Created by Jinghui Hu at 2021-07-23 Fri 11:43.</p>
 </div>
 </body>
 </html>
