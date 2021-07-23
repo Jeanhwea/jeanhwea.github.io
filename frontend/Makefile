@@ -3,9 +3,7 @@
 ################################################################################
 TAG   := $(shell git describe --tags --always --dirty="-dev")
 TODAY := $(shell date +'%Y-%m-%d')
-# ORGS  := $(shell find . -iname '*.org')
 ORGS  := $(wildcard *.org)
-# PDFS  := $(patsubst %.org,%.pdf,$(ORGS))
 PDFS  := $(ORGS:%.org=%.pdf)
 DOCS  := $(ORGS:%.org=%.docx)
 
@@ -52,5 +50,5 @@ clean:
 # sed '/^[-0-9A-Za-z]*:/!d;s/:.*$//' Makefile | sort | tr '\n' ' ' | xargs -I {} printf ".PHONY:\n\t{}\n"
 # codetta: output
 .PHONY:
-	all clean
+	all clean docs
 # codetta: end
