@@ -11,6 +11,7 @@ TODAY := $(shell date +'%Y-%m-%d')
 PANDOC := pandoc
 ECHO   := @echo
 RM     := rm
+MAKE   := make
 
 ################################################################################
 # Setup PDF Flags
