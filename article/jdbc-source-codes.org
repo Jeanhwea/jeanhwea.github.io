@@ -1,4 +1,4 @@
-#+TITLE: JDBC 数据库连接
+#+TITLE: JDBC 连接数据库
 #+AUTHOR: Jinghui Hu
 #+EMAIL: hujinghui@buaa.edu.cn
 #+DATE: <2021-07-23 Fri 11:43:18>
@@ -9,11 +9,160 @@
 
 
 * 实现原理
-  1. 首先需要在运行路径中加载驱动 ~mysql-connector-java-5.1.47.jar~, 驱动通过
-     SPI 的方式提前注册类信息, 添加的驱动信息在下面文件中
-     =META-INF/services/java.sql.Driver=
-     #+BEGIN_SRC text
-       com.mysql.jdbc.Driver
-       com.mysql.fabric.jdbc.FabricMySQLDriver
-     #+END_SRC
-  2. ~DriverManager~ 类创建数据库连接对象 ~Connection~
+** JDBC 连接数据库流程
+   Java 中定义了 JDBC 的连接操作数据库的基本流程
+   1. JDK 的实现包在 ~java.sql.*~ 下
+   2. 实现包括如下四个步骤
+   3. 注意 ~Class.forName(...)~ 是兼容性的写法
+      - 低版本的 JDK 中没有加载数据库驱动的代码，需要显示加载驱动
+      - 高版本的 JDK 不需要手动调用 ~Class.forName(...)~ 方法，在 ~DriverManager~
+        的源码中可以看到一个静态块，通过 SPI 方式自动加载驱动
+   #+BEGIN_SRC java
+     private static String url = "jdbc:mysql://localhost:3306/database?useSSL=false";
+     private static String username = "user01";
+     private static String password = "pass01";
+
+     public static void testMySQL() throws Exception {
+       // 加载驱动
+       Class.forName("com.mysql.jdbc.Driver");
+
+       // 创建连接
+       Connection conn = DriverManager.getConnection(url, username, password);
+
+       // 发送 SQL 语句
+       Statement stmt = conn.createStatement();
+       ResultSet rs = stmt.executeQuery("SELECT 'Hello'");
+       while (rs.next()) {
+         // rs.getObject(1);
+         String message = rs.getString(1);
+         System.out.println(message);
+       }
+
+       // 关闭连接
+       conn.close();
+     }
+   #+END_SRC
+
+** SPI 连接数据库流程
+   SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式和配置文件组
+   合实现的动态加载机制
+
+   1. 首先需要在运行路径中包含待加载的驱动 ~mysql-connector-java-5.1.47.jar~, 三
+      方驱动在 =META-INF/services/java.sql.Driver= 中添加驱动配置信息
+   2. ~DriverManager~ 的静态代码块中通过调用 ~loadInitialDrivers();~ 来读取使
+      用驱动信息
+      #+BEGIN_SRC java
+        /**
+         ,* Load the initial JDBC drivers by checking the System property
+         ,* jdbc.properties and then use the {@code ServiceLoader} mechanism
+         ,*/
+        static {
+            loadInitialDrivers();
+            println("JDBC DriverManager initialized");
+        }
+      #+END_SRC
+   3. 在 ~loadInitialDrivers();~ 方法中， ~ServiceLoader.load(Driver.class)~
+      通过扫描 =META-INF/services= 目录下的配置文件找到实现类的全限定名，把类
+      加载到 JVM
+      #+BEGIN_SRC java
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
+              // 这里加载通过 ServiceLoader 调用 AppClassLoader 加载 JDBC 驱动
+              ServiceLoader<Driver> loadedDrivers = ServiceLoader.load(Driver.class);
+              Iterator<Driver> driversIterator = loadedDrivers.iterator();
+
+              /* Load these drivers, so that they can be instantiated.
+               ,* It may be the case that the driver class may not be there
+               ,* i.e. there may be a packaged driver with the service class
+               ,* as implementation of java.sql.Driver but the actual class
+               ,* may be missing. In that case a java.util.ServiceConfigurationError
+               ,* will be thrown at runtime by the VM trying to locate
+               ,* and load the service.
+               ,*
+               ,* Adding a try catch block to catch those runtime errors
+               ,* if driver not available in classpath but it's
+               ,* packaged as service and that service is there in classpath.
+               ,*/
+              try{
+                while(driversIterator.hasNext()) {
+                  driversIterator.next();
+                }
+              } catch(Throwable t) {
+                // Do nothing
+              }
+              return null;
+            }
+          });
+      #+END_SRC
+   4. 使用 ~DriverManager~ 中定义了 ~registeredDrivers~ 来存储项目中引用的确定类
+      信息
+      #+BEGIN_SRC java
+        // List of registered JDBC drivers
+        private final static CopyOnWriteArrayList<DriverInfo> registeredDrivers = new CopyOnWriteArrayList<>();
+      #+END_SRC
+   5. 调用 ~getConnection~ 方法时通过变量所有注册的驱动来获取连接信息
+      #+BEGIN_SRC java
+        //  Worker method called by the public getConnection() methods.
+        private static Connection getConnection(
+            String url, java.util.Properties info, Class<?> caller) throws SQLException {
+            /*
+             ,* When callerCl is null, we should check the application's
+             ,* (which is invoking this class indirectly)
+             ,* classloader, so that the JDBC driver class outside rt.jar
+             ,* can be loaded from here.
+             ,*/
+            ClassLoader callerCL = caller != null ? caller.getClassLoader() : null;
+            synchronized(DriverManager.class) {
+                // synchronize loading of the correct classloader.
+                if (callerCL == null) {
+                    callerCL = Thread.currentThread().getContextClassLoader();
+                }
+            }
+
+            if(url == null) {
+                throw new SQLException("The url cannot be null", "08001");
+            }
+
+            println("DriverManager.getConnection(\"" + url + "\")");
+
+            // Walk through the loaded registeredDrivers attempting to make a connection.
+            // Remember the first exception that gets raised so we can reraise it.
+            SQLException reason = null;
+
+            for(DriverInfo aDriver : registeredDrivers) {
+                // If the caller does not have permission to load the driver then
+                // skip it.
+                if(isDriverAllowed(aDriver.driver, callerCL)) {
+                    try {
+                        println("    trying " + aDriver.driver.getClass().getName());
+                        Connection con = aDriver.driver.connect(url, info);
+                        if (con != null) {
+                            // Success!
+                            println("getConnection returning " + aDriver.driver.getClass().getName());
+                            return (con);
+                        }
+                    } catch (SQLException ex) {
+                        if (reason == null) {
+                            reason = ex;
+                        }
+                    }
+
+                } else {
+                    println("    skipping: " + aDriver.getClass().getName());
+                }
+
+            }
+
+            // if we got here nobody could connect.
+            if (reason != null)    {
+                println("getConnection failed: " + reason);
+                throw reason;
+            }
+
+            println("getConnection: no suitable driver found for "+ url);
+            throw new SQLException("No suitable driver found for "+ url, "08001");
+        }
+      #+END_SRC
+
+* Spring 中的 ~JdbcTemplate~
+  Spring 框架中对 JDBC 的操作进行了封装，提供可以方便操作数据库的 ~JdbcTemplate~ 类

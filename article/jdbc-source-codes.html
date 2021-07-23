@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-07-23 Fri 13:42 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JDBC 连接数据库</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script type="text/javascript" src="styles/lib/js/jquery.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="../readme.html"> UP </a>
+ |
+ <a accesskey="H" href="../index.html"> HOME </a>
+</div><div id="content">
+<h1 class="title">JDBC 连接数据库</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgf4e085d">1. 实现原理</a>
+<ul>
+<li><a href="#org25af4b8">1.1. JDBC 连接数据库流程</a></li>
+<li><a href="#org7376fde">1.2. SPI 连接数据库流程</a></li>
+</ul>
+</li>
+<li><a href="#orgf9e2c2d">2. Spring 中的 <code>JdbcTemplate</code></a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orgf4e085d" class="outline-2">
+<h2 id="orgf4e085d"><span class="section-number-2">1</span> 实现原理</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org25af4b8" class="outline-3">
+<h3 id="org25af4b8"><span class="section-number-3">1.1</span> JDBC 连接数据库流程</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Java 中定义了 JDBC 的连接操作数据库的基本流程
+</p>
+<ol class="org-ol">
+<li>JDK 的实现包在 <code>java.sql.*</code> 下</li>
+<li>实现包括如下四个步骤</li>
+<li>注意 <code>Class.forName(...)</code> 是兼容性的写法
+<ul class="org-ul">
+<li>低版本的 JDK 中没有加载数据库驱动的代码，需要显示加载驱动</li>
+<li>高版本的 JDK 不需要手动调用 <code>Class.forName(...)</code> 方法，在 <code>DriverManager</code>
+的源码中可以看到一个静态块，通过 SPI 方式自动加载驱动</li>
+</ul></li>
+</ol>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #99cc99;">private</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">url</span> = <span style="color: #66cccc;">"jdbc:mysql://localhost:3306/database?useSSL=false"</span>;
+<span style="color: #99cc99;">private</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">username</span> = <span style="color: #66cccc;">"user01"</span>;
+<span style="color: #99cc99;">private</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">password</span> = <span style="color: #66cccc;">"pass01"</span>;
+
+<span style="color: #99cc99;">public</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">void</span> <span style="color: #f99157;">testMySQL</span><span style="color: #8d5649;">()</span> <span style="color: #99cc99;">throws</span> <span style="color: #6699cc;">Exception</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#21152;&#36733;&#39537;&#21160;</span>
+  Class.forName<span style="color: #d8241f;">(</span><span style="color: #66cccc;">"com.mysql.jdbc.Driver"</span><span style="color: #d8241f;">)</span>;
+
+  <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#21019;&#24314;&#36830;&#25509;</span>
+  <span style="color: #6699cc;">Connection</span> <span style="color: #ffcc66;">conn</span> = DriverManager.getConnection<span style="color: #d8241f;">(</span>url, username, password<span style="color: #d8241f;">)</span>;
+
+  <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#21457;&#36865; SQL &#35821;&#21477;</span>
+  <span style="color: #6699cc;">Statement</span> <span style="color: #ffcc66;">stmt</span> = conn.createStatement<span style="color: #d8241f;">()</span>;
+  <span style="color: #6699cc;">ResultSet</span> <span style="color: #ffcc66;">rs</span> = stmt.executeQuery<span style="color: #d8241f;">(</span><span style="color: #66cccc;">"SELECT 'Hello'"</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #99cc99;">while</span> <span style="color: #d8241f;">(</span>rs.next<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">rs.getObject(1);</span>
+    <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">message</span> = rs.getString<span style="color: #9564bf;">(</span>1<span style="color: #9564bf;">)</span>;
+    System.out.println<span style="color: #9564bf;">(</span>message<span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span>
+
+  <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#20851;&#38381;&#36830;&#25509;</span>
+  conn.close<span style="color: #d8241f;">()</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7376fde" class="outline-3">
+<h3 id="org7376fde"><span class="section-number-3">1.2</span> SPI 连接数据库流程</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式和配置文件组
+合实现的动态加载机制
+</p>
+
+<ol class="org-ol">
+<li>首先需要在运行路径中包含待加载的驱动 <code>mysql-connector-java-5.1.47.jar</code>, 三
+方驱动在 <code>META-INF/services/java.sql.Driver</code> 中添加驱动配置信息</li>
+<li><p>
+<code>DriverManager</code> 的静态代码块中通过调用 <code>loadInitialDrivers();</code> 来读取使
+用驱动信息
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #cc99cc;">/**</span>
+<span style="color: #cc99cc;"> * Load the initial JDBC drivers by checking the System property</span>
+<span style="color: #cc99cc;"> * jdbc.properties and then use the </span><span style="color: #6699cc;">{@code ServiceLoader}</span><span style="color: #cc99cc;"> mechanism</span>
+<span style="color: #cc99cc;"> */</span>
+<span style="color: #99cc99;">static</span> <span style="color: #8d5649;">{</span>
+    loadInitialDrivers<span style="color: #d8241f;">()</span>;
+    println<span style="color: #d8241f;">(</span><span style="color: #66cccc;">"JDBC DriverManager initialized"</span><span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div></li>
+<li><p>
+在 <code>loadInitialDrivers();</code> 方法中， <code>ServiceLoader.load(Driver.class)</code>
+通过扫描 <code>META-INF/services</code> 目录下的配置文件找到实现类的全限定名，把类
+加载到 JVM
+</p>
+<div class="org-src-container">
+<pre class="src src-java">AccessController.doPrivileged<span style="color: #8d5649;">(</span><span style="color: #99cc99;">new</span> <span style="color: #6699cc;">PrivilegedAction</span><span style="color: #d8241f;">&lt;</span><span style="color: #6699cc;">Void</span><span style="color: #d8241f;">&gt;()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #99cc99;">public</span> <span style="color: #6699cc;">Void</span> <span style="color: #f99157;">run</span><span style="color: #9564bf;">()</span> <span style="color: #9564bf;">{</span>
+      <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">&#36825;&#37324;&#21152;&#36733;&#36890;&#36807; ServiceLoader &#35843;&#29992; AppClassLoader &#21152;&#36733; JDBC &#39537;&#21160;</span>
+      <span style="color: #6699cc;">ServiceLoader</span><span style="color: #24a222;">&lt;</span><span style="color: #6699cc;">Driver</span><span style="color: #24a222;">&gt;</span> <span style="color: #ffcc66;">loadedDrivers</span> = ServiceLoader.load<span style="color: #24a222;">(</span>Driver.<span style="color: #99cc99;">class</span><span style="color: #24a222;">)</span>;
+      <span style="color: #6699cc;">Iterator</span><span style="color: #24a222;">&lt;</span><span style="color: #6699cc;">Driver</span><span style="color: #24a222;">&gt;</span> <span style="color: #ffcc66;">driversIterator</span> = loadedDrivers.iterator<span style="color: #24a222;">()</span>;
+
+      <span style="color: #999999; font-style: italic;">/* </span><span style="color: #999999; font-style: italic;">Load these drivers, so that they can be instantiated.</span>
+<span style="color: #999999; font-style: italic;">       * It may be the case that the driver class may not be there</span>
+<span style="color: #999999; font-style: italic;">       * i.e. there may be a packaged driver with the service class</span>
+<span style="color: #999999; font-style: italic;">       * as implementation of java.sql.Driver but the actual class</span>
+<span style="color: #999999; font-style: italic;">       * may be missing. In that case a java.util.ServiceConfigurationError</span>
+<span style="color: #999999; font-style: italic;">       * will be thrown at runtime by the VM trying to locate</span>
+<span style="color: #999999; font-style: italic;">       * and load the service.</span>
+<span style="color: #999999; font-style: italic;">       *</span>
+<span style="color: #999999; font-style: italic;">       * Adding a try catch block to catch those runtime errors</span>
+<span style="color: #999999; font-style: italic;">       * if driver not available in classpath but it's</span>
+<span style="color: #999999; font-style: italic;">       * packaged as service and that service is there in classpath.</span>
+<span style="color: #999999; font-style: italic;">       */</span>
+      <span style="color: #99cc99;">try</span><span style="color: #24a222;">{</span>
+        <span style="color: #99cc99;">while</span><span style="color: #ff7f00;">(</span>driversIterator.hasNext<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+          driversIterator.next<span style="color: #1776b6;">()</span>;
+        <span style="color: #ff7f00;">}</span>
+      <span style="color: #24a222;">}</span> <span style="color: #99cc99;">catch</span><span style="color: #24a222;">(</span><span style="color: #6699cc;">Throwable</span> <span style="color: #ffcc66;">t</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+        <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">Do nothing</span>
+      <span style="color: #24a222;">}</span>
+      <span style="color: #99cc99;">return</span> <span style="color: #6699cc;">null</span>;
+    <span style="color: #9564bf;">}</span>
+  <span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>;
+</pre>
+</div></li>
+<li><p>
+使用 <code>DriverManager</code> 中定义了 <code>registeredDrivers</code> 来存储项目中引用的确定类
+信息
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">List of registered JDBC drivers</span>
+<span style="color: #99cc99;">private</span> <span style="color: #99cc99;">final</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">CopyOnWriteArrayList</span><span style="color: #8d5649;">&lt;</span><span style="color: #6699cc;">DriverInfo</span><span style="color: #8d5649;">&gt;</span> <span style="color: #ffcc66;">registeredDrivers</span> = <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">CopyOnWriteArrayList</span><span style="color: #8d5649;">&lt;&gt;()</span>;
+</pre>
+</div></li>
+<li><p>
+调用 <code>getConnection</code> 方法时通过变量所有注册的驱动来获取连接信息
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #999999; font-style: italic;">//  </span><span style="color: #999999; font-style: italic;">Worker method called by the public getConnection() methods.</span>
+<span style="color: #99cc99;">private</span> <span style="color: #99cc99;">static</span> <span style="color: #6699cc;">Connection</span> <span style="color: #f99157;">getConnection</span><span style="color: #8d5649;">(</span>
+    <span style="color: #6699cc;">String</span> <span style="color: #ffcc66;">url</span>, <span style="color: #6699cc;">java</span>.<span style="color: #6699cc;">util</span>.<span style="color: #6699cc;">Properties</span> <span style="color: #ffcc66;">info</span>, <span style="color: #6699cc;">Class</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #ffcc66;">caller</span><span style="color: #8d5649;">)</span> <span style="color: #99cc99;">throws</span> <span style="color: #6699cc;">SQLException</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #999999; font-style: italic;">/*</span>
+<span style="color: #999999; font-style: italic;">     * When callerCl is null, we should check the application's</span>
+<span style="color: #999999; font-style: italic;">     * (which is invoking this class indirectly)</span>
+<span style="color: #999999; font-style: italic;">     * classloader, so that the JDBC driver class outside rt.jar</span>
+<span style="color: #999999; font-style: italic;">     * can be loaded from here.</span>
+<span style="color: #999999; font-style: italic;">     */</span>
+    <span style="color: #6699cc;">ClassLoader</span> <span style="color: #ffcc66;">callerCL</span> = caller != <span style="color: #6699cc;">null</span> ? caller.getClassLoader<span style="color: #d8241f;">()</span> : <span style="color: #6699cc;">null</span>;
+    <span style="color: #99cc99;">synchronized</span><span style="color: #d8241f;">(</span>DriverManager.<span style="color: #99cc99;">class</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">synchronize loading of the correct classloader.</span>
+        <span style="color: #99cc99;">if</span> <span style="color: #9564bf;">(</span>callerCL == <span style="color: #6699cc;">null</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            callerCL = Thread.currentThread<span style="color: #24a222;">()</span>.getContextClassLoader<span style="color: #24a222;">()</span>;
+        <span style="color: #9564bf;">}</span>
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #99cc99;">if</span><span style="color: #d8241f;">(</span>url == <span style="color: #6699cc;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #99cc99;">throw</span> <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">SQLException</span><span style="color: #9564bf;">(</span><span style="color: #66cccc;">"The url cannot be null"</span>, <span style="color: #66cccc;">"08001"</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span>
+
+    println<span style="color: #d8241f;">(</span><span style="color: #66cccc;">"DriverManager.getConnection(\""</span> + url + <span style="color: #66cccc;">"\")"</span><span style="color: #d8241f;">)</span>;
+
+    <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">Walk through the loaded registeredDrivers attempting to make a connection.</span>
+    <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">Remember the first exception that gets raised so we can reraise it.</span>
+    <span style="color: #6699cc;">SQLException</span> <span style="color: #ffcc66;">reason</span> = <span style="color: #6699cc;">null</span>;
+
+    <span style="color: #99cc99;">for</span><span style="color: #d8241f;">(</span><span style="color: #6699cc;">DriverInfo</span> <span style="color: #ffcc66;">aDriver</span> : registeredDrivers<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">If the caller does not have permission to load the driver then</span>
+        <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">skip it.</span>
+        <span style="color: #99cc99;">if</span><span style="color: #9564bf;">(</span>isDriverAllowed<span style="color: #24a222;">(</span>aDriver.driver, callerCL<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #99cc99;">try</span> <span style="color: #24a222;">{</span>
+                println<span style="color: #ff7f00;">(</span><span style="color: #66cccc;">"    trying "</span> + aDriver.driver.getClass<span style="color: #1776b6;">()</span>.getName<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span>;
+                <span style="color: #6699cc;">Connection</span> <span style="color: #ffcc66;">con</span> = aDriver.driver.connect<span style="color: #ff7f00;">(</span>url, info<span style="color: #ff7f00;">)</span>;
+                <span style="color: #99cc99;">if</span> <span style="color: #ff7f00;">(</span>con != <span style="color: #6699cc;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                    <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">Success!</span>
+                    println<span style="color: #1776b6;">(</span><span style="color: #66cccc;">"getConnection returning "</span> + aDriver.driver.getClass<span style="color: #00bed1;">()</span>.getName<span style="color: #00bed1;">()</span><span style="color: #1776b6;">)</span>;
+                    <span style="color: #99cc99;">return</span> <span style="color: #1776b6;">(</span>con<span style="color: #1776b6;">)</span>;
+                <span style="color: #ff7f00;">}</span>
+            <span style="color: #24a222;">}</span> <span style="color: #99cc99;">catch</span> <span style="color: #24a222;">(</span><span style="color: #6699cc;">SQLException</span> <span style="color: #ffcc66;">ex</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #99cc99;">if</span> <span style="color: #ff7f00;">(</span>reason == <span style="color: #6699cc;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                    reason = ex;
+                <span style="color: #ff7f00;">}</span>
+            <span style="color: #24a222;">}</span>
+
+        <span style="color: #9564bf;">}</span> <span style="color: #99cc99;">else</span> <span style="color: #9564bf;">{</span>
+            println<span style="color: #24a222;">(</span><span style="color: #66cccc;">"    skipping: "</span> + aDriver.getClass<span style="color: #ff7f00;">()</span>.getName<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span>
+
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #999999; font-style: italic;">// </span><span style="color: #999999; font-style: italic;">if we got here nobody could connect.</span>
+    <span style="color: #99cc99;">if</span> <span style="color: #d8241f;">(</span>reason != <span style="color: #6699cc;">null</span><span style="color: #d8241f;">)</span>    <span style="color: #d8241f;">{</span>
+        println<span style="color: #9564bf;">(</span><span style="color: #66cccc;">"getConnection failed: "</span> + reason<span style="color: #9564bf;">)</span>;
+        <span style="color: #99cc99;">throw</span> reason;
+    <span style="color: #d8241f;">}</span>
+
+    println<span style="color: #d8241f;">(</span><span style="color: #66cccc;">"getConnection: no suitable driver found for "</span>+ url<span style="color: #d8241f;">)</span>;
+    <span style="color: #99cc99;">throw</span> <span style="color: #99cc99;">new</span> <span style="color: #6699cc;">SQLException</span><span style="color: #d8241f;">(</span><span style="color: #66cccc;">"No suitable driver found for "</span>+ url, <span style="color: #66cccc;">"08001"</span><span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf9e2c2d" class="outline-2">
+<h2 id="orgf9e2c2d"><span class="section-number-2">2</span> Spring 中的 <code>JdbcTemplate</code></h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Spring 框架中对 JDBC 的操作进行了封装，提供可以方便操作数据库的 <code>JdbcTemplate</code> 类
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Last Updated 2021-07-23 Fri 13:42. Created by Jinghui Hu at 2021-07-23 Fri 11:43.</p>
+</div>
+</body>
+</html>
