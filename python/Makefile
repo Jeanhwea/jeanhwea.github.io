@@ -13,10 +13,10 @@ docs: $(DOCS)
 	$(ECHO) "Finish: [$(DOCS)]"
 
 %.pdf: %.org
-	$(PANDOC) $(CFLAG) $< -o $@
+	-$(PANDOC) $(CFLAG) $< -o $@
 
 %.docx: %.org
-	$(PANDOC) $< -o $@
+	-$(PANDOC) $< -o $@
 
 clean:
 	-$(RM) -f *.pdf *.docx
