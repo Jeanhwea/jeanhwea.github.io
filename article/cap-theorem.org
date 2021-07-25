@@ -26,7 +26,7 @@
   如果保证 P, 那么系统可以容忍 Partition, 根据 CAP 定理需要牺牲 A 或者 C
   1. 保证 A 的情形: 两个节点虽然彼此不能沟通，但是既然或者就让他们正常服务，这样
      其中一半的变化不能传递到另一边，因此可能两边的数据会出现不一致。更糟糕的状
-     况是会发生 =脑裂=, 就是 master 中写入数据，slave 允许写数据出现时序不一致问
+     况是会发生 =脑裂=, 就是 Master 中写入数据，Slave 允许写数据出现时序不一致问
      题
   2. 保证 P 的情形: 为了避免之前的不一致问题，因此必须停掉其中任一个节点
 
@@ -43,14 +43,46 @@
   3. AP: Cassandra, CouchDB, DynamoDB, Riak
      - Cassandra 不保证一致性，高度容错
 
-* CAP 定理延伸: ZK
+* Apache ZooKeeper
 ** ZK 的 Metadata
-   ZK 是维持 cluster 中共同状态的分布式系统，
+   ZK 是维持 Cluster 中共同状态的分布式系统，
    1. ZK 主要维护了一些 Metadata, 用于降低大量更新时同步数据的开销
-   2. ZK 有自己的 HA 和 Consistency 机制，在 production 环境下只需要维护 ~2n+1~
-      的 node 的数据即可保证数据的一致性
+   2. ZK 有自己的 HA 和 Consistency 机制，在 Production 环境下只需要维护 ~2n+1~
+      的 Node 的数据即可保证数据的一致性
 
 ** ZK 的几个常见用法
    1. 共享 Metadata
+      - ZK 的文件是以树的方式组织，树节点是 znode
+      - ZK 的节点间有 Notification 机载，在 znode 里的资料更新时需事先通知对该
+        znode 注册的 Watcher Process
    2. 监控成员节点的状况 & 维护集群的成员名单
-   3. 协助集群选集 leader (master)
+      - 有一种 znode 叫做 Ephemeral Node, 用来监控成员的状况。
+      - Ephemeral Node 跟其它 znode 建立 Session 是连动的
+      - 若 Session 没有 Heartbeat，Ephemeral Node 会被删除
+      - 其它 znode 上设定了 watcher, 就会在节点挂掉（即 Session 挂掉后）收到通知
+   3. 协助集群选集 Leader (Master)
+      - 所有成员对 Master 节点对应的 Ephemeral Node 注册 Watcher
+      - 当 Master 失效后，会有成员侦测到而启动 Leader Election
+
+** ZK 的 Quorum
+   1. ZK 能保证 Global Order, 因为只有 Leader 能处理写入的需求
+   2. 如果发生 Partition, ZK 任然可以维持服务，因为 ZK 采用了 Quorum 机载，所有
+      ZK 是偏向于 CA 的系统
+   3. Quorum 是成员数达到最低投票门口的成员集合，Quorum 具有如下属性
+      - 成员只能是 Leader 或 Follower
+      - 一个 Quorum 中只有一个 Leader, 其它都是支持改 Leader 的 Follower
+   4. 当集群出现多个 Quorum 时，触发 Leader Election, 拥有半数以上的 Quorum 被称
+      为 Majority
+   5. 当 Cluster 出现多个 Quorum 时，最多只有 Majority 可以对外进行服务，这样保
+      证了不会出现不一致的状况
+
+* Apache Kafka
+** Kafka 特点
+   1. 分布式架构，天生容易扩充
+   2. 基于硬盘空间，且避免随机存取
+   3. 因为存储空间大，Queue 里的消息及时消费后，可以不用删掉
+      - 新加入的 consumer 可以处理过去的消息
+      - 如果有 Batch-Oriented 的消费者（例如 Hadoop）, 可以一次拉取足够大量的资
+        料，提高 Batch 处理的效率
+   4. 消息的包装轻量级，可压缩
+   5. 因为是直接处理文件，可以利用 OS 的 Page Cache, 避免消耗内存

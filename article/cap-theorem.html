@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-25 Sun 17:33 -->
+<!-- 2021-07-25 Sun 18:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CAP 定理</title>
@@ -233,17 +233,29 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org42c5812">1. CAP 定理</a></li>
-<li><a href="#org56de6e4">2. Partition Tolerance</a></li>
-<li><a href="#org6e749a6">3. Availability &amp; Consistency</a></li>
-<li><a href="#orgfb2772c">4. 数据产品的分类</a></li>
+<li><a href="#org297ba9c">1. CAP 定理</a></li>
+<li><a href="#org771ecf7">2. Partition Tolerance</a></li>
+<li><a href="#org0adf7ed">3. Availability &amp; Consistency</a></li>
+<li><a href="#orge62eda5">4. 数据产品的分类</a></li>
+<li><a href="#orgf9d189b">5. Apache ZooKeeper</a>
+<ul>
+<li><a href="#org5c31315">5.1. ZK 的 Metadata</a></li>
+<li><a href="#org01f059b">5.2. ZK 的几个常见用法</a></li>
+<li><a href="#orgb51f301">5.3. ZK 的 Quorum</a></li>
+</ul>
+</li>
+<li><a href="#org6bab0ca">6. Apache Kafka</a>
+<ul>
+<li><a href="#org8b92789">6.1. Kafka 特点</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org42c5812" class="outline-2">
-<h2 id="org42c5812"><span class="section-number-2">1</span> CAP 定理</h2>
+<div id="outline-container-org297ba9c" class="outline-2">
+<h2 id="org297ba9c"><span class="section-number-2">1</span> CAP 定理</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 CAP 定理说明在分布式场景中经常遇到的问题，其中 CAP 指分布式系统的三个特性
@@ -261,8 +273,8 @@ CAP 定理说明在分布式场景中经常遇到的问题，其中 CAP 指分�
 </div>
 </div>
 
-<div id="outline-container-org56de6e4" class="outline-2">
-<h2 id="org56de6e4"><span class="section-number-2">2</span> Partition Tolerance</h2>
+<div id="outline-container-org771ecf7" class="outline-2">
+<h2 id="org771ecf7"><span class="section-number-2">2</span> Partition Tolerance</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 假如两台节点在不同机器上，如果存入资料的方式是 2PC (Two-Phase Commit), 即所有
@@ -272,8 +284,8 @@ CAP 定理说明在分布式场景中经常遇到的问题，其中 CAP 指分�
 </div>
 </div>
 
-<div id="outline-container-org6e749a6" class="outline-2">
-<h2 id="org6e749a6"><span class="section-number-2">3</span> Availability &amp; Consistency</h2>
+<div id="outline-container-org0adf7ed" class="outline-2">
+<h2 id="org0adf7ed"><span class="section-number-2">3</span> Availability &amp; Consistency</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 如果保证 P, 那么系统可以容忍 Partition, 根据 CAP 定理需要牺牲 A 或者 C
@@ -281,15 +293,15 @@ CAP 定理说明在分布式场景中经常遇到的问题，其中 CAP 指分�
 <ol class="org-ol">
 <li>保证 A 的情形: 两个节点虽然彼此不能沟通，但是既然或者就让他们正常服务，这样
 其中一半的变化不能传递到另一边，因此可能两边的数据会出现不一致。更糟糕的状
-况是会发生 <code>脑裂</code>, 就是 master 中写入数据，slave 允许写数据出现时序不一致问
+况是会发生 <code>脑裂</code>, 就是 Master 中写入数据，Slave 允许写数据出现时序不一致问
 题</li>
 <li>保证 P 的情形: 为了避免之前的不一致问题，因此必须停掉其中任一个节点</li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orgfb2772c" class="outline-2">
-<h2 id="orgfb2772c"><span class="section-number-2">4</span> 数据产品的分类</h2>
+<div id="outline-container-orge62eda5" class="outline-2">
+<h2 id="orge62eda5"><span class="section-number-2">4</span> 数据产品的分类</h2>
 <div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li>CA: 关系型数据库 RDBMS
@@ -305,13 +317,104 @@ CAP 定理说明在分布式场景中经常遇到的问题，其中 CAP 指分�
 <li>Redis</li>
 <li>ZooKeeper (偏向于 CP 的设计)</li>
 </ul></li>
-<li>AP: Cassandra, CouchDB, DynamoDB, Riak</li>
+<li>AP: Cassandra, CouchDB, DynamoDB, Riak
+<ul class="org-ul">
+<li>Cassandra 不保证一致性，高度容错</li>
+</ul></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgf9d189b" class="outline-2">
+<h2 id="orgf9d189b"><span class="section-number-2">5</span> Apache ZooKeeper</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org5c31315" class="outline-3">
+<h3 id="org5c31315"><span class="section-number-3">5.1</span> ZK 的 Metadata</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+ZK 是维持 Cluster 中共同状态的分布式系统，
+</p>
+<ol class="org-ol">
+<li>ZK 主要维护了一些 Metadata, 用于降低大量更新时同步数据的开销</li>
+<li>ZK 有自己的 HA 和 Consistency 机制，在 Production 环境下只需要维护 <code>2n+1</code>
+的 Node 的数据即可保证数据的一致性</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org01f059b" class="outline-3">
+<h3 id="org01f059b"><span class="section-number-3">5.2</span> ZK 的几个常见用法</h3>
+<div class="outline-text-3" id="text-5-2">
+<ol class="org-ol">
+<li>共享 Metadata
+<ul class="org-ul">
+<li>ZK 的文件是以树的方式组织，树节点是 znode</li>
+<li>ZK 的节点间有 Notification 机载，在 znode 里的资料更新时需事先通知对该
+znode 注册的 Watcher Process</li>
+</ul></li>
+<li>监控成员节点的状况 &amp; 维护集群的成员名单
+<ul class="org-ul">
+<li>有一种 znode 叫做 Ephemeral Node, 用来监控成员的状况。</li>
+<li>Ephemeral Node 跟其它 znode 建立 Session 是连动的</li>
+<li>若 Session 没有 Heartbeat，Ephemeral Node 会被删除</li>
+<li>其它 znode 上设定了 watcher, 就会在节点挂掉（即 Session 挂掉后）收到通知</li>
+</ul></li>
+<li>协助集群选集 Leader (Master)
+<ul class="org-ul">
+<li>所有成员对 Master 节点对应的 Ephemeral Node 注册 Watcher</li>
+<li>当 Master 失效后，会有成员侦测到而启动 Leader Election</li>
+</ul></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgb51f301" class="outline-3">
+<h3 id="orgb51f301"><span class="section-number-3">5.3</span> ZK 的 Quorum</h3>
+<div class="outline-text-3" id="text-5-3">
+<ol class="org-ol">
+<li>ZK 能保证 Global Order, 因为只有 Leader 能处理写入的需求</li>
+<li>如果发生 Partition, ZK 任然可以维持服务，因为 ZK 采用了 Quorum 机载，所有
+ZK 是偏向于 CA 的系统</li>
+<li>Quorum 是成员数达到最低投票门口的成员集合，Quorum 具有如下属性
+<ul class="org-ul">
+<li>成员只能是 Leader 或 Follower</li>
+<li>一个 Quorum 中只有一个 Leader, 其它都是支持改 Leader 的 Follower</li>
+</ul></li>
+<li>当集群出现多个 Quorum 时，触发 Leader Election, 拥有半数以上的 Quorum 被称
+为 Majority</li>
+<li>当 Cluster 出现多个 Quorum 时，最多只有 Majority 可以对外进行服务，这样保
+证了不会出现不一致的状况</li>
 </ol>
 </div>
 </div>
 </div>
+
+<div id="outline-container-org6bab0ca" class="outline-2">
+<h2 id="org6bab0ca"><span class="section-number-2">6</span> Apache Kafka</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-org8b92789" class="outline-3">
+<h3 id="org8b92789"><span class="section-number-3">6.1</span> Kafka 特点</h3>
+<div class="outline-text-3" id="text-6-1">
+<ol class="org-ol">
+<li>分布式架构，天生容易扩充</li>
+<li>基于硬盘空间，且避免随机存取</li>
+<li>因为存储空间大，Queue 里的消息及时消费后，可以不用删掉
+<ul class="org-ul">
+<li>新加入的 consumer 可以处理过去的消息</li>
+<li>如果有 Batch-Oriented 的消费者（例如 Hadoop）, 可以一次拉取足够大量的资
+料，提高 Batch 处理的效率</li>
+</ul></li>
+<li>消息的包装轻量级，可压缩</li>
+<li>因为是直接处理文件，可以利用 OS 的 Page Cache, 避免消耗内存</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-25 Sun 17:33. Created by Jinghui Hu at 2021-07-25 Sun 17:10.</p>
+<p class="author">Last Updated 2021-07-25 Sun 18:44. Created by Jinghui Hu at 2021-07-25 Sun 17:10.</p>
 </div>
 </body>
 </html>
