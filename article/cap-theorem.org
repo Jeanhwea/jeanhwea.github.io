@@ -41,3 +41,16 @@
      - Redis
      - ZooKeeper (偏向于 CP 的设计)
   3. AP: Cassandra, CouchDB, DynamoDB, Riak
+     - Cassandra 不保证一致性，高度容错
+
+* CAP 定理延伸: ZK
+** ZK 的 Metadata
+   ZK 是维持 cluster 中共同状态的分布式系统，
+   1. ZK 主要维护了一些 Metadata, 用于降低大量更新时同步数据的开销
+   2. ZK 有自己的 HA 和 Consistency 机制，在 production 环境下只需要维护 ~2n+1~
+      的 node 的数据即可保证数据的一致性
+
+** ZK 的几个常见用法
+   1. 共享 Metadata
+   2. 监控成员节点的状况 & 维护集群的成员名单
+   3. 协助集群选集 leader (master)
