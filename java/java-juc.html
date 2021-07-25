@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-07 Wed 09:23 -->
+<!-- 2021-07-25 Sun 22:24 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Java 并发编程</title>
@@ -233,26 +233,67 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgdb1a0c9">1. 线程</a>
+<li><a href="#org2bc2c8e">1. 线程</a>
 <ul>
-<li><a href="#orgf530a91">1.1. 线程六种状态</a></li>
-<li><a href="#orgb7ecafc">1.2. Thread</a></li>
-<li><a href="#orgb66582d">1.3. ThreadLocal</a></li>
-<li><a href="#org3179fdd">1.4. ThreadPoolExecutor</a></li>
+<li><a href="#org5f742e4">1.1. 线程六种状态</a></li>
+<li><a href="#org1090045">1.2. Thread</a></li>
+<li><a href="#org55b1534">1.3. ThreadLocal</a></li>
+<li><a href="#org06ccd47">1.4. ThreadPoolExecutor</a></li>
 </ul>
 </li>
-<li><a href="#org115c8c9">2. 线程死锁</a>
+<li><a href="#org57a896c">2. 线程死锁</a>
 <ul>
-<li><a href="#orgf8d0cb9">2.1. 死锁的四个必要条件</a></li>
+<li><a href="#org73501cf">2.1. 死锁的四个必要条件</a></li>
 </ul>
 </li>
-<li><a href="#org75c4053">3. CAS</a></li>
-<li><a href="#org0feb10b">4. AQS</a></li>
-<li><a href="#org5945cbd">5. 常用工具</a>
+<li><a href="#orgcc2213f">3. CAS</a></li>
+<li><a href="#org732407c">4. AQS</a></li>
+<li><a href="#org49dcb48">5. 核心组件</a>
 <ul>
-<li><a href="#org55aba91">5.1. CountDownLatch &amp; CyclicBarrier</a></li>
-<li><a href="#org969bd7d">5.2. ReentrantLock</a></li>
-<li><a href="#org5121761">5.3. ConcurrentHashMap</a></li>
+<li><a href="#orgc0cf29c">5.1. 原子类</a>
+<ul>
+<li><a href="#orgf408418">5.1.1. AtmoicInteger</a></li>
+<li><a href="#org1efb19c">5.1.2. AtomicReference</a></li>
+</ul>
+</li>
+<li><a href="#org1cf0584">5.2. 并发队列</a>
+<ul>
+<li><a href="#orgcbd4971">5.2.1. LinkedBlockingQueue</a></li>
+<li><a href="#org50b8b98">5.2.2. ArrayBlockingQueue</a></li>
+<li><a href="#org2d62bdc">5.2.3. ConcurrentLinkedDeque</a></li>
+<li><a href="#orgf248597">5.2.4. ConcurrentLinkedQueue</a></li>
+</ul>
+</li>
+<li><a href="#orgb3fd31e">5.3. 同步工具</a>
+<ul>
+<li><a href="#org937c16e">5.3.1. CountDownLatch</a></li>
+<li><a href="#orgb2879b4">5.3.2. CyclicBarrier</a></li>
+<li><a href="#org526c0c6">5.3.3. Semaphore</a></li>
+<li><a href="#org4582bf3">5.3.4. Exchanger</a></li>
+</ul>
+</li>
+<li><a href="#orga21dfce">5.4. 并发集合</a>
+<ul>
+<li><a href="#orgb964f98">5.4.1. ConcurrentHashMap</a></li>
+<li><a href="#org40b1b85">5.4.2. CopyOnWriteArrayList</a></li>
+<li><a href="#org52de001">5.4.3. CopyOnWriteArraySet</a></li>
+<li><a href="#orgae2ca7c">5.4.4. ConcurrentSkipSet</a></li>
+<li><a href="#org89b4fb6">5.4.5. ConcurrentSkipListMap</a></li>
+</ul>
+</li>
+<li><a href="#org1c2207d">5.5. 并发锁</a>
+<ul>
+<li><a href="#org607f4b1">5.5.1. ReentrantLock</a></li>
+<li><a href="#org4099772">5.5.2. StampedLock</a></li>
+<li><a href="#orge4132ea">5.5.3. ReentrantReadWriteLock</a></li>
+</ul>
+</li>
+<li><a href="#org7c5dfea">5.6. 线程池</a>
+<ul>
+<li><a href="#org149b4b5">5.6.1. Fork/Join</a></li>
+<li><a href="#org93063ce">5.6.2. Executor</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -260,12 +301,12 @@
 </div>
 
 
-<div id="outline-container-orgdb1a0c9" class="outline-2">
-<h2 id="orgdb1a0c9"><span class="section-number-2">1</span> 线程</h2>
+<div id="outline-container-org2bc2c8e" class="outline-2">
+<h2 id="org2bc2c8e"><span class="section-number-2">1</span> 线程</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgf530a91" class="outline-3">
-<h3 id="orgf530a91"><span class="section-number-3">1.1</span> 线程六种状态</h3>
+<div id="outline-container-org5f742e4" class="outline-3">
+<h3 id="org5f742e4"><span class="section-number-3">1.1</span> 线程六种状态</h3>
 <div class="outline-text-3" id="text-1-1">
 <ol class="org-ol">
 <li>NEW
@@ -313,25 +354,30 @@
 </ol>
 </div>
 </div>
-<div id="outline-container-orgb7ecafc" class="outline-3">
-<h3 id="orgb7ecafc"><span class="section-number-3">1.2</span> Thread</h3>
+<div id="outline-container-org1090045" class="outline-3">
+<h3 id="org1090045"><span class="section-number-3">1.2</span> Thread</h3>
 </div>
 
-<div id="outline-container-orgb66582d" class="outline-3">
-<h3 id="orgb66582d"><span class="section-number-3">1.3</span> ThreadLocal</h3>
+<div id="outline-container-org55b1534" class="outline-3">
+<h3 id="org55b1534"><span class="section-number-3">1.3</span> ThreadLocal</h3>
 </div>
 
-<div id="outline-container-org3179fdd" class="outline-3">
-<h3 id="org3179fdd"><span class="section-number-3">1.4</span> ThreadPoolExecutor</h3>
+<div id="outline-container-org06ccd47" class="outline-3">
+<h3 id="org06ccd47"><span class="section-number-3">1.4</span> ThreadPoolExecutor</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+线程执行器，
+</p>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org115c8c9" class="outline-2">
-<h2 id="org115c8c9"><span class="section-number-2">2</span> 线程死锁</h2>
+<div id="outline-container-org57a896c" class="outline-2">
+<h2 id="org57a896c"><span class="section-number-2">2</span> 线程死锁</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgf8d0cb9" class="outline-3">
-<h3 id="orgf8d0cb9"><span class="section-number-3">2.1</span> 死锁的四个必要条件</h3>
+<div id="outline-container-org73501cf" class="outline-3">
+<h3 id="org73501cf"><span class="section-number-3">2.1</span> 死锁的四个必要条件</h3>
 <div class="outline-text-3" id="text-2-1">
 <ol class="org-ol">
 <li><code>互斥条件</code>: 一个资源每次只能被一个进程使用</li>
@@ -343,58 +389,90 @@
 </div>
 </div>
 
-<div id="outline-container-org75c4053" class="outline-2">
-<h2 id="org75c4053"><span class="section-number-2">3</span> CAS</h2>
+<div id="outline-container-orgcc2213f" class="outline-2">
+<h2 id="orgcc2213f"><span class="section-number-2">3</span> CAS</h2>
 </div>
 
-<div id="outline-container-org0feb10b" class="outline-2">
-<h2 id="org0feb10b"><span class="section-number-2">4</span> AQS</h2>
+<div id="outline-container-org732407c" class="outline-2">
+<h2 id="org732407c"><span class="section-number-2">4</span> AQS</h2>
 </div>
 
-<div id="outline-container-org5945cbd" class="outline-2">
-<h2 id="org5945cbd"><span class="section-number-2">5</span> 常用工具</h2>
+<div id="outline-container-org49dcb48" class="outline-2">
+<h2 id="org49dcb48"><span class="section-number-2">5</span> 核心组件</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-org55aba91" class="outline-3">
-<h3 id="org55aba91"><span class="section-number-3">5.1</span> CountDownLatch &amp; CyclicBarrier</h3>
+<div id="outline-container-orgc0cf29c" class="outline-3">
+<h3 id="orgc0cf29c"><span class="section-number-3">5.1</span> 原子类</h3>
 <div class="outline-text-3" id="text-5-1">
+</div>
+<div id="outline-container-orgf408418" class="outline-4">
+<h4 id="orgf408418"><span class="section-number-4">5.1.1</span> AtmoicInteger</h4>
+</div>
+<div id="outline-container-org1efb19c" class="outline-4">
+<h4 id="org1efb19c"><span class="section-number-4">5.1.2</span> AtomicReference</h4>
+</div>
+</div>
+<div id="outline-container-org1cf0584" class="outline-3">
+<h3 id="org1cf0584"><span class="section-number-3">5.2</span> 并发队列</h3>
+<div class="outline-text-3" id="text-5-2">
+</div>
+<div id="outline-container-orgcbd4971" class="outline-4">
+<h4 id="orgcbd4971"><span class="section-number-4">5.2.1</span> LinkedBlockingQueue</h4>
+</div>
+<div id="outline-container-org50b8b98" class="outline-4">
+<h4 id="org50b8b98"><span class="section-number-4">5.2.2</span> ArrayBlockingQueue</h4>
+</div>
+<div id="outline-container-org2d62bdc" class="outline-4">
+<h4 id="org2d62bdc"><span class="section-number-4">5.2.3</span> ConcurrentLinkedDeque</h4>
+</div>
+<div id="outline-container-orgf248597" class="outline-4">
+<h4 id="orgf248597"><span class="section-number-4">5.2.4</span> ConcurrentLinkedQueue</h4>
+</div>
+</div>
+<div id="outline-container-orgb3fd31e" class="outline-3">
+<h3 id="orgb3fd31e"><span class="section-number-3">5.3</span> 同步工具</h3>
+<div class="outline-text-3" id="text-5-3">
+</div>
+<div id="outline-container-org937c16e" class="outline-4">
+<h4 id="org937c16e"><span class="section-number-4">5.3.1</span> CountDownLatch</h4>
+<div class="outline-text-4" id="text-5-3-1">
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #859900;">private</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">doWork</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #859900;">try</span> <span style="color: #d8241f;">{</span>
-    Thread.sleep<span style="color: #9564bf;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">Double</span><span style="color: #24a222;">(</span>Math.random<span style="color: #ff7f00;">()</span> * 3000<span style="color: #24a222;">)</span>.longValue<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
-  <span style="color: #d8241f;">}</span> <span style="color: #859900;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">InterruptedException</span> <span style="color: #6c71c4;">e</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">doWork</span><span style="color: #8d5649;">()</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #4f97d7; font-weight: bold;">try</span> <span style="color: #d8241f;">{</span>
+    Thread.sleep<span style="color: #9564bf;">(</span><span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Double</span><span style="color: #24a222;">(</span>Math.random<span style="color: #ff7f00;">()</span> * 3000<span style="color: #24a222;">)</span>.longValue<span style="color: #24a222;">()</span><span style="color: #9564bf;">)</span>;
+  <span style="color: #d8241f;">}</span> <span style="color: #4f97d7; font-weight: bold;">catch</span> <span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">InterruptedException</span> <span style="color: #7590db;">e</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
     e.printStackTrace<span style="color: #9564bf;">()</span>;
   <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
 
-<span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">test01</span><span style="color: #8d5649;">()</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">InterruptedException</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #268bd2;">CountDownLatch</span> <span style="color: #6c71c4;">countDownLatch</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">CountDownLatch</span><span style="color: #d8241f;">(</span>5<span style="color: #d8241f;">)</span>;
-  <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">i</span> = 0; i &lt; 5; i++<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #268bd2;">Thread</span> <span style="color: #6c71c4;">t</span> =
-        <span style="color: #859900;">new</span> <span style="color: #268bd2;">Thread</span><span style="color: #9564bf;">(</span>
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">test01</span><span style="color: #8d5649;">()</span> <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">InterruptedException</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #ce537a; font-weight: bold;">CountDownLatch</span> <span style="color: #7590db;">countDownLatch</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">CountDownLatch</span><span style="color: #d8241f;">(</span>5<span style="color: #d8241f;">)</span>;
+  <span style="color: #4f97d7; font-weight: bold;">for</span> <span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span> = 0; i &lt; 5; i++<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #ce537a; font-weight: bold;">Thread</span> <span style="color: #7590db;">t</span> =
+        <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Thread</span><span style="color: #9564bf;">(</span>
             <span style="color: #24a222;">()</span> -&gt; <span style="color: #24a222;">{</span>
               doWork<span style="color: #ff7f00;">()</span>;
-              countDownLatch.countDown<span style="color: #ff7f00;">()</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#19981;&#38459;&#22622;</span>
-              System.out.printf<span style="color: #ff7f00;">(</span><span style="color: #2aa198;">"&#29609;&#23478;[%s]&#20934;&#22791;&#23601;&#32490;\n"</span>, Thread.currentThread<span style="color: #1776b6;">()</span>.getName<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span>;
+              countDownLatch.countDown<span style="color: #ff7f00;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#19981;&#38459;&#22622;</span>
+              System.out.printf<span style="color: #ff7f00;">(</span><span style="color: #2d9574;">"&#29609;&#23478;[%s]&#20934;&#22791;&#23601;&#32490;\n"</span>, Thread.currentThread<span style="color: #1776b6;">()</span>.getName<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span>;
             <span style="color: #24a222;">}</span><span style="color: #9564bf;">)</span>;
     t.start<span style="color: #9564bf;">()</span>;
   <span style="color: #d8241f;">}</span>
-  countDownLatch.await<span style="color: #d8241f;">()</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#38459;&#22622;</span>
-  System.out.println<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"&#28216;&#25103;&#24320;&#22987;"</span><span style="color: #d8241f;">)</span>;
+  countDownLatch.await<span style="color: #d8241f;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#38459;&#22622;</span>
+  System.out.println<span style="color: #d8241f;">(</span><span style="color: #2d9574;">"&#28216;&#25103;&#24320;&#22987;"</span><span style="color: #d8241f;">)</span>;
 <span style="color: #8d5649;">}</span>
 
-<span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">test02</span><span style="color: #8d5649;">()</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">InterruptedException</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #268bd2;">CyclicBarrier</span> <span style="color: #6c71c4;">cyclicBarrier</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">CyclicBarrier</span><span style="color: #d8241f;">(</span>5<span style="color: #d8241f;">)</span>;
-  <span style="color: #859900;">for</span> <span style="color: #d8241f;">(</span><span style="color: #268bd2;">int</span> <span style="color: #6c71c4;">i</span> = 0; i &lt; 10; i++<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #268bd2;">Thread</span> <span style="color: #6c71c4;">t</span> =
-        <span style="color: #859900;">new</span> <span style="color: #268bd2;">Thread</span><span style="color: #9564bf;">(</span>
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">test02</span><span style="color: #8d5649;">()</span> <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">InterruptedException</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #ce537a; font-weight: bold;">CyclicBarrier</span> <span style="color: #7590db;">cyclicBarrier</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">CyclicBarrier</span><span style="color: #d8241f;">(</span>5<span style="color: #d8241f;">)</span>;
+  <span style="color: #4f97d7; font-weight: bold;">for</span> <span style="color: #d8241f;">(</span><span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span> = 0; i &lt; 10; i++<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #ce537a; font-weight: bold;">Thread</span> <span style="color: #7590db;">t</span> =
+        <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Thread</span><span style="color: #9564bf;">(</span>
             <span style="color: #24a222;">()</span> -&gt; <span style="color: #24a222;">{</span>
               doWork<span style="color: #ff7f00;">()</span>;
-              <span style="color: #859900;">try</span> <span style="color: #ff7f00;">{</span>
-                System.out.printf<span style="color: #1776b6;">(</span><span style="color: #2aa198;">"&#29609;&#23478;[%s]&#36873;&#25321;&#33521;&#38596;\n"</span>, Thread.currentThread<span style="color: #00bed1;">()</span>.getName<span style="color: #00bed1;">()</span><span style="color: #1776b6;">)</span>;
-                cyclicBarrier.await<span style="color: #1776b6;">()</span>; <span style="color: #586e75; font-style: italic;">// </span><span style="color: #586e75; font-style: italic;">&#19981;&#38459;&#22622;&#65292;&#36798;&#21040;&#24490;&#29615;&#25968;&#23383;&#26102;&#25152;&#26377;&#32447;&#31243;&#21516;&#26102;&#21796;&#37266;&#65292;&#24182;&#24490;&#29615;&#21033;&#29992;</span>
-                System.out.printf<span style="color: #1776b6;">(</span><span style="color: #2aa198;">"&#29609;&#23478;[%s]&#20934;&#22791;&#23601;&#32490;\n"</span>, Thread.currentThread<span style="color: #00bed1;">()</span>.getName<span style="color: #00bed1;">()</span><span style="color: #1776b6;">)</span>;
-              <span style="color: #ff7f00;">}</span> <span style="color: #859900;">catch</span> <span style="color: #ff7f00;">(</span>InterruptedException | BrokenBarrierException e<span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+              <span style="color: #4f97d7; font-weight: bold;">try</span> <span style="color: #ff7f00;">{</span>
+                System.out.printf<span style="color: #1776b6;">(</span><span style="color: #2d9574;">"&#29609;&#23478;[%s]&#36873;&#25321;&#33521;&#38596;\n"</span>, Thread.currentThread<span style="color: #00bed1;">()</span>.getName<span style="color: #00bed1;">()</span><span style="color: #1776b6;">)</span>;
+                cyclicBarrier.await<span style="color: #1776b6;">()</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#19981;&#38459;&#22622;&#65292;&#36798;&#21040;&#24490;&#29615;&#25968;&#23383;&#26102;&#25152;&#26377;&#32447;&#31243;&#21516;&#26102;&#21796;&#37266;&#65292;&#24182;&#24490;&#29615;&#21033;&#29992;</span>
+                System.out.printf<span style="color: #1776b6;">(</span><span style="color: #2d9574;">"&#29609;&#23478;[%s]&#20934;&#22791;&#23601;&#32490;\n"</span>, Thread.currentThread<span style="color: #00bed1;">()</span>.getName<span style="color: #00bed1;">()</span><span style="color: #1776b6;">)</span>;
+              <span style="color: #ff7f00;">}</span> <span style="color: #4f97d7; font-weight: bold;">catch</span> <span style="color: #ff7f00;">(</span>InterruptedException | BrokenBarrierException e<span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
                 e.printStackTrace<span style="color: #1776b6;">()</span>;
               <span style="color: #ff7f00;">}</span>
             <span style="color: #24a222;">}</span><span style="color: #9564bf;">)</span>;
@@ -407,17 +485,67 @@
 </div>
 </div>
 
-<div id="outline-container-org969bd7d" class="outline-3">
-<h3 id="org969bd7d"><span class="section-number-3">5.2</span> ReentrantLock</h3>
+<div id="outline-container-orgb2879b4" class="outline-4">
+<h4 id="orgb2879b4"><span class="section-number-4">5.3.2</span> CyclicBarrier</h4>
 </div>
 
-<div id="outline-container-org5121761" class="outline-3">
-<h3 id="org5121761"><span class="section-number-3">5.3</span> ConcurrentHashMap</h3>
+<div id="outline-container-org526c0c6" class="outline-4">
+<h4 id="org526c0c6"><span class="section-number-4">5.3.3</span> Semaphore</h4>
+</div>
+
+<div id="outline-container-org4582bf3" class="outline-4">
+<h4 id="org4582bf3"><span class="section-number-4">5.3.4</span> Exchanger</h4>
+</div>
+</div>
+<div id="outline-container-orga21dfce" class="outline-3">
+<h3 id="orga21dfce"><span class="section-number-3">5.4</span> 并发集合</h3>
+<div class="outline-text-3" id="text-5-4">
+</div>
+<div id="outline-container-orgb964f98" class="outline-4">
+<h4 id="orgb964f98"><span class="section-number-4">5.4.1</span> ConcurrentHashMap</h4>
+</div>
+<div id="outline-container-org40b1b85" class="outline-4">
+<h4 id="org40b1b85"><span class="section-number-4">5.4.2</span> CopyOnWriteArrayList</h4>
+</div>
+<div id="outline-container-org52de001" class="outline-4">
+<h4 id="org52de001"><span class="section-number-4">5.4.3</span> CopyOnWriteArraySet</h4>
+</div>
+<div id="outline-container-orgae2ca7c" class="outline-4">
+<h4 id="orgae2ca7c"><span class="section-number-4">5.4.4</span> ConcurrentSkipSet</h4>
+</div>
+<div id="outline-container-org89b4fb6" class="outline-4">
+<h4 id="org89b4fb6"><span class="section-number-4">5.4.5</span> ConcurrentSkipListMap</h4>
+</div>
+</div>
+<div id="outline-container-org1c2207d" class="outline-3">
+<h3 id="org1c2207d"><span class="section-number-3">5.5</span> 并发锁</h3>
+<div class="outline-text-3" id="text-5-5">
+</div>
+<div id="outline-container-org607f4b1" class="outline-4">
+<h4 id="org607f4b1"><span class="section-number-4">5.5.1</span> ReentrantLock</h4>
+</div>
+<div id="outline-container-org4099772" class="outline-4">
+<h4 id="org4099772"><span class="section-number-4">5.5.2</span> StampedLock</h4>
+</div>
+<div id="outline-container-orge4132ea" class="outline-4">
+<h4 id="orge4132ea"><span class="section-number-4">5.5.3</span> ReentrantReadWriteLock</h4>
+</div>
+</div>
+<div id="outline-container-org7c5dfea" class="outline-3">
+<h3 id="org7c5dfea"><span class="section-number-3">5.6</span> 线程池</h3>
+<div class="outline-text-3" id="text-5-6">
+</div>
+<div id="outline-container-org149b4b5" class="outline-4">
+<h4 id="org149b4b5"><span class="section-number-4">5.6.1</span> Fork/Join</h4>
+</div>
+<div id="outline-container-org93063ce" class="outline-4">
+<h4 id="org93063ce"><span class="section-number-4">5.6.2</span> Executor</h4>
+</div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-07 Wed 09:23. Created by Jinghui Hu at 2021-06-21 Mon 22:27.</p>
+<p class="author">Last Updated 2021-07-25 Sun 22:24. Created by Jinghui Hu at 2021-06-21 Mon 22:27.</p>
 </div>
 </body>
 </html>
