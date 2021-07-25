@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-25 Sun 19:37 -->
+<!-- 2021-07-25 Sun 22:46 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CAP 定理</title>
@@ -233,24 +233,24 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org2472261">1. CAP 定理</a></li>
-<li><a href="#org47fb830">2. Partition Tolerance</a></li>
-<li><a href="#org82273e5">3. Availability &amp; Consistency</a></li>
-<li><a href="#orgb2772e2">4. 数据产品的分类</a></li>
-<li><a href="#org541931a">5. Apache ZooKeeper</a>
+<li><a href="#orgffffabe">1. CAP 定理</a></li>
+<li><a href="#orgfa2878c">2. Partition Tolerance</a></li>
+<li><a href="#orgf9c5efc">3. Availability &amp; Consistency</a></li>
+<li><a href="#org98ffaad">4. 数据产品的分类</a></li>
+<li><a href="#orgbbca160">5. Apache ZooKeeper</a>
 <ul>
-<li><a href="#org87fb336">5.1. ZK 的 Metadata</a></li>
-<li><a href="#orgbd7a66f">5.2. ZK 的几个常见用法</a></li>
-<li><a href="#orgc1d2535">5.3. ZK 的 Quorum</a></li>
+<li><a href="#org8e0e7db">5.1. ZK 的 Metadata</a></li>
+<li><a href="#orgd2b346c">5.2. ZK 的几个常见用法</a></li>
+<li><a href="#org3f4e9e1">5.3. ZK 的 Quorum</a></li>
 </ul>
 </li>
-<li><a href="#org40ec177">6. Apache Kafka</a>
+<li><a href="#orga748712">6. Apache Kafka</a>
 <ul>
-<li><a href="#org8fa3f05">6.1. Kafka 特点</a></li>
-<li><a href="#org55d1d8e">6.2. Kafka 的基本架构</a></li>
-<li><a href="#org8cb87e8">6.3. Kafka 的限制</a></li>
-<li><a href="#org36800e1">6.4. Kafka 的 Replication 机制</a></li>
-<li><a href="#orgdac49ca">6.5. Kafka 的 ACK 确认机制</a></li>
+<li><a href="#org44ed804">6.1. Kafka 特点</a></li>
+<li><a href="#orgeeef36e">6.2. Kafka 的基本架构</a></li>
+<li><a href="#orgddaf8e7">6.3. Kafka 的限制</a></li>
+<li><a href="#org57e79f8">6.4. Kafka 的 Replication 机制</a></li>
+<li><a href="#org2fe391d">6.5. Kafka 的 ACK 确认机制</a></li>
 </ul>
 </li>
 </ul>
@@ -258,8 +258,8 @@
 </div>
 
 
-<div id="outline-container-org2472261" class="outline-2">
-<h2 id="org2472261"><span class="section-number-2">1</span> CAP 定理</h2>
+<div id="outline-container-orgffffabe" class="outline-2">
+<h2 id="orgffffabe"><span class="section-number-2">1</span> CAP 定理</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 CAP 定理说明在分布式场景中经常遇到的问题，其中 CAP 指分布式系统的三个特性
@@ -277,8 +277,8 @@ CAP 定理说明在分布式场景中经常遇到的问题，其中 CAP 指分�
 </div>
 </div>
 
-<div id="outline-container-org47fb830" class="outline-2">
-<h2 id="org47fb830"><span class="section-number-2">2</span> Partition Tolerance</h2>
+<div id="outline-container-orgfa2878c" class="outline-2">
+<h2 id="orgfa2878c"><span class="section-number-2">2</span> Partition Tolerance</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 假如两台节点在不同机器上，如果存入资料的方式是 2PC (Two-Phase Commit), 即所有
@@ -288,8 +288,8 @@ CAP 定理说明在分布式场景中经常遇到的问题，其中 CAP 指分�
 </div>
 </div>
 
-<div id="outline-container-org82273e5" class="outline-2">
-<h2 id="org82273e5"><span class="section-number-2">3</span> Availability &amp; Consistency</h2>
+<div id="outline-container-orgf9c5efc" class="outline-2">
+<h2 id="orgf9c5efc"><span class="section-number-2">3</span> Availability &amp; Consistency</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 如果保证 P, 那么系统可以容忍 Partition, 根据 CAP 定理需要牺牲 A 或者 C
@@ -297,15 +297,15 @@ CAP 定理说明在分布式场景中经常遇到的问题，其中 CAP 指分�
 <ol class="org-ol">
 <li>保证 A 的情形: 两个节点虽然彼此不能沟通，但是既然或者就让他们正常服务，这样
 其中一半的变化不能传递到另一边，因此可能两边的数据会出现不一致。更糟糕的状
-况是会发生 <code>脑裂</code>, 就是 Master 中写入数据，Slave 允许写数据出现时序不一致问
+况是会发生 <b>脑裂</b>, 就是 Master 中写入数据，Slave 允许写数据出现时序不一致问
 题</li>
 <li>保证 P 的情形: 为了避免之前的不一致问题，因此必须停掉其中任一个节点</li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orgb2772e2" class="outline-2">
-<h2 id="orgb2772e2"><span class="section-number-2">4</span> 数据产品的分类</h2>
+<div id="outline-container-org98ffaad" class="outline-2">
+<h2 id="org98ffaad"><span class="section-number-2">4</span> 数据产品的分类</h2>
 <div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li>CA: 关系型数据库 RDBMS
@@ -329,12 +329,12 @@ CAP 定理说明在分布式场景中经常遇到的问题，其中 CAP 指分�
 </div>
 </div>
 
-<div id="outline-container-org541931a" class="outline-2">
-<h2 id="org541931a"><span class="section-number-2">5</span> Apache ZooKeeper</h2>
+<div id="outline-container-orgbbca160" class="outline-2">
+<h2 id="orgbbca160"><span class="section-number-2">5</span> Apache ZooKeeper</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-org87fb336" class="outline-3">
-<h3 id="org87fb336"><span class="section-number-3">5.1</span> ZK 的 Metadata</h3>
+<div id="outline-container-org8e0e7db" class="outline-3">
+<h3 id="org8e0e7db"><span class="section-number-3">5.1</span> ZK 的 Metadata</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 ZK 是维持 Cluster 中共同状态的分布式系统，
@@ -347,8 +347,8 @@ ZK 是维持 Cluster 中共同状态的分布式系统，
 </div>
 </div>
 
-<div id="outline-container-orgbd7a66f" class="outline-3">
-<h3 id="orgbd7a66f"><span class="section-number-3">5.2</span> ZK 的几个常见用法</h3>
+<div id="outline-container-orgd2b346c" class="outline-3">
+<h3 id="orgd2b346c"><span class="section-number-3">5.2</span> ZK 的几个常见用法</h3>
 <div class="outline-text-3" id="text-5-2">
 <ol class="org-ol">
 <li>共享 Metadata
@@ -373,8 +373,8 @@ znode 注册的 Watcher Process</li>
 </div>
 </div>
 
-<div id="outline-container-orgc1d2535" class="outline-3">
-<h3 id="orgc1d2535"><span class="section-number-3">5.3</span> ZK 的 Quorum</h3>
+<div id="outline-container-org3f4e9e1" class="outline-3">
+<h3 id="org3f4e9e1"><span class="section-number-3">5.3</span> ZK 的 Quorum</h3>
 <div class="outline-text-3" id="text-5-3">
 <ol class="org-ol">
 <li>ZK 能保证 Global Order, 因为只有 Leader 能处理写入的需求</li>
@@ -394,12 +394,12 @@ ZK 是偏向于 CA 的系统</li>
 </div>
 </div>
 
-<div id="outline-container-org40ec177" class="outline-2">
-<h2 id="org40ec177"><span class="section-number-2">6</span> Apache Kafka</h2>
+<div id="outline-container-orga748712" class="outline-2">
+<h2 id="orga748712"><span class="section-number-2">6</span> Apache Kafka</h2>
 <div class="outline-text-2" id="text-6">
 </div>
-<div id="outline-container-org8fa3f05" class="outline-3">
-<h3 id="org8fa3f05"><span class="section-number-3">6.1</span> Kafka 特点</h3>
+<div id="outline-container-org44ed804" class="outline-3">
+<h3 id="org44ed804"><span class="section-number-3">6.1</span> Kafka 特点</h3>
 <div class="outline-text-3" id="text-6-1">
 <ol class="org-ol">
 <li>分布式架构，天生容易扩充</li>
@@ -416,8 +416,8 @@ ZK 是偏向于 CA 的系统</li>
 </div>
 </div>
 
-<div id="outline-container-org55d1d8e" class="outline-3">
-<h3 id="org55d1d8e"><span class="section-number-3">6.2</span> Kafka 的基本架构</h3>
+<div id="outline-container-orgeeef36e" class="outline-3">
+<h3 id="orgeeef36e"><span class="section-number-3">6.2</span> Kafka 的基本架构</h3>
 <div class="outline-text-3" id="text-6-2">
 <ol class="org-ol">
 <li>基本上 Kafka 是一个 Broker 的角色，介于 Producer 和 Consumer 之间，Kafka
@@ -453,8 +453,8 @@ Consumer</li>
 </div>
 </div>
 
-<div id="outline-container-org8cb87e8" class="outline-3">
-<h3 id="org8cb87e8"><span class="section-number-3">6.3</span> Kafka 的限制</h3>
+<div id="outline-container-orgddaf8e7" class="outline-3">
+<h3 id="orgddaf8e7"><span class="section-number-3">6.3</span> Kafka 的限制</h3>
 <div class="outline-text-3" id="text-6-3">
 <ol class="org-ol">
 <li>Consumer Group 里的 Consumer 数量不能小于 Partition 数量，否则就会出现
@@ -474,8 +474,8 @@ Order, Kafka 天生不适用于 Global Order 的处理</li>
 </div>
 </div>
 
-<div id="outline-container-org36800e1" class="outline-3">
-<h3 id="org36800e1"><span class="section-number-3">6.4</span> Kafka 的 Replication 机制</h3>
+<div id="outline-container-org57e79f8" class="outline-3">
+<h3 id="org57e79f8"><span class="section-number-3">6.4</span> Kafka 的 Replication 机制</h3>
 <div class="outline-text-3" id="text-6-4">
 <ol class="org-ol">
 <li>Kafka 的 Replication 是以 Partition 为单位的
@@ -498,8 +498,8 @@ Order, Kafka 天生不适用于 Global Order 的处理</li>
 </div>
 </div>
 
-<div id="outline-container-orgdac49ca" class="outline-3">
-<h3 id="orgdac49ca"><span class="section-number-3">6.5</span> Kafka 的 ACK 确认机制</h3>
+<div id="outline-container-org2fe391d" class="outline-3">
+<h3 id="org2fe391d"><span class="section-number-3">6.5</span> Kafka 的 ACK 确认机制</h3>
 <div class="outline-text-3" id="text-6-5">
 <ol class="org-ol">
 <li>ACK 的 ACK 确认只有保证 Message Deliver Semantics</li>
@@ -515,7 +515,7 @@ Order, Kafka 天生不适用于 Global Order 的处理</li>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-25 Sun 19:37. Created by Jinghui Hu at 2021-07-25 Sun 17:10.</p>
+<p class="author">Last Updated 2021-07-25 Sun 22:46. Created by Jinghui Hu at 2021-07-25 Sun 17:10.</p>
 </div>
 </body>
 </html>
