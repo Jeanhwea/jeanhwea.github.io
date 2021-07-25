@@ -149,6 +149,8 @@
 * 面向对象
 ** 对象初始化和销毁
    一般类的初始化工具有以下几种方式
+   1. 静态初始化块只在类第一次实例化才调用一次
+   2. 对象初始化块每次对象实例化都调用一次，并且是中构造器调用前调用
    #+BEGIN_SRC java
      import java.util.Random;
 
@@ -183,25 +185,26 @@
          Employee e2 = new Employee();
        }
      }
+
+     ////////////////////////////////////////////////////////////////////////////////
+     //  Static Initialezation Block
+     //  Object Initialezation Block
+     //  Default Constructor
+     //  Object Initialezation Block
+     //  Default Constructor
+     ////////////////////////////////////////////////////////////////////////////////
    #+END_SRC
 
-   由下面运行结果可以得知，静态初始化块只在类第一次实例化才调用一次，对象初始化
-   块每次对象实例化都调用一次，并且是中构造器调用前调用
-   #+BEGIN_SRC text
-     $ java Employee
-     Static Initialezation Block
-     Object Initialezation Block
-     Default Constructor
-     Object Initialezation Block
-     Default Constructor
-   #+END_SRC
+   类和实例初始化方法
+   1. Java 的对象初始化的构造器相当于调用 ~<init>()~ 方法
+   2. 类的初始化调用 ~<clinit>()~ 方法
 
    对象销毁:
    1. Java 有自己的垃圾回收机制 (GC), 在 GC 过程中会将没有用的对象进行释放
-   2. 一般 ~finalize()~ 方法只会在对象内存回收前被调用一次，我们不需要显示让对象
-      销毁, 有时候会显示将将引用置空来帮助 GC
-   3. 而是让 GC 来自动处理对象的析构，并且当需要阻止对象消亡时，就需要显示将保护
-      的对象通过 ~finalize()~ 挂载到 GCRoot 上
+   2. 一般 ~finalize()~ 方法只会在对象内存回收前被调用一次
+   3. 我们不需要显示让对象销毁, 而是让 GC 来自动处理对象的析构，并且当需要阻止对
+      象消亡时，就需要显示将保护的对象通过 ~finalize()~ 挂载到 GCRoot 上
+   4. 有时候会显示将将引用置空来帮助 GC
 
 ** 面向对象的三大特征
 *** 继承
