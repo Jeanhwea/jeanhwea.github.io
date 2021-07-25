@@ -86,3 +86,58 @@
         料，提高 Batch 处理的效率
    4. 消息的包装轻量级，可压缩
    5. 因为是直接处理文件，可以利用 OS 的 Page Cache, 避免消耗内存
+
+** Kafka 的基本架构
+   1. 基本上 Kafka 是一个 Broker 的角色，介于 Producer 和 Consumer 之间，Kafka
+      一般是由多个节点构成的 Cluster
+   2. Kafka 有自己的 Producer API 和 Consumer API
+      - Producer Client 和 Consumer Client 需要遵循 API 规范进行存取
+   3. Topic 是 Kafka 的一组文件流
+      - 一个 Topic 可以分成多个 Partition
+      - 每个 Partition 在不同的节点上
+      - Producer 需要指定文件写入哪个 Partition
+        + 通过 Producer API 的一个参数指定 Partition Key
+        + Producer API 会根据 Hash 方式决定对应的 Partition
+   4. Kafka 可以弹性支持 ~point-to-point~ 和 ~pub/sub~ 两种队列模式
+      - 主要通过一个 Consumer Group 的抽象, Consumer Group 包含多个实体的
+        Consumer
+      - ~point-to-point~ 就是将所有的 Consumer 划分到一个 Consumer Group 中
+      - ~pub/sub~ 是将不同的 Pub 和 Sub 放在不同的 Consumer Group
+   5. 每个 Consumer 只能同时 bind 到一个 Partition 中
+      - 一个 Consumer 只会找一个 Partition 来拉取文件
+      - 一个 Partition 只能被同一 Consumer Group 中的一个 Consumer 消费，这样保
+        证这个 Partition 对于一个 Consumer Group 来说不会并发取
+
+** Kafka 的限制
+   1. Consumer Group 里的 Consumer 数量不能小于 Partition 数量，否则就会出现
+      Partition 对不到 Consumer
+   2. 若各个 Consumer 消费速度不均匀，Partition 就会出现失衡
+   3. 由于 Partition 的写入是在 Producer 指定的，所以即使出现失衡也无法通过
+      Round-robin 来解决
+   4. 综上所述，每个 Partition 实际上可以看成独立的队列
+      - 每个 Partition 只能保证自己的 Local Order
+      - 每个 Partition 没有跨 Partition 的 Global Order
+   5. 若有一个 AP 处理跨 Partition 的数据，不能依赖于每个 Partition 的 Local
+      Order, Kafka 天生不适用于 Global Order 的处理
+   6. Kafka 依赖于 ZK 进行 Partition 的 Metadata 存储
+
+** Kafka 的 Replication 机制
+   1. Kafka 的 Replication 是以 Partition 为单位的
+      - 让 replica 订阅需要追踪的 Partition, 因为这里是 Queue, 直接使用订阅就可
+        以处理掉 Replication
+   2. 每个 Replica Set 里，只会有一个 Master, 这个 Master 负责所有读写工作，其它
+      的 Slave 只是备援，所以保证了一致性
+   3. 每个 Replica Set 会维持一个 ISR (In-Sync Replica) 名单
+      - ISR 中的 Replica 与 Master 较为同步
+      - 如果 Master 挂掉，在 ISR 中多少挑选出新的 Master
+   4. 写入数据虽然是以 Master 作为窗口，但是要等消息同步到所有 ISR 中，才能算提交
+      - 未提交的数据不能被 Consumer 消费
+
+** Kafka 的 ACK 确认机制
+   1. ACK 的 ACK 确认只有保证 Message Deliver Semantics
+   2. ~acks=0~ 生产者在成功写入消息之前不会等待任何来自服务器的响应.
+   3. ~acks=1~ 只要集群的 Leader 分区副本接收到了消息，就会向生产者发送一个成功
+      响应的 ACK
+   4. ~acks=all~ 表示只有所有参与复制的节点 ISR 列表的 Replica 全部收到消息时,
+      生产者才会接收到来自服务器的响应，此时如果ISR同步副本的个数小于
+      ~min.insync.replicas~ 的值，消息不会被写入
