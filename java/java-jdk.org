@@ -780,49 +780,59 @@
      Arrays.sort(arr2);
    #+END_SRC
 
+** 声明 Map 对象数组
+   #+BEGIN_SRC java
+     // 声明 HashMap 数组
+     Map<Character, Integer>[] mapArray = new HashMap[9];
+     // 需要初始化元素
+     for (int i = 0; i < 9; i++) mapArray[i] = new HashMap<>();
+   #+END_SRC
+
 ** 列表和数组互转
    #+BEGIN_SRC java
      // List 转 Array
-     List<Employee> list = new ArrayList<>();
-     while (...) {
-       x = ...;
-       list.add(x);
+     List<String> list = new ArrayList<>();
+     String[] arr1 = new String[] {"a", "b", "c"};
+     for (int i = 0; i < arr1.length; i++) {
+       list.add(arr1[i]);
      }
+     // System.out.println(list);
 
      // Array 转 List
-     Employee[] arr = new Employee[list.size()];
-     list.toArray(arr);
+     List<String> names =
+         new LinkedList<String>() {
+           {
+             add("Jack");
+             add("Tome");
+           }
+         };
+     String[] arr2 = new String[names.size()];
+     names.toArray(arr2);
+     // System.out.println(Arrays.toString(arr2));
    #+END_SRC
 
-   注意 ~Arrays.asList(...)~ 将数组转 List 时需要传对象。
-   #+BEGIN_SRC java
-     Integer[] primes1 = {2,3,5};
-     List list1 = Arrays.asList(primes1);
-     list1.size();
+** ~Arrays.asList(...)~ 转数组
+   在 ~Arrays.asList(...)~ 中
+   1. 该方法接受一个变长参数，一般可看做数组参数，
+      #+BEGIN_SRC java
+        @SafeVarargs
+        @SuppressWarnings("varargs")
+        public static <T> List<T> asList(T... a) {
+            return new ArrayList<>(a);
+        }
+      #+END_SRC
+   2. 但是因为 ~int[]~ 本身就是一个类型，所以 primes2 变量作为参数传递时，编译器
+      认为只传了一个变量，这个变量的类型是 int 数组
+      #+BEGIN_SRC java
+        Integer[] primes1 = {2,3,5};
+        List list1 = Arrays.asList(primes1); // list1 => [2, 3, 5]
+        list1.size(); // => 3
 
-     int[] primes2 = {2,3,5};
-     List list2 = Arrays.asList(primes2);
-     list2.size();
-   #+END_SRC
+        int[] primes2 = {2,3,5};
+        List list2 = Arrays.asList(primes2); // list2 => list2 = [[I@4ed8ff]
+        list2.size(); // => 1
+      #+END_SRC
 
-   在 ~Arrays.asList(...)~ 中，该方法接受一个变长参数，一般可看做数组参数，但是
-   因为 ~int[]~ 本身就是一个类型，所以 primes2 变量作为参数传递时，编译器认为只
-   传了一个变量，这个变量的类型是 int 数组
-   #+BEGIN_SRC text
-     java> Integer[] primes1 = {2,3,5};
-     java.lang.Integer[] primes1 = [2, 3, 5]
-     java> List list1 = Arrays.asList(primes1);
-     java.util.List list1 = [2, 3, 5]
-     java> list1.size();
-     java.lang.Integer res7 = 3
-     java> int[] primes2 = {2,3,5};
-     int[] primes2 = [2, 3, 5]
-     java> List list2 = Arrays.asList(primes2);
-     java.util.List list2 = [[I@4ed8ff]
-     java> list2.size();
-     java.lang.Integer res10 = 1
-     java>
-   #+END_SRC
 * 集合
 ** List
 *** LinkedList
