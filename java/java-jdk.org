@@ -427,6 +427,222 @@
          void sort(Collection arg1) { }
        #+END_SRC
 
+* JDK 简介及开发工具
+** JDK 1.8 简介和新特性
+   [[https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html][JDK]] 是 Java 语言的软件开发工具包，主要用于移动设备、嵌入式设备上的 JAVA 应用
+   程序。JDK 是整个 Java 开发的核心，它包含了 JAVA 的运行环境 和 JAVA 工具。其参
+   考见 [[https://www.oracle.com/technetwork/java/javase/documentation/jdk8-doc-downloads-2133158.html][JDK Documentation]], Java 8 包含如下新特性：
+   1. Java 8 允许我们给接口添加一个非抽象的方法默认实现，只需要使用 default 关键
+      字即可
+   2. 新增 lambda 表达式
+   3. 提供函数式接口
+   4. Java 8 允许你使用关键字来传递方法或者构造函数引用
+   5. 我们可以直接在 lambda 表达式中访问外层的局部变量
+
+   JDK 1.8 的架构图如下：
+   [[file:../static/image/2019/07/jdk8-conceptual-diagram.png]]
+
+** JDK 的安装和环境变量配置
+   JDK 可以直接在 Oracle 网站上下载，链接是 [[https://www.oracle.com/java/technologies/javase-jdk8-downloads.html][JDK 1.8 Download]]
+   1. 将 JDK 直接解压放到一个文件夹里就可以使用
+      #+BEGIN_SRC sh
+        mkdir -p /usr/local/java && cd /usr/local/java tar xzvf
+        jdk-8u231-linux-x64.tar.gz
+      #+END_SRC
+   2. ~JAVA_HOME~ 环境变量，~JAVA_HOME~ 环境变量是指向 Java 的安装文件夹，具体配
+      置如下所示
+      #+BEGIN_SRC sh
+        export JAVA_HOME='/usr/local/java/jdk1.8.0_231'
+        export PATH=$JAVA_HOME/bin:$PATH
+      #+END_SRC
+
+** 编译器 javac 和虚拟机 java
+   Java 的两个基本工具是 ~javac~ 和 ~java~, 其中这两个工具功能如下：
+   1. javac 是 Java 的编译器，将 Java 的源代码编译成虚拟机识别的字节码
+   2. java 是 Java 的执行器，可以执行 Java 编译器编译好的字节码
+
+   下面是查看工具版本的方法
+   #+BEGIN_SRC text
+     $ java -version
+     java version "1.8.0_221"
+     Java(TM) SE Runtime Environment (build 1.8.0_221-b11)
+     Java HotSpot(TM) 64-Bit Server VM (build 25.221-b11, mixed mode)
+     $ javac -version
+     javac 1.8.0_221
+   #+END_SRC
+
+   也可以使用 javac 和 java 一个编译并执行 Java 代码
+   #+BEGIN_SRC text
+     $ ls
+     Hello.java
+     $ cat Hello.java
+     public class Hello {
+       public static void main(String args[]) {
+         System.out.println("hello");
+       }
+     }
+     $ javac Hello.java
+     $ ls
+     Hello.class  Hello.java
+     $ java Hello
+     hello
+     $
+   #+END_SRC
+
+** TODO 调试器 jdb
+   Java 自带的调试器是 ~jdb~ 命令，通常可以使用集成开发环境（IDE）中的调试工具来
+   调试 Java，所以 jdb 一般使用的比较少
+
+** 解释器 jrepl
+   Java 9 的 JDK 中就自带解释器, 可以用于调试一些常见的命令。Java 8 用户可以使用
+   一个民间开发的 REPL，就叫 ~java-repl~, 该工具可以在 [[https://github.com/albertlatacz/java-repl][github]] 中下载 jar 包，然
+   后直接执行
+   #+BEGIN_SRC sh
+     java -jar $JAVA_HOME/lib/javarepl-dev.jar
+   #+END_SRC
+
+   我一般直接建一个别名，这样运行 java 的解释器效果如下
+   #+BEGIN_SRC text
+     $ jrepl
+     [INFO] Unable to bind key for unsupported operation: edit-and-execute-command
+     Welcome to JavaREPL version dev (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_231)
+     Type expression to evaluate, :help for more options or press tab to auto-complete.
+     Connected to local instance at http://localhost:40173
+     java> "hello world"
+     java.lang.String res0 = "hello world"
+     java>
+   #+END_SRC
+
+** 反汇编器 javap
+   javap 时 JDK 自带的反汇编器，可以反汇编 java 的类
+   #+HEADER: :classname Apple
+   #+BEGIN_SRC java
+     class Apple {
+
+       public int add(int a, int b) {
+         return a + b;
+       }
+
+       public static void main(String args[]) {
+         System.out.println("Hello World");
+       }
+     }
+   #+END_SRC
+
+   使用 javap 的反汇编的示例如下
+   #+BEGIN_SRC text
+     $ javap Apple
+     Compiled from "Apple.java"
+     class Apple {
+       Apple();
+       public int add(int, int);
+       public static void main(java.lang.String[]);
+     }
+
+     $ javap -c Apple
+     Compiled from "Apple.java"
+     class Apple {
+       Apple();
+         Code:
+            0: aload_0
+            1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+            4: return
+
+       public int add(int, int);
+         Code:
+            0: iload_1
+            1: iload_2
+            2: iadd
+            3: ireturn
+
+       public static void main(java.lang.String[]);
+         Code:
+            0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+            3: ldc           #3                  // String Hello World
+            5: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+            8: return
+     }
+
+     $ javap -v Apple
+     Classfile /tmp/java/Apple.class
+       Last modified Mar 17, 2020; size 471 bytes
+       MD5 checksum ad20aeca420725caad4423644222e82d
+       Compiled from "Apple.java"
+     class Apple
+       minor version: 0
+       major version: 52
+       flags: ACC_SUPER
+     Constant pool:
+        #1 = Methodref          #6.#17         // java/lang/Object."<init>":()V
+        #2 = Fieldref           #18.#19        // java/lang/System.out:Ljava/io/PrintStream;
+        #3 = String             #20            // Hello World
+        #4 = Methodref          #21.#22        // java/io/PrintStream.println:(Ljava/lang/String;)V
+        #5 = Class              #23            // Apple
+        #6 = Class              #24            // java/lang/Object
+        #7 = Utf8               <init>
+        #8 = Utf8               ()V
+        #9 = Utf8               Code
+       #10 = Utf8               LineNumberTable
+       #11 = Utf8               add
+       #12 = Utf8               (II)I
+       #13 = Utf8               main
+       #14 = Utf8               ([Ljava/lang/String;)V
+       #15 = Utf8               SourceFile
+       #16 = Utf8               Apple.java
+       #17 = NameAndType        #7:#8          // "<init>":()V
+       #18 = Class              #25            // java/lang/System
+       #19 = NameAndType        #26:#27        // out:Ljava/io/PrintStream;
+       #20 = Utf8               Hello World
+       #21 = Class              #28            // java/io/PrintStream
+       #22 = NameAndType        #29:#30        // println:(Ljava/lang/String;)V
+       #23 = Utf8               Apple
+       #24 = Utf8               java/lang/Object
+       #25 = Utf8               java/lang/System
+       #26 = Utf8               out
+       #27 = Utf8               Ljava/io/PrintStream;
+       #28 = Utf8               java/io/PrintStream
+       #29 = Utf8               println
+       #30 = Utf8               (Ljava/lang/String;)V
+     {
+       Apple();
+         descriptor: ()V
+         flags:
+         Code:
+           stack=1, locals=1, args_size=1
+              0: aload_0
+              1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+              4: return
+           LineNumberTable:
+             line 1: 0
+
+       public int add(int, int);
+         descriptor: (II)I
+         flags: ACC_PUBLIC
+         Code:
+           stack=2, locals=3, args_size=3
+              0: iload_1
+              1: iload_2
+              2: iadd
+              3: ireturn
+           LineNumberTable:
+             line 4: 0
+
+       public static void main(java.lang.String[]);
+         descriptor: ([Ljava/lang/String;)V
+         flags: ACC_PUBLIC, ACC_STATIC
+         Code:
+           stack=2, locals=1, args_size=1
+              0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+              3: ldc           #3                  // String Hello World
+              5: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+              8: return
+           LineNumberTable:
+             line 8: 0
+             line 9: 8
+     }
+     SourceFile: "Apple.java"
+   #+END_SRC
+
 * 字符串
 ** 基本操作
    #+BEGIN_SRC java
@@ -701,31 +917,6 @@
     String res2 = text.replaceAll("[0-9]+", "#"); // same as res1
   #+END_SRC
 
-* 反射
-  Java 提供可以动态创建对象和操作对象的方法，一般叫做反射
-  #+BEGIN_SRC java
-    public static void main(String[] args) throws Exception {
-      // 获取 Class 类
-      Class<?> clz = Class.forName("io.github.jeanhwea.app03.bean.Person");
-
-      // 获取类的构造器
-      Constructor<?> ctor = clz.getConstructor();
-      // 新建对象
-      Object obj = ctor.newInstance();
-
-      // 获取定义的字段
-      Field field = clz.getDeclaredField("name");
-      field.setAccessible(true); // private 修饰的字段需要配置可见性
-      // 设置字段值
-      field.set(obj, "Injected Person Name");
-
-      // 获取类的方法
-      Method method = clz.getMethod("getName");
-      // 调用方法
-      String name = (String) method.invoke(obj);
-      System.out.println(name);
-    }
-  #+END_SRC
 * 其它
 ** 断言
    assertion (断言) 在软件开发中是一种常用的调试方式，很多开发语言中都支持这种机
@@ -762,222 +953,4 @@
    #+BEGIN_SRC java
      new Date().getTime(); // =>  1583839335691
      System.currentTimeMillis(); // => 1583839349221
-   #+END_SRC
-* 开发工具
-** JDK 1.8 简介和新特性
-   [[https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html][JDK]] 是 Java 语言的软件开发工具包，主要用于移动设备、嵌入式设备上的 JAVA 应用
-   程序。JDK 是整个 Java 开发的核心，它包含了 JAVA 的运行环境（JVM+Java 系统类库）
-   和 JAVA 工具。目前主要使用的 JDK 版本为 1.8 ，其参考见 [[https://www.oracle.com/technetwork/java/javase/documentation/jdk8-doc-downloads-2133158.html][JDK Documentation]]
-
-   1. Java 8 允许我们给接口添加一个非抽象的方法实现，只需要使用 default 关键字即
-      可
-   2. 新增 lambda 表达式
-   3. 提供函数式接口
-   4. Java 8 允许你使用关键字来传递方法或者构造函数引用
-   5. 我们可以直接在 lambda 表达式中访问外层的局部变量。
-
-   JDK 1.8 的概念图如下：
-
-   [[file:../static/image/2019/07/jdk8-conceptual-diagram.png]]
-
-** JDK 的安装和环境变量配置
-   JDK 可以直接在 Oracle 网站上下载，链接是 [[https://www.oracle.com/java/technologies/javase-jdk8-downloads.html][JDK 1.8 Download]] ，将 JDK 直接解压放
-   到一个文件夹里就可以使用 JDK，Java 一般会配置 ~JAVA_HOME~ 环境变量，
-   ~JAVA_HOME~ 环境变量是指向 Java 的安装文件夹，具体配置如下所示
-   #+BEGIN_SRC sh
-     mkdir -p /usr/local/java && cd /usr/local/java
-     tar xzvf jdk-8u231-linux-x64.tar.gz
-   #+END_SRC
-
-   配置环境变量如下
-   #+BEGIN_SRC sh
-     export JAVA_HOME='/usr/local/java/jdk1.8.0_231'
-     export PATH=$JAVA_HOME/bin:$PATH
-   #+END_SRC
-
-** 编译器 javac 和虚拟机 java
-   Java 的两个基本工具是 ~javac~ 和 ~java~, 其中这两个工具功能如下：
-   - javac 是 Java 的编译器，将 Java 的源代码编译成虚拟机识别的字节码
-   - java 是 Java 的执行器，可以执行 Java 编译器编译好的字节码
-
-   下面是查看工具版本的方法
-   #+BEGIN_SRC text
-     $ java -version
-     java version "1.8.0_221"
-     Java(TM) SE Runtime Environment (build 1.8.0_221-b11)
-     Java HotSpot(TM) 64-Bit Server VM (build 25.221-b11, mixed mode)
-     $ javac -version
-     javac 1.8.0_221
-   #+END_SRC
-
-   也可以使用 javac 和 java 一个编译并执行 Java 代码
-   #+BEGIN_SRC text
-     $ ls
-     Hello.java
-     $ cat Hello.java
-     public class Hello {
-       public static void main(String args[]) {
-         System.out.println("hello");
-       }
-     }
-     $ javac Hello.java
-     $ ls
-     Hello.class  Hello.java
-     $ java Hello
-     hello
-     $
-   #+END_SRC
-
-** TODO 调试器 jdb
-   Java 自带的调试器是 ~jdb~ 命令，通常可以使用集成开发环境（IDE）中的调试工具来
-   调试 Java，所以 jdb 一般使用的比较少
-
-** 解释器 jrepl
-   Java 9 的 JDK 中就自带解释器, 可以用于调试一些常见的命令。Java 8 用户可以使用
-   一个民间开发的 REPL，就叫 ~java-repl~, 该工具可以在 [[https://github.com/albertlatacz/java-repl][github]] 中下载 jar 包，然
-   后直接执行
-   #+BEGIN_SRC sh
-     java -jar $JAVA_HOME/lib/javarepl-dev.jar
-   #+END_SRC
-
-   我一般直接建一个别名，这样运行 java 的解释器效果如下
-   #+BEGIN_SRC text
-     $ jrepl
-     [INFO] Unable to bind key for unsupported operation: edit-and-execute-command
-     Welcome to JavaREPL version dev (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_231)
-     Type expression to evaluate, :help for more options or press tab to auto-complete.
-     Connected to local instance at http://localhost:40173
-     java> "hello world"
-     java.lang.String res0 = "hello world"
-     java>
-   #+END_SRC
-
-** 反汇编器 javap
-   javap 时 JDK 自带的反汇编器，可以反汇编 java 的类
-   #+HEADER: :classname Apple
-   #+BEGIN_SRC java
-     class Apple {
-
-       public int add(int a, int b) {
-         return a + b;
-       }
-
-       public static void main(String args[]) {
-         System.out.println("Hello World");
-       }
-     }
-   #+END_SRC
-
-   使用 javap 的反汇编的示例如下
-   #+BEGIN_SRC text
-     $ javap Apple
-     Compiled from "Apple.java"
-     class Apple {
-       Apple();
-       public int add(int, int);
-       public static void main(java.lang.String[]);
-     }
-
-     $ javap -c Apple
-     Compiled from "Apple.java"
-     class Apple {
-       Apple();
-         Code:
-            0: aload_0
-            1: invokespecial #1                  // Method java/lang/Object."<init>":()V
-            4: return
-
-       public int add(int, int);
-         Code:
-            0: iload_1
-            1: iload_2
-            2: iadd
-            3: ireturn
-
-       public static void main(java.lang.String[]);
-         Code:
-            0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
-            3: ldc           #3                  // String Hello World
-            5: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
-            8: return
-     }
-
-     $ javap -v Apple
-     Classfile /tmp/java/Apple.class
-       Last modified Mar 17, 2020; size 471 bytes
-       MD5 checksum ad20aeca420725caad4423644222e82d
-       Compiled from "Apple.java"
-     class Apple
-       minor version: 0
-       major version: 52
-       flags: ACC_SUPER
-     Constant pool:
-        #1 = Methodref          #6.#17         // java/lang/Object."<init>":()V
-        #2 = Fieldref           #18.#19        // java/lang/System.out:Ljava/io/PrintStream;
-        #3 = String             #20            // Hello World
-        #4 = Methodref          #21.#22        // java/io/PrintStream.println:(Ljava/lang/String;)V
-        #5 = Class              #23            // Apple
-        #6 = Class              #24            // java/lang/Object
-        #7 = Utf8               <init>
-        #8 = Utf8               ()V
-        #9 = Utf8               Code
-       #10 = Utf8               LineNumberTable
-       #11 = Utf8               add
-       #12 = Utf8               (II)I
-       #13 = Utf8               main
-       #14 = Utf8               ([Ljava/lang/String;)V
-       #15 = Utf8               SourceFile
-       #16 = Utf8               Apple.java
-       #17 = NameAndType        #7:#8          // "<init>":()V
-       #18 = Class              #25            // java/lang/System
-       #19 = NameAndType        #26:#27        // out:Ljava/io/PrintStream;
-       #20 = Utf8               Hello World
-       #21 = Class              #28            // java/io/PrintStream
-       #22 = NameAndType        #29:#30        // println:(Ljava/lang/String;)V
-       #23 = Utf8               Apple
-       #24 = Utf8               java/lang/Object
-       #25 = Utf8               java/lang/System
-       #26 = Utf8               out
-       #27 = Utf8               Ljava/io/PrintStream;
-       #28 = Utf8               java/io/PrintStream
-       #29 = Utf8               println
-       #30 = Utf8               (Ljava/lang/String;)V
-     {
-       Apple();
-         descriptor: ()V
-         flags:
-         Code:
-           stack=1, locals=1, args_size=1
-              0: aload_0
-              1: invokespecial #1                  // Method java/lang/Object."<init>":()V
-              4: return
-           LineNumberTable:
-             line 1: 0
-
-       public int add(int, int);
-         descriptor: (II)I
-         flags: ACC_PUBLIC
-         Code:
-           stack=2, locals=3, args_size=3
-              0: iload_1
-              1: iload_2
-              2: iadd
-              3: ireturn
-           LineNumberTable:
-             line 4: 0
-
-       public static void main(java.lang.String[]);
-         descriptor: ([Ljava/lang/String;)V
-         flags: ACC_PUBLIC, ACC_STATIC
-         Code:
-           stack=2, locals=1, args_size=1
-              0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
-              3: ldc           #3                  // String Hello World
-              5: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
-              8: return
-           LineNumberTable:
-             line 8: 0
-             line 9: 8
-     }
-     SourceFile: "Apple.java"
    #+END_SRC

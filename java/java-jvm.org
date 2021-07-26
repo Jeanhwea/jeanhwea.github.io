@@ -678,3 +678,29 @@
         下的类，无法加载运行时的，其他目录下的类
       - JDBC 接口都是由 JDK 提供，具体实现是由第三方数据库产商提供的,所以也只能
         采用这种方式去加载驱动实现类
+
+* 反射
+  Java 提供可以动态创建对象和操作对象的方法，一般叫做反射
+  #+BEGIN_SRC java
+    public static void main(String[] args) throws Exception {
+      // 获取 Class 类
+      Class<?> clz = Class.forName("io.github.jeanhwea.app03.bean.Person");
+
+      // 获取类的构造器
+      Constructor<?> ctor = clz.getConstructor();
+      // 新建对象
+      Object obj = ctor.newInstance();
+
+      // 获取定义的字段
+      Field field = clz.getDeclaredField("name");
+      field.setAccessible(true); // private 修饰的字段需要配置可见性
+      // 设置字段值
+      field.set(obj, "Injected Person Name");
+
+      // 获取类的方法
+      Method method = clz.getMethod("getName");
+      // 调用方法
+      String name = (String) method.invoke(obj);
+      System.out.println(name);
+    }
+  #+END_SRC
