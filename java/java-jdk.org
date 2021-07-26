@@ -645,27 +645,39 @@
 
 * 字符串
 ** 基本操作
+   字符串的基本操作如下
+   1. Java 的字符串内部实现使用了 ~char~ 数组
+   2. ~char[]~ 和 ~String~ 类的区别
+      - 如果密码是存储在 String 对象中的，则直到对它进行垃圾收集或进程终止之前，
+        密码会一直驻留在内存中
+      - 即使进行了垃圾收集，它仍会存在于空闲内存堆中，直到重用该内存空间为止，密
+        码 String 在内存中驻留得越久，遭到窃听的危险性就越大
+      - 如果实际内存减少，则操作系统会将这个密码 String 换页调度到磁盘的交换空间，
+        因此容易遭受磁盘块窃听攻击。 为了将这种泄密的可能性降至最低 ，您应该将密
+        码存储在 ~char[]~ 中，并在使用后对其置零
+   3. 常用方法包括取子字符串，分割和合并字符串以及正则表达式替换
+   4. 字符串的 ~split()~ 和 ~join()~ 函数方便使用分隔符替换
    #+BEGIN_SRC java
-     // 字符串
+     // 字符串基本操作
      String str1 = "abcdef";
      str1.isEmpty();
      str1.length();
+     str1.indexOf("c"); // => 2
      str1.substring(0, 3); // => "abc"
 
-     // 字符串分割和合并
+     // 合并字符串
      String str2 = "1,2,3,4";
      String[] res1 = str2.split(","); // => ["1", "2", "3", "4"]
-
+     // 分割字符串
      List<String> res2 = Arrays.asList(res1);
      // res2.add("xxx"); // => throw UnsupportedOperationException
      List<String> res3 = new LinkedList<>(Arrays.asList(res1));
      res3.add("xxx"); // now is OK
-
      String str3 = String.join(":", res3); // => "1:2:3:4:xxx"
 
-     // 正则表达式
+     // 正则表达式替换
      String str6 = "3 +5-4";
-     str6 = str6.replaceAll("(\\+|-|\\*|/)", " $1 ").replaceAll("  ", " ").trim();
+     str6 = str6.replaceAll("(\\+|-|\\*|/)", " $1 ").replaceAll("  ", " ").trim(); // => "3 + 5 - 4"
    #+END_SRC
 
    在判断字符串 str 为非空时需要写如下的两个条件
@@ -675,44 +687,41 @@
      }
    #+END_SRC
 
-** 格式化成字符串
+** 字符串的格式化
    1. ~String.format(String fmt, Object... args)~ 的字符串格式和 C 语言的 printf
       一样
    2. ~MessageFormat.format(String fmt, Object... args)~ 使用单引号标记任意字面
       量，使用花括号加数字来表示相应的位置的占位符，例如： ={0}= 表示第 1 个位置
       的参数， ={1}= 表示第 2 个位置的参数，以此类推。
-      #+BEGIN_SRC java
-        java> String.format("Hi, %s", "Jack");
-        java.lang.String res0 = "Hi, Jack"
-        java> import java.text.MessageFormat;
-        Imported java.text.MessageFormat
-        java> MessageFormat.format("Hi, {0}, I''m {1} years old.", "Tom", 18);
-        java.lang.String res1 = "Hi, Tom, I'm 18 years old."
-        java> MessageFormat.format("'Hi, {0}, I''m {1} years old.'", "Tom", 18);
-        java.lang.String res2 = "Hi, {0}, I'm {1} years old."
-        java>
-      #+END_SRC
    3. 格式化数字，注意在处理 ~long~ 类型的数字时，需要对数字进行格式化
-      #+BEGIN_SRC java
-        java> MessageFormat.format("{0,number,#}", 1889989898989L);
-        java.lang.String res14 = "1889989898989"
-        java> MessageFormat.format("{0}", 1889989898989L);
-        java.lang.String res15 = "1,889,989,898,989"
-        java> MessageFormat.format("{0,number,#000000}", 1889989898989L);
-        java.lang.String res16 = "1889989898989"
-        java> MessageFormat.format("{0,number,#000000}", 12345L);
-        java.lang.String res17 = "012345"
-        java> MessageFormat.format("{0,number,#}", 12345L);
-        java.lang.String res18 = "12345"
-        java>
-      #+END_SRC
+
+   #+BEGIN_SRC java
+     String.format("Hi, %s", "Jack"); // => "Hi, Jack"
+     MessageFormat.format("Hi, {0}, I''m {1} years old.", "Tom", 18);
+     // => "Hi, Tom, I'm 18 years old."
+
+     // 单引号表示字面量，MessageFormat 不会替换
+     MessageFormat.format("'Hi, {0}, I''m {1} years old.'", "Tom", 18);
+     // => "Hi, {0}, I'm {1} years old."
+
+     // 处理数值类型的对象
+     MessageFormat.format("{0,number,#}", 1889989898989L); // => "1889989898989"
+     MessageFormat.format("{0}", 1889989898989L); // => "1,889,989,898,989"
+     MessageFormat.format("{0,number,#000000}", 1889989898989L); // => "1889989898989"
+     MessageFormat.format("{0,number,#000000}", 12345L); //  => "012345"
+     MessageFormat.format("{0,number,#}", 12345L); // => "12345"
+   #+END_SRC
 
 ** String 的不可变性
    1. 不可变对象指的是 *一个对象，在它创建完成之后，不能再改变它的状态* 。
       - 不能改变状态的意思是，不能改变对象内的成员变量，
         + 基本数据类型的值不能改变
         + 引用类型的变量不能指向其他的对象，引用类型指向的对象的状态也不能改变
-   2. 为什么要把 String 类设计成不可变类，是它的用途决定的
+   2. ~javac~ 编译可以对字符串常量直接相加的表达式进行优化
+      - 不必要等到运行期去进行加法运算处理，而是在编译时去掉其中的加号，直接将其
+        编译成一个这些常量相连的结果
+      - 所以 ~String s = "a" + "b";~ 只生成一个对象 ~String s = "ab";~
+   3. 为什么要把 String 类设计成不可变类，是它的用途决定的
       - 不可变类有一些优点，比如因为它的对象是只读的，所以多线程并发访问也不会有任何问题
       - 当然也有一些缺点，比如每个不同的状态都要一个对象来代表，可能会造成性能上的问题。
       - 所以 Java 标 准类库还提供了一个可变版本，即 StringBuffer/StringBuilder
@@ -720,10 +729,17 @@
         + StringBuilder 是 JDK 1.5 中引入的，它和 StringBuffer 的方法完全相同
         + 区别在于它是在单线程环境下使用的，因为它的所有方面都没有被
           ~synchronized~ 修饰, 因此它的效率也比 StringBuffer 略高
-   3. ~javac~ 编译可以对字符串常量直接相加的表达式进行优化
-      - 不必要等到运行期去进行加法运算处理，而是在编译时去掉其中的加号，直接将其
-        编译成一个这些常量相连的结果
-      - 所以 ~String s = "a" + "b";~ 只生成一个对象 ~String s = "ab";~
+
+   ~StringBuilder~ 的使用例子如下
+   #+BEGIN_SRC java
+     StringBuilder sb = new StringBuilder(10);
+     sb.append("Hello.."); // => "Hello.."
+     sb.append("!"); // => "Hello..!"
+     sb.insert(8, "Java"); // => "Hello..!Java"
+     sb.delete(5, 8); // => "HelloJava"
+     sb.reverse(); // => "avaJolleH"
+     System.out.println(sb.toString());
+   #+END_SRC
 
 * 数组
 ** 基本操作
