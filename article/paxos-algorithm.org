@@ -1,0 +1,40 @@
+#+TITLE: paxos 算法
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2021-07-27 Tue 19:03:31>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: paxos
+
+
+* 三种角色
+  1. Proposer (提议者): 半数以上的 Proposer 提出的 Value 被接受, 则 Value 被选定
+  2. Acceptor (接受者): 只要 Acceptor 接受了某个提案, Acceptor 就认为该提案的
+     Value 被选定
+  3. Learner (记录员): Acceptor 告诉 Learner 哪个 Value 被选定, Learner 就认为哪
+     个 Value 值被选定
+
+* 两个阶段
+** Prepare 阶段
+   1. Proposer 收到 Client 请求或者发现本地有未提交的 Value, 选择一个提案编号 N,
+      然后向半数以上的 Acceptor 发送编号为 N 的 Prepare 请求
+   2. Acceptor 收到一个编号为 N 的 Prepare 请求，如果该轮 paxos
+      - 本节点已经有已提交的 Value 记录，对比记录的编号和 N
+        + 如果本地编号大于 N, 则拒绝回应
+        + 否则返回该记录 Value 及编号
+      - 没有已提交的记录, 判断本地是否有编号 M
+        + 如果 M > N, 则拒绝响应
+        + 否则将 M 修改成 N, 并响应 Prepare
+
+** Accept 阶段
+   1. 如果 Proposer 收到半数以上 Acceptor 对其发出的编号为 N 的 Prepare 请求的响
+      应, 那么它就发送对 ~(N,V)~ 提案的 Accept 请求给半数以上的 Acceptor。V 就是
+      收到的响应中编号最大的 Value, 如果响应不包含任何 Value, 那么 V 就由
+      Proposer 自己决定
+   2. 如果 Acceptor 收到针对编号为 N 的提案的 Accept 请求, Acceptor 就对比本地的
+      记录编号
+      - 如果小于等于 N, 则接受该值，并提交记录 Value
+      - 否则拒绝请求
+   3. Proposer 如果收到的大多数 Acceptor 响应，则选定该 Value 值，并同步给
+      Learner, 使未响应的 Acceptor 达成一致
