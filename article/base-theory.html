@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-27 Tue 18:43 -->
+<!-- 2021-07-27 Tue 18:51 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>BASE 理论</title>
@@ -233,21 +233,22 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org1a0b605">1. BASE 理论</a></li>
-<li><a href="#orgb0d7ea5">2. 基本可用</a></li>
-<li><a href="#orge1e2384">3. 软状态</a></li>
-<li><a href="#orge6d6786">4. 最终一致</a></li>
+<li><a href="#org981ffc7">1. BASE 理论</a></li>
+<li><a href="#org6d36a29">2. 基本可用</a></li>
+<li><a href="#orgba0f0cb">3. 软状态</a></li>
+<li><a href="#org3808740">4. 最终一致</a></li>
+<li><a href="#orgf5034bf">5. WARO 和 Quorum</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org1a0b605" class="outline-2">
-<h2 id="org1a0b605"><span class="section-number-2">1</span> BASE 理论</h2>
+<div id="outline-container-org981ffc7" class="outline-2">
+<h2 id="org981ffc7"><span class="section-number-2">1</span> BASE 理论</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-<a href="cap-theorem.html">文章</a>介绍了分布式系统的 C (一致性), A (可用性) 和 P (分区容错性) 只能满足其二，
-本文中的 BASE 理论是基于 CAP 定理的前提，提出的分布式系统的折中方案。
+<a href="cap-theorem.html">文章</a>介绍了分布式系统的 C (一致性), A (可用性) 和 P (分区容错性) 只能满足其二,
+本文中的 BASE 理论是基于 CAP 定理的前提, 提出的分布式系统的折中方案。
 </p>
 
 <p>
@@ -261,63 +262,63 @@ BASE 理论是下列三个短语的缩写
 </div>
 </div>
 
-<div id="outline-container-orgb0d7ea5" class="outline-2">
-<h2 id="orgb0d7ea5"><span class="section-number-2">2</span> 基本可用</h2>
+<div id="outline-container-org6d36a29" class="outline-2">
+<h2 id="org6d36a29"><span class="section-number-2">2</span> 基本可用</h2>
 <div class="outline-text-2" id="text-2">
 <p>
-基本可用指系统出现了不可预知的故障，但还是能用，相比较正常的系统而言
+基本可用指系统出现了不可预知的故障, 但还是能用, 相比较正常的系统而言
 </p>
 <ol class="org-ol">
-<li><b>响应延长</b>: 正常情况下的搜索引擎 0.5 秒即返回给用户结果，而基本可用的搜索引
+<li><b>响应延长</b>: 正常情况下的搜索引擎 0.5 秒即返回给用户结果, 而基本可用的搜索引
 擎可以在 2 秒作用返回结果</li>
-<li><b>服务降级</b>: 在一个电商网站上，正常情况下，用户可以顺利完成每一笔订单。但是
-到了大促期间，为了保护购物系统的稳定性，部分消费者可能会被引导到一个降级页面</li>
+<li><b>服务降级</b>: 在一个电商网站上, 正常情况下, 用户可以顺利完成每一笔订单。但是
+到了大促期间, 为了保护购物系统的稳定性, 部分消费者可能会被引导到一个降级页面</li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orge1e2384" class="outline-2">
-<h2 id="orge1e2384"><span class="section-number-2">3</span> 软状态</h2>
+<div id="outline-container-orgba0f0cb" class="outline-2">
+<h2 id="orgba0f0cb"><span class="section-number-2">3</span> 软状态</h2>
 <div class="outline-text-2" id="text-3">
 <p>
-软状态指的是允许系统中的数据存在中间状态，并认为该状态不影响系统的整体可用性，
+软状态指的是允许系统中的数据存在中间状态, 并认为该状态不影响系统的整体可用性,
 即允许系统在多个不同节点的数据副本存在数据延时
 </p>
 
 <p>
 例如：订单支付后不要求马上将状态改成 <b>已支付</b>, 而是引入一个 <b>支付中</b> 这样的中
-间状态，只有最后支付成功收到款项再将状态改成 <b>已支付</b>
+间状态, 只有最后支付成功收到款项再将状态改成 <b>已支付</b>
 </p>
 </div>
 </div>
 
-<div id="outline-container-orge6d6786" class="outline-2">
-<h2 id="orge6d6786"><span class="section-number-2">4</span> 最终一致</h2>
+<div id="outline-container-org3808740" class="outline-2">
+<h2 id="org3808740"><span class="section-number-2">4</span> 最终一致</h2>
 <div class="outline-text-2" id="text-4">
 <p>
-上面说软状态，然后不可能一直是软状态，必须有个时间期限。在期限过后，应当保证所
-有副本保持数据一致性，从而达到数据的最终一致性。这个时间期限取决于网络延时、系
+上面说软状态, 然后不可能一直是软状态, 必须有个时间期限。在期限过后, 应当保证所
+有副本保持数据一致性, 从而达到数据的最终一致性。这个时间期限取决于网络延时、系
 统负载、数据复制方案设计等等因素
 </p>
 
 <p>
-而在实际工程实践中，最终一致性分为 5 种
+而在实际工程实践中, 最终一致性分为 5 种
 </p>
 <ol class="org-ol">
 <li><b>因果一致性</b> Causal Consistency
 <ul class="org-ul">
-<li>如果节点 A 在更新完某个数据后通知了节点 B，那么节点 B 之后对该数据的访问
-和修改都是基于 A 更新后的值。于此同时，和节点 A 无因果关系的节点 C 的数据
+<li>如果节点 A 在更新完某个数据后通知了节点 B, 那么节点 B 之后对该数据的访问
+和修改都是基于 A 更新后的值。于此同时, 和节点 A 无因果关系的节点 C 的数据
 访问则没有这样的限制</li>
 </ul></li>
 <li><b>会话一致性</b> Session Consistency
 <ul class="org-ul">
-<li>系统能保证在同一个有效的会话中实现 Read Your Writes 的一致性，也就是说，
-执行更新操作之后，客户端能够在同一个会话中始终读取到该数据项的最新值</li>
+<li>系统能保证在同一个有效的会话中实现 Read Your Writes 的一致性, 也就是说,执
+行更新操作之后, 客户端能够在同一个会话中始终读取到该数据项的最新值</li>
 </ul></li>
 <li><b>单调读</b> Monotonic Read Consistency
 <ul class="org-ul">
-<li>如果一个节点从系统中读取出一个数据项的某个值后，那么系统对于该节点后续的
+<li>如果一个节点从系统中读取出一个数据项的某个值后, 那么系统对于该节点后续的
 任何数据访问都不应该返回更旧的值</li>
 </ul></li>
 <li><b>单调写</b> Monotonic Write Consistency
@@ -326,15 +327,34 @@ BASE 理论是下列三个短语的缩写
 </ul></li>
 <li><b>读写一致性</b> Read Your Writes
 <ul class="org-ul">
-<li>节点 A 更新一个数据后，它自身总是能访问到自身更新过的最新值，而不会看到旧
+<li>节点 A 更新一个数据后, 它自身总是能访问到自身更新过的最新值, 而不会看到旧
 值。其实也算一种因果一致性</li>
+</ul></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgf5034bf" class="outline-2">
+<h2 id="orgf5034bf"><span class="section-number-2">5</span> WARO 和 Quorum</h2>
+<div class="outline-text-2" id="text-5">
+<ol class="org-ol">
+<li>WARO (Write All Read One): 一种简单副本控制协议, 当写入多个副本时只有当所有
+副本都写入成功本次写入才算成功</li>
+<li>Quorum: 假设有 N 个副本, 更新操作 wi 在 W 个副本中更新成功之后, 则认为此次
+更新操作 wi 成功, 把这次成功提交的更新操作对应的数据叫做: "成功提交的数据"
+对于读操作而言, 至少需要读 <code>R</code> 个副本, 其中, <code>W+R&gt;N</code>, 即 W 和 R 有重叠, 一
+般, <code>W+R=N+1</code>
+<ul class="org-ul">
+<li>N = 存储数据副本的数量</li>
+<li>W = 更新成功所需的副本</li>
+<li>R = 一次数据对象读取要访问的副本的数量</li>
 </ul></li>
 </ol>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-27 Tue 18:43. Created by Jinghui Hu at 2021-07-27 Tue 18:19.</p>
+<p class="author">Last Updated 2021-07-27 Tue 18:51. Created by Jinghui Hu at 2021-07-27 Tue 18:19.</p>
 </div>
 </body>
 </html>
