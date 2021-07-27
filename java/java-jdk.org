@@ -744,6 +744,8 @@
 
 * 数组
 ** 基本操作
+   Java 的数组使用注意事项如下
+   1. 数组的下标从 0 开始
    #+BEGIN_SRC java
      // 定长数组
      int[] arr1 = new int[10]; // 定义数组
@@ -778,52 +780,107 @@
      Arrays.sort(arr2);
    #+END_SRC
 
+** 声明 Map 对象数组
+   #+BEGIN_SRC java
+     // 声明 HashMap 数组
+     Map<Character, Integer>[] mapArray = new HashMap[9];
+     // 需要初始化元素
+     for (int i = 0; i < 9; i++) mapArray[i] = new HashMap<>();
+   #+END_SRC
+
 ** 列表和数组互转
    #+BEGIN_SRC java
      // List 转 Array
-     List<Employee> list = new ArrayList<>();
-     while (...) {
-       x = ...;
-       list.add(x);
+     List<String> list = new ArrayList<>();
+     String[] arr1 = new String[] {"a", "b", "c"};
+     for (int i = 0; i < arr1.length; i++) {
+       list.add(arr1[i]);
      }
 
      // Array 转 List
-     Employee[] arr = new Employee[list.size()];
-     list.toArray(arr);
+     List<String> names = new LinkedList<String>() {{add("Jack"); add("Tome");}};
+     String[] arr2 = new String[names.size()];
+     names.toArray(arr2);
    #+END_SRC
 
-   注意 ~Arrays.asList(...)~ 将数组转 List 时需要传对象。
-   #+BEGIN_SRC java
-     Integer[] primes1 = {2,3,5};
-     List list1 = Arrays.asList(primes1);
-     list1.size();
+** ~Arrays.asList(...)~ 转数组
+   在 ~Arrays.asList(...)~ 中
+   1. 该方法接受一个变长参数，一般可看做数组参数，
+      #+BEGIN_SRC java
+        @SafeVarargs
+        @SuppressWarnings("varargs")
+        public static <T> List<T> asList(T... a) {
+            return new ArrayList<>(a);
+        }
+      #+END_SRC
+   2. 但是因为 ~int[]~ 本身就是一个类型，所以 primes2 变量作为参数传递时，编译器
+      认为只传了一个变量，这个变量的类型是 int 数组
+      #+BEGIN_SRC java
+        Integer[] primes1 = {2,3,5};
+        List list1 = Arrays.asList(primes1); // list1 => [2, 3, 5]
+        list1.size(); // => 3
 
-     int[] primes2 = {2,3,5};
-     List list2 = Arrays.asList(primes2);
-     list2.size();
-   #+END_SRC
+        int[] primes2 = {2,3,5};
+        List list2 = Arrays.asList(primes2); // list2 => list2 = [[I@4ed8ff]
+        list2.size(); // => 1
+      #+END_SRC
 
-   在 ~Arrays.asList(...)~ 中，该方法接受一个变长参数，一般可看做数组参数，但是
-   因为 ~int[]~ 本身就是一个类型，所以 primes2 变量作为参数传递时，编译器认为只
-   传了一个变量，这个变量的类型是 int 数组
-   #+BEGIN_SRC text
-     java> Integer[] primes1 = {2,3,5};
-     java.lang.Integer[] primes1 = [2, 3, 5]
-     java> List list1 = Arrays.asList(primes1);
-     java.util.List list1 = [2, 3, 5]
-     java> list1.size();
-     java.lang.Integer res7 = 3
-     java> int[] primes2 = {2,3,5};
-     int[] primes2 = [2, 3, 5]
-     java> List list2 = Arrays.asList(primes2);
-     java.util.List list2 = [[I@4ed8ff]
-     java> list2.size();
-     java.lang.Integer res10 = 1
-     java>
-   #+END_SRC
-* 集合
-** List
-*** LinkedList
+* 集合 Collections
+** 集合接口
+   | 接口                   | 说明                                     |
+   |------------------------+------------------------------------------|
+   | Collection             | 一系列元素的分组                         |
+   | Set                    | 类似数学中的集合，其中没有重复元素       |
+   | List                   | 有序的对象，可以有重复元素，允许位置索引 |
+   | Queue                  | 队列，一种先进先出的元素集合             |
+   | Deque                  | 双向队列，和队列类似，只不过支持两端操作 |
+   | Map                    | 表，一种支持键值对操作的结构             |
+   | SortedSet              | 有序集合，元素按自然顺序排列的集合       |
+   | SortedMap              | 有序表，键按自然顺序排列的集合           |
+   | NavigableSet           | 扩展了 SortedSet，提供导航方法           |
+   | NavigableMap           | 扩展了 SortedMap，提供导航方法           |
+   | BlockingQueue          | 阻塞队列，若队列为空阻塞直到插入元素     |
+   | TransferQueue          | 继承 BlockingQueue, 生产者等待消费者     |
+   | BlockingDeque          | 继承 BlockingDeque 和 Deque              |
+   | ConcurrentMap          | 并发表，支持并发操作的 Map               |
+   | ConcurrentNavigableMap | 继承 ConcurrentMap 和 NavigableMap       |
+
+** 常见实现类
+   | 实现类        | 说明                                                      |
+   |---------------+-----------------------------------------------------------|
+   | HashSet       | 基于哈希表的 Set 的实现                                   |
+   | TreeSet       | 基于红黑树的 NavigableSet 的实现                          |
+   | LinkedHashSet | 基于哈希表和链表的 Set 的实现                             |
+   | ArrayList     | 基于动态扩容数组的 List 的实现                            |
+   | ArrayDeque    | 基于动态扩容数组的 Deque 的实现                           |
+   | LinkedList    | 基于双向链表的 List 的实现，同时也是实现了 Deque 和 Queue |
+   | PriorityQueue | 基于堆的优先队列的实现                                    |
+   | HashMap       | 基于哈希的 Map 的实现                                     |
+   | TreeMap       | 基于红黑树的 NavigableMap 的实现                          |
+   | LinkedHashMap | 基于哈希表和链表的 Map 的实现                             |
+
+** 常见的算法
+   | 静态算法方法                                          | 说明           |
+   |-------------------------------------------------------+----------------|
+   | ~sort(List)~                                          | 排序           |
+   | ~binarySearch(List, Object)~                          | 二分查找       |
+   | ~reverse(List)~                                       | 翻转           |
+   | ~shuffle(List)~                                       | 随机排序       |
+   | ~fill(List, Object)~                                  | 填充           |
+   | ~copy(List dest, List src)~                           | 复制           |
+   | ~min(Collection)~                                     | 最小值         |
+   | ~max(Collection)~                                     | 最大值         |
+   | ~rotate(List list, int distance)~                     | 旋转           |
+   | ~replaceAll(List list, Object oldVal, Object newVal)~ | 替换全部       |
+   | ~indexOfSubList(List source, List target)~            | 查找           |
+   | ~lastIndexOfSubList(List source, List target)~        | 反向查找       |
+   | ~swap(List, int, int)~                                | 交换           |
+   | ~frequency(Collection, Object)~                       | 计算出现次数   |
+   | ~disjoint(Collection, Collection)~                    | 两个集合的交集 |
+   | ~addAll(Collection<? super T>, T...)~                 | 添加多个元素   |
+
+** 常用集合方法
+*** List
     #+BEGIN_SRC java
       // 单链表
       Deque<Integer> list1 = new LinkedList<>(Arrays.asList(1, 2, 3));
@@ -845,63 +902,63 @@
       delist1.peekFirst(); // 查看表头的元素
       delist1.peekLast(); // 查看表尾的元素
     #+END_SRC
-** Queue & Deque
-   #+BEGIN_SRC java
-     // 队列
-     Queue<Integer> queue1 = new LinkedList<>();
-     queue1.offer(7);
-     queue1.poll();
-     queue1.peek();
-     queue1.isEmpty();
+*** Queue & Deque
+    #+BEGIN_SRC java
+      // 队列
+      Queue<Integer> queue1 = new LinkedList<>();
+      queue1.offer(7);
+      queue1.poll();
+      queue1.peek();
+      queue1.isEmpty();
 
-     // 双向队列 （和双向链表一样）
-     Deque<Integer> deque1 = new LinkedList<>();
-   #+END_SRC
-** Stack & Heap
-   #+BEGIN_SRC java
-     // 栈
-     Deque<Integer> stack1 = new LinkedList<>();
-     stack1.push(2);
-     stack1.push(3);
-     stack1.pop();
-     stack1.peek();
-     stack1.isEmpty();
+      // 双向队列 （和双向链表一样）
+      Deque<Integer> deque1 = new LinkedList<>();
+    #+END_SRC
 
-     // 优先队列（堆）
-     PriorityQueue<Integer> pq1 = new PriorityQueue<>(); // 新建一个小根堆
-     PriorityQueue<Integer> pq2 = new PriorityQueue<>((x, y) -> y - x); // 新建一个大根堆
-     pq1.offer(3); // 往堆添加 1 个元素
-     pq1.poll(); // 删除堆中的元素
-     pq1.peek(); // 查看堆顶的元素
-     pq1.isEmpty();
-   #+END_SRC
+*** Stack & Heap
+    #+BEGIN_SRC java
+      // 栈
+      Deque<Integer> stack1 = new LinkedList<>();
+      stack1.push(2);
+      stack1.push(3);
+      stack1.pop();
+      stack1.peek();
+      stack1.isEmpty();
 
-** Set & Map
-   #+BEGIN_SRC java
-     // 集合
-     Set<Integer> set1 = new HashSet<>();
-     set1.add(3);
-     set1.add(3);
-     set1.add(4);
-     set1.contains(4);
+      // 优先队列（堆）
+      PriorityQueue<Integer> pq1 = new PriorityQueue<>(); // 新建一个小根堆
+      PriorityQueue<Integer> pq2 = new PriorityQueue<>((x, y) -> y - x); // 新建一个大根堆
+      pq1.offer(3); // 往堆添加 1 个元素
+      pq1.poll(); // 删除堆中的元素
+      pq1.peek(); // 查看堆顶的元素
+      pq1.isEmpty();
+    #+END_SRC
 
-     // 散列表
-     Map<String, Integer> map1 = new HashMap<>();
-     map1.put("a", 3);
-     map1.put("b", 4);
-     map1.put("b", 8);
-     map1.putIfAbsent("b", 8);
-     map1.get("c"); // 查找 key, 如果不存在返回 null
-     map1.getOrDefault("c", 0);
+*** Set & Map
+    #+BEGIN_SRC java
+      // 集合
+      Set<Integer> set1 = new HashSet<>();
+      set1.add(3);
+      set1.add(3);
+      set1.add(4);
+      set1.contains(4);
 
-     map1.containsKey("s");
-     map1.containsValue(8);
+      // 散列表
+      Map<String, Integer> map1 = new HashMap<>();
+      map1.put("a", 3);
+      map1.put("b", 4);
+      map1.put("b", 8);
+      map1.putIfAbsent("b", 8);
+      map1.get("c"); // 查找 key, 如果不存在返回 null
+      map1.getOrDefault("c", 0);
 
-     map1.keySet(); // 键的集合
-     map1.values(); // 值的集合
-     map1.entrySet(); // 键值对的集合
+      map1.containsKey("s");
+      map1.containsValue(8);
 
-   #+END_SRC
+      map1.keySet(); // 键的集合
+      map1.values(); // 值的集合
+      map1.entrySet(); // 键值对的集合
+    #+END_SRC
 
 * 正则表达式
   正则表达式是处理字符串的一个非常有效的工具，Java 中关于正则表达式处理的相关方
