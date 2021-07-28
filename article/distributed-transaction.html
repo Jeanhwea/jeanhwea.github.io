@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-28 Wed 11:35 -->
+<!-- 2021-07-28 Wed 11:37 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>分布式事务</title>
@@ -233,19 +233,20 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgfae4010">1. 分布式事务</a></li>
-<li><a href="#org1adedda">2. 2PC &amp; 3PC</a>
+<li><a href="#org87494c3">1. 分布式事务</a></li>
+<li><a href="#org17a9af3">2. 2PC &amp; 3PC</a>
 <ul>
-<li><a href="#orge4535ba">2.1. 提交模型</a></li>
-<li><a href="#org402c7bf">2.2. 2PC (tow-phase-commit) 两阶段事务</a></li>
-<li><a href="#org79924a1">2.3. 3PC (three-phase-commit) 三阶段事务</a></li>
+<li><a href="#org453d0df">2.1. 提交模型</a></li>
+<li><a href="#org9557201">2.2. 2PC (tow-phase-commit) 两阶段事务</a></li>
+<li><a href="#org25aef0e">2.3. 3PC (three-phase-commit) 三阶段事务</a></li>
 </ul>
 </li>
-<li><a href="#org538e1c2">3. TCC (Try-Confirm-Cancel) 补偿事务</a>
+<li><a href="#org47b6b89">3. TCC (Try-Confirm-Cancel) 补偿事务</a>
 <ul>
-<li><a href="#orge6ec459">3.1. 提交模型</a></li>
-<li><a href="#org156e5e2">3.2. TCC 实现</a></li>
-<li><a href="#org0bbce74">3.3. TCC 缺点</a></li>
+<li><a href="#orgece11d1">3.1. 提交模型</a></li>
+<li><a href="#orga812a7e">3.2. TCC 三个操作说明</a></li>
+<li><a href="#org42ddc95">3.3. TCC 实践案例</a></li>
+<li><a href="#org4205954">3.4. TCC 缺点</a></li>
 </ul>
 </li>
 </ul>
@@ -253,8 +254,8 @@
 </div>
 
 
-<div id="outline-container-orgfae4010" class="outline-2">
-<h2 id="orgfae4010"><span class="section-number-2">1</span> 分布式事务</h2>
+<div id="outline-container-org87494c3" class="outline-2">
+<h2 id="org87494c3"><span class="section-number-2">1</span> 分布式事务</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 分布式事务是指事务的参与者、支持事务的服务器、资源服务器以及事务管理器分别位于
@@ -277,12 +278,12 @@
 </div>
 </div>
 
-<div id="outline-container-org1adedda" class="outline-2">
-<h2 id="org1adedda"><span class="section-number-2">2</span> 2PC &amp; 3PC</h2>
+<div id="outline-container-org17a9af3" class="outline-2">
+<h2 id="org17a9af3"><span class="section-number-2">2</span> 2PC &amp; 3PC</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orge4535ba" class="outline-3">
-<h3 id="orge4535ba"><span class="section-number-3">2.1</span> 提交模型</h3>
+<div id="outline-container-org453d0df" class="outline-3">
+<h3 id="org453d0df"><span class="section-number-3">2.1</span> 提交模型</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 2PC 和 3PC 参与事务提交的处理流程如下，事务包含如下三类角色
@@ -303,8 +304,8 @@
 </div>
 </div>
 
-<div id="outline-container-org402c7bf" class="outline-3">
-<h3 id="org402c7bf"><span class="section-number-3">2.2</span> 2PC (tow-phase-commit) 两阶段事务</h3>
+<div id="outline-container-org9557201" class="outline-3">
+<h3 id="org9557201"><span class="section-number-3">2.2</span> 2PC (tow-phase-commit) 两阶段事务</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 2PC 的具体的实现流程如下
@@ -347,8 +348,8 @@
 </div>
 </div>
 
-<div id="outline-container-org79924a1" class="outline-3">
-<h3 id="org79924a1"><span class="section-number-3">2.3</span> 3PC (three-phase-commit) 三阶段事务</h3>
+<div id="outline-container-org25aef0e" class="outline-3">
+<h3 id="org25aef0e"><span class="section-number-3">2.3</span> 3PC (three-phase-commit) 三阶段事务</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 3PC 在 2PC 的基础上增加了 CanCommit 阶段
@@ -402,12 +403,12 @@
 </div>
 </div>
 
-<div id="outline-container-org538e1c2" class="outline-2">
-<h2 id="org538e1c2"><span class="section-number-2">3</span> TCC (Try-Confirm-Cancel) 补偿事务</h2>
+<div id="outline-container-org47b6b89" class="outline-2">
+<h2 id="org47b6b89"><span class="section-number-2">3</span> TCC (Try-Confirm-Cancel) 补偿事务</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orge6ec459" class="outline-3">
-<h3 id="orge6ec459"><span class="section-number-3">3.1</span> 提交模型</h3>
+<div id="outline-container-orgece11d1" class="outline-3">
+<h3 id="orgece11d1"><span class="section-number-3">3.1</span> 提交模型</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 TCC 参与事务提交的处理流程如下，事务包含如下三类角色
@@ -431,31 +432,29 @@ TCC 参与事务提交的处理流程如下，事务包含如下三类角色
 </div>
 </div>
 
-<div id="outline-container-org156e5e2" class="outline-3">
-<h3 id="org156e5e2"><span class="section-number-3">3.2</span> TCC 实现</h3>
+<div id="outline-container-orga812a7e" class="outline-3">
+<h3 id="orga812a7e"><span class="section-number-3">3.2</span> TCC 三个操作说明</h3>
 <div class="outline-text-3" id="text-3-2">
 <ol class="org-ol">
-<li>Try 阶段
+<li>Try 操作
 <ul class="org-ul">
 <li>完成业务检查，预留业务所需的资源</li>
-<li>下单时通过 Try 操作去扣除库存预留资源</li>
 </ul></li>
-<li>Confirm 阶段
+<li>Confirm 操作
 <ul class="org-ul">
 <li>执行业务逻辑</li>
-<li>确认执行业务操作，在只预留的资源基础上，发起购买请求</li>
 </ul></li>
-<li>Cancel 阶段
+<li>Cancel 操作
 <ul class="org-ul">
-<li>释放 Try 阶段预留的业务资源</li>
-<li>只要涉及到的相关业务中，有一个业务方预留资源未成功，则取消所有业务资源的
-预留请求</li>
+<li>释放 Try 操作预留的业务资源</li>
 </ul></li>
 </ol>
+</div>
+</div>
 
-<p>
-TCC 的实践案例
-</p>
+<div id="outline-container-org42ddc95" class="outline-3">
+<h3 id="org42ddc95"><span class="section-number-3">3.3</span> TCC 实践案例</h3>
+<div class="outline-text-3" id="text-3-3">
 <ol class="org-ol">
 <li>汇款服务
 <ul class="org-ul">
@@ -483,9 +482,9 @@ TCC 的实践案例
 </div>
 </div>
 
-<div id="outline-container-org0bbce74" class="outline-3">
-<h3 id="org0bbce74"><span class="section-number-3">3.3</span> TCC 缺点</h3>
-<div class="outline-text-3" id="text-3-3">
+<div id="outline-container-org4205954" class="outline-3">
+<h3 id="org4205954"><span class="section-number-3">3.4</span> TCC 缺点</h3>
+<div class="outline-text-3" id="text-3-4">
 <ol class="org-ol">
 <li>应用侵入性强
 <ul class="org-ul">
@@ -503,7 +502,7 @@ TCC 的实践案例
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-28 Wed 11:35. Created by Jinghui Hu at 2021-07-28 Wed 08:23.</p>
+<p class="author">Last Updated 2021-07-28 Wed 11:37. Created by Jinghui Hu at 2021-07-28 Wed 08:23.</p>
 </div>
 </body>
 </html>
