@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-07-28 Wed 11:04 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>分布式事务</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script type="text/javascript" src="styles/lib/js/jquery.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="../readme.html"> UP </a>
+ |
+ <a accesskey="H" href="../index.html"> HOME </a>
+</div><div id="content">
+<h1 class="title">分布式事务</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgf954cb4">1. 分布式事务</a></li>
+<li><a href="#org01c44fb">2. 2PC &amp; 3PC</a>
+<ul>
+<li><a href="#org4c60a12">2.1. 提交模型</a></li>
+<li><a href="#org17089fa">2.2. 2PC (tow-phase-commit) 两阶段事务</a></li>
+<li><a href="#org5c88e9b">2.3. 3PC (three-phase-commit) 三阶段事务</a></li>
+</ul>
+</li>
+<li><a href="#org3ae2eaa">3. TCC (Try-Confirm-Cancel) 补偿事务</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orgf954cb4" class="outline-2">
+<h2 id="orgf954cb4"><span class="section-number-2">1</span> 分布式事务</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+分布式事务是指事务的参与者、支持事务的服务器、资源服务器以及事务管理器分别位于
+不同的分布式系统的不同节点之上
+</p>
+<ol class="org-ol">
+<li>事务参与者 (APP)
+<ul class="org-ul">
+<li>前端处理请求的应用</li>
+</ul></li>
+<li>事务管理器 (TM)
+<ul class="org-ul">
+<li>后台协调事务的应用</li>
+</ul></li>
+<li>资源服务器 (RM)
+<ul class="org-ul">
+<li>一般指的是数据库中的数据</li>
+</ul></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org01c44fb" class="outline-2">
+<h2 id="org01c44fb"><span class="section-number-2">2</span> 2PC &amp; 3PC</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org4c60a12" class="outline-3">
+<h3 id="org4c60a12"><span class="section-number-3">2.1</span> 提交模型</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+2PC 和 3PC 参与事务提交的处理流程如下，事务包含如下三类角色
+</p>
+<ol class="org-ol">
+<li>一个业务发起方 APP</li>
+<li>一个事务管理器 TM</li>
+<li>三个资源管理器 RM</li>
+</ol>
+<div class="org-src-container">
+<pre class="src src-text">[APP] -&gt;[  TM  ]-&gt; [RM_1]
+          |  |
+          |  +---&gt; [RM_2]
+          |
+          +------&gt; [RM_3]
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org17089fa" class="outline-3">
+<h3 id="org17089fa"><span class="section-number-3">2.2</span> 2PC (tow-phase-commit) 两阶段事务</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+2PC 的具体的实现流程如下
+</p>
+<ol class="org-ol">
+<li>Prepare 阶段
+<ul class="org-ul">
+<li>APP 向 TM 发送请求，请求执行一个操作</li>
+<li>TM 向所有参与的 RM 发送 <b>预请求</b>, RM 需要报告能否执行操作
+<ul class="org-ul">
+<li>TM 可以向 MQ 消息队列发送个半消息 (Half Message)</li>
+<li>RM 打开本地事务，执行到待提交的阶段</li>
+<li>然后反馈能否成功执行事务</li>
+</ul></li>
+</ul></li>
+<li>Commit 阶段
+<ul class="org-ul">
+<li>TM 接收所有 RM 的报告</li>
+<li>TM 接收到所有的报告，如果所有 RM 表示可以成功执行
+<ul class="org-ul">
+<li>TM 发送全局提交 (Global Commit) 信号</li>
+<li>所有 RM 提交事务</li>
+</ul></li>
+<li>TM 接收到所有的报告，如果有一个 RM 表示不能成功执行
+<ul class="org-ul">
+<li>TM 发送全局回滚 (Global Commit) 信号</li>
+<li>所有 RM 回滚事务</li>
+</ul></li>
+</ul></li>
+</ol>
+
+<p>
+2PC 存在问题
+</p>
+<ol class="org-ol">
+<li>RM 的事务一直挂起可能存在 <b>性能问题</b></li>
+<li>TM 是单点的，可能存在 <b>单点故障</b></li>
+<li>Commit 阶段出现消息丢失会导致数据不一致</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org5c88e9b" class="outline-3">
+<h3 id="org5c88e9b"><span class="section-number-3">2.3</span> 3PC (three-phase-commit) 三阶段事务</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+3PC 在 2PC 的基础上增加了 CanCommit 阶段
+</p>
+<ol class="org-ol">
+<li>增加了 <b>超时机制</b>, 可以预先判断任何 RM 是否宕机，减少超时交互的成本</li>
+<li>有效地解决了 RM 的 <b>单点故障</b> 问题</li>
+</ol>
+
+<p>
+3PC 的具体的实现流程如下
+</p>
+<ol class="org-ol">
+<li>CanCommit 阶段
+<ul class="org-ul">
+<li>APP 向 TM 发送请求，请求执行一个操作</li>
+<li>TM 向所有参与的 RM 发送 <b>自检操作</b>, 所有 RM 完成自检回复 Yes/No
+<ul class="org-ul">
+<li>注意，这里 RM 并没有开启本地事务</li>
+</ul></li>
+<li>如果 TM 收到任何一个 RM 回复 No，事务操作终止</li>
+<li>如果任何一个 TM 超时，事务操作终止</li>
+</ul></li>
+<li>PreCommit 阶段
+<ul class="org-ul">
+<li>在 CanCommit 阶段中 TM 都回复 Yes</li>
+<li>接着进行 PreCommit 阶段，该阶段类似 2PC 的 Prepare 阶段</li>
+<li>TM 向所有参与的 RM 发送 <b>预请求</b>, RM 需要报告能否执行操作
+<ul class="org-ul">
+<li>所有 RM 执行本地事务，记录 Undo/Redo 日志</li>
+<li>如果 RM 确认可以执行，向 TM 返回 ACK 确认</li>
+</ul></li>
+</ul></li>
+<li>doCommit 阶段
+<ul class="org-ul">
+<li>该阶段类似于 2PC 的 Commit 阶段</li>
+<li>TM 接收所有 RM 的报告</li>
+<li>TM 接收到所有的报告，如果所有 RM 表示可以成功执行
+<ul class="org-ul">
+<li>TM 发送全局提交 (Global Commit) 信号</li>
+<li>所有 RM 提交事务</li>
+</ul></li>
+<li>TM 接收到所有的报告，如果有一个 RM 表示不能成功执行
+<ul class="org-ul">
+<li>TM 发送全局回滚 (Global Commit) 信号</li>
+<li>所有 RM 回滚事务</li>
+</ul></li>
+</ul></li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3ae2eaa" class="outline-2">
+<h2 id="org3ae2eaa"><span class="section-number-2">3</span> TCC (Try-Confirm-Cancel) 补偿事务</h2>
+<div class="outline-text-2" id="text-3">
+<ol class="org-ol">
+<li>Try</li>
+<li>Confirm</li>
+<li>Cancel</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Last Updated 2021-07-28 Wed 11:04. Created by Jinghui Hu at 2021-07-28 Wed 08:23.</p>
+</div>
+</body>
+</html>

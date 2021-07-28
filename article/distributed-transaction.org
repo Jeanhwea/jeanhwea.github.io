@@ -18,14 +18,9 @@
   3. 资源服务器 (RM)
      - 一般指的是数据库中的数据
 
-* TCC
-  1. Try
-  2. Commit
-  3. Cancel
-
 * 2PC & 3PC
-** 2PC (tow-phase-commit)
-   参与 2PC 的事务提交的处理流程如下，事务包含
+** 提交模型
+   2PC 和 3PC 参与事务提交的处理流程如下，事务包含如下三类角色
    1. 一个业务发起方 APP
    2. 一个事务管理器 TM
    3. 三个资源管理器 RM
@@ -37,10 +32,13 @@
                +------> [RM_3]
    #+END_SRC
 
+** 2PC (tow-phase-commit) 两阶段事务
+   2PC 的具体的实现流程如下
    1. Prepare 阶段
-      - APP 向 TM 发送请求
-      - TM 向所有参与的 RM 发送预请求，RM 需要报告能否执行操作
-        + 一般来说，RM 就是打开本地事务，执行到待提交的阶段
+      - APP 向 TM 发送请求，请求执行一个操作
+      - TM 向所有参与的 RM 发送 *预请求*, RM 需要报告能否执行操作
+        + TM 可以向 MQ 消息队列发送个半消息 (Half Message)
+        + RM 打开本地事务，执行到待提交的阶段
         + 然后反馈能否成功执行事务
    2. Commit 阶段
       - TM 接收所有 RM 的报告
@@ -51,7 +49,40 @@
         + TM 发送全局回滚 (Global Commit) 信号
         + 所有 RM 回滚事务
 
-** 3PC
+   2PC 存在问题
+   1. RM 的事务一直挂起可能存在 *性能问题*
+   2. TM 是单点的，可能存在 *单点故障*
+   3. Commit 阶段出现消息丢失会导致数据不一致
+
+** 3PC (three-phase-commit) 三阶段事务
+   3PC 在 2PC 的基础上增加了 CanCommit 阶段
+   1. 增加了 *超时机制*, 可以预先判断任何 RM 是否宕机，减少超时交互的成本
+   2. 有效地解决了 RM 的 *单点故障* 问题
+
+   3PC 的具体的实现流程如下
    1. CanCommit 阶段
+      - APP 向 TM 发送请求，请求执行一个操作
+      - TM 向所有参与的 RM 发送 *自检操作*, 所有 RM 完成自检回复 Yes/No
+        + 注意，这里 RM 并没有开启本地事务
+      - 如果 TM 收到任何一个 RM 回复 No，事务操作终止
+      - 如果任何一个 TM 超时，事务操作终止
    2. PreCommit 阶段
+      - 在 CanCommit 阶段中 TM 都回复 Yes
+      - 接着进行 PreCommit 阶段，该阶段类似 2PC 的 Prepare 阶段
+      - TM 向所有参与的 RM 发送 *预请求*, RM 需要报告能否执行操作
+        + 所有 RM 执行本地事务，记录 Undo/Redo 日志
+        + 如果 RM 确认可以执行，向 TM 返回 ACK 确认
    3. doCommit 阶段
+      - 该阶段类似于 2PC 的 Commit 阶段
+      - TM 接收所有 RM 的报告
+      - TM 接收到所有的报告，如果所有 RM 表示可以成功执行
+        + TM 发送全局提交 (Global Commit) 信号
+        + 所有 RM 提交事务
+      - TM 接收到所有的报告，如果有一个 RM 表示不能成功执行
+        + TM 发送全局回滚 (Global Commit) 信号
+        + 所有 RM 回滚事务
+
+* TCC (Try-Confirm-Cancel) 补偿事务
+  1. Try
+  2. Confirm
+  3. Cancel
