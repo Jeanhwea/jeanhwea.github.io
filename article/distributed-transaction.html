@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-28 Wed 11:52 -->
+<!-- 2021-07-28 Wed 15:36 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>分布式事务</title>
@@ -233,21 +233,21 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orga22145c">1. 分布式事务</a></li>
-<li><a href="#orgc1971d5">2. XA 协议</a></li>
-<li><a href="#orga45d150">3. 2PC &amp; 3PC</a>
+<li><a href="#orgb43aa33">1. 分布式事务</a></li>
+<li><a href="#org9c3e840">2. XA 协议</a></li>
+<li><a href="#orgc16d361">3. 2PC &amp; 3PC</a>
 <ul>
-<li><a href="#org697824e">3.1. 提交模型</a></li>
-<li><a href="#org1a0dd19">3.2. 2PC (two-phase-commit) 两阶段事务</a></li>
-<li><a href="#org2e39e74">3.3. 3PC (three-phase-commit) 三阶段事务</a></li>
+<li><a href="#orge17f2d9">3.1. 提交模型</a></li>
+<li><a href="#org47f5229">3.2. 2PC (two-phase-commit) 两阶段事务</a></li>
+<li><a href="#org7a49ce6">3.3. 3PC (three-phase-commit) 三阶段事务</a></li>
 </ul>
 </li>
-<li><a href="#org040b5c3">4. TCC (Try-Confirm-Cancel) 补偿事务</a>
+<li><a href="#org1f1ea6d">4. TCC (Try-Confirm-Cancel) 补偿事务</a>
 <ul>
-<li><a href="#org68bd9a2">4.1. 提交模型</a></li>
-<li><a href="#org6fa5c6d">4.2. TCC 三个操作说明</a></li>
-<li><a href="#orgfd9ec8b">4.3. TCC 实践案例</a></li>
-<li><a href="#orgf4ce7d2">4.4. TCC 缺点</a></li>
+<li><a href="#org8d1fd51">4.1. 提交模型</a></li>
+<li><a href="#orge0337ae">4.2. TCC 三个操作说明</a></li>
+<li><a href="#org580f48c">4.3. TCC 实践案例</a></li>
+<li><a href="#orgc7c5ec3">4.4. TCC 缺点</a></li>
 </ul>
 </li>
 </ul>
@@ -255,8 +255,8 @@
 </div>
 
 
-<div id="outline-container-orga22145c" class="outline-2">
-<h2 id="orga22145c"><span class="section-number-2">1</span> 分布式事务</h2>
+<div id="outline-container-orgb43aa33" class="outline-2">
+<h2 id="orgb43aa33"><span class="section-number-2">1</span> 分布式事务</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 分布式事务是指事务的参与者、支持事务的服务器、资源服务器以及事务管理器分别位于
@@ -279,8 +279,8 @@
 </div>
 </div>
 
-<div id="outline-container-orgc1971d5" class="outline-2">
-<h2 id="orgc1971d5"><span class="section-number-2">2</span> XA 协议</h2>
+<div id="outline-container-org9c3e840" class="outline-2">
+<h2 id="org9c3e840"><span class="section-number-2">2</span> XA 协议</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 XA 协议是一个基于数据库的分布式事务协议，其分为两部分
@@ -293,20 +293,20 @@ XA 协议是一个基于数据库的分布式事务协议，其分为两部分
 </div>
 </div>
 
-<div id="outline-container-orga45d150" class="outline-2">
-<h2 id="orga45d150"><span class="section-number-2">3</span> 2PC &amp; 3PC</h2>
+<div id="outline-container-orgc16d361" class="outline-2">
+<h2 id="orgc16d361"><span class="section-number-2">3</span> 2PC &amp; 3PC</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org697824e" class="outline-3">
-<h3 id="org697824e"><span class="section-number-3">3.1</span> 提交模型</h3>
+<div id="outline-container-orge17f2d9" class="outline-3">
+<h3 id="orge17f2d9"><span class="section-number-3">3.1</span> 提交模型</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 2PC 和 3PC 参与事务提交的处理流程如下，事务包含如下三类角色
 </p>
 <ol class="org-ol">
-<li>一个业务发起方 APP</li>
-<li>一个事务管理器 TM</li>
-<li>三个资源管理器 RM</li>
+<li>单业务发起方 APP</li>
+<li>单事务管理器 TM</li>
+<li>多资源管理器 RM</li>
 </ol>
 <div class="org-src-container">
 <pre class="src src-text">[APP] -&gt; [  TM  ] -&gt; [RM_1]
@@ -319,8 +319,8 @@ XA 协议是一个基于数据库的分布式事务协议，其分为两部分
 </div>
 </div>
 
-<div id="outline-container-org1a0dd19" class="outline-3">
-<h3 id="org1a0dd19"><span class="section-number-3">3.2</span> 2PC (two-phase-commit) 两阶段事务</h3>
+<div id="outline-container-org47f5229" class="outline-3">
+<h3 id="org47f5229"><span class="section-number-3">3.2</span> 2PC (two-phase-commit) 两阶段事务</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 2PC 的具体的实现流程如下
@@ -363,8 +363,8 @@ XA 协议是一个基于数据库的分布式事务协议，其分为两部分
 </div>
 </div>
 
-<div id="outline-container-org2e39e74" class="outline-3">
-<h3 id="org2e39e74"><span class="section-number-3">3.3</span> 3PC (three-phase-commit) 三阶段事务</h3>
+<div id="outline-container-org7a49ce6" class="outline-3">
+<h3 id="org7a49ce6"><span class="section-number-3">3.3</span> 3PC (three-phase-commit) 三阶段事务</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 3PC 在 2PC 的基础上增加了 CanCommit 阶段
@@ -418,20 +418,20 @@ XA 协议是一个基于数据库的分布式事务协议，其分为两部分
 </div>
 </div>
 
-<div id="outline-container-org040b5c3" class="outline-2">
-<h2 id="org040b5c3"><span class="section-number-2">4</span> TCC (Try-Confirm-Cancel) 补偿事务</h2>
+<div id="outline-container-org1f1ea6d" class="outline-2">
+<h2 id="org1f1ea6d"><span class="section-number-2">4</span> TCC (Try-Confirm-Cancel) 补偿事务</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org68bd9a2" class="outline-3">
-<h3 id="org68bd9a2"><span class="section-number-3">4.1</span> 提交模型</h3>
+<div id="outline-container-org8d1fd51" class="outline-3">
+<h3 id="org8d1fd51"><span class="section-number-3">4.1</span> 提交模型</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 TCC 参与事务提交的处理流程如下，事务包含如下三类角色
 </p>
 <ol class="org-ol">
-<li>一个业务发起方 APP</li>
-<li>一个事务管理器 TM</li>
-<li>三个资源管理器 RM
+<li>单业务发起方 APP</li>
+<li>单事务管理器 TM</li>
+<li>多资源管理器 RM
 <ul class="org-ul">
 <li>每个 RM 需要实现 Try, Confirm, Cancel 接口</li>
 </ul></li>
@@ -447,8 +447,8 @@ TCC 参与事务提交的处理流程如下，事务包含如下三类角色
 </div>
 </div>
 
-<div id="outline-container-org6fa5c6d" class="outline-3">
-<h3 id="org6fa5c6d"><span class="section-number-3">4.2</span> TCC 三个操作说明</h3>
+<div id="outline-container-orge0337ae" class="outline-3">
+<h3 id="orge0337ae"><span class="section-number-3">4.2</span> TCC 三个操作说明</h3>
 <div class="outline-text-3" id="text-4-2">
 <ol class="org-ol">
 <li>Try 操作
@@ -467,8 +467,8 @@ TCC 参与事务提交的处理流程如下，事务包含如下三类角色
 </div>
 </div>
 
-<div id="outline-container-orgfd9ec8b" class="outline-3">
-<h3 id="orgfd9ec8b"><span class="section-number-3">4.3</span> TCC 实践案例</h3>
+<div id="outline-container-org580f48c" class="outline-3">
+<h3 id="org580f48c"><span class="section-number-3">4.3</span> TCC 实践案例</h3>
 <div class="outline-text-3" id="text-4-3">
 <ol class="org-ol">
 <li>汇款服务
@@ -497,8 +497,8 @@ TCC 参与事务提交的处理流程如下，事务包含如下三类角色
 </div>
 </div>
 
-<div id="outline-container-orgf4ce7d2" class="outline-3">
-<h3 id="orgf4ce7d2"><span class="section-number-3">4.4</span> TCC 缺点</h3>
+<div id="outline-container-orgc7c5ec3" class="outline-3">
+<h3 id="orgc7c5ec3"><span class="section-number-3">4.4</span> TCC 缺点</h3>
 <div class="outline-text-3" id="text-4-4">
 <ol class="org-ol">
 <li>应用侵入性强
@@ -517,7 +517,7 @@ TCC 参与事务提交的处理流程如下，事务包含如下三类角色
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-28 Wed 11:52. Created by Jinghui Hu at 2021-07-28 Wed 08:23.</p>
+<p class="author">Last Updated 2021-07-28 Wed 15:36. Created by Jinghui Hu at 2021-07-28 Wed 08:23.</p>
 </div>
 </body>
 </html>
