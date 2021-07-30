@@ -76,7 +76,14 @@
           - ~postProcessMergedBeanDefinition(...)~
           - ~resetBeanDefinition(...)~
 
-** ~IoC~ 核心方法
+** IoC 的理解
+   IoC 叫做控制反转 (Inversion of Control)
+   1. 通过 Spring 来管理 Bean 的创建、配置和生命周期，相当于把控制权交给了框架
+   2. 这样做的好处就是解耦，不需要人工来管理对象之间复杂的依赖关系
+   3. 在 Spring 里面，主要提供了 BeanFactory 和 ApplicationContext 两种 IOC 容器，
+      通过他们来实现对 Bean 的管理
+
+** IoC 核心方法
    1. ~getBean()~ 获取 Bean
    2. ~doGetBean()~ 真正获取 Bean
    3. ~transformedBeanName()~ 转换 Bean 名称
@@ -726,6 +733,19 @@
 
 * Bean 实现原理
 ** Bean 的生命周期
+   SpringBean 生命周期简单概括为 4 个阶段：
+   1. *实例化*: 创建一个 Bean 对象
+   2. *填充属性*: 为属性赋值
+   3. *初始化*: 包括如下的基本逻辑
+      - 如果实现了 xxxAware 接口， 通过不同类型的 Aware 接口拿到 Spring 容器的资源
+      - 如果实现了 BeanPostProcessor 接口，则会回调该接口的
+        + postProcessBeforeInitialzation 方法
+        + postProcessAfterInitialization 方法
+      - 如果配置了 init-method 方法，则会执行 init-method 配置的方法
+   4. *销毁*: 容器关闭后，如果 Bean 实现了 DisposableBean 接口， 则会回调该接口
+      的 destroy 方法如果配置了 destroy-method 方法，则会执行 destroy-method 配
+      置的方法
+
    ~BeanFactory~ 的注释中完整地说明的实现标准 BeanFactory 的代码
    1. BeanFactory 初始化过程，支持的标准 Bean 的生命周期
       - ~BeanNameAware#setBeanName(...)~
@@ -1100,15 +1120,17 @@
       private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
     #+END_SRC
     这里需要注意的是其定义的三级缓存结构
-    1. singletonObjects: 一级缓存单例 Bean 对象
-    2. earlySingletonObjects: 二级缓存早期创建的单例 Bean 对象
-       - earlySingletonObjects 于 singletonObjects 不同之处是，当一个单例 Bean
-         还在创建过程中可以将其依赖的单例 Bean 放入 earlySingletonObjects 哈希表
-         内
+    1. singletonObjects: 一级缓存单例 Bean 对象，用来保存实例化、初始化都完成的
+       对象
+    2. earlySingletonObjects: 二级缓存早期创建的单例 Bean 对象，用来保存实例化完
+       成，但是未初始化完成的对象
+       - earlySingletonObjects 于 singletonObjects 不同之处是，当一个单例 Bean 还
+         在创建过程中可以将其依赖的单例 Bean 放入 earlySingletonObjects 哈希表内
        - 这样做，即使单例 Bean 在创建过程中，调用 ~getBean(...)~ 方法依然可以获
          取到所依赖的 Bean 对象
        - 另外该方案用来循环检测，避免循环依赖
-    3. singletonFactories: 三级缓存单例对象工厂 ObjectFactory
+    3. singletonFactories: 三级缓存单例对象工厂 ObjectFactory，用来保存一个对象
+       工厂，提供一个匿名内部类，用于创建二级缓存中的对象
        - singletonFactories 哈希表的值是 ~ObjectFactory~ 接口类型
        - ~ObjectFactory~ 是个函数式接口，用于延迟创建 Bean
        #+BEGIN_SRC java
@@ -1125,6 +1147,17 @@
 
          }
        #+END_SRC
+
+*** 为什么必须要三级缓存
+    1. 不可以，主要是为了生成代理对象
+    2. 因为三级缓存中放的是生成具体对象的匿名内部类
+       - 他可以生成代理对象
+       - 也可以是普通的实例对象
+    3. 使用三级缓存主要是为了保证不管什么时候使用的都是一个对象
+    4. 假设只有二级缓存的情况
+       - 往二级缓存中放的显示一个普通的 Bean 对象
+       - BeanPostProcessor 去生成代理对象之后，覆盖掉二级缓存中的普通 Bean 对象
+       - 那么多线程环境下可能取到的对象会不一致
 
 *** 获取单例 Bean 方法: ~getSingleton(...)~ 方法
     ~getSingleton()~ 方法是获取 Bean 的核心方法, 它的实现如下
@@ -2779,6 +2812,12 @@
 * AOP 面向切面编程
 ** AOP 预备知识
 *** AOP 核心概念
+    AOP 叫做面向切面编程，他是一个编程范式，目的就是提高代码的模块性。Spring AOP
+    基于动态代理的方式实现，如果是实现了接口的话就会使用 JDK 动态代理，反之则使
+    用 CGLIB 代理，Spring 中 AOP 的应用主要体现在 事务、日志、异常处理等方面，通
+    过在代码的前后做一些增强处理，可以实现对业务逻辑的隔离，提高代码的模块化能力，
+    同时也是解耦。
+
     1. Aspect: 切面，由一系列切点、增强和引入组成的模块对象，可定义优先级，从而
        影响增强和引入的执行顺序。事务管理在 Java 企业应用中就是一个很好的切面样例
     2. Join point: 接入点，程序执行期的一个点，例如方法执行、类初始化、异常处理。
@@ -2813,7 +2852,9 @@
     2. cglib 动态代理
        - 原理类似 JDK 动态代理，只是它在运行期间创建的代理对象是针对目标类扩展的
          子类
-       - cglib 底层基于 ASM 开源 Java 字节码编辑类库实现，性能优于 JDK 动态代理
+       - cglib 底层基于 ASM 开源 Java 字节码编辑类库实现，通过修改字节码生成成成
+         一个子类，然后重写父类的方法，实现对代码的增强
+       - 性能优于 JDK 动态代理
     3. 常见 XML 设置属性
        - proxy-target-class 属性
          + 属性值决定是基于接口的还是基于类的代理被创建。
@@ -2825,6 +2866,20 @@
          + ~this.b();~ 修改为 ~((AService) AopContext.currentProxy()).b();~ 来显
            示调用
          + 开启新的事务最好写在另外一个 Service 中, 将传播机制设为 ~REQUIRE_NEW~
+
+*** Spring AOP 和 AspectJ 的区别
+    1. Spring AOP 基于动态代理实现，属于运行时增强
+    2. AspectJ 则属于编译时增强，主要有 3 种方式
+       - *编译时织入*: 指的是增强的代码和源代码我们都有，直接使用 AspectJ 编译器
+         编译就行，编译之后生成一个新的类，他也会作为一个正常的 Java 类装载到
+         JVM 虚拟机中
+       - *编译后织入*: 指的是代码已经被编译成 class 文件或者已经打成 jar 包，这
+         时候要增强的话，就是编译后织入，比如你依赖了第三方的类库，又想对他增强
+         的话，就可以通过这种方式
+       - *加载时织入*: 指的是在 JVM 加载类的时候进行织入
+    3. 总结下来的话，就是 Spring AOP 只能在运行时织入，不需要单独编译，性能相比
+       AspectJ 编译织入的方式慢，而 AspectJ 只支持编译前后和类加载时织入，性能更
+       好， 功能更加强大
 
 *** AOP 组件
     PointCut 接口的定义如下
