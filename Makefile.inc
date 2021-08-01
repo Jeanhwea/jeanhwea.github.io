@@ -25,4 +25,4 @@ CFLAG += --number-sections
 # CFLAG += -V mainfont="Heiti SC Light"
 CFLAG += -V mainfont="SimSun"
 CFLAG += -V documentclass=ctexart
-CFLAG += -V geometry:margin='.8in'
+CFLAG += -V geometry:margin='1in'
