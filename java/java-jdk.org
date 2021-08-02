@@ -146,6 +146,33 @@
    3. 被 ~transient~ 修饰的变量不属于对象持久化的一部分，该变量内容在序列化后无
       法获得访问
 
+** 匿名内部类和 Lambda 表达式
+   1. 匿名内部类对象在编译后会生成一个单独的类文件, 当 Lambda 表达式转换为私有方
+      法时, 该类文件会增加 jar 文件的大小。它使用 ~invokedynamic~ 字节码指令动态
+      绑定此方法, 从而节省了时间和内存
+   2. 可以使用 ~this~ 关键字表示 Lambda 表达式中的当前类, 而对于匿名内部类,
+      ~this~ 关键字可以表示该特定的匿名内部类
+   3. 匿名内部类可以用于多个抽象方法, 而 Lambda 表达式专门用于函数接口
+   4. 我们只需要在 Lambda 表达式中提供函数体, 而对于匿名内部类, 则需要编写冗余的
+      类定义
+
+   #+BEGIN_SRC java
+     // 匿名内部类写法
+     Runnable run01 =
+         new Runnable() {
+           @Override
+           public void run() {
+             System.out.println("run01");
+           }
+         };
+
+     // Lambda 表达式写法
+     Runnable run02 =
+         () -> {
+           System.out.println("run02");
+         };
+   #+END_SRC
+
 * 面向对象
 ** 对象初始化和销毁
    一般类的初始化工具有以下几种方式
