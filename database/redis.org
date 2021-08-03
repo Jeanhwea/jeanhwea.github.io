@@ -60,20 +60,24 @@
 
 * Redis 的数据类型
   1. string 字符串, 整数, 浮点数
-     - 二进制安全, 可以存储图片和序列化对象
+     - 二进制安全, 可以存储图片和序列化对象, 最多可存储 512M 的数据
      - get/set/del
      - mset 多个键设置
      - incr/decr
      - strlen/append
   2. hash 哈希表
-     - hmset/hgetall
+     - hmset/hget/hgetall
      - 物理存储会在 ziplist 和 hashtable 两种类型中转换
   3. list 列表
+     - 列表是一个双向链表, 最多存储 ~2^32-1~ 个元素
      - lpush/lpop/rpush/rpop
      - lrange key 0 10
      - llen
-  4. set 集合
-  5. zset 有序集合
+  5. set 集合
+     - sadd/smembers
+  6. zset 有序集合
+     - 有序的集合类型, 键是不可重复的
+     - zadd
 
   整数操作
   #+BEGIN_SRC text
@@ -115,6 +119,19 @@
     2) "zhang"
     3) "age"
     4) "12"
+  #+END_SRC
+
+  集合操作
+  #+BEGIN_SRC text
+    127.0.0.1:6379> sadd course math
+    (integer) 1
+    127.0.0.1:6379> sadd course chinese
+    (integer) 1
+    127.0.0.1:6379> object encoding course
+    "hashtable"
+    127.0.0.1:6379> smembers course
+    1) "math"
+    2) "chinese"
   #+END_SRC
 
   获取对象存储类型
