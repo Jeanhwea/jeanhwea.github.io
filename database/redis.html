@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-08-02 Mon 22:44 -->
+<!-- 2021-08-03 Tue 08:52 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Redis</title>
@@ -233,16 +233,18 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org82bb2a8">1. Redis 特性</a></li>
-<li><a href="#org2c33343">2. Redis 使用场景</a></li>
-<li><a href="#org1b8ff43">3. 相关连接</a></li>
+<li><a href="#orgbc07a65">1. Redis 特性</a></li>
+<li><a href="#orgd7cac9a">2. Redis 使用场景</a></li>
+<li><a href="#orgdafe7fe">3. Redis 的安装及使用</a></li>
+<li><a href="#org6729a5f">4. Redis 的数据类型</a></li>
+<li><a href="#orgbe3e2f0">5. 相关连接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org82bb2a8" class="outline-2">
-<h2 id="org82bb2a8"><span class="section-number-2">1</span> Redis 特性</h2>
+<div id="outline-container-orgbc07a65" class="outline-2">
+<h2 id="orgbc07a65"><span class="section-number-2">1</span> Redis 特性</h2>
 <div class="outline-text-2" id="text-1">
 <ol class="org-ol">
 <li>速度快
@@ -274,8 +276,8 @@
 </div>
 </div>
 
-<div id="outline-container-org2c33343" class="outline-2">
-<h2 id="org2c33343"><span class="section-number-2">2</span> Redis 使用场景</h2>
+<div id="outline-container-orgd7cac9a" class="outline-2">
+<h2 id="orgd7cac9a"><span class="section-number-2">2</span> Redis 使用场景</h2>
 <div class="outline-text-2" id="text-2">
 <ol class="org-ol">
 <li>缓存数据库</li>
@@ -288,9 +290,117 @@
 </div>
 </div>
 
-<div id="outline-container-org1b8ff43" class="outline-2">
-<h2 id="org1b8ff43"><span class="section-number-2">3</span> 相关连接</h2>
+<div id="outline-container-orgdafe7fe" class="outline-2">
+<h2 id="orgdafe7fe"><span class="section-number-2">3</span> Redis 的安装及使用</h2>
 <div class="outline-text-2" id="text-3">
+<p>
+下载并安装
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">wget https://download.redis.io/releases/redis-6.2.5.tar.gz
+tar xzf redis-6.2.5.tar.gz
+<span style="color: #4f97d7;">cd</span> redis-6.2.5
+make
+</pre>
+</div>
+
+<p>
+启动 Redis Server
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">src/redis-server
+</pre>
+</div>
+
+<p>
+客户端连接 Redis
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">$ src/redis-cli
+redis&gt; set foo bar
+OK
+redis&gt; get foo
+<span style="color: #2d9574;">"bar"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6729a5f" class="outline-2">
+<h2 id="org6729a5f"><span class="section-number-2">4</span> Redis 的数据类型</h2>
+<div class="outline-text-2" id="text-4">
+<ol class="org-ol">
+<li>string 字符串, 整数, 浮点数
+<ul class="org-ul">
+<li>get/set 单个键设置和查找</li>
+<li>mset 多个键设置</li>
+</ul></li>
+<li>hash 哈希表
+<ul class="org-ul">
+<li>hmset/hgetall</li>
+<li>物理存储会在 ziplist 和 hashtable 两种类型中转换</li>
+</ul></li>
+<li>list 列表</li>
+<li>set 集合</li>
+<li>zset 有序集合</li>
+</ol>
+
+<p>
+整数操作
+</p>
+<div class="org-src-container">
+<pre class="src src-text">127.0.0.1:6379&gt; flushdb
+OK
+127.0.0.1:6379&gt; set hello 'world'
+OK
+127.0.0.1:6379&gt; keys *
+1) "hello"
+127.0.0.1:6379&gt; get hello
+"world"
+127.0.0.1:6379&gt; append hello '!'
+(integer) 6
+127.0.0.1:6379&gt; get hello
+"world!"
+</pre>
+</div>
+
+<p>
+计数器
+</p>
+<div class="org-src-container">
+<pre class="src src-text">127.0.0.1:6379&gt; set count 1
+OK
+127.0.0.1:6379&gt; incr count
+(integer) 2
+127.0.0.1:6379&gt; get count
+"2"
+127.0.0.1:6379&gt; incr count
+(integer) 3
+127.0.0.1:6379&gt;
+</pre>
+</div>
+
+<p>
+哈希使用
+</p>
+<div class="org-src-container">
+<pre class="src src-text">127.0.0.1:6379&gt; flushdb
+OK
+127.0.0.1:6379&gt; hmset user name zhang age 12
+OK
+127.0.0.1:6379&gt; hgetall user
+1) "name"
+2) "zhang"
+3) "age"
+4) "12"
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgbe3e2f0" class="outline-2">
+<h2 id="orgbe3e2f0"><span class="section-number-2">5</span> 相关连接</h2>
+<div class="outline-text-2" id="text-5">
 <ol class="org-ol">
 <li><a href="https://redis.io/">Redis Official Site</a></li>
 </ol>
@@ -298,7 +408,7 @@
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-08-02 Mon 22:44. Created by Jinghui Hu at 2021-07-07 Wed 16:51.</p>
+<p class="author">Last Updated 2021-08-03 Tue 08:52. Created by Jinghui Hu at 2021-07-07 Wed 16:51.</p>
 </div>
 </body>
 </html>
