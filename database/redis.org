@@ -58,7 +58,58 @@
     "bar"
   #+END_SRC
 
-* Redis 的常用操作
+* Redis 的数据类型
+  1. string 字符串, 整数, 浮点数
+     - get/set 单个键设置和查找
+     - mset 多个键设置
+  2. hash 哈希表
+     - hmset/hgetall
+     - 物理存储会在 ziplist 和 hashtable 两种类型中转换
+  3. list 列表
+  4. set 集合
+  5. zset 有序集合
+
+  整数操作
+  #+BEGIN_SRC text
+    127.0.0.1:6379> flushdb
+    OK
+    127.0.0.1:6379> set hello 'world'
+    OK
+    127.0.0.1:6379> keys *
+    1) "hello"
+    127.0.0.1:6379> get hello
+    "world"
+    127.0.0.1:6379> append hello '!'
+    (integer) 6
+    127.0.0.1:6379> get hello
+    "world!"
+  #+END_SRC
+
+  计数器
+  #+BEGIN_SRC text
+    127.0.0.1:6379> set count 1
+    OK
+    127.0.0.1:6379> incr count
+    (integer) 2
+    127.0.0.1:6379> get count
+    "2"
+    127.0.0.1:6379> incr count
+    (integer) 3
+    127.0.0.1:6379>
+  #+END_SRC
+
+  哈希使用
+  #+BEGIN_SRC text
+    127.0.0.1:6379> flushdb
+    OK
+    127.0.0.1:6379> hmset user name zhang age 12
+    OK
+    127.0.0.1:6379> hgetall user
+    1) "name"
+    2) "zhang"
+    3) "age"
+    4) "12"
+  #+END_SRC
 
 * 相关连接
   1. [[https://redis.io/][Redis Official Site]]
