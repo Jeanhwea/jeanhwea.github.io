@@ -41,7 +41,33 @@
 ** ThreadLocal
 
 ** ThreadPoolExecutor
-   线程执行器，
+   线程执行器的继承关系如下
+   #+BEGIN_SRC text
+     java.util.concurrent
+     Class ThreadPoolExecutor
+
+         java.lang.Object
+             java.util.concurrent.AbstractExecutorService
+                 java.util.concurrent.ThreadPoolExecutor
+
+         All Implemented Interfaces:
+             Executor, ExecutorService
+
+         Direct Known Subclasses:
+             ScheduledThreadPoolExecutor
+   #+END_SRC
+
+   一般关于该类的 7 个重要参数是并行编程必须掌握的技能
+   1. corePoolSize 和 maximumPoolSize: 核心线程数和最大线程数
+   2. 按需创建
+      - 核心线程数在初始化就创建，启动是才调用
+      - 如果 BlockingQueue 是非空的话，线程在启动时就会调用
+   3. 创建线程
+      - 使用 ThreadFactory 工程类创建线程
+      - 若未指定创建工程使用默认的工程类创建, 即 ~Executors.defaultThreadFactory()~
+   4. 存活时间
+      - 超过 corePoolSize 的线程会通过 keepAliveTime
+
 
 * 线程死锁
 ** 死锁的四个必要条件
