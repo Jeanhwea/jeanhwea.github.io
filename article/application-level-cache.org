@@ -45,16 +45,21 @@
   3. 活动流
   4. 用户图数据
 
-
 * 更新缓存的时机
   由于你只能在缓存中存储有限的数据，所以你需要选择一个适用于你用例的缓存更新策略
-
 ** 缓存模式
    应用从存储器读写。缓存不和存储器直接交互，应用执行以下操作：
    1. 在缓存中查找记录，如果所需数据不在缓存中
    2. 从数据库中加载所需内容
    3. 将查找到的结果存储到缓存中
    4. 返回所需内容
+
+   #+BEGIN_SRC text
+     [App] <-----------> [Cache]
+       ^
+       |
+       +---------------> [Database]
+   #+END_SRC
 
    #+BEGIN_SRC python
      def get_user(self, user_id):
@@ -86,6 +91,18 @@
    由于存写操作所以直写模式整体是一种很慢的操作，但是读取刚写入的数据很快。相比
    读取数据，用户通常比较能接受更新数据时速度较慢。缓存中的数据不会过时
 
+   #+BEGIN_SRC text
+       +----------- 3. Return to App ----------+
+       |                                       |
+       v                                       |
+     [App] -- 1. Write to Cache --> [Cache] ---+
+                                       |
+                                2. Store in DB
+                                       |
+                                       v
+                                   [Database]
+   #+END_SRC
+
    应用代码
    #+BEGIN_SRC python
      set_user(12345, {"foo":"bar"})
@@ -108,6 +125,23 @@
    1. 在缓存中增加或者更新条目
    2. 异步写入数据，提高写入性能
 
+   #+BEGIN_SRC text
+       +----------- 3. Return to App ----------+
+       |                                       |
+       v                                       |
+     [App] -- 1. Write to Cache --> [Cache] ---+
+                                       |
+                             2. Add event to Queue
+                                       |
+                                       v
+                                    [Queue]
+                                       |
+                   4. Asynchronously: select and execute event
+                                       |
+                                       v
+                                   [Database]
+   #+END_SRC
+
    回写模式的缺点
    1. 缓存可能在其内容成功存储之前丢失数据
    2. 执行直写模式比缓存或者回写模式更复杂
@@ -115,6 +149,15 @@
 ** 刷新
    你可以将缓存配置成在到期之前自动刷新最近访问过的内容。 如果缓存可以准确预测将
    来可能请求哪些数据，那么刷新可能会导致延迟与读取时间的降低
+
+   #+BEGIN_SRC text
+     [App] <------------ [Cache]
+                            ^
+                            |
+                refresh to cache with strategy
+                            |
+                        [Database]
+   #+END_SRC
 
    刷新的缺点
    1. 不能准确预测到未来需要用到的数据可能会导致性能不如不使用刷新。

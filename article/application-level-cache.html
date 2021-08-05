@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-08-05 Thu 18:38 -->
+<!-- 2021-08-05 Thu 18:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>应用级别缓存</title>
@@ -233,25 +233,25 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org101558e">1. 应用级别缓存</a></li>
-<li><a href="#org98d8485">2. 数据库查询级别的缓存</a></li>
-<li><a href="#org155764b">3. 对象级别的缓存</a></li>
-<li><a href="#org76302e8">4. 更新缓存的时机</a>
+<li><a href="#org8c04a51">1. 应用级别缓存</a></li>
+<li><a href="#org8d5d44c">2. 数据库查询级别的缓存</a></li>
+<li><a href="#org4c2484e">3. 对象级别的缓存</a></li>
+<li><a href="#org92ee1c0">4. 更新缓存的时机</a>
 <ul>
-<li><a href="#org1851edc">4.1. 缓存模式</a></li>
-<li><a href="#org8147464">4.2. 直写模式</a></li>
-<li><a href="#orgfd09d90">4.3. 回写模式</a></li>
-<li><a href="#org8fbd330">4.4. 刷新</a></li>
+<li><a href="#orge98f473">4.1. 缓存模式</a></li>
+<li><a href="#org5b5fd5e">4.2. 直写模式</a></li>
+<li><a href="#orga14ded8">4.3. 回写模式</a></li>
+<li><a href="#orgaffc2ae">4.4. 刷新</a></li>
 </ul>
 </li>
-<li><a href="#org08bcb2c">5. 缓存的缺点</a></li>
+<li><a href="#org8e3beca">5. 缓存的缺点</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org101558e" class="outline-2">
-<h2 id="org101558e"><span class="section-number-2">1</span> 应用级别缓存</h2>
+<div id="outline-container-org8c04a51" class="outline-2">
+<h2 id="org8c04a51"><span class="section-number-2">1</span> 应用级别缓存</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 基于内存的缓存比如 Memcached 和 Redis 是应用程序和数据存储之间的一种键值存储。
@@ -284,8 +284,8 @@ Redis 有下列附加功能
 </div>
 </div>
 
-<div id="outline-container-org98d8485" class="outline-2">
-<h2 id="org98d8485"><span class="section-number-2">2</span> 数据库查询级别的缓存</h2>
+<div id="outline-container-org8d5d44c" class="outline-2">
+<h2 id="org8d5d44c"><span class="section-number-2">2</span> 数据库查询级别的缓存</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 当你查询数据库的时候，将查询语句的哈希值与查询结果存储到缓存中。这种方法会遇到
@@ -299,8 +299,8 @@ Redis 有下列附加功能
 </div>
 </div>
 
-<div id="outline-container-org155764b" class="outline-2">
-<h2 id="org155764b"><span class="section-number-2">3</span> 对象级别的缓存</h2>
+<div id="outline-container-org4c2484e" class="outline-2">
+<h2 id="org4c2484e"><span class="section-number-2">3</span> 对象级别的缓存</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 将您的数据视为对象，就像对待你的应用代码一样。让应用程序将数据从数据库中组合到
@@ -323,17 +323,15 @@ Redis 有下列附加功能
 </div>
 </div>
 
-
-<div id="outline-container-org76302e8" class="outline-2">
-<h2 id="org76302e8"><span class="section-number-2">4</span> 更新缓存的时机</h2>
+<div id="outline-container-org92ee1c0" class="outline-2">
+<h2 id="org92ee1c0"><span class="section-number-2">4</span> 更新缓存的时机</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 由于你只能在缓存中存储有限的数据，所以你需要选择一个适用于你用例的缓存更新策略
 </p>
 </div>
-
-<div id="outline-container-org1851edc" class="outline-3">
-<h3 id="org1851edc"><span class="section-number-3">4.1</span> 缓存模式</h3>
+<div id="outline-container-orge98f473" class="outline-3">
+<h3 id="orge98f473"><span class="section-number-3">4.1</span> 缓存模式</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 应用从存储器读写。缓存不和存储器直接交互，应用执行以下操作：
@@ -344,6 +342,14 @@ Redis 有下列附加功能
 <li>将查找到的结果存储到缓存中</li>
 <li>返回所需内容</li>
 </ol>
+
+<div class="org-src-container">
+<pre class="src src-text">[App] &lt;-----------&gt; [Cache]
+  ^
+  |
+  +---------------&gt; [Database]
+</pre>
+</div>
 
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #4f97d7; font-weight: bold;">def</span> <span style="color: #bc6ec5; font-weight: bold;">get_user</span><span style="color: #8d5649;">(</span><span style="color: #4f97d7; font-weight: bold;">self</span>, user_id<span style="color: #8d5649;">)</span>:
@@ -375,8 +381,8 @@ Redis 有下列附加功能
 </div>
 </div>
 
-<div id="outline-container-org8147464" class="outline-3">
-<h3 id="org8147464"><span class="section-number-3">4.2</span> 直写模式</h3>
+<div id="outline-container-org5b5fd5e" class="outline-3">
+<h3 id="org5b5fd5e"><span class="section-number-3">4.2</span> 直写模式</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 应用使用缓存作为主要的数据存储，将数据读写到缓存中，而缓存负责从数据库中读写
@@ -391,6 +397,19 @@ Redis 有下列附加功能
 由于存写操作所以直写模式整体是一种很慢的操作，但是读取刚写入的数据很快。相比
 读取数据，用户通常比较能接受更新数据时速度较慢。缓存中的数据不会过时
 </p>
+
+<div class="org-src-container">
+<pre class="src src-text">  +----------- 3. Return to App ----------+
+  |                                       |
+  v                                       |
+[App] -- 1. Write to Cache --&gt; [Cache] ---+
+                                  |
+                           2. Store in DB
+                                  |
+                                  v
+                              [Database]
+</pre>
+</div>
 
 <p>
 应用代码
@@ -421,8 +440,8 @@ Redis 有下列附加功能
 </div>
 </div>
 
-<div id="outline-container-orgfd09d90" class="outline-3">
-<h3 id="orgfd09d90"><span class="section-number-3">4.3</span> 回写模式</h3>
+<div id="outline-container-orga14ded8" class="outline-3">
+<h3 id="orga14ded8"><span class="section-number-3">4.3</span> 回写模式</h3>
 <div class="outline-text-3" id="text-4-3">
 <p>
 在回写模式中，应用执行以下操作
@@ -431,6 +450,24 @@ Redis 有下列附加功能
 <li>在缓存中增加或者更新条目</li>
 <li>异步写入数据，提高写入性能</li>
 </ol>
+
+<div class="org-src-container">
+<pre class="src src-text">  +----------- 3. Return to App ----------+
+  |                                       |
+  v                                       |
+[App] -- 1. Write to Cache --&gt; [Cache] ---+
+                                  |
+                        2. Add event to Queue
+                                  |
+                                  v
+                               [Queue]
+                                  |
+              4. Asynchronously: select and execute event
+                                  |
+                                  v
+                              [Database]
+</pre>
+</div>
 
 <p>
 回写模式的缺点
@@ -442,13 +479,23 @@ Redis 有下列附加功能
 </div>
 </div>
 
-<div id="outline-container-org8fbd330" class="outline-3">
-<h3 id="org8fbd330"><span class="section-number-3">4.4</span> 刷新</h3>
+<div id="outline-container-orgaffc2ae" class="outline-3">
+<h3 id="orgaffc2ae"><span class="section-number-3">4.4</span> 刷新</h3>
 <div class="outline-text-3" id="text-4-4">
 <p>
 你可以将缓存配置成在到期之前自动刷新最近访问过的内容。 如果缓存可以准确预测将
 来可能请求哪些数据，那么刷新可能会导致延迟与读取时间的降低
 </p>
+
+<div class="org-src-container">
+<pre class="src src-text">[App] &lt;------------ [Cache]
+                       ^
+                       |
+           refresh to cache with strategy
+                       |
+                   [Database]
+</pre>
+</div>
 
 <p>
 刷新的缺点
@@ -460,8 +507,8 @@ Redis 有下列附加功能
 </div>
 </div>
 
-<div id="outline-container-org08bcb2c" class="outline-2">
-<h2 id="org08bcb2c"><span class="section-number-2">5</span> 缓存的缺点</h2>
+<div id="outline-container-org8e3beca" class="outline-2">
+<h2 id="org8e3beca"><span class="section-number-2">5</span> 缓存的缺点</h2>
 <div class="outline-text-2" id="text-5">
 <ol class="org-ol">
 <li>需要保持缓存和真实数据源之间的一致性，比如数据库根据缓存无效</li>
@@ -472,7 +519,7 @@ Redis 有下列附加功能
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-08-05 Thu 18:38. Created by Jinghui Hu at 2021-08-05 Thu 18:23.</p>
+<p class="author">Last Updated 2021-08-05 Thu 18:53. Created by Jinghui Hu at 2021-08-05 Thu 18:23.</p>
 </div>
 </body>
 </html>
