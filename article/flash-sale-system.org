@@ -9,16 +9,20 @@
 
 
 * 基本参数
-  1. 100W QPS 的秒杀系统的设计
-  2. MySQL 的最大 QPS = 1000
-  3. Redis 的最大 QPS = 10W
+  1. 需求设计一个可以承载 100W QPS 的秒杀系统
+  2. 考虑到 MySQL 的最大 QPS = 1000
+  3. 考虑到 Redis 的最大 QPS = 10W
 
 * 架构设计
   在描述活动中涉及到多个微服务的
+  1. ActivityService 活动微服务
+  2. ProductService 产品微服务
+  3. OrderService 订单微服务
+  4. PaymentService 支付微服务
   #+BEGIN_SRC text
     [App] ----> ActivityService  --> DB1
            |
-           +--> ProduceService   --> DB2
+           +--> ProductService   --> DB2
            |
            +--> OrderService     --> DB3
            |
@@ -27,41 +31,84 @@
 
 * 数据库设计
 ** 秒杀活动表 activity
+   #+BEGIN_SRC sql
+     create table activity (
+       id bigint primary key not null auto_increment,
+       activity_code varchar(64) unique not null,
+       activity_name varchar(64) not null,
+       activity_type varchar(8) not null,
+       product_code varchar(64) not null,
+       activity_price int not null,
+       activity_count int not null
+     );
+   #+END_SRC
    | 活动编码 | 活动名称                         | 活动类型 | 商品编码 | 活动价格 | 活动数量 |
    |----------+----------------------------------+----------+----------+----------+----------|
    | H10001   | iPhone 2021 秒杀                 | 秒杀     | T0001    |     4499 |       10 |
    | H10002   | iPhone 2021 下单增 1000 元优惠卷 | 买赠     | T0001    |     4999 |       10 |
 
 ** 库存表 stock
+   #+BEGIN_SRC sql
+     create table stock (
+       id bigint primary key not null auto_increment,
+       product_code varchar(64) unique not null,
+       product_name varchar(64) not null,
+       activity_code varchar(64) not null,
+       stock_count int not null,
+       occupy_count int default 0 not null,
+       version int default 0
+     );
+   #+END_SRC
    | 商品编码 | 商品名称  | 活动编码 | 总库存数 | 预占库存数 |
    |----------+-----------+----------+----------+------------|
    | T0001    | iPhone 12 | H10001   |       10 |          2 |
 
 ** 商品表 product
-   | 商品编码 | 商品名称  | 商品标题                                                 | 商品原价 | 商品描述 |
-   |----------+-----------+----------------------------------------------------------+----------+----------|
-   | T0001    | iPhone 12 | Apple iPhone 12 128GB 白色 移动联通电信 4G 手机 双卡双待 |     5599 | xxxx     |
+   #+BEGIN_SRC sql
+     create table product (
+       id bigint primary key not null auto_increment,
+       product_code varchar(64) unique not null,
+       product_name varchar(64) not null,
+       product_title varchar(128) not null,
+       product_desc text,
+       product_price int not null
+     );
+   #+END_SRC
+   | 商品编码 | 商品名称  | 商品标题                                        | 商品原价 | 商品描述 |
+   |----------+-----------+-------------------------------------------------+----------+----------|
+   | T0001    | iPhone 12 | Apple iPhone 12 128GB 白色 移动联通电信 4G 手机 |     5599 | xxxx     |
 
 * MySQL 实现扣减库存的途径
 ** 悲观锁 Pessimistic Lock
    在 MySQL 的实现方法, 利用 ~for update~ 的行锁机制来并发竞争库存
    #+BEGIN_SRC sql
      -- 第一步: 查询并锁表
-     select * from stock where prdt_id = xxxx for update;
+     select *
+       from stock
+      where product_id = ??? for update;
 
      -- 第二步: 扣库存
-     update stock set num = num - 1 where prdt_id = xxxx and num > 0;
+     update stock
+        set stock_count = stock_count - 1
+      where product_id = ??? and stock_count > 0;
    #+END_SRC
 
 ** 乐观锁 Optimistic Lock
    在 MySQL 的实现方法是引入一个额外的字段，记住更新的版本号
    #+BEGIN_SRC sql
-     -- 每次查询时添加版本号字段 ver, 这种做法不会产生行锁
-     update stock set num = num - 1 and ver = ver + 1 where prdt_id = xxxx and num > 0 and ver = xxxx;
+     -- 每次查询时添加版本号字段 version, 这种做法不会产生行锁
+     update stock
+        set stock_count = stock_count - 1 and version = version + 1
+      where product_id = ??? and stock_count > 0 and version = ???;
 
      -- 如果更新失败, 需要重试一下
-     select * from stock where prdt_id == xxxx;
-     update stock set num = num - 1 and ver = ver + 1 where prdt_id = xxxx and num > 0 and ver = xxxx;
+     select *
+       from stock
+      where product_id == ???;
+
+     update stock
+        set stock_count = stock_count - 1 and version = version + 1
+      where product_id = ??? and stock_count > 0 and version = ???;
    #+END_SRC
 
    注意：
