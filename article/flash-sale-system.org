@@ -1,0 +1,107 @@
+#+TITLE: 秒杀系统设计
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2021-08-06 Fri 12:22:36>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: flash-sale system-design
+
+
+* 基本参数
+  1. 100W QPS 的秒杀系统的设计
+  2. MySQL 的最大 QPS = 1000
+  3. Redis 的最大 QPS = 10W
+
+* 架构设计
+  在描述活动中涉及到多个微服务的
+  #+BEGIN_SRC text
+    [App] ----> ActivityService  --> DB1
+           |
+           +--> ProduceService   --> DB2
+           |
+           +--> OrderService     --> DB3
+           |
+           +--> PaymentService   --> DB4
+  #+END_SRC
+
+* 数据库设计
+** 秒杀活动表 activity
+   | 活动编码 | 活动名称                         | 活动类型 | 商品编码 | 活动价格 | 活动数量 |
+   |----------+----------------------------------+----------+----------+----------+----------|
+   | H10001   | iPhone 2021 秒杀                 | 秒杀     | T0001    |     4499 |       10 |
+   | H10002   | iPhone 2021 下单增 1000 元优惠卷 | 买赠     | T0001    |     4999 |       10 |
+
+** 库存表 stock
+   | 商品编码 | 商品名称  | 活动编码 | 总库存数 | 预占库存数 |
+   |----------+-----------+----------+----------+------------|
+   | T0001    | iPhone 12 | H10001   |       10 |          2 |
+
+** 商品表 product
+   | 商品编码 | 商品名称  | 商品标题                                                 | 商品原价 | 商品描述 |
+   |----------+-----------+----------------------------------------------------------+----------+----------|
+   | T0001    | iPhone 12 | Apple iPhone 12 128GB 白色 移动联通电信 4G 手机 双卡双待 |     5599 | xxxx     |
+
+* MySQL 实现扣减库存的途径
+** 悲观锁 Pessimistic Lock
+   在 MySQL 的实现方法, 利用 ~for update~ 的行锁机制来并发竞争库存
+   #+BEGIN_SRC sql
+     -- 第一步: 查询并锁表
+     select * from stock where prdt_id = xxxx for update;
+
+     -- 第二步: 扣库存
+     update stock set num = num - 1 where prdt_id = xxxx and num > 0;
+   #+END_SRC
+
+** 乐观锁 Optimistic Lock
+   在 MySQL 的实现方法是引入一个额外的字段，记住更新的版本号
+   #+BEGIN_SRC sql
+     -- 每次查询时添加版本号字段 ver, 这种做法不会产生行锁
+     update stock set num = num - 1 and ver = ver + 1 where prdt_id = xxxx and num > 0 and ver = xxxx;
+
+     -- 如果更新失败, 需要重试一下
+     select * from stock where prdt_id == xxxx;
+     update stock set num = num - 1 and ver = ver + 1 where prdt_id = xxxx and num > 0 and ver = xxxx;
+   #+END_SRC
+
+   注意：
+   1. 在秒杀的情景下乐观锁并不能解决问题
+   2. 高并发情景下可能会把 MySQL 数据库整崩溃
+
+* Redis 实现扣减库存的途径
+  因为 Redis 的并发量比 MySQL 要高，可以引用 Redis 来优化库存扣减的逻辑，从而提
+  高系统的吞吐量
+
+  设置库存, 创建或维护时将数据写入 Redis 缓存
+  #+BEGIN_SRC java
+    redisClient.set("prdt_id_stock", 10);
+  #+END_SRC
+
+  扣减库存
+  1. Lua 脚本完成原子操作
+     #+BEGIN_SRC lua
+       if (redis.call('exists', KEYS[1]) == 1) then
+          local stock = tonumber(redis.call('get', KEYS[1]));
+          if (stock == -1) then
+             return 1;
+          end;
+          if (stock > 0) then
+             redis.call('incrby', KEYS[1], -1);
+             return stock;
+          end;
+          return 0;
+       end;
+       return -1;
+     #+END_SRC
+  2. Java API 的操作
+     #+BEGIN_SRC java
+       redisClient.decr("prdt_id_stock");
+     #+END_SRC
+
+* 数据一致性
+  目前记录活动的数量出现在三个地方
+  1. 活动表 -- 售卖数量 static
+  2. 库存表 -- 库存数量 dynamic
+  3. Redis  -- 库存数量 dynamic
+
+  问题是如何保证 库存表和 Redis 的库存数量和活动表的数量一致
