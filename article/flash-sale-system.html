@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-08-06 Fri 16:49 -->
+<!-- 2021-08-06 Fri 16:57 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>秒杀系统设计</title>
@@ -233,32 +233,32 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orge133df6">1. 基本参数</a></li>
-<li><a href="#org1f5ee7d">2. 架构设计</a></li>
-<li><a href="#org2897471">3. 数据库设计</a>
+<li><a href="#org0a8f8b6">1. 基本参数</a></li>
+<li><a href="#orgd0616d0">2. 架构设计</a></li>
+<li><a href="#orga8ab3b7">3. 数据库设计</a>
 <ul>
-<li><a href="#orga2f9f1e">3.1. 秒杀活动表 activity</a></li>
-<li><a href="#org8c0b887">3.2. 库存表 stock</a></li>
-<li><a href="#orgcab1d21">3.3. 商品表 product</a></li>
+<li><a href="#orga878fa0">3.1. 秒杀活动表 activity</a></li>
+<li><a href="#orgcef02cb">3.2. 库存表 stock</a></li>
+<li><a href="#org6b30154">3.3. 商品表 product</a></li>
 </ul>
 </li>
-<li><a href="#orgb9952c0">4. MySQL 实现扣减库存的途径</a>
+<li><a href="#orgcde0d88">4. MySQL 实现扣减库存的途径</a>
 <ul>
-<li><a href="#org31e9ae1">4.1. 悲观锁 Pessimistic Lock</a></li>
-<li><a href="#org6c709b2">4.2. 乐观锁 Optimistic Lock</a></li>
+<li><a href="#org5bb3154">4.1. 悲观锁 Pessimistic Lock</a></li>
+<li><a href="#org8cecaba">4.2. 乐观锁 Optimistic Lock</a></li>
 </ul>
 </li>
-<li><a href="#org4d31fb7">5. Redis 实现扣减库存的途径</a></li>
-<li><a href="#orgcc3d5db">6. 数据一致性的讨论</a></li>
-<li><a href="#orgf0c65ea">7. 常见处理问题</a>
+<li><a href="#orga8b8a63">5. Redis 实现扣减库存的途径</a></li>
+<li><a href="#orga3e153e">6. 数据一致性的讨论</a></li>
+<li><a href="#org7eea905">7. 常见处理问题</a>
 <ul>
-<li><a href="#org7549120">7.1. 倒计时实现方式</a></li>
-<li><a href="#org56172c3">7.2. 下单和减库存的细节</a></li>
-<li><a href="#orgb38d31d">7.3. 如何防止超卖</a></li>
-<li><a href="#orgc03e6ee">7.4. 库存写回数据库时机</a></li>
-<li><a href="#orgeee63aa">7.5. 双十一刷爆页面的处理策略</a></li>
-<li><a href="#orga1fa200">7.6. 增对爬虫和黄牛处理</a></li>
-<li><a href="#org7463994">7.7. 如果秒杀服务挂了，如果不影响正常服务</a></li>
+<li><a href="#orgbe0682c">7.1. 倒计时实现方式</a></li>
+<li><a href="#orgdbdafb4">7.2. 下单和减库存的细节</a></li>
+<li><a href="#org26de955">7.3. 如何防止超卖</a></li>
+<li><a href="#org8f4a5be">7.4. 库存写回数据库时机</a></li>
+<li><a href="#org69b4f81">7.5. 双十一刷爆页面的处理策略</a></li>
+<li><a href="#org9714271">7.6. 增对爬虫和黄牛处理</a></li>
+<li><a href="#org48680ef">7.7. 如果秒杀服务挂了，如果不影响正常服务</a></li>
 </ul>
 </li>
 </ul>
@@ -266,8 +266,8 @@
 </div>
 
 
-<div id="outline-container-orge133df6" class="outline-2">
-<h2 id="orge133df6"><span class="section-number-2">1</span> 基本参数</h2>
+<div id="outline-container-org0a8f8b6" class="outline-2">
+<h2 id="org0a8f8b6"><span class="section-number-2">1</span> 基本参数</h2>
 <div class="outline-text-2" id="text-1">
 <ol class="org-ol">
 <li>需求设计一个可以承载 100W QPS 的秒杀系统</li>
@@ -277,8 +277,8 @@
 </div>
 </div>
 
-<div id="outline-container-org1f5ee7d" class="outline-2">
-<h2 id="org1f5ee7d"><span class="section-number-2">2</span> 架构设计</h2>
+<div id="outline-container-orgd0616d0" class="outline-2">
+<h2 id="orgd0616d0"><span class="section-number-2">2</span> 架构设计</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 在描述活动中涉及到多个微服务的
@@ -302,12 +302,12 @@
 </div>
 </div>
 
-<div id="outline-container-org2897471" class="outline-2">
-<h2 id="org2897471"><span class="section-number-2">3</span> 数据库设计</h2>
+<div id="outline-container-orga8ab3b7" class="outline-2">
+<h2 id="orga8ab3b7"><span class="section-number-2">3</span> 数据库设计</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orga2f9f1e" class="outline-3">
-<h3 id="orga2f9f1e"><span class="section-number-3">3.1</span> 秒杀活动表 activity</h3>
+<div id="outline-container-orga878fa0" class="outline-3">
+<h3 id="orga878fa0"><span class="section-number-3">3.1</span> 秒杀活动表 activity</h3>
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">create</span> <span style="color: #4f97d7; font-weight: bold;">table</span> <span style="color: #bc6ec5; font-weight: bold;">activity</span> (
@@ -370,8 +370,8 @@
 </div>
 </div>
 
-<div id="outline-container-org8c0b887" class="outline-3">
-<h3 id="org8c0b887"><span class="section-number-3">3.2</span> 库存表 stock</h3>
+<div id="outline-container-orgcef02cb" class="outline-3">
+<h3 id="orgcef02cb"><span class="section-number-3">3.2</span> 库存表 stock</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">create</span> <span style="color: #4f97d7; font-weight: bold;">table</span> <span style="color: #bc6ec5; font-weight: bold;">stock</span> (
@@ -421,8 +421,8 @@
 </div>
 </div>
 
-<div id="outline-container-orgcab1d21" class="outline-3">
-<h3 id="orgcab1d21"><span class="section-number-3">3.3</span> 商品表 product</h3>
+<div id="outline-container-org6b30154" class="outline-3">
+<h3 id="org6b30154"><span class="section-number-3">3.3</span> 商品表 product</h3>
 <div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">create</span> <span style="color: #4f97d7; font-weight: bold;">table</span> <span style="color: #bc6ec5; font-weight: bold;">product</span> (
@@ -472,12 +472,12 @@
 </div>
 </div>
 
-<div id="outline-container-orgb9952c0" class="outline-2">
-<h2 id="orgb9952c0"><span class="section-number-2">4</span> MySQL 实现扣减库存的途径</h2>
+<div id="outline-container-orgcde0d88" class="outline-2">
+<h2 id="orgcde0d88"><span class="section-number-2">4</span> MySQL 实现扣减库存的途径</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org31e9ae1" class="outline-3">
-<h3 id="org31e9ae1"><span class="section-number-3">4.1</span> 悲观锁 Pessimistic Lock</h3>
+<div id="outline-container-org5bb3154" class="outline-3">
+<h3 id="org5bb3154"><span class="section-number-3">4.1</span> 悲观锁 Pessimistic Lock</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 在 MySQL 的实现方法, 利用 <code>for update</code> 的行锁机制来并发竞争库存
@@ -486,19 +486,19 @@
 <pre class="src src-sql"><span style="color: #2aa1ae; background-color: #292e34;">-- &#31532;&#19968;&#27493;: &#26597;&#35810;&#24182;&#38145;&#34920;</span>
 <span style="color: #4f97d7; font-weight: bold;">select</span> *
   <span style="color: #4f97d7; font-weight: bold;">from</span> stock
- <span style="color: #4f97d7; font-weight: bold;">where</span> product_id = ??? <span style="color: #4f97d7; font-weight: bold;">for</span> <span style="color: #4f97d7; font-weight: bold;">update</span>;
+ <span style="color: #4f97d7; font-weight: bold;">where</span> product_code = ??? <span style="color: #4f97d7; font-weight: bold;">for</span> <span style="color: #4f97d7; font-weight: bold;">update</span>;
 
 <span style="color: #2aa1ae; background-color: #292e34;">-- &#31532;&#20108;&#27493;: &#25187;&#24211;&#23384;</span>
 <span style="color: #4f97d7; font-weight: bold;">update</span> stock
    <span style="color: #4f97d7; font-weight: bold;">set</span> stock_count = stock_count - 1
- <span style="color: #4f97d7; font-weight: bold;">where</span> product_id = ??? <span style="color: #4f97d7; font-weight: bold;">and</span> stock_count &gt; 0;
+ <span style="color: #4f97d7; font-weight: bold;">where</span> product_code = ??? <span style="color: #4f97d7; font-weight: bold;">and</span> stock_count &gt; 0;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org6c709b2" class="outline-3">
-<h3 id="org6c709b2"><span class="section-number-3">4.2</span> 乐观锁 Optimistic Lock</h3>
+<div id="outline-container-org8cecaba" class="outline-3">
+<h3 id="org8cecaba"><span class="section-number-3">4.2</span> 乐观锁 Optimistic Lock</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 在 MySQL 的实现方法是引入一个额外的字段，记住更新的版本号
@@ -507,16 +507,16 @@
 <pre class="src src-sql"><span style="color: #2aa1ae; background-color: #292e34;">-- &#27599;&#27425;&#26597;&#35810;&#26102;&#28155;&#21152;&#29256;&#26412;&#21495;&#23383;&#27573; version, &#36825;&#31181;&#20570;&#27861;&#19981;&#20250;&#20135;&#29983;&#34892;&#38145;</span>
 <span style="color: #4f97d7; font-weight: bold;">update</span> stock
    <span style="color: #4f97d7; font-weight: bold;">set</span> stock_count = stock_count - 1 <span style="color: #4f97d7; font-weight: bold;">and</span> version = version + 1
- <span style="color: #4f97d7; font-weight: bold;">where</span> product_id = ??? <span style="color: #4f97d7; font-weight: bold;">and</span> stock_count &gt; 0 <span style="color: #4f97d7; font-weight: bold;">and</span> version = ???;
+ <span style="color: #4f97d7; font-weight: bold;">where</span> product_code = ??? <span style="color: #4f97d7; font-weight: bold;">and</span> stock_count &gt; 0 <span style="color: #4f97d7; font-weight: bold;">and</span> version = ???;
 
 <span style="color: #2aa1ae; background-color: #292e34;">-- &#22914;&#26524;&#26356;&#26032;&#22833;&#36133;, &#38656;&#35201;&#37325;&#35797;&#19968;&#19979;</span>
 <span style="color: #4f97d7; font-weight: bold;">select</span> *
   <span style="color: #4f97d7; font-weight: bold;">from</span> stock
- <span style="color: #4f97d7; font-weight: bold;">where</span> product_id == ???;
+ <span style="color: #4f97d7; font-weight: bold;">where</span> product_code == ???;
 
 <span style="color: #4f97d7; font-weight: bold;">update</span> stock
    <span style="color: #4f97d7; font-weight: bold;">set</span> stock_count = stock_count - 1 <span style="color: #4f97d7; font-weight: bold;">and</span> version = version + 1
- <span style="color: #4f97d7; font-weight: bold;">where</span> product_id = ??? <span style="color: #4f97d7; font-weight: bold;">and</span> stock_count &gt; 0 <span style="color: #4f97d7; font-weight: bold;">and</span> version = ???;
+ <span style="color: #4f97d7; font-weight: bold;">where</span> product_code = ??? <span style="color: #4f97d7; font-weight: bold;">and</span> stock_count &gt; 0 <span style="color: #4f97d7; font-weight: bold;">and</span> version = ???;
 </pre>
 </div>
 
@@ -531,8 +531,8 @@
 </div>
 </div>
 
-<div id="outline-container-org4d31fb7" class="outline-2">
-<h2 id="org4d31fb7"><span class="section-number-2">5</span> Redis 实现扣减库存的途径</h2>
+<div id="outline-container-orga8b8a63" class="outline-2">
+<h2 id="orga8b8a63"><span class="section-number-2">5</span> Redis 实现扣减库存的途径</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 因为 Redis 的并发量比 MySQL 要高，可以引用 Redis 来优化库存扣减的逻辑，从而提
@@ -580,8 +580,8 @@ Java API 的操作
 </div>
 </div>
 
-<div id="outline-container-orgcc3d5db" class="outline-2">
-<h2 id="orgcc3d5db"><span class="section-number-2">6</span> 数据一致性的讨论</h2>
+<div id="outline-container-orga3e153e" class="outline-2">
+<h2 id="orga3e153e"><span class="section-number-2">6</span> 数据一致性的讨论</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 目前记录活动的数量出现在三个地方
@@ -623,12 +623,12 @@ Java API 的操作
 </div>
 </div>
 
-<div id="outline-container-orgf0c65ea" class="outline-2">
-<h2 id="orgf0c65ea"><span class="section-number-2">7</span> 常见处理问题</h2>
+<div id="outline-container-org7eea905" class="outline-2">
+<h2 id="org7eea905"><span class="section-number-2">7</span> 常见处理问题</h2>
 <div class="outline-text-2" id="text-7">
 </div>
-<div id="outline-container-org7549120" class="outline-3">
-<h3 id="org7549120"><span class="section-number-3">7.1</span> 倒计时实现方式</h3>
+<div id="outline-container-orgbe0682c" class="outline-3">
+<h3 id="orgbe0682c"><span class="section-number-3">7.1</span> 倒计时实现方式</h3>
 <div class="outline-text-3" id="text-7-1">
 <ol class="org-ol">
 <li>客户单第一次获取服务端的时间</li>
@@ -637,8 +637,8 @@ Java API 的操作
 </div>
 </div>
 
-<div id="outline-container-org56172c3" class="outline-3">
-<h3 id="org56172c3"><span class="section-number-3">7.2</span> 下单和减库存的细节</h3>
+<div id="outline-container-orgdbdafb4" class="outline-3">
+<h3 id="orgdbdafb4"><span class="section-number-3">7.2</span> 下单和减库存的细节</h3>
 <div class="outline-text-3" id="text-7-2">
 <ol class="org-ol">
 <li>先下单锁定库存 (需要设置超时释放库存)</li>
@@ -647,8 +647,8 @@ Java API 的操作
 </div>
 </div>
 
-<div id="outline-container-orgb38d31d" class="outline-3">
-<h3 id="orgb38d31d"><span class="section-number-3">7.3</span> 如何防止超卖</h3>
+<div id="outline-container-org26de955" class="outline-3">
+<h3 id="org26de955"><span class="section-number-3">7.3</span> 如何防止超卖</h3>
 <div class="outline-text-3" id="text-7-3">
 <ol class="org-ol">
 <li>将数据放入 Redis 的缓存中</li>
@@ -657,8 +657,8 @@ Java API 的操作
 </div>
 </div>
 
-<div id="outline-container-orgc03e6ee" class="outline-3">
-<h3 id="orgc03e6ee"><span class="section-number-3">7.4</span> 库存写回数据库时机</h3>
+<div id="outline-container-org8f4a5be" class="outline-3">
+<h3 id="org8f4a5be"><span class="section-number-3">7.4</span> 库存写回数据库时机</h3>
 <div class="outline-text-3" id="text-7-4">
 <p>
 使用定时任务, 每秒回写一下库存
@@ -666,8 +666,8 @@ Java API 的操作
 </div>
 </div>
 
-<div id="outline-container-orgeee63aa" class="outline-3">
-<h3 id="orgeee63aa"><span class="section-number-3">7.5</span> 双十一刷爆页面的处理策略</h3>
+<div id="outline-container-org69b4f81" class="outline-3">
+<h3 id="org69b4f81"><span class="section-number-3">7.5</span> 双十一刷爆页面的处理策略</h3>
 <div class="outline-text-3" id="text-7-5">
 <ol class="org-ol">
 <li>CDN 来缓存 (首推这种策略)</li>
@@ -677,8 +677,8 @@ Java API 的操作
 </div>
 </div>
 
-<div id="outline-container-orga1fa200" class="outline-3">
-<h3 id="orga1fa200"><span class="section-number-3">7.6</span> 增对爬虫和黄牛处理</h3>
+<div id="outline-container-org9714271" class="outline-3">
+<h3 id="org9714271"><span class="section-number-3">7.6</span> 增对爬虫和黄牛处理</h3>
 <div class="outline-text-3" id="text-7-6">
 <ol class="org-ol">
 <li>增加页面访问验证码</li>
@@ -687,8 +687,8 @@ Java API 的操作
 </div>
 </div>
 
-<div id="outline-container-org7463994" class="outline-3">
-<h3 id="org7463994"><span class="section-number-3">7.7</span> 如果秒杀服务挂了，如果不影响正常服务</h3>
+<div id="outline-container-org48680ef" class="outline-3">
+<h3 id="org48680ef"><span class="section-number-3">7.7</span> 如果秒杀服务挂了，如果不影响正常服务</h3>
 <div class="outline-text-3" id="text-7-7">
 <ol class="org-ol">
 <li>使用熔断策略</li>
@@ -700,7 +700,7 @@ Java API 的操作
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-08-06 Fri 16:49. Created by Jinghui Hu at 2021-08-06 Fri 12:22.</p>
+<p class="author">Last Updated 2021-08-06 Fri 16:57. Created by Jinghui Hu at 2021-08-06 Fri 12:22.</p>
 </div>
 </body>
 </html>

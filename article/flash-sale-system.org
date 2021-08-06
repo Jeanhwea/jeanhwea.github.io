@@ -85,12 +85,12 @@
      -- 第一步: 查询并锁表
      select *
        from stock
-      where product_id = ??? for update;
+      where product_code = ??? for update;
 
      -- 第二步: 扣库存
      update stock
         set stock_count = stock_count - 1
-      where product_id = ??? and stock_count > 0;
+      where product_code = ??? and stock_count > 0;
    #+END_SRC
 
 ** 乐观锁 Optimistic Lock
@@ -99,16 +99,16 @@
      -- 每次查询时添加版本号字段 version, 这种做法不会产生行锁
      update stock
         set stock_count = stock_count - 1 and version = version + 1
-      where product_id = ??? and stock_count > 0 and version = ???;
+      where product_code = ??? and stock_count > 0 and version = ???;
 
      -- 如果更新失败, 需要重试一下
      select *
        from stock
-      where product_id == ???;
+      where product_code == ???;
 
      update stock
         set stock_count = stock_count - 1 and version = version + 1
-      where product_id = ??? and stock_count > 0 and version = ???;
+      where product_code = ??? and stock_count > 0 and version = ???;
    #+END_SRC
 
    注意：
