@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-08-06 Fri 22:20 -->
+<!-- 2021-08-06 Fri 22:43 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>InnoDB 存储引擎</title>
@@ -233,27 +233,29 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org23c1e0b">1. InnoDB 多版本控制 MVCC</a></li>
-<li><a href="#orgee3930a">2. InnoDB 体系结构</a></li>
-<li><a href="#orgcc87135">3. InnoDB 内存结构</a>
+<li><a href="#org713e941">1. InnoDB 多版本控制 MVCC</a></li>
+<li><a href="#org502c8ce">2. InnoDB 体系结构</a></li>
+<li><a href="#org12e3f96">3. InnoDB 内存结构</a>
 <ul>
-<li><a href="#orgc473d93">3.1. Buffer Pool</a>
+<li><a href="#org09a264b">3.1. Buffer Pool</a>
 <ul>
-<li><a href="#orgac25cf4">3.1.1. Buffer Pool 概述</a></li>
-<li><a href="#org9001cd1">3.1.2. Buffer Pool 相关调优</a></li>
+<li><a href="#orgf0103cf">3.1.1. Buffer Pool 概述</a></li>
+<li><a href="#orge8e3556">3.1.2. Buffer Pool 相关调优</a></li>
 </ul>
 </li>
-<li><a href="#org1020449">3.2. Change Buffer</a></li>
+<li><a href="#org4403622">3.2. Change Buffer</a></li>
+<li><a href="#orgf305984">3.3. Adaptive Hash Index</a></li>
+<li><a href="#org9ebf44f">3.4. Log Buffer</a></li>
 </ul>
 </li>
-<li><a href="#orga0cf138">4. InnoDB 磁盘结构</a></li>
-<li><a href="#orgeec14ec">5. 参考链接</a></li>
+<li><a href="#orgd6b93ff">4. InnoDB 磁盘结构</a></li>
+<li><a href="#orgc060ecd">5. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org23c1e0b" class="outline-2">
-<h2 id="org23c1e0b"><span class="section-number-2">1</span> InnoDB 多版本控制 MVCC</h2>
+<div id="outline-container-org713e941" class="outline-2">
+<h2 id="org713e941"><span class="section-number-2">1</span> InnoDB 多版本控制 MVCC</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 InnoDB 的多版本控制添加如下三个字段来记录额外的信息
@@ -277,15 +279,15 @@ InnoDB 的多版本控制添加如下三个字段来记录额外的信息
 </div>
 </div>
 
-<div id="outline-container-orgee3930a" class="outline-2">
-<h2 id="orgee3930a"><span class="section-number-2">2</span> InnoDB 体系结构</h2>
+<div id="outline-container-org502c8ce" class="outline-2">
+<h2 id="org502c8ce"><span class="section-number-2">2</span> InnoDB 体系结构</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 MySQL 的 InnoDB 存储引擎体系结构如下图所示
 </p>
 
 
-<div id="orgab069d4" class="figure">
+<div id="org9537c79" class="figure">
 <p><img src="../static/image/2021/07/innodb-architecture.png" alt="innodb-architecture.png" />
 </p>
 </div>
@@ -323,16 +325,16 @@ drwxr-x--- 2 mysql mysql      8192 May 21 09:58 sys
 </div>
 </div>
 
-<div id="outline-container-orgcc87135" class="outline-2">
-<h2 id="orgcc87135"><span class="section-number-2">3</span> InnoDB 内存结构</h2>
+<div id="outline-container-org12e3f96" class="outline-2">
+<h2 id="org12e3f96"><span class="section-number-2">3</span> InnoDB 内存结构</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgc473d93" class="outline-3">
-<h3 id="orgc473d93"><span class="section-number-3">3.1</span> Buffer Pool</h3>
+<div id="outline-container-org09a264b" class="outline-3">
+<h3 id="org09a264b"><span class="section-number-3">3.1</span> Buffer Pool</h3>
 <div class="outline-text-3" id="text-3-1">
 </div>
-<div id="outline-container-orgac25cf4" class="outline-4">
-<h4 id="orgac25cf4"><span class="section-number-4">3.1.1</span> Buffer Pool 概述</h4>
+<div id="outline-container-orgf0103cf" class="outline-4">
+<h4 id="orgf0103cf"><span class="section-number-4">3.1.1</span> Buffer Pool 概述</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <p>
 Buffer Pool 是 MySQL 缓存数据到内存的结构
@@ -374,8 +376,8 @@ Buffer Pool 是 MySQL 缓存数据到内存的结构
 </div>
 </div>
 
-<div id="outline-container-org9001cd1" class="outline-4">
-<h4 id="org9001cd1"><span class="section-number-4">3.1.2</span> Buffer Pool 相关调优</h4>
+<div id="outline-container-orge8e3556" class="outline-4">
+<h4 id="orge8e3556"><span class="section-number-4">3.1.2</span> Buffer Pool 相关调优</h4>
 <div class="outline-text-4" id="text-3-1-2">
 <p>
 MySQL 默认的 <code>innodb_buffer_pool_size</code> 的默认大小 128 M，一般需要根据需求进
@@ -417,8 +419,8 @@ MySQL 默认的 <code>innodb_buffer_pool_size</code> 的默认大小 128 M，一
 </div>
 </div>
 
-<div id="outline-container-org1020449" class="outline-3">
-<h3 id="org1020449"><span class="section-number-3">3.2</span> Change Buffer</h3>
+<div id="outline-container-org4403622" class="outline-3">
+<h3 id="org4403622"><span class="section-number-3">3.2</span> Change Buffer</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Change Buffer 使用了 Buffer Pool 的部分空间完成性能优化
@@ -433,14 +435,46 @@ and Delete) 进行缓存</li>
 </ol>
 </div>
 </div>
+
+<div id="outline-container-orgf305984" class="outline-3">
+<h3 id="orgf305984"><span class="section-number-3">3.3</span> Adaptive Hash Index</h3>
+<div class="outline-text-3" id="text-3-3">
+<ol class="org-ol">
+<li>InnoDB 存储引擎会监控对表上索引的查找，如果观察到建立哈希索引可以带来速度
+的提升，则建立哈希索引，所以称之为自适应（adaptive）</li>
+<li>自适应哈希索引通过缓冲池的 B+ 树构造而来，因此建立的速度很快。而且不需要将
+整个表都建哈希索引，InnoDB 存储引擎会自动根据访问的频率和模式来为某些页建
+立哈希索引</li>
+</ol>
+</div>
 </div>
 
-<div id="outline-container-orga0cf138" class="outline-2">
-<h2 id="orga0cf138"><span class="section-number-2">4</span> InnoDB 磁盘结构</h2>
+<div id="outline-container-org9ebf44f" class="outline-3">
+<h3 id="org9ebf44f"><span class="section-number-3">3.4</span> Log Buffer</h3>
+<div class="outline-text-3" id="text-3-4">
+<ol class="org-ol">
+<li>Redo Log 日志文件也需要相应的内存数据结构来进行缓存操作</li>
+<li>Log Buffer 就是用于缓存 Redo Log 日志文件的内存空间</li>
+<li>其空间大小可以通过参数 <code>innodb_log_buffer_size</code> 来设定</li>
+<li>日志文件的每次更新都应该刷会磁盘，不然就会有数据丢失或不一致的风险,
+<code>innodb_flush_log_at_trx_commit</code> 参数用于设置日志刷回磁盘的频率
+<ul class="org-ul">
+<li>默认值为 1， 即每次事务提交时，都会记录日志，并将其刷回到磁盘</li>
+<li>参数值为 0 时，日志写入和刷回磁盘的操作为每秒 1 次</li>
+<li>参数值为 2 时，每次事务提交时都会写入 Log Buffer，但 Log Buffer 更新到磁
+盘的操作为每秒 1 次</li>
+</ul></li>
+</ol>
+</div>
+</div>
 </div>
 
-<div id="outline-container-orgeec14ec" class="outline-2">
-<h2 id="orgeec14ec"><span class="section-number-2">5</span> 参考链接</h2>
+<div id="outline-container-orgd6b93ff" class="outline-2">
+<h2 id="orgd6b93ff"><span class="section-number-2">4</span> InnoDB 磁盘结构</h2>
+</div>
+
+<div id="outline-container-orgc060ecd" class="outline-2">
+<h2 id="orgc060ecd"><span class="section-number-2">5</span> 参考链接</h2>
 <div class="outline-text-2" id="text-5">
 <ol class="org-ol">
 <li><a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-storage-engine.html">The InnoDB Storage Engine</a></li>
@@ -449,7 +483,7 @@ and Delete) 进行缓存</li>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-08-06 Fri 22:20. Created by Jinghui Hu at 2021-07-07 Wed 09:41.</p>
+<p class="author">Last Updated 2021-08-06 Fri 22:43. Created by Jinghui Hu at 2021-07-07 Wed 09:41.</p>
 </div>
 </body>
 </html>
