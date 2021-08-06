@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-08-06 Fri 13:34 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>秒杀系统设计</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script type="text/javascript" src="styles/lib/js/jquery.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="../readme.html"> UP </a>
+ |
+ <a accesskey="H" href="../index.html"> HOME </a>
+</div><div id="content">
+<h1 class="title">秒杀系统设计</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orged792e7">1. 基本参数</a></li>
+<li><a href="#org0c3e918">2. 架构设计</a></li>
+<li><a href="#org185b741">3. 数据库设计</a>
+<ul>
+<li><a href="#orgd0d7a9d">3.1. 秒杀活动表 activity</a></li>
+<li><a href="#org5d60c85">3.2. 库存表 stock</a></li>
+<li><a href="#org3a54500">3.3. 商品表 product</a></li>
+</ul>
+</li>
+<li><a href="#org67cbe67">4. MySQL 实现扣减库存的途径</a>
+<ul>
+<li><a href="#org9c539b4">4.1. 悲观锁 Pessimistic Lock</a></li>
+<li><a href="#org75341b0">4.2. 乐观锁 Optimistic Lock</a></li>
+</ul>
+</li>
+<li><a href="#org7c2fae5">5. Redis 实现扣减库存的途径</a></li>
+<li><a href="#org9025350">6. 数据一致性的讨论</a></li>
+<li><a href="#orgfe0f0b3">7. 常见问题</a>
+<ul>
+<li><a href="#org9ebda0b">7.1. 倒计时实现方式</a></li>
+<li><a href="#org90ba259">7.2. 下单和减库存的细节</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orged792e7" class="outline-2">
+<h2 id="orged792e7"><span class="section-number-2">1</span> 基本参数</h2>
+<div class="outline-text-2" id="text-1">
+<ol class="org-ol">
+<li>100W QPS 的秒杀系统的设计</li>
+<li>MySQL 的最大 QPS = 1000</li>
+<li>Redis 的最大 QPS = 10W</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org0c3e918" class="outline-2">
+<h2 id="org0c3e918"><span class="section-number-2">2</span> 架构设计</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+在描述活动中涉及到多个微服务的
+</p>
+<div class="org-src-container">
+<pre class="src src-text">[App] ----&gt; ActivityService  --&gt; DB1
+       |
+       +--&gt; ProduceService   --&gt; DB2
+       |
+       +--&gt; OrderService     --&gt; DB3
+       |
+       +--&gt; PaymentService   --&gt; DB4
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org185b741" class="outline-2">
+<h2 id="org185b741"><span class="section-number-2">3</span> 数据库设计</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgd0d7a9d" class="outline-3">
+<h3 id="orgd0d7a9d"><span class="section-number-3">3.1</span> 秒杀活动表 activity</h3>
+<div class="outline-text-3" id="text-3-1">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">活动编码</th>
+<th scope="col" class="org-left">活动名称</th>
+<th scope="col" class="org-left">活动类型</th>
+<th scope="col" class="org-left">商品编码</th>
+<th scope="col" class="org-right">活动价格</th>
+<th scope="col" class="org-right">活动数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">H10001</td>
+<td class="org-left">iPhone 2021 秒杀</td>
+<td class="org-left">秒杀</td>
+<td class="org-left">T0001</td>
+<td class="org-right">4499</td>
+<td class="org-right">10</td>
+</tr>
+
+<tr>
+<td class="org-left">H10002</td>
+<td class="org-left">iPhone 2021 下单增 1000 元优惠卷</td>
+<td class="org-left">买赠</td>
+<td class="org-left">T0001</td>
+<td class="org-right">4999</td>
+<td class="org-right">10</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-org5d60c85" class="outline-3">
+<h3 id="org5d60c85"><span class="section-number-3">3.2</span> 库存表 stock</h3>
+<div class="outline-text-3" id="text-3-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">商品编码</th>
+<th scope="col" class="org-left">商品名称</th>
+<th scope="col" class="org-left">活动编码</th>
+<th scope="col" class="org-right">总库存数</th>
+<th scope="col" class="org-right">预占库存数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">T0001</td>
+<td class="org-left">iPhone 12</td>
+<td class="org-left">H10001</td>
+<td class="org-right">10</td>
+<td class="org-right">2</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-org3a54500" class="outline-3">
+<h3 id="org3a54500"><span class="section-number-3">3.3</span> 商品表 product</h3>
+<div class="outline-text-3" id="text-3-3">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">商品编码</th>
+<th scope="col" class="org-left">商品名称</th>
+<th scope="col" class="org-left">商品标题</th>
+<th scope="col" class="org-right">商品原价</th>
+<th scope="col" class="org-left">商品描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">T0001</td>
+<td class="org-left">iPhone 12</td>
+<td class="org-left">Apple iPhone 12 128GB 白色 移动联通电信 4G 手机 双卡双待</td>
+<td class="org-right">5599</td>
+<td class="org-left">xxxx</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org67cbe67" class="outline-2">
+<h2 id="org67cbe67"><span class="section-number-2">4</span> MySQL 实现扣减库存的途径</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-org9c539b4" class="outline-3">
+<h3 id="org9c539b4"><span class="section-number-3">4.1</span> 悲观锁 Pessimistic Lock</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+在 MySQL 的实现方法, 利用 <code>for update</code> 的行锁机制来并发竞争库存
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #2aa1ae; background-color: #292e34;">-- &#31532;&#19968;&#27493;: &#26597;&#35810;&#24182;&#38145;&#34920;</span>
+<span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> stock <span style="color: #4f97d7; font-weight: bold;">where</span> prdt_id = xxxx <span style="color: #4f97d7; font-weight: bold;">for</span> <span style="color: #4f97d7; font-weight: bold;">update</span>;
+
+<span style="color: #2aa1ae; background-color: #292e34;">-- &#31532;&#20108;&#27493;: &#25187;&#24211;&#23384;</span>
+<span style="color: #4f97d7; font-weight: bold;">update</span> stock <span style="color: #4f97d7; font-weight: bold;">set</span> num = num - 1 <span style="color: #4f97d7; font-weight: bold;">where</span> prdt_id = xxxx <span style="color: #4f97d7; font-weight: bold;">and</span> num &gt; 0;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org75341b0" class="outline-3">
+<h3 id="org75341b0"><span class="section-number-3">4.2</span> 乐观锁 Optimistic Lock</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+在 MySQL 的实现方法是引入一个额外的字段，记住更新的版本号
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #2aa1ae; background-color: #292e34;">-- &#27599;&#27425;&#26597;&#35810;&#26102;&#28155;&#21152;&#29256;&#26412;&#21495;&#23383;&#27573; ver, &#36825;&#31181;&#20570;&#27861;&#19981;&#20250;&#20135;&#29983;&#34892;&#38145;</span>
+<span style="color: #4f97d7; font-weight: bold;">update</span> stock <span style="color: #4f97d7; font-weight: bold;">set</span> num = num - 1 <span style="color: #4f97d7; font-weight: bold;">and</span> ver = ver + 1 <span style="color: #4f97d7; font-weight: bold;">where</span> prdt_id = xxxx <span style="color: #4f97d7; font-weight: bold;">and</span> num &gt; 0 <span style="color: #4f97d7; font-weight: bold;">and</span> ver = xxxx;
+
+<span style="color: #2aa1ae; background-color: #292e34;">-- &#22914;&#26524;&#26356;&#26032;&#22833;&#36133;, &#38656;&#35201;&#37325;&#35797;&#19968;&#19979;</span>
+<span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> stock <span style="color: #4f97d7; font-weight: bold;">where</span> prdt_id == xxxx;
+<span style="color: #4f97d7; font-weight: bold;">update</span> stock <span style="color: #4f97d7; font-weight: bold;">set</span> num = num - 1 <span style="color: #4f97d7; font-weight: bold;">and</span> ver = ver + 1 <span style="color: #4f97d7; font-weight: bold;">where</span> prdt_id = xxxx <span style="color: #4f97d7; font-weight: bold;">and</span> num &gt; 0 <span style="color: #4f97d7; font-weight: bold;">and</span> ver = xxxx;
+</pre>
+</div>
+
+<p>
+注意：
+</p>
+<ol class="org-ol">
+<li>在秒杀的情景下乐观锁并不能解决问题</li>
+<li>高并发情景下可能会把 MySQL 数据库整崩溃</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7c2fae5" class="outline-2">
+<h2 id="org7c2fae5"><span class="section-number-2">5</span> Redis 实现扣减库存的途径</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+因为 Redis 的并发量比 MySQL 要高，可以引用 Redis 来优化库存扣减的逻辑，从而提
+高系统的吞吐量
+</p>
+
+<p>
+设置库存, 创建或维护时将数据写入 Redis 缓存
+</p>
+<div class="org-src-container">
+<pre class="src src-java">redisClient.set<span style="color: #8d5649;">(</span><span style="color: #2d9574;">"prdt_id_stock"</span>, 10<span style="color: #8d5649;">)</span>;
+</pre>
+</div>
+
+<p>
+扣减库存
+</p>
+<ol class="org-ol">
+<li><p>
+Lua 脚本完成原子操作
+</p>
+<div class="org-src-container">
+<pre class="src src-lua"><span style="color: #4f97d7; font-weight: bold;">if</span> (redis.call(<span style="color: #2d9574;">'exists'</span>, KEYS[1]) == 1) <span style="color: #4f97d7; font-weight: bold;">then</span>
+   <span style="color: #4f97d7; font-weight: bold;">local</span> <span style="color: #7590db;">stock</span> = <span style="color: #4f97d7;">tonumber</span>(redis.call(<span style="color: #2d9574;">'get'</span>, KEYS[1]));
+   <span style="color: #4f97d7; font-weight: bold;">if</span> (stock == -1) <span style="color: #4f97d7; font-weight: bold;">then</span>
+      <span style="color: #4f97d7; font-weight: bold;">return</span> 1;
+   <span style="color: #4f97d7; font-weight: bold;">end</span>;
+   <span style="color: #4f97d7; font-weight: bold;">if</span> (stock &gt; 0) <span style="color: #4f97d7; font-weight: bold;">then</span>
+      redis.call(<span style="color: #2d9574;">'incrby'</span>, KEYS[1], -1);
+      <span style="color: #4f97d7; font-weight: bold;">return</span> stock;
+   <span style="color: #4f97d7; font-weight: bold;">end</span>;
+   <span style="color: #4f97d7; font-weight: bold;">return</span> 0;
+<span style="color: #4f97d7; font-weight: bold;">end</span>;
+<span style="color: #4f97d7; font-weight: bold;">return</span> -1;
+</pre>
+</div></li>
+<li><p>
+Java API 的操作
+</p>
+<div class="org-src-container">
+<pre class="src src-java">redisClient.decr<span style="color: #8d5649;">(</span><span style="color: #2d9574;">"prdt_id_stock"</span><span style="color: #8d5649;">)</span>;
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org9025350" class="outline-2">
+<h2 id="org9025350"><span class="section-number-2">6</span> 数据一致性的讨论</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+目前记录活动的数量出现在三个地方
+</p>
+<ol class="org-ol">
+<li>活动表 &#x2013; 售卖数量 static</li>
+<li>库存表 &#x2013; 库存数量 dynamic</li>
+<li>Redis  &#x2013; 库存数量 dynamic</li>
+</ol>
+
+<p>
+问题是如何保证 <code>库存表</code> 和 <code>Redis</code> 的库存数量和 <code>活动表</code> 的数量一致
+</p>
+<ol class="org-ol">
+<li>在分布式系统中要不保证强一致性是不可能的</li>
+<li>通过 BASE 理论，在互联网业务中只是要求最终一致性即可</li>
+</ol>
+
+<p>
+在保证数据最终一致的方式上，这里引用了消息队列的机制，常见的消息队列包括
+</p>
+<ol class="org-ol">
+<li>消息队列的好处是可以慢慢出来请求，不必同步处理相应结果</li>
+<li>除了异步任务之外，一般还用于处理失败的情况下重试处理，重复消费直到成功</li>
+<li><p>
+目前主流的消息队列包括 RocketMQ, Kafka
+</p>
+<ul class="org-ul">
+<li>一般使用 Broker 的模型, 所有的消息需要过 Broker 进行处理</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-text">[Producer] --- send --&gt; [Broker] -- receive --&gt; [Consumer]
+</pre>
+</div>
+<ul class="org-ul">
+<li>如果 Broker 可能会重复发送, 消费者在做 API 时需要实现接口的幂等性</li>
+</ul></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgfe0f0b3" class="outline-2">
+<h2 id="orgfe0f0b3"><span class="section-number-2">7</span> 常见问题</h2>
+<div class="outline-text-2" id="text-7">
+</div>
+<div id="outline-container-org9ebda0b" class="outline-3">
+<h3 id="org9ebda0b"><span class="section-number-3">7.1</span> 倒计时实现方式</h3>
+<div class="outline-text-3" id="text-7-1">
+<ol class="org-ol">
+<li>客户单第一次获取服务端的时间</li>
+<li>客户端使用本地时间进行倒计时的操作</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org90ba259" class="outline-3">
+<h3 id="org90ba259"><span class="section-number-3">7.2</span> 下单和减库存的细节</h3>
+<div class="outline-text-3" id="text-7-2">
+<ol class="org-ol">
+<li>先下单锁定库存 (需要设置超时释放库存)</li>
+<li>支付减库存</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Last Updated 2021-08-06 Fri 13:34. Created by Jinghui Hu at 2021-08-06 Fri 12:22.</p>
+</div>
+</body>
+</html>
