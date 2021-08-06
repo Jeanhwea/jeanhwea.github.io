@@ -114,6 +114,13 @@
     #+END_SRC
 
 ** Change Buffer
+   Change Buffer 使用了 Buffer Pool 的部分空间完成性能优化
+   1. 它主要对部分不在 Buffer Pool 中的数据 Page 页的 DML 操作 (Insert, Update
+      and Delete) 进行缓存
+   2. 通常这些 DML 语句影响的 Page 具有随机寻址的特性， Change Buffer 将这些修改
+      缓存起来，当下次读取对应的 Page 时合并修改操作，可以降低 I/O 带来的性能低
+      的问题
+   3. 对于系统长时间没有访问的 Change Buffer, MySQL 会定期同步数据到磁盘
 
 * InnoDB 磁盘结构
 
