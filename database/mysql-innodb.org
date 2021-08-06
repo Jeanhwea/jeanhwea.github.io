@@ -50,6 +50,34 @@
 
 * InnoDB 内存结构
 ** Buffer Pool
+*** Buffer Pool 概述
+    Buffer Pool 是 MySQL 缓存数据到内存的结构
+    1. Buffer Pool 一般占用 80% 的 MySQL 的物理内存
+    2. Buffer Pool 中缓存基本数据大小叫做 Page, Page 一般通过链表的方式组织
+    3. LRU-List: 经常用的 Page 通过 LRU 算法组织起来
+       - MySQL 使用一种改进的 LRU 算法
+       - 该算法将 LRU 链表分成两个部分, ~innodb_old_blocks_pct~ 参数设置
+         + New Sublist: 占 5/8
+         + Old Sublist: 占 3/8
+         #+BEGIN_SRC text
+           New Pages                                                 Old Pages
+           <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+           |----------------------------------------|------------------------|
+           | head                              tail | head              tail |
+           |----------------------------------------|------------------------|
+           |<---------- New Sublist 5/8 ----------->|<--- Old Sublist 3/8 -->|
+                                                    ^
+                                                    |
+                                            MidPoint Insertion
+         #+END_SRC
+       - 当 Page 第一次访问时，会被插入到 MidPoint 处, 即 Old Sublist 的 head,
+         这么做是减少全表扫描对 LRU 的热数据的影响
+       - Old Sublist 的数据会在一点的时间窗口被移到 New Sublist 中，通过
+         ~innodb_old_blocks_time~ 参数可以控制移动的时间窗口
+    4. Free-List: 缓存中空闲的列表
+    5. Flush-List: 记录被修改的脏页 (dirty page), 这些页需要刷新到磁盘上
+
 *** Buffer Pool 相关调优
     MySQL 默认的 ~innodb_buffer_pool_size~ 的默认大小 128 M，一般需要根据需求进
     行配置
