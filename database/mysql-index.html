@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-31 Sat 22:36 -->
+<!-- 2021-08-06 Fri 21:21 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MySQL 索引笔记</title>
@@ -233,34 +233,34 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgb30501f">1. 准备测试表</a></li>
-<li><a href="#org67ceb03">2. 修改索引</a></li>
-<li><a href="#org025ca7a">3. 索引组织方式: 聚簇索引和非聚簇索引</a></li>
-<li><a href="#orgd22d7ae">4. 示例数据</a></li>
-<li><a href="#orgd427aad">5. 主键索引</a></li>
-<li><a href="#org9cee340">6. 联合键索引</a></li>
-<li><a href="#orgb73a247">7. 索引失效情形</a></li>
+<li><a href="#org4faca47">1. 准备测试表</a></li>
+<li><a href="#orga5f7957">2. 修改索引</a></li>
+<li><a href="#org678dcf1">3. 索引组织方式: 聚簇索引和非聚簇索引</a></li>
+<li><a href="#orgb564d19">4. 示例数据</a></li>
+<li><a href="#org28879c5">5. 主键索引</a></li>
+<li><a href="#orgda59aee">6. 联合键索引</a></li>
+<li><a href="#org1618a0a">7. 索引失效情形</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgb30501f" class="outline-2">
-<h2 id="orgb30501f"><span class="section-number-2">1</span> 准备测试表</h2>
+<div id="outline-container-org4faca47" class="outline-2">
+<h2 id="org4faca47"><span class="section-number-2">1</span> 准备测试表</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 构建测试表 <code>author</code>, 建表语句如下
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">drop</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">if</span> <span style="color: #859900;">exists</span> author;
-<span style="color: #859900;">create</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> (
-  id <span style="color: #268bd2;">int</span> auto_increment <span style="color: #859900;">primary</span> <span style="color: #859900;">key</span>,
-  <span style="color: #859900;">name</span> <span style="color: #268bd2;">varchar</span>(128) <span style="color: #859900;">not</span> <span style="color: #859900;">null</span>,
-  age <span style="color: #268bd2;">int</span>,
-  gender <span style="color: #268bd2;">varchar</span>(32),
-  a <span style="color: #268bd2;">int</span>,
-  b <span style="color: #268bd2;">int</span>,
-  c <span style="color: #268bd2;">int</span>
+<pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">drop</span> <span style="color: #4f97d7; font-weight: bold;">table</span> <span style="color: #bc6ec5; font-weight: bold;">if</span> <span style="color: #4f97d7; font-weight: bold;">exists</span> author;
+<span style="color: #4f97d7; font-weight: bold;">create</span> <span style="color: #4f97d7; font-weight: bold;">table</span> <span style="color: #bc6ec5; font-weight: bold;">author</span> (
+  id <span style="color: #ce537a; font-weight: bold;">int</span> auto_increment <span style="color: #4f97d7; font-weight: bold;">primary</span> <span style="color: #4f97d7; font-weight: bold;">key</span>,
+  <span style="color: #4f97d7; font-weight: bold;">name</span> <span style="color: #ce537a; font-weight: bold;">varchar</span>(128) <span style="color: #4f97d7; font-weight: bold;">not</span> <span style="color: #4f97d7; font-weight: bold;">null</span>,
+  age <span style="color: #ce537a; font-weight: bold;">int</span>,
+  gender <span style="color: #ce537a; font-weight: bold;">varchar</span>(32),
+  a <span style="color: #ce537a; font-weight: bold;">int</span>,
+  b <span style="color: #ce537a; font-weight: bold;">int</span>,
+  c <span style="color: #ce537a; font-weight: bold;">int</span>
 );
 </pre>
 </div>
@@ -269,15 +269,15 @@
 准备测试数据
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">insert</span> <span style="color: #859900;">into</span> author(<span style="color: #859900;">name</span>, age, gender, a, b, c) <span style="color: #859900;">values</span> (<span style="color: #2aa198;">'aaa'</span>, 11, <span style="color: #2aa198;">'M'</span>, 1, 1, 1);
-<span style="color: #859900;">insert</span> <span style="color: #859900;">into</span> author(<span style="color: #859900;">name</span>, age, gender, a, b, c) <span style="color: #859900;">values</span> (<span style="color: #2aa198;">'aab'</span>, 12, <span style="color: #2aa198;">'M'</span>, 1, 1, 2);
-<span style="color: #859900;">insert</span> <span style="color: #859900;">into</span> author(<span style="color: #859900;">name</span>, age, gender, a, b, c) <span style="color: #859900;">values</span> (<span style="color: #2aa198;">'abc'</span>, 10, <span style="color: #2aa198;">'F'</span>, 1, 2, 3);
-<span style="color: #859900;">insert</span> <span style="color: #859900;">into</span> author(<span style="color: #859900;">name</span>, age, gender, a, b, c) <span style="color: #859900;">values</span> (<span style="color: #2aa198;">'bba'</span>, 22, <span style="color: #2aa198;">'M'</span>, 2, 2, 1);
-<span style="color: #859900;">insert</span> <span style="color: #859900;">into</span> author(<span style="color: #859900;">name</span>, age, gender, a, b, c) <span style="color: #859900;">values</span> (<span style="color: #2aa198;">'bcb'</span>, 42, <span style="color: #2aa198;">'F'</span>, 2, 3, 2);
-<span style="color: #859900;">insert</span> <span style="color: #859900;">into</span> author(<span style="color: #859900;">name</span>, age, gender, a, b, c) <span style="color: #859900;">values</span> (<span style="color: #2aa198;">'bcc'</span>, 12, <span style="color: #2aa198;">'M'</span>, 2, 3, 3);
-<span style="color: #859900;">insert</span> <span style="color: #859900;">into</span> author(<span style="color: #859900;">name</span>, age, gender, a, b, c) <span style="color: #859900;">values</span> (<span style="color: #2aa198;">'cba'</span>, 17, <span style="color: #2aa198;">'M'</span>, 3, 2, 1);
-<span style="color: #859900;">insert</span> <span style="color: #859900;">into</span> author(<span style="color: #859900;">name</span>, age, gender, a, b, c) <span style="color: #859900;">values</span> (<span style="color: #2aa198;">'bcb'</span>, 32, <span style="color: #2aa198;">'F'</span>, 3, 1, 2);
-<span style="color: #859900;">insert</span> <span style="color: #859900;">into</span> author(<span style="color: #859900;">name</span>, age, gender, a, b, c) <span style="color: #859900;">values</span> (<span style="color: #2aa198;">'bcc'</span>, 82, <span style="color: #2aa198;">'M'</span>, 3, 1, 3);
+<pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">insert</span> <span style="color: #4f97d7; font-weight: bold;">into</span> author(<span style="color: #4f97d7; font-weight: bold;">name</span>, age, gender, a, b, c) <span style="color: #4f97d7; font-weight: bold;">values</span> (<span style="color: #2d9574;">'aaa'</span>, 11, <span style="color: #2d9574;">'M'</span>, 1, 1, 1);
+<span style="color: #4f97d7; font-weight: bold;">insert</span> <span style="color: #4f97d7; font-weight: bold;">into</span> author(<span style="color: #4f97d7; font-weight: bold;">name</span>, age, gender, a, b, c) <span style="color: #4f97d7; font-weight: bold;">values</span> (<span style="color: #2d9574;">'aab'</span>, 12, <span style="color: #2d9574;">'M'</span>, 1, 1, 2);
+<span style="color: #4f97d7; font-weight: bold;">insert</span> <span style="color: #4f97d7; font-weight: bold;">into</span> author(<span style="color: #4f97d7; font-weight: bold;">name</span>, age, gender, a, b, c) <span style="color: #4f97d7; font-weight: bold;">values</span> (<span style="color: #2d9574;">'abc'</span>, 10, <span style="color: #2d9574;">'F'</span>, 1, 2, 3);
+<span style="color: #4f97d7; font-weight: bold;">insert</span> <span style="color: #4f97d7; font-weight: bold;">into</span> author(<span style="color: #4f97d7; font-weight: bold;">name</span>, age, gender, a, b, c) <span style="color: #4f97d7; font-weight: bold;">values</span> (<span style="color: #2d9574;">'bba'</span>, 22, <span style="color: #2d9574;">'M'</span>, 2, 2, 1);
+<span style="color: #4f97d7; font-weight: bold;">insert</span> <span style="color: #4f97d7; font-weight: bold;">into</span> author(<span style="color: #4f97d7; font-weight: bold;">name</span>, age, gender, a, b, c) <span style="color: #4f97d7; font-weight: bold;">values</span> (<span style="color: #2d9574;">'bcb'</span>, 42, <span style="color: #2d9574;">'F'</span>, 2, 3, 2);
+<span style="color: #4f97d7; font-weight: bold;">insert</span> <span style="color: #4f97d7; font-weight: bold;">into</span> author(<span style="color: #4f97d7; font-weight: bold;">name</span>, age, gender, a, b, c) <span style="color: #4f97d7; font-weight: bold;">values</span> (<span style="color: #2d9574;">'bcc'</span>, 12, <span style="color: #2d9574;">'M'</span>, 2, 3, 3);
+<span style="color: #4f97d7; font-weight: bold;">insert</span> <span style="color: #4f97d7; font-weight: bold;">into</span> author(<span style="color: #4f97d7; font-weight: bold;">name</span>, age, gender, a, b, c) <span style="color: #4f97d7; font-weight: bold;">values</span> (<span style="color: #2d9574;">'cba'</span>, 17, <span style="color: #2d9574;">'M'</span>, 3, 2, 1);
+<span style="color: #4f97d7; font-weight: bold;">insert</span> <span style="color: #4f97d7; font-weight: bold;">into</span> author(<span style="color: #4f97d7; font-weight: bold;">name</span>, age, gender, a, b, c) <span style="color: #4f97d7; font-weight: bold;">values</span> (<span style="color: #2d9574;">'bcb'</span>, 32, <span style="color: #2d9574;">'F'</span>, 3, 1, 2);
+<span style="color: #4f97d7; font-weight: bold;">insert</span> <span style="color: #4f97d7; font-weight: bold;">into</span> author(<span style="color: #4f97d7; font-weight: bold;">name</span>, age, gender, a, b, c) <span style="color: #4f97d7; font-weight: bold;">values</span> (<span style="color: #2d9574;">'bcc'</span>, 82, <span style="color: #2d9574;">'M'</span>, 3, 1, 3);
 </pre>
 </div>
 
@@ -287,7 +287,7 @@
 </table>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author;
+<pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author;
 </pre>
 </div>
 
@@ -417,8 +417,8 @@
 添加唯一性约束和联合索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> <span style="color: #859900;">add</span> <span style="color: #859900;">unique</span> <span style="color: #859900;">key</span> uk_author_nag (<span style="color: #859900;">name</span>, age, gender);
-<span style="color: #859900;">create</span> index ix_author_abc <span style="color: #859900;">on</span> author(a, b, c);
+<pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">alter</span> <span style="color: #4f97d7; font-weight: bold;">table</span> <span style="color: #bc6ec5; font-weight: bold;">author</span> <span style="color: #4f97d7; font-weight: bold;">add</span> <span style="color: #4f97d7; font-weight: bold;">unique</span> <span style="color: #4f97d7; font-weight: bold;">key</span> uk_author_nag (<span style="color: #4f97d7; font-weight: bold;">name</span>, age, gender);
+<span style="color: #4f97d7; font-weight: bold;">create</span> index ix_author_abc <span style="color: #4f97d7; font-weight: bold;">on</span> author(a, b, c);
 </pre>
 </div>
 
@@ -431,11 +431,11 @@
 查看准备好的表结构和索引键
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">show <span style="color: #859900;">create</span> <span style="color: #859900;">table</span> author\G
+<pre class="src src-sql">show <span style="color: #4f97d7; font-weight: bold;">create</span> <span style="color: #4f97d7; font-weight: bold;">table</span> author\G
 </pre>
 </div>
 
-<pre class="example" id="orga393796">
+<pre class="example" id="org4f60222">
 *************************** 1. row ***************************
        Table: author
 Create Table: CREATE TABLE `author` (
@@ -456,7 +456,7 @@ Create Table: CREATE TABLE `author` (
 查看表结构
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">desc</span> author;
+<pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">desc</span> author;
 </pre>
 </div>
 
@@ -556,7 +556,7 @@ Create Table: CREATE TABLE `author` (
 查看准备好的表索引信息
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">show index <span style="color: #859900;">from</span> author;
+<pre class="src src-sql">show index <span style="color: #4f97d7; font-weight: bold;">from</span> author;
 </pre>
 </div>
 
@@ -724,15 +724,15 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-org67ceb03" class="outline-2">
-<h2 id="org67ceb03"><span class="section-number-2">2</span> 修改索引</h2>
+<div id="outline-container-orga5f7957" class="outline-2">
+<h2 id="orga5f7957"><span class="section-number-2">2</span> 修改索引</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 删除唯一键和索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> <span style="color: #859900;">drop</span> <span style="color: #859900;">key</span> uk_author_nag;
-<span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> <span style="color: #859900;">drop</span> index ix_author_abc;
+<pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">alter</span> <span style="color: #4f97d7; font-weight: bold;">table</span> <span style="color: #bc6ec5; font-weight: bold;">author</span> <span style="color: #4f97d7; font-weight: bold;">drop</span> <span style="color: #4f97d7; font-weight: bold;">key</span> uk_author_nag;
+<span style="color: #4f97d7; font-weight: bold;">alter</span> <span style="color: #4f97d7; font-weight: bold;">table</span> <span style="color: #bc6ec5; font-weight: bold;">author</span> <span style="color: #4f97d7; font-weight: bold;">drop</span> index ix_author_abc;
 </pre>
 </div>
 
@@ -741,15 +741,15 @@ Create Table: CREATE TABLE `author` (
 名称
 </p>
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> rename index aa <span style="color: #859900;">to</span> ix_author_abc;
-<span style="color: #859900;">alter</span> <span style="color: #859900;">table</span> <span style="color: #b58900;">author</span> rename index bbb <span style="color: #859900;">to</span> uk_author_nag;
+<pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">alter</span> <span style="color: #4f97d7; font-weight: bold;">table</span> <span style="color: #bc6ec5; font-weight: bold;">author</span> rename index aa <span style="color: #4f97d7; font-weight: bold;">to</span> ix_author_abc;
+<span style="color: #4f97d7; font-weight: bold;">alter</span> <span style="color: #4f97d7; font-weight: bold;">table</span> <span style="color: #bc6ec5; font-weight: bold;">author</span> rename index bbb <span style="color: #4f97d7; font-weight: bold;">to</span> uk_author_nag;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org025ca7a" class="outline-2">
-<h2 id="org025ca7a"><span class="section-number-2">3</span> 索引组织方式: 聚簇索引和非聚簇索引</h2>
+<div id="outline-container-org678dcf1" class="outline-2">
+<h2 id="org678dcf1"><span class="section-number-2">3</span> 索引组织方式: 聚簇索引和非聚簇索引</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 常见索引包括: B+ 树和哈希索引两种。哈希索引由于不支持范围查找一般使用较少，后
@@ -792,21 +792,22 @@ Create Table: CREATE TABLE `author` (
 <li><b>最左前缀</b> 指 WHERE 查询条件利用联合索引的从左到右的匹配, 如果匹配成功,
 该查询走联合索引</li>
 <li><b>回表</b> 指 WHERE 查询条件找到主键后, 然后通过主键返回 B+ 树中查找数据</li>
-<li><b>索引覆盖</b> 只需要在一棵索引树上就能获取 SQL 所需的所有列数据, 无需回表,
-速度更快</li>
-<li><b>索引下推</b> 在 MySQL 5.6 引入了索引下推优化, 可以在索引遍历过程中, 对索
-引中包含的字段先做判断, 过滤掉不符合条件的记录, 减少回表次数</li>
+<li><b>索引覆盖</b> <a href="https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_covering_index">Covering Index</a> 只需要在一棵索引树上就能获取 SQL 所需的所有列
+数据, 无需回表,速度更快</li>
+<li><b>索引下推</b> <a href="https://dev.mysql.com/doc/refman/5.7/en/index-condition-pushdown-optimization.html">Index Condition Pushdown</a> 在 MySQL 5.6 引入了索引下推优化, 可
+以在索引遍历过程中, 对索引中包含的字段先做判断, 过滤掉不符合条件的记录,
+减少回表次数</li>
 </ul></li>
 </ul></li>
 </ol>
 </div>
 </div>
 
-<div id="outline-container-orgd22d7ae" class="outline-2">
-<h2 id="orgd22d7ae"><span class="section-number-2">4</span> 示例数据</h2>
+<div id="outline-container-orgb564d19" class="outline-2">
+<h2 id="orgb564d19"><span class="section-number-2">4</span> 示例数据</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author;
+<pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author;
 </pre>
 </div>
 
@@ -934,14 +935,14 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-orgd427aad" class="outline-2">
-<h2 id="orgd427aad"><span class="section-number-2">5</span> 主键索引</h2>
+<div id="outline-container-org28879c5" class="outline-2">
+<h2 id="org28879c5"><span class="section-number-2">5</span> 主键索引</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 全表扫描，不走索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author;
 </pre>
 </div>
 
@@ -1011,7 +1012,7 @@ Create Table: CREATE TABLE `author` (
 主键查找，走 const 主键索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> id = 4;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">where</span> id = 4;
 </pre>
 </div>
 
@@ -1081,7 +1082,7 @@ Create Table: CREATE TABLE `author` (
 主键查找，走 range 主键索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> id &gt; 4;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">where</span> id &gt; 4;
 </pre>
 </div>
 
@@ -1149,8 +1150,8 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-org9cee340" class="outline-2">
-<h2 id="org9cee340"><span class="section-number-2">6</span> 联合键索引</h2>
+<div id="outline-container-orgda59aee" class="outline-2">
+<h2 id="orgda59aee"><span class="section-number-2">6</span> 联合键索引</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 联合索引查询优化需要考虑以下条件
@@ -1181,7 +1182,7 @@ Create Table: CREATE TABLE `author` (
 联合键查找，走 ref 范围索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> a = 4;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">where</span> a = 4;
 </pre>
 </div>
 
@@ -1251,7 +1252,7 @@ Create Table: CREATE TABLE `author` (
 联合键查找，走 range 范围索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> a &gt; 4;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">where</span> a &gt; 4;
 </pre>
 </div>
 
@@ -1321,7 +1322,7 @@ Create Table: CREATE TABLE `author` (
 多个联合键字段查询，符号最左前缀原则走索引 <code>ix_author_abc</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> a = 4 <span style="color: #859900;">and</span> b = 1;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">where</span> a = 4 <span style="color: #4f97d7; font-weight: bold;">and</span> b = 1;
 </pre>
 </div>
 
@@ -1391,7 +1392,7 @@ Create Table: CREATE TABLE `author` (
 同上，a 和 b 的顺序调换也走索引 <code>ix_author_abc</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> b = 1 <span style="color: #859900;">and</span> a = 4;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">where</span> b = 1 <span style="color: #4f97d7; font-weight: bold;">and</span> a = 4;
 </pre>
 </div>
 
@@ -1461,7 +1462,7 @@ Create Table: CREATE TABLE `author` (
 查询 b 和 c 情况不符合最左前缀原则，不走索引 <code>ix_author_abc</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> b = 1 <span style="color: #859900;">and</span> c = 4;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">where</span> b = 1 <span style="color: #4f97d7; font-weight: bold;">and</span> c = 4;
 </pre>
 </div>
 
@@ -1531,7 +1532,7 @@ Create Table: CREATE TABLE `author` (
 构建 <code>a+1</code> 为键的 B+树效率较大，无法走联合索引 <code>ix_author_abc</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> a + 1 &gt; 3;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">where</span> a + 1 &gt; 3;
 </pre>
 </div>
 
@@ -1601,7 +1602,7 @@ Create Table: CREATE TABLE `author` (
 查找联合索引字段包含值，走主键索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> a <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> id &gt; 4;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> a <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">where</span> id &gt; 4;
 </pre>
 </div>
 
@@ -1671,7 +1672,7 @@ Create Table: CREATE TABLE `author` (
 查找联合索引字段包含值，并且同时过滤主键，走联合索引效率更高
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> a <span style="color: #859900;">from</span> author <span style="color: #859900;">where</span> id &gt; 4 <span style="color: #859900;">and</span> a &gt; 4;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> a <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">where</span> id &gt; 4 <span style="color: #4f97d7; font-weight: bold;">and</span> a &gt; 4;
 </pre>
 </div>
 
@@ -1741,7 +1742,7 @@ Create Table: CREATE TABLE `author` (
 排序索引 <code>ix_author_abc</code> 包含时，直接走索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> a, b <span style="color: #859900;">from</span> author <span style="color: #859900;">order</span> <span style="color: #859900;">by</span> a, b, c;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> a, b <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">order</span> <span style="color: #4f97d7; font-weight: bold;">by</span> a, b, c;
 </pre>
 </div>
 
@@ -1811,7 +1812,7 @@ Create Table: CREATE TABLE `author` (
 排序所有字段时无法走索引
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> * <span style="color: #859900;">from</span> author <span style="color: #859900;">order</span> <span style="color: #859900;">by</span> a, b, c;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">order</span> <span style="color: #4f97d7; font-weight: bold;">by</span> a, b, c;
 </pre>
 </div>
 
@@ -1881,7 +1882,7 @@ Create Table: CREATE TABLE `author` (
 排序索引 <code>ix_author_abc</code> 包含时，走索引并且需要文件排序 <code>filesort</code>
 </p>
 <div class="org-src-container">
-<pre class="src src-sql">explain <span style="color: #859900;">select</span> a, b <span style="color: #859900;">from</span> author <span style="color: #859900;">order</span> <span style="color: #859900;">by</span> a, b <span style="color: #859900;">desc</span>, c;
+<pre class="src src-sql">explain <span style="color: #4f97d7; font-weight: bold;">select</span> a, b <span style="color: #4f97d7; font-weight: bold;">from</span> author <span style="color: #4f97d7; font-weight: bold;">order</span> <span style="color: #4f97d7; font-weight: bold;">by</span> a, b <span style="color: #4f97d7; font-weight: bold;">desc</span>, c;
 </pre>
 </div>
 
@@ -1949,8 +1950,8 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-orgb73a247" class="outline-2">
-<h2 id="orgb73a247"><span class="section-number-2">7</span> 索引失效情形</h2>
+<div id="outline-container-org1618a0a" class="outline-2">
+<h2 id="org1618a0a"><span class="section-number-2">7</span> 索引失效情形</h2>
 <div class="outline-text-2" id="text-7">
 <ol class="org-ol">
 <li>没有符合最左前缀原值</li>
@@ -1961,7 +1962,7 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-31 Sat 22:36. Created by Jinghui Hu at 2021-07-03 Sat 09:36.</p>
+<p class="author">Last Updated 2021-08-06 Fri 21:21. Created by Jinghui Hu at 2021-07-03 Sat 09:36.</p>
 </div>
 </body>
 </html>

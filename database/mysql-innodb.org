@@ -7,6 +7,16 @@
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
 #+TAGS: mysql innodb storage-engine
 
+* InnoDB 多版本控制 MVCC
+  InnoDB 的多版本控制添加如下三个字段来记录额外的信息
+  1. ~DB_TRX_ID~ 6 字节的事务 ID
+     - 记录上一个 Insert 或者 Update 的事务 ID
+     - Delete 的事务也被当成一种特殊的 Update, 只不过多了一个标记位
+  2. ~DB_ROLL_PTR~ 7 字节的回滚指针
+     - 指向一个 Undo Log 记录
+     - 如果是列更新了的话， Undo Log 包含反向重建的操作
+  3. ~DB_ROW_ID~ 行标识
+     - 就是聚簇索引的标识
 
 * InnoDB 体系结构
 
