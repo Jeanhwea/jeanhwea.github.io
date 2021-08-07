@@ -7,18 +7,7 @@
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
 #+TAGS: mysql innodb storage-engine
 
-* InnoDB 多版本控制 MVCC
-  InnoDB 的多版本控制添加如下三个字段来记录额外的信息
-  1. ~DB_TRX_ID~ 6 字节的事务标识
-     - 记录上一个 Insert 或者 Update 的事务 ID
-     - Delete 的事务也被当成一种特殊的 Update, 只不过多了一个标记位
-  2. ~DB_ROLL_PTR~ 7 字节的回滚指针
-     - 指向一个 Undo Log 记录
-     - 如果是列更新了的话， Undo Log 包含反向重建的操作
-  3. ~DB_ROW_ID~ 6 字节的行标识
-     - 就是聚簇索引的标识
-
-* InnoDB 体系结构
+* 体系结构
 
   MySQL 的 InnoDB 存储引擎体系结构如下图所示
 
@@ -48,7 +37,7 @@
     进行拦截，让其流入到自己开发的缓存系统内
   - Redo Log 是循环写入多个文件的，当文件写满可能会触发 checkpoint
 
-* InnoDB 内存结构
+* 内存结构
 ** Buffer Pool
 *** Buffer Pool 概述
     Buffer Pool 是 MySQL 缓存数据到内存的结构
@@ -140,7 +129,7 @@
       - 参数值为 2 时，每次事务提交时都会写入 Log Buffer，但 Log Buffer 更新到磁
         盘的操作为每秒 1 次
 
-* InnoDB 磁盘结构
+* 磁盘结构
 ** 表 Tables
    这里着重介绍使用 InnoDB 表结构需要的注意事项
    1. 调整数据库的内存结构
@@ -271,6 +260,53 @@
       - 用户定义表的 UPDATE 和 DELETE 操作
       - 用户定义临时表的 INSERT 操作
       - 用户定义临时表的 UPDATE 和 DELETE 操作
+
+* 多版本控制
+  InnoDB 的多版本控制 (MVCC) 添加如下三个字段来记录额外的信息
+  1. ~DB_TRX_ID~ 6 字节的事务标识
+     - 记录上一个 Insert 或者 Update 的事务 ID
+     - Delete 的事务也被当成一种特殊的 Update, 只不过多了一个标记位
+  2. ~DB_ROLL_PTR~ 7 字节的回滚指针
+     - 指向一个 Undo Log 记录
+     - 如果是列更新了的话， Undo Log 包含反向重建的操作
+  3. ~DB_ROW_ID~ 6 字节的行标识
+     - 就是聚簇索引的标识
+  具体实现使用到了 Undo Log 的磁盘结构，同时需要区分当前读和快照读
+
+* 锁和事务模型
+** 锁
+   1. 锁实现方式
+      - Shared (S) Lock: 共享锁
+        + SELECT 读操作时使用共享锁
+      - Exclusive (X) Lock: 排它锁
+        + UPDATE, DELETE 操作使用排他锁
+        + ~SELECT ... FOR UPDATE~
+   2. 行锁算法
+      - Record Lock 记录锁
+        + 记录锁定是对索引记录的锁定
+        + 记录锁始终锁定索引记录
+        + ~SELECT ... WHERE id = 10 FOR UPDATE~
+      - Gap Lock 间隙锁
+        + 间隙锁定是对索引记录之间的间隙的锁定
+        + 间隙可能跨越单个索引值，多个索引值，甚至为空
+        + 间隙锁是性能和并发性之间权衡的一部分，并且在某些事务隔离级别而非其他级别
+          中使用
+        + ~SELECT ... WHERE id BETWEEN 10 AND 20 FOR UPDATE~
+      - Next-Key Lock (Record + Gap) 下一键锁
+        + 下一键锁定是索引记录上的记录锁定和索引记录之前的间隙上的间隙锁定的组合
+        + 如果一个锁同时生成了 Record Lock 和 Gap Lock 就可以称之为 Next-Key Lock
+   3. 表锁算法
+      - Insert Intention Lock 插入意向锁
+        + 插入意图锁定是一种在行插入之前通过 INSERT 操作设置的间隙锁定
+      - AUTO-INC Lock 自增锁
+        + 事务插入自增类型的列时获取自增锁
+        + 如果一个事务正在往表中插入自增记录，所有其他事务的插入必须等待
+      - Intetion Lock 意向锁
+        + Intetion Shared Lock (IS): 意向共享锁, 表中每行数据添加共享锁
+          - ~SELECT ... LOCK IN SHARE MODE~
+        + Intetion Exclusive Lock (IX): 意向排它锁，表中每行数据添加排他锁
+          - ~LOCK TABLE ... WRITE~
+          - ~SELECT ... FOR UPDATE~
 
 * 参考链接
   1. [[https://dev.mysql.com/doc/refman/5.7/en/innodb-storage-engine.html][The InnoDB Storage Engine]]
