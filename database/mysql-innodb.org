@@ -166,24 +166,31 @@
 ** 索引 Indexes
    1. InnoDB 的索引使用 B+ 树结构，另外有一种哈希索引，MySQL 中只有 MEMORY 引擎支
       持哈希索引
-   2. 聚簇索引 clustered index
-      - 每张表的主键构造一颗 B+ 树, 同时叶子节点中存放的就是整张表的行记录数据
-      - 聚集索引的叶子节点称为数据页
-      - 索引组织表中数据的同时也是索引的一部分, 每张表只能拥有一个聚簇索引, 一般
-        是主键索引
+   2. [[https://www.cs.usfca.edu/~galles/visualization/BPlusTree.html][B+ Tree]] 索引包括以下特征, 具体见[[https://dev.mysql.com/doc/refman/5.7/en/innodb-physical-structure.html][文档]]
+      - ~innodb_page_size~ 表示页的大小，默认 16K
+      - ~innodb_fill_factor~ 表示 B+ 树索引页的填充百分比，默认值 100 表示保留
+        1/16 的数据空间预留给将来的扩展
+   3. 聚簇索引 clustered index, 参考[[https://dev.mysql.com/doc/refman/5.7/en/innodb-index-types.html][这里]]
+      - 每张表的主键构造一棵 b+ 树, 同时叶子节点中存放的就是整张表的行记录数据
+      - 聚集索引的叶子节点称为数据页 (page)
+      - 索引组织表中数据的同时也是索引的一部分, *每张表只能拥有一个聚簇索引*, 主
+        键索引的 key 选择的如下顺序
+        + 首要选取自增主键
+        + 其次选取非空的唯一键
+        + 如果上述都不满足，自动生成一个 6 字节的 row_id 字段
       - 优点
         + 数据访问更快, 因为聚簇索引将索引和数据保存在同一个 B+ 树中, 因此从聚簇
           索引中获取数据比非聚簇索引更快
         + 聚簇索引对于主键的排序查找和范围查找速度非常快
       - 缺点
         + 插入速度严重依赖于插入顺序, 按照主键的顺序插入是最快的方式, 否则将会出
-          现 *页分裂*, 严重影响性能。因此, 对于 InnoDB 表, 我们一般都会定义一个自
-          增的 ID 列为主键
+          现 *页分裂*, 严重影响性能。因此, 对于 InnoDB 表, 我们一般都会定义一个
+          自增的 ID 列为主键 (optimistic insertion 和 pessimistic insertion)
         + 更新主键的代价很高, 因为将会导致被更新的行移动。因此, 对于 InnoDB 表,
           我们一般定义主键为不可更新
         + 二级索引访问需要两次索引查找, 第一次找到主键值, 第二次根据主键值找到行
           数据, 即 *回表* 操作
-   3. 非聚簇索引 non-clustered index
+   4. 辅助索引 secondary index
       - 辅助索引叶子节点存储的不再是行的物理位置, 而是主键值
       - 通过辅助索引首先找到的是主键值, 再通过主键值找到数据行的数据页, 再通过数
         据页中的 Page Directory 找到数据行
@@ -198,6 +205,35 @@
         + *索引下推* [[https://dev.mysql.com/doc/refman/5.7/en/index-condition-pushdown-optimization.html][Index Condition Pushdown]] 在 MySQL 5.6 引入了索引下推优化, 可
           以在索引遍历过程中, 对索引中包含的字段先做判断, 过滤掉不符合条件的记录,
           减少回表次数
+
+** 表空间 Tablespaces
+   1. [[https://dev.mysql.com/doc/refman/5.7/en/innodb-system-tablespace.html][系统表空间]], 系统表空间包括如下部分
+      - Data Dictionary 数据字典
+      - DoubleWrite Buffer
+      - Change Buffer
+      - Undo Logs
+      - 系统表空间默认是一个单 Datafile 管理方式，默认命名为 ibdata1
+   2. File-Per-Table 表空间, 即每个 ~CREATE TABLE~ 语句生成的表默认占一个表空间
+      文件, 更多优缺点参考[[https://dev.mysql.com/doc/refman/5.7/en/innodb-file-per-table-tablespaces.html][文档]]
+      - 优点
+        + TRUNCATE 表过后立马释放操作系统中文件占用的空间, 注意，共享表空间的表
+          在 TRUNCATE 过后不会立马释放
+        + 共享表空间在修改表 ~ALTER TABLE~ 的语句执行后产生的额外空间不会释放，
+          对于 File-Per-Table 表空间则不会出现这种情况
+        + 单个文件管理方式更加良好，例如： I/O 优化, 空间管理, 备份管理
+        + 当 ~innodb_flush_method~ 设置成 O_DIRECT 时, Linux 文件系统不允许并发
+          写入共享表空间, 但是对于 File-Per-Table 则不会出现问题
+        + 表空间最大为 64TB, File-Per-Table 相当于每张表可以存 64TB
+      - 缺点
+        + 每张表存在一些预留的数据占用，File-Per-Table 多了会造成浪费
+        + fsync 操作需要对每个表空间进行，增加了 fsync 操作的开销
+        + mysqld 进程需要开多个文件句柄，造成操作系统资源浪费和性能开销
+   3. 通用表空间
+   4. Undo 表空间
+      - Undo 表空间专门存放 Undo Logs
+      - Undo Logs 默认存在系统表空间中，但是也可以存在 Undo 表空间中
+      - Undo Logs 可以存放在 SSD 中，用于提高 MySQL 的性能
+   5. 临时表空间
 
 * 参考链接
   1. [[https://dev.mysql.com/doc/refman/5.7/en/innodb-storage-engine.html][The InnoDB Storage Engine]]
