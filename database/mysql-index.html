@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-08-06 Fri 21:21 -->
+<!-- 2021-08-07 Sat 22:26 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MySQL 索引笔记</title>
@@ -233,20 +233,20 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org4faca47">1. 准备测试表</a></li>
-<li><a href="#orga5f7957">2. 修改索引</a></li>
-<li><a href="#org678dcf1">3. 索引组织方式: 聚簇索引和非聚簇索引</a></li>
-<li><a href="#orgb564d19">4. 示例数据</a></li>
-<li><a href="#org28879c5">5. 主键索引</a></li>
-<li><a href="#orgda59aee">6. 联合键索引</a></li>
-<li><a href="#org1618a0a">7. 索引失效情形</a></li>
+<li><a href="#orgba9e3bc">1. 准备测试表</a></li>
+<li><a href="#orgf2320a5">2. 修改索引</a></li>
+<li><a href="#org0488772">3. 索引组织方式: 聚簇索引和非聚簇索引</a></li>
+<li><a href="#org709ecdc">4. 示例数据</a></li>
+<li><a href="#orga244e1e">5. 主键索引</a></li>
+<li><a href="#orge9231c3">6. 联合键索引</a></li>
+<li><a href="#org307df50">7. 索引失效情形</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org4faca47" class="outline-2">
-<h2 id="org4faca47"><span class="section-number-2">1</span> 准备测试表</h2>
+<div id="outline-container-orgba9e3bc" class="outline-2">
+<h2 id="orgba9e3bc"><span class="section-number-2">1</span> 准备测试表</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 构建测试表 <code>author</code>, 建表语句如下
@@ -435,7 +435,7 @@
 </pre>
 </div>
 
-<pre class="example" id="org4f60222">
+<pre class="example" id="org4358edb">
 *************************** 1. row ***************************
        Table: author
 Create Table: CREATE TABLE `author` (
@@ -724,8 +724,8 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-orga5f7957" class="outline-2">
-<h2 id="orga5f7957"><span class="section-number-2">2</span> 修改索引</h2>
+<div id="outline-container-orgf2320a5" class="outline-2">
+<h2 id="orgf2320a5"><span class="section-number-2">2</span> 修改索引</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 删除唯一键和索引
@@ -748,8 +748,8 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-org678dcf1" class="outline-2">
-<h2 id="org678dcf1"><span class="section-number-2">3</span> 索引组织方式: 聚簇索引和非聚簇索引</h2>
+<div id="outline-container-org0488772" class="outline-2">
+<h2 id="org0488772"><span class="section-number-2">3</span> 索引组织方式: 聚簇索引和非聚簇索引</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 常见索引包括: B+ 树和哈希索引两种。哈希索引由于不支持范围查找一般使用较少，后
@@ -759,7 +759,7 @@ Create Table: CREATE TABLE `author` (
 <ol class="org-ol">
 <li>聚簇索引 clustered index
 <ul class="org-ul">
-<li>每张表的主键构造一颗 B+ 树, 同时叶子节点中存放的就是整张表的行记录数据</li>
+<li>每张表的主键构造一棵 B+ 树, 同时叶子节点中存放的就是整张表的行记录数据</li>
 <li>聚集索引的叶子节点称为数据页</li>
 <li>索引组织表中数据的同时也是索引的一部分, 每张表只能拥有一个聚簇索引, 一般
 是主键索引</li>
@@ -803,8 +803,8 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-orgb564d19" class="outline-2">
-<h2 id="orgb564d19"><span class="section-number-2">4</span> 示例数据</h2>
+<div id="outline-container-org709ecdc" class="outline-2">
+<h2 id="org709ecdc"><span class="section-number-2">4</span> 示例数据</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #4f97d7; font-weight: bold;">select</span> * <span style="color: #4f97d7; font-weight: bold;">from</span> author;
@@ -935,8 +935,8 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-org28879c5" class="outline-2">
-<h2 id="org28879c5"><span class="section-number-2">5</span> 主键索引</h2>
+<div id="outline-container-orga244e1e" class="outline-2">
+<h2 id="orga244e1e"><span class="section-number-2">5</span> 主键索引</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 全表扫描，不走索引
@@ -1150,8 +1150,8 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-orgda59aee" class="outline-2">
-<h2 id="orgda59aee"><span class="section-number-2">6</span> 联合键索引</h2>
+<div id="outline-container-orge9231c3" class="outline-2">
+<h2 id="orge9231c3"><span class="section-number-2">6</span> 联合键索引</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 联合索引查询优化需要考虑以下条件
@@ -1950,8 +1950,8 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 
-<div id="outline-container-org1618a0a" class="outline-2">
-<h2 id="org1618a0a"><span class="section-number-2">7</span> 索引失效情形</h2>
+<div id="outline-container-org307df50" class="outline-2">
+<h2 id="org307df50"><span class="section-number-2">7</span> 索引失效情形</h2>
 <div class="outline-text-2" id="text-7">
 <ol class="org-ol">
 <li>没有符合最左前缀原值</li>
@@ -1962,7 +1962,7 @@ Create Table: CREATE TABLE `author` (
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-08-06 Fri 21:21. Created by Jinghui Hu at 2021-07-03 Sat 09:36.</p>
+<p class="author">Last Updated 2021-08-07 Sat 22:26. Created by Jinghui Hu at 2021-07-03 Sat 09:36.</p>
 </div>
 </body>
 </html>

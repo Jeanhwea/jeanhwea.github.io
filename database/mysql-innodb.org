@@ -141,6 +141,63 @@
         盘的操作为每秒 1 次
 
 * InnoDB 磁盘结构
+** 表 Tables
+   这里着重介绍使用 InnoDB 表结构需要的注意事项
+   1. 调整数据库的内存结构
+      - ~key_buffer_size~ 配置 MyISAM 表的缓存结果， InnoDB 一般不需要，可以适当
+        调小一点
+      - ~innodb_buffer_pool_size~ 配置 InnoDB 的 Buffer Pool 大小，适当扩大内存来
+        获取更高的性能
+   2. 调整事务的参数 ~autocommit~
+      - MySQL 的 ~autocommit~ 默认为 1, 即开启事务提交
+      - 应用程序在使用事务时，需要显示关闭自动提交这个参数
+   3. 处理死锁问题
+      - 通过下列命令查看 ~show engine innodb status\G~
+      - ~innodb_deadlock_detect~ 是检测死锁是否开启，如果死锁检测到立马回滚
+      - ~innodb_lock_wait_timeout~ 可以配置等待超时，避免长时间的死锁
+   4. InnoDB 的建表需要满足如下条件来提供性能
+      - 建表时添加主键, 用于标识数据
+      - 主键的值最好使用 ~CREATE TABLE~ 语句, 而避免使用 ~ALTER TABLE~ 语句
+      - 主键类型需要事先选择好，一般使用自增主键时一个比较好的选择
+      - 修改主键类型是一个代价比较大的操作，涉及如下影响
+        + 导致表的数据的重新排布
+        + 影响非聚簇索引的结构
+
+** 索引 Indexes
+   1. InnoDB 的索引使用 B+ 树结构，另外有一种哈希索引，MySQL 中只有 MEMORY 引擎支
+      持哈希索引
+   2. 聚簇索引 clustered index
+      - 每张表的主键构造一颗 B+ 树, 同时叶子节点中存放的就是整张表的行记录数据
+      - 聚集索引的叶子节点称为数据页
+      - 索引组织表中数据的同时也是索引的一部分, 每张表只能拥有一个聚簇索引, 一般
+        是主键索引
+      - 优点
+        + 数据访问更快, 因为聚簇索引将索引和数据保存在同一个 B+ 树中, 因此从聚簇
+          索引中获取数据比非聚簇索引更快
+        + 聚簇索引对于主键的排序查找和范围查找速度非常快
+      - 缺点
+        + 插入速度严重依赖于插入顺序, 按照主键的顺序插入是最快的方式, 否则将会出
+          现 *页分裂*, 严重影响性能。因此, 对于 InnoDB 表, 我们一般都会定义一个自
+          增的 ID 列为主键
+        + 更新主键的代价很高, 因为将会导致被更新的行移动。因此, 对于 InnoDB 表,
+          我们一般定义主键为不可更新
+        + 二级索引访问需要两次索引查找, 第一次找到主键值, 第二次根据主键值找到行
+          数据, 即 *回表* 操作
+   3. 非聚簇索引 non-clustered index
+      - 辅助索引叶子节点存储的不再是行的物理位置, 而是主键值
+      - 通过辅助索引首先找到的是主键值, 再通过主键值找到数据行的数据页, 再通过数
+        据页中的 Page Directory 找到数据行
+      - 每张表可以拥有多个非聚簇索引
+      - 联合索引为非聚簇索引, 节点中除了存储索引字段, 还额外存储主键
+      - 联合索引查询时, 需要考虑以下的情形
+        + *最左前缀* 指 WHERE 查询条件利用联合索引的从左到右的匹配, 如果匹配成功,
+          该查询走联合索引
+        + *回表* 指 WHERE 查询条件找到主键后, 然后通过主键返回 B+ 树中查找数据
+        + *索引覆盖* [[https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_covering_index][Covering Index]] 只需要在一棵索引树上就能获取 SQL 所需的所有列
+          数据, 无需回表,速度更快
+        + *索引下推* [[https://dev.mysql.com/doc/refman/5.7/en/index-condition-pushdown-optimization.html][Index Condition Pushdown]] 在 MySQL 5.6 引入了索引下推优化, 可
+          以在索引遍历过程中, 对索引中包含的字段先做判断, 过滤掉不符合条件的记录,
+          减少回表次数
 
 * 参考链接
   1. [[https://dev.mysql.com/doc/refman/5.7/en/innodb-storage-engine.html][The InnoDB Storage Engine]]
