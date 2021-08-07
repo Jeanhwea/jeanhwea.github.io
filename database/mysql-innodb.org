@@ -209,9 +209,9 @@
 ** 表空间 Tablespaces
    1. [[https://dev.mysql.com/doc/refman/5.7/en/innodb-system-tablespace.html][系统表空间]], 系统表空间包括如下部分
       - Data Dictionary 数据字典
-      - DoubleWrite Buffer
+      - Doublewrite Buffer
       - Change Buffer
-      - Undo Logs
+      - Undo Log
       - 系统表空间默认是一个单 Datafile 管理方式，默认命名为 ibdata1
    2. File-Per-Table 表空间, 即每个 ~CREATE TABLE~ 语句生成的表默认占一个表空间
       文件, 更多优缺点参考[[https://dev.mysql.com/doc/refman/5.7/en/innodb-file-per-table-tablespaces.html][文档]]
@@ -230,10 +230,47 @@
         + mysqld 进程需要开多个文件句柄，造成操作系统资源浪费和性能开销
    3. 通用表空间
    4. Undo 表空间
-      - Undo 表空间专门存放 Undo Logs
-      - Undo Logs 默认存在系统表空间中，但是也可以存在 Undo 表空间中
-      - Undo Logs 可以存放在 SSD 中，用于提高 MySQL 的性能
+      - Undo 表空间专门存放 Undo Log
+      - Undo Log 默认存在系统表空间中，但是也可以存在 Undo 表空间中
+      - Undo Log 可以存放在 SSD 中，用于提高 MySQL 的性能
    5. 临时表空间
+      - 不压缩的用户创建的临时表
+      - 磁盘中的内部临时表
+      - 注意, ~ROW_FORMAT=COMPRESSED~ 压缩的临时表使用 File-Per-Table 表空间管理,
+        数据文件放在临时文件夹
+
+** Doublewrite Buffer
+   1. 双写技术指的是 Buffer Pool 的写入页面时调用一次 ~fsync()~ 函数来完成数据写
+      入系统表空间的 Doublewrite Buffer 区域，而不是多次调用 ~fsync()~ 来写入每
+      个表空间
+   2. 这样做可以减少 I/O 的开销
+   3. 便于崩溃恢复
+   4. 双写技术默认开启, 可以调整 ~innodb_doublewrite~ 参数为 0 来关闭
+
+** Redo Log
+   1. Redo Log 存储在磁盘中, 用于崩溃恢复时完成不完整的事务操作
+   2. Redo Log 记录修改表数据 SQL 语句对应的 low-level 的数据库操作
+   3. 默认情况下, Redo Log 物理存储在两个文件中, ib_logfile0 和 ib_logfile1, 两
+      个文件循环利用
+   4. ~innodb_log_file_size~ 控制 Redo Log 的大小
+   5. ~innodb_log_files_in_group~ 控制 Redo Log 的数量
+   6. Redo Log 是物理日志，记录的是数据页的物理修改，而不是某一行或某几行修改成
+      怎样怎样
+   7. Redo Log 用来恢复提交后的物理数据页，且只能恢复到最后一次提交的位置
+
+** Undo Log
+   1. Undo Log 是与单个读写事务关联的撤消日志记录的集合
+   2. InnoDB 存储引擎对 Undo Log 的管理采用段 Segment 的方式，具体来说是一种命名
+      为回滚段 Rollback Segment 的数据结构
+   3. InnoDB 支持最多 128 个回滚段，其中 32 个回滚段分配给了临时 table 空间。剩
+      下的 96 个回滚段可以分配给修改常规 table 中数据的事务
+   4. ~innodb_rollback_segments~ 变量定义 InnoDB 使用的回滚段数
+   5. 与 Redo Log 不同的是, Undo Log 一般是逻辑日志，根据每行记录进行记录，常见
+      有如下几类定义
+      - 用户定义表的 INSERT 操作
+      - 用户定义表的 UPDATE 和 DELETE 操作
+      - 用户定义临时表的 INSERT 操作
+      - 用户定义临时表的 UPDATE 和 DELETE 操作
 
 * 参考链接
   1. [[https://dev.mysql.com/doc/refman/5.7/en/innodb-storage-engine.html][The InnoDB Storage Engine]]
