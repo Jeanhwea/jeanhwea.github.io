@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-08-08 Sun 13:31 -->
+<!-- 2021-08-08 Sun 13:43 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MySQL 的半一致读</title>
@@ -233,17 +233,17 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org00c8eac">1. 半一致读</a></li>
-<li><a href="#org0941b94">2. RR 隔离级别时</a>
+<li><a href="#orged64e39">1. 半一致读</a></li>
+<li><a href="#orgc32d714">2. RR 隔离级别时</a>
 <ul>
-<li><a href="#orgda5ef59">2.1. 查看数据库的隔离级别</a></li>
-<li><a href="#orgdf3841c">2.2. 实验 I 分析</a></li>
+<li><a href="#org606b561">2.1. 查看数据库的隔离级别</a></li>
+<li><a href="#orgbf84e8f">2.2. 实验 I 分析</a></li>
 </ul>
 </li>
-<li><a href="#orgb0aad65">3. RC 隔离级别时</a>
+<li><a href="#orgc8cb5ea">3. RC 隔离级别时</a>
 <ul>
-<li><a href="#org9e58954">3.1. 修改数据库隔离级别成 RC</a></li>
-<li><a href="#org42a59dd">3.2. 实验 II 分析</a></li>
+<li><a href="#orgc8b6d03">3.1. 修改数据库隔离级别成 RC</a></li>
+<li><a href="#orgd31c33d">3.2. 实验 II 分析</a></li>
 </ul>
 </li>
 </ul>
@@ -251,24 +251,29 @@
 </div>
 
 
-<div id="outline-container-org00c8eac" class="outline-2">
-<h2 id="org00c8eac"><span class="section-number-2">1</span> 半一致读</h2>
+<div id="outline-container-orged64e39" class="outline-2">
+<h2 id="orged64e39"><span class="section-number-2">1</span> 半一致读</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-Semi-Consistent Read 是 InnoDB 引擎中的一种特殊的同步方式, 在 READ COMMITED 的
-隔离级别下, 对于 <code>UPDATE</code> 语句, 如果匹配行被锁住, InnoDB 会执行 <b><b>半一致读</b></b>
-(Semi-Consistent Read), 即返回最近一条匹配行, <b><b>只有当匹配行必须更新时</b></b>,
-MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或者阻塞等待
+半一致读 Semi-Consistent Read 是 InnoDB 引擎中的一种特殊的同步方式
 </p>
+<ol class="org-ol">
+<li>在 READ COMMITED 的隔离级别下, 对于 <code>UPDATE</code> 语句, 如果匹配行被锁住, InnoDB
+会执行 <b><b>半一致读</b></b>, 即返回最近一条匹配行,</li>
+<li><b><b>只有当匹配行必须更新时</b></b>, MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或
+者阻塞等待</li>
+<li>如果 <code>WHERE</code> 条件包含索引列，并且 InnoDB 使用索引，则在获取和保留记录锁时仅
+考虑索引列</li>
+</ol>
 </div>
 </div>
 
-<div id="outline-container-org0941b94" class="outline-2">
-<h2 id="org0941b94"><span class="section-number-2">2</span> RR 隔离级别时</h2>
+<div id="outline-container-orgc32d714" class="outline-2">
+<h2 id="orgc32d714"><span class="section-number-2">2</span> RR 隔离级别时</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgda5ef59" class="outline-3">
-<h3 id="orgda5ef59"><span class="section-number-3">2.1</span> 查看数据库的隔离级别</h3>
+<div id="outline-container-org606b561" class="outline-3">
+<h3 id="org606b561"><span class="section-number-3">2.1</span> 查看数据库的隔离级别</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 首先将数据库设置成 RR
@@ -287,8 +292,8 @@ MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或者阻塞等待
 </div>
 </div>
 
-<div id="outline-container-orgdf3841c" class="outline-3">
-<h3 id="orgdf3841c"><span class="section-number-3">2.2</span> 实验 I 分析</h3>
+<div id="outline-container-orgbf84e8f" class="outline-3">
+<h3 id="orgbf84e8f"><span class="section-number-3">2.2</span> 实验 I 分析</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 添加测试表 t, 并插入一些数据
@@ -342,12 +347,12 @@ MySQL thread id 10, OS thread handle 123145474785280, query id 663 192.168.0.10 
 </div>
 </div>
 
-<div id="outline-container-orgb0aad65" class="outline-2">
-<h2 id="orgb0aad65"><span class="section-number-2">3</span> RC 隔离级别时</h2>
+<div id="outline-container-orgc8cb5ea" class="outline-2">
+<h2 id="orgc8cb5ea"><span class="section-number-2">3</span> RC 隔离级别时</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org9e58954" class="outline-3">
-<h3 id="org9e58954"><span class="section-number-3">3.1</span> 修改数据库隔离级别成 RC</h3>
+<div id="outline-container-orgc8b6d03" class="outline-3">
+<h3 id="orgc8b6d03"><span class="section-number-3">3.1</span> 修改数据库隔离级别成 RC</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 直接编辑 <code>my.cnf</code> 文件, 添加如下配置参数
@@ -375,8 +380,8 @@ MySQL thread id 10, OS thread handle 123145474785280, query id 663 192.168.0.10 
 </div>
 </div>
 
-<div id="outline-container-org42a59dd" class="outline-3">
-<h3 id="org42a59dd"><span class="section-number-3">3.2</span> 实验 II 分析</h3>
+<div id="outline-container-orgd31c33d" class="outline-3">
+<h3 id="orgd31c33d"><span class="section-number-3">3.2</span> 实验 II 分析</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 重复上述的实验 I 得到结果
@@ -476,7 +481,7 @@ MySQL thread id 2, OS thread handle 123145391591424, query id 21 localhost root
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-08-08 Sun 13:31. Created by Jinghui Hu at 2021-08-08 Sun 13:04.</p>
+<p class="author">Last Updated 2021-08-08 Sun 13:43. Created by Jinghui Hu at 2021-08-08 Sun 13:04.</p>
 </div>
 </body>
 </html>

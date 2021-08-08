@@ -9,10 +9,13 @@
 
 
 * 半一致读
-  Semi-Consistent Read 是 InnoDB 引擎中的一种特殊的同步方式, 在 READ COMMITED 的
-  隔离级别下, 对于 ~UPDATE~ 语句, 如果匹配行被锁住, InnoDB 会执行 **半一致读**
-  (Semi-Consistent Read), 即返回最近一条匹配行, **只有当匹配行必须更新时**,
-  MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或者阻塞等待
+  半一致读 Semi-Consistent Read 是 InnoDB 引擎中的一种特殊的同步方式
+  1. 在 READ COMMITED 的隔离级别下, 对于 ~UPDATE~ 语句, 如果匹配行被锁住, InnoDB
+     会执行 **半一致读**, 即返回最近一条匹配行,
+  2. **只有当匹配行必须更新时**, MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或
+     者阻塞等待
+  3. 如果 ~WHERE~ 条件包含索引列，并且 InnoDB 使用索引，则在获取和保留记录锁时仅
+     考虑索引列
 
 * RR 隔离级别时
 ** 查看数据库的隔离级别
