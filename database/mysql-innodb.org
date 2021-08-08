@@ -269,18 +269,6 @@
       - 用户定义临时表的 INSERT 操作
       - 用户定义临时表的 UPDATE 和 DELETE 操作
 
-* 多版本控制
-  InnoDB 的多版本控制 (MVCC) 添加如下三个字段来记录额外的信息
-  1. ~DB_TRX_ID~ 6 字节的事务标识
-     - 记录上一个 Insert 或者 Update 的事务 ID
-     - Delete 的事务也被当成一种特殊的 Update, 只不过多了一个标记位
-  2. ~DB_ROLL_PTR~ 7 字节的回滚指针
-     - 指向一个 Undo Log 记录
-     - 如果是列更新了的话， Undo Log 包含反向重建的操作
-  3. ~DB_ROW_ID~ 6 字节的行标识
-     - 就是聚簇索引的标识
-  具体实现使用到了 Undo Log 的磁盘结构，同时需要区分当前读和快照读
-
 * 锁和事务模型
 ** 锁
    1. 锁实现方式
@@ -350,6 +338,30 @@
     4. READ UNCOMMITTED (RU) 读未提交
        - ~SELECT~ 语句以非锁定方式执行，但是可能会使用行的早期版本
        - 使用此隔离级别，此类读取不一致。这也称为 dirty read
+
+** 多版本控制
+   InnoDB 的多版本控制 (MVCC) 添加如下三个字段来记录额外的信息
+   1. ~DB_TRX_ID~ 6 字节的事务标识
+      - 记录上一个 Insert 或者 Update 的事务 ID
+      - Delete 的事务也被当成一种特殊的 Update, 只不过多了一个标记位
+   2. ~DB_ROLL_PTR~ 7 字节的回滚指针
+      - 指向一个 Undo Log 记录
+      - 如果是列更新了的话， Undo Log 包含反向重建的操作
+   3. ~DB_ROW_ID~ 6 字节的行标识
+      - 就是聚簇索引的标识
+   4. 具体实现使用到了 Undo Log 的磁盘结构，同时需要区分当前读和快照读
+   5. 关于多版本控制利用到 InnoDB 对于读的实现
+      - 一致非锁定读 [[https://dev.mysql.com/doc/refman/5.7/en/innodb-consistent-read.html][Consistent Nonlocking Read]]
+        + ~SELECT~ 语句
+      - 锁定读 [[https://dev.mysql.com/doc/refman/5.7/en/innodb-locking-reads.html][Locking Read]]
+        + ~SELECT ... LOCK IN SHARE MODE~
+          - 在读取的任何行上设置共享模式锁定。其他会话可以读取行，但是在事务提交
+            之前不能修改它们
+          - 如果这些行中的任何一个被尚未提交的另一个事务更改，则查询将阻塞等待直
+            到该事务结束，然后使用最新值
+        + ~SELECT ... FOR UPDATE~
+          - 对于索引记录，搜索遇到的情况，锁定行和任何关联的索引条目，就像使用
+            UPDATE 语句一样
 
 * 参考链接
   1. [[https://dev.mysql.com/doc/refman/5.7/en/innodb-storage-engine.html][The InnoDB Storage Engine]]
