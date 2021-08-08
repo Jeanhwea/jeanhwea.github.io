@@ -365,6 +365,18 @@
       - ~SELECT~ 语句以非锁定方式执行，但是可能会使用行的早期版本
       - 使用此隔离级别，此类读取不一致。这也称为 dirty read
 
+** 死锁
+   死锁 (Deadlock) 是指由于每个事务都持有对方需要的锁而无法进行其他事务的情况
+   1. Session A 和 Session B 同获得了记录 R1 的 S 锁, 显然他们互相都在等待并不会
+      释放，这样会造成死锁
+   2. Session A 首先持有记录 R1 的 S 锁， Session B 需要获取记录 R1 的 X 锁进行
+      操作，此时 Session A 又在事务中获取 X 锁，这时会产生死锁
+   3. 死锁检测 (Deadlock detection)
+      - 死锁检测可以通过 ~innodb_deadlock_detect~ 参数配置, 默认是打开的
+      - InnoDB 自动检测到事务 Deadlocks 并回滚一个或多个事务以打破僵局
+      - InnoDB 尝试选择要回滚的小事务，其中事务的大小由插入，更新或删除的行数确定
+   4. 死锁并不可怕，可以参考[[https://dev.mysql.com/doc/refman/5.7/en/innodb-deadlocks.html][InnoDB 死锁]]来调整系统的设计，避免产生死锁
+
 * 参考链接
   1. [[https://dev.mysql.com/doc/refman/5.7/en/innodb-storage-engine.html][The InnoDB Storage Engine]]
   2. [[https://www.docs4dev.com/docs/zh/mysql/5.7/reference/innodb-locks-set.html][MySQL 中文文档]]
