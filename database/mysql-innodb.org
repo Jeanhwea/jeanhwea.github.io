@@ -162,7 +162,7 @@
    3. B+ 索引构建方式, 具体描述见[[https://dev.mysql.com/doc/refman/5.7/en/sorted-index-builds.html][文档]]
       - 第一阶段: 扫描 clustered index, 利用 Buffer Pool 缓存数据， 当 Sort
         Buffer 遍满时使用临时文件中
-      - 第二阶段: 将临时文件中的条目归并排序, 这里应该是发生 **磁盘排序**
+      - 第二阶段: 将临时文件中的条目归并排序, 这里应该是发生 *磁盘排序*
       - 第三阶段: 将排好序的数据插入 B+ 树
         + 插入需要打开 B+ 树的 cursor 来找到插入位置
         + 优先选用 optimistic insert,  如果页面已满可能导致插入失败
@@ -334,17 +334,17 @@
          + 如果是 ~range-type search~, InnoDB 会根据情况来加 Gap Lock 或
            Next-Key Lock
     3. READ COMMITTED (RC) 读已提交
-       - [[https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_consistent_read][一致读]] (Consistent Read) 读的是所有事务的最新的快照, 这种读法也称当前读
-         (Current Read)
+       - [[https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_consistent_read][一致读]] (Consistent Read) 读的是所有事务的 _最新的快照_, 这种读法也称当
+         前读 (Current Read)
        - 对于有锁读 ~SELECT ... FOR UPDATE~, ~UPDATE~ 和 ~DELETE~ 不会产生 Gap
          Lock, Gap Lock 只用于外键校验和唯一性约束校验
        - 由于没有 Gap Lock 来锁住一致读, 可能会产生幻读 (Phantom Read)
        - RC 可能产生系列影响
          + ~UPDATE~ 和 ~DELETE~ 只会锁住其影响的行, Record Lock 执行完毕后立马释
            放，降低了产生死锁的概率
-         + 对于 ~UPDATE~ 语句, 如果匹配行被锁住, InnoDB 会执行 **半一致读**
-           (Semi-Consistent Read), 即返回最近一条匹配行, **只有当匹配行必须更新
-           时**, MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或者阻塞等待
+         + 对于 ~UPDATE~ 语句, 如果匹配行被锁住, InnoDB 会执行 *半一致读*
+           (Semi-Consistent Read), 即返回最近一条匹配行, _只有当匹配行必须更新时_,
+           MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或者阻塞等待
        - 如果 ~WHERE~ 条件包含索引列，并且 InnoDB 使用索引，则在获取和保留
          Record Lock 时仅考虑索引列
     4. READ UNCOMMITTED (RU) 读未提交
