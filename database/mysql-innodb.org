@@ -159,7 +159,15 @@
       - ~innodb_page_size~ 表示页的大小，默认 16K
       - ~innodb_fill_factor~ 表示 B+ 树索引页的填充百分比，默认值 100 表示保留
         1/16 的数据空间预留给将来的扩展
-   3. 聚簇索引 clustered index, 参考[[https://dev.mysql.com/doc/refman/5.7/en/innodb-index-types.html][这里]]
+   3. B+ 索引构建方式, 具体描述见[[https://dev.mysql.com/doc/refman/5.7/en/sorted-index-builds.html][文档]]
+      - 第一阶段: 扫描 clustered index, 利用 Buffer Pool 缓存数据， 当 Sort
+        Buffer 遍满时使用临时文件中
+      - 第二阶段: 将临时文件中的条目归并排序, 这里应该是发生 **磁盘排序**
+      - 第三阶段: 将排好序的数据插入 B+ 树
+        + 插入需要打开 B+ 树的 cursor 来找到插入位置
+        + 优先选用 optimistic insert,  如果页面已满可能导致插入失败
+        + 失败后执行 pessimistic insert, 这里需要拆分和合并 B+ 树节点
+   4. 聚簇索引 clustered index, 参考[[https://dev.mysql.com/doc/refman/5.7/en/innodb-index-types.html][这里]]
       - 每张表的主键构造一棵 b+ 树, 同时叶子节点中存放的就是整张表的行记录数据
       - 聚集索引的叶子节点称为数据页 (page)
       - 索引组织表中数据的同时也是索引的一部分, *每张表只能拥有一个聚簇索引*, 主
@@ -174,12 +182,12 @@
       - 缺点
         + 插入速度严重依赖于插入顺序, 按照主键的顺序插入是最快的方式, 否则将会出
           现 *页分裂*, 严重影响性能。因此, 对于 InnoDB 表, 我们一般都会定义一个
-          自增的 ID 列为主键 (optimistic insertion 和 pessimistic insertion)
-        + 更新主键的代价很高, 因为将会导致被更新的行移动。因此, 对于 InnoDB 表,
+          自增的 ID 列为主键
+        + 更新主键的代价很高, 因为将会导致被更新的行移动。 因此, 对于 InnoDB 表,
           我们一般定义主键为不可更新
         + 二级索引访问需要两次索引查找, 第一次找到主键值, 第二次根据主键值找到行
           数据, 即 *回表* 操作
-   4. 辅助索引 secondary index
+   5. 辅助索引 secondary index
       - 辅助索引叶子节点存储的不再是行的物理位置, 而是主键值
       - 通过辅助索引首先找到的是主键值, 再通过主键值找到数据行的数据页, 再通过数
         据页中的 Page Directory 找到数据行
