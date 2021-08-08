@@ -270,6 +270,31 @@
       - 用户定义临时表的 UPDATE 和 DELETE 操作
 
 * 锁和事务模型
+** 多版本控制
+   InnoDB 的多版本控制 (MVCC) 添加如下三个字段来记录额外的信息
+   1. ~DB_TRX_ID~ 6 字节的事务标识
+      - 记录上一个 Insert 或者 Update 的事务 ID
+      - Delete 的事务也被当成一种特殊的 Update, 只不过多了一个标记位
+   2. ~DB_ROLL_PTR~ 7 字节的回滚指针
+      - 指向一个 Undo Log 记录
+      - 如果是列更新了的话， Undo Log 包含反向重建的操作
+   3. ~DB_ROW_ID~ 6 字节的行标识
+      - 就是聚簇索引的标识
+   4. 具体实现使用到了 Undo Log 的磁盘结构，同时需要区分当前读和快照读
+   5. 关于多版本控制利用到 InnoDB 对于读的实现
+      - 一致非锁定读 [[https://dev.mysql.com/doc/refman/5.7/en/innodb-consistent-read.html][Consistent Nonlocking Read]]
+        + ~SELECT~ 语句
+      - 锁定读 [[https://dev.mysql.com/doc/refman/5.7/en/innodb-locking-reads.html][Locking Read]]
+        + ~SELECT ... LOCK IN SHARE MODE~
+          - 在读取的任何行上设置共享模式锁定。其他会话可以读取行，但是在事务提交
+            之前不能修改它们
+          - 如果这些行中的任何一个被尚未提交的另一个事务更改，则查询将阻塞等待直
+            到该事务结束，然后使用最新值
+        + ~SELECT ... FOR UPDATE~
+          - 对于索引记录，搜索遇到的情况，锁定行和任何关联的索引条目，就像使用
+            UPDATE 语句一样
+        + ~UPDATE~, ~DELETE~ 语句
+
 ** 锁
    1. 锁实现方式
       - Shared (S) Lock: 共享锁
@@ -303,66 +328,40 @@
         + Intetion Exclusive Lock (IX): 意向排它锁，表中每行数据添加排他锁
           - ~LOCK TABLE ... WRITE~
           - ~SELECT ... FOR UPDATE~
-** 事务
-*** 隔离级别
-    1. SERIALIZABLE (S) 串行化
-       - 该隔离级别中每个 SQL 语句串行化执行
-       - 该种模式不会出现脏读或幻读，但是系统的并发能力极弱
-       - MySQL 的实现方式如下
-         + 开启 ~autocommit~ 时, 则 ~SELECT~ 自身就是事务
-         + 关闭 ~autocommit~ 时, InnoDB 直接将 ~SELECT~ 转化成锁定共享读模式，即
-           ~SELECT ... LOCK IN SHARE MODE~ 语句
-    2. REPEATABLE READ (RR) 可重复读, InnoDB 的默认隔离级别
-       - 一致读 (Consistent Read) 读的是事务开始的第一个快照, 这种读法也称快照读
-         (Snapshot Read)
-       - 对于 ~SELECT~ 语句，直接使用快照读
-       - 对于有锁读 ~SELECT ... FOR UPDATE~, ~UPDATE~ 和 ~DELETE~ 这三类语句，是
-         否加锁取决于是 ~unique search~ 还是 ~range-type search~
-         + 如果是 ~unique search~, InnoDB 会添加 Record Lock 锁住对应的记录
-         + 如果是 ~range-type search~, InnoDB 会根据情况来加 Gap Lock 或
-           Next-Key Lock
-    3. READ COMMITTED (RC) 读已提交
-       - [[https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_consistent_read][一致读]] (Consistent Read) 读的是所有事务的 _最新的快照_, 这种读法也称当
-         前读 (Current Read)
-       - 对于有锁读 ~SELECT ... FOR UPDATE~, ~UPDATE~ 和 ~DELETE~ 不会产生 Gap
-         Lock, Gap Lock 只用于外键校验和唯一性约束校验
-       - 由于没有 Gap Lock 来锁住一致读, 可能会产生幻读 (Phantom Read)
-       - RC 可能产生系列影响
-         + ~UPDATE~ 和 ~DELETE~ 只会锁住其影响的行, Record Lock 执行完毕后立马释
-           放，降低了产生死锁的概率
-         + 对于 ~UPDATE~ 语句, 如果匹配行被锁住, InnoDB 会执行 *半一致读*
-           (Semi-Consistent Read), 即返回最近一条匹配行, _只有当匹配行必须更新时_,
-           MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或者阻塞等待
-       - 如果 ~WHERE~ 条件包含索引列，并且 InnoDB 使用索引，则在获取和保留
-         Record Lock 时仅考虑索引列
-    4. READ UNCOMMITTED (RU) 读未提交
-       - ~SELECT~ 语句以非锁定方式执行，但是可能会使用行的早期版本
-       - 使用此隔离级别，此类读取不一致。这也称为 dirty read
-
-** 多版本控制
-   InnoDB 的多版本控制 (MVCC) 添加如下三个字段来记录额外的信息
-   1. ~DB_TRX_ID~ 6 字节的事务标识
-      - 记录上一个 Insert 或者 Update 的事务 ID
-      - Delete 的事务也被当成一种特殊的 Update, 只不过多了一个标记位
-   2. ~DB_ROLL_PTR~ 7 字节的回滚指针
-      - 指向一个 Undo Log 记录
-      - 如果是列更新了的话， Undo Log 包含反向重建的操作
-   3. ~DB_ROW_ID~ 6 字节的行标识
-      - 就是聚簇索引的标识
-   4. 具体实现使用到了 Undo Log 的磁盘结构，同时需要区分当前读和快照读
-   5. 关于多版本控制利用到 InnoDB 对于读的实现
-      - 一致非锁定读 [[https://dev.mysql.com/doc/refman/5.7/en/innodb-consistent-read.html][Consistent Nonlocking Read]]
-        + ~SELECT~ 语句
-      - 锁定读 [[https://dev.mysql.com/doc/refman/5.7/en/innodb-locking-reads.html][Locking Read]]
-        + ~SELECT ... LOCK IN SHARE MODE~
-          - 在读取的任何行上设置共享模式锁定。其他会话可以读取行，但是在事务提交
-            之前不能修改它们
-          - 如果这些行中的任何一个被尚未提交的另一个事务更改，则查询将阻塞等待直
-            到该事务结束，然后使用最新值
-        + ~SELECT ... FOR UPDATE~
-          - 对于索引记录，搜索遇到的情况，锁定行和任何关联的索引条目，就像使用
-            UPDATE 语句一样
-        + ~UPDATE~, ~DELETE~ 语句
+** 事务隔离级别
+   1. SERIALIZABLE (S) 串行化
+      - 该隔离级别中每个 SQL 语句串行化执行
+      - 该种模式不会出现脏读或幻读，但是系统的并发能力极弱
+      - MySQL 的实现方式如下
+        + 开启 ~autocommit~ 时, 则 ~SELECT~ 自身就是事务
+        + 关闭 ~autocommit~ 时, InnoDB 直接将 ~SELECT~ 转化成锁定共享读模式，即
+          ~SELECT ... LOCK IN SHARE MODE~ 语句
+   2. REPEATABLE READ (RR) 可重复读, InnoDB 的默认隔离级别
+      - 一致读 (Consistent Read) 读的是事务开始的第一个快照, 这种读法也称快照读
+        (Snapshot Read)
+      - 对于 ~SELECT~ 语句，直接使用快照读
+      - 对于有锁读 ~SELECT ... FOR UPDATE~, ~UPDATE~ 和 ~DELETE~ 这三类语句，是
+        否加锁取决于是 ~unique search~ 还是 ~range-type search~
+        + 如果是 ~unique search~, InnoDB 会添加 Record Lock 锁住对应的记录
+        + 如果是 ~range-type search~, InnoDB 会根据情况来加 Gap Lock 或
+          Next-Key Lock
+   3. READ COMMITTED (RC) 读已提交
+      - [[https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_consistent_read][一致读]] (Consistent Read) 读的是所有事务的 _最新的快照_, 这种读法也称当
+        前读 (Current Read)
+      - 对于有锁读 ~SELECT ... FOR UPDATE~, ~UPDATE~ 和 ~DELETE~ 不会产生 Gap
+        Lock, Gap Lock 只用于外键校验和唯一性约束校验
+      - 由于没有 Gap Lock 来锁住一致读, 可能会产生幻读 (Phantom Read)
+      - RC 可能产生系列影响
+        + ~UPDATE~ 和 ~DELETE~ 只会锁住其影响的行, Record Lock 执行完毕后立马释
+          放，降低了产生死锁的概率
+        + 对于 ~UPDATE~ 语句, 如果匹配行被锁住, InnoDB 会执行 *半一致读*
+          (Semi-Consistent Read), 即返回最近一条匹配行, _只有当匹配行必须更新时_,
+          MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或者阻塞等待
+      - 如果 ~WHERE~ 条件包含索引列，并且 InnoDB 使用索引，则在获取和保留
+        Record Lock 时仅考虑索引列
+   4. READ UNCOMMITTED (RU) 读未提交
+      - ~SELECT~ 语句以非锁定方式执行，但是可能会使用行的早期版本
+      - 使用此隔离级别，此类读取不一致。这也称为 dirty read
 
 * 参考链接
   1. [[https://dev.mysql.com/doc/refman/5.7/en/innodb-storage-engine.html][The InnoDB Storage Engine]]
