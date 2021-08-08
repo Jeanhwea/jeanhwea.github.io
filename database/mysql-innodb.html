@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-08-08 Sun 10:54 -->
+<!-- 2021-08-08 Sun 12:28 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>InnoDB 存储引擎</title>
@@ -233,50 +233,55 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org3962475">1. 体系结构</a></li>
-<li><a href="#org38462a8">2. 内存结构</a>
+<li><a href="#org88d4dfe">1. 体系结构</a></li>
+<li><a href="#org52a3117">2. 内存结构</a>
 <ul>
-<li><a href="#org897d682">2.1. Buffer Pool</a>
+<li><a href="#orgd42f7d5">2.1. Buffer Pool</a>
 <ul>
-<li><a href="#orgf86b20f">2.1.1. Buffer Pool 概述</a></li>
-<li><a href="#org4a61a84">2.1.2. Buffer Pool 相关调优</a></li>
+<li><a href="#org80a40c3">2.1.1. Buffer Pool 概述</a></li>
+<li><a href="#org969883d">2.1.2. Buffer Pool 相关调优</a></li>
 </ul>
 </li>
-<li><a href="#orgd57cb68">2.2. Change Buffer</a></li>
-<li><a href="#org6957927">2.3. Adaptive Hash Index</a></li>
-<li><a href="#orgdeb7370">2.4. Log Buffer</a></li>
+<li><a href="#org0022095">2.2. Change Buffer</a></li>
+<li><a href="#org597eb76">2.3. Adaptive Hash Index</a></li>
+<li><a href="#org312ca95">2.4. Log Buffer</a></li>
 </ul>
 </li>
-<li><a href="#org3d37e91">3. 磁盘结构</a>
+<li><a href="#org406784b">3. 磁盘结构</a>
 <ul>
-<li><a href="#org13fca0d">3.1. 表 Tables</a></li>
-<li><a href="#orgec419ec">3.2. 索引 Indexes</a></li>
-<li><a href="#org7c7f0bf">3.3. 表空间 Tablespaces</a></li>
-<li><a href="#org1c511b2">3.4. Doublewrite Buffer</a></li>
-<li><a href="#orgd5b71c4">3.5. Redo Log</a></li>
-<li><a href="#orgff7d834">3.6. Undo Log</a></li>
+<li><a href="#orgbb86f78">3.1. 表 Tables</a></li>
+<li><a href="#orgf7685e0">3.2. 索引 Indexes</a></li>
+<li><a href="#org08c579f">3.3. 表空间 Tablespaces</a></li>
+<li><a href="#orgb1282c3">3.4. Doublewrite Buffer</a></li>
+<li><a href="#org900dc35">3.5. Redo Log</a></li>
+<li><a href="#org43c9148">3.6. Undo Log</a></li>
 </ul>
 </li>
-<li><a href="#orge843fb6">4. 多版本控制</a></li>
-<li><a href="#org7998786">5. 锁和事务模型</a>
+<li><a href="#org543b3bc">4. 多版本控制</a></li>
+<li><a href="#org3864a24">5. 锁和事务模型</a>
 <ul>
-<li><a href="#org3e93f34">5.1. 锁</a></li>
+<li><a href="#org4597d9f">5.1. 锁</a></li>
+<li><a href="#orgdbb0d77">5.2. 事务</a>
+<ul>
+<li><a href="#orgf64bb26">5.2.1. 隔离级别</a></li>
 </ul>
 </li>
-<li><a href="#org09c6f46">6. 参考链接</a></li>
+</ul>
+</li>
+<li><a href="#org15f2d52">6. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org3962475" class="outline-2">
-<h2 id="org3962475"><span class="section-number-2">1</span> 体系结构</h2>
+<div id="outline-container-org88d4dfe" class="outline-2">
+<h2 id="org88d4dfe"><span class="section-number-2">1</span> 体系结构</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 MySQL 的 InnoDB 存储引擎体系结构如下图所示
 </p>
 
 
-<div id="org73d8467" class="figure">
+<div id="org4c01633" class="figure">
 <p><img src="../static/image/2021/07/innodb-architecture.png" alt="innodb-architecture.png" />
 </p>
 </div>
@@ -314,16 +319,16 @@ drwxr-x--- 2 mysql mysql      8192 May 21 09:58 sys
 </div>
 </div>
 
-<div id="outline-container-org38462a8" class="outline-2">
-<h2 id="org38462a8"><span class="section-number-2">2</span> 内存结构</h2>
+<div id="outline-container-org52a3117" class="outline-2">
+<h2 id="org52a3117"><span class="section-number-2">2</span> 内存结构</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org897d682" class="outline-3">
-<h3 id="org897d682"><span class="section-number-3">2.1</span> Buffer Pool</h3>
+<div id="outline-container-orgd42f7d5" class="outline-3">
+<h3 id="orgd42f7d5"><span class="section-number-3">2.1</span> Buffer Pool</h3>
 <div class="outline-text-3" id="text-2-1">
 </div>
-<div id="outline-container-orgf86b20f" class="outline-4">
-<h4 id="orgf86b20f"><span class="section-number-4">2.1.1</span> Buffer Pool 概述</h4>
+<div id="outline-container-org80a40c3" class="outline-4">
+<h4 id="org80a40c3"><span class="section-number-4">2.1.1</span> Buffer Pool 概述</h4>
 <div class="outline-text-4" id="text-2-1-1">
 <p>
 Buffer Pool 是 MySQL 缓存数据到内存的结构
@@ -365,8 +370,8 @@ Buffer Pool 是 MySQL 缓存数据到内存的结构
 </div>
 </div>
 
-<div id="outline-container-org4a61a84" class="outline-4">
-<h4 id="org4a61a84"><span class="section-number-4">2.1.2</span> Buffer Pool 相关调优</h4>
+<div id="outline-container-org969883d" class="outline-4">
+<h4 id="org969883d"><span class="section-number-4">2.1.2</span> Buffer Pool 相关调优</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <p>
 MySQL 默认的 <code>innodb_buffer_pool_size</code> 的默认大小 128 M，一般需要根据需求进
@@ -408,8 +413,8 @@ MySQL 默认的 <code>innodb_buffer_pool_size</code> 的默认大小 128 M，一
 </div>
 </div>
 
-<div id="outline-container-orgd57cb68" class="outline-3">
-<h3 id="orgd57cb68"><span class="section-number-3">2.2</span> Change Buffer</h3>
+<div id="outline-container-org0022095" class="outline-3">
+<h3 id="org0022095"><span class="section-number-3">2.2</span> Change Buffer</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Change Buffer 使用了 Buffer Pool 的部分空间完成性能优化
@@ -425,8 +430,8 @@ and Delete) 进行缓存</li>
 </div>
 </div>
 
-<div id="outline-container-org6957927" class="outline-3">
-<h3 id="org6957927"><span class="section-number-3">2.3</span> Adaptive Hash Index</h3>
+<div id="outline-container-org597eb76" class="outline-3">
+<h3 id="org597eb76"><span class="section-number-3">2.3</span> Adaptive Hash Index</h3>
 <div class="outline-text-3" id="text-2-3">
 <ol class="org-ol">
 <li>InnoDB 存储引擎会监控对表上索引的查找，如果观察到建立哈希索引可以带来速度
@@ -438,8 +443,8 @@ and Delete) 进行缓存</li>
 </div>
 </div>
 
-<div id="outline-container-orgdeb7370" class="outline-3">
-<h3 id="orgdeb7370"><span class="section-number-3">2.4</span> Log Buffer</h3>
+<div id="outline-container-org312ca95" class="outline-3">
+<h3 id="org312ca95"><span class="section-number-3">2.4</span> Log Buffer</h3>
 <div class="outline-text-3" id="text-2-4">
 <ol class="org-ol">
 <li>Redo Log 日志文件也需要相应的内存数据结构来进行缓存操作</li>
@@ -458,12 +463,12 @@ and Delete) 进行缓存</li>
 </div>
 </div>
 
-<div id="outline-container-org3d37e91" class="outline-2">
-<h2 id="org3d37e91"><span class="section-number-2">3</span> 磁盘结构</h2>
+<div id="outline-container-org406784b" class="outline-2">
+<h2 id="org406784b"><span class="section-number-2">3</span> 磁盘结构</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org13fca0d" class="outline-3">
-<h3 id="org13fca0d"><span class="section-number-3">3.1</span> 表 Tables</h3>
+<div id="outline-container-orgbb86f78" class="outline-3">
+<h3 id="orgbb86f78"><span class="section-number-3">3.1</span> 表 Tables</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 这里着重介绍使用 InnoDB 表结构需要的注意事项
@@ -502,8 +507,8 @@ and Delete) 进行缓存</li>
 </div>
 </div>
 
-<div id="outline-container-orgec419ec" class="outline-3">
-<h3 id="orgec419ec"><span class="section-number-3">3.2</span> 索引 Indexes</h3>
+<div id="outline-container-orgf7685e0" class="outline-3">
+<h3 id="orgf7685e0"><span class="section-number-3">3.2</span> 索引 Indexes</h3>
 <div class="outline-text-3" id="text-3-2">
 <ol class="org-ol">
 <li>InnoDB 的索引使用 B+ 树结构，另外有一种哈希索引，MySQL 中只有 MEMORY 引擎支
@@ -577,8 +582,8 @@ Buffer 遍满时使用临时文件中</li>
 </div>
 </div>
 
-<div id="outline-container-org7c7f0bf" class="outline-3">
-<h3 id="org7c7f0bf"><span class="section-number-3">3.3</span> 表空间 Tablespaces</h3>
+<div id="outline-container-org08c579f" class="outline-3">
+<h3 id="org08c579f"><span class="section-number-3">3.3</span> 表空间 Tablespaces</h3>
 <div class="outline-text-3" id="text-3-3">
 <ol class="org-ol">
 <li><a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-system-tablespace.html">系统表空间</a>, 系统表空间包括如下部分
@@ -628,8 +633,8 @@ Buffer 遍满时使用临时文件中</li>
 </div>
 </div>
 
-<div id="outline-container-org1c511b2" class="outline-3">
-<h3 id="org1c511b2"><span class="section-number-3">3.4</span> Doublewrite Buffer</h3>
+<div id="outline-container-orgb1282c3" class="outline-3">
+<h3 id="orgb1282c3"><span class="section-number-3">3.4</span> Doublewrite Buffer</h3>
 <div class="outline-text-3" id="text-3-4">
 <ol class="org-ol">
 <li>双写技术指的是 Buffer Pool 的写入页面时调用一次 <code>fsync()</code> 函数来完成数据写
@@ -642,8 +647,8 @@ Buffer 遍满时使用临时文件中</li>
 </div>
 </div>
 
-<div id="outline-container-orgd5b71c4" class="outline-3">
-<h3 id="orgd5b71c4"><span class="section-number-3">3.5</span> Redo Log</h3>
+<div id="outline-container-org900dc35" class="outline-3">
+<h3 id="org900dc35"><span class="section-number-3">3.5</span> Redo Log</h3>
 <div class="outline-text-3" id="text-3-5">
 <ol class="org-ol">
 <li>Redo Log 存储在磁盘中, 用于崩溃恢复时完成不完整的事务操作</li>
@@ -659,8 +664,8 @@ Buffer 遍满时使用临时文件中</li>
 </div>
 </div>
 
-<div id="outline-container-orgff7d834" class="outline-3">
-<h3 id="orgff7d834"><span class="section-number-3">3.6</span> Undo Log</h3>
+<div id="outline-container-org43c9148" class="outline-3">
+<h3 id="org43c9148"><span class="section-number-3">3.6</span> Undo Log</h3>
 <div class="outline-text-3" id="text-3-6">
 <ol class="org-ol">
 <li>Undo Log 是与单个读写事务关联的撤消日志记录的集合</li>
@@ -682,8 +687,8 @@ Buffer 遍满时使用临时文件中</li>
 </div>
 </div>
 
-<div id="outline-container-orge843fb6" class="outline-2">
-<h2 id="orge843fb6"><span class="section-number-2">4</span> 多版本控制</h2>
+<div id="outline-container-org543b3bc" class="outline-2">
+<h2 id="org543b3bc"><span class="section-number-2">4</span> 多版本控制</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 InnoDB 的多版本控制 (MVCC) 添加如下三个字段来记录额外的信息
@@ -710,12 +715,12 @@ InnoDB 的多版本控制 (MVCC) 添加如下三个字段来记录额外的信�
 </div>
 </div>
 
-<div id="outline-container-org7998786" class="outline-2">
-<h2 id="org7998786"><span class="section-number-2">5</span> 锁和事务模型</h2>
+<div id="outline-container-org3864a24" class="outline-2">
+<h2 id="org3864a24"><span class="section-number-2">5</span> 锁和事务模型</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-org3e93f34" class="outline-3">
-<h3 id="org3e93f34"><span class="section-number-3">5.1</span> 锁</h3>
+<div id="outline-container-org4597d9f" class="outline-3">
+<h3 id="org4597d9f"><span class="section-number-3">5.1</span> 锁</h3>
 <div class="outline-text-3" id="text-5-1">
 <ol class="org-ol">
 <li>锁实现方式
@@ -779,10 +784,53 @@ InnoDB 的多版本控制 (MVCC) 添加如下三个字段来记录额外的信�
 </ol>
 </div>
 </div>
+<div id="outline-container-orgdbb0d77" class="outline-3">
+<h3 id="orgdbb0d77"><span class="section-number-3">5.2</span> 事务</h3>
+<div class="outline-text-3" id="text-5-2">
+</div>
+<div id="outline-container-orgf64bb26" class="outline-4">
+<h4 id="orgf64bb26"><span class="section-number-4">5.2.1</span> 隔离级别</h4>
+<div class="outline-text-4" id="text-5-2-1">
+<ol class="org-ol">
+<li>SERIALIZABLE (S) 串行化</li>
+<li>REPEATABLE READ (RR) 可重复读, InnoDB 的默认隔离级别
+<ul class="org-ul">
+<li>一致读 (Consistent Read) 读的是事务开始的第一个快照, 这种读法也称快照读
+(Snapshot Read)</li>
+<li>对于 <code>SELECT</code> 语句，直接使用快照读</li>
+<li>对于有锁读 <code>SELECT ... FOR UPDATE</code>, <code>UPDATE</code> 和 <code>DELETE</code> 这三类语句，是
+否加锁取决于是 <code>unique search</code> 还是 <code>range-type search</code>
+<ul class="org-ul">
+<li>如果是 <code>unique search</code>, InnoDB 会添加 Record Lock 锁住对应的记录</li>
+<li>如果是 <code>range-type search</code>, InnoDB 会根据情况来加 Gap Lock 或
+Next-Key Lock</li>
+</ul></li>
+</ul></li>
+<li>READ COMMITTED (RC) 读已提交
+<ul class="org-ul">
+<li>一致读 (Consistent Read) 读的是所有事务的最新的快照, 这种读法也称当前读
+(Current Read)</li>
+<li>对于有锁读 <code>SELECT ... FOR UPDATE</code>, <code>UPDATE</code> 和 <code>DELETE</code> 不会产生 Gap
+Lock, Gap Lock 只用于外键校验和唯一性约束校验</li>
+<li>由于没有 Gap Lock 来锁住一致读, 可能会产生幻读 (Phantom Read)</li>
+<li>RC 可能产生系列影响
+<ul class="org-ul">
+<li><code>UPDATE</code> 和 <code>DELETE</code> 只会锁住其影响的行, Record Lock 执行完毕后立马释
+放，降低了产生死锁的概率</li>
+<li>对于 <code>UPDATE</code> 语句, 如果匹配行被锁住, InnoDB 会执行 <b><b>半一致读</b></b>
+(Semi-Consistent Read), 即返回最近一条匹配行, <b><b>只有当匹配行必须更新
+时</b></b>, MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或者阻塞等待</li>
+</ul></li>
+</ul></li>
+<li>READ UNCOMMITTED (RU) 读未提交</li>
+</ol>
+</div>
+</div>
+</div>
 </div>
 
-<div id="outline-container-org09c6f46" class="outline-2">
-<h2 id="org09c6f46"><span class="section-number-2">6</span> 参考链接</h2>
+<div id="outline-container-org15f2d52" class="outline-2">
+<h2 id="org15f2d52"><span class="section-number-2">6</span> 参考链接</h2>
 <div class="outline-text-2" id="text-6">
 <ol class="org-ol">
 <li><a href="https://dev.mysql.com/doc/refman/5.7/en/innodb-storage-engine.html">The InnoDB Storage Engine</a></li>
@@ -791,7 +839,7 @@ InnoDB 的多版本控制 (MVCC) 添加如下三个字段来记录额外的信�
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-08-08 Sun 10:54. Created by Jinghui Hu at 2021-07-07 Wed 09:41.</p>
+<p class="author">Last Updated 2021-08-08 Sun 12:28. Created by Jinghui Hu at 2021-07-07 Wed 09:41.</p>
 </div>
 </body>
 </html>

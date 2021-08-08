@@ -315,6 +315,31 @@
         + Intetion Exclusive Lock (IX): 意向排它锁，表中每行数据添加排他锁
           - ~LOCK TABLE ... WRITE~
           - ~SELECT ... FOR UPDATE~
+** 事务
+*** 隔离级别
+    1. SERIALIZABLE (S) 串行化
+    2. REPEATABLE READ (RR) 可重复读, InnoDB 的默认隔离级别
+       - 一致读 (Consistent Read) 读的是事务开始的第一个快照, 这种读法也称快照读
+         (Snapshot Read)
+       - 对于 ~SELECT~ 语句，直接使用快照读
+       - 对于有锁读 ~SELECT ... FOR UPDATE~, ~UPDATE~ 和 ~DELETE~ 这三类语句，是
+         否加锁取决于是 ~unique search~ 还是 ~range-type search~
+         + 如果是 ~unique search~, InnoDB 会添加 Record Lock 锁住对应的记录
+         + 如果是 ~range-type search~, InnoDB 会根据情况来加 Gap Lock 或
+           Next-Key Lock
+    3. READ COMMITTED (RC) 读已提交
+       - 一致读 (Consistent Read) 读的是所有事务的最新的快照, 这种读法也称当前读
+         (Current Read)
+       - 对于有锁读 ~SELECT ... FOR UPDATE~, ~UPDATE~ 和 ~DELETE~ 不会产生 Gap
+         Lock, Gap Lock 只用于外键校验和唯一性约束校验
+       - 由于没有 Gap Lock 来锁住一致读, 可能会产生幻读 (Phantom Read)
+       - RC 可能产生系列影响
+         + ~UPDATE~ 和 ~DELETE~ 只会锁住其影响的行, Record Lock 执行完毕后立马释
+           放，降低了产生死锁的概率
+         + 对于 ~UPDATE~ 语句, 如果匹配行被锁住, InnoDB 会执行 **半一致读**
+           (Semi-Consistent Read), 即返回最近一条匹配行, **只有当匹配行必须更新
+           时**, MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或者阻塞等待
+    4. READ UNCOMMITTED (RU) 读未提交
 
 * 参考链接
   1. [[https://dev.mysql.com/doc/refman/5.7/en/innodb-storage-engine.html][The InnoDB Storage Engine]]

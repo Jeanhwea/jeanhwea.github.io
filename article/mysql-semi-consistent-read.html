@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-08-08 Sun 13:31 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MySQL 的半一致读</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script type="text/javascript" src="styles/lib/js/jquery.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="../readme.html"> UP </a>
+ |
+ <a accesskey="H" href="../index.html"> HOME </a>
+</div><div id="content">
+<h1 class="title">MySQL 的半一致读</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org00c8eac">1. 半一致读</a></li>
+<li><a href="#org0941b94">2. RR 隔离级别时</a>
+<ul>
+<li><a href="#orgda5ef59">2.1. 查看数据库的隔离级别</a></li>
+<li><a href="#orgdf3841c">2.2. 实验 I 分析</a></li>
+</ul>
+</li>
+<li><a href="#orgb0aad65">3. RC 隔离级别时</a>
+<ul>
+<li><a href="#org9e58954">3.1. 修改数据库隔离级别成 RC</a></li>
+<li><a href="#org42a59dd">3.2. 实验 II 分析</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org00c8eac" class="outline-2">
+<h2 id="org00c8eac"><span class="section-number-2">1</span> 半一致读</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Semi-Consistent Read 是 InnoDB 引擎中的一种特殊的同步方式, 在 READ COMMITED 的
+隔离级别下, 对于 <code>UPDATE</code> 语句, 如果匹配行被锁住, InnoDB 会执行 <b><b>半一致读</b></b>
+(Semi-Consistent Read), 即返回最近一条匹配行, <b><b>只有当匹配行必须更新时</b></b>,
+MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或者阻塞等待
+</p>
+</div>
+</div>
+
+<div id="outline-container-org0941b94" class="outline-2">
+<h2 id="org0941b94"><span class="section-number-2">2</span> RR 隔离级别时</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgda5ef59" class="outline-3">
+<h3 id="orgda5ef59"><span class="section-number-3">2.1</span> 查看数据库的隔离级别</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+首先将数据库设置成 RR
+</p>
+<div class="org-src-container">
+<pre class="src src-text">mysql&gt; show variables like '%iso%';
++-----------------------+-----------------+
+| Variable_name         | Value           |
++-----------------------+-----------------+
+| transaction_isolation | REPEATABLE-READ |
+| tx_isolation          | REPEATABLE-READ |
++-----------------------+-----------------+
+2 rows in set (0.00 sec)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgdf3841c" class="outline-3">
+<h3 id="orgdf3841c"><span class="section-number-3">2.2</span> 实验 I 分析</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+添加测试表 t, 并插入一些数据
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #859900;">CREATE</span> <span style="color: #859900;">TABLE</span> <span style="color: #b58900;">t</span> (a <span style="color: #268bd2;">INT</span> <span style="color: #859900;">NOT</span> <span style="color: #859900;">NULL</span>, b <span style="color: #268bd2;">INT</span>) ENGINE = InnoDB;
+<span style="color: #859900;">INSERT</span> <span style="color: #859900;">INTO</span> t <span style="color: #859900;">VALUES</span> (1,2),(2,3),(3,2),(4,3),(5,2);
+<span style="color: #859900;">COMMIT</span>;
+
+# &#20250;&#35805; A
+<span style="color: #859900;">START</span> <span style="color: #859900;">TRANSACTION</span>;
+<span style="color: #859900;">UPDATE</span> t <span style="color: #859900;">SET</span> b = 5 <span style="color: #859900;">WHERE</span> b = 3;
+
+# &#20250;&#35805; B
+<span style="color: #859900;">UPDATE</span> t <span style="color: #859900;">SET</span> b = 4 <span style="color: #859900;">WHERE</span> b = 2;
+</pre>
+</div>
+
+<ol class="org-ol">
+<li>注意会话 A 和会话 B 更新的数据并不是互相影响的</li>
+<li>当会话 A 执行事务未进行提交后</li>
+<li>会话 B 在执行 UPDATE 语句时直接 <b><b>阻塞等待</b></b></li>
+<li><p>
+注意 b 字段不是主键，也不是唯一键，所有不会出现 Record Lock 或 Gap Lock ,
+在两 个数据库执行完操作后，数据库直接锁住了 6 行，相当于整个表都锁住了
+</p>
+<div class="org-src-container">
+<pre class="src src-text">mysql&gt; show engine innodb status\G
+*************************** 1. row ***************************
+... &#30465;&#30053;&#19968;&#22534;&#26080;&#20851;&#21442;&#25968;
+------------
+TRANSACTIONS
+------------
+Trx id counter 15450
+Purge done for trx's n:o &lt; 15448 undo n:o &lt; 0 state: running but idle
+History list length 0
+LIST OF TRANSACTIONS FOR EACH SESSION:
+---TRANSACTION 281479455829568, not started
+0 lock struct(s), heap size 1136, 0 row lock(s)
+---TRANSACTION 15449, ACTIVE 184 sec
+1 lock struct(s), heap size 1136, 1 row lock(s)
+MySQL thread id 11, OS thread handle 123145474228224, query id 664 localhost root
+Trx read view will not see trx with id &gt;= 15448, sees &lt; 15448
+---TRANSACTION 15448, ACTIVE 109 sec &#12304;&#27880;&#24847;&#36825;&#37324;&#38145;&#20303;&#20102;6&#34892;&#12305;
+2 lock struct(s), heap size 1136, 6 row lock(s), undo log entries 2
+MySQL thread id 10, OS thread handle 123145474785280, query id 663 192.168.0.10 root
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb0aad65" class="outline-2">
+<h2 id="orgb0aad65"><span class="section-number-2">3</span> RC 隔离级别时</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org9e58954" class="outline-3">
+<h3 id="org9e58954"><span class="section-number-3">3.1</span> 修改数据库隔离级别成 RC</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+直接编辑 <code>my.cnf</code> 文件, 添加如下配置参数
+</p>
+<div class="org-src-container">
+<pre class="src src-conf">[<span style="color: #268bd2;">mysqld</span>]
+<span style="color: #6c71c4;">transaction-isolation</span> = READ-COMMITTED
+</pre>
+</div>
+
+<p>
+重启 MySQL 服务后查看
+</p>
+<div class="org-src-container">
+<pre class="src src-text">mysql&gt; show variables like '%iso%';
++-----------------------+----------------+
+| Variable_name         | Value          |
++-----------------------+----------------+
+| transaction_isolation | READ-COMMITTED |
+| tx_isolation          | READ-COMMITTED |
++-----------------------+----------------+
+2 rows in set (0.01 sec)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org42a59dd" class="outline-3">
+<h3 id="org42a59dd"><span class="section-number-3">3.2</span> 实验 II 分析</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+重复上述的实验 I 得到结果
+</p>
+
+<p>
+会话 A 的输出结果
+</p>
+<div class="org-src-container">
+<pre class="src src-text">mysql&gt; select * from t;
++---+------+
+| a | b    |
++---+------+
+| 1 |    2 |
+| 2 |    3 |
+| 3 |    2 |
+| 4 |    3 |
+| 5 |    2 |
++---+------+
+5 rows in set (0.00 sec)
+
+mysql&gt; set @@autocommit = 0;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; UPDATE t SET b = 5 WHERE b = 3;
+Query OK, 2 rows affected (0.00 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+</pre>
+</div>
+
+<p>
+会话 B 的输出结果
+</p>
+<div class="org-src-container">
+<pre class="src src-text">mysql&gt; select * from t;
++---+------+
+| a | b    |
++---+------+
+| 1 |    2 |
+| 2 |    3 |
+| 3 |    2 |
+| 4 |    3 |
+| 5 |    2 |
++---+------+
+5 rows in set (0.00 sec)
+
+mysql&gt; set @@autocommit = 0;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; UPDATE t SET b = 4 WHERE b = 2;
+Query OK, 3 rows affected (0.00 sec)
+Rows matched: 3  Changed: 3  Warnings: 0
+</pre>
+</div>
+
+<p>
+查看当前事务加锁的状态
+</p>
+<div class="org-src-container">
+<pre class="src src-text">mysql&gt; show engine innodb status\G
+... &#30465;&#30053;&#20102;&#19968;&#22534;
+------------
+TRANSACTIONS
+------------
+Trx id counter 15878
+Purge done for trx's n:o &lt; 0 undo n:o &lt; 0 state: running but idle
+History list length 0
+LIST OF TRANSACTIONS FOR EACH SESSION:
+---TRANSACTION 281479536606784, not started
+0 lock struct(s), heap size 1136, 0 row lock(s)
+---TRANSACTION 15877, ACTIVE 14 sec
+2 lock struct(s), heap size 1136, 5 row lock(s), undo log entries 3
+MySQL thread id 3, OS thread handle 123145391869952, query id 22 localhost root
+---TRANSACTION 15876, ACTIVE 21 sec &#12304;&#36825;&#37324;&#21482;&#26159;&#38145;&#20303;&#20102;2&#34892;&#12305;
+2 lock struct(s), heap size 1136, 2 row lock(s), undo log entries 2
+MySQL thread id 2, OS thread handle 123145391591424, query id 21 localhost root
+--------
+</pre>
+</div>
+
+<p>
+与实验 I 不同的是, 实验 II 的隔离级别改成了 READ-COMMITED, 在 UPDATE 执行是发
+生了 <b><b>半一致读</b></b>, 并不会锁定所有数据
+</p>
+<ol class="org-ol">
+<li>注意会话 A 和会话 B 更新的数据并不是互相影响的</li>
+<li>当会话 A 执行事务未进行提交后</li>
+<li>会话 B 在执行 UPDATE 语句时直接更新成功</li>
+<li>在 UPDATE 执行是发生了 <b><b>半一致读</b></b>, 并不会锁定所有数据, 所有会话 A 不会锁
+定会话 B 更新的数据</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Last Updated 2021-08-08 Sun 13:31. Created by Jinghui Hu at 2021-08-08 Sun 13:04.</p>
+</div>
+</body>
+</html>

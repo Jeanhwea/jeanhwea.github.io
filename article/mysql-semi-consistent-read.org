@@ -1,0 +1,171 @@
+#+TITLE: MySQL 的半一致读
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2021-08-08 Sun 13:04:32>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: mysql transaction
+
+
+* 半一致读
+  Semi-Consistent Read 是 InnoDB 引擎中的一种特殊的同步方式, 在 READ COMMITED 的
+  隔离级别下, 对于 ~UPDATE~ 语句, 如果匹配行被锁住, InnoDB 会执行 **半一致读**
+  (Semi-Consistent Read), 即返回最近一条匹配行, **只有当匹配行必须更新时**,
+  MySQL 会再次读取它, 这时 InnoDB 才会锁定它, 或者阻塞等待
+
+* RR 隔离级别时
+** 查看数据库的隔离级别
+  首先将数据库设置成 RR
+  #+BEGIN_SRC text
+    mysql> show variables like '%iso%';
+    +-----------------------+-----------------+
+    | Variable_name         | Value           |
+    +-----------------------+-----------------+
+    | transaction_isolation | REPEATABLE-READ |
+    | tx_isolation          | REPEATABLE-READ |
+    +-----------------------+-----------------+
+    2 rows in set (0.00 sec)
+  #+END_SRC
+
+** 实验 I 分析
+   添加测试表 t, 并插入一些数据
+   #+BEGIN_SRC sql
+     CREATE TABLE t (a INT NOT NULL, b INT) ENGINE = InnoDB;
+     INSERT INTO t VALUES (1,2),(2,3),(3,2),(4,3),(5,2);
+     COMMIT;
+
+     # 会话 A
+     START TRANSACTION;
+     UPDATE t SET b = 5 WHERE b = 3;
+
+     # 会话 B
+     UPDATE t SET b = 4 WHERE b = 2;
+   #+END_SRC
+
+   1. 注意会话 A 和会话 B 更新的数据并不是互相影响的
+   2. 当会话 A 执行事务未进行提交后
+   3. 会话 B 在执行 UPDATE 语句时直接 **阻塞等待**
+   4. 注意 b 字段不是主键，也不是唯一键，所有不会出现 Record Lock 或 Gap Lock ,
+      在两 个数据库执行完操作后，数据库直接锁住了 6 行，相当于整个表都锁住了
+      #+BEGIN_SRC text
+        mysql> show engine innodb status\G
+        ,*************************** 1. row ***************************
+        ... 省略一堆无关参数
+        ------------
+        TRANSACTIONS
+        ------------
+        Trx id counter 15450
+        Purge done for trx's n:o < 15448 undo n:o < 0 state: running but idle
+        History list length 0
+        LIST OF TRANSACTIONS FOR EACH SESSION:
+        ---TRANSACTION 281479455829568, not started
+        0 lock struct(s), heap size 1136, 0 row lock(s)
+        ---TRANSACTION 15449, ACTIVE 184 sec
+        1 lock struct(s), heap size 1136, 1 row lock(s)
+        MySQL thread id 11, OS thread handle 123145474228224, query id 664 localhost root
+        Trx read view will not see trx with id >= 15448, sees < 15448
+        ---TRANSACTION 15448, ACTIVE 109 sec 【注意这里锁住了6行】
+        2 lock struct(s), heap size 1136, 6 row lock(s), undo log entries 2
+        MySQL thread id 10, OS thread handle 123145474785280, query id 663 192.168.0.10 root
+      #+END_SRC
+
+* RC 隔离级别时
+** 修改数据库隔离级别成 RC
+   直接编辑 ~my.cnf~ 文件, 添加如下配置参数
+   #+BEGIN_SRC conf
+     [mysqld]
+     transaction-isolation = READ-COMMITTED
+   #+END_SRC
+
+   重启 MySQL 服务后查看
+   #+BEGIN_SRC text
+     mysql> show variables like '%iso%';
+     +-----------------------+----------------+
+     | Variable_name         | Value          |
+     +-----------------------+----------------+
+     | transaction_isolation | READ-COMMITTED |
+     | tx_isolation          | READ-COMMITTED |
+     +-----------------------+----------------+
+     2 rows in set (0.01 sec)
+   #+END_SRC
+
+** 实验 II 分析
+   重复上述的实验 I 得到结果
+
+   会话 A 的输出结果
+   #+BEGIN_SRC text
+     mysql> select * from t;
+     +---+------+
+     | a | b    |
+     +---+------+
+     | 1 |    2 |
+     | 2 |    3 |
+     | 3 |    2 |
+     | 4 |    3 |
+     | 5 |    2 |
+     +---+------+
+     5 rows in set (0.00 sec)
+
+     mysql> set @@autocommit = 0;
+     Query OK, 0 rows affected (0.00 sec)
+
+     mysql> START TRANSACTION;
+     Query OK, 0 rows affected (0.00 sec)
+
+     mysql> UPDATE t SET b = 5 WHERE b = 3;
+     Query OK, 2 rows affected (0.00 sec)
+     Rows matched: 2  Changed: 2  Warnings: 0
+   #+END_SRC
+
+   会话 B 的输出结果
+   #+BEGIN_SRC text
+     mysql> select * from t;
+     +---+------+
+     | a | b    |
+     +---+------+
+     | 1 |    2 |
+     | 2 |    3 |
+     | 3 |    2 |
+     | 4 |    3 |
+     | 5 |    2 |
+     +---+------+
+     5 rows in set (0.00 sec)
+
+     mysql> set @@autocommit = 0;
+     Query OK, 0 rows affected (0.00 sec)
+
+     mysql> UPDATE t SET b = 4 WHERE b = 2;
+     Query OK, 3 rows affected (0.00 sec)
+     Rows matched: 3  Changed: 3  Warnings: 0
+   #+END_SRC
+
+   查看当前事务加锁的状态
+   #+BEGIN_SRC text
+     mysql> show engine innodb status\G
+     ... 省略了一堆
+     ------------
+     TRANSACTIONS
+     ------------
+     Trx id counter 15878
+     Purge done for trx's n:o < 0 undo n:o < 0 state: running but idle
+     History list length 0
+     LIST OF TRANSACTIONS FOR EACH SESSION:
+     ---TRANSACTION 281479536606784, not started
+     0 lock struct(s), heap size 1136, 0 row lock(s)
+     ---TRANSACTION 15877, ACTIVE 14 sec
+     2 lock struct(s), heap size 1136, 5 row lock(s), undo log entries 3
+     MySQL thread id 3, OS thread handle 123145391869952, query id 22 localhost root
+     ---TRANSACTION 15876, ACTIVE 21 sec 【这里只是锁住了2行】
+     2 lock struct(s), heap size 1136, 2 row lock(s), undo log entries 2
+     MySQL thread id 2, OS thread handle 123145391591424, query id 21 localhost root
+     --------
+   #+END_SRC
+
+   与实验 I 不同的是, 实验 II 的隔离级别改成了 READ-COMMITED, 在 UPDATE 执行是发
+   生了 **半一致读**, 并不会锁定所有数据
+   1. 注意会话 A 和会话 B 更新的数据并不是互相影响的
+   2. 当会话 A 执行事务未进行提交后
+   3. 会话 B 在执行 UPDATE 语句时直接更新成功
+   4. 在 UPDATE 执行是发生了 **半一致读**, 并不会锁定所有数据, 所有会话 A 不会锁
+      定会话 B 更新的数据
