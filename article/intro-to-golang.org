@@ -21,6 +21,152 @@
   11. 支持指针, 但是没有指针运算
   12. 默认并发支持: Goroutines 和 Channels
 
+* 基本语法
+** 主函数
+   #+BEGIN_SRC go
+     package main
+
+     import "fmt"
+
+     func main() {
+         fmt.Println("Hello Go")
+     }
+   #+END_SRC
+
+** 声明
+   #+BEGIN_SRC go
+     // 定义变量
+     var foo int // 定义，未初始化
+     var foo int = 42 // 定义并初始化
+     var foo, bar int = 42, 1302 // 定义多个参数，并初始化
+     var foo = 42 // 未给定类型，需要类型推导
+     foo := 42 // 只能在函数体中使用, 省略 var 关键字，不能提供类型
+
+
+     // 定义常量
+     const constant = "This is a constant"
+
+     // iota 可以用于数字自增，起始值为 0
+     const (
+         _ = iota
+         a
+         b
+         c = 1 << iota
+         d
+     )
+
+     mt.Println(a, b) // 1 2 (0 is skipped)
+     mt.Println(c, d) // 8 16 (2^3, 2^4)
+   #+END_SRC
+
+** 函数
+   #+BEGIN_SRC go
+     // 定义函数
+     func functionName() {}
+
+     // 参数类型在参数后
+     func functionName(param1 string, param2 int) {}
+
+     // 同样类型的参数可以合并
+     func functionName(param1, param2 int) {}
+
+     // 函数返回值
+     func functionName() int {
+         return 42
+     }
+
+     // 函数可以返回多个值
+     func returnMulti() (int, string) {
+         return 42, "foobar"
+     }
+     var x, str = returnMulti()
+
+     // 命名函数返回值
+     func returnMulti2() (n int, s string) {
+         n = 42
+         s = "foobar"
+         // n and s will be returned
+         return
+     }
+     var x, str = returnMulti2()
+   #+END_SRC
+
+** 闭包
+   #+BEGIN_SRC go
+     func main() {
+         // 定义函数
+         add := func(a, b int) int {
+             return a + b
+         }
+         // 调用函数定义
+         fmt.Println(add(3, 4))
+     }
+
+     // 闭包的情形
+     func scope() func() int{
+         outer_var := 2
+         foo := func() int { return outer_var}
+         return foo
+     }
+
+     func another_scope() func() int{
+         // 编译错误，因为 outer_var 和 foo 未定义
+         outer_var = 444
+         return foo
+     }
+
+
+     // 使用闭包
+     func outer() (func() int, int) {
+         outer_var := 2
+         inner := func() int {
+             outer_var += 99 // 上一个作用域的 outer_var 变量值被改变
+             return outer_var
+         }
+         inner()
+         return inner, outer_var // 返回 inner 函数和被修改的 outer_var 值, (改成了 101)
+     }
+   #+END_SRC
+
+** 变长参数列表
+   #+BEGIN_SRC go
+     func main() {
+         fmt.Println(adder(1, 2, 3)) // 6
+         fmt.Println(adder(9, 9))	// 18
+
+         nums := []int{10, 20, 30}
+         fmt.Println(adder(nums...))	// 60
+     }
+
+     func adder(args ...int) int {
+         total := 0
+         // 变长列表
+         for _, v := range args {
+             total += v
+         }
+         return total
+     }
+   #+END_SRC
+
+** 类型
+   #+BEGIN_SRC go
+     var i int = 42
+     var f float64 = float64(i)
+     var u uint = uint(f)
+
+     // 等价语法
+     i := 42
+     f := float64(i)
+     u := uint(f)
+   #+END_SRC
+
+** 包
+   1. 定义在每个源文件的头
+   2. 可执行文件在 main 包中
+   3. 规约: 包名是最后的文件夹
+   4. Upper case 的标识会被导出，可以被其它包可见
+   5. Lower case 的标识不会被导出，对其它包不可见
+
 * 参考连接
   1. [[https://golang.google.cn/][Golang 官网]]
   2. [[https://github.com/astaxie/build-web-application-with-golang][Build Web Application with Golang]]

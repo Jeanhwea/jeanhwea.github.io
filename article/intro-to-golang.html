@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-08-11 Wed 16:03 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Go 语言笔记</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jinghui Hu" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script type="text/javascript" src="styles/lib/js/jquery.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="../readme.html"> UP </a>
+ |
+ <a accesskey="H" href="../index.html"> HOME </a>
+</div><div id="content">
+<h1 class="title">Go 语言笔记</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orga2bd754">1. Go 语言特点</a></li>
+<li><a href="#org320f63c">2. 基本语法</a>
+<ul>
+<li><a href="#org5111bee">2.1. 主函数</a></li>
+<li><a href="#orgf7ff6a9">2.2. 声明</a></li>
+<li><a href="#org6cbf3bf">2.3. 函数</a></li>
+<li><a href="#org88fd473">2.4. 闭包</a></li>
+<li><a href="#org77ff9a6">2.5. 变长参数列表</a></li>
+</ul>
+</li>
+<li><a href="#org49a2155">3. 参考连接</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orga2bd754" class="outline-2">
+<h2 id="orga2bd754"><span class="section-number-2">1</span> Go 语言特点</h2>
+<div class="outline-text-2" id="text-1">
+<ol class="org-ol">
+<li>命令式编程</li>
+<li>静态类型</li>
+<li>类似 C 语言的语法</li>
+<li>编译成本地可执行的文件，没有运行虚拟机</li>
+<li>不支持类, 使用结构体和方法编程</li>
+<li>支持接口</li>
+<li>没有 implementation inheritance, 可以使用 Type Embedding</li>
+<li>函数是一等公民</li>
+<li>函数可以返回多个值</li>
+<li>可以使用闭包</li>
+<li>支持指针, 但是没有指针运算</li>
+<li>默认并发支持: Goroutines 和 Channels</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org320f63c" class="outline-2">
+<h2 id="org320f63c"><span class="section-number-2">2</span> 基本语法</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org5111bee" class="outline-3">
+<h3 id="org5111bee"><span class="section-number-3">2.1</span> 主函数</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #F92672;">package</span> main
+
+<span style="color: #F92672;">import</span> <span style="color: #E6DB74;">"fmt"</span>
+
+<span style="color: #F92672;">func</span> <span style="color: #A6E22E;">main</span>() {
+    fmt.<span style="color: #A6E22E;">Println</span>(<span style="color: #E6DB74;">"Hello Go"</span>)
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf7ff6a9" class="outline-3">
+<h3 id="orgf7ff6a9"><span class="section-number-3">2.2</span> 声明</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#23450;&#20041;&#21464;&#37327;</span>
+<span style="color: #F92672;">var</span> <span style="color: #FD971F;">foo</span> <span style="color: #66D9EF;">int</span> <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#23450;&#20041;&#65292;&#26410;&#21021;&#22987;&#21270;</span>
+<span style="color: #F92672;">var</span> <span style="color: #FD971F;">foo</span> <span style="color: #66D9EF;">int</span> = 42 <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#23450;&#20041;&#24182;&#21021;&#22987;&#21270;</span>
+<span style="color: #F92672;">var</span> <span style="color: #FD971F;">foo</span>, <span style="color: #FD971F;">bar</span> <span style="color: #66D9EF;">int</span> = 42, 1302 <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#23450;&#20041;&#22810;&#20010;&#21442;&#25968;&#65292;&#24182;&#21021;&#22987;&#21270;</span>
+<span style="color: #F92672;">var</span> <span style="color: #FD971F;">foo</span> = 42 <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#26410;&#32473;&#23450;&#31867;&#22411;&#65292;&#38656;&#35201;&#31867;&#22411;&#25512;&#23548;</span>
+<span style="color: #FD971F;">foo</span> := 42 <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#21482;&#33021;&#22312;&#20989;&#25968;&#20307;&#20013;&#20351;&#29992;, &#30465;&#30053; var &#20851;&#38190;&#23383;&#65292;&#19981;&#33021;&#25552;&#20379;&#31867;&#22411;</span>
+
+
+<span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#23450;&#20041;&#24120;&#37327;</span>
+<span style="color: #F92672;">const</span> <span style="color: #AE81FF;">constant</span> = <span style="color: #E6DB74;">"This is a constant"</span>
+
+<span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">iota &#21487;&#20197;&#29992;&#20110;&#25968;&#23383;&#33258;&#22686;&#65292;&#36215;&#22987;&#20540;&#20026; 0</span>
+<span style="color: #F92672;">const</span> (
+    <span style="color: #AE81FF;">_</span> = <span style="color: #AE81FF;">iota</span>
+    <span style="color: #AE81FF;">a</span>
+    <span style="color: #AE81FF;">b</span>
+    <span style="color: #AE81FF;">c</span> = 1 &lt;&lt; <span style="color: #AE81FF;">iota</span>
+    <span style="color: #AE81FF;">d</span>
+)
+
+mt.<span style="color: #A6E22E;">Println</span>(a, b) <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">1 2 (0 is skipped)</span>
+mt.<span style="color: #A6E22E;">Println</span>(c, d) <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">8 16 (2^3, 2^4)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6cbf3bf" class="outline-3">
+<h3 id="org6cbf3bf"><span class="section-number-3">2.3</span> 函数</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#23450;&#20041;&#20989;&#25968;</span>
+<span style="color: #F92672;">func</span> <span style="color: #A6E22E;">functionName</span>() {}
+
+<span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#21442;&#25968;&#31867;&#22411;&#22312;&#21442;&#25968;&#21518;</span>
+<span style="color: #F92672;">func</span> <span style="color: #A6E22E;">functionName</span>(<span style="color: #FD971F;">param1</span> <span style="color: #66D9EF;">string</span>, <span style="color: #FD971F;">param2</span> <span style="color: #66D9EF;">int</span>) {}
+
+<span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#21516;&#26679;&#31867;&#22411;&#30340;&#21442;&#25968;&#21487;&#20197;&#21512;&#24182;</span>
+<span style="color: #F92672;">func</span> <span style="color: #A6E22E;">functionName</span>(<span style="color: #FD971F;">param1</span>, <span style="color: #FD971F;">param2</span> <span style="color: #66D9EF;">int</span>) {}
+
+<span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#20989;&#25968;&#36820;&#22238;&#20540;</span>
+<span style="color: #F92672;">func</span> <span style="color: #A6E22E;">functionName</span>() <span style="color: #66D9EF;">int</span> {
+    <span style="color: #F92672;">return</span> 42
+}
+
+<span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#20989;&#25968;&#21487;&#20197;&#36820;&#22238;&#22810;&#20010;&#20540;</span>
+<span style="color: #F92672;">func</span> <span style="color: #A6E22E;">returnMulti</span>() (<span style="color: #66D9EF;">int</span>, <span style="color: #66D9EF;">string</span>) {
+    <span style="color: #F92672;">return</span> 42, <span style="color: #E6DB74;">"foobar"</span>
+}
+<span style="color: #F92672;">var</span> <span style="color: #FD971F;">x</span>, <span style="color: #FD971F;">str</span> = <span style="color: #A6E22E;">returnMulti</span>()
+
+<span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#21629;&#21517;&#20989;&#25968;&#36820;&#22238;&#20540;</span>
+<span style="color: #F92672;">func</span> <span style="color: #A6E22E;">returnMulti2</span>() (<span style="color: #FD971F;">n</span> <span style="color: #66D9EF;">int</span>, <span style="color: #FD971F;">s</span> <span style="color: #66D9EF;">string</span>) {
+    n = 42
+    s = <span style="color: #E6DB74;">"foobar"</span>
+    <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">n and s will be returned</span>
+    <span style="color: #F92672;">return</span>
+}
+<span style="color: #F92672;">var</span> <span style="color: #FD971F;">x</span>, <span style="color: #FD971F;">str</span> = <span style="color: #A6E22E;">returnMulti2</span>()
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org88fd473" class="outline-3">
+<h3 id="org88fd473"><span class="section-number-3">2.4</span> 闭包</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #F92672;">func</span> <span style="color: #A6E22E;">main</span>() {
+    <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#23450;&#20041;&#20989;&#25968;</span>
+    <span style="color: #FD971F;">add</span> := <span style="color: #F92672;">func</span>(<span style="color: #FD971F;">a</span>, <span style="color: #FD971F;">b</span> <span style="color: #66D9EF;">int</span>) <span style="color: #66D9EF;">int</span> {
+        <span style="color: #F92672;">return</span> a + b
+    }
+    <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#35843;&#29992;&#20989;&#25968;&#23450;&#20041;</span>
+    fmt.<span style="color: #A6E22E;">Println</span>(<span style="color: #A6E22E;">add</span>(3, 4))
+}
+
+<span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#38381;&#21253;&#30340;&#24773;&#24418;</span>
+<span style="color: #F92672;">func</span> <span style="color: #A6E22E;">scope</span>() <span style="color: #F92672;">func</span>() <span style="color: #66D9EF;">int</span>{
+    <span style="color: #FD971F;">outer_var</span> := 2
+    <span style="color: #FD971F;">foo</span> := <span style="color: #F92672;">func</span>() <span style="color: #66D9EF;">int</span> { <span style="color: #F92672;">return</span> outer_var}
+    <span style="color: #F92672;">return</span> foo
+}
+
+<span style="color: #F92672;">func</span> <span style="color: #A6E22E;">another_scope</span>() <span style="color: #F92672;">func</span>() <span style="color: #66D9EF;">int</span>{
+    <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#32534;&#35793;&#38169;&#35823;&#65292;&#22240;&#20026; outer_var &#21644; foo &#26410;&#23450;&#20041;</span>
+    outer_var = 444
+    <span style="color: #F92672;">return</span> foo
+}
+
+
+<span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#20351;&#29992;&#38381;&#21253;</span>
+<span style="color: #F92672;">func</span> <span style="color: #A6E22E;">outer</span>() (<span style="color: #F92672;">func</span>() <span style="color: #66D9EF;">int</span>, <span style="color: #66D9EF;">int</span>) {
+    <span style="color: #FD971F;">outer_var</span> := 2
+    <span style="color: #FD971F;">inner</span> := <span style="color: #F92672;">func</span>() <span style="color: #66D9EF;">int</span> {
+        outer_var += 99 <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#19978;&#19968;&#20010;&#20316;&#29992;&#22495;&#30340; outer_var &#21464;&#37327;&#20540;&#34987;&#25913;&#21464;</span>
+        <span style="color: #F92672;">return</span> outer_var
+    }
+    <span style="color: #A6E22E;">inner</span>()
+    <span style="color: #F92672;">return</span> inner, outer_var <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#36820;&#22238; inner &#20989;&#25968;&#21644;&#34987;&#20462;&#25913;&#30340; outer_var &#20540;, (&#25913;&#25104;&#20102; 101)</span>
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org77ff9a6" class="outline-3">
+<h3 id="org77ff9a6"><span class="section-number-3">2.5</span> 变长参数列表</h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #F92672;">func</span> <span style="color: #A6E22E;">main</span>() {
+    fmt.<span style="color: #A6E22E;">Println</span>(<span style="color: #A6E22E;">adder</span>(1, 2, 3)) <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">6</span>
+    fmt.<span style="color: #A6E22E;">Println</span>(<span style="color: #A6E22E;">adder</span>(9, 9))    <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">18</span>
+
+    <span style="color: #FD971F;">nums</span> := []<span style="color: #66D9EF;">int</span>{10, 20, 30}
+    fmt.<span style="color: #A6E22E;">Println</span>(<span style="color: #A6E22E;">adder</span>(nums...)) <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">60</span>
+}
+
+<span style="color: #F92672;">func</span> <span style="color: #A6E22E;">adder</span>(<span style="color: #FD971F;">args</span> ...<span style="color: #66D9EF;">int</span>) <span style="color: #66D9EF;">int</span> {
+    <span style="color: #FD971F;">total</span> := 0
+    <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#21464;&#38271;&#21015;&#34920;</span>
+    <span style="color: #F92672;">for</span> <span style="color: #FD971F;">_</span>, <span style="color: #FD971F;">v</span> := <span style="color: #F92672;">range</span> args {
+        total += v
+    }
+    <span style="color: #F92672;">return</span> total
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org49a2155" class="outline-2">
+<h2 id="org49a2155"><span class="section-number-2">3</span> 参考连接</h2>
+<div class="outline-text-2" id="text-3">
+<ol class="org-ol">
+<li><a href="https://golang.google.cn/">Golang 官网</a></li>
+<li><a href="https://github.com/astaxie/build-web-application-with-golang">Build Web Application with Golang</a></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Last Updated 2021-08-11 Wed 16:03. Created by Jinghui Hu at 2021-08-11 Wed 11:41.</p>
+</div>
+</body>
+</html>
