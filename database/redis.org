@@ -58,6 +58,48 @@
     "bar"
   #+END_SRC
 
+* Redis 的内部数据结构
+** 简单动态字符串 (Simple Dynamic String)
+   1. sds 是对 C 语言字符串的扩展, 除了记录底层字符串，还缓存了当前长度
+      #+BEGIN_SRC c
+        struct __attribute__ ((__packed__)) sdshdr64 {
+            uint64_t len; /* used */
+            uint64_t alloc; /* excluding the header and null terminator */
+            unsigned char flags; /* 3 lsb of type, 5 unused bits */
+            char buf[];
+        };
+      #+END_SRC
+   2. Redis 的字符串是二进制安全
+   3. 对比 C 语言字符串，提供了如下的特性
+      - 高效计算字符串长度 ~strlen~
+      - 高效追加字符串 ~append~
+   4. 代码实现在 ~sds.h~ 和 ~sds.c~ 两个文件中
+
+** 双端链表 (Doubly Linked List)
+   1. 代码实现在 ~adlist.h~ 和 ~adlist.c~ 两个文件中
+   2. 该数据结构的定义如下
+      #+BEGIN_SRC c
+        typedef struct listNode {
+            struct listNode *prev;
+            struct listNode *next;
+            void *value;
+        } listNode;
+
+        typedef struct listIter {
+            listNode *next;
+            int direction;
+        } listIter;
+
+        typedef struct list {
+            listNode *head;
+            listNode *tail;
+            void *(*dup)(void *ptr);
+            void (*free)(void *ptr);
+            int (*match)(void *ptr, void *key);
+            unsigned long len;
+        } list;
+      #+END_SRC
+
 * Redis 的数据类型
   1. string 字符串, 整数, 浮点数
      - 二进制安全, 可以存储图片和序列化对象, 最多可存储 512M 的数据
