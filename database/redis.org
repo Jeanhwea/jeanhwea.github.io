@@ -105,7 +105,7 @@
 ** 字典 (Hash Table)
    1. 代码实现在 ~dict.h~ 和 ~dict.c~ 两个文件中
    2. 字典的实现在 Redis 中有两个作用
-      - 实现数据库键空间 (Key Space)
+      - 实现数据库键空间 (Key Space), 例如: ~DBSIZE~, ~FLUSHDB~, ~RANDOMKEY~
       - 用作 Hash 类型键的底层实现之一
    3. 该数据结构的定义如下
       #+BEGIN_SRC c
@@ -134,10 +134,10 @@
          ,* implement incremental rehashing, for the old to the new table. */
         // 每个字典的 entry 有两个 dictht, 主要目的是可以快速 rehash
         typedef struct dictht {
-          dictEntry **table;
-          unsigned long size;
-          unsigned long sizemask;
-          unsigned long used;
+          dictEntry **table; // 哈希桶 bucket
+          unsigned long size; // 指针数组大小 bucket size
+          unsigned long sizemask; // 指针数组长度掩码，用于计算索引值
+          unsigned long used; // 哈希表现有节点数量
         } dictht;
 
         typedef struct dict { // 字典数据类型的定义
@@ -167,7 +167,19 @@
         /* This is the initial size of every hash table */
         #define DICT_HT_INITIAL_SIZE     4
       #+END_SRC
-   4. 字典的每个项记录两个 ~dictht~, 主要用于 rehash 操作
+   4. 字典的每个项记录两个 ~dictht~
+      - ~ht[0]~ 是字典主要使用的哈希表，
+      - ~ht[1]~ 则只有在程序对 ~ht[0]~ 进行 rehash 时才使用
+   5. ~dictCreate()~ 创建新的字典
+      - ~dictCreate()~ 创建了 ~dict~ 和两个 ~dictht~
+      - ~dictCreate()~ 并没有给 ~dictht~ 的 ~table~ 分配空间
+   6. ~dictAdd()~ 表示向字典中添加 ~dictEntry~ 数据
+      - 该过程可能触发 rehash
+      - rehash 使用 ~ht[1]~ 作为中转节点
+      - 为了 hash 效率, Redis 采用渐进式哈希
+        + ~_dictRehashStep~ 用于对数据库字典、以及哈希键的字典进行被动 rehash
+        + ~dictRehashMilliseconds~ 则由 Redis 服务器常规任务程序执行，用于对数据
+          库字典进行主动 rehash
 
 * Redis 的数据类型
   1. string 字符串, 整数, 浮点数
@@ -179,14 +191,16 @@
   2. hash 哈希表
      - hmset/hget/hgetall
      - 物理存储会在 ziplist 和 hashtable 两种类型中转换
+     - ziplist 比 hashtable 节约空间，默认使用 ziplist
+     - 当有需要时，Redis 会自动将 ziplist 转成 hashtable
   3. list 列表
      - 列表是一个双向链表, 最多存储 ~2^32-1~ 个元素
      - lpush/lpop/rpush/rpop
      - lrange key 0 10
      - llen
-  5. set 集合
+  4. set 集合
      - sadd/smembers
-  6. zset 有序集合
+  5. zset 有序集合
      - 有序的集合类型, 键是不可重复的
      - zadd
 
