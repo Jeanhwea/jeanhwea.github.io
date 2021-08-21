@@ -223,6 +223,20 @@
       - 每个节点带有高度为 1 层的后退指针，用于从表尾方向向表头方向迭代
 
 * 内存映射数据结构
+** 整数集合 (intset)
+   1. 用于有序、无重复地保存多个整数值，根据元素的值，自动选择该用什么长度的整数
+      类型来保存元素
+   2. intset 的应用范围如下
+      - 只保存着整数元素
+      - 元素的数量不多
+   3. intset 的实习见 ~intset.c~ 和 ~intset.h~ 中
+      #+BEGIN_SRC c
+        typedef struct intset {
+          uint32_t encoding; // 保存所使用类型的长度
+          uint32_t length; // 元素个数
+          int8_t contents[]; // 元素
+        } intset;
+      #+END_SRC
 
 * 数据类型
   1. string 字符串, 整数, 浮点数
