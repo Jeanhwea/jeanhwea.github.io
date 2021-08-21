@@ -154,8 +154,8 @@
          ,* should be called while iterating. */
         typedef struct dictIterator {
           dict *d;
-          long index;
-          int table, safe;
+          long index; // 正在迭代的数组索引
+          int table, safe; // table 表示正在迭代的号码（0或1）, safe=1, 表示迭代过程中修改哈希表
           dictEntry *entry, *nextEntry;
           /* unsafe iterator fingerprint for misuse detection. */
           long long fingerprint;
@@ -175,11 +175,49 @@
       - ~dictCreate()~ 并没有给 ~dictht~ 的 ~table~ 分配空间
    6. ~dictAdd()~ 表示向字典中添加 ~dictEntry~ 数据
       - 该过程可能触发 rehash
+        + rehash 可以是扩展数据，也可能是收缩数据 (shrink)
       - rehash 使用 ~ht[1]~ 作为中转节点
       - 为了 hash 效率, Redis 采用渐进式哈希
         + ~_dictRehashStep~ 用于对数据库字典、以及哈希键的字典进行被动 rehash
         + ~dictRehashMilliseconds~ 则由 Redis 服务器常规任务程序执行，用于对数据
           库字典进行主动 rehash
+   7. 字典使用 _链地址_ 解决哈希冲突
+
+** 跳跃表 (Skip List)
+   1. 跳跃表主要使用场景就是 _有序集合_ zset
+   2. 跳跃表以有序的方式在 _层次化_ 的链表中保存元素， 效率和平衡树媲美
+   3. 查找、删除、添加等操作都可以在 _O(logN)_ 期望时间下完成
+   4. 比起平衡树来说， 跳跃表的实现要简单直观得多
+   5. 跳跃表的构成部分
+      - 表头（head）：负责维护跳跃表的节点指针
+      - 跳跃表节点：保存着元素值，以及多个层
+      - 层：保存着指向其他元素的指针。高层的指针越过的元素数量大于等于低层的指针，
+        为了提高查找的效率，程序总是从高层先开始访问，然后随着元素值范围的缩小，
+        慢慢降低层次
+      - 表尾：全部由 NULL 组成，表示跳跃表的末尾
+   6. 跳跃表的定义位于 ~server.h~ 中
+      #+BEGIN_SRC c
+        /* ZSETs use a specialized version of Skiplists */
+        typedef struct zskiplistNode {
+            sds ele;
+            double score;
+            struct zskiplistNode *backward; // 后退指针
+            struct zskiplistLevel { // 层
+                struct zskiplistNode *forward; // 前进指针
+                unsigned long span; // 该层跨域的节点数量
+            } level[];
+        } zskiplistNode;
+
+        typedef struct zskiplist {
+            struct zskiplistNode *header, *tail; // 头节点和尾节点
+            unsigned long length; // 节点数量
+            int level; // 目前表内节点的最大层数
+        } zskiplist;
+      #+END_SRC
+   7. Redis 在 William Pugh 关于 Skip List 的设计中进行修改，满足自身查询的需求
+      - score 值可重复
+      - 对比一个元素需要同时检查它的 score 和 member
+      - 每个节点带有高度为 1 层的后退指针，用于从表尾方向向表头方向迭代
 
 * Redis 的数据类型
   1. string 字符串, 整数, 浮点数
