@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-08-03 Tue 09:29 -->
+<!-- 2021-08-22 Sun 12:35 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Redis</title>
@@ -233,18 +233,33 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org2430543">1. Redis 特性</a></li>
-<li><a href="#org2969a5e">2. Redis 使用场景</a></li>
-<li><a href="#org3983dd0">3. Redis 的安装及使用</a></li>
-<li><a href="#orgbfb1056">4. Redis 的数据类型</a></li>
-<li><a href="#org48c0756">5. 相关连接</a></li>
+<li><a href="#orgb864aee">1. Redis 特性</a></li>
+<li><a href="#org1278dce">2. Redis 使用场景</a></li>
+<li><a href="#org5b2e4b9">3. 安装及使用</a></li>
+<li><a href="#orgccf172c">4. 内部数据结构</a>
+<ul>
+<li><a href="#orgb308ac4">4.1. 简单动态字符串 (Simple Dynamic String)</a></li>
+<li><a href="#org2976047">4.2. 双端链表 (Doubly Linked List)</a></li>
+<li><a href="#org45fb50e">4.3. 字典 (Hash Table)</a></li>
+<li><a href="#orge7b3586">4.4. 跳跃表 (Skip List)</a></li>
+</ul>
+</li>
+<li><a href="#orgfdf47e5">5. 内存映射数据结构</a>
+<ul>
+<li><a href="#orgb2df461">5.1. 整数集合 (intset)</a></li>
+<li><a href="#org2d55b7c">5.2. 压缩列表 (ziplist)</a></li>
+</ul>
+</li>
+<li><a href="#org32116e6">6. 数据类型</a></li>
+<li><a href="#orgd111a8d">7. Redis 缓存相关问题</a></li>
+<li><a href="#org2348f13">8. 相关连接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org2430543" class="outline-2">
-<h2 id="org2430543"><span class="section-number-2">1</span> Redis 特性</h2>
+<div id="outline-container-orgb864aee" class="outline-2">
+<h2 id="orgb864aee"><span class="section-number-2">1</span> Redis 特性</h2>
 <div class="outline-text-2" id="text-1">
 <ol class="org-ol">
 <li>速度快
@@ -257,7 +272,7 @@
 <li>键值对的数据结构服务器
 <ul class="org-ul">
 <li>key 永远是 String</li>
-<li>value 可以</li>
+<li>value 可以是多种类型, 可以通过 <code>object encoding &lt;key&gt;</code> 来查看</li>
 </ul></li>
 <li>丰富的功能</li>
 <li>简单稳定
@@ -276,8 +291,8 @@
 </div>
 </div>
 
-<div id="outline-container-org2969a5e" class="outline-2">
-<h2 id="org2969a5e"><span class="section-number-2">2</span> Redis 使用场景</h2>
+<div id="outline-container-org1278dce" class="outline-2">
+<h2 id="org1278dce"><span class="section-number-2">2</span> Redis 使用场景</h2>
 <div class="outline-text-2" id="text-2">
 <ol class="org-ol">
 <li>缓存数据库</li>
@@ -290,8 +305,8 @@
 </div>
 </div>
 
-<div id="outline-container-org3983dd0" class="outline-2">
-<h2 id="org3983dd0"><span class="section-number-2">3</span> Redis 的安装及使用</h2>
+<div id="outline-container-org5b2e4b9" class="outline-2">
+<h2 id="org5b2e4b9"><span class="section-number-2">3</span> 安装及使用</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 下载并安装
@@ -326,9 +341,315 @@ redis&gt; get foo
 </div>
 </div>
 
-<div id="outline-container-orgbfb1056" class="outline-2">
-<h2 id="orgbfb1056"><span class="section-number-2">4</span> Redis 的数据类型</h2>
+<div id="outline-container-orgccf172c" class="outline-2">
+<h2 id="orgccf172c"><span class="section-number-2">4</span> 内部数据结构</h2>
 <div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-orgb308ac4" class="outline-3">
+<h3 id="orgb308ac4"><span class="section-number-3">4.1</span> 简单动态字符串 (Simple Dynamic String)</h3>
+<div class="outline-text-3" id="text-4-1">
+<ol class="org-ol">
+<li><p>
+sds 是对 C 语言字符串的扩展, 除了记录底层字符串，还缓存了当前长度
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">sds &#30340;&#23454;&#29616;&#32467;&#26500;&#20307;&#19981;&#27490;&#19968;&#20010;&#65292;&#20294;&#26159;&#23450;&#20041;&#30340;&#26041;&#24335;&#31867;&#20284;&#65292;&#21482;&#26159;&#25805;&#20316;&#31995;&#32479;&#20301;&#25968;&#19981;&#19968;&#33268;</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#19979;&#38754;&#20197; sdshdr64 &#20026;&#20363;&#23637;&#31034;</span>
+<span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #4f97d7; font-weight: bold;">__attribute__</span> <span style="color: #8d5649;">(</span><span style="color: #d8241f;">(</span>__packed__<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span> <span style="color: #ce537a; font-weight: bold;">sdshdr64</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #ce537a; font-weight: bold;">uint64_t</span> <span style="color: #7590db;">len</span>; <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">used</span><span style="color: #93a1a1; font-style: italic;"> */</span>
+  <span style="color: #ce537a; font-weight: bold;">uint64_t</span> <span style="color: #7590db;">alloc</span>; <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">excluding the header and null terminator</span><span style="color: #93a1a1; font-style: italic;"> */</span>
+  <span style="color: #ce537a; font-weight: bold;">unsigned</span> <span style="color: #ce537a; font-weight: bold;">char</span> <span style="color: #7590db;">flags</span>; <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">3 lsb of type, 5 unused bits</span><span style="color: #93a1a1; font-style: italic;"> */</span>
+  <span style="color: #ce537a; font-weight: bold;">char</span> <span style="color: #7590db;">buf</span><span style="color: #d8241f;">[]</span>;
+<span style="color: #8d5649;">}</span>;
+</pre>
+</div></li>
+<li>Redis 的字符串是 <span class="underline">二进制安全</span></li>
+<li>对比 C 语言字符串，提供了如下的特性
+<ul class="org-ul">
+<li>高效计算字符串长度 <code>strlen</code></li>
+<li>高效追加字符串 <code>append</code></li>
+</ul></li>
+<li>代码实现在 <code>sds.h</code> 和 <code>sds.c</code> 两个文件中</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org2976047" class="outline-3">
+<h3 id="org2976047"><span class="section-number-3">4.2</span> 双端链表 (Doubly Linked List)</h3>
+<div class="outline-text-3" id="text-4-2">
+<ol class="org-ol">
+<li>代码实现在 <code>adlist.h</code> 和 <code>adlist.c</code> 两个文件中</li>
+<li><p>
+该数据结构的定义如下
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">listNode</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#35760;&#24405;&#38142;&#34920;&#33410;&#28857;</span>
+  <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">listNode</span> *<span style="color: #7590db;">prev</span>;
+  <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">listNode</span> *<span style="color: #7590db;">next</span>;
+  <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">value</span>;
+<span style="color: #8d5649;">}</span> <span style="color: #ce537a; font-weight: bold;">listNode</span>;
+
+<span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">listIter</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#35760;&#24405;&#38142;&#34920;&#30340;&#36845;&#20195;&#22120;</span>
+  <span style="color: #ce537a; font-weight: bold;">listNode</span> *<span style="color: #7590db;">next</span>;
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">direction</span>;
+<span style="color: #8d5649;">}</span> <span style="color: #ce537a; font-weight: bold;">listIter</span>;
+
+<span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">list</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#38142;&#34920;&#30340;&#25968;&#25454;&#32467;&#26500;</span>
+  <span style="color: #ce537a; font-weight: bold;">listNode</span> *<span style="color: #7590db;">head</span>;
+  <span style="color: #ce537a; font-weight: bold;">listNode</span> *<span style="color: #7590db;">tail</span>;
+  <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #d8241f;">(</span>*<span style="color: #bc6ec5; font-weight: bold;">dup</span><span style="color: #d8241f;">)(</span><span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">ptr</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #d8241f;">(</span>*<span style="color: #bc6ec5; font-weight: bold;">free</span><span style="color: #d8241f;">)(</span><span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">ptr</span><span style="color: #d8241f;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#35760;&#24405;&#38142;&#34920;&#30340;&#31354;&#38386;&#25351;&#38024;</span>
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #d8241f;">(</span>*<span style="color: #bc6ec5; font-weight: bold;">match</span><span style="color: #d8241f;">)(</span><span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">ptr</span>, <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">key</span><span style="color: #d8241f;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#21305;&#37197;&#30340;&#20989;&#25968;&#25351;&#38024;</span>
+  <span style="color: #ce537a; font-weight: bold;">unsigned</span> <span style="color: #ce537a; font-weight: bold;">long</span> <span style="color: #7590db;">len</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#32531;&#23384;&#38142;&#34920;&#38271;&#24230;</span>
+<span style="color: #8d5649;">}</span> <span style="color: #ce537a; font-weight: bold;">list</span>;
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org45fb50e" class="outline-3">
+<h3 id="org45fb50e"><span class="section-number-3">4.3</span> 字典 (Hash Table)</h3>
+<div class="outline-text-3" id="text-4-3">
+<ol class="org-ol">
+<li>代码实现在 <code>dict.h</code> 和 <code>dict.c</code> 两个文件中</li>
+<li>字典的实现在 Redis 中有两个作用
+<ul class="org-ul">
+<li>实现数据库键空间 (Key Space), 例如: <code>DBSIZE</code>, <code>FLUSHDB</code>, <code>RANDOMKEY</code></li>
+<li>用作 Hash 类型键的底层实现之一</li>
+</ul></li>
+<li><p>
+该数据结构的定义如下
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">dictEntry</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#23383;&#20856;&#39033;&#23450;&#20041;</span>
+  <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">key</span>;
+  <span style="color: #4f97d7; font-weight: bold;">union</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">val</span>;
+    <span style="color: #ce537a; font-weight: bold;">uint64_t</span> <span style="color: #7590db;">u64</span>;
+    <span style="color: #ce537a; font-weight: bold;">int64_t</span> <span style="color: #7590db;">s64</span>;
+    <span style="color: #ce537a; font-weight: bold;">double</span> <span style="color: #7590db;">d</span>;
+  <span style="color: #d8241f;">}</span> <span style="color: #7590db;">v</span>;
+  <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">dictEntry</span> *<span style="color: #7590db;">next</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#25351;&#21521;&#30456;&#24212;&#25968;&#25454;&#39033;</span>
+<span style="color: #8d5649;">}</span> <span style="color: #ce537a; font-weight: bold;">dictEntry</span>;
+
+<span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">dictType</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #ce537a; font-weight: bold;">uint64_t</span> <span style="color: #d8241f;">(</span>*<span style="color: #bc6ec5; font-weight: bold;">hashFunction</span><span style="color: #d8241f;">)(</span><span style="color: #4f97d7; font-weight: bold;">const</span> <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">key</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #d8241f;">(</span>*<span style="color: #bc6ec5; font-weight: bold;">keyDup</span><span style="color: #d8241f;">)(</span><span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">privdata</span>, <span style="color: #4f97d7; font-weight: bold;">const</span> <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">key</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #d8241f;">(</span>*<span style="color: #bc6ec5; font-weight: bold;">valDup</span><span style="color: #d8241f;">)(</span><span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">privdata</span>, <span style="color: #4f97d7; font-weight: bold;">const</span> <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">obj</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #d8241f;">(</span>*<span style="color: #bc6ec5; font-weight: bold;">keyCompare</span><span style="color: #d8241f;">)(</span><span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">privdata</span>, <span style="color: #4f97d7; font-weight: bold;">const</span> <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">key1</span>, <span style="color: #4f97d7; font-weight: bold;">const</span> <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">key2</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #d8241f;">(</span>*<span style="color: #bc6ec5; font-weight: bold;">keyDestructor</span><span style="color: #d8241f;">)(</span><span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">privdata</span>, <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">key</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #d8241f;">(</span>*<span style="color: #bc6ec5; font-weight: bold;">valDestructor</span><span style="color: #d8241f;">)(</span><span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">privdata</span>, <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">obj</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #d8241f;">(</span>*<span style="color: #bc6ec5; font-weight: bold;">expandAllowed</span><span style="color: #d8241f;">)(</span><span style="color: #ce537a; font-weight: bold;">size_t</span> <span style="color: #7590db;">moreMem</span>, <span style="color: #ce537a; font-weight: bold;">double</span> <span style="color: #7590db;">usedRatio</span><span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span> <span style="color: #ce537a; font-weight: bold;">dictType</span>;
+
+<span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">This is our hash table structure. Every dictionary has two of this as we</span>
+<span style="color: #2aa1ae; background-color: #292e34;"> * implement incremental rehashing, for the old to the new table.</span><span style="color: #93a1a1; font-style: italic;"> */</span>
+<span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#27599;&#20010;&#23383;&#20856;&#30340; entry &#26377;&#20004;&#20010; dictht, &#20027;&#35201;&#30446;&#30340;&#26159;&#21487;&#20197;&#24555;&#36895; rehash</span>
+<span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">dictht</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #ce537a; font-weight: bold;">dictEntry</span> **<span style="color: #7590db;">table</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#21704;&#24076;&#26742; bucket</span>
+  <span style="color: #ce537a; font-weight: bold;">unsigned</span> <span style="color: #ce537a; font-weight: bold;">long</span> <span style="color: #7590db;">size</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#25351;&#38024;&#25968;&#32452;&#22823;&#23567; bucket size</span>
+  <span style="color: #ce537a; font-weight: bold;">unsigned</span> <span style="color: #ce537a; font-weight: bold;">long</span> <span style="color: #7590db;">sizemask</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#25351;&#38024;&#25968;&#32452;&#38271;&#24230;&#25513;&#30721;&#65292;&#29992;&#20110;&#35745;&#31639;&#32034;&#24341;&#20540;</span>
+  <span style="color: #ce537a; font-weight: bold;">unsigned</span> <span style="color: #ce537a; font-weight: bold;">long</span> <span style="color: #7590db;">used</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#21704;&#24076;&#34920;&#29616;&#26377;&#33410;&#28857;&#25968;&#37327;</span>
+<span style="color: #8d5649;">}</span> <span style="color: #ce537a; font-weight: bold;">dictht</span>;
+
+<span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">dict</span> <span style="color: #8d5649;">{</span> <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#23383;&#20856;&#25968;&#25454;&#31867;&#22411;&#30340;&#23450;&#20041;</span>
+  <span style="color: #ce537a; font-weight: bold;">dictType</span> *<span style="color: #7590db;">type</span>;
+  <span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">privdata</span>;
+  <span style="color: #ce537a; font-weight: bold;">dictht</span> <span style="color: #7590db;">ht</span><span style="color: #d8241f;">[</span>2<span style="color: #d8241f;">]</span>;
+  <span style="color: #ce537a; font-weight: bold;">long</span> <span style="color: #7590db;">rehashidx</span>; <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">rehashing not in progress if rehashidx == -1</span><span style="color: #93a1a1; font-style: italic;"> */</span>
+  <span style="color: #ce537a; font-weight: bold;">int16_t</span> <span style="color: #7590db;">pauserehash</span>; <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">If &gt;0 rehashing is paused (&lt;0 indicates coding error)</span><span style="color: #93a1a1; font-style: italic;"> */</span>
+<span style="color: #8d5649;">}</span> <span style="color: #ce537a; font-weight: bold;">dict</span>;
+
+<span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">If safe is set to 1 this is a safe iterator, that means, you can call</span>
+<span style="color: #2aa1ae; background-color: #292e34;"> * dictAdd, dictFind, and other functions against the dictionary even while</span>
+<span style="color: #2aa1ae; background-color: #292e34;"> * iterating. Otherwise it is a non safe iterator, and only dictNext()</span>
+<span style="color: #2aa1ae; background-color: #292e34;"> * should be called while iterating.</span><span style="color: #93a1a1; font-style: italic;"> */</span>
+<span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">dictIterator</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #ce537a; font-weight: bold;">dict</span> *<span style="color: #7590db;">d</span>;
+  <span style="color: #ce537a; font-weight: bold;">long</span> <span style="color: #7590db;">index</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#27491;&#22312;&#36845;&#20195;&#30340;&#25968;&#32452;&#32034;&#24341;</span>
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">table</span>, <span style="color: #7590db;">safe</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">table &#34920;&#31034;&#27491;&#22312;&#36845;&#20195;&#30340;&#21495;&#30721;&#65288;0&#25110;1&#65289;, safe=1, &#34920;&#31034;&#36845;&#20195;&#36807;&#31243;&#20013;&#20462;&#25913;&#21704;&#24076;&#34920;</span>
+  <span style="color: #ce537a; font-weight: bold;">dictEntry</span> *<span style="color: #7590db;">entry</span>, *<span style="color: #7590db;">nextEntry</span>;
+  <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">unsafe iterator fingerprint for misuse detection.</span><span style="color: #93a1a1; font-style: italic;"> */</span>
+  <span style="color: #ce537a; font-weight: bold;">long</span> <span style="color: #ce537a; font-weight: bold;">long</span> <span style="color: #7590db;">fingerprint</span>;
+<span style="color: #8d5649;">}</span> <span style="color: #ce537a; font-weight: bold;">dictIterator</span>;
+
+<span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #8d5649;">(</span>dictScanFunction<span style="color: #8d5649;">)(</span><span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">privdata</span>, <span style="color: #4f97d7; font-weight: bold;">const</span> <span style="color: #ce537a; font-weight: bold;">dictEntry</span> *<span style="color: #7590db;">de</span><span style="color: #8d5649;">)</span>;
+<span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #8d5649;">(</span>dictScanBucketFunction<span style="color: #8d5649;">)(</span><span style="color: #ce537a; font-weight: bold;">void</span> *<span style="color: #7590db;">privdata</span>, <span style="color: #ce537a; font-weight: bold;">dictEntry</span> **<span style="color: #7590db;">bucketref</span><span style="color: #8d5649;">)</span>;
+
+<span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">This is the initial size of every hash table</span><span style="color: #93a1a1; font-style: italic;"> */</span>
+<span style="color: #bc6ec5;">#define</span> <span style="color: #7590db;">DICT_HT_INITIAL_SIZE</span>     4
+</pre>
+</div></li>
+<li>字典的每个项记录两个 <code>dictht</code>
+<ul class="org-ul">
+<li><code>ht[0]</code> 是字典主要使用的哈希表，</li>
+<li><code>ht[1]</code> 则只有在程序对 <code>ht[0]</code> 进行 rehash 时才使用</li>
+</ul></li>
+<li><code>dictCreate()</code> 创建新的字典
+<ul class="org-ul">
+<li><code>dictCreate()</code> 创建了 <code>dict</code> 和两个 <code>dictht</code></li>
+<li><code>dictCreate()</code> 并没有给 <code>dictht</code> 的 <code>table</code> 分配空间</li>
+</ul></li>
+<li><code>dictAdd()</code> 表示向字典中添加 <code>dictEntry</code> 数据
+<ul class="org-ul">
+<li>该过程可能触发 rehash
+<ul class="org-ul">
+<li>rehash 可以是扩展数据，也可能是收缩数据 (shrink)</li>
+</ul></li>
+<li>rehash 使用 <code>ht[1]</code> 作为中转节点</li>
+<li>为了 hash 效率, Redis 采用渐进式哈希
+<ul class="org-ul">
+<li><code>_dictRehashStep</code> 用于对数据库字典、以及哈希键的字典进行被动 rehash</li>
+<li><code>dictRehashMilliseconds</code> 则由 Redis 服务器常规任务程序执行，用于对数据
+库字典进行主动 rehash</li>
+</ul></li>
+</ul></li>
+<li>字典使用 <span class="underline">链地址</span> 解决哈希冲突</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orge7b3586" class="outline-3">
+<h3 id="orge7b3586"><span class="section-number-3">4.4</span> 跳跃表 (Skip List)</h3>
+<div class="outline-text-3" id="text-4-4">
+<ol class="org-ol">
+<li>跳跃表主要使用场景就是 <span class="underline">有序集合</span> zset
+<ul class="org-ul">
+<li>包含的元素数量比较多</li>
+<li>元素成员 (member) 是比较长的字符串</li>
+</ul></li>
+<li><a href="https://www.cl.cam.ac.uk/teaching/0506/Algorithms/skiplists.pdf">跳跃表</a>以有序的方式在 <span class="underline">层次化</span> 的链表中保存元素， 效率和平衡树媲美</li>
+<li>查找、删除、添加等操作都可以在 <span class="underline">O(logN)</span> 期望时间下完成</li>
+<li>比起平衡树来说， 跳跃表的实现要简单直观得多</li>
+<li>跳跃表的构成部分
+<ul class="org-ul">
+<li>表头 (head): 负责维护跳跃表的节点指针</li>
+<li>跳跃表节点: 保存着元素值，以及多个层</li>
+<li>层: 保存着指向其他元素的指针
+<ul class="org-ul">
+<li>高层的指针越过的元素数量大于等于低层的指针</li>
+<li>为了提高查找的效率，程序总是从高层先开始访问，然后随着元素值范围的缩小，
+慢慢降低层次</li>
+</ul></li>
+<li>表尾: 全部由 NULL 组成，表示跳跃表的末尾</li>
+</ul></li>
+<li><p>
+跳跃表的定义位于 <code>server.h</code> 中
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">ZSETs use a specialized version of Skiplists</span><span style="color: #93a1a1; font-style: italic;"> */</span>
+<span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">zskiplistNode</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #ce537a; font-weight: bold;">sds</span> <span style="color: #7590db;">ele</span>;
+    <span style="color: #ce537a; font-weight: bold;">double</span> <span style="color: #7590db;">score</span>;
+    <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">zskiplistNode</span> *<span style="color: #7590db;">backward</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#21518;&#36864;&#25351;&#38024;</span>
+    <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">zskiplistLevel</span> <span style="color: #d8241f;">{</span> <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#23618;</span>
+        <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">zskiplistNode</span> *<span style="color: #7590db;">forward</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#21069;&#36827;&#25351;&#38024;</span>
+        <span style="color: #ce537a; font-weight: bold;">unsigned</span> <span style="color: #ce537a; font-weight: bold;">long</span> <span style="color: #7590db;">span</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#35813;&#23618;&#36328;&#22495;&#30340;&#33410;&#28857;&#25968;&#37327;</span>
+    <span style="color: #d8241f;">}</span> <span style="color: #7590db;">level</span><span style="color: #d8241f;">[]</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">level[] &#22312; Redis &#20013;&#26159; 1 &#21040; 32 &#30340;&#38543;&#26426;&#25968;</span>
+<span style="color: #8d5649;">}</span> <span style="color: #ce537a; font-weight: bold;">zskiplistNode</span>;
+
+<span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">zskiplist</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">zskiplistNode</span> *<span style="color: #7590db;">header</span>, *<span style="color: #7590db;">tail</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#22836;&#33410;&#28857;&#21644;&#23614;&#33410;&#28857;</span>
+    <span style="color: #ce537a; font-weight: bold;">unsigned</span> <span style="color: #ce537a; font-weight: bold;">long</span> <span style="color: #7590db;">length</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#33410;&#28857;&#25968;&#37327;</span>
+    <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">level</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#30446;&#21069;&#34920;&#20869;&#33410;&#28857;&#30340;&#26368;&#22823;&#23618;&#25968;</span>
+<span style="color: #8d5649;">}</span> <span style="color: #ce537a; font-weight: bold;">zskiplist</span>;
+</pre>
+</div></li>
+<li>Redis 在 William Pugh 关于 Skip List 的设计中进行修改，满足自身查询的需求
+<ul class="org-ul">
+<li>score 值可重复</li>
+<li>对比一个元素需要同时检查它的 score 和 member</li>
+<li>每个节点带有高度为 1 层的后退指针，用于从表尾方向向表头方向迭代</li>
+</ul></li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfdf47e5" class="outline-2">
+<h2 id="orgfdf47e5"><span class="section-number-2">5</span> 内存映射数据结构</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-orgb2df461" class="outline-3">
+<h3 id="orgb2df461"><span class="section-number-3">5.1</span> 整数集合 (intset)</h3>
+<div class="outline-text-3" id="text-5-1">
+<ol class="org-ol">
+<li>用于有序、无重复地保存多个整数值，根据元素的值，自动选择该用什么长度的整数
+类型来保存元素</li>
+<li>intset 的应用范围如下
+<ul class="org-ul">
+<li>只保存着整数元素</li>
+<li>元素的数量不多</li>
+</ul></li>
+<li><p>
+intset 的实习见 <code>intset.c</code> 和 <code>intset.h</code> 中
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #4f97d7; font-weight: bold;">typedef</span> <span style="color: #4f97d7; font-weight: bold;">struct</span> <span style="color: #ce537a; font-weight: bold;">intset</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #ce537a; font-weight: bold;">uint32_t</span> <span style="color: #7590db;">encoding</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#20445;&#23384;&#25152;&#20351;&#29992;&#31867;&#22411;&#30340;&#38271;&#24230;</span>
+  <span style="color: #ce537a; font-weight: bold;">uint32_t</span> <span style="color: #7590db;">length</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#20803;&#32032;&#20010;&#25968;</span>
+  <span style="color: #ce537a; font-weight: bold;">int8_t</span> <span style="color: #7590db;">contents</span><span style="color: #d8241f;">[]</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#20803;&#32032;</span>
+<span style="color: #8d5649;">}</span> <span style="color: #ce537a; font-weight: bold;">intset</span>;
+</pre>
+</div></li>
+<li><code>contents</code> 数组中的整数位数提升时，需要对整数进行扩充操作，这个扩充过程叫
+做 <span class="underline">升级</span> (upgrade)</li>
+<li><code>contents</code> 数组不支持降级操作，一旦升级过后即使最大位数的数字被删除了，依
+旧使用保持最大位数</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org2d55b7c" class="outline-3">
+<h3 id="org2d55b7c"><span class="section-number-3">5.2</span> 压缩列表 (ziplist)</h3>
+<div class="outline-text-3" id="text-5-2">
+<ol class="org-ol">
+<li>ziplist 是由一系列特殊编码的内存块构成的列表
+<ul class="org-ul">
+<li>一个 ziplist 可以包含多个节点 (entry)</li>
+<li>每个节点可以保存一个长度受限的字符数组 (不以 <code>\0</code> 结尾的 char 数组) 或者
+整数</li>
+</ul></li>
+<li>哈希键、列表键和有序集合键初始化的底层实现皆采用 ziplist</li>
+<li>添加和删除 ziplist 节点有可能会引起连锁更新，因此，添加和删除操作的最坏复
+杂度为 <code>O(N^2)</code></li>
+<li><p>
+ziplist 的典型结构如下，其中存储数据的是 entries
+</p>
+<div class="org-src-container">
+<pre class="src src-text">area        |&lt;---- ziplist header ----&gt;|&lt;----------- entries -------------&gt;|&lt;-end-&gt;|
+
+size          4 bytes  4 bytes  2 bytes    ?        ?        ?        ?     1 byte
+            +---------+--------+-------+--------+--------+--------+--------+-------+
+component   | zlbytes | zltail | zllen | entry1 | entry2 |  ...   | entryN | zlend |
+            +---------+--------+-------+--------+--------+--------+--------+-------+
+                                       ^                          ^        ^
+address                                |                          |        |
+                                ZIPLIST_ENTRY_HEAD                |   ZIPLIST_ENTRY_END
+                                                                  |
+                                                         ZIPLIST_ENTRY_TAIL
+</pre>
+</div></li>
+<li><p>
+ziplist 的 entry 如下
+</p>
+<div class="org-src-container">
+<pre class="src src-text">area        |&lt;------------------- entry --------------------&gt;|
+
+            +------------------+----------+--------+---------+
+component   | pre_entry_length | encoding | length | content |
+            +------------------+----------+--------+---------+
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org32116e6" class="outline-2">
+<h2 id="org32116e6"><span class="section-number-2">6</span> 数据类型</h2>
+<div class="outline-text-2" id="text-6">
 <ol class="org-ol">
 <li>string 字符串, 整数, 浮点数
 <ul class="org-ul">
@@ -342,6 +663,8 @@ redis&gt; get foo
 <ul class="org-ul">
 <li>hmset/hget/hgetall</li>
 <li>物理存储会在 ziplist 和 hashtable 两种类型中转换</li>
+<li>ziplist 比 hashtable 节约空间，默认使用 ziplist</li>
+<li>当有需要时，Redis 会自动将 ziplist 转成 hashtable</li>
 </ul></li>
 <li>list 列表
 <ul class="org-ul">
@@ -444,17 +767,42 @@ OK
 </div>
 </div>
 
-<div id="outline-container-org48c0756" class="outline-2">
-<h2 id="org48c0756"><span class="section-number-2">5</span> 相关连接</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-orgd111a8d" class="outline-2">
+<h2 id="orgd111a8d"><span class="section-number-2">7</span> Redis 缓存相关问题</h2>
+<div class="outline-text-2" id="text-7">
+<ol class="org-ol">
+<li><b>缓存穿透</b> 指查询一个数据库中不存在的数据
+<ul class="org-ul">
+<li>容易产生对数据库过大的访问压力导致数据库崩溃</li>
+<li>解决方案: 设置缓存过期时间, 即使未查到时设置一个空值</li>
+</ul></li>
+<li><b>缓存雪崩</b> 指在某一个时间段, 缓存集中失效
+<ul class="org-ul">
+<li>对数据库产生周期性的压力</li>
+<li>解决方案: 对冷数据, 超时设置短一点, 对热数据, 超时设置长一点</li>
+</ul></li>
+<li><b>缓存击穿</b> 指一个非常热的 Key, 在失效的瞬间大并发量把数据库击穿
+<ul class="org-ul">
+<li>瞬间并发量高, 直接把数据库打崩溃掉</li>
+<li>解决方案: 对于特别大的热 Key, 可以设置永不过期</li>
+</ul></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org2348f13" class="outline-2">
+<h2 id="org2348f13"><span class="section-number-2">8</span> 相关连接</h2>
+<div class="outline-text-2" id="text-8">
 <ol class="org-ol">
 <li><a href="https://redis.io/">Redis Official Site</a></li>
+<li><a href="http://origin.redisbook.com/">Redis 设计与实现（第一版）</a></li>
+<li><a href="https://github.com/huangz1990/redisbook">《Redis 设计与实现》第一版的原稿</a></li>
 </ol>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-08-03 Tue 09:29. Created by Jinghui Hu at 2021-07-07 Wed 16:51.</p>
+<p class="author">Last Updated 2021-08-22 Sun 12:35. Created by Jinghui Hu at 2021-07-07 Wed 16:51.</p>
 </div>
 </body>
 </html>
