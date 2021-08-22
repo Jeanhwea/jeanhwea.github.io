@@ -187,7 +187,7 @@
    1. 跳跃表主要使用场景就是 _有序集合_ zset
       - 包含的元素数量比较多
       - 元素成员 (member) 是比较长的字符串
-   2. 跳跃表以有序的方式在 _层次化_ 的链表中保存元素， 效率和平衡树媲美
+   2. [[https://www.cl.cam.ac.uk/teaching/0506/Algorithms/skiplists.pdf][跳跃表]]以有序的方式在 _层次化_ 的链表中保存元素， 效率和平衡树媲美
    3. 查找、删除、添加等操作都可以在 _O(logN)_ 期望时间下完成
    4. 比起平衡树来说， 跳跃表的实现要简单直观得多
    5. 跳跃表的构成部分
@@ -236,6 +236,41 @@
           uint32_t length; // 元素个数
           int8_t contents[]; // 元素
         } intset;
+      #+END_SRC
+   4. ~contents~ 数组中的整数位数提升时，需要对整数进行扩充操作，这个扩充过程叫
+      做 _升级_ (upgrade)
+   5. ~contents~ 数组不支持降级操作，一旦升级过后即使最大位数的数字被删除了，依
+      旧使用保持最大位数
+
+** 压缩列表 (ziplist)
+   1. ziplist 是由一系列特殊编码的内存块构成的列表
+      - 一个 ziplist 可以包含多个节点 (entry)
+      - 每个节点可以保存一个长度受限的字符数组 (不以 ~\0~ 结尾的 char 数组) 或者
+        整数
+   2. 哈希键、列表键和有序集合键初始化的底层实现皆采用 ziplist
+   3. 添加和删除 ziplist 节点有可能会引起连锁更新，因此，添加和删除操作的最坏复
+      杂度为 ~O(N^2)~
+   4. ziplist 的典型结构如下，其中存储数据的是 entries
+      #+BEGIN_SRC text
+        area        |<---- ziplist header ---->|<----------- entries ------------->|<-end->|
+
+        size          4 bytes  4 bytes  2 bytes    ?        ?        ?        ?     1 byte
+                    +---------+--------+-------+--------+--------+--------+--------+-------+
+        component   | zlbytes | zltail | zllen | entry1 | entry2 |  ...   | entryN | zlend |
+                    +---------+--------+-------+--------+--------+--------+--------+-------+
+                                               ^                          ^        ^
+        address                                |                          |        |
+                                        ZIPLIST_ENTRY_HEAD                |   ZIPLIST_ENTRY_END
+                                                                          |
+                                                                 ZIPLIST_ENTRY_TAIL
+      #+END_SRC
+   5. ziplist 的 entry 如下
+      #+BEGIN_SRC text
+        area        |<------------------- entry -------------------->|
+
+                    +------------------+----------+--------+---------+
+        component   | pre_entry_length | encoding | length | content |
+                    +------------------+----------+--------+---------+
       #+END_SRC
 
 * 数据类型
