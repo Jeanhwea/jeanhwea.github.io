@@ -321,10 +321,19 @@
    5. 当有需要时，Redis 会自动将 ziplist 转成 hashtable
 
 ** 列表 List
-   - 列表是一个双向链表, 最多存储 ~2^32-1~ 个元素
-   - lpush/lpop/rpush/rpop
-   - lrange key 0 10
-   - llen
+   1. 列表使用如下两种编码格式
+      - ~REDIS_ENCODING_ZIPLIST~
+        - 将值添加到压缩列表中
+      - ~REDIS_ENCODING_LINKEDLIST~ 当出现如下条件时, ziplist 转 linkedlist
+        + 哈希表中某个键或某个值的长度大于 ~server.list_max_ziplist_value~, 默认
+          值为 64
+        + 压缩列表中的节点数量大于 ~server.list_max_ziplist_entries~, 默认值为
+          512
+   2. 列表是一个双向链表, 最多存储 ~2^32-1~ 个元素
+   3. 常见列表操作 lpush/lpop/rpush/rpop
+   4. 范围查找 lrange key 0 10
+   5. llen
+
 ** 集合 Set
    - sadd/smembers
 ** 有序集合 Zset
