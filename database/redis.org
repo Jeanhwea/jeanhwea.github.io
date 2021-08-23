@@ -274,25 +274,37 @@
       #+END_SRC
 
 * 数据类型
-  1. string 字符串, 整数, 浮点数
+  1. 对象处理机制
+     #+BEGIN_SRC c
+       typedef struct redisObject {
+         unsigned type:4; // 类型：字符串，哈希表，列表等等
+         unsigned encoding:4; // 编码格式：sds, int, hashtable, zipmap, list, ziplist, skiplist
+         unsigned lru:LRU_BITS; /* LRU time (relative to global lru_clock) or
+                                 ,* LFU data (least significant 8 bits frequency
+                                 ,* and most significant 16 bits access time). */
+         int refcount; // 引用计数
+         void *ptr;
+       } robj;
+     #+END_SRC
+  2. String 字符串, 整数, 浮点数
      - 二进制安全, 可以存储图片和序列化对象, 最多可存储 512M 的数据
      - get/set/del
      - mset 多个键设置
      - incr/decr
      - strlen/append
-  2. hash 哈希表
+  3. Hash 哈希表
      - hmset/hget/hgetall
      - 物理存储会在 ziplist 和 hashtable 两种类型中转换
      - ziplist 比 hashtable 节约空间，默认使用 ziplist
      - 当有需要时，Redis 会自动将 ziplist 转成 hashtable
-  3. list 列表
+  4. List 列表
      - 列表是一个双向链表, 最多存储 ~2^32-1~ 个元素
      - lpush/lpop/rpush/rpop
      - lrange key 0 10
      - llen
-  4. set 集合
+  5. Set 集合
      - sadd/smembers
-  5. zset 有序集合
+  6. Zset 有序集合
      - 有序的集合类型, 键是不可重复的
      - zadd
 
