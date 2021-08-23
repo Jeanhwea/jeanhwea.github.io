@@ -347,10 +347,36 @@
         + 字典编码时，对应的 ~dictEntry~ 只保存 ~key~, ~value~ 和 ~next~ 都为空
    2. 集合数据操作 ~SADD~, ~SREM~ 和 ~SMEMBERS~
    3. 随机获取成员 ~SRANDMEMBERS~
+   4. 集合交集和并集操作 ~SINTER~ 和 ~SUNION~
+   5. 求差集 ~SDIFF~
 
 ** 有序集合 Zset
-   - 有序的集合类型, 键是不可重复的
-   - zadd
+   1. 有序集合使用如下两种编码格式
+      - ~REDIS_ENCODING_ZIPLIST~
+        + 每个有序集元素以两个相邻的 ziplist 节点表示
+        + 第一个节点保存元素的 member 域
+        + 第二个元素保存元素的 score 域
+      - ~REDIS_ENCODING_SKIPLIST~ 当出现如下条件时, ziplist 转 skiplist
+        + 服务器属性 ~server.zset_max_ziplist_entries~ 的值大于 0, 默认为 128
+        + 元素的 member 长度小于服务器属性 ~server.zset_max_ziplist_value~ 的值,
+          默认为 64
+        + zset 同时使用 _字典_ 和 _跳跃表_ 两个数据结构来保存有序集元素
+          #+BEGIN_SRC c
+            typedef struct zset {
+              dict *dict;
+              zskiplist *zsl;
+            } zset;
+          #+END_SRC
+        + 字典和跳跃表两个结构通过将指针共同指向这两个值来节约空间
+   2. 关于 zset 的两种定义的有序
+      - 字典结构 dict
+        + 检查给定 member 是否存在于有序集（被很多底层函数使用）
+        + 取出 member 对应的 score 值 (实现 ~ZSCORE~ 命令)
+      - 跳跃表结构 skiplist
+        + _O(logN)_ 时间复杂度内根据 score 对 member 进行定位（被很多底层函数使用）
+        + 范围查找和处理操作，例如 ~ZRANGE~, ~ZRANK~ 和 ~ZINTERSTORE~
+   3. 有序的集合类型, 键是不可重复的
+   4. ~ZADD~ 和 ~ZCOUNT~
 
 ** 使用示例
    整数操作
