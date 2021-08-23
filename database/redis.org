@@ -274,105 +274,129 @@
       #+END_SRC
 
 * 数据类型
-  1. 对象处理机制
-     #+BEGIN_SRC c
-       typedef struct redisObject {
-         unsigned type:4; // 类型：字符串，哈希表，列表等等
-         unsigned encoding:4; // 编码格式：sds, int, hashtable, zipmap, list, ziplist, skiplist
-         unsigned lru:LRU_BITS; /* LRU time (relative to global lru_clock) or
-                                 ,* LFU data (least significant 8 bits frequency
-                                 ,* and most significant 16 bits access time). */
-         int refcount; // 引用计数
-         void *ptr;
-       } robj;
-     #+END_SRC
-  2. String 字符串, 整数, 浮点数
-     - 二进制安全, 可以存储图片和序列化对象, 最多可存储 512M 的数据
-     - get/set/del
-     - mset 多个键设置
-     - incr/decr
-     - strlen/append
-  3. Hash 哈希表
-     - hmset/hget/hgetall
-     - 物理存储会在 ziplist 和 hashtable 两种类型中转换
-     - ziplist 比 hashtable 节约空间，默认使用 ziplist
-     - 当有需要时，Redis 会自动将 ziplist 转成 hashtable
-  4. List 列表
-     - 列表是一个双向链表, 最多存储 ~2^32-1~ 个元素
-     - lpush/lpop/rpush/rpop
-     - lrange key 0 10
-     - llen
-  5. Set 集合
-     - sadd/smembers
-  6. Zset 有序集合
-     - 有序的集合类型, 键是不可重复的
-     - zadd
+** 对象处理机制
+   1. 对象的类型定义位于 ~redisObject~ 结构体
+      #+BEGIN_SRC c
+        typedef struct redisObject {
+          unsigned type:4; // 类型：字符串，哈希表，列表等等
+          unsigned encoding:4; // 编码格式：sds, int, hashtable, zipmap, list, ziplist, skiplist
+          unsigned lru:LRU_BITS; /* LRU time (relative to global lru_clock) or
+                                  ,* LFU data (least significant 8 bits frequency
+                                  ,* and most significant 16 bits access time). */
+          int refcount; // 引用计数
+          void *ptr;
+        } robj;
+      #+END_SRC
+   2. 对象的内存释放方式是使用引用计数
+      - 对象初始创建时 ~refcount~ 的值被设置成 1
+      - 当 ~refcount~ 降至 0 后，该 ~redisObject~ 将会被释放
 
-  整数操作
-  #+BEGIN_SRC text
-    127.0.0.1:6379> flushdb
-    OK
-    127.0.0.1:6379> set hello 'world'
-    OK
-    127.0.0.1:6379> keys *
-    1) "hello"
-    127.0.0.1:6379> get hello
-    "world"
-    127.0.0.1:6379> append hello '!'
-    (integer) 6
-    127.0.0.1:6379> get hello
-    "world!"
-  #+END_SRC
+** 字符串 String
+   1. 字符串默认有如下两种类型
+      - ~REDIS_ENCODING_INT~ 使用 ~long~ 类型来保存 ~long~ 类型值
+      - ~REDIS_ENCODING_RAW~ 则使用 ~sdshdr~ 结构来如下类型的值
+        + ~sds~ (也即是 ~char*~ )
+        + ~long long~
+        + ~double~
+        + ~long double~
+   2. 二进制安全, 可以存储图片和序列化对象, 最多可存储 512M 的数据
+   3. get/set/del, 操作单个字符串键的指令
+   4. mset 同时设置多个键
+   5. incr/decr
+   6. strlen/append
 
-  计数器
-  #+BEGIN_SRC text
-    127.0.0.1:6379> set count 1
-    OK
-    127.0.0.1:6379> incr count
-    (integer) 2
-    127.0.0.1:6379> get count
-    "2"
-    127.0.0.1:6379> incr count
-    (integer) 3
-    127.0.0.1:6379>
-  #+END_SRC
+** 哈希表 Hash
+   1. 哈希表使用如下两种编码格式
+      - ~REDIS_ENCODING_ZIPLIST~
+        + 键和值一同推入压缩列表
+        + 形成保存哈希表所需的键-值对结构
+      - ~REDIS_ENCODING_HT~ 当出现如下条件时, ziplist 转 hashtable
+        + 哈希表中某个键或某个值的长度大于 ~server.hash_max_ziplist_value~, 默认
+          值为 64
+        + 压缩列表中的节点数量大于 ~server.hash_max_ziplist_entries~, 默认值为
+          512
+   2. 操作哈希表的指令 hmset/hget/hgetall
+   3. 物理存储会在 ziplist 和 hashtable 两种类型中转换
+   4. ziplist 比 hashtable 节约空间，默认使用 ziplist
+   5. 当有需要时，Redis 会自动将 ziplist 转成 hashtable
 
-  哈希使用
-  #+BEGIN_SRC text
-    127.0.0.1:6379> flushdb
-    OK
-    127.0.0.1:6379> hmset user name zhang age 12
-    OK
-    127.0.0.1:6379> hgetall user
-    1) "name"
-    2) "zhang"
-    3) "age"
-    4) "12"
-  #+END_SRC
+** 列表 List
+   - 列表是一个双向链表, 最多存储 ~2^32-1~ 个元素
+   - lpush/lpop/rpush/rpop
+   - lrange key 0 10
+   - llen
+** 集合 Set
+   - sadd/smembers
+** 有序集合 Zset
+   - 有序的集合类型, 键是不可重复的
+   - zadd
 
-  集合操作
-  #+BEGIN_SRC text
-    127.0.0.1:6379> sadd course math
-    (integer) 1
-    127.0.0.1:6379> sadd course chinese
-    (integer) 1
-    127.0.0.1:6379> object encoding course
-    "hashtable"
-    127.0.0.1:6379> smembers course
-    1) "math"
-    2) "chinese"
-  #+END_SRC
+** 使用示例
+   整数操作
+   #+BEGIN_SRC text
+     127.0.0.1:6379> flushdb
+     OK
+     127.0.0.1:6379> set hello 'world'
+     OK
+     127.0.0.1:6379> keys *
+     1) "hello"
+     127.0.0.1:6379> get hello
+     "world"
+     127.0.0.1:6379> append hello '!'
+     (integer) 6
+     127.0.0.1:6379> get hello
+     "world!"
+   #+END_SRC
 
-  获取对象存储类型
-  #+BEGIN_SRC text
-    127.0.0.1:6379> keys *
-    1) "a"
-    2) "str1"
-    127.0.0.1:6379> object encoding a
-    "quicklist"
-    127.0.0.1:6379> object encoding str1
-    "embstr"
-  #+END_SRC
+   计数器
+   #+BEGIN_SRC text
+     127.0.0.1:6379> set count 1
+     OK
+     127.0.0.1:6379> incr count
+     (integer) 2
+     127.0.0.1:6379> get count
+     "2"
+     127.0.0.1:6379> incr count
+     (integer) 3
+     127.0.0.1:6379>
+   #+END_SRC
+
+   哈希使用
+   #+BEGIN_SRC text
+     127.0.0.1:6379> flushdb
+     OK
+     127.0.0.1:6379> hmset user name zhang age 12
+     OK
+     127.0.0.1:6379> hgetall user
+     1) "name"
+     2) "zhang"
+     3) "age"
+     4) "12"
+   #+END_SRC
+
+   集合操作
+   #+BEGIN_SRC text
+     127.0.0.1:6379> sadd course math
+     (integer) 1
+     127.0.0.1:6379> sadd course chinese
+     (integer) 1
+     127.0.0.1:6379> object encoding course
+     "hashtable"
+     127.0.0.1:6379> smembers course
+     1) "math"
+     2) "chinese"
+   #+END_SRC
+
+   获取对象存储类型
+   #+BEGIN_SRC text
+     127.0.0.1:6379> keys *
+     1) "a"
+     2) "str1"
+     127.0.0.1:6379> object encoding a
+     "quicklist"
+     127.0.0.1:6379> object encoding str1
+     "embstr"
+   #+END_SRC
 
 * Redis 缓存相关问题
   1. *缓存穿透* 指查询一个数据库中不存在的数据
