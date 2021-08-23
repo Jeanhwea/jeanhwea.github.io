@@ -300,10 +300,10 @@
         + ~double~
         + ~long double~
    2. 二进制安全, 可以存储图片和序列化对象, 最多可存储 512M 的数据
-   3. get/set/del, 操作单个字符串键的指令
-   4. mset 同时设置多个键
-   5. incr/decr
-   6. strlen/append
+   3. ~GET~, ~SET~, ~DEL~, 操作单个字符串键的指令
+   4. ~MSET~ 同时设置多个键
+   5. ~INCR~ 和 ~DECR~
+   6. ~STRLEN~, ~APPEND~
 
 ** 哈希表 Hash
    1. 哈希表使用如下两种编码格式
@@ -315,7 +315,7 @@
           值为 64
         + 压缩列表中的节点数量大于 ~server.hash_max_ziplist_entries~, 默认值为
           512
-   2. 操作哈希表的指令 hmset/hget/hgetall
+   2. 操作哈希表的指令 ~HMSET~, ~HGET~ 和 ~HGETALL~
    3. 物理存储会在 ziplist 和 hashtable 两种类型中转换
    4. ziplist 比 hashtable 节约空间，默认使用 ziplist
    5. 当有需要时，Redis 会自动将 ziplist 转成 hashtable
@@ -330,12 +330,23 @@
         + 压缩列表中的节点数量大于 ~server.list_max_ziplist_entries~, 默认值为
           512
    2. 列表是一个双向链表, 最多存储 ~2^32-1~ 个元素
-   3. 常见列表操作 lpush/lpop/rpush/rpop
-   4. 范围查找 lrange key 0 10
-   5. llen
+   3. 常见列表操作 ~LPUSH~, ~LPOP~, ~RPUSH~ 和 ~RPOP~
+   4. 范围查找 ~LRANGE key 0 10~
+   5. 计算列表长度 ~LLEN~
+   6. 列表可能会发生阻塞, ~BLPOP~, ~BRPOP~ 和 ~BRPOPLPUSH~
 
 ** 集合 Set
-   - sadd/smembers
+   1. 集合使用如下两种编码格式
+      - ~REDIS_ENCODING_INTSET~
+        + 如果集合的第一个元素是 ~long long~ 类型，则初始化成该类型
+      - ~REDIS_ENCODING_HT~ 当出现如下条件时, intset 转 hashtable
+        + 哈希表中某个键或某个值的长度大于 ~server.set_max_ziplist_value~, 默认
+          值为 64
+        + 压缩列表中的节点数量大于 ~server.set_max_ziplist_entries~, 默认值为
+          512
+   2. 集合数据操作 ~SADD~, ~SREM~ 和 ~SMEMBERS~
+   3. 随机获取成员 ~SRANDMEMBERS~
+
 ** 有序集合 Zset
    - 有序的集合类型, 键是不可重复的
    - zadd
