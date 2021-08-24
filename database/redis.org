@@ -378,8 +378,9 @@
    3. 有序的集合类型, 键是不可重复的
    4. ~ZADD~ 和 ~ZCOUNT~
 
-** 使用示例
-   整数操作
+* 使用示例
+** 整数操作
+   Redis 的整数和字符串都是存在 string 类型中
    #+BEGIN_SRC text
      127.0.0.1:6379> flushdb
      OK
@@ -395,7 +396,8 @@
      "world!"
    #+END_SRC
 
-   计数器
+** 计数器
+   使用一个整数 string 类型的 count 变量值来计数
    #+BEGIN_SRC text
      127.0.0.1:6379> set count 1
      OK
@@ -408,7 +410,8 @@
      127.0.0.1:6379>
    #+END_SRC
 
-   哈希使用
+** 哈希使用
+   常见哈希表的操作如下
    #+BEGIN_SRC text
      127.0.0.1:6379> flushdb
      OK
@@ -421,7 +424,8 @@
      4) "12"
    #+END_SRC
 
-   集合操作
+** 集合操作
+   集合的操作如下，包括对集合的基本操作
    #+BEGIN_SRC text
      127.0.0.1:6379> sadd course math
      (integer) 1
@@ -434,7 +438,9 @@
      2) "chinese"
    #+END_SRC
 
-   获取对象存储类型
+** 获取对象存储类型
+   1. 使用 ~object encoding~ 查看对象的底层数据类型
+   2. 使用 ~type~ 来查看 key 对应的数据结构类型
    #+BEGIN_SRC text
      127.0.0.1:6379> keys *
      1) "a"
@@ -443,6 +449,8 @@
      "quicklist"
      127.0.0.1:6379> object encoding str1
      "embstr"
+     127.0.0.1:6379> type str1
+     string
    #+END_SRC
 
 * Redis 缓存相关问题
