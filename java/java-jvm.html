@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-07-16 Fri 22:41 -->
+<!-- 2021-09-21 Tue 16:48 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JVM 知识点</title>
@@ -233,48 +233,50 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org272c17a">1. 基础知识</a>
+<li><a href="#orgb98bf6f">1. 基础知识</a>
 <ul>
-<li><a href="#org1ed4fb4">1.1. JVM 运行内存的分类</a></li>
-<li><a href="#orgf1928b8">1.2. Java 内存堆和栈区别</a></li>
-<li><a href="#org7deb755">1.3. Java 四引用</a></li>
-<li><a href="#org5ef5e68">1.4. GC 回收机制</a></li>
-<li><a href="#orga126c98">1.5. GC 标记对象的死活</a></li>
-<li><a href="#orgaf2e298">1.6. GC 回收算法</a></li>
-<li><a href="#org34a4a41">1.7. MinorGC 和 FullGC</a></li>
-<li><a href="#org46fd5ab">1.8. 内存分配与回收策略</a></li>
-<li><a href="#org9099247">1.9. GC 垃圾收集器</a></li>
-<li><a href="#org1f55d35">1.10. Java 类加载机制</a></li>
-<li><a href="#orge353ce6">1.11. 引起类加载操作的五个行为</a></li>
-<li><a href="#orgc22dd7a">1.12. Java 对象创建时机</a></li>
+<li><a href="#org1f0da8c">1.1. JVM 运行内存的分类</a></li>
+<li><a href="#orgfed6755">1.2. Java 内存堆和栈区别</a></li>
+<li><a href="#orgbfca57a">1.3. Java 四引用</a></li>
+<li><a href="#orgf5f1db0">1.4. GC 回收机制</a></li>
+<li><a href="#org9c38d04">1.5. GC 标记对象的死活</a></li>
+<li><a href="#org7d81892">1.6. GC 回收算法</a></li>
+<li><a href="#orgf36300e">1.7. MinorGC 和 FullGC</a></li>
+<li><a href="#org9874c69">1.8. 内存分配与回收策略</a></li>
+<li><a href="#org697fd7f">1.9. GC 垃圾收集器</a></li>
+<li><a href="#org80da957">1.10. 内存泄漏的几种情形</a></li>
+<li><a href="#orgff7eb5f">1.11. Java 类加载机制</a></li>
+<li><a href="#org836cd5d">1.12. 引起类加载操作的五个行为</a></li>
+<li><a href="#org15ec655">1.13. Java 对象创建时机</a></li>
 </ul>
 </li>
-<li><a href="#org9035ff7">2. 实践案例</a>
+<li><a href="#org26a72ba">2. 实践案例</a>
 <ul>
-<li><a href="#org00b4953">2.1. JVM 调优参数</a></li>
-<li><a href="#orgb96119c">2.2. JDK  调试工具</a>
+<li><a href="#org9f31b23">2.1. JVM 调优参数</a></li>
+<li><a href="#org755d4d7">2.2. JDK  调试工具</a>
 <ul>
-<li><a href="#orgcd1a89e">2.2.1. jps</a></li>
-<li><a href="#org21b0af2">2.2.2. jstat</a></li>
-<li><a href="#org977fc2b">2.2.3. jmap</a></li>
-<li><a href="#org8bf76bb">2.2.4. jstack</a></li>
-<li><a href="#org5f8f603">2.2.5. arthas</a></li>
+<li><a href="#org01c64c8">2.2.1. jps</a></li>
+<li><a href="#org0df116b">2.2.2. jstat</a></li>
+<li><a href="#orgcd429c6">2.2.3. jmap</a></li>
+<li><a href="#org4284543">2.2.4. jstack</a></li>
+<li><a href="#org0193c42">2.2.5. arthas</a></li>
 </ul>
 </li>
-<li><a href="#org02fc375">2.3. 逃逸分析</a></li>
-<li><a href="#org8c06d68">2.4. JDBC 知识点</a></li>
+<li><a href="#org4f33c32">2.3. 逃逸分析</a></li>
+<li><a href="#orgbf924ec">2.4. JDBC 知识点</a></li>
 </ul>
 </li>
+<li><a href="#orgf67c855">3. 反射</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org272c17a" class="outline-2">
-<h2 id="org272c17a"><span class="section-number-2">1</span> 基础知识</h2>
+<div id="outline-container-orgb98bf6f" class="outline-2">
+<h2 id="orgb98bf6f"><span class="section-number-2">1</span> 基础知识</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org1ed4fb4" class="outline-3">
-<h3 id="org1ed4fb4"><span class="section-number-3">1.1</span> JVM 运行内存的分类</h3>
+<div id="outline-container-org1f0da8c" class="outline-3">
+<h3 id="org1f0da8c"><span class="section-number-3">1.1</span> JVM 运行内存的分类</h3>
 <div class="outline-text-3" id="text-1-1">
 <ol class="org-ol">
 <li><b>程序计数器</b> 当前线程所执行的字节码的行号指示器，用于记录正在执行的虚拟机
@@ -298,8 +300,8 @@
 </div>
 </div>
 
-<div id="outline-container-orgf1928b8" class="outline-3">
-<h3 id="orgf1928b8"><span class="section-number-3">1.2</span> Java 内存堆和栈区别</h3>
+<div id="outline-container-orgfed6755" class="outline-3">
+<h3 id="orgfed6755"><span class="section-number-3">1.2</span> Java 内存堆和栈区别</h3>
 <div class="outline-text-3" id="text-1-2">
 <ol class="org-ol">
 <li>栈内存用来存储基本类型的变量和对象的引用变量，堆内存用来存储 Java 中的对象，
@@ -320,8 +322,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org7deb755" class="outline-3">
-<h3 id="org7deb755"><span class="section-number-3">1.3</span> Java 四引用</h3>
+<div id="outline-container-orgbfca57a" class="outline-3">
+<h3 id="orgbfca57a"><span class="section-number-3">1.3</span> Java 四引用</h3>
 <div class="outline-text-3" id="text-1-3">
 <ol class="org-ol">
 <li><b>强引用</b> （StrongReference）强引用是使用最普遍的引用。如果一个对象具有强引
@@ -346,8 +348,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org5ef5e68" class="outline-3">
-<h3 id="org5ef5e68"><span class="section-number-3">1.4</span> GC 回收机制</h3>
+<div id="outline-container-orgf5f1db0" class="outline-3">
+<h3 id="orgf5f1db0"><span class="section-number-3">1.4</span> GC 回收机制</h3>
 <div class="outline-text-3" id="text-1-4">
 <ol class="org-ol">
 <li>Java 中对象是采用 <code>new</code> 或者反射的方法创建的，这些对象的创建都是在堆（Heap）
@@ -361,8 +363,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-orga126c98" class="outline-3">
-<h3 id="orga126c98"><span class="section-number-3">1.5</span> GC 标记对象的死活</h3>
+<div id="outline-container-org9c38d04" class="outline-3">
+<h3 id="org9c38d04"><span class="section-number-3">1.5</span> GC 标记对象的死活</h3>
 <div class="outline-text-3" id="text-1-5">
 <ol class="org-ol">
 <li><b>引用计数法</b> 给对象添加一个引用计数器,没当被引用的时候,计数器的值就加一。
@@ -383,8 +385,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-orgaf2e298" class="outline-3">
-<h3 id="orgaf2e298"><span class="section-number-3">1.6</span> GC 回收算法</h3>
+<div id="outline-container-org7d81892" class="outline-3">
+<h3 id="org7d81892"><span class="section-number-3">1.6</span> GC 回收算法</h3>
 <div class="outline-text-3" id="text-1-6">
 <ol class="org-ol">
 <li><b>标记-清除法</b>: 标记出没有用的对象，然后一个一个回收掉
@@ -409,8 +411,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org34a4a41" class="outline-3">
-<h3 id="org34a4a41"><span class="section-number-3">1.7</span> MinorGC 和 FullGC</h3>
+<div id="outline-container-orgf36300e" class="outline-3">
+<h3 id="orgf36300e"><span class="section-number-3">1.7</span> MinorGC 和 FullGC</h3>
 <div class="outline-text-3" id="text-1-7">
 <ol class="org-ol">
 <li><b>Minor GC</b> 通常发生在新生代的 Eden 区，在这个区的对象生存期短，往往发生 GC
@@ -421,8 +423,8 @@ Minor GC，所采用的是标记-清除算法</li>
 </div>
 </div>
 
-<div id="outline-container-org46fd5ab" class="outline-3">
-<h3 id="org46fd5ab"><span class="section-number-3">1.8</span> 内存分配与回收策略</h3>
+<div id="outline-container-org9874c69" class="outline-3">
+<h3 id="org9874c69"><span class="section-number-3">1.8</span> 内存分配与回收策略</h3>
 <div class="outline-text-3" id="text-1-8">
 <ol class="org-ol">
 <li>结构（堆大小 = 新生代(1/3) + 老年代(2/3)）:
@@ -453,8 +455,8 @@ survivor1 中
 </div>
 </div>
 
-<div id="outline-container-org9099247" class="outline-3">
-<h3 id="org9099247"><span class="section-number-3">1.9</span> GC 垃圾收集器</h3>
+<div id="outline-container-org697fd7f" class="outline-3">
+<h3 id="org697fd7f"><span class="section-number-3">1.9</span> GC 垃圾收集器</h3>
 <div class="outline-text-3" id="text-1-9">
 <ol class="org-ol">
 <li>年轻代常见垃圾收集器
@@ -502,9 +504,66 @@ survivor1 中
 </div>
 </div>
 
-<div id="outline-container-org1f55d35" class="outline-3">
-<h3 id="org1f55d35"><span class="section-number-3">1.10</span> Java 类加载机制</h3>
+<div id="outline-container-org80da957" class="outline-3">
+<h3 id="org80da957"><span class="section-number-3">1.10</span> 内存泄漏的几种情形</h3>
 <div class="outline-text-3" id="text-1-10">
+<ol class="org-ol">
+<li><b>静态集合类</b>: 如 HashMap、LinkedList 等等
+<ul class="org-ul">
+<li>如果这些容器为静态的，那么它们的生命周期与程序一致，则容器中的对象在程序
+结束之前将不能被释放</li>
+<li>长生命周期的对象持有短生命周期对象的引用，尽管短生命周期的</li>
+<li>对象不再使用，但是因为长生命周期对象持有它的引用而导致不能被回收</li>
+</ul></li>
+<li><b>各种连接不释放</b>: 如数据库连接、网络连接和 IO 连接等
+<ul class="org-ul">
+<li>在对数据库进行操作的过程中，首先需要建立与数据库的连接，当不再使用时，需
+要调用 <code>close()</code> 方法来释放与数据库的 连接。只有连接被关闭后，垃圾回收器
+才会回收对应的对象</li>
+<li>如果在访问数据库的过程中，对 Connection、Statement 或 ResultSet 不显性地
+关闭，将会造成大量的对象无法被回收，从而引起内存泄漏。</li>
+</ul></li>
+<li><b>变量不合理的作用域</b>:
+<ul class="org-ul">
+<li>变量的定义的作用范围大于其使用范围，很有可能会造成内存泄漏</li>
+<li>如果没有及时地把对象设置为 null，很有可能导致内存泄漏的发生</li>
+</ul></li>
+<li><b>内部类持有外部类</b>:
+<ul class="org-ul">
+<li>如果一个外部类的实例对象的方法返回了一个内部类的实例对象，这个内部类对象
+被长期引用了，即使那个外部类实例对象不再被使用，但由于内部类持有外部类的
+实例对象，这个外部类对象将不会被垃圾回收，这也会造成内存泄露</li>
+</ul></li>
+<li><b>改变哈希值</b>:
+<ul class="org-ul">
+<li>当一个对象被存储进 HashSet 集合中以后，就不能修改这个对象中的那些参与计算
+哈希值的字段了，</li>
+<li>否则，对象修改后的哈希值与最初存储进 HashSet 集合中时的哈希值就不同了，在
+这种情况下，即使在 contains 方法使用该对象的当前引用作为的参数去 HashSet 集
+合中检索对象，也将返回找不到对象的结果，这也会导致无法从 HashSet 集合中单
+独删除当前对象，造成内存泄露</li>
+</ul></li>
+<li><b>缓存泄漏</b>:
+<ul class="org-ul">
+<li>内存泄漏的另一个常见来源是缓存，一旦你把对象引用放入到缓存中，他就很容易
+遗忘</li>
+<li>对于这个问题，可以使用 WeakHashMap 代表缓存，此种 Map 的特点是，当除了自
+身有对 key 的引用外，此 key 没有其他引用那么此 map 会自动丢弃此值</li>
+</ul></li>
+<li><b>监听器和回调</b>:
+<ul class="org-ul">
+<li>内存泄漏第三个常见来源是监听器和其他回调</li>
+<li>如果客户端在你实现的 API 中注册回调，却没有显示的取消，那么就会积聚</li>
+<li>需要确保回调立即被当作垃圾回收的最佳方法是只保存他的若引用，例如将他们保
+存成为 WeakHashMap 中的键</li>
+</ul></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgff7eb5f" class="outline-3">
+<h3 id="orgff7eb5f"><span class="section-number-3">1.11</span> Java 类加载机制</h3>
+<div class="outline-text-3" id="text-1-11">
 <ol class="org-ol">
 <li>概念:
 <ul class="org-ul">
@@ -589,9 +648,9 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-orge353ce6" class="outline-3">
-<h3 id="orge353ce6"><span class="section-number-3">1.11</span> 引起类加载操作的五个行为</h3>
-<div class="outline-text-3" id="text-1-11">
+<div id="outline-container-org836cd5d" class="outline-3">
+<h3 id="org836cd5d"><span class="section-number-3">1.12</span> 引起类加载操作的五个行为</h3>
+<div class="outline-text-3" id="text-1-12">
 <ol class="org-ol">
 <li>遇到 <code>new</code>, <code>getstatic</code>, <code>putstatic</code> 或 <code>invokestatic</code> 这四条字节码指令</li>
 <li>反射调用的时候，如果类没有进行过初始化，则需要先触发其初始化</li>
@@ -602,9 +661,9 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-orgc22dd7a" class="outline-3">
-<h3 id="orgc22dd7a"><span class="section-number-3">1.12</span> Java 对象创建时机</h3>
-<div class="outline-text-3" id="text-1-12">
+<div id="outline-container-org15ec655" class="outline-3">
+<h3 id="org15ec655"><span class="section-number-3">1.13</span> Java 对象创建时机</h3>
+<div class="outline-text-3" id="text-1-13">
 <ol class="org-ol">
 <li>使用 <code>new</code> 关键字创建对象</li>
 <li>使用 <code>Class</code> 类的 <code>newInstance</code> 方法(反射机制)</li>
@@ -616,12 +675,12 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-org9035ff7" class="outline-2">
-<h2 id="org9035ff7"><span class="section-number-2">2</span> 实践案例</h2>
+<div id="outline-container-org26a72ba" class="outline-2">
+<h2 id="org26a72ba"><span class="section-number-2">2</span> 实践案例</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org00b4953" class="outline-3">
-<h3 id="org00b4953"><span class="section-number-3">2.1</span> JVM 调优参数</h3>
+<div id="outline-container-org9f31b23" class="outline-3">
+<h3 id="org9f31b23"><span class="section-number-3">2.1</span> JVM 调优参数</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 设置堆空间，栈空间和元数据空间大小
@@ -633,12 +692,12 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-orgb96119c" class="outline-3">
-<h3 id="orgb96119c"><span class="section-number-3">2.2</span> JDK  调试工具</h3>
+<div id="outline-container-org755d4d7" class="outline-3">
+<h3 id="org755d4d7"><span class="section-number-3">2.2</span> JDK  调试工具</h3>
 <div class="outline-text-3" id="text-2-2">
 </div>
-<div id="outline-container-orgcd1a89e" class="outline-4">
-<h4 id="orgcd1a89e"><span class="section-number-4">2.2.1</span> jps</h4>
+<div id="outline-container-org01c64c8" class="outline-4">
+<h4 id="org01c64c8"><span class="section-number-4">2.2.1</span> jps</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 打印 JVM 进程号
@@ -652,8 +711,8 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-org21b0af2" class="outline-4">
-<h4 id="org21b0af2"><span class="section-number-4">2.2.2</span> jstat</h4>
+<div id="outline-container-org0df116b" class="outline-4">
+<h4 id="org0df116b"><span class="section-number-4">2.2.2</span> jstat</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 通过 <code>jstat</code> 动态查看堆内存使用情况
@@ -705,8 +764,8 @@ $ jstat -gcnew 70670 1000
 </div>
 </div>
 
-<div id="outline-container-org977fc2b" class="outline-4">
-<h4 id="org977fc2b"><span class="section-number-4">2.2.3</span> jmap</h4>
+<div id="outline-container-orgcd429c6" class="outline-4">
+<h4 id="orgcd429c6"><span class="section-number-4">2.2.3</span> jmap</h4>
 <div class="outline-text-4" id="text-2-2-3">
 <p>
 使用 <code>jmap</code> 查看 JVM 虚拟机内存
@@ -729,6 +788,8 @@ jmap -finalizerinfo &lt;pid&gt;
 
 <span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#29983;&#25104;&#22534;&#36716;&#20648;&#24555;&#29031; dump &#25991;&#20214;</span>
 jmap -dump:<span style="color: #6c71c4;">format</span>=b,<span style="color: #6c71c4;">file</span>=heapdump.phrof &lt;pid&gt;
+<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">live &#23376;&#36873;&#39033;&#34920;&#31034;&#21482; dump &#23384;&#27963;&#30340;&#23545;&#35937;</span>
+jmap -dump:live,<span style="color: #6c71c4;">format</span>=b,<span style="color: #6c71c4;">file</span>=heapdump.phrof &lt;pid&gt;
 </pre>
 </div>
 
@@ -817,8 +878,8 @@ PS Old Generation
 </div>
 </div>
 
-<div id="outline-container-org8bf76bb" class="outline-4">
-<h4 id="org8bf76bb"><span class="section-number-4">2.2.4</span> jstack</h4>
+<div id="outline-container-org4284543" class="outline-4">
+<h4 id="org4284543"><span class="section-number-4">2.2.4</span> jstack</h4>
 <div class="outline-text-4" id="text-2-2-4">
 <p>
 <code>jstack</code> 可以打印线程栈
@@ -886,8 +947,8 @@ JNI global references: 2614
 </div>
 </div>
 
-<div id="outline-container-org5f8f603" class="outline-4">
-<h4 id="org5f8f603"><span class="section-number-4">2.2.5</span> arthas</h4>
+<div id="outline-container-org0193c42" class="outline-4">
+<h4 id="org0193c42"><span class="section-number-4">2.2.5</span> arthas</h4>
 <div class="outline-text-4" id="text-2-2-5">
 <p>
 阿里巴巴开源的 JVM 监控调试工具 <a href="https://github.com/alibaba/arthas">Arthas</a> 提供更多调试方法
@@ -896,8 +957,8 @@ JNI global references: 2614
 </div>
 </div>
 
-<div id="outline-container-org02fc375" class="outline-3">
-<h3 id="org02fc375"><span class="section-number-3">2.3</span> 逃逸分析</h3>
+<div id="outline-container-org4f33c32" class="outline-3">
+<h3 id="org4f33c32"><span class="section-number-3">2.3</span> 逃逸分析</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 Java 在发现 new 出来的对象如果只在当前方法中运行，会直接进入线程栈，而不会放入
@@ -954,8 +1015,8 @@ JDK 1.6 后默认开启逃逸分析 <code>-XX:-DoEscapeAnalysis</code> 选项，
 </div>
 </div>
 
-<div id="outline-container-org8c06d68" class="outline-3">
-<h3 id="org8c06d68"><span class="section-number-3">2.4</span> JDBC 知识点</h3>
+<div id="outline-container-orgbf924ec" class="outline-3">
+<h3 id="orgbf924ec"><span class="section-number-3">2.4</span> JDBC 知识点</h3>
 <div class="outline-text-3" id="text-2-4">
 <ol class="org-ol">
 <li>SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式和配置文
@@ -1162,9 +1223,51 @@ JDBC 4.0 之后使用 SPI 机制才会破坏双亲委派机制</li>
 </div>
 </div>
 </div>
+
+<div id="outline-container-orgf67c855" class="outline-2">
+<h2 id="orgf67c855"><span class="section-number-2">3</span> 反射</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Java 提供可以动态创建对象和操作对象的方法，一般叫做反射
+</p>
+<ol class="org-ol">
+<li><code>private</code> 属性处理时需要设置可见性</li>
+</ol>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #8d5649;">)</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">Exception</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462; Class &#31867;</span>
+  <span style="color: #268bd2;">Class</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">clz</span> = Class.forName<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"io.github.jeanhwea.app03.bean.Person"</span><span style="color: #d8241f;">)</span>;
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#31867;&#30340;&#26500;&#36896;&#22120;</span>
+  <span style="color: #268bd2;">Constructor</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">ctor</span> = clz.getConstructor<span style="color: #d8241f;">()</span>;
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26032;&#24314;&#23545;&#35937;</span>
+  <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">obj</span> = ctor.newInstance<span style="color: #d8241f;">()</span>;
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#23450;&#20041;&#30340;&#23383;&#27573;</span>
+  <span style="color: #268bd2;">Field</span> <span style="color: #6c71c4;">field</span> = clz.getDeclaredField<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"name"</span><span style="color: #d8241f;">)</span>;
+  field.setAccessible<span style="color: #d8241f;">(</span><span style="color: #268bd2;">true</span><span style="color: #d8241f;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">private &#20462;&#39280;&#30340;&#23383;&#27573;&#38656;&#35201;&#37197;&#32622;&#21487;&#35265;&#24615;</span>
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#35774;&#32622;&#23383;&#27573;&#20540;</span>
+  field.set<span style="color: #d8241f;">(</span>obj, <span style="color: #2aa198;">"Injected Person Name"</span><span style="color: #d8241f;">)</span>;
+
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#31867;&#30340;&#26041;&#27861;</span>
+  <span style="color: #268bd2;">Method</span> <span style="color: #6c71c4;">method</span> = clz.getMethod<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"getName"</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#35843;&#29992;&#26041;&#27861;</span>
+  <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span> = <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">)</span> method.invoke<span style="color: #d8241f;">(</span>obj<span style="color: #d8241f;">)</span>;
+  System.out.println<span style="color: #d8241f;">(</span>name<span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+<p>
+反射的一些注意事项
+</p>
+<ol class="org-ol">
+<li>内部类调用 <code>getConstructor()</code> 时可能没有默认的构造器，声明成静态内部类</li>
+</ol>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-07-16 Fri 22:41. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
+<p class="author">Last Updated 2021-09-21 Tue 16:48. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
 </div>
 </body>
 </html>
