@@ -2458,87 +2458,87 @@
 ** 判断恢复日志竞争的 SQL 语句
    Immediate Contention 或 Wait Contention 的值大于 1 时存在竞争
    #+BEGIN_SRC sql
-     column name format a20;
+     COLUMN NAME FORMAT A20;
 
-     select
-       name,
-       round(100 * decode(sign(t.immediate_gets - t.immediate_misses), 1,
-         t.immediate_misses / (t.immediate_gets - t.immediate_misses), 0), 2) as
+     SELECT
+       NAME,
+       ROUND(100 * DECODE(SIGN(T.IMMEDIATE_GETS - T.IMMEDIATE_MISSES), 1,
+         T.IMMEDIATE_MISSES / (T.IMMEDIATE_GETS - T.IMMEDIATE_MISSES), 0), 2) AS
          "Immediate Contention (%)",
-       round(100 * decode(sign(t.gets - t.misses), 1, t.misses / (t.gets -
-         t.misses), 0), 2) as "Wait Contention (%)"
-     from
-       v$latch t
-     where
-       lower(name) in ('redo copy', 'redo allocation');
+       ROUND(100 * DECODE(SIGN(T.GETS - T.MISSES), 1, T.MISSES / (T.GETS -
+         T.MISSES), 0), 2) AS "Wait Contention (%)"
+     FROM
+       V$LATCH T
+     WHERE
+       LOWER(NAME) IN ('redo copy', 'redo allocation');
    #+END_SRC
 ** 判断表空间碎片
    如果最大空闲空间占总空间很大比例则可能不存在碎片，如果比例较小，且有许多空闲
    空间，则可能碎片很多
    #+BEGIN_SRC sql
-     select
-       t.tablespace_name,
-       sum(t.bytes),
-       max(t.bytes),
-       count(*),
-       max(t.bytes) / sum(t.bytes) radio
-     from
-       dba_free_space t
-     group by
-       t.tablespace_name
-     order by
-       t.tablespace_name;
+     SELECT
+       T.TABLESPACE_NAME,
+       SUM(T.BYTES),
+       MAX(T.BYTES),
+       COUNT(*),
+       MAX(T.BYTES) / SUM(T.BYTES) RADIO
+     FROM
+       DBA_FREE_SPACE T
+     GROUP BY
+       T.TABLESPACE_NAME
+     ORDER BY
+       T.TABLESPACE_NAME;
    #+END_SRC
 ** 确定命中排序域的次数
    #+BEGIN_SRC sql
-     select t.name, t.value from v$sysstat t where lower(t.name) like 'sort%';
+     SELECT T.NAME, T.VALUE FROM V$SYSSTAT T WHERE LOWER(T.NAME) LIKE 'sort%';
    #+END_SRC
 ** 查看当前 SGA 值
    #+BEGIN_SRC sql
-     select * from v$sga;
+     SELECT * FROM V$SGA;
    #+END_SRC
 ** 确定高速缓冲区命中率
    如果命中率低于 70％，则应该加大 init.ora 参数中的 ~db_block_buffer~ 的值
    #+BEGIN_SRC sql
-     select
-       100 * (1 - ((physical.value - direct.value - lobs.value) / logical.value)) as
-         "Buffer Cache Hit Ratio (%)"
-     from
-       v$sysstat physical,
-       v$sysstat direct,
-       v$sysstat lobs,
-       v$sysstat logical
-     where
-       physical.name = 'physical reads'
-       and direct.name = 'physical reads direct'
-       and lobs.name = 'physical reads direct (lob)'
-       and logical.name = 'session logical reads';
+     SELECT
+       100 * (1 - ((PHYSICAL.VALUE - DIRECT.VALUE - LOBS.VALUE) / LOGICAL.VALUE)) AS "Buffer Cache Hit Ratio (%)"
+     FROM
+       V$SYSSTAT PHYSICAL,
+       V$SYSSTAT DIRECT,
+       V$SYSSTAT LOBS,
+       V$SYSSTAT LOGICAL
+     WHERE
+       PHYSICAL.NAME = 'physical reads'
+       AND DIRECT.NAME = 'physical reads direct'
+       AND LOBS.NAME = 'physical reads direct (lob)'
+       AND LOGICAL.NAME = 'session logical reads';
    #+END_SRC
 ** 确定共享池中的命中率
    如果 ratio1 大于 1 时，需要加大共享池，如果 ratio2 大于 10％时，需要加大共享
    池 ~shared_pool_size~
    #+BEGIN_SRC sql
-     select
-       sum(pins) as pins,
-       sum(reloads) as reloads,
-       (sum(reloads) / sum(pins)) * 100 as ratio1
-     from
-       v$librarycache;
+     SELECT
+       SUM(PINS) AS PINS,
+       SUM(RELOADS) AS RELOADS,
+       (SUM(RELOADS) / SUM(PINS)) * 100 AS RATIO1
+     FROM
+       V$LIBRARYCACHE;
 
-     select
-       sum(gets) as gets,
-       sum(getmisses) as getmisses,
-       (sum(getmisses) / sum(gets)) * 100 as ratio2
-     from
-       v$rowcache;
+     SELECT
+       SUM(GETS) AS GETS,
+       SUM(GETMISSES) AS GETMISSES,
+       (SUM(GETMISSES) / SUM(GETS)) * 100 AS RATIO2
+     FROM
+       V$ROWCACHE;
    #+END_SRC
 ** 数据库参数属性
    #+BEGIN_SRC sql
-     column property_name format a25;
-     column property_value format a30;
-     column description format a100;
-     select * from database_properties;
-     select * from v$version;
+     COLUMN PROPERTY_NAME FORMAT A25;
+     COLUMN PROPERTY_VALUE FORMAT A30;
+     COLUMN DESCRIPTION FORMAT A100;
+
+     SELECT * FROM DATABASE_PROPERTIES;
+     SELECT * FROM V$VERSION;
    #+END_SRC
 ** 求当前会话的 ~SID~, ~SERIAL#~
    #+BEGIN_SRC sql
@@ -2606,6 +2606,11 @@
    通过 ~tkprof~ 来分析会话的运行资源消耗数
    #+BEGIN_SRC text
      tkprof ora11g_ora_10868.trc d:\a.txt
+   #+END_SRC
+
+** 清空回收站
+   #+BEGIN_SRC sql
+     purge recyclebin;
    #+END_SRC
 
 * 参考链接
