@@ -1,0 +1,115 @@
+#+TITLE: 后端培训记录
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2021-09-10 Fri 09:59:53>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: tag1 tag2 tag3
+
+
+* 数据库
+** MySQL 初始化
+   #+BEGIN_SRC sh
+     -- 初始化数据库
+     mysqld.exe --initialize-insecure --basedir=C:\Local\mysql-5.7.26-winx64 --datadir=C:\Local\mysql-5.7.26-winx64\data
+
+     -- 初始化数据库证书
+     mysql_ssl_rsa_setup --datadir=C:\Local\mysql-5.7.26-winx64\data
+   #+END_SRC
+
+** MySQL 连接
+   #+BEGIN_SRC sh
+     mysql -uroot -h 127.0.0.1
+   #+END_SRC
+
+** 新建数据库和用户
+   #+BEGIN_SRC sql
+     -- 创建数据库
+     create database test01 default character set = 'utf8mb4' collate utf8mb4_general_ci;
+
+     -- 创建用户并授权
+     create user 'user01'@'%' identified by 'password';
+     grant all privileges on test01.* to 'user01'@'%';
+     flush privileges;
+   #+END_SRC
+
+** 建库建表语句
+   #+BEGIN_SRC sql
+     -- 创建表
+     create table if not exists employee (
+       empl_id bigint not null primary key auto_increment,
+       empl_code varchar(128),
+       empl_name varchar(128)
+       empl_gender varchar(16),
+       empl_note text
+     );
+   #+END_SRC
+
+* Java 后端
+** 技术点
+   1. Spring Framework
+   2. Spring Boot
+   3. Maven
+
+** Java 配置
+   配置以下环境变量
+   #+BEGIN_SRC sh
+     export JAVA_HOME=/usr/local/java/jdk1.8.0_191
+     export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar${CLASSPATH:+:${CLASSPATH}}
+     export MAVEN_HOME=/usr/local/java/apache-maven-3.6.3
+     export PATH=$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH
+   #+END_SRC
+
+** Maven
+   [[http://maven.apache.org/][Maven]] 是 Java 项目中依赖包管理工具。官方给出了一个[[http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html][五分钟教程]]，里面有基本使用
+   的介绍
+
+   在国内访问官方 [[https://mvnrepository.com][Apache Maven Repository]] 的镜像站比较慢， 一般会使用阿里的镜像
+   源来提高 Maven 下载包的速度。配置方法很简单，即在 =~/.m2/settings.xml= 文件中
+   添加如下配置
+   #+BEGIN_SRC xml
+     <mirrors>
+       <mirror>
+         <id>aliyun</id>
+         <mirrorOf>*</mirrorOf>
+         <name>ALiYun Public Repository</name>
+         <url>https://maven.aliyun.com/nexus/content/groups/public</url>
+       </mirror>
+     </mirrors>
+   #+END_SRC
+
+** 新建项目
+   Spring Boot 提供了一个基于 web 的新建项目工具 [[http://start.spring.io/][start-spring-io]] 。当然，也可以
+   通过命令行工具来创建。
+
+** 配置数据库 MySQL
+   ~application.yml~ 配置文件中添加用户名、密码等相关信息
+   #+BEGIN_SRC yaml
+     spring:
+       jpa:
+         database-platform: org.hibernate.dialect.MySQL5Dialect
+       datasource:
+         platform: mysql
+         username: username
+         password: password
+         url: jdbc:mysql://localhost:3306/database?useUnicode=true&characterEncoding=utf-8&useSSL=false
+         driver-class-name: com.mysql.jdbc.Driver
+   #+END_SRC
+
+   ~pom.xml~ 文件中添加 MySQL 依赖
+   #+BEGIN_SRC xml
+     <dependency>
+       <groupId>mysql</groupId>
+       <artifactId>mysql-connector-java</artifactId>
+       <version>5.1.47</version>
+     </dependency>
+   #+END_SRC
+
+* 参考链接
+  1. [[https://docs.spring.io/spring-boot/docs/current/reference/html/cli-using-the-cli.html][Using Spring Boot CLI]]
+  2. [[https://spring.io/projects/spring-boot][Spring Boot Project Homepage]]
+  3. [[https://spring.io/guides/gs/rest-service/][RESTful Service]]
+  4. [[https://spring.io/guides/gs/consuming-rest-angularjs/][Consuming a RESTful Web Service with AngularJS]]
+  5. [[https://github.com/spring-guides/tut-rest.git][Spring Tutorial Github Repo]]
+  6. [[https://www.imooc.com/learn/1058][Spring Boot 2.0 深度实践之系列总览]]
