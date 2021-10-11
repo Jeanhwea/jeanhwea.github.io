@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-09-21 Tue 16:48 -->
+<!-- 2021-10-11 Mon 16:04 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JVM 知识点</title>
@@ -233,50 +233,50 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgb98bf6f">1. 基础知识</a>
+<li><a href="#org0901e51">1. 基础知识</a>
 <ul>
-<li><a href="#org1f0da8c">1.1. JVM 运行内存的分类</a></li>
-<li><a href="#orgfed6755">1.2. Java 内存堆和栈区别</a></li>
-<li><a href="#orgbfca57a">1.3. Java 四引用</a></li>
-<li><a href="#orgf5f1db0">1.4. GC 回收机制</a></li>
-<li><a href="#org9c38d04">1.5. GC 标记对象的死活</a></li>
-<li><a href="#org7d81892">1.6. GC 回收算法</a></li>
-<li><a href="#orgf36300e">1.7. MinorGC 和 FullGC</a></li>
-<li><a href="#org9874c69">1.8. 内存分配与回收策略</a></li>
-<li><a href="#org697fd7f">1.9. GC 垃圾收集器</a></li>
-<li><a href="#org80da957">1.10. 内存泄漏的几种情形</a></li>
-<li><a href="#orgff7eb5f">1.11. Java 类加载机制</a></li>
-<li><a href="#org836cd5d">1.12. 引起类加载操作的五个行为</a></li>
-<li><a href="#org15ec655">1.13. Java 对象创建时机</a></li>
+<li><a href="#orgefeae29">1.1. JVM 运行内存的分类</a></li>
+<li><a href="#org796fc22">1.2. Java 内存堆和栈区别</a></li>
+<li><a href="#org6cfa0b9">1.3. Java 四引用</a></li>
+<li><a href="#orgf5c8d7a">1.4. GC 回收机制</a></li>
+<li><a href="#org8d92fd0">1.5. GC 标记对象的死活</a></li>
+<li><a href="#org7183d11">1.6. GC 回收算法</a></li>
+<li><a href="#orgc0903a3">1.7. MinorGC 和 FullGC</a></li>
+<li><a href="#orgc4a46fb">1.8. 内存分配与回收策略</a></li>
+<li><a href="#orgd7a07ff">1.9. GC 垃圾收集器</a></li>
+<li><a href="#org5fcf171">1.10. 内存泄漏的几种情形</a></li>
+<li><a href="#org5fe4838">1.11. Java 类加载机制</a></li>
+<li><a href="#org68b8ff6">1.12. 引起类加载操作的五个行为</a></li>
+<li><a href="#org539e03a">1.13. Java 对象创建时机</a></li>
 </ul>
 </li>
-<li><a href="#org26a72ba">2. 实践案例</a>
+<li><a href="#org4a492b6">2. 实践案例</a>
 <ul>
-<li><a href="#org9f31b23">2.1. JVM 调优参数</a></li>
-<li><a href="#org755d4d7">2.2. JDK  调试工具</a>
+<li><a href="#org3923240">2.1. JVM 调优参数</a></li>
+<li><a href="#orgf7751ff">2.2. JDK 调试工具</a>
 <ul>
-<li><a href="#org01c64c8">2.2.1. jps</a></li>
-<li><a href="#org0df116b">2.2.2. jstat</a></li>
-<li><a href="#orgcd429c6">2.2.3. jmap</a></li>
-<li><a href="#org4284543">2.2.4. jstack</a></li>
-<li><a href="#org0193c42">2.2.5. arthas</a></li>
+<li><a href="#org7e6d2ff">2.2.1. jps</a></li>
+<li><a href="#orga496cbb">2.2.2. jstat</a></li>
+<li><a href="#org38f2c42">2.2.3. jmap</a></li>
+<li><a href="#org071239c">2.2.4. jstack</a></li>
+<li><a href="#org4014a4d">2.2.5. arthas</a></li>
 </ul>
 </li>
-<li><a href="#org4f33c32">2.3. 逃逸分析</a></li>
-<li><a href="#orgbf924ec">2.4. JDBC 知识点</a></li>
+<li><a href="#org3ea7247">2.3. 逃逸分析</a></li>
+<li><a href="#orgb5cc01a">2.4. JDBC 知识点</a></li>
 </ul>
 </li>
-<li><a href="#orgf67c855">3. 反射</a></li>
+<li><a href="#org9a811c1">3. 反射</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgb98bf6f" class="outline-2">
-<h2 id="orgb98bf6f"><span class="section-number-2">1</span> 基础知识</h2>
+<div id="outline-container-org0901e51" class="outline-2">
+<h2 id="org0901e51"><span class="section-number-2">1</span> 基础知识</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org1f0da8c" class="outline-3">
-<h3 id="org1f0da8c"><span class="section-number-3">1.1</span> JVM 运行内存的分类</h3>
+<div id="outline-container-orgefeae29" class="outline-3">
+<h3 id="orgefeae29"><span class="section-number-3">1.1</span> JVM 运行内存的分类</h3>
 <div class="outline-text-3" id="text-1-1">
 <ol class="org-ol">
 <li><b>程序计数器</b> 当前线程所执行的字节码的行号指示器，用于记录正在执行的虚拟机
@@ -300,8 +300,8 @@
 </div>
 </div>
 
-<div id="outline-container-orgfed6755" class="outline-3">
-<h3 id="orgfed6755"><span class="section-number-3">1.2</span> Java 内存堆和栈区别</h3>
+<div id="outline-container-org796fc22" class="outline-3">
+<h3 id="org796fc22"><span class="section-number-3">1.2</span> Java 内存堆和栈区别</h3>
 <div class="outline-text-3" id="text-1-2">
 <ol class="org-ol">
 <li>栈内存用来存储基本类型的变量和对象的引用变量，堆内存用来存储 Java 中的对象，
@@ -322,8 +322,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-orgbfca57a" class="outline-3">
-<h3 id="orgbfca57a"><span class="section-number-3">1.3</span> Java 四引用</h3>
+<div id="outline-container-org6cfa0b9" class="outline-3">
+<h3 id="org6cfa0b9"><span class="section-number-3">1.3</span> Java 四引用</h3>
 <div class="outline-text-3" id="text-1-3">
 <ol class="org-ol">
 <li><b>强引用</b> （StrongReference）强引用是使用最普遍的引用。如果一个对象具有强引
@@ -348,8 +348,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-orgf5f1db0" class="outline-3">
-<h3 id="orgf5f1db0"><span class="section-number-3">1.4</span> GC 回收机制</h3>
+<div id="outline-container-orgf5c8d7a" class="outline-3">
+<h3 id="orgf5c8d7a"><span class="section-number-3">1.4</span> GC 回收机制</h3>
 <div class="outline-text-3" id="text-1-4">
 <ol class="org-ol">
 <li>Java 中对象是采用 <code>new</code> 或者反射的方法创建的，这些对象的创建都是在堆（Heap）
@@ -363,8 +363,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org9c38d04" class="outline-3">
-<h3 id="org9c38d04"><span class="section-number-3">1.5</span> GC 标记对象的死活</h3>
+<div id="outline-container-org8d92fd0" class="outline-3">
+<h3 id="org8d92fd0"><span class="section-number-3">1.5</span> GC 标记对象的死活</h3>
 <div class="outline-text-3" id="text-1-5">
 <ol class="org-ol">
 <li><b>引用计数法</b> 给对象添加一个引用计数器,没当被引用的时候,计数器的值就加一。
@@ -385,8 +385,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-org7d81892" class="outline-3">
-<h3 id="org7d81892"><span class="section-number-3">1.6</span> GC 回收算法</h3>
+<div id="outline-container-org7183d11" class="outline-3">
+<h3 id="org7183d11"><span class="section-number-3">1.6</span> GC 回收算法</h3>
 <div class="outline-text-3" id="text-1-6">
 <ol class="org-ol">
 <li><b>标记-清除法</b>: 标记出没有用的对象，然后一个一个回收掉
@@ -411,8 +411,8 @@ JVM 会抛出 <code>java.lang.OutOfMemoryError</code></li>
 </div>
 </div>
 
-<div id="outline-container-orgf36300e" class="outline-3">
-<h3 id="orgf36300e"><span class="section-number-3">1.7</span> MinorGC 和 FullGC</h3>
+<div id="outline-container-orgc0903a3" class="outline-3">
+<h3 id="orgc0903a3"><span class="section-number-3">1.7</span> MinorGC 和 FullGC</h3>
 <div class="outline-text-3" id="text-1-7">
 <ol class="org-ol">
 <li><b>Minor GC</b> 通常发生在新生代的 Eden 区，在这个区的对象生存期短，往往发生 GC
@@ -423,8 +423,8 @@ Minor GC，所采用的是标记-清除算法</li>
 </div>
 </div>
 
-<div id="outline-container-org9874c69" class="outline-3">
-<h3 id="org9874c69"><span class="section-number-3">1.8</span> 内存分配与回收策略</h3>
+<div id="outline-container-orgc4a46fb" class="outline-3">
+<h3 id="orgc4a46fb"><span class="section-number-3">1.8</span> 内存分配与回收策略</h3>
 <div class="outline-text-3" id="text-1-8">
 <ol class="org-ol">
 <li>结构（堆大小 = 新生代(1/3) + 老年代(2/3)）:
@@ -455,8 +455,8 @@ survivor1 中
 </div>
 </div>
 
-<div id="outline-container-org697fd7f" class="outline-3">
-<h3 id="org697fd7f"><span class="section-number-3">1.9</span> GC 垃圾收集器</h3>
+<div id="outline-container-orgd7a07ff" class="outline-3">
+<h3 id="orgd7a07ff"><span class="section-number-3">1.9</span> GC 垃圾收集器</h3>
 <div class="outline-text-3" id="text-1-9">
 <ol class="org-ol">
 <li>年轻代常见垃圾收集器
@@ -504,8 +504,8 @@ survivor1 中
 </div>
 </div>
 
-<div id="outline-container-org80da957" class="outline-3">
-<h3 id="org80da957"><span class="section-number-3">1.10</span> 内存泄漏的几种情形</h3>
+<div id="outline-container-org5fcf171" class="outline-3">
+<h3 id="org5fcf171"><span class="section-number-3">1.10</span> 内存泄漏的几种情形</h3>
 <div class="outline-text-3" id="text-1-10">
 <ol class="org-ol">
 <li><b>静态集合类</b>: 如 HashMap、LinkedList 等等
@@ -561,8 +561,8 @@ survivor1 中
 </div>
 </div>
 
-<div id="outline-container-orgff7eb5f" class="outline-3">
-<h3 id="orgff7eb5f"><span class="section-number-3">1.11</span> Java 类加载机制</h3>
+<div id="outline-container-org5fe4838" class="outline-3">
+<h3 id="org5fe4838"><span class="section-number-3">1.11</span> Java 类加载机制</h3>
 <div class="outline-text-3" id="text-1-11">
 <ol class="org-ol">
 <li>概念:
@@ -604,10 +604,10 @@ Java 命令的 <code>-classpath</code> 选项, <code>java.class.path</code> 系�
 来获取系统类加载器。系统加载器的加载路径是程序运行的当前路径
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #268bd2;">ClassLoader</span> <span style="color: #6c71c4;">loader</span> = ClassLoader.getSystemClassLoader<span style="color: #8d5649;">()</span>;
-System.out.println<span style="color: #8d5649;">(</span>loader<span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; sun.misc.Launcher$AppClassLoader@73d16e93</span>
-System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; sun.misc.Launcher$ExtClassLoader@15db9742</span>
-System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span style="color: #d8241f;">()</span>.getParent<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">=&gt; null</span>
+<pre class="src src-java"><span style="color: #66D9EF;">ClassLoader</span> <span style="color: #FD971F;">loader</span> = ClassLoader.getSystemClassLoader<span style="color: #8d5649;">()</span>;
+System.out.println<span style="color: #8d5649;">(</span>loader<span style="color: #8d5649;">)</span>; <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">=&gt; sun.misc.Launcher$AppClassLoader@73d16e93</span>
+System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span>; <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">=&gt; sun.misc.Launcher$ExtClassLoader@15db9742</span>
+System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span style="color: #d8241f;">()</span>.getParent<span style="color: #d8241f;">()</span><span style="color: #8d5649;">)</span>; <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">=&gt; null</span>
 </pre>
 </div></li>
 </ul></li>
@@ -648,8 +648,8 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-org836cd5d" class="outline-3">
-<h3 id="org836cd5d"><span class="section-number-3">1.12</span> 引起类加载操作的五个行为</h3>
+<div id="outline-container-org68b8ff6" class="outline-3">
+<h3 id="org68b8ff6"><span class="section-number-3">1.12</span> 引起类加载操作的五个行为</h3>
 <div class="outline-text-3" id="text-1-12">
 <ol class="org-ol">
 <li>遇到 <code>new</code>, <code>getstatic</code>, <code>putstatic</code> 或 <code>invokestatic</code> 这四条字节码指令</li>
@@ -661,8 +661,8 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-org15ec655" class="outline-3">
-<h3 id="org15ec655"><span class="section-number-3">1.13</span> Java 对象创建时机</h3>
+<div id="outline-container-org539e03a" class="outline-3">
+<h3 id="org539e03a"><span class="section-number-3">1.13</span> Java 对象创建时机</h3>
 <div class="outline-text-3" id="text-1-13">
 <ol class="org-ol">
 <li>使用 <code>new</code> 关键字创建对象</li>
@@ -675,29 +675,29 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-org26a72ba" class="outline-2">
-<h2 id="org26a72ba"><span class="section-number-2">2</span> 实践案例</h2>
+<div id="outline-container-org4a492b6" class="outline-2">
+<h2 id="org4a492b6"><span class="section-number-2">2</span> 实践案例</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org9f31b23" class="outline-3">
-<h3 id="org9f31b23"><span class="section-number-3">2.1</span> JVM 调优参数</h3>
+<div id="outline-container-org3923240" class="outline-3">
+<h3 id="org3923240"><span class="section-number-3">2.1</span> JVM 调优参数</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 设置堆空间，栈空间和元数据空间大小
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">java -Xms3072M -Xmx3072M -Xss1M -XX:<span style="color: #6c71c4;">MetaspaceSize</span>=512M -XX:<span style="color: #6c71c4;">MaxMetaspaceSize</span>=512M -jar app.jar
+<pre class="src src-sh">java -Xms3072M -Xmx3072M -Xss1M -XX:<span style="color: #FD971F;">MetaspaceSize</span>=512M -XX:<span style="color: #FD971F;">MaxMetaspaceSize</span>=512M -jar app.jar
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org755d4d7" class="outline-3">
-<h3 id="org755d4d7"><span class="section-number-3">2.2</span> JDK  调试工具</h3>
+<div id="outline-container-orgf7751ff" class="outline-3">
+<h3 id="orgf7751ff"><span class="section-number-3">2.2</span> JDK 调试工具</h3>
 <div class="outline-text-3" id="text-2-2">
 </div>
-<div id="outline-container-org01c64c8" class="outline-4">
-<h4 id="org01c64c8"><span class="section-number-4">2.2.1</span> jps</h4>
+<div id="outline-container-org7e6d2ff" class="outline-4">
+<h4 id="org7e6d2ff"><span class="section-number-4">2.2.1</span> jps</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 打印 JVM 进程号
@@ -711,20 +711,20 @@ System.out.println<span style="color: #8d5649;">(</span>loader.getParent<span st
 </div>
 </div>
 
-<div id="outline-container-org0df116b" class="outline-4">
-<h4 id="org0df116b"><span class="section-number-4">2.2.2</span> jstat</h4>
+<div id="outline-container-orga496cbb" class="outline-4">
+<h4 id="orga496cbb"><span class="section-number-4">2.2.2</span> jstat</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 通过 <code>jstat</code> 动态查看堆内存使用情况
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#22534;&#20869;&#23384;&#20351;&#29992;&#24773;&#20917;</span>
+<pre class="src src-sh"><span style="color: #75715E; font-style: italic;"># </span><span style="color: #75715E; font-style: italic;">&#26597;&#30475;&#22534;&#20869;&#23384;&#20351;&#29992;&#24773;&#20917;</span>
 jstat -gcutil &lt;pid&gt; 1000
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#32769;&#24180;&#20195;&#20351;&#29992;&#24773;&#20917;</span>
+<span style="color: #75715E; font-style: italic;"># </span><span style="color: #75715E; font-style: italic;">&#26597;&#30475;&#32769;&#24180;&#20195;&#20351;&#29992;&#24773;&#20917;</span>
 jstat -gcold &lt;pid&gt; 1000
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#24180;&#36731;&#20195;&#20351;&#29992;&#24773;&#20917;</span>
+<span style="color: #75715E; font-style: italic;"># </span><span style="color: #75715E; font-style: italic;">&#26597;&#30475;&#24180;&#36731;&#20195;&#20351;&#29992;&#24773;&#20917;</span>
 jstat -gcnew &lt;pid&gt; 1000
 </pre>
 </div>
@@ -764,32 +764,34 @@ $ jstat -gcnew 70670 1000
 </div>
 </div>
 
-<div id="outline-container-orgcd429c6" class="outline-4">
-<h4 id="orgcd429c6"><span class="section-number-4">2.2.3</span> jmap</h4>
+<div id="outline-container-org38f2c42" class="outline-4">
+<h4 id="org38f2c42"><span class="section-number-4">2.2.3</span> jmap</h4>
 <div class="outline-text-4" id="text-2-2-3">
 <p>
 使用 <code>jmap</code> 查看 JVM 虚拟机内存
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#20869;&#23384;&#20998;&#24067;</span>
+<pre class="src src-sh"><span style="color: #75715E; font-style: italic;"># </span><span style="color: #75715E; font-style: italic;">&#26597;&#30475;&#25152;&#26377;&#20869;&#23384;&#20998;&#24067;</span>
 jmap &lt;pid&gt;
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25171;&#21360;&#22534;&#20869;&#23384;&#20449;&#24687;</span>
+<span style="color: #75715E; font-style: italic;"># </span><span style="color: #75715E; font-style: italic;">&#25171;&#21360;&#22534;&#20869;&#23384;&#20449;&#24687;</span>
 jmap -heap &lt;pid&gt;
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26174;&#31034;&#22534;&#20013;&#23545;&#35937;&#30340;&#32479;&#35745;&#20449;&#24687;</span>
+<span style="color: #75715E; font-style: italic;"># </span><span style="color: #75715E; font-style: italic;">&#26174;&#31034;&#22534;&#20013;&#23545;&#35937;&#30340;&#32479;&#35745;&#20449;&#24687;</span>
 jmap -histo:live &lt;pid&gt;
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25171;&#21360;&#31867;&#21152;&#36733;&#22120;&#20449;&#24687;</span>
+<span style="color: #75715E; font-style: italic;"># </span><span style="color: #75715E; font-style: italic;">&#25171;&#21360;&#31867;&#21152;&#36733;&#22120;&#20449;&#24687;</span>
 jmap -clstats &lt;pid&gt;
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25171;&#21360;&#31561;&#24453;&#32456;&#32467;&#30340;&#23545;&#35937;&#20449;&#24687;</span>
+<span style="color: #75715E; font-style: italic;"># </span><span style="color: #75715E; font-style: italic;">&#25171;&#21360;&#31561;&#24453;&#32456;&#32467;&#30340;&#23545;&#35937;&#20449;&#24687;</span>
 jmap -finalizerinfo &lt;pid&gt;
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#29983;&#25104;&#22534;&#36716;&#20648;&#24555;&#29031; dump &#25991;&#20214;</span>
-jmap -dump:<span style="color: #6c71c4;">format</span>=b,<span style="color: #6c71c4;">file</span>=heapdump.phrof &lt;pid&gt;
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">live &#23376;&#36873;&#39033;&#34920;&#31034;&#21482; dump &#23384;&#27963;&#30340;&#23545;&#35937;</span>
-jmap -dump:live,<span style="color: #6c71c4;">format</span>=b,<span style="color: #6c71c4;">file</span>=heapdump.phrof &lt;pid&gt;
+<span style="color: #75715E; font-style: italic;"># </span><span style="color: #75715E; font-style: italic;">&#29983;&#25104;&#22534;&#36716;&#20648;&#24555;&#29031; dump &#25991;&#20214;</span>
+jmap -dump:<span style="color: #FD971F;">format</span>=b,<span style="color: #FD971F;">file</span>=heapdump.hprof &lt;pid&gt;
+<span style="color: #75715E; font-style: italic;"># </span><span style="color: #75715E; font-style: italic;">live &#23376;&#36873;&#39033;&#34920;&#31034;&#21482; dump &#23384;&#27963;&#30340;&#23545;&#35937;</span>
+jmap -dump:live,<span style="color: #FD971F;">format</span>=b,<span style="color: #FD971F;">file</span>=heapdump.hprof &lt;pid&gt;
+
+jmap -dump:<span style="color: #FD971F;">format</span>=b,<span style="color: #FD971F;">file</span>=heapdump-$(date +<span style="color: #E6DB74;">'%Y%m%d-%H%M%S'</span>).hprof &lt;pid&gt;
 </pre>
 </div>
 
@@ -878,8 +880,8 @@ PS Old Generation
 </div>
 </div>
 
-<div id="outline-container-org4284543" class="outline-4">
-<h4 id="org4284543"><span class="section-number-4">2.2.4</span> jstack</h4>
+<div id="outline-container-org071239c" class="outline-4">
+<h4 id="org071239c"><span class="section-number-4">2.2.4</span> jstack</h4>
 <div class="outline-text-4" id="text-2-2-4">
 <p>
 <code>jstack</code> 可以打印线程栈
@@ -947,8 +949,8 @@ JNI global references: 2614
 </div>
 </div>
 
-<div id="outline-container-org0193c42" class="outline-4">
-<h4 id="org0193c42"><span class="section-number-4">2.2.5</span> arthas</h4>
+<div id="outline-container-org4014a4d" class="outline-4">
+<h4 id="org4014a4d"><span class="section-number-4">2.2.5</span> arthas</h4>
 <div class="outline-text-4" id="text-2-2-5">
 <p>
 阿里巴巴开源的 JVM 监控调试工具 <a href="https://github.com/alibaba/arthas">Arthas</a> 提供更多调试方法
@@ -957,8 +959,8 @@ JNI global references: 2614
 </div>
 </div>
 
-<div id="outline-container-org4f33c32" class="outline-3">
-<h3 id="org4f33c32"><span class="section-number-3">2.3</span> 逃逸分析</h3>
+<div id="outline-container-org3ea7247" class="outline-3">
+<h3 id="org3ea7247"><span class="section-number-3">2.3</span> 逃逸分析</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 Java 在发现 new 出来的对象如果只在当前方法中运行，会直接进入线程栈，而不会放入
@@ -982,11 +984,11 @@ JDK 1.6 后默认开启逃逸分析 <code>-XX:-DoEscapeAnalysis</code> 选项，
 添加如下实验代码
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Example02</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">-Xmx10m -Xms10m -XX:+PrintGC -XX:-DoEscapeAnalysis</span>
-  <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #859900;">while</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">true</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-      <span style="color: #268bd2;">Integer</span> <span style="color: #6c71c4;">temp</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Integer</span><span style="color: #24a222;">(</span>999999999<span style="color: #24a222;">)</span>;
+<pre class="src src-java"><span style="color: #F92672;">public</span> <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Example02</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">-Xmx10m -Xms10m -XX:+PrintGC -XX:-DoEscapeAnalysis</span>
+  <span style="color: #F92672;">public</span> <span style="color: #F92672;">static</span> <span style="color: #66D9EF;">void</span> <span style="color: #A6E22E;">main</span><span style="color: #d8241f;">(</span><span style="color: #66D9EF;">String</span><span style="color: #9564bf;">[]</span> <span style="color: #FD971F;">args</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #F92672;">while</span> <span style="color: #9564bf;">(</span><span style="color: #AE81FF;">true</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+      <span style="color: #66D9EF;">Integer</span> <span style="color: #FD971F;">temp</span> = <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">Integer</span><span style="color: #24a222;">(</span>999999999<span style="color: #24a222;">)</span>;
     <span style="color: #9564bf;">}</span>
   <span style="color: #d8241f;">}</span>
 <span style="color: #8d5649;">}</span>
@@ -1015,8 +1017,8 @@ JDK 1.6 后默认开启逃逸分析 <code>-XX:-DoEscapeAnalysis</code> 选项，
 </div>
 </div>
 
-<div id="outline-container-orgbf924ec" class="outline-3">
-<h3 id="orgbf924ec"><span class="section-number-3">2.4</span> JDBC 知识点</h3>
+<div id="outline-container-orgb5cc01a" class="outline-3">
+<h3 id="orgb5cc01a"><span class="section-number-3">2.4</span> JDBC 知识点</h3>
 <div class="outline-text-3" id="text-2-4">
 <ol class="org-ol">
 <li>SPI (Service Provider Interface) 实际上是基于接口的编程, 策略模式和配置文
@@ -1028,13 +1030,13 @@ JDK 1.6 后默认开启逃逸分析 <code>-XX:-DoEscapeAnalysis</code> 选项，
 用驱动信息
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #d33682;">/**</span>
-<span style="color: #d33682;"> * Load the initial JDBC drivers by checking the System property</span>
-<span style="color: #d33682;"> * jdbc.properties and then use the </span><span style="color: #268bd2;">{@code ServiceLoader}</span><span style="color: #d33682;"> mechanism</span>
-<span style="color: #d33682;"> */</span>
-<span style="color: #859900;">static</span> <span style="color: #8d5649;">{</span>
+<pre class="src src-java"><span style="color: #E6DB74;">/**</span>
+<span style="color: #E6DB74;"> * Load the initial JDBC drivers by checking the System property</span>
+<span style="color: #E6DB74;"> * jdbc.properties and then use the </span><span style="color: #AE81FF;">{@code ServiceLoader}</span><span style="color: #E6DB74;"> mechanism</span>
+<span style="color: #E6DB74;"> */</span>
+<span style="color: #F92672;">static</span> <span style="color: #8d5649;">{</span>
     loadInitialDrivers<span style="color: #d8241f;">()</span>;
-    println<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"JDBC DriverManager initialized"</span><span style="color: #d8241f;">)</span>;
+    println<span style="color: #d8241f;">(</span><span style="color: #E6DB74;">"JDBC DriverManager initialized"</span><span style="color: #d8241f;">)</span>;
 <span style="color: #8d5649;">}</span>
 </pre>
 </div></li>
@@ -1044,32 +1046,32 @@ JDK 1.6 后默认开启逃逸分析 <code>-XX:-DoEscapeAnalysis</code> 选项，
 加载到 JVM
 </p>
 <div class="org-src-container">
-<pre class="src src-java">AccessController.doPrivileged<span style="color: #8d5649;">(</span><span style="color: #859900;">new</span> <span style="color: #268bd2;">PrivilegedAction</span><span style="color: #d8241f;">&lt;</span><span style="color: #268bd2;">Void</span><span style="color: #d8241f;">&gt;()</span> <span style="color: #d8241f;">{</span>
-    <span style="color: #859900;">public</span> <span style="color: #268bd2;">Void</span> <span style="color: #b58900;">run</span><span style="color: #9564bf;">()</span> <span style="color: #9564bf;">{</span>
+<pre class="src src-java">AccessController.doPrivileged<span style="color: #8d5649;">(</span><span style="color: #F92672;">new</span> <span style="color: #66D9EF;">PrivilegedAction</span><span style="color: #d8241f;">&lt;</span><span style="color: #66D9EF;">Void</span><span style="color: #d8241f;">&gt;()</span> <span style="color: #d8241f;">{</span>
+    <span style="color: #F92672;">public</span> <span style="color: #66D9EF;">Void</span> <span style="color: #A6E22E;">run</span><span style="color: #9564bf;">()</span> <span style="color: #9564bf;">{</span>
 
-        <span style="color: #268bd2;">ServiceLoader</span><span style="color: #24a222;">&lt;</span><span style="color: #268bd2;">Driver</span><span style="color: #24a222;">&gt;</span> <span style="color: #6c71c4;">loadedDrivers</span> = ServiceLoader.load<span style="color: #24a222;">(</span>Driver.<span style="color: #859900;">class</span><span style="color: #24a222;">)</span>;
-        <span style="color: #268bd2;">Iterator</span><span style="color: #24a222;">&lt;</span><span style="color: #268bd2;">Driver</span><span style="color: #24a222;">&gt;</span> <span style="color: #6c71c4;">driversIterator</span> = loadedDrivers.iterator<span style="color: #24a222;">()</span>;
+        <span style="color: #66D9EF;">ServiceLoader</span><span style="color: #24a222;">&lt;</span><span style="color: #66D9EF;">Driver</span><span style="color: #24a222;">&gt;</span> <span style="color: #FD971F;">loadedDrivers</span> = ServiceLoader.load<span style="color: #24a222;">(</span>Driver.<span style="color: #F92672;">class</span><span style="color: #24a222;">)</span>;
+        <span style="color: #66D9EF;">Iterator</span><span style="color: #24a222;">&lt;</span><span style="color: #66D9EF;">Driver</span><span style="color: #24a222;">&gt;</span> <span style="color: #FD971F;">driversIterator</span> = loadedDrivers.iterator<span style="color: #24a222;">()</span>;
 
-        <span style="color: #93a1a1; font-style: italic;">/* </span><span style="color: #93a1a1; font-style: italic;">Load these drivers, so that they can be instantiated.</span>
-<span style="color: #93a1a1; font-style: italic;">         * It may be the case that the driver class may not be there</span>
-<span style="color: #93a1a1; font-style: italic;">         * i.e. there may be a packaged driver with the service class</span>
-<span style="color: #93a1a1; font-style: italic;">         * as implementation of java.sql.Driver but the actual class</span>
-<span style="color: #93a1a1; font-style: italic;">         * may be missing. In that case a java.util.ServiceConfigurationError</span>
-<span style="color: #93a1a1; font-style: italic;">         * will be thrown at runtime by the VM trying to locate</span>
-<span style="color: #93a1a1; font-style: italic;">         * and load the service.</span>
-<span style="color: #93a1a1; font-style: italic;">         *</span>
-<span style="color: #93a1a1; font-style: italic;">         * Adding a try catch block to catch those runtime errors</span>
-<span style="color: #93a1a1; font-style: italic;">         * if driver not available in classpath but it's</span>
-<span style="color: #93a1a1; font-style: italic;">         * packaged as service and that service is there in classpath.</span>
-<span style="color: #93a1a1; font-style: italic;">         */</span>
-        <span style="color: #859900;">try</span><span style="color: #24a222;">{</span>
-            <span style="color: #859900;">while</span><span style="color: #ff7f00;">(</span>driversIterator.hasNext<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+        <span style="color: #75715E; font-style: italic;">/* </span><span style="color: #75715E; font-style: italic;">Load these drivers, so that they can be instantiated.</span>
+<span style="color: #75715E; font-style: italic;">         * It may be the case that the driver class may not be there</span>
+<span style="color: #75715E; font-style: italic;">         * i.e. there may be a packaged driver with the service class</span>
+<span style="color: #75715E; font-style: italic;">         * as implementation of java.sql.Driver but the actual class</span>
+<span style="color: #75715E; font-style: italic;">         * may be missing. In that case a java.util.ServiceConfigurationError</span>
+<span style="color: #75715E; font-style: italic;">         * will be thrown at runtime by the VM trying to locate</span>
+<span style="color: #75715E; font-style: italic;">         * and load the service.</span>
+<span style="color: #75715E; font-style: italic;">         *</span>
+<span style="color: #75715E; font-style: italic;">         * Adding a try catch block to catch those runtime errors</span>
+<span style="color: #75715E; font-style: italic;">         * if driver not available in classpath but it's</span>
+<span style="color: #75715E; font-style: italic;">         * packaged as service and that service is there in classpath.</span>
+<span style="color: #75715E; font-style: italic;">         */</span>
+        <span style="color: #F92672;">try</span><span style="color: #24a222;">{</span>
+            <span style="color: #F92672;">while</span><span style="color: #ff7f00;">(</span>driversIterator.hasNext<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
                 driversIterator.next<span style="color: #1776b6;">()</span>;
             <span style="color: #ff7f00;">}</span>
-        <span style="color: #24a222;">}</span> <span style="color: #859900;">catch</span><span style="color: #24a222;">(</span><span style="color: #268bd2;">Throwable</span> <span style="color: #6c71c4;">t</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
-        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Do nothing</span>
+        <span style="color: #24a222;">}</span> <span style="color: #F92672;">catch</span><span style="color: #24a222;">(</span><span style="color: #66D9EF;">Throwable</span> <span style="color: #FD971F;">t</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+        <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">Do nothing</span>
         <span style="color: #24a222;">}</span>
-        <span style="color: #859900;">return</span> <span style="color: #268bd2;">null</span>;
+        <span style="color: #F92672;">return</span> <span style="color: #AE81FF;">null</span>;
     <span style="color: #9564bf;">}</span>
 <span style="color: #d8241f;">}</span><span style="color: #8d5649;">)</span>;
 </pre>
@@ -1080,73 +1082,73 @@ JDK 1.6 后默认开启逃逸分析 <code>-XX:-DoEscapeAnalysis</code> 选项，
 信息
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">List of registered JDBC drivers</span>
-<span style="color: #859900;">private</span> <span style="color: #859900;">final</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">CopyOnWriteArrayList</span><span style="color: #8d5649;">&lt;</span><span style="color: #268bd2;">DriverInfo</span><span style="color: #8d5649;">&gt;</span> <span style="color: #6c71c4;">registeredDrivers</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">CopyOnWriteArrayList</span><span style="color: #8d5649;">&lt;&gt;()</span>;
+<pre class="src src-java"><span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">List of registered JDBC drivers</span>
+<span style="color: #F92672;">private</span> <span style="color: #F92672;">final</span> <span style="color: #F92672;">static</span> <span style="color: #66D9EF;">CopyOnWriteArrayList</span><span style="color: #8d5649;">&lt;</span><span style="color: #66D9EF;">DriverInfo</span><span style="color: #8d5649;">&gt;</span> <span style="color: #FD971F;">registeredDrivers</span> = <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">CopyOnWriteArrayList</span><span style="color: #8d5649;">&lt;&gt;()</span>;
 </pre>
 </div></li>
 <li><p>
 调用 <code>getConnection</code> 方法时通过变量所有注册的驱动来获取连接信息
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #93a1a1; font-style: italic;">//  </span><span style="color: #93a1a1; font-style: italic;">Worker method called by the public getConnection() methods.</span>
-<span style="color: #859900;">private</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">Connection</span> <span style="color: #b58900;">getConnection</span><span style="color: #8d5649;">(</span>
-    <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">url</span>, <span style="color: #268bd2;">java</span>.<span style="color: #268bd2;">util</span>.<span style="color: #268bd2;">Properties</span> <span style="color: #6c71c4;">info</span>, <span style="color: #268bd2;">Class</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">caller</span><span style="color: #8d5649;">)</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">SQLException</span> <span style="color: #8d5649;">{</span>
-    <span style="color: #93a1a1; font-style: italic;">/*</span>
-<span style="color: #93a1a1; font-style: italic;">     * When callerCl is null, we should check the application's</span>
-<span style="color: #93a1a1; font-style: italic;">     * (which is invoking this class indirectly)</span>
-<span style="color: #93a1a1; font-style: italic;">     * classloader, so that the JDBC driver class outside rt.jar</span>
-<span style="color: #93a1a1; font-style: italic;">     * can be loaded from here.</span>
-<span style="color: #93a1a1; font-style: italic;">     */</span>
-    <span style="color: #268bd2;">ClassLoader</span> <span style="color: #6c71c4;">callerCL</span> = caller != <span style="color: #268bd2;">null</span> ? caller.getClassLoader<span style="color: #d8241f;">()</span> : <span style="color: #268bd2;">null</span>;
-    <span style="color: #859900;">synchronized</span><span style="color: #d8241f;">(</span>DriverManager.<span style="color: #859900;">class</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">synchronize loading of the correct classloader.</span>
-        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>callerCL == <span style="color: #268bd2;">null</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+<pre class="src src-java"><span style="color: #75715E; font-style: italic;">//  </span><span style="color: #75715E; font-style: italic;">Worker method called by the public getConnection() methods.</span>
+<span style="color: #F92672;">private</span> <span style="color: #F92672;">static</span> <span style="color: #66D9EF;">Connection</span> <span style="color: #A6E22E;">getConnection</span><span style="color: #8d5649;">(</span>
+    <span style="color: #66D9EF;">String</span> <span style="color: #FD971F;">url</span>, <span style="color: #AE81FF;">java</span>.<span style="color: #AE81FF;">util</span>.<span style="color: #66D9EF;">Properties</span> <span style="color: #FD971F;">info</span>, <span style="color: #66D9EF;">Class</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #FD971F;">caller</span><span style="color: #8d5649;">)</span> <span style="color: #F92672;">throws</span> <span style="color: #66D9EF;">SQLException</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #75715E; font-style: italic;">/*</span>
+<span style="color: #75715E; font-style: italic;">     * When callerCl is null, we should check the application's</span>
+<span style="color: #75715E; font-style: italic;">     * (which is invoking this class indirectly)</span>
+<span style="color: #75715E; font-style: italic;">     * classloader, so that the JDBC driver class outside rt.jar</span>
+<span style="color: #75715E; font-style: italic;">     * can be loaded from here.</span>
+<span style="color: #75715E; font-style: italic;">     */</span>
+    <span style="color: #66D9EF;">ClassLoader</span> <span style="color: #FD971F;">callerCL</span> = caller != <span style="color: #AE81FF;">null</span> ? caller.getClassLoader<span style="color: #d8241f;">()</span> : <span style="color: #AE81FF;">null</span>;
+    <span style="color: #F92672;">synchronized</span><span style="color: #d8241f;">(</span>DriverManager.<span style="color: #F92672;">class</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">synchronize loading of the correct classloader.</span>
+        <span style="color: #F92672;">if</span> <span style="color: #9564bf;">(</span>callerCL == <span style="color: #AE81FF;">null</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
             callerCL = Thread.currentThread<span style="color: #24a222;">()</span>.getContextClassLoader<span style="color: #24a222;">()</span>;
         <span style="color: #9564bf;">}</span>
     <span style="color: #d8241f;">}</span>
 
-    <span style="color: #859900;">if</span><span style="color: #d8241f;">(</span>url == <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">SQLException</span><span style="color: #9564bf;">(</span><span style="color: #2aa198;">"The url cannot be null"</span>, <span style="color: #2aa198;">"08001"</span><span style="color: #9564bf;">)</span>;
+    <span style="color: #F92672;">if</span><span style="color: #d8241f;">(</span>url == <span style="color: #AE81FF;">null</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #F92672;">throw</span> <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">SQLException</span><span style="color: #9564bf;">(</span><span style="color: #E6DB74;">"The url cannot be null"</span>, <span style="color: #E6DB74;">"08001"</span><span style="color: #9564bf;">)</span>;
     <span style="color: #d8241f;">}</span>
 
-    println<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"DriverManager.getConnection(\""</span> + url + <span style="color: #2aa198;">"\")"</span><span style="color: #d8241f;">)</span>;
+    println<span style="color: #d8241f;">(</span><span style="color: #E6DB74;">"DriverManager.getConnection(\""</span> + url + <span style="color: #E6DB74;">"\")"</span><span style="color: #d8241f;">)</span>;
 
-    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Walk through the loaded registeredDrivers attempting to make a connection.</span>
-    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Remember the first exception that gets raised so we can reraise it.</span>
-    <span style="color: #268bd2;">SQLException</span> <span style="color: #6c71c4;">reason</span> = <span style="color: #268bd2;">null</span>;
+    <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">Walk through the loaded registeredDrivers attempting to make a connection.</span>
+    <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">Remember the first exception that gets raised so we can reraise it.</span>
+    <span style="color: #66D9EF;">SQLException</span> <span style="color: #FD971F;">reason</span> = <span style="color: #AE81FF;">null</span>;
 
-    <span style="color: #859900;">for</span><span style="color: #d8241f;">(</span><span style="color: #268bd2;">DriverInfo</span> <span style="color: #6c71c4;">aDriver</span> : registeredDrivers<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">If the caller does not have permission to load the driver then</span>
-        <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">skip it.</span>
-        <span style="color: #859900;">if</span><span style="color: #9564bf;">(</span>isDriverAllowed<span style="color: #24a222;">(</span>aDriver.driver, callerCL<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #859900;">try</span> <span style="color: #24a222;">{</span>
-                println<span style="color: #ff7f00;">(</span><span style="color: #2aa198;">"    trying "</span> + aDriver.driver.getClass<span style="color: #1776b6;">()</span>.getName<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span>;
-                <span style="color: #268bd2;">Connection</span> <span style="color: #6c71c4;">con</span> = aDriver.driver.connect<span style="color: #ff7f00;">(</span>url, info<span style="color: #ff7f00;">)</span>;
-                <span style="color: #859900;">if</span> <span style="color: #ff7f00;">(</span>con != <span style="color: #268bd2;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
-                    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">Success!</span>
-                    println<span style="color: #1776b6;">(</span><span style="color: #2aa198;">"getConnection returning "</span> + aDriver.driver.getClass<span style="color: #00bed1;">()</span>.getName<span style="color: #00bed1;">()</span><span style="color: #1776b6;">)</span>;
-                    <span style="color: #859900;">return</span> <span style="color: #1776b6;">(</span>con<span style="color: #1776b6;">)</span>;
+    <span style="color: #F92672;">for</span><span style="color: #d8241f;">(</span><span style="color: #66D9EF;">DriverInfo</span> <span style="color: #FD971F;">aDriver</span> : registeredDrivers<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">If the caller does not have permission to load the driver then</span>
+        <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">skip it.</span>
+        <span style="color: #F92672;">if</span><span style="color: #9564bf;">(</span>isDriverAllowed<span style="color: #24a222;">(</span>aDriver.driver, callerCL<span style="color: #24a222;">)</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #F92672;">try</span> <span style="color: #24a222;">{</span>
+                println<span style="color: #ff7f00;">(</span><span style="color: #E6DB74;">"    trying "</span> + aDriver.driver.getClass<span style="color: #1776b6;">()</span>.getName<span style="color: #1776b6;">()</span><span style="color: #ff7f00;">)</span>;
+                <span style="color: #66D9EF;">Connection</span> <span style="color: #FD971F;">con</span> = aDriver.driver.connect<span style="color: #ff7f00;">(</span>url, info<span style="color: #ff7f00;">)</span>;
+                <span style="color: #F92672;">if</span> <span style="color: #ff7f00;">(</span>con != <span style="color: #AE81FF;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                    <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">Success!</span>
+                    println<span style="color: #1776b6;">(</span><span style="color: #E6DB74;">"getConnection returning "</span> + aDriver.driver.getClass<span style="color: #00bed1;">()</span>.getName<span style="color: #00bed1;">()</span><span style="color: #1776b6;">)</span>;
+                    <span style="color: #F92672;">return</span> <span style="color: #1776b6;">(</span>con<span style="color: #1776b6;">)</span>;
                 <span style="color: #ff7f00;">}</span>
-            <span style="color: #24a222;">}</span> <span style="color: #859900;">catch</span> <span style="color: #24a222;">(</span><span style="color: #268bd2;">SQLException</span> <span style="color: #6c71c4;">ex</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
-                <span style="color: #859900;">if</span> <span style="color: #ff7f00;">(</span>reason == <span style="color: #268bd2;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+            <span style="color: #24a222;">}</span> <span style="color: #F92672;">catch</span> <span style="color: #24a222;">(</span><span style="color: #66D9EF;">SQLException</span> <span style="color: #FD971F;">ex</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #F92672;">if</span> <span style="color: #ff7f00;">(</span>reason == <span style="color: #AE81FF;">null</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
                     reason = ex;
                 <span style="color: #ff7f00;">}</span>
             <span style="color: #24a222;">}</span>
 
-        <span style="color: #9564bf;">}</span> <span style="color: #859900;">else</span> <span style="color: #9564bf;">{</span>
-            println<span style="color: #24a222;">(</span><span style="color: #2aa198;">"    skipping: "</span> + aDriver.getClass<span style="color: #ff7f00;">()</span>.getName<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span> <span style="color: #F92672;">else</span> <span style="color: #9564bf;">{</span>
+            println<span style="color: #24a222;">(</span><span style="color: #E6DB74;">"    skipping: "</span> + aDriver.getClass<span style="color: #ff7f00;">()</span>.getName<span style="color: #ff7f00;">()</span><span style="color: #24a222;">)</span>;
         <span style="color: #9564bf;">}</span>
 
     <span style="color: #d8241f;">}</span>
 
-    <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">if we got here nobody could connect.</span>
-    <span style="color: #859900;">if</span> <span style="color: #d8241f;">(</span>reason != <span style="color: #268bd2;">null</span><span style="color: #d8241f;">)</span>    <span style="color: #d8241f;">{</span>
-        println<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"getConnection failed: "</span> + reason<span style="color: #9564bf;">)</span>;
-        <span style="color: #859900;">throw</span> reason;
+    <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">if we got here nobody could connect.</span>
+    <span style="color: #F92672;">if</span> <span style="color: #d8241f;">(</span>reason != <span style="color: #AE81FF;">null</span><span style="color: #d8241f;">)</span>    <span style="color: #d8241f;">{</span>
+        println<span style="color: #9564bf;">(</span><span style="color: #E6DB74;">"getConnection failed: "</span> + reason<span style="color: #9564bf;">)</span>;
+        <span style="color: #F92672;">throw</span> reason;
     <span style="color: #d8241f;">}</span>
 
-    println<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"getConnection: no suitable driver found for "</span>+ url<span style="color: #d8241f;">)</span>;
-    <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">SQLException</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"No suitable driver found for "</span>+ url, <span style="color: #2aa198;">"08001"</span><span style="color: #d8241f;">)</span>;
+    println<span style="color: #d8241f;">(</span><span style="color: #E6DB74;">"getConnection: no suitable driver found for "</span>+ url<span style="color: #d8241f;">)</span>;
+    <span style="color: #F92672;">throw</span> <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">SQLException</span><span style="color: #d8241f;">(</span><span style="color: #E6DB74;">"No suitable driver found for "</span>+ url, <span style="color: #E6DB74;">"08001"</span><span style="color: #d8241f;">)</span>;
 <span style="color: #8d5649;">}</span>
 </pre>
 </div></li>
@@ -1158,49 +1160,49 @@ JDK 1.6 后默认开启逃逸分析 <code>-XX:-DoEscapeAnalysis</code> 选项，
 上下文应该是 <code>AppClassLoader</code>, 这违背了双亲委派模型
 </p>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">class</span> <span style="color: #268bd2;">Launcher</span> <span style="color: #8d5649;">{</span>
-    <span style="color: #859900;">private</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">URLStreamHandlerFactory</span> <span style="color: #6c71c4;">factory</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Launcher</span>.<span style="color: #268bd2;">Factory</span><span style="color: #d8241f;">()</span>;
-    <span style="color: #859900;">private</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">Launcher</span> <span style="color: #6c71c4;">launcher</span> = <span style="color: #859900;">new</span> <span style="color: #268bd2;">Launcher</span><span style="color: #d8241f;">()</span>;
-    <span style="color: #859900;">private</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">bootClassPath</span> = System.getProperty<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"sun.boot.class.path"</span><span style="color: #d8241f;">)</span>;
-    <span style="color: #859900;">private</span> <span style="color: #268bd2;">ClassLoader</span> <span style="color: #6c71c4;">loader</span>;
-    <span style="color: #859900;">private</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">URLStreamHandler</span> <span style="color: #6c71c4;">fileHandler</span>;
+<pre class="src src-java"><span style="color: #F92672;">public</span> <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Launcher</span> <span style="color: #8d5649;">{</span>
+    <span style="color: #F92672;">private</span> <span style="color: #F92672;">static</span> <span style="color: #66D9EF;">URLStreamHandlerFactory</span> <span style="color: #FD971F;">factory</span> = <span style="color: #F92672;">new</span> <span style="color: #AE81FF;">Launcher</span>.<span style="color: #66D9EF;">Factory</span><span style="color: #d8241f;">()</span>;
+    <span style="color: #F92672;">private</span> <span style="color: #F92672;">static</span> <span style="color: #66D9EF;">Launcher</span> <span style="color: #FD971F;">launcher</span> = <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">Launcher</span><span style="color: #d8241f;">()</span>;
+    <span style="color: #F92672;">private</span> <span style="color: #F92672;">static</span> <span style="color: #66D9EF;">String</span> <span style="color: #FD971F;">bootClassPath</span> = System.getProperty<span style="color: #d8241f;">(</span><span style="color: #E6DB74;">"sun.boot.class.path"</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #F92672;">private</span> <span style="color: #66D9EF;">ClassLoader</span> <span style="color: #FD971F;">loader</span>;
+    <span style="color: #F92672;">private</span> <span style="color: #F92672;">static</span> <span style="color: #66D9EF;">URLStreamHandler</span> <span style="color: #FD971F;">fileHandler</span>;
 
-    <span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">Launcher</span> <span style="color: #b58900;">getLauncher</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #859900;">return</span> launcher;
+    <span style="color: #F92672;">public</span> <span style="color: #F92672;">static</span> <span style="color: #66D9EF;">Launcher</span> <span style="color: #A6E22E;">getLauncher</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #F92672;">return</span> launcher;
     <span style="color: #d8241f;">}</span>
 
-    <span style="color: #859900;">public</span> <span style="color: #b58900;">Launcher</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
-        <span style="color: #268bd2;">Launcher</span>.<span style="color: #268bd2;">ExtClassLoader</span> <span style="color: #6c71c4;">var1</span>;
-        <span style="color: #859900;">try</span> <span style="color: #9564bf;">{</span>
-            var1 = <span style="color: #268bd2;">Launcher</span>.ExtClassLoader.getExtClassLoader<span style="color: #24a222;">()</span>;
-        <span style="color: #9564bf;">}</span> <span style="color: #859900;">catch</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">IOException</span> <span style="color: #6c71c4;">var10</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">InternalError</span><span style="color: #24a222;">(</span><span style="color: #2aa198;">"Could not create extension class loader"</span>, var10<span style="color: #24a222;">)</span>;
+    <span style="color: #F92672;">public</span> <span style="color: #A6E22E;">Launcher</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #AE81FF;">Launcher</span>.<span style="color: #66D9EF;">ExtClassLoader</span> <span style="color: #FD971F;">var1</span>;
+        <span style="color: #F92672;">try</span> <span style="color: #9564bf;">{</span>
+            var1 = <span style="color: #AE81FF;">Launcher</span>.ExtClassLoader.getExtClassLoader<span style="color: #24a222;">()</span>;
+        <span style="color: #9564bf;">}</span> <span style="color: #F92672;">catch</span> <span style="color: #9564bf;">(</span><span style="color: #66D9EF;">IOException</span> <span style="color: #FD971F;">var10</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #F92672;">throw</span> <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">InternalError</span><span style="color: #24a222;">(</span><span style="color: #E6DB74;">"Could not create extension class loader"</span>, var10<span style="color: #24a222;">)</span>;
         <span style="color: #9564bf;">}</span>
 
-        <span style="color: #859900;">try</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #859900;">this</span>.loader = <span style="color: #268bd2;">Launcher</span>.AppClassLoader.getAppClassLoader<span style="color: #24a222;">(</span>var1<span style="color: #24a222;">)</span>;
-        <span style="color: #9564bf;">}</span> <span style="color: #859900;">catch</span> <span style="color: #9564bf;">(</span><span style="color: #268bd2;">IOException</span> <span style="color: #6c71c4;">var9</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">InternalError</span><span style="color: #24a222;">(</span><span style="color: #2aa198;">"Could not create application class loader"</span>, var9<span style="color: #24a222;">)</span>;
+        <span style="color: #F92672;">try</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #F92672;">this</span>.loader = <span style="color: #AE81FF;">Launcher</span>.AppClassLoader.getAppClassLoader<span style="color: #24a222;">(</span>var1<span style="color: #24a222;">)</span>;
+        <span style="color: #9564bf;">}</span> <span style="color: #F92672;">catch</span> <span style="color: #9564bf;">(</span><span style="color: #66D9EF;">IOException</span> <span style="color: #FD971F;">var9</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #F92672;">throw</span> <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">InternalError</span><span style="color: #24a222;">(</span><span style="color: #E6DB74;">"Could not create application class loader"</span>, var9<span style="color: #24a222;">)</span>;
         <span style="color: #9564bf;">}</span>
 
-        Thread.currentThread<span style="color: #9564bf;">()</span>.setContextClassLoader<span style="color: #9564bf;">(</span><span style="color: #859900;">this</span>.loader<span style="color: #9564bf;">)</span>;
-        <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">var2</span> = System.getProperty<span style="color: #9564bf;">(</span><span style="color: #2aa198;">"java.security.manager"</span><span style="color: #9564bf;">)</span>;
-        <span style="color: #859900;">if</span> <span style="color: #9564bf;">(</span>var2 != <span style="color: #268bd2;">null</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
-            <span style="color: #268bd2;">SecurityManager</span> <span style="color: #6c71c4;">var3</span> = <span style="color: #268bd2;">null</span>;
-            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span><span style="color: #268bd2;">!</span><span style="color: #2aa198;">""</span>.equals<span style="color: #ff7f00;">(</span>var2<span style="color: #ff7f00;">)</span> &amp;&amp; <span style="color: #268bd2;">!</span><span style="color: #2aa198;">"default"</span>.equals<span style="color: #ff7f00;">(</span>var2<span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
-                <span style="color: #859900;">try</span> <span style="color: #ff7f00;">{</span>
-                    var3 = <span style="color: #1776b6;">(</span><span style="color: #268bd2;">SecurityManager</span><span style="color: #1776b6;">)</span><span style="color: #859900;">this</span>.loader.loadClass<span style="color: #1776b6;">(</span>var2<span style="color: #1776b6;">)</span>.newInstance<span style="color: #1776b6;">()</span>;
-                <span style="color: #ff7f00;">}</span> <span style="color: #859900;">catch</span> <span style="color: #ff7f00;">(</span><span style="color: #268bd2;">IllegalAccessException</span> <span style="color: #6c71c4;">var5</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
-                <span style="color: #ff7f00;">}</span> <span style="color: #859900;">catch</span> <span style="color: #ff7f00;">(</span><span style="color: #268bd2;">InstantiationException</span> <span style="color: #6c71c4;">var6</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
-                <span style="color: #ff7f00;">}</span> <span style="color: #859900;">catch</span> <span style="color: #ff7f00;">(</span><span style="color: #268bd2;">ClassNotFoundException</span> <span style="color: #6c71c4;">var7</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
-                <span style="color: #ff7f00;">}</span> <span style="color: #859900;">catch</span> <span style="color: #ff7f00;">(</span><span style="color: #268bd2;">ClassCastException</span> <span style="color: #6c71c4;">var8</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+        Thread.currentThread<span style="color: #9564bf;">()</span>.setContextClassLoader<span style="color: #9564bf;">(</span><span style="color: #F92672;">this</span>.loader<span style="color: #9564bf;">)</span>;
+        <span style="color: #66D9EF;">String</span> <span style="color: #FD971F;">var2</span> = System.getProperty<span style="color: #9564bf;">(</span><span style="color: #E6DB74;">"java.security.manager"</span><span style="color: #9564bf;">)</span>;
+        <span style="color: #F92672;">if</span> <span style="color: #9564bf;">(</span>var2 != <span style="color: #AE81FF;">null</span><span style="color: #9564bf;">)</span> <span style="color: #9564bf;">{</span>
+            <span style="color: #66D9EF;">SecurityManager</span> <span style="color: #FD971F;">var3</span> = <span style="color: #AE81FF;">null</span>;
+            <span style="color: #F92672;">if</span> <span style="color: #24a222;">(</span><span style="color: #E6DB74; font-weight: bold;">!</span><span style="color: #E6DB74;">""</span>.equals<span style="color: #ff7f00;">(</span>var2<span style="color: #ff7f00;">)</span> &amp;&amp; <span style="color: #E6DB74; font-weight: bold;">!</span><span style="color: #E6DB74;">"default"</span>.equals<span style="color: #ff7f00;">(</span>var2<span style="color: #ff7f00;">)</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #F92672;">try</span> <span style="color: #ff7f00;">{</span>
+                    var3 = <span style="color: #1776b6;">(</span><span style="color: #66D9EF;">SecurityManager</span><span style="color: #1776b6;">)</span><span style="color: #F92672;">this</span>.loader.loadClass<span style="color: #1776b6;">(</span>var2<span style="color: #1776b6;">)</span>.newInstance<span style="color: #1776b6;">()</span>;
+                <span style="color: #ff7f00;">}</span> <span style="color: #F92672;">catch</span> <span style="color: #ff7f00;">(</span><span style="color: #66D9EF;">IllegalAccessException</span> <span style="color: #FD971F;">var5</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                <span style="color: #ff7f00;">}</span> <span style="color: #F92672;">catch</span> <span style="color: #ff7f00;">(</span><span style="color: #66D9EF;">InstantiationException</span> <span style="color: #FD971F;">var6</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                <span style="color: #ff7f00;">}</span> <span style="color: #F92672;">catch</span> <span style="color: #ff7f00;">(</span><span style="color: #66D9EF;">ClassNotFoundException</span> <span style="color: #FD971F;">var7</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
+                <span style="color: #ff7f00;">}</span> <span style="color: #F92672;">catch</span> <span style="color: #ff7f00;">(</span><span style="color: #66D9EF;">ClassCastException</span> <span style="color: #FD971F;">var8</span><span style="color: #ff7f00;">)</span> <span style="color: #ff7f00;">{</span>
                 <span style="color: #ff7f00;">}</span>
-            <span style="color: #24a222;">}</span> <span style="color: #859900;">else</span> <span style="color: #24a222;">{</span>
-                var3 = <span style="color: #859900;">new</span> <span style="color: #268bd2;">SecurityManager</span><span style="color: #ff7f00;">()</span>;
+            <span style="color: #24a222;">}</span> <span style="color: #F92672;">else</span> <span style="color: #24a222;">{</span>
+                var3 = <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">SecurityManager</span><span style="color: #ff7f00;">()</span>;
             <span style="color: #24a222;">}</span>
 
-            <span style="color: #859900;">if</span> <span style="color: #24a222;">(</span>var3 == <span style="color: #268bd2;">null</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
-                <span style="color: #859900;">throw</span> <span style="color: #859900;">new</span> <span style="color: #268bd2;">InternalError</span><span style="color: #ff7f00;">(</span><span style="color: #2aa198;">"Could not create SecurityManager: "</span> + var2<span style="color: #ff7f00;">)</span>;
+            <span style="color: #F92672;">if</span> <span style="color: #24a222;">(</span>var3 == <span style="color: #AE81FF;">null</span><span style="color: #24a222;">)</span> <span style="color: #24a222;">{</span>
+                <span style="color: #F92672;">throw</span> <span style="color: #F92672;">new</span> <span style="color: #66D9EF;">InternalError</span><span style="color: #ff7f00;">(</span><span style="color: #E6DB74;">"Could not create SecurityManager: "</span> + var2<span style="color: #ff7f00;">)</span>;
             <span style="color: #24a222;">}</span>
 
             System.setSecurityManager<span style="color: #24a222;">(</span>var3<span style="color: #24a222;">)</span>;
@@ -1208,7 +1210,7 @@ JDK 1.6 后默认开启逃逸分析 <code>-XX:-DoEscapeAnalysis</code> 选项，
 
     <span style="color: #d8241f;">}</span>
 
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#30465;&#30053;</span>
+  <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#30465;&#30053;</span>
 <span style="color: #8d5649;">}</span>
 </pre>
 </div></li>
@@ -1224,8 +1226,8 @@ JDBC 4.0 之后使用 SPI 机制才会破坏双亲委派机制</li>
 </div>
 </div>
 
-<div id="outline-container-orgf67c855" class="outline-2">
-<h2 id="orgf67c855"><span class="section-number-2">3</span> 反射</h2>
+<div id="outline-container-org9a811c1" class="outline-2">
+<h2 id="org9a811c1"><span class="section-number-2">3</span> 反射</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Java 提供可以动态创建对象和操作对象的方法，一般叫做反射
@@ -1234,25 +1236,25 @@ Java 提供可以动态创建对象和操作对象的方法，一般叫做反射
 <li><code>private</code> 属性处理时需要设置可见性</li>
 </ol>
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #859900;">public</span> <span style="color: #859900;">static</span> <span style="color: #268bd2;">void</span> <span style="color: #b58900;">main</span><span style="color: #8d5649;">(</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">[]</span> <span style="color: #6c71c4;">args</span><span style="color: #8d5649;">)</span> <span style="color: #859900;">throws</span> <span style="color: #268bd2;">Exception</span> <span style="color: #8d5649;">{</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462; Class &#31867;</span>
-  <span style="color: #268bd2;">Class</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">clz</span> = Class.forName<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"io.github.jeanhwea.app03.bean.Person"</span><span style="color: #d8241f;">)</span>;
+<pre class="src src-java"><span style="color: #F92672;">public</span> <span style="color: #F92672;">static</span> <span style="color: #66D9EF;">void</span> <span style="color: #A6E22E;">main</span><span style="color: #8d5649;">(</span><span style="color: #66D9EF;">String</span><span style="color: #d8241f;">[]</span> <span style="color: #FD971F;">args</span><span style="color: #8d5649;">)</span> <span style="color: #F92672;">throws</span> <span style="color: #66D9EF;">Exception</span> <span style="color: #8d5649;">{</span>
+  <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#33719;&#21462; Class &#31867;</span>
+  <span style="color: #66D9EF;">Class</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #FD971F;">clz</span> = Class.forName<span style="color: #d8241f;">(</span><span style="color: #E6DB74;">"io.github.jeanhwea.app03.bean.Person"</span><span style="color: #d8241f;">)</span>;
 
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#31867;&#30340;&#26500;&#36896;&#22120;</span>
-  <span style="color: #268bd2;">Constructor</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #6c71c4;">ctor</span> = clz.getConstructor<span style="color: #d8241f;">()</span>;
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#26032;&#24314;&#23545;&#35937;</span>
-  <span style="color: #268bd2;">Object</span> <span style="color: #6c71c4;">obj</span> = ctor.newInstance<span style="color: #d8241f;">()</span>;
+  <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#33719;&#21462;&#31867;&#30340;&#26500;&#36896;&#22120;</span>
+  <span style="color: #66D9EF;">Constructor</span><span style="color: #d8241f;">&lt;</span>?<span style="color: #d8241f;">&gt;</span> <span style="color: #FD971F;">ctor</span> = clz.getConstructor<span style="color: #d8241f;">()</span>;
+  <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#26032;&#24314;&#23545;&#35937;</span>
+  <span style="color: #66D9EF;">Object</span> <span style="color: #FD971F;">obj</span> = ctor.newInstance<span style="color: #d8241f;">()</span>;
 
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#23450;&#20041;&#30340;&#23383;&#27573;</span>
-  <span style="color: #268bd2;">Field</span> <span style="color: #6c71c4;">field</span> = clz.getDeclaredField<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"name"</span><span style="color: #d8241f;">)</span>;
-  field.setAccessible<span style="color: #d8241f;">(</span><span style="color: #268bd2;">true</span><span style="color: #d8241f;">)</span>; <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">private &#20462;&#39280;&#30340;&#23383;&#27573;&#38656;&#35201;&#37197;&#32622;&#21487;&#35265;&#24615;</span>
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#35774;&#32622;&#23383;&#27573;&#20540;</span>
-  field.set<span style="color: #d8241f;">(</span>obj, <span style="color: #2aa198;">"Injected Person Name"</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#33719;&#21462;&#23450;&#20041;&#30340;&#23383;&#27573;</span>
+  <span style="color: #66D9EF;">Field</span> <span style="color: #FD971F;">field</span> = clz.getDeclaredField<span style="color: #d8241f;">(</span><span style="color: #E6DB74;">"name"</span><span style="color: #d8241f;">)</span>;
+  field.setAccessible<span style="color: #d8241f;">(</span><span style="color: #AE81FF;">true</span><span style="color: #d8241f;">)</span>; <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">private &#20462;&#39280;&#30340;&#23383;&#27573;&#38656;&#35201;&#37197;&#32622;&#21487;&#35265;&#24615;</span>
+  <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#35774;&#32622;&#23383;&#27573;&#20540;</span>
+  field.set<span style="color: #d8241f;">(</span>obj, <span style="color: #E6DB74;">"Injected Person Name"</span><span style="color: #d8241f;">)</span>;
 
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#33719;&#21462;&#31867;&#30340;&#26041;&#27861;</span>
-  <span style="color: #268bd2;">Method</span> <span style="color: #6c71c4;">method</span> = clz.getMethod<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"getName"</span><span style="color: #d8241f;">)</span>;
-  <span style="color: #93a1a1; font-style: italic;">// </span><span style="color: #93a1a1; font-style: italic;">&#35843;&#29992;&#26041;&#27861;</span>
-  <span style="color: #268bd2;">String</span> <span style="color: #6c71c4;">name</span> = <span style="color: #d8241f;">(</span><span style="color: #268bd2;">String</span><span style="color: #d8241f;">)</span> method.invoke<span style="color: #d8241f;">(</span>obj<span style="color: #d8241f;">)</span>;
+  <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#33719;&#21462;&#31867;&#30340;&#26041;&#27861;</span>
+  <span style="color: #66D9EF;">Method</span> <span style="color: #FD971F;">method</span> = clz.getMethod<span style="color: #d8241f;">(</span><span style="color: #E6DB74;">"getName"</span><span style="color: #d8241f;">)</span>;
+  <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">&#35843;&#29992;&#26041;&#27861;</span>
+  <span style="color: #66D9EF;">String</span> <span style="color: #FD971F;">name</span> = <span style="color: #d8241f;">(</span><span style="color: #66D9EF;">String</span><span style="color: #d8241f;">)</span> method.invoke<span style="color: #d8241f;">(</span>obj<span style="color: #d8241f;">)</span>;
   System.out.println<span style="color: #d8241f;">(</span>name<span style="color: #d8241f;">)</span>;
 <span style="color: #8d5649;">}</span>
 </pre>
@@ -1267,7 +1269,7 @@ Java 提供可以动态创建对象和操作对象的方法，一般叫做反射
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2021-09-21 Tue 16:48. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
+<p class="author">Last Updated 2021-10-11 Mon 16:04. Created by Jinghui Hu at 2021-06-21 Mon 14:27.</p>
 </div>
 </body>
 </html>
