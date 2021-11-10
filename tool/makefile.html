@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-02-22 Sat 20:09 -->
+<!-- 2021-11-10 Wed 12:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Makefile 笔记</title>
@@ -40,7 +40,7 @@
   }
   pre.src {
     position: relative;
-    overflow: visible;
+    overflow: auto;
     padding-top: 1.2em;
   }
   pre.src:before {
@@ -52,7 +52,7 @@
     padding: 3px;
     border: 1px solid black;
   }
-  pre.src:hover:before { display: inline;}
+  pre.src:hover:before { display: inline; margin-top: 14px;}
   /* Languages per Org manual */
   pre.src-asymptote:before { content: 'Asymptote'; }
   pre.src-awk:before { content: 'Awk'; }
@@ -161,6 +161,19 @@
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
   .inlinetask {
     padding: 10px;
     border: 2px solid gray;
@@ -187,50 +200,26 @@
 <script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
 <script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
 <script type="text/javascript">
-/*
-@licstart  The following is the entire license notice for the
-JavaScript code in this tag.
-
-Copyright (C) 2012-2019 Free Software Foundation, Inc.
-
-The JavaScript code in this tag is free software: you can
-redistribute it and/or modify it under the terms of the GNU
-General Public License (GNU GPL) as published by the Free Software
-Foundation, either version 3 of the License, or (at your option)
-any later version.  The code is distributed WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
-
-As additional permission under GNU GPL version 3 section 7, you
-may distribute non-source (e.g., minimized or compacted) forms of
-that code without the copy of the GNU GPL normally required by
-section 4, provided you include this license notice and a URL
-through which recipients can access the Corresponding Source.
-
-
-@licend  The above is the entire license notice
-for the JavaScript code in this tag.
-*/
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
 <!--/*--><![CDATA[/*><!--*/
- function CodeHighlightOn(elem, id)
- {
-   var target = document.getElementById(id);
-   if(null != target) {
-     elem.cacheClassElem = elem.className;
-     elem.cacheClassTarget = target.className;
-     target.className = "code-highlighted";
-     elem.className   = "code-highlighted";
-   }
- }
- function CodeHighlightOff(elem, id)
- {
-   var target = document.getElementById(id);
-   if(elem.cacheClassElem)
-     elem.className = elem.cacheClassElem;
-   if(elem.cacheClassTarget)
-     target.className = elem.cacheClassTarget;
- }
-/*]]>*///-->
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
 </script>
 </head>
 <body>
@@ -244,26 +233,27 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org52c8f44">1. Makefile</a></li>
-<li><a href="#org5849fe0">2. 语法</a>
+<li><a href="#orga55b4a3">1. Makefile</a></li>
+<li><a href="#org6895998">2. 语法</a>
 <ul>
-<li><a href="#org79ae3d9">2.1. 基本语法</a></li>
-<li><a href="#orgc1bfe44">2.2. 变量</a>
+<li><a href="#orgdce5239">2.1. 基本语法</a></li>
+<li><a href="#org8282953">2.2. 变量</a>
 <ul>
-<li><a href="#orgb3fb8c6">2.2.1. 读取文件名</a></li>
-<li><a href="#org116b98f">2.2.2. 覆盖变量</a></li>
+<li><a href="#org4e128d7">2.2.1. 读取文件名</a></li>
+<li><a href="#org6fdaed1">2.2.2. 覆盖变量</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgd955b69">3. 参考链接</a></li>
+<li><a href="#orga407cf6">3. 综合运用</a></li>
+<li><a href="#orgc9cc7a8">4. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org52c8f44" class="outline-2">
-<h2 id="org52c8f44"><span class="section-number-2">1</span> Makefile</h2>
+<div id="outline-container-orga55b4a3" class="outline-2">
+<h2 id="orga55b4a3"><span class="section-number-2">1</span> Makefile</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Makefile 是 Linux 系统中的一个比较重要的工具，通常可以用来管理软件项目的编译，
@@ -272,18 +262,18 @@ Makefile 是 Linux 系统中的一个比较重要的工具，通常可以用来�
 </div>
 </div>
 
-<div id="outline-container-org5849fe0" class="outline-2">
-<h2 id="org5849fe0"><span class="section-number-2">2</span> 语法</h2>
+<div id="outline-container-org6895998" class="outline-2">
+<h2 id="org6895998"><span class="section-number-2">2</span> 语法</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org79ae3d9" class="outline-3">
-<h3 id="org79ae3d9"><span class="section-number-3">2.1</span> 基本语法</h3>
+<div id="outline-container-orgdce5239" class="outline-3">
+<h3 id="orgdce5239"><span class="section-number-3">2.1</span> 基本语法</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 Makefile 的基本语法是由目标、依赖和命令组成，它的语法如下：
 </p>
 <div class="org-src-container">
-<pre class="src src-makefile"><span style="color: #b58900;">target</span>: dependencies
+<pre class="src src-makefile"><span style="color: #93E0E3;">target</span>: dependencies
     command
 </pre>
 </div>
@@ -296,39 +286,39 @@ Makefile 的基本语法是由目标、依赖和命令组成，它的语法如�
 </div>
 </div>
 
-<div id="outline-container-orgc1bfe44" class="outline-3">
-<h3 id="orgc1bfe44"><span class="section-number-3">2.2</span> 变量</h3>
+<div id="outline-container-org8282953" class="outline-3">
+<h3 id="org8282953"><span class="section-number-3">2.2</span> 变量</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 变量定义的方法是使用一个等于号连接变量和如下：
 </p>
 <div class="org-src-container">
-<pre class="src src-makefile"><span style="color: #6c71c4;">VAR_NAME</span> = definition
+<pre class="src src-makefile"><span style="color: #DFAF8F;">VAR_NAME</span> = definition
 </pre>
 </div>
 </div>
 
-<div id="outline-container-orgb3fb8c6" class="outline-4">
-<h4 id="orgb3fb8c6"><span class="section-number-4">2.2.1</span> 读取文件名</h4>
+<div id="outline-container-org4e128d7" class="outline-4">
+<h4 id="org4e128d7"><span class="section-number-4">2.2.1</span> 读取文件名</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <div class="org-src-container">
-<pre class="src src-makefile"><span style="color: #6c71c4;">SRCS</span> = $(<span style="color: #6c71c4;">shell</span> ls *.cc)
+<pre class="src src-makefile"><span style="color: #DFAF8F;">SRCS</span> = $(<span style="color: #DFAF8F;">shell</span> ls *.cc)
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org116b98f" class="outline-4">
-<h4 id="org116b98f"><span class="section-number-4">2.2.2</span> 覆盖变量</h4>
+<div id="outline-container-org6fdaed1" class="outline-4">
+<h4 id="org6fdaed1"><span class="section-number-4">2.2.2</span> 覆盖变量</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 首先在 Makefile 中定义 TEST 变量
 </p>
 <div class="org-src-container">
-<pre class="src src-makefile"><span style="color: #6c71c4;">TEST</span> = apple
+<pre class="src src-makefile"><span style="color: #DFAF8F;">TEST</span> = apple
 
-<span style="color: #b58900;">all</span>:
-    echo $(<span style="color: #6c71c4;">TEST</span>)
+<span style="color: #93E0E3;">all</span>:
+    echo $(<span style="color: #DFAF8F;">TEST</span>)
 </pre>
 </div>
 
@@ -349,9 +339,62 @@ banana
 </div>
 </div>
 
-<div id="outline-container-orgd955b69" class="outline-2">
-<h2 id="orgd955b69"><span class="section-number-2">3</span> 参考链接</h2>
+<div id="outline-container-orga407cf6" class="outline-2">
+<h2 id="orga407cf6"><span class="section-number-2">3</span> 综合运用</h2>
 <div class="outline-text-2" id="text-3">
+<p>
+给一个可以管理一个简单 c 语言项目的 Makefile，个人使用完全够用
+</p>
+<div class="org-src-container">
+<pre class="src src-makefile"><span style="color: #DFAF8F;">TARGET_EXEC</span> ?= a.out
+
+<span style="color: #DFAF8F;">BLD_DIR</span> ?= ./build
+<span style="color: #DFAF8F;">SRC_DIR</span> ?= ./src
+
+<span style="color: #DFAF8F;">SRCS</span> := $(<span style="color: #DFAF8F;">shell</span> find $(<span style="color: #DFAF8F;">SRC_DIR</span>) -name *.cpp -or -name *.c -or -name *.s)
+<span style="color: #DFAF8F;">OBJS</span> := $(<span style="color: #DFAF8F;">SRCS</span>:<span style="color: #DFAF8F;">%</span>=$(<span style="color: #DFAF8F;">BLD_DIR</span>)/%.o)
+<span style="color: #DFAF8F;">DEPS</span> := $(<span style="color: #DFAF8F;">OBJS</span>:<span style="color: #DFAF8F;">.o</span>=.d)
+
+<span style="color: #DFAF8F;">INC_DIRS</span>  := $(<span style="color: #DFAF8F;">shell</span> find $(<span style="color: #DFAF8F;">SRC_DIR</span>) -type d)
+<span style="color: #DFAF8F;">INC_FLAGS</span> := $(<span style="color: #DFAF8F;">addprefix</span> -I,$(<span style="color: #DFAF8F;">INC_DIRS</span>))
+
+<span style="color: #DFAF8F;">CPPFLAGS</span>  ?= $(<span style="color: #DFAF8F;">INC_FLAGS</span>) -MMD -MP
+
+<span style="color: #93E0E3;">$(</span><span style="color: #93E0E3;">BLD_DIR</span><span style="color: #93E0E3;">)/$(</span><span style="color: #93E0E3;">TARGET_EXEC</span><span style="color: #93E0E3;">)</span>: $(<span style="color: #DFAF8F;">OBJS</span>)
+    $(<span style="color: #DFAF8F;">CC</span>) $(<span style="color: #DFAF8F;">OBJS</span>) -o <span style="color: #93E0E3;">$</span><span style="color: #BFEBBF;">@</span> $(<span style="color: #DFAF8F;">LDFLAGS</span>)
+
+<span style="color: #5F7F5F; font-style: italic;"># </span><span style="color: #7F9F7F; font-style: italic;">assembly</span>
+<span style="color: #93E0E3;">$(</span><span style="color: #93E0E3;">BLD_DIR</span><span style="color: #93E0E3;">)/%.s.o</span>: %.s
+    $(<span style="color: #DFAF8F;">MKDIR_P</span>) $(<span style="color: #DFAF8F;">dir</span> <span style="color: #93E0E3;">$</span><span style="color: #BFEBBF;">@</span>)
+    $(<span style="color: #DFAF8F;">AS</span>) $(<span style="color: #DFAF8F;">ASFLAGS</span>) -c $<span style="color: #BFEBBF;">&lt;</span> -o <span style="color: #93E0E3;">$</span><span style="color: #BFEBBF;">@</span>
+
+<span style="color: #5F7F5F; font-style: italic;"># </span><span style="color: #7F9F7F; font-style: italic;">c source</span>
+<span style="color: #93E0E3;">$(</span><span style="color: #93E0E3;">BLD_DIR</span><span style="color: #93E0E3;">)/%.c.o</span>: %.c
+    $(<span style="color: #DFAF8F;">MKDIR_P</span>) $(<span style="color: #DFAF8F;">dir</span> <span style="color: #93E0E3;">$</span><span style="color: #BFEBBF;">@</span>)
+    $(<span style="color: #DFAF8F;">CC</span>) $(<span style="color: #DFAF8F;">CPPFLAGS</span>) $(<span style="color: #DFAF8F;">CFLAGS</span>) -c $<span style="color: #BFEBBF;">&lt;</span> -o <span style="color: #93E0E3;">$</span><span style="color: #BFEBBF;">@</span>
+
+<span style="color: #5F7F5F; font-style: italic;"># </span><span style="color: #7F9F7F; font-style: italic;">c++ source</span>
+<span style="color: #93E0E3;">$(</span><span style="color: #93E0E3;">BLD_DIR</span><span style="color: #93E0E3;">)/%.cpp.o</span>: %.cpp
+    $(<span style="color: #DFAF8F;">MKDIR_P</span>) $(<span style="color: #DFAF8F;">dir</span> <span style="color: #93E0E3;">$</span><span style="color: #BFEBBF;">@</span>)
+    $(<span style="color: #DFAF8F;">CXX</span>) $(<span style="color: #DFAF8F;">CPPFLAGS</span>) $(<span style="color: #DFAF8F;">CXXFLAGS</span>) -c $<span style="color: #BFEBBF;">&lt;</span> -o <span style="color: #93E0E3;">$</span><span style="color: #BFEBBF;">@</span>
+
+
+<span style="color: #93E0E3;">.PHONY</span>: clean
+
+<span style="color: #93E0E3;">clean</span>:
+    $(<span style="color: #DFAF8F;">RM</span>) -r $(<span style="color: #DFAF8F;">BLD_DIR</span>)
+
+-include $(<span style="color: #DFAF8F;">DEPS</span>)
+
+<span style="color: #DFAF8F;">MKDIR_P</span> ?= mkdir -p
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc9cc7a8" class="outline-2">
+<h2 id="orgc9cc7a8"><span class="section-number-2">4</span> 参考链接</h2>
+<div class="outline-text-2" id="text-4">
 <ol class="org-ol">
 <li><a href="https://www.gnu.org/software/make/manual/make.html">GNU make</a></li>
 </ol>
@@ -359,7 +402,7 @@ banana
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-02-22 Sat 20:09. Created by Jinghui Hu at 2019-08-05 Mon 20:47.</p>
+<p class="author">Last Updated 2021-11-10 Wed 12:30. Created by Jinghui Hu at 2019-08-05 Mon 20:47.</p>
 </div>
 </body>
 </html>
