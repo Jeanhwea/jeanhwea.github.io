@@ -1,0 +1,39 @@
+#+TITLE: macOS 下 Emacs新人踩坑
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2021-11-10 Wed 11:50:31>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: emacs macOS
+
+
+* dired 无法访问文件
+  dired 可能因为权限无法正常运行，出现下面错误
+  #+BEGIN_SRC text
+    Listing directory failed but 'access-file' worked
+  #+END_SRC
+
+  解决方法:
+  1. 进入 System Preferences -> Security & Privacy, 选择 Privacy tab.
+  2. 先选左侧 Full Disk Access
+  3. 把 ruby 加入全盘访问中
+
+* tramp 的远端文件 PS1 环境变量问题
+  在远端 Linux 安装过 oh-my-zsh 后可能会出现 PS1 问题
+  #+BEGIN_SRC text
+    Tramp: Waiting for prompts from remote shell...failed
+  #+END_SRC
+
+  解决方法:
+  在远端中添加如下配置
+  #+BEGIN_SRC sh
+    if [[ "$TERM" == "dumb" ]]; then
+      unsetopt zle
+      unsetopt prompt_cr
+      unsetopt prompt_subst
+      # unfunction precmd
+      # unfunction preexec
+      PS1='$ '
+    fi
+  #+END_SRC
