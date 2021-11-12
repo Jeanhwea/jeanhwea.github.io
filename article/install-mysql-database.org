@@ -15,13 +15,13 @@
    1. [[https://cdn.mysql.com/archives/mysql-5.7/mysql-5.7.26.tar.gz][mysql-5.7.26.tar.gz]]
    2. [[https://cdn.mysql.com/archives/mysql-5.7/mysql-boost-5.7.26.tar.gz][mysql-boost-5.7.26.tar.gz]]
 
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      wget https://cdn.mysql.com/archives/mysql-5.7/mysql-5.7.26.tar.gz
      wget https://cdn.mysql.com/archives/mysql-5.7/mysql-boost-5.7.26.tar.gz
    #+END_SRC
 
    安装包校验码如下
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      mysql57 $ md5sum mysql-5.7.26.tar.gz
      5756a63d37d343a39e8e2cf8b13378ba *mysql-5.7.26.tar.gz
      mysql57 $ md5sum mysql-boost-5.7.26.tar.gz
@@ -30,12 +30,12 @@
 
 ** 安装依赖包
    直接使用 yum 安装下面对应的依赖包
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      yum install -y gcc gcc-c++ cmake ncurses ncurses-devel bison bison-devel
    #+END_SRC
 
 ** 新建用户及目录
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      groupadd mysql && \
        useradd -r -g mysql -s /bin/false mysql
 
@@ -46,13 +46,13 @@
 * 编译安装
 ** 配置 cmake 的编译参数
    解压源代码文件
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      cd /usr/local/mysql
      tar xzvf mysql-5.7.26.tar.gz
      tar xzvf mysql-boost-5.7.26.tar.gz
    #+END_SRC
 
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      cmake . \
            -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
            -DMYSQL_DATADIR=/usr/local/mysql/data \
@@ -75,14 +75,14 @@
    #+END_SRC
 
 ** 编译和安装
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      make && make install
    #+END_SRC
 
 * 配置和建库
 ** 配置数据库
    备份操作系统默认的配置文件
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sudo mv /etc/my.cnf /etc/my.cnf.1
    #+END_SRC
 
@@ -118,7 +118,7 @@
 
 ** 初始化和建库
    初始化数据库目录
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      chown mysql:mysql -R /usr/local/mysql
 
      ./bin/mysqld --initialize-insecure --user=mysql \
@@ -129,13 +129,13 @@
    #+END_SRC
 
    添加系统服务
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      cp support-files/mysql.server /etc/init.d/mysql.server &&
        chmod +x /etc/init.d/mysql.server
    #+END_SRC
 
    启动 MySQL 服务器进程
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sudo service mysql.server start
    #+END_SRC
 
@@ -163,7 +163,7 @@
    #+END_SRC
 
 * 配置环境变量
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC shell
     export PATH=/usr/local/mysql/bin${PATH:+:${PATH}}
   #+END_SRC
 
