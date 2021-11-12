@@ -21,20 +21,20 @@
    安装操作系统参考 [[file:intall-ubuntu-os.org][这篇]]
 
 ** 更新系统的源
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sudo apt-get update
      sudo apt-get upgrade
    #+END_SRC
 
 ** 安装 Python 的环境
    TensorFlow 12 依赖的 Python 环境是 Python 3.6，先安装 Python 的相关依赖
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sudo apt install -y python-dev python-pip python3-dev python3-pip
    #+END_SRC
 
 ** 安装 CUDA 编译工具
    检验系统正确地识别到了 NVIDIA 显卡
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      lspci | grep -i nvidia
    #+END_SRC
 
@@ -44,20 +44,20 @@
    #+END_SRC
 
    查看系统和 gcc 的版本
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      uname -m && cat /etc/*release
      gcc --version
    #+END_SRC
 
    安装编译过程中的依赖
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sudo apt-get install -y build-essential \
           cmake git unzip zip \
           python-dev python3-dev python-pip python3-pip
    #+END_SRC
 
    安装内核的头文件依赖
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # 查看内核版本
      uname -r
      # 安装内核的头文件
@@ -67,18 +67,18 @@
    参考 [[https://docs.nvidia.com/cuda/index.html][CUDA Documentation]] 文档安装 CUDA 驱动，这里使用 run 文件来安装
 
    首先禁用 Nouveau 驱动
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sudo touch /etc/modprobe.d/blacklist-nouveau.conf
      sudo echo 'blacklist nouveau' > /etc/modprobe.d/blacklist-nouveau.conf
      sudo echo 'options nouveau modeset=0' >> /etc/modprobe.d/blacklist-nouveau.conf
    #+END_SRC
    更新内核 initramfs
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sudo update-initramfs -u
    #+END_SRC
 
    删除之前安装的 CUDA
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sudo apt-get purge nvidia*
      sudo apt-get autoremove
      sudo apt-get autoclean
@@ -86,12 +86,12 @@
    #+END_SRC
 
    通过 run 文件安装 CUDA 驱动
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sudo sh cuda_10.0.130_410.48_linux.run
    #+END_SRC
 
    安装驱动后的操作
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      echo 'export PATH=/usr/local/cuda-10.0/bin${PATH:+:${PATH}}' >> ~/.bashrc
      echo 'export LD_LIBRARY_PATH=/usr/local/cuda-10.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' >> ~/.bashrc
 
@@ -104,7 +104,7 @@
 
 ** 安装 cuDNN 和 NCCL
    安装 cuDNN
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      tar xvf cudnn-10.0-linux-x64-v7.4.2.24.tgz
    #+END_SRC
    #+BEGIN_SRC text
@@ -120,13 +120,13 @@
    #+END_SRC
 
    复制文件到 CUDA 中
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sudo cp -R cuda/include/* /usr/local/cuda-10.0/include
      sudo cp -R cuda/lib64/* /usr/local/cuda-10.0/lib64
    #+END_SRC
 
    安装 NCCL
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
       tar xvf nccl_2.3.7-1+cuda10.0_x86_64.txz
    #+END_SRC
    #+BEGIN_SRC text
@@ -142,7 +142,7 @@
    #+END_SRC
 
    复制文件到 CUDA 目录中
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      cd nccl_2.3.7-1+cuda10.0_x86_64
      sudo cp -R include/* /usr/local/cuda-10.0/include
      sudo cp -R lib/* /usr/local/cuda-10.0/lib64
@@ -150,7 +150,7 @@
 
 ** 安装 Python 依赖包
    最好启动一个 virtualenv
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      mkdir ~/.venv && cd ~/.venv
 
      # 安装 virtualenv 依赖
@@ -166,14 +166,14 @@
    #+END_SRC
 
    然后安装相关依赖包
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      pip install pip six numpy==1.15.4 wheel setuptools mock future>=0.17.1
      pip install keras_applications==1.0.6 --no-deps
      pip install keras_preprocessing==1.0.5 --no-deps
    #+END_SRC
 
 ** 安装 bazel 编译工具
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      #  bazel 依赖
      sudo apt-get install -y build-essential pkg-config zip g++ zlib1g-dev unzip
 
@@ -184,7 +184,7 @@
    #+END_SRC
 
 ** 使用 TensorFlow 源码编译和安装
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      git clone https://github.com/tensorflow/tensorflow.git
      git checkout r1.12
    #+END_SRC
@@ -276,7 +276,7 @@
    #+END_SRC
 
    编译源代码
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # CPU only
      bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
      # GPU version with CUDA
@@ -284,7 +284,7 @@
    #+END_SRC
 
    打 wheel 包并安装
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      ./bazel-bin/tensorflow/tools/pip_package/build_pip_package tensorflow_pkg
      pip install tensorflow_pkg/tensorflow-1.12.0-cp36-cp36m-linux_x86_64.whl
    #+END_SRC
@@ -302,12 +302,12 @@
    4. tf-nightly-gpu: Nightly build with GPU support (unstable, Ubuntu and Windows)
 
    直接使用下面指令安装即可：
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      pip install tensorflow
    #+END_SRC
 
 ** 更新 TensorFlow 包
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      pip install --upgrade tensorflow
    #+END_SRC
 
@@ -337,7 +337,7 @@
   #+END_SRC
 
   运行上述文件
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC shell
     python mnist.py
   #+END_SRC
 

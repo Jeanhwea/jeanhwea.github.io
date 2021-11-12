@@ -17,19 +17,19 @@
    将需要修改的文件名全面找到放到 /tmp 目录下的两个文件里面，文件 a 里面存放原来的文
    件名，文件 b 通过 vim 编辑成修改后的文件。注意文件 a 里面的文件名或者目录名的空格
    需要转义。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      find . -type f -iname '*.txt' | tee /tmp/b | sed 's/ /\\ /' > /tmp/a
      vim /tmp/b
    #+END_SRC
 
    或者使用下面的命令，在 find 找到的文件前后添加单引号
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      find . -type f -iname '*.txt' | tee /tmp/b | sed "s/$/'/" | sed "s/^/'/" > /tmp/a
    #+END_SRC
 
 ** 第二步
    编辑好文件/tmp/b 保存后用下面命令批量重命名。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      paste /tmp/a /tmp/b | xargs -n 2 mv
    #+END_SRC
 

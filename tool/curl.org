@@ -44,33 +44,33 @@
 
 ** 保存成本地文件
    使用 =-o= 选项可以将下载的内容保存成相应的文件，并命名成给定的文件名。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      curl -o example.html http://www.example.com/
    #+END_SRC
 
    使用 =-O= 选项将下载的内容保存成 url 最后给定的文件名，如下例子中将会把文件命
    名成 index.html
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      curl -O www.haxx.se/index.html
    #+END_SRC
 
 ** 下载 ftp 文件时添加用户名和密码
    有时候下载 ftp 中的内容需要用户名和密码，可以使用 =-u= 选项添加用户名和密码。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      curl -u name:passwd ftp://machine.domain:port/full/path/to/file
    #+END_SRC
 
 ** HTTP 和 SOCKS 代理
    curl 还支持 HTTP 和 SOCKS 协议的代理。可以使用 =-x= 选项了设置代理服务器的地
    址和端口号信息。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      curl -x my-proxy:888 ftp://ftp.leachsite.com/README
      curl -u user:passwd -x my-proxy:888 http://www.get.this/
    #+END_SRC
 
 ** 分片下载 (Range)
    可以使用 =-r= 选项来分片下载文件。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # Get the first 100 bytes of a document
      curl -r 0-99 http://www.get.this/
      # Get the last 500 bytes of a document
@@ -79,7 +79,7 @@
 
 ** FTP/SMB 协议上传文件
    使用 curl 的 =-T= 选项来指定上传文件。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # upload all data on stdin to a specified server
      curl -T - ftp://ftp.upload.com/myfile
      # upload file with username and password
@@ -89,14 +89,14 @@
    #+END_SRC
 
    使用 smb 协议上传文件。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
       curl -T file.txt -u "domain\username:passwd" smb://server.example.com/share/
    #+END_SRC
 
 * API 测试
 ** 处理 HTTP 方法
 *** 提交表单数据
-    #+BEGIN_SRC sh :exports both :results output
+    #+BEGIN_SRC shell :exports both :results output
       curl -X POST -d "user=foobar&pass=12345&id=blablabla&ding=submit" \
            http://httpbin.org/post
     #+END_SRC
@@ -129,7 +129,7 @@
 *** 命令行中指定 JSON 字符串
     在测试 API 时常常需要 POST 数据，使用 =-X= 可以指定 HTTP 方法， =-d= 选项可以
     指定 POST 数据。
-    #+BEGIN_SRC sh :exports both :results output
+    #+BEGIN_SRC shell :exports both :results output
       curl -X POST -d '{"name":"Rafael, Sagula", "phone":3320780}' \
            -H "Content-Type: application/json" http://httpbin.org/post
     #+END_SRC
@@ -160,7 +160,7 @@
 *** 命令行中指定 JSON 文件
     使用 =-d= 选项的局限性是只能使用普通键值对方式的参数，如果需要 POST 文件内容，
     可以使用 =@<filename>= 来指定
-    #+BEGIN_SRC sh :exports both :results output
+    #+BEGIN_SRC shell :exports both :results output
       cat /tmp/input.json
     #+END_SRC
 
@@ -170,7 +170,7 @@
     :   "banana": 2
     : }
 
-    #+BEGIN_SRC sh :exports both :results output
+    #+BEGIN_SRC shell :exports both :results output
       curl -X POST -d@/tmp/input.json \
            -H "Content-Type: application/json" http://httpbin.org/post
     #+END_SRC
@@ -201,13 +201,13 @@
     参数则需要使用 =-F= 选项。 =-F= 选项使用 ~@<filename>;type=<mime-type>~ 这种
     方式来编码所要上传的文件。如果没有给定 mime-type 则 curl 根据文件后缀名来猜
     测。如下命令中上传了三个文件。
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       curl -X POST -F "coolfiles=@fil1.gif;type=image/gif,fil2.txt,fil3.html" \
            http://www.post.com/postit.cgi
     #+END_SRC
 
     上传文件并且添加其它字段的例子。
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       curl -X POST -F "file=@cooltext.txt" -F "yourname=Daniel" \
            -F "filedescription=Cool text file with cool text inside" \
            http://www.post.com/postit.cgi
@@ -215,7 +215,7 @@
 
 ** 添加 USER AGENT
    使用 =-A= 选项知道 USER-AGENT。
-   #+BEGIN_SRC sh :exports both :results output
+   #+BEGIN_SRC shell :exports both :results output
      curl -A 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0' \
           https://httpbin.org/headers
    #+END_SRC
@@ -231,7 +231,7 @@
 
 ** 处理返回头和 HTTP 状态码
    使用 =-i= 选项可以参考网页的给出的返回头相关信息。
-   #+BEGIN_SRC sh :exports both :results output
+   #+BEGIN_SRC shell :exports both :results output
      curl -i http://httpbin.org/get
    #+END_SRC
 
@@ -301,13 +301,13 @@
    #+END_SRC
 
    可以使用下面命令来将 header 下载起来保存成文件。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      curl --dump-header headers.txt www.example.com
    #+END_SRC
 
    有时候我们在写脚本是仅仅需要参考网站的返回码，为了方便解析可以使用下面命令直
    接获取返回码。
-   #+BEGIN_SRC sh :exports both :results output
+   #+BEGIN_SRC shell :exports both :results output
      curl -q -s -w %{http_code} http://httpbin.org/get
    #+END_SRC
 
@@ -330,7 +330,7 @@
    由于 HTTP 协议是无状态的，所以有些网站是使用 cookie 来记录会话信息。对于
    chrome 这样的浏览器，可以轻易处理 cookie 信息，但在 curl 中只要增加相关参数也
    是可以很容易的处理 cookie 。如下， =-c= 选项可以将获取到的 cookie 保存成文件。
-   #+BEGIN_SRC sh :exports both :results output
+   #+BEGIN_SRC shell :exports both :results output
      curl -c cookie.txt http://httpbin.org/cookies
    #+END_SRC
 
@@ -340,7 +340,7 @@
    : }
 
    使用 =-b= 可以指定 cookie 字段。
-   #+BEGIN_SRC sh :exports both :results output
+   #+BEGIN_SRC shell :exports both :results output
      curl -b "name=Daniel" http://httpbin.org/cookies
    #+END_SRC
 
@@ -352,6 +352,6 @@
    : }
 
    读写同一个 cookie 文件。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      curl -b cookies.txt -c cookies.txt www.example.com
    #+END_SRC

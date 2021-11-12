@@ -20,7 +20,7 @@
     化掉
 
     使用 fdisk 查看可以用的 U 盘的设备路径
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       ub64@volantis:~$ sudo fdisk -l
       [sudo] password for ub64:
       Disk /dev/loop0: 13 MiB, 13619200 bytes, 26600 sectors
@@ -52,13 +52,13 @@
     #+END_SRC
 
     这里的 U 盘是 =/dev/sdb=, 卸载 =sdb1= 和 =sdb=
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       ub64@volantis:~$ sudo umount /dev/sdb
       ub64@volantis:~$ sudo umount /dev/sdb1
     #+END_SRC
 
     =mkfs.vfat= 将 U 盘格式化成 vfat 的格式，一般的系统启动认这种类型是格式
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       ub64@volantis:~$ sudo mkfs.vfat /dev/sdb -I
       mkfs.fat 4.1 (2017-01-24)
       attribute "partition" not found
@@ -68,7 +68,7 @@
 *** 制作启动盘
     直接使用 dd 命令复制镜像就可以制作成功启动盘。注意，这里一定要添加
     ~status=progress~, 因为 dd 复制一般时间很长，显示进度会让你不会怀疑 dd 命令死了
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       ub64@volantis:~$ sudo dd if=~/Downloads/ubuntu-18.04.3-live-server-amd64.iso of=/dev/sdb status=progress
       3883520 bytes (3.9 MB, 3.7 MiB) copied, 3 s, 1.3 MB/s
     #+END_SRC
@@ -76,7 +76,7 @@
     然后等 dd 完成过后就可以愉快地启动了。
 
     Mac 下 dd 可以通过 pv 工具来显示复制进度
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       # install pv
       brew install pv
       # dd iso image

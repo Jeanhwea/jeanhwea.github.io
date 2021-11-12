@@ -155,7 +155,7 @@
   期那个晦涩复杂的 Git 用户界面；不过最近几年来，它已经被改进到不输于任何其他版
   本控制系统地清晰易用了。
 
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC shell
     git hash-object -w --stdin
     git cat-file -p <sha>
     git update-index --add --cacheinfo 100644 <sha-blob> filename.txt
@@ -173,13 +173,13 @@
 *** 使用子模块
     添加子模块后会在同名目录下创建 ~.gitmodules~ 文件，该文件保存子项目的 URL 和
     当前仓库目录的映射关系
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       # 为当前仓库添加子模块
       git submodule add <url>
     #+END_SRC
 
 *** 克隆含有子模块的项目
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       # 初始化本地配置文件
       git submodule init
       # 抓取所有数据并检出父项目中列出的合适的提交
@@ -191,13 +191,13 @@
 
 *** 在包含子模块项目中工作
     更新某个子模块
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       # 进入 SubModuleName 子模块然后抓取并更新
       git submodule update --remote SubModuleName
     #+END_SRC
 
     修改子模块的分支
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       git config -f .gitmodules submodule.SubModuleName.branch stable
       # 抓取子模块并更新
       git submodule update --remote
@@ -205,12 +205,12 @@
 
 *** 在子模块中工作
     拉去远端子模块的更新并合并
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       git submodule update --remote --merge
     #+END_SRC
 
     使用 rebase
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       git submodule update --remote --rebase
     #+END_SRC
 
@@ -218,16 +218,16 @@
      git push 命令接受可以设置为 =check= 或 =on-demand= 的
      ~--recurse-submodules~ 参数。 如果任何提交的子模块改动没有推送那么 =check=
      选项会直接使 push 操作失败
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       git push --recurse-submodules=check
     #+END_SRC
     =on-demand= 选项按需推送
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       git push --recurse-submodules=on-demand
     #+END_SRC
 
 *** 遍历子模块
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       # stash 所有子模块
       git submodule foreach 'git stash'
 
@@ -240,13 +240,13 @@
 
 *** 安装
     Mac 下安装
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       brew install git-lfs
     #+END_SRC
 
 *** 使用
     Git LFS 的文档参考 [[https://github.com/git-lfs/git-lfs/tree/master/docs][这里]]
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       # 在当前 git 代码仓中安装 lfs 钩子
       git lfs install
 
@@ -258,20 +258,20 @@
     #+END_SRC
 
     如果安装 lfs 晚于 git clone 仓库，使用下面命令下载文件
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       git lfs pull
     #+END_SRC
 
 * 常见工作流
 ** 批量更新当前文件夹下代码仓库
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      for dotgit in `find $(pwd) -type d -name '.git'`; do cd $dotgit/.. && git pull; done
    #+END_SRC
 
 ** 初次添加远端并且上传代码
    先添加一个远端，然后使用 =--all= 选项将所有的分支都推送上去，并 =--tags= 将所
    有的标签一起推送上去。值得注意的是： *--all 和 --tags 不可以同时使用* 。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      git remote add origin git@github.com:Username/Repo.git
      git push -u origin master
      git push -u origin --all
@@ -285,7 +285,7 @@
    [[file:../static/image/2018/10/git-rebase1.gif]]
 
    基本的 rebase 示例如下：
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      git rebase master
      git rebase master topic
 
@@ -310,7 +310,7 @@
      # D---E---A'---F master
    #+END_SRC
    git-rebase 的 *--on-to* 选项也是非常重要的，可以跨多个分支来修改本地提交。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      git rebase --onto master next topic
      # 情形一：连续线性依赖
      # o---o---o---o---o  master
@@ -355,7 +355,7 @@
 
 *** 安装
     直接通过 yarn 安装即可。
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       yarn global add git-open
     #+END_SRC
 
@@ -366,12 +366,12 @@
 
 ** 显示分页
    Git 默认是分页显示输出的，如果要关闭分页显示可以使用 =--no-pager= 选项
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      alias git='git --no-pager'
    #+END_SRC
 
    当然可以使用环境变量，告诉 less 如输出超过一屏才分页，否则直接输出
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      export LESS="-F -X $LESS"
    #+END_SRC
 
@@ -388,7 +388,7 @@
 
 ** 将代码导出 zip 包
    使用 git 可以直接将代码的某次提交直接打成 zip 包
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      git archive --format tar.gz --output "output.tar.gz" master
      git archive --format=zip --prefix=emacs/ master > emacs.zip
    #+END_SRC

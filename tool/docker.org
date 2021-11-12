@@ -70,11 +70,11 @@
    - ~docker export~ : 将文件系统导出成压缩文档，并输出到 STDOUT
    - ~docker exec~ : 在容器里面执行一个指令。例如可以用下面的命令进入容器里面，
      启动一个 bash 交互环境。
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      docker exec -it foo /bin/bash
    #+END_SRC
 
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # 复制容器里的文件到主机
      docker cp container:/source/path /host/path
 
@@ -152,7 +152,7 @@
    - ~docker tag~ : 重命名图像，打标签等操作
 
 ** 常用命令
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # 删除 tag 为 <none> 的图像
      docker images | awk '$2 == "<none>" {print $3}' | xargs -I {} docker rmi {}
    #+END_SRC
@@ -160,23 +160,23 @@
 * 工作流
 ** load/save 图像
    加载文件中的图像
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      docker load < filename.tar.gz
    #+END_SRC
 
    保存图像到文件
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      docker save imagename:tagname | gzip > filename.tar.gz
    #+END_SRC
 
 ** import/export 容器
    从一个容器文件中导入容器
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      cat filename.tar.gz | docker import - imagename:tagname
    #+END_SRC
 
    导出一个容器
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      docker export containername | gzip > filename.tar.gz
    #+END_SRC
 
@@ -201,7 +201,7 @@
 ** 上传图像到私有仓库
    在上传或下载私有仓库的图像时，需要提前设置安全性。通常 docker 私有仓库默认采
    用 HTTPS，如果不设置安全性则会出现如下错误：
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      ➜  ~ docker tag ubuntu:18.04 192.168.1.2:5000/ubuntu:18.04
      ➜  ~ docker push 192.168.1.2:5000/ubuntu:18.04
      The push refers to repository [192.168.1.2:5000/ubuntu]
@@ -228,7 +228,7 @@
 
    [[file:../static/image/2019/07/docker-daemon-config.png]]
 
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      > docker tag imagename 192.168.1.2:5000/imagename
      > docker push 192.168.1.2:5000/imagename
      The push refers to repository [192.168.1.2:5000/redis]
@@ -243,7 +243,7 @@
 
 ** 开启私有仓库允许删除图像的接口
    registry 默认不允许删除已经上传的图像，可以通过以下设置来开启允许删除的配置
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # 查看默认配置
      docker exec -it registry sh -c 'cat /etc/docker/registry/config.yml'
      # 开启删除的配置项 (添加  delete: enabled: true)
@@ -255,12 +255,12 @@
 
 ** 私有仓库中的 API 接口
    添加一些别名帮助查询远端的仓库内容，添加远端仓库的环境变量
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      export REGISTRY=localhost:5000
    #+END_SRC
 
 *** Registry 的 API 接口
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       # 查询 registry 中所有的 repository
       curl -s -XGET "http://${REGISTRY}/v2/_catalog"
 
@@ -279,7 +279,7 @@
     #+END_SRC
 
     添加以下帮助脚本
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       # list repositories
       dkrepos() {
         curl -s -XGET "http://${REGISTRY}/v2/_catalog"
@@ -340,7 +340,7 @@
    #+END_SRC
 
    使用 ~docker build~ 命令来新建图像
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      docker build -t myapp .
    #+END_SRC
 

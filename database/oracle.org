@@ -1724,7 +1724,7 @@
 
    方案二：添加环境变量，每次启动 sqlplus 会直接读取环境变量从而达到修改日期格式
    的目的
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      export NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'
    #+END_SRC
 
@@ -1796,7 +1796,7 @@
 *** 创建数据储存的目录
     Oracle 数据库的表空间的存储目录需要手工创建，注意创建的文件夹要求
     =oracle:dba= 能够读写
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       mkdir -p /u01/app/oracle/oradata/XE
     #+END_SRC
 
@@ -1850,14 +1850,14 @@
     #+END_SRC
 
     使用 sqlplus 测试一下连接是否成功
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       sqlplus avictor/secret@localhost/xe
     #+END_SRC
 ** 导入/导出数据
 *** 导出全部数据库
     如果两个数据库的磁盘的物理路径都是相同的，可以指定 ~full=y~ 的方式导入所有的
     数据库，这种方式导出的表空间会绑定到磁盘上存储的 Datafile 路径
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       -- 导出所有的表
       exp user/pass@host:port/sid FULL=y FILE=data.dmp
 
@@ -1868,7 +1868,7 @@
 *** 导出用户的数据库
     如果要导出某个特定用户的所有数据库，这种方式导出的数据库的表空间文件不会绑定
     到磁盘存储的物理位置，使用下面命令可以查看所有的帮忙选项
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       -- 查看帮助和可选的参数
       exp help=y
       imp help=y
@@ -1886,7 +1886,7 @@
     #+END_SRC
 
     导入和导出命令
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       -- 导出数据库
       exp PARFILE=options.txt LOG=export.log OWNER=owner1
 
@@ -2055,7 +2055,7 @@
    #+END_SRC
 
    根据服务器的编码格式来修改客户端的编码格式
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # 将客户端修改成英文的 Unicode 码
      export NLS_LANG="AMERICAN_AMERICA.AL32UTF8"
 
@@ -2124,7 +2124,7 @@
 
 ** ORA-21561: OID generation failed
    数据库的主机名解析错误
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      $ hostname
      Jesenia.local
      $ ping Jesenia.local
@@ -2142,7 +2142,7 @@
    #+END_SRC
 
    在 hosts 文件结尾追加当前主机的解析地址即可
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sudo echo "127.0.0.1 $(hostname)" >> /etc/hosts
    #+END_SRC
 
@@ -2159,20 +2159,20 @@
     3. instantclient-sqlplus-macos.x64-11.2.0.4.0.zip
 
     解压安装包
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       unzip instantclient-basic-macos.x64-11.2.0.4.0.zip
       unzip instantclient-sdk-macos.x64-11.2.0.4.0.zip
       unzip instantclient-sqlplus-macos.x64-11.2.0.4.0.zip
     #+END_SRC
 
     解压后生成一个 =instantclient_11_2= 文件夹，直接拷贝到安装的文件夹中
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       sudo mkdir -p /usr/local/java
       sudo cp -r instantclient_11_2 /usr/local/java
     #+END_SRC
 
     建立软连接
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       cd /usr/local/java/instantclient_11_2
       mkdir lib
       ln -s libclntsh.dylib.11.1 libclntsh.dylib
@@ -2182,7 +2182,7 @@
     #+END_SRC
 
     添加环境变量到 .bashrc 中
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       export SQLPATH="/usr/local/java/instantclient_11_2"
       export PATH="${SQLPATH}:$PATH"
       export DYLD_LIBRARY_PATH="${SQLPATH}/lib${DYLD_LIBRARY_PATH:+:${DYLD_LIBRARY_PATH}}"
@@ -2195,14 +2195,14 @@
     3. instantclient-sqlplus-linux.x64-11.2.0.4.0.zip
 
     解压安装包
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       unzip instantclient-basic-linux.x64-11.2.0.4.0.zip
       unzip instantclient-sdk-linux.x64-11.2.0.4.0.zip
       unzip instantclient-sqlplus-linux.x64-11.2.0.4.0.zip
     #+END_SRC
 
     构建目录结构
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       [ ! -d /usr/local/java ] && mkdir -p /usr/local/java
       sudo mv instantclient_11_2 /usr/local/java
       cd /usr/local/java/instantclient_11_2
@@ -2210,7 +2210,7 @@
     #+END_SRC
 
     建立软连接
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       ln -s libclntsh.so libclntsh.so.11.1
       ln -s libocci.so libocci.so.11.1
 
@@ -2225,7 +2225,7 @@
     #+END_SRC
 
     添加环境变量
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       export SQLPATH="/usr/local/java/instantclient_11_2"
       export PATH=${SQLPATH}${PATH:+:${PATH}}
       export LD_LIBRARY_PATH=${SQLPLUS}/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
@@ -2233,7 +2233,7 @@
 ** 添加 Readline 的支持
    sqlplus 本身不支持 Readline 的特性，但可以通过安装 [[https://github.com/hanslub42/rlwrap/releases][rlwrap]] 来将 Readline 特性
    添加到 sqlplus 中
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # mac
      brew install rlwrap
      # ubuntu
@@ -2241,18 +2241,18 @@
    #+END_SRC
 
    通过 rlwrap 来启动 sqlplus
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      rlwrap -c sqlplus user/pass@host/sid
    #+END_SRC
 
    或者直接定义一个别名
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      alias sp='rlwrap -c sqlplus'
    #+END_SRC
 
 ** 启动 sqlplus
    第一种登录方式的命令如下
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sqlplus username/password@hostname:port/service_id
    #+END_SRC
 
@@ -2275,12 +2275,12 @@
    #+END_SRC
 
    熟悉了 tnsnames.org 这种格式后就可以编写相应的登录命令，具体方式如下：
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sqlplus username/password@"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=service_id)))"
    #+END_SRC
 
    当命令中的密码字段中含义有 @ 字段时需要将 password 字段用双引号包起来，如下：
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      sqlplus user/\"my@password\"@hostname:port/service_id
    #+END_SRC
 
@@ -2391,7 +2391,7 @@
 
 ** 执行 SQL 脚本的方法
    执行没有参数的 SQL 脚本
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # 执行 script.sql 脚本后退出,
      echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql
      # 使用重定向执行 script.sql 脚本
@@ -2404,7 +2404,7 @@
    #+END_SRC
 
    将参数传入 script.sql 脚本，在调用脚本时直接将参数写到后面，见下面的例子
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      echo 'exit' | sqlplus -S user/pass@host:port/sid @script.sql arg1 arg2
    #+END_SRC
 
@@ -2434,7 +2434,7 @@
 ** Ubuntu 18.04 安装 Oracle 11g XE 数据库
    如果有 Oracle 11g XE 版本的 deb 包，可以使用如下方式安装，否则最好参考官方的
    手册来安装
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # 安装依赖包
      sudo apt-get install -y libaio1 libaio-dev net-tools
      # 安装软件包

@@ -25,7 +25,7 @@
    - =p13390677_112040_Linux-x86-64_2of7.zip=
 
    将两个文件解压到统一个文件夹中，得到一个 =database= 的文件夹
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      unzip p13390677_112040_Linux-x86-64_1of7.zip
      unzip p13390677_112040_Linux-x86-64_2of7.zip
    #+END_SRC
@@ -58,7 +58,7 @@
    [[file:../static/image/2020/01/oinstall-target-database-memory-config.png]]
 
    检测操作系统 RAM 和 Swap 的命令如下：
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      grep MemTotal /proc/meminfo
      grep SwapTotal /proc/meminfo
      free
@@ -67,7 +67,7 @@
    Oracle 11g 包含 *自动内存管理* 特性，该特性需要更多的共享内存 =/dev/shm= 和文
    件描述符，可以通过以下命令查看可用的共享内存大小，需要注意的是可用的共享内存
    值需要比 =MEMORY_MAX_TARGET= 和 =MEMORY_TARGET= 都要大
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      df -h /dev/shm/
    #+END_SRC
 
@@ -90,7 +90,7 @@
 ** 检验操作系统的存储大小
    为了配合 Oracle 安装包释放安装程序，操作系统的 =/tmp= 文件夹需要有超过 1G 的可
    用存储空间
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      df -h /tmp
    #+END_SRC
 
@@ -100,7 +100,7 @@
    在 Oracle Linux 6.9 中需要内核版本大于 =2.6.32-71.el6.x86_64= ，默认的内核就
    满足要求
 
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      [oracle@orange139 database]$ uname -r
      4.1.12-61.1.28.el6uek.x86_64
    #+END_SRC
@@ -151,12 +151,12 @@
 
 *** 配置本地的 yum 源
     将系统安装的 iso 包加载的 cdrom 中
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       mkdir -p /mnt/cdrom && mount /dev/cdrom /mnt/cdrom
     #+END_SRC
 
     添加本地的 repo 配置文件
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       vim /etc/yum.repos.d/local-yum.repo
     #+END_SRC
 
@@ -169,7 +169,7 @@
     #+END_SRC
 
     检测是否配置成功
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       # 下载缓存
       yum makecache
       # 列出可安装包
@@ -178,14 +178,14 @@
 
 *** 安装相关依赖包
     直接使用 yum 管理器安装
-    #+BEGIN_SRC sh
+    #+BEGIN_SRC shell
       yum install -y binutils compat-libcap1 compat-libstdc++-33 gcc gcc-c++ glibc \
           glibc-devel ksh libgcc libstdc++ libstdc++-devel libaio libaio-devel make \
           sysstat unixODBC unixODBC-devel oracleasm-support
     #+END_SRC
 
    安装 [[https://github.com/hanslub42/rlwrap/releases][rlwrap]] 工具 （可选项）
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      ./configure --prefix=/usr/local
      make
      make install
@@ -222,7 +222,7 @@
    #+END_SRC
 
    测试是否修改成功
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      hostname
    #+END_SRC
 
@@ -243,26 +243,26 @@
    - The Oracle software owner (typically, =oracle= )
 
    新建 oinstall, dba 和 oper 用户组
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      groupadd oinstall
      groupadd dba
      groupadd oper
    #+END_SRC
 
    新建 oracle 用户
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      useradd -g oinstall -G dba,oper oracle
      # 如果 oracle 用户已经存在，则直接加入对应用户组即可
      # usermod -g oinstall -G dba,oper oracle
    #+END_SRC
 
    配置 oracle 用户的密码
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      echo system | passwd --stdin oracle
    #+END_SRC
 
    检验建立好的 oracle 用户
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      id oracle
    #+END_SRC
    #+BEGIN_SRC text
@@ -305,7 +305,7 @@
    #+END_SRC
 
    可以使用如下命令查看一些内核参数
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # 配置的参数，确保配置文件格式正确
      sysctl -p
      # 打印当前所有的参数大小
@@ -321,7 +321,7 @@
    | 用户可用的进程数量   | nproc    | 最小 2047     | 最小 16384                   |
    | 进程的栈空间的大小   | stack    | 最小 10240 KB | 最小 10240 KB，最多 32768 KB |
 
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      echo "nofile: soft=$(ulimit -Sn) hard=$(ulimit -Hn)"
      echo "nproc:  soft=$(ulimit -Su) hard=$(ulimit -Hu)"
      echo "stack:  soft=$(ulimit -Ss) hard=$(ulimit -Hs)"
@@ -344,7 +344,7 @@
 ** 添加如下的环境变量
    为了后面操作简单，需要添加一些常用的环境变量和命令别名
 
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # 基础变量
      export ORACLE_BASE=/u01/app/oracle
      export ORACLE_SID=ora11g
@@ -373,7 +373,7 @@
 
 ** 创建安装目录
    使用如下命令
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      mkdir -p /u01/app
      chown -R oracle:oinstall /u01/app
      chmod -R 775 /u01/app
@@ -407,7 +407,7 @@
 
    添加启动任务， 编辑 =/etc/rc.local= 文件，在最后添加启动 Oracle 监听和 Oracle
    数据库的命令
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC shell
      # start oracle database
      su - oracle -c 'lsnrctl start'
      su - oracle -c 'dbstart /u01/app/oracle/product/11.2.0/dbhome_1'
