@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-11-03 Thu 10:26 -->
+<!-- 2022-11-03 Thu 10:34 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MySQL 工具使用笔记</title>
@@ -211,9 +211,10 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgd3e4873">1. 索引</a>
+<li><a href="#org422c0ad">1. 索引</a>
 <ul>
-<li><a href="#orgd3ef0e0">1.1. explain 工具</a></li>
+<li><a href="#orga0abdc3">1.1. explain 工具</a></li>
+<li><a href="#org95a24f8">1.2. 使用 optimize trace 工具</a></li>
 </ul>
 </li>
 </ul>
@@ -221,12 +222,12 @@
 </div>
 
 
-<div id="outline-container-orgd3e4873" class="outline-2">
-<h2 id="orgd3e4873"><span class="section-number-2">1.</span> 索引</h2>
+<div id="outline-container-org422c0ad" class="outline-2">
+<h2 id="org422c0ad"><span class="section-number-2">1.</span> 索引</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgd3ef0e0" class="outline-3">
-<h3 id="orgd3ef0e0"><span class="section-number-3">1.1.</span> explain 工具</h3>
+<div id="outline-container-orga0abdc3" class="outline-3">
+<h3 id="orga0abdc3"><span class="section-number-3">1.1.</span> explain 工具</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 直接通过在 query 的前面添加 <code>explain</code> 关键字就可以得到查询计划
@@ -300,10 +301,129 @@
 </table>
 </div>
 </div>
+
+<div id="outline-container-org95a24f8" class="outline-3">
+<h3 id="org95a24f8"><span class="section-number-3">1.2.</span> 使用 optimize trace 工具</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+开启 optimize trace 工具，先开启配置项，结果在 <code>information_schema.optimizer_trace</code> 查看结果
+</p>
+
+<div class="org-src-container">
+<pre class="src src-json"><span style="color: #8d5649;">{</span>
+  <span style="color: #859900;">"steps"</span>: <span style="color: #d8241f;">[</span>
+    <span style="color: #9564bf;">{</span>
+      <span style="color: #859900;">"join_preparation"</span>: <span style="color: #24a222;">{</span>
+        <span style="color: #859900;">"select#"</span>: <span style="color: #268bd2;">1</span>,
+        <span style="color: #859900;">"steps"</span>: <span style="color: #ff7f00;">[</span>
+          <span style="color: #1776b6;">{</span>
+            <span style="color: #859900;">"expanded_query"</span>: <span style="color: #2aa198;">"/* select#1 */ select count(0) AS `count(*)` from `t`"</span>
+          <span style="color: #1776b6;">}</span>
+        <span style="color: #ff7f00;">]</span>
+      <span style="color: #24a222;">}</span>
+    <span style="color: #9564bf;">}</span>,
+    <span style="color: #9564bf;">{</span>
+      <span style="color: #859900;">"join_optimization"</span>: <span style="color: #24a222;">{</span>
+        <span style="color: #859900;">"select#"</span>: <span style="color: #268bd2;">1</span>,
+        <span style="color: #859900;">"steps"</span>: <span style="color: #ff7f00;">[</span>
+          <span style="color: #1776b6;">{</span>
+            <span style="color: #859900;">"table_dependencies"</span>: <span style="color: #00bed1;">[</span>
+              <span style="color: #bcbf00;">{</span>
+                <span style="color: #859900;">"table"</span>: <span style="color: #2aa198;">"`t`"</span>,
+                <span style="color: #859900;">"row_may_be_null"</span>: <span style="color: #268bd2;">false</span>,
+                <span style="color: #859900;">"map_bit"</span>: <span style="color: #268bd2;">0</span>,
+                <span style="color: #859900;">"depends_on_map_bits"</span>: <span style="color: #e574c3;">[</span>
+                <span style="color: #e574c3;">]</span>
+              <span style="color: #bcbf00;">}</span>
+            <span style="color: #00bed1;">]</span>
+          <span style="color: #1776b6;">}</span>,
+          <span style="color: #1776b6;">{</span>
+            <span style="color: #859900;">"rows_estimation"</span>: <span style="color: #00bed1;">[</span>
+              <span style="color: #bcbf00;">{</span>
+                <span style="color: #859900;">"table"</span>: <span style="color: #2aa198;">"`t`"</span>,
+                <span style="color: #859900;">"table_scan"</span>: <span style="color: #e574c3;">{</span>
+                  <span style="color: #859900;">"rows"</span>: <span style="color: #268bd2;">6</span>,
+                  <span style="color: #859900;">"cost"</span>: <span style="color: #268bd2;">0.25</span>
+                <span style="color: #e574c3;">}</span>
+              <span style="color: #bcbf00;">}</span>
+            <span style="color: #00bed1;">]</span>
+          <span style="color: #1776b6;">}</span>,
+          <span style="color: #1776b6;">{</span>
+            <span style="color: #859900;">"considered_execution_plans"</span>: <span style="color: #00bed1;">[</span>
+              <span style="color: #bcbf00;">{</span>
+                <span style="color: #859900;">"plan_prefix"</span>: <span style="color: #e574c3;">[</span>
+                <span style="color: #e574c3;">]</span>,
+                <span style="color: #859900;">"table"</span>: <span style="color: #2aa198;">"`t`"</span>,
+                <span style="color: #859900;">"best_access_path"</span>: <span style="color: #e574c3;">{</span>
+                  <span style="color: #859900;">"considered_access_paths"</span>: <span style="color: #8d5649;">[</span>
+                    <span style="color: #d8241f;">{</span>
+                      <span style="color: #859900;">"rows_to_scan"</span>: <span style="color: #268bd2;">6</span>,
+                      <span style="color: #859900;">"access_type"</span>: <span style="color: #2aa198;">"scan"</span>,
+                      <span style="color: #859900;">"resulting_rows"</span>: <span style="color: #268bd2;">6</span>,
+                      <span style="color: #859900;">"cost"</span>: <span style="color: #268bd2;">0.85</span>,
+                      <span style="color: #859900;">"chosen"</span>: <span style="color: #268bd2;">true</span>
+                    <span style="color: #d8241f;">}</span>
+                  <span style="color: #8d5649;">]</span>
+                <span style="color: #e574c3;">}</span>,
+                <span style="color: #859900;">"condition_filtering_pct"</span>: <span style="color: #268bd2;">100</span>,
+                <span style="color: #859900;">"rows_for_plan"</span>: <span style="color: #268bd2;">6</span>,
+                <span style="color: #859900;">"cost_for_plan"</span>: <span style="color: #268bd2;">0.85</span>,
+                <span style="color: #859900;">"chosen"</span>: <span style="color: #268bd2;">true</span>
+              <span style="color: #bcbf00;">}</span>
+            <span style="color: #00bed1;">]</span>
+          <span style="color: #1776b6;">}</span>,
+          <span style="color: #1776b6;">{</span>
+            <span style="color: #859900;">"attaching_conditions_to_tables"</span>: <span style="color: #00bed1;">{</span>
+              <span style="color: #859900;">"original_condition"</span>: <span style="color: #268bd2;">null</span>,
+              <span style="color: #859900;">"attached_conditions_computation"</span>: <span style="color: #bcbf00;">[</span>
+              <span style="color: #bcbf00;">]</span>,
+              <span style="color: #859900;">"attached_conditions_summary"</span>: <span style="color: #bcbf00;">[</span>
+                <span style="color: #e574c3;">{</span>
+                  <span style="color: #859900;">"table"</span>: <span style="color: #2aa198;">"`t`"</span>,
+                  <span style="color: #859900;">"attached"</span>: <span style="color: #268bd2;">null</span>
+                <span style="color: #e574c3;">}</span>
+              <span style="color: #bcbf00;">]</span>
+            <span style="color: #00bed1;">}</span>
+          <span style="color: #1776b6;">}</span>,
+          <span style="color: #1776b6;">{</span>
+            <span style="color: #859900;">"optimizing_distinct_group_by_order_by"</span>: <span style="color: #00bed1;">{</span>
+            <span style="color: #00bed1;">}</span>
+          <span style="color: #1776b6;">}</span>,
+          <span style="color: #1776b6;">{</span>
+            <span style="color: #859900;">"finalizing_table_conditions"</span>: <span style="color: #00bed1;">[</span>
+            <span style="color: #00bed1;">]</span>
+          <span style="color: #1776b6;">}</span>,
+          <span style="color: #1776b6;">{</span>
+            <span style="color: #859900;">"refine_plan"</span>: <span style="color: #00bed1;">[</span>
+              <span style="color: #bcbf00;">{</span>
+                <span style="color: #859900;">"table"</span>: <span style="color: #2aa198;">"`t`"</span>
+              <span style="color: #bcbf00;">}</span>
+            <span style="color: #00bed1;">]</span>
+          <span style="color: #1776b6;">}</span>,
+          <span style="color: #1776b6;">{</span>
+            <span style="color: #859900;">"considering_tmp_tables"</span>: <span style="color: #00bed1;">[</span>
+            <span style="color: #00bed1;">]</span>
+          <span style="color: #1776b6;">}</span>
+        <span style="color: #ff7f00;">]</span>
+      <span style="color: #24a222;">}</span>
+    <span style="color: #9564bf;">}</span>,
+    <span style="color: #9564bf;">{</span>
+      <span style="color: #859900;">"join_execution"</span>: <span style="color: #24a222;">{</span>
+        <span style="color: #859900;">"select#"</span>: <span style="color: #268bd2;">1</span>,
+        <span style="color: #859900;">"steps"</span>: <span style="color: #ff7f00;">[</span>
+        <span style="color: #ff7f00;">]</span>
+      <span style="color: #24a222;">}</span>
+    <span style="color: #9564bf;">}</span>
+  <span style="color: #d8241f;">]</span>
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2022-11-03 Thu 10:26. Created by Jinghui Hu at 2022-11-03 Thu 10:19.</p>
+<p class="author">Last Updated 2022-11-03 Thu 10:34. Created by Jinghui Hu at 2022-11-03 Thu 10:19.</p>
 </div>
 </body>
 </html>
