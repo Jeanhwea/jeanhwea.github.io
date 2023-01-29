@@ -1,1 +1,1 @@
-((org-mode . ((eval . (git-auto-commit-mode)))))
+;; ((org-mode . ((eval . (git-auto-commit-mode)))))
