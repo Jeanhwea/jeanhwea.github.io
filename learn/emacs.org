@@ -24,7 +24,8 @@
 *** graphviz
 **** 参考连接
 1. 图库 [[http://graphviz.org/gallery/][Gallery]]
-2. [[file:../article/drawing-graphs-with-dot.org::+TITLE: 使用 dot 画图工具][文章]]
+2. [[file:../article/drawing-graphs-with-dot.org::+TITLE: 使用 dot 画图工具][文章]] | 快速入门 [[https://www.graphviz.org/pdf/dotguide.pdf][Drawing graphs with dot]]
+3. 属性参考文档 [[http://www.graphviz.org/doc/info/attrs.html][Attrs]]
 **** 无向图
 #+BEGIN_SRC dot :exports results :file ../static/image/2023/0201/000024.png
   graph {
@@ -61,6 +62,36 @@
 
 #+RESULTS:
 [[file:../static/image/2023/0201/001233.png]]
+
+**** 系统交互图
+#+BEGIN_SRC dot :exports results :file ../static/image/2023/0201/001954.png
+    digraph {
+      size="8,8";
+      node [fontname="Microsoft Yahei"];
+
+      subgraph cluster_metadata {
+        label = "元数据管理模块"; color = "lightgray"; style = "filled";
+        module_meta_data [shape=record label="治理数据 | {Servie | Module | Field}"];
+        module_meta_status [label="治理状态"];
+        module_work_order [label="工单管理"];
+      }
+
+      subgraph cluster_detector {
+        label = "劣化探测模块"; color = "lightgray"; style = "filled";
+        module_data_preload [label="数据准备"];
+        module_intern_checker [label="内置检测器"];
+        module_extern_checker [label="外置检测器"];
+      }
+
+      module_data_preload -> module_intern_checker;
+      module_data_preload -> module_extern_checker;
+
+      module_data_preload -> module_meta_data;
+    }
+#+END_SRC
+
+#+RESULTS:
+[[file:../static/image/2023/0201/001954.png]]
 
 * Elisp
 ** 函数相关
