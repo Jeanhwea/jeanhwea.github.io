@@ -1,0 +1,84 @@
+% Created 2023-02-02 Thu 11:56
+% Intended LaTeX compiler: xelatex
+\documentclass[presentation]{beamer}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage[scheme=plain]{ctex}
+\usetheme{Madrid}
+\author{Jinghui Hu}
+\date{\textit{<2023-02-02 Thu 11:21>}}
+\title{GroupBy语句实现原理探索}
+\hypersetup{
+ pdfauthor={Jinghui Hu},
+ pdftitle={GroupBy语句实现原理探索},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 28.2 (Org mode 9.5.5)},
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+
+
+\section{数据准备}
+\label{sec:org827e8a0}
+\begin{frame}[label={sec:org039b5e1},fragile]{建表}
+ \begin{verbatim}
+create table tb_data_01 (
+  id int primary key,
+  a int,
+  b int,
+  index (a)
+) engine = innodb;
+\end{verbatim}
+
+\begin{verbatim}
+select * from tb_data_01 limit 10;
+\end{verbatim}
+
+\begin{center}
+\begin{tabular}{rrr}
+id & a & b\\
+\hline
+1 & 1 & 1\\
+2 & 2 & 2\\
+3 & 3 & 3\\
+4 & 4 & 4\\
+5 & 5 & 5\\
+6 & 6 & 6\\
+7 & 7 & 7\\
+8 & 8 & 8\\
+9 & 9 & 9\\
+10 & 10 & 10\\
+\end{tabular}
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:org4becff4},fragile]{插入数据}
+ \begin{verbatim}
+delimiter ;;
+  create procedure idata()
+  begin
+    declare i int;
+    set i=1;
+    while(i<=1000)do
+      insert into tb_data_01 values(i,i,i);
+      set i=i+1;
+    end while;
+  end;;
+delimiter ;
+
+call idata();
+\end{verbatim}
+\end{frame}
+\end{document}
