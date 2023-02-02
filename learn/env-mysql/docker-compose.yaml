@@ -1,0 +1,54 @@
+version: '3.1'
+
+services:
+  master:
+    platform: linux/amd64
+    container_name: mysql-master
+    hostname: "mysql-master-100"
+    image: mysql:8.0.30-debian
+    ports:
+      - 9001:3306
+    restart: 'always'
+    volumes:
+      - ./mysql-conf-master.conf:/etc/mysql/conf.d/mysql.conf.cnf
+      # - ./data/mysql-master:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: p111
+      MYSQL_PORT: 3306
+      MYSQL_USER: user01
+      MYSQL_PASSWORD: user01
+      MYSQL_DATABASE: test01
+      MYSQL_LOWER_CASE_TABLE_NAMES: 0
+    networks:
+      dbnet:
+        ipv4_address: 172.20.0.100
+  slave:
+    depends_on:
+      - master
+    platform: linux/amd64
+    container_name: mysql-slave
+    hostname: "mysql-slave-101"
+    image: mysql:8.0.30-debian
+    ports:
+      - 9002:3306
+    restart: 'always'
+    volumes:
+      - ./mysql-conf-slave.conf:/etc/mysql/conf.d/mysql.conf.cnf
+      # - ./data/mysql-slave:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: p222
+      MYSQL_PORT: 3306
+      MYSQL_USER: user02
+      MYSQL_PASSWORD: user02
+      MYSQL_DATABASE: test01
+      MYSQL_LOWER_CASE_TABLE_NAMES: 0
+    networks:
+      dbnet:
+        ipv4_address: 172.20.0.101
+
+networks:
+  dbnet:
+    name: dbnet
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

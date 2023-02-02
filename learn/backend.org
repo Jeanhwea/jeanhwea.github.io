@@ -27,6 +27,196 @@
 *** Centos 7
 1. [[https://hub.docker.com/_/centos/][docker container]]
 
+* MySQL
+** 实验环境
+*** 配置 Docker 环境
+1. 安装 Docker Server
+2. 参考文档 [[https://docs.docker.com/compose/install/other][Install the Compose standalone]] 安装 docker-compose
+3. 编写启动配置文件 [[file:env-mysql/][MySQL 主备配置]]
+4. 启动服务
+#+BEGIN_SRC sh :dir env-mysql
+  docker-compose up -d
+#+END_SRC
+
+*** 配置主备环境
+**** 查看主备网络配置
+#+BEGIN_SRC sh :results output
+  docker inspect mysql-master | jq '.[0].NetworkSettings.Networks.dbnet.IPAddress'
+  docker inspect mysql-slave  | jq '.[0].NetworkSettings.Networks.dbnet.IPAddress'
+#+END_SRC
+
+#+RESULTS:
+: "172.20.0.100"
+: "172.20.0.101"
+
+**** 主库配置备库用户的访问权限
+:properties:
+:header-args:sql: :engine mysql :dbhost 127.0.0.1 :dbport 9001 :database test01 :dbuser root :dbpassword p111
+:end:
+
+#+BEGIN_SRC sql :results output
+  create user "user02"@"%" identified by "user02";
+  grant replication slave on *.* to "user02"@"%";
+  flush privileges;
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sql
+  show master status
+#+END_SRC
+
+#+RESULTS:
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
+|------------------+----------+--------------+------------------+-------------------|
+| mysql-bin.000003 |      841 | test01       |                  |                   |
+
+**** 备库同步配置
+:properties:
+:header-args:sql: :engine mysql :dbhost 127.0.0.1 :dbport 9002 :database test01 :dbuser root :dbpassword p222
+:end:
+
+#+BEGIN_SRC sql :results output
+  # 这里的 host 等参数需要根据主库的配置修改
+  -- change master to master_host='172.20.0.100', master_user='user02', master_password='user02', master_log_file='1.000003', master_log_pos=823;
+  -- change master to master_host='mysql-master', master_user='user02', master_password='user02', master_log_file='mysql-bin.000003', master_log_pos=0;
+  change master to master_host='mysql-master', master_user='user02', master_password='user02', master_log_file='mysql-bin.000003', master_log_pos=841;
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sql :results output
+   start slave;
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sql :results output
+  show slave status\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+               Slave_IO_State: Waiting for source to send event
+                  Master_Host: mysql-master
+                  Master_User: user02
+                  Master_Port: 3306
+                Connect_Retry: 60
+              Master_Log_File: mysql-bin.000003
+          Read_Master_Log_Pos: 841
+               Relay_Log_File: 1e8e597992df-relay-bin.000002
+                Relay_Log_Pos: 326
+        Relay_Master_Log_File: mysql-bin.000003
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+              Replicate_Do_DB:
+          Replicate_Ignore_DB:
+           Replicate_Do_Table:
+       Replicate_Ignore_Table:
+      Replicate_Wild_Do_Table:
+  Replicate_Wild_Ignore_Table:
+                   Last_Errno: 0
+                   Last_Error:
+                 Skip_Counter: 0
+          Exec_Master_Log_Pos: 841
+              Relay_Log_Space: 543
+              Until_Condition: None
+               Until_Log_File:
+                Until_Log_Pos: 0
+           Master_SSL_Allowed: No
+           Master_SSL_CA_File:
+           Master_SSL_CA_Path:
+              Master_SSL_Cert:
+            Master_SSL_Cipher:
+               Master_SSL_Key:
+        Seconds_Behind_Master: 0
+Master_SSL_Verify_Server_Cert: No
+                Last_IO_Errno: 0
+                Last_IO_Error:
+               Last_SQL_Errno: 0
+               Last_SQL_Error:
+  Replicate_Ignore_Server_Ids:
+             Master_Server_Id: 100
+                  Master_UUID: 860a4dac-94f0-11ed-a2f3-0242ac140064
+             Master_Info_File: mysql.slave_master_info
+                    SQL_Delay: 0
+          SQL_Remaining_Delay: NULL
+      Slave_SQL_Running_State: Replica has read all relay log; waiting for more updates
+           Master_Retry_Count: 86400
+                  Master_Bind:
+      Last_IO_Error_Timestamp:
+     Last_SQL_Error_Timestamp:
+               Master_SSL_Crl:
+           Master_SSL_Crlpath:
+           Retrieved_Gtid_Set:
+            Executed_Gtid_Set:
+                Auto_Position: 0
+         Replicate_Rewrite_DB:
+                 Channel_Name:
+           Master_TLS_Version:
+       Master_public_key_path:
+        Get_master_public_key: 0
+            Network_Namespace:
+#+end_example
+
+如果出现这样的两行表示结果是正确的
+#+begin_quote
+Slave_IO_Running: Yes
+Slave_SQL_Running: Yes
+#+end_quote
+
+重置 slave
+#+BEGIN_SRC sql :results output
+  stop slave;
+  reset slave;
+#+END_SRC
+
+**** 主库建表
+:properties:
+:header-args:sql: :engine mysql :dbhost 127.0.0.1 :dbport 9001 :database test01 :dbuser root :dbpassword p111
+:end:
+
+#+BEGIN_SRC sql :results output
+  create table t (
+    id int primary key auto_increment,
+    c int
+  );
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sql :results output
+  insert into t(c) values (1), (2), (3);
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sql :results output
+  delete from t where id < 10;
+#+END_SRC
+
+#+RESULTS:
+
+**** 备库查询
+:properties:
+:header-args:sql: :engine mysql :dbhost 127.0.0.1 :dbport 9002 :database test01 :dbuser root :dbpassword p222
+:end:
+
+#+BEGIN_SRC sql
+  select * from t;
+#+END_SRC
+
+*** 设置登录别名
+#+BEGIN_SRC sh
+  alias my1="MYSQL_PWD=p111   mysql -h127.0.0.1 -uroot -P9001"
+  alias my2="MYSQL_PWD=p222   mysql -h127.0.0.1 -uroot -P9002"
+  alias u01="MYSQL_PWD=user01 mysql -h127.0.0.1 -uuser01 -P9001 test01"
+  alias u02="MYSQL_PWD=user02 mysql -h127.0.0.1 -uuser02 -P9002 test01"
+  alias m100='docker exec -it mysql-master /bin/bash'
+  alias m101='docker exec -it mysql-slave /bin/bash'
+#+END_SRC
+
 * K8s
 ** minikube
 1. [[https://minikube.sigs.k8s.io/docs/][文档中心]]
