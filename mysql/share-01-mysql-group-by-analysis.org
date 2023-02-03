@@ -56,10 +56,22 @@
 #+END_SRC
 
 * 整体执行流程
-#+BEGIN_SRC awk :in-file /tmp/mysqld.trace :results file :file /tmp/output.txt
-  /^T@8/ {
-      print
+#+BEGIN_SRC perl :results file
+  use strict;
+  use warnings;
+
+  my $fout = '/tmp/output.txt';
+  open(FIN, '<:encoding(UTF-8)', '/tmp/mysqld.trace') or die;
+  open(FOUT, '>', $fout) or die;
+
+  while (my $line = <FIN>) {
+      if ($line =~ /^T\@8/) {
+          print FOUT $line;
+      }
   }
+
+  close(FOUT);
+  $fout;
 #+END_SRC
 
 #+RESULTS:
