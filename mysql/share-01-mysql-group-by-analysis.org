@@ -60,12 +60,13 @@
   use strict;
   use warnings;
 
-  my $fout = '/tmp/output.txt';
-  open(FIN, '<:encoding(UTF-8)', '/tmp/mysqld.trace') or die;
+  my $cid = 8;
+  my $fout = "/tmp/mysqld-thd-$cid.txt";
+  open(FIN, '<:encoding(UTF-8)', "/tmp/mysqld.trace") or die;
   open(FOUT, '>', $fout) or die;
 
   while (my $line = <FIN>) {
-      if ($line =~ /^T\@8/) {
+      if ($line =~ /^T\@$cid/) {
           print FOUT $line;
       }
   }
@@ -75,4 +76,4 @@
 #+END_SRC
 
 #+RESULTS:
-[[file:/tmp/output.txt]]
+[[file:/tmp/mysqld-thd-8.txt]]
