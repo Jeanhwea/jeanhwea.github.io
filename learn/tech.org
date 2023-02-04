@@ -299,6 +299,39 @@ Slave_SQL_Running: Yes
 : kube-system   kube-scheduler-minikube            1/1     Running   0             57s
 : kube-system   storage-provisioner                1/1     Running   1 (18s ago)   54s
 
+* GDB & LLDB
+** 参考目录
+1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
+2. [[https://github.com/hellogcc/100-gdb-tips][GDB 小技巧]]
+** 问题解决
+*** MacOS: 证书错误问题
+please check gdb is codesigned - see taskgated(8)
+#+BEGIN_SRC xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  <plist version="1.0">
+  <dict>
+      <key>com.apple.security.cs.allow-jit</key>
+      <true/>
+      <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+      <true/>
+      <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+      <true/>
+      <key>com.apple.security.cs.disable-library-validation</key>
+      <true/>
+      <key>com.apple.security.cs.disable-executable-page-protection</key>
+      <true/>
+      <key>com.apple.security.cs.debugger</key>
+      <true/>
+      <key>com.apple.security.get-task-allow</key>
+      <true/>
+  </dict>
+  </plist>
+#+END_SRC
+#+BEGIN_SRC sh
+  codesign --entitlements gdb.xml -fs gdb-cert /usr/local/bin/gdb
+#+END_SRC
 * 脚本语言
 ** Perl
 *** 环境配置
