@@ -14,15 +14,10 @@
 
 
 * 极客时光
-** 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2][MySQL实战45讲]]
-1. MySQL 开发文档 8.0.30  [[https://dev.mysql.com/doc/dev/mysql-server/8.0.30/PAGE_GET_STARTED.html#start_source][Source Code Documents]]
-2. MySQL 使用文档 [[https://dev.mysql.com/doc/refman/8.0/en/innodb-storage-engine.html][InnoDB Storage Engine]]
-3. Golang 库 [[https://gorm.io/docs/index.html][GORM]]
-4. Java 库 [[https://docs.spring.io/spring-data/jpa/docs/2.7.7/reference/html/][JPA]] | [[https://github.com/mybatis/mybatis-3][mybatis-3]]
 ** 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/22%20%E8%AE%B2%E9%80%9A%E5%85%B3%20Go%20%E8%AF%AD%E8%A8%80-%E5%AE%8C][22 讲通关 Go 语言]]
 ** 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/24%E8%AE%B2%E5%90%83%E9%80%8F%E5%88%86%E5%B8%83%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93-%E5%AE%8C][24讲吃透分布式数据库]]
 
-* Oracle
+* Oracle Database
 ** 镜像构建
 *** Centos 7
 1. [[https://hub.docker.com/_/centos/][docker container]]
@@ -228,6 +223,11 @@ Slave_SQL_Running: Yes
   alias m101='docker exec -it mysql-slave /bin/bash'
 #+END_SRC
 
+** 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2][MySQL实战45讲]]
+1. MySQL 开发文档 8.0.30  [[https://dev.mysql.com/doc/dev/mysql-server/8.0.30/PAGE_GET_STARTED.html#start_source][Source Code Documents]]
+2. MySQL 使用文档 [[https://dev.mysql.com/doc/refman/8.0/en/innodb-storage-engine.html][InnoDB Storage Engine]]
+3. Golang 库 [[https://gorm.io/docs/index.html][GORM]]
+4. Java 库 [[https://docs.spring.io/spring-data/jpa/docs/2.7.7/reference/html/][JPA]] | [[https://github.com/mybatis/mybatis-3][mybatis-3]]
 ** 源码研究
 1. [[*专栏 \[\[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2\]\[MySQL实战45讲\]\]][专栏 MySQL实战45讲]]
 2. [[file:mysql-source-code.org][MySQL 源码笔记]]
@@ -245,3 +245,50 @@ Slave_SQL_Running: Yes
      # 启动
      minikube start
    #+END_SRC
+** Pod
+*** 查看 Pod
+#+BEGIN_SRC sh :results output
+  kubectl get pods -A
+#+END_SRC
+
+#+RESULTS:
+: NAMESPACE     NAME                               READY   STATUS    RESTARTS      AGE
+: kube-system   coredns-787d4945fb-g688w           1/1     Running   0             50s
+: kube-system   etcd-minikube                      1/1     Running   0             65s
+: kube-system   kube-apiserver-minikube            1/1     Running   0             57s
+: kube-system   kube-controller-manager-minikube   1/1     Running   0             56s
+: kube-system   kube-proxy-4ph9m                   1/1     Running   0             50s
+: kube-system   kube-scheduler-minikube            1/1     Running   0             57s
+: kube-system   storage-provisioner                1/1     Running   1 (18s ago)   54s
+
+* 脚本语言
+** Perl
+*** 环境配置
+**** 包管理工具配置 CPAN
+1. 官网 [[https://metacpan.org/][CPAN]]
+2. 镜像 [[https://mirrors.tuna.tsinghua.edu.cn/help/CPAN/][TUNA]]
+   #+BEGIN_SRC sh
+     PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'CPAN::HandleConfig->edit("pushy_https", 0); CPAN::HandleConfig->edit("urllist", "unshift", "https://mirrors.tuna.tsinghua.edu.cn/CPAN/"); mkmyconfig'
+   #+END_SRC
+3. CPAN 的配置文件: =~/.cpan/CPAN/MyConfig.pm=
+**** 包管理命令
+#+BEGIN_SRC sh
+  perl -MCPAN -e 'install Excel::Writer::XLSX'
+#+END_SRC
+*** 基本使用
+**** Hello world
+创建 =hello.pl= 文件写以下代码
+#+BEGIN_SRC perl :results output
+  print("hello world\n");
+#+END_SRC
+
+#+RESULTS:
+: hello world
+
+使用 perl 命令运行代码
+#+BEGIN_SRC sh
+  perl hello.pl
+#+END_SRC
+[[file:../static/image/2023/0129/192740.png]]
+
+** Python
