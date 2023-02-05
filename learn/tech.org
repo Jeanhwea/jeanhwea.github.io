@@ -1,4 +1,4 @@
-#+TITLE: 学习笔记
+#+TITLE: 技术文档
 #+AUTHOR: Jinghui Hu
 #+EMAIL: hujinghui@buaa.edu.cn
 #+DATE: <2023-01-29 Sun 10:55:28>
@@ -304,6 +304,25 @@ Slave_SQL_Running: Yes
 1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
 2. [[https://github.com/hellogcc/100-gdb-tips][GDB 小技巧]] | [[https://sourceware.org/gdb/onlinedocs/gdb/][GDB 在线手册]]
 ** 📒 使用笔记
+*** 启动调试
+方法一：使用 attach 模式调试。首先正常启动重新，然后使用 attach 命令附属到进程上
+#+BEGIN_SRC sh
+  (lldb) attach -p 18616
+  (gdb) attach 18616
+#+END_SRC
+
+方法二：直接 run 启动进程
+#+BEGIN_SRC sh
+  # 直接 run 启动进程
+  (lldb/gdb) r
+  # 添加启动参数
+  (lldb/gdb) r args1 args2 ...
+  # 查看参数
+  (gdb) show args
+  (lldb) settings show target.run-args
+#+END_SRC
+[[file:../static/image/2023/0205/131917.png]]
+
 *** 设置断点 breakpoint
 #+BEGIN_SRC sh
   # 普通断点
@@ -314,6 +333,9 @@ Slave_SQL_Running: Yes
   b 34 if i = 10
   # 临时断点
   tb main
+  # until 直接执行到行数
+  (gdb) until 12
+  (lldb) thread until 12
 #+END_SRC
 *** 保存断点
 GDB 保存断点的方式比较方便，直接保持成一个文本文件后，再应用代码
