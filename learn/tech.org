@@ -304,7 +304,7 @@ Slave_SQL_Running: Yes
 1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
 2. [[https://github.com/hellogcc/100-gdb-tips][GDB 小技巧]] | [[https://sourceware.org/gdb/onlinedocs/gdb/][GDB 在线手册]]
 ** 📒 使用笔记
-*** 启动调试
+*** 进程启动: run & attach
 方法一：使用 attach 模式调试。首先正常启动重新，然后使用 attach 命令附属到进程上
 #+BEGIN_SRC sh
   (lldb) attach -p 18616
@@ -323,7 +323,8 @@ Slave_SQL_Running: Yes
 #+END_SRC
 [[file:../static/image/2023/0205/131917.png]]
 
-*** 设置断点 breakpoint
+*** 调试流程控制
+**** 设置断点 breakpoint
 #+BEGIN_SRC sh
   # 普通断点
   b main
@@ -331,13 +332,28 @@ Slave_SQL_Running: Yes
   b 12
   # 条件断点
   b 34 if i = 10
-  # 临时断点
+  # 临时断点: 临时断点执行一次后自动销毁
   tb main
-  # until 直接执行到行数
-  (gdb) until 12
-  (lldb) thread until 12
 #+END_SRC
-*** 保存断点
+
+**** 流程控制 step & next & continue
+1. step 单步调试，不进入函数
+2. next 单步调试，进入函数
+3. continue 继续执行
+   #+BEGIN_SRC sh
+     s # step
+     n # next
+     c # continue
+
+     # until 直接执行到行数
+     (gdb) until 12
+     (lldb) thread until 12
+   #+END_SRC
+4. 跳转到指定行
+   - 条件断点 ~tb~ temp breakpoint
+   - until ~until <line>~
+
+*** 保持断点 & 现场恢复
 GDB 保存断点的方式比较方便，直接保持成一个文本文件后，再应用代码
 #+BEGIN_SRC sh
   # 保持断点到文件中
