@@ -313,6 +313,9 @@ Slave_SQL_Running: Yes
 
 方法二：直接 run 启动进程
 #+BEGIN_SRC sh
+  # 指定启动文件
+  (lldb/gdb) file <binary>
+
   # 直接 run 启动进程
   (lldb/gdb) r
   # 添加启动参数
@@ -352,6 +355,11 @@ Slave_SQL_Running: Yes
 4. 跳转到指定行
    - 条件断点 ~tb~ temp breakpoint
    - until ~until <line>~
+5. 返回当前值
+   #+BEGIN_SRC sh
+     (gdb) return <return expression>
+     (lldb) thread return <return expression>
+   #+END_SRC
 
 *** 保持断点 & 现场恢复
 GDB 保存断点的方式比较方便，直接保持成一个文本文件后，再应用代码
@@ -376,18 +384,33 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
 
 *** 查看/修改变量和内存数据
 1. 打印变量 print
+   #+BEGIN_SRC sh
+     (lldb) p thd->m_thread_id
+     (my_thread_id) $1 = 10
+     (lldb) x/w &$1
+     0x7fbdc1240188: 0x0000000a
+     (lldb)
+   #+END_SRC
 2. 查看内存地址中的数据
    #+BEGIN_SRC sh
      (lldb) x/8w $0 => 打印地址的数据, 打印8 条数据, [w, b] 表示不同的打印方式
-     x/8w $0
      0x7fbdc123dc00: 0x0916f4d8 0x00000001 0x0916f548 0x00000001
      0x7fbdc123dc10: 0x00000000 0x00000000 0xc1240440 0x00007fbd
      (lldb) x/8b $0
-     x/8b $0
      0x7fbdc123dc00: 0xd8 0xf4 0x16 0x09 0x01 0x00 0x00 0x00
      (lldb) x/8x $0
-     x/8x $0
      0x7fbdc123dc00: 0xd8 0xf4 0x16 0x09 0x01 0x00 0x00 0x00
+   #+END_SRC
+3. 查看 frame 中变量
+   #+BEGIN_SRC sh
+     # 查看局部变量
+     (lldb) frame variable
+     (lldb) fr v
+     # 查看全局变量
+     (lldb) target variable
+     (lldb) ta v
+     # 查看调用栈 thread backtrace
+     (lldb/gdb) bt
    #+END_SRC
 
 ** 问题解决
