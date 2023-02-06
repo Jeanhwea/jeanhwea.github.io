@@ -60,8 +60,6 @@
   yum install -y libaio-devel flex bison bison-devel ncurses-devel glibc-devel \
       patch redhat-lsb-core readline-devel
 
-  # MySQL 编译包
-  yum install -y openssl-devel gettext-devel bison-devel ncurses-devel
 #+END_SRC
 
 *** 设置时区
@@ -282,17 +280,25 @@ Slave_SQL_Running: Yes
 3. 代码阅读分享
    - [[file:../mysql/share-01-mysql-group-by-analysis.org][GroupBy语句实现原理探索]]
 *** 安装编译调试环境
-1. gcc 安装 [[https://gcc.gnu.org/install/][GCC]]
+1. 安装 yum 包
+   #+BEGIN_SRC sh
+     # 安装依赖包
+     yum update
+
+     # MySQL 编译包
+     yum install -y openssl-devel gettext-devel bison-devel ncurses-devel wget make gcc g++
+   #+END_SRC
+2. gcc 安装 [[https://gcc.gnu.org/install/][GCC]]
    #+BEGIN_SRC sh
      # 下载 gcc 的依赖
      ./contrib/download_prerequisites
 
      # --enable-multilib 开启 32 位库支持
-     ./configure --disable-multilib
+     ./configure --prefix=/usr/local/gcc --disable-multilib
      make
      make install
    #+END_SRC
-2. cmake 安装 [[https://cmake.org/install/][CMake Install]]
+3. cmake 安装 [[https://cmake.org/install/][CMake Install]]
    #+BEGIN_SRC sh
      # 下载代码
      curl -OL https://github.com/Kitware/CMake/releases/download/v3.20.1/cmake-3.20.1.tar.gz
