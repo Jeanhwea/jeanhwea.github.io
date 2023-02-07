@@ -334,6 +334,29 @@ Slave_SQL_Running: Yes
    #+END_SRC
 *** 编译代码及初始数据库
 1. 参考资料 [[https://dev.mysql.com/doc/refman/8.0/en/source-installation.html][源代码安装文档]] | [[https://dev.mysql.com/doc/refman/8.0/en/making-trace-files.html][TRACE文件]]
+2. 配置文件 ~/etc/my.cnf~
+   #+BEGIN_SRC conf
+     # -* mode: Conf; -*-
+
+     [mysqld]
+     basedir=/opt/mysql
+     datadir=/opt/mysql/data
+     log-error=/tmp/mysql-error.log
+     pid-file=/tmp/mysql.pid
+     # debug=d,info,error,query,general,where:O,/tmp/mysqld.trace
+     # debug=+d,info,error,query,general,enter,where:O,/tmp/mysqld.trace
+     debug
+
+     # autocommit=0
+     innodb_lock_wait_timeout=3600
+     # long_query_time = 0
+     slow_query_log = on
+     slow_query_log_file = /tmp/mysql-slow.log
+     # secure_file_priv = /tmp
+
+     [client]
+     user=root
+   #+END_SRC
 2. 编译源代码
    #+BEGIN_SRC sh
      # 准备代码编译目录, 输出目录为 out
@@ -350,6 +373,7 @@ Slave_SQL_Running: Yes
      # 初始化数据库
      mysqld --defaults-file=/etc/my.cnf --initialize-insecure
 
+     # https://dev.mysql.com/doc/refman/8.0/en/starting-server.html
      # 启动数据库数据库, --gdb 是开启 gdb 调试支持
      # --debug=d,info,error,query,general,where:O,/tmp/mysqld.trace
      mysqld --gdb >/dev/null 2>&1 &
