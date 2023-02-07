@@ -16,6 +16,17 @@
 3. m_query_str SQL 字符串, 使用 ~thd->query()~ 获取
 
 ** 事务相关
-1. 回滚指针 [[file:../../../github/mysql/mysql-server/storage/innobase/include/trx0types.h::/** Rollback pointer (DB_ROLL_PTR, DATA_ROLL_PTR) */][ROLL_PTR]]
+1. row_id, trx_id, roll_ptr [[file:../../mysql-server/storage/innobase/include/trx0types.h][/storage/innobase/include/trx0types.h]]
+   #+BEGIN_SRC c++
+     /** Row identifier (DB_ROW_ID, DATA_ROW_ID) */
+     typedef ib_id_t row_id_t;
+     /** Transaction identifier (DB_TRX_ID, DATA_TRX_ID) */
+     typedef ib_id_t trx_id_t;
+     /** Rollback pointer (DB_ROLL_PTR, DATA_ROLL_PTR) */
+     typedef ib_id_t roll_ptr_t;
+     /** Undo number */
+     typedef ib_id_t undo_no_t;
+   #+END_SRC
+
 * 执行流程
-1. [[file:../../../../code/github/mysql/mysql-server/sql/sql_parse.cc::void dispatch_sql_command(THD *thd, Parser_state *parser_state) {][dispatch_sql_command]]
+1. [[file:../../mysql-server/sql/sql_parse.cc::assert(thd->lex->m_IS_table_stats.is_valid() == false);][dispatch_command]]
