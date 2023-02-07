@@ -333,7 +333,7 @@ Slave_SQL_Running: Yes
      export PATH=/usr/local/cmake/bin:$PATH
    #+END_SRC
 *** 编译代码及初始数据库
-1. 参考资料 [[https://dev.mysql.com/doc/refman/8.0/en/source-installation.html][源代码安装文档]]
+1. 参考资料 [[https://dev.mysql.com/doc/refman/8.0/en/source-installation.html][源代码安装文档]] | [[https://dev.mysql.com/doc/refman/8.0/en/making-trace-files.html][TRACE文件]]
 2. 编译源代码
    #+BEGIN_SRC sh
      # 准备代码编译目录, 输出目录为 out
@@ -349,6 +349,11 @@ Slave_SQL_Running: Yes
    #+BEGIN_SRC sh
      # 初始化数据库
      mysqld --defaults-file=/etc/my.cnf --initialize-insecure
+
+     # 启动数据库数据库, --gdb 是开启 gdb 调试支持
+     # --debug=d,info,error,query,general,where:O,/tmp/mysqld.trace
+     mysqld --gdb >/dev/null 2>&1 &
+
      # 链接数据库
      mysql
      # 关闭数据库
