@@ -332,8 +332,33 @@ Slave_SQL_Running: Yes
    #+BEGIN_SRC sh
      export PATH=/usr/local/cmake/bin:$PATH
    #+END_SRC
-*** 初始数据库
-1. [[https://dev.mysql.com/doc/refman/8.0/en/source-installation.html][源代码安装文档]]
+*** 编译代码及初始数据库
+1. 参考资料 [[https://dev.mysql.com/doc/refman/8.0/en/source-installation.html][源代码安装文档]]
+2. 编译源代码
+   #+BEGIN_SRC sh
+     # 准备代码编译目录, 输出目录为 out
+     mkdir out
+     cd out
+     cmake -DCMAKE_INSTALL_PREFIX=/opt/mysql -DWITH_BOOST=../../boost/boost_1_77_0 -DWITH_DEBUG=1 -DWITH_UNIT_TESTS=0 ..
+     # 编译代码
+     cd out
+     make -j8
+     make install
+   #+END_SRC
+3. 初始化数据库
+   #+BEGIN_SRC sh
+     # 初始化数据库
+     mysqld --defaults-file=/etc/my.cnf --initialize-insecure
+     # 链接数据库
+     mysql
+     # 关闭数据库
+     mysqladmin shutdown
+   #+END_SRC
+*** 代码阅读配置
+#+BEGIN_SRC sh
+  # 生成跳转的 TAG
+  ctags -e -R --languages=c,c++ .
+#+END_SRC
 
 * 🐳 Docker & kubernetes
 ** minikube
