@@ -25,7 +25,7 @@
    #+END_SRC
 3. 数据库的 Schema
 [[file:../static/image/2023/0208/103345.png]]
-* 研究问题
+* 问题聚焦
 ** 查看一下 employees 的表结构
 #+BEGIN_SRC sql :results output :exports both
   show create table employees\G
@@ -48,37 +48,54 @@ Create Table: CREATE TABLE `employees` (
 
 ** 选取 10 条示例数据
 #+BEGIN_SRC sql
-  select * from employees limit 10;
+  select * from dept_manager limit 10;
 #+END_SRC
 
 #+RESULTS:
-| emp_no | birth_date | first_name | last_name | gender |  hire_date |
-|--------+------------+------------+-----------+--------+------------|
-|  10001 | 1953-09-02 | Georgi     | Facello   | M      | 1986-06-26 |
-|  10002 | 1964-06-02 | Bezalel    | Simmel    | F      | 1985-11-21 |
-|  10003 | 1959-12-03 | Parto      | Bamford   | M      | 1986-08-28 |
-|  10004 | 1954-05-01 | Chirstian  | Koblick   | M      | 1986-12-01 |
-|  10005 | 1955-01-21 | Kyoichi    | Maliniak  | M      | 1989-09-12 |
-|  10006 | 1953-04-20 | Anneke     | Preusig   | F      | 1989-06-02 |
-|  10007 | 1957-05-23 | Tzvetan    | Zielinski | F      | 1989-02-10 |
-|  10008 | 1958-02-19 | Saniya     | Kalloufi  | M      | 1994-09-15 |
-|  10009 | 1952-04-19 | Sumant     | Peac      | F      | 1985-02-18 |
-|  10010 | 1963-06-01 | Duangkaew  | Piveteau  | F      | 1989-08-24 |
+| emp_no | dept_no |  from_date |    to_date |
+|--------+---------+------------+------------|
+| 110022 | d001    | 1985-01-01 | 1991-10-01 |
+| 110039 | d001    | 1991-10-01 | 9999-01-01 |
+| 110085 | d002    | 1985-01-01 | 1989-12-17 |
+| 110114 | d002    | 1989-12-17 | 9999-01-01 |
+| 110183 | d003    | 1985-01-01 | 1992-03-21 |
+| 110228 | d003    | 1992-03-21 | 9999-01-01 |
+| 110303 | d004    | 1985-01-01 | 1988-09-09 |
+| 110344 | d004    | 1988-09-09 | 1992-08-02 |
+| 110386 | d004    | 1992-08-02 | 1996-08-30 |
+| 110420 | d004    | 1996-08-30 | 9999-01-01 |
 
 ** 问题引出
-研究👇🏻 语句中 group by 的执行流程
+研究下面语句中 group by 的执行流程
 #+BEGIN_SRC sql
   select
-    last_name,
-    count(*) total
+    dept_no,
+    count(*) dept_count
   from
-    employees
+    dept_manager
   group by
-    last_name
-  order by
-    2 desc
-  limit 10;
+    dept_no;
 #+END_SRC
+
+#+RESULTS:
+| dept_no | dept_count |
+|---------+------------|
+| d001    |          2 |
+| d002    |          2 |
+| d003    |          2 |
+| d004    |          4 |
+| d005    |          2 |
+| d006    |          4 |
+| d007    |          2 |
+| d008    |          2 |
+| d009    |          4 |
+
+* Group By 介绍
+1. [[https://dev.mysql.com/doc/refman/8.0/en/select.html][SELECT 语句]]
+2. [[https://dev.mysql.com/doc/refman/8.0/en/group-by-modifiers.html][GROUP BY 修饰器]]
+
+* 执行日志分析
+1. 通过开启 trace 抓取执行日志 [[file:log01-group-by-01.txt][group-by-trace-log]]
 
 * 整体执行流程
 #+BEGIN_SRC perl :results file
