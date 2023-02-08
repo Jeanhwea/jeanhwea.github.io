@@ -599,6 +599,29 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
 #+END_SRC
 [[file:../static/image/2023/0129/192740.png]]
 
+**** 过滤 MySQL trace 日志
+#+BEGIN_SRC perl :results file
+  use strict;
+  use warnings;
+
+  my $cid = 8;
+  my $fout = "/tmp/mysqld-thd-$cid.txt";
+  open(FIN, '<:encoding(UTF-8)', "/tmp/mysqld.trace") or die;
+  open(FOUT, '>', $fout) or die;
+
+  while (my $line = <FIN>) {
+      if ($line =~ /^T\@$cid/) {
+          print FOUT $line;
+      }
+  }
+
+  close(FOUT);
+  $fout;
+#+END_SRC
+
+#+RESULTS:
+[[file:/tmp/mysqld-thd-8.txt]]
+
 ** Python
 * 极客时光
 ** 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/22%20%E8%AE%B2%E9%80%9A%E5%85%B3%20Go%20%E8%AF%AD%E8%A8%80-%E5%AE%8C][22 讲通关 Go 语言]]
