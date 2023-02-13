@@ -18,8 +18,67 @@
 ** Page & Block
 *** Page
 1. [[https://blog.jcole.us/2013/01/07/the-physical-structure-of-innodb-index-pages/][Page Structure]] | [[https://github.com/jeremycole/innodb_diagrams][innodb_diagrams]] | [[https://github.com/jeremycole/innodb_ruby/][innodb_ruby]]
+
    [[file:../static/image/2023/0213/133040.png]]
+
 2. 读取页数据 [[file:../../mysql-server/storage/innobase/buf/buf0buf.cc::void Buf_fetch<T>::read_page() {][read_page]] : space, page_no
+   #+BEGIN_SRC C++
+     template <typename T>
+     void Buf_fetch<T>::read_page() {
+       bool success{};
+       auto sync = m_mode != Page_fetch::SCAN;
+
+       DBUG_PRINT("banana:read_page", ("space: %u, page_no: %u", m_page_id.space(), m_page_id.page_no()));
+
+       if (sync) {
+         success = buf_read_page(m_page_id, m_page_size);
+       } else {
+         dberr_t err;
+
+         auto ret = buf_read_page_low(&err, false, 0, BUF_READ_ANY_PAGE, m_page_id,
+                                      m_page_size, false);
+         success = ret > 0;
+
+         if (success) {
+           srv_stats.buf_pool_reads.add(1);
+         }
+
+         ut_a(err != DB_TABLESPACE_DELETED);
+
+         /* Increment number of I/O operations used for LRU policy. */
+         buf_LRU_stat_inc_io();
+       }
+
+       if (success) {
+         if (sync) {
+           buf_read_ahead_random(m_page_id, m_page_size, ibuf_inside(m_mtr));
+         }
+         m_retries = 0;
+       } else if (m_retries < BUF_PAGE_READ_MAX_RETRIES) {
+         ++m_retries;
+
+         DBUG_EXECUTE_IF("innodb_page_corruption_retries",
+                         m_retries = BUF_PAGE_READ_MAX_RETRIES;);
+       } else {
+         ib::fatal(UT_LOCATION_HERE, ER_IB_MSG_74)
+             << "Unable to read page " << m_page_id << " into the buffer pool after "
+             << BUF_PAGE_READ_MAX_RETRIES
+             << " attempts. The most probable cause of this error may"
+                " be that the table has been corrupted. Or, the table was"
+                " compressed with with an algorithm that is not supported by "
+                "this"
+                " instance. If it is not a decompress failure, you can try to "
+                "fix"
+                " this problem by using innodb_force_recovery. Please "
+                "see " REFMAN " for more details. Aborting...";
+       }
+
+     #if defined UNIV_DEBUG || defined UNIV_BUF_DEBUG
+       ut_ad(fsp_skip_sanity_check(m_page_id.space()) || ++buf_dbg_counter % 5771 ||
+             buf_validate());
+     #endif /* UNIV_DEBUG || UNIV_BUF_DEBUG */
+     }
+   #+END_SRC
 
 ** 线程信息
 1. [[https://dev.mysql.com/doc/dev/mysql-server/8.0.30/classTHD.html][THD]] 类 | [[file:../../../jeanhwea/mysql-server/sql/sql_class.h::class THD : public MDL_context_owner,][class THD]] 记录 Query 连接执行信息
