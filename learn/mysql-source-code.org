@@ -18,6 +18,57 @@
 ** Page & Block
 *** Page
 1. [[https://blog.jcole.us/2013/01/07/the-physical-structure-of-innodb-index-pages/][Page Structure]] | [[https://github.com/jeremycole/innodb_diagrams][innodb_diagrams]] | [[https://github.com/jeremycole/innodb_ruby/][innodb_ruby]]
+*** Page 宏观视图
+1. 页大小通过 UNIV_PAGE_SIZE 空值，通过为 16KB
+   #+BEGIN_SRC c++
+     // lot0types.h
+     const unsigned int UNIV_PAGE_SIZE = 16384; /* 16KB */
+   #+END_SRC
+2. 页都包含 FIL Header (38) + FIL Trailer (8) + 其它
+   [[file:../static/image/2023/0214/135808.png]]
+3. FIL Header/Trailer 的数据结构如下:
+   - checksum 校验值
+   - offset/page_no
+   - Prev/Next Page
+   - Last LSN
+   - Page Type
+   - Flush LSN
+   - Space ID
+   [[file:../static/image/2023/0214/135958.png]]
+
+*** 表空间文件 Space Files
+[[file:../static/image/2023/0214/141326.png]]
+
+1. space file 是一堆 page 的合集
+2. page 是内存管理概念, block 是磁盘管理概念。通常有以下换算关系
+   - 1 page = 1 block = 16KB
+   - 64 * block = 1 * extent = 1MB
+   - FSP_HDR 最大支持 256 extents = 256MB
+3. FSP_HDR 页: 记录表空间头信息/Extent 描述
+   - FSP_HDR 最大支持 256 Extents, 超出到部分通过 XDES 页记录
+   - XDES 和 FSP_HDR 结构一样，只是 Filespace Header 置零
+4. IBUF_BITMAP 页: Insert Buffer 信息
+5. INODE 页: 记录页信息
+
+*** 系统表空间 / Per-table 表空间
+**** 系统表空间
+[[file:../static/image/2023/0214/143424.png]]
+
+1. 系统表空间 space_id = 0
+2. 系统表空间 ibdata1 和常规的表空间类型，只是后续会存储 innodb 的一些系统数据
+   - Insert Buffer
+   - Tracsaction System
+   - Rollback Segment
+   - Data Dictionary
+
+**** Per-table 表表空间
+[[file:../static/image/2023/0214/143339.png]]
+
+1. 每次创建一个表对应一个 ~*.ibd~ 表空间文件
+2. 通过 ~innodb_file_per_table=1~ 配置
+
+
+*** Index 概览
 
    [[file:../static/image/2023/0213/133040.png]]
 
