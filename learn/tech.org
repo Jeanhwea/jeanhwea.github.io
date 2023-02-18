@@ -394,6 +394,27 @@ Slave_SQL_Running: Yes
   ctags -e -R --languages=c,c++ .
 #+END_SRC
 
+* 🐘 Postgres
+** 编译调试 & 初始化数据
+#+BEGIN_SRC sh
+  # 配置调试环境
+  ./configure --prefix=/opt/local/pgsql --enable-debug CFLAGS='-O0'
+  # 编译, 安装
+  make -j8
+  make install
+#+END_SRC
+
+#+BEGIN_SRC sh
+  # 初始化数据库
+  initdb -D /opt/local/pgsql/data
+  # 启动数据库
+  pg_ctl -D /opt/local/pgsql/data -l logfile start
+  # 创建库
+  createdb test01
+  # 链接库
+  psql test01
+#+END_SRC
+
 * 🐳 Docker & kubernetes
 ** minikube
 1. [[https://minikube.sigs.k8s.io/docs/][文档中心]]
