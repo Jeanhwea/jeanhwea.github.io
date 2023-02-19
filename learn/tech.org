@@ -419,21 +419,20 @@ Slave_SQL_Running: Yes
   psql test01
 #+END_SRC
 ** 调试命令
-找到对应的进程，然后使用 lldb attach 上
-#+BEGIN_SRC sh :results output
-  ps aux | grep postgres
+找到对应的进程
+#+BEGIN_SRC sh :results output :exports both
+  $ ps aux | grep postgres
+  jinghuihu        87208   0.0  0.0 34130524    676 s006  S+   12:13PM   0:00.00 grep --color=auto --exclude-dir=.bzr --exclude-dir=CVS --exclude-dir=.git --exclude-dir=.hg --exclude-dir=.svn --exclude-dir=.idea --exclude-dir=.tox postgres
+  jinghuihu        82329   0.0  0.2 34313316  36860   ??  Ss   10:51AM   0:00.16 postgres: jinghuihu test01 [local] idle
+  jinghuihu        82278   0.0  0.0 34309036   1792   ??  Ss   10:51AM   0:00.00 postgres: logical replication launcher
+  jinghuihu        82277   0.0  0.0 34310060   2136   ??  Ss   10:51AM   0:00.02 postgres: autovacuum launcher
+  jinghuihu        82276   0.0  0.0 34307820   5152   ??  Ss   10:51AM   0:00.04 postgres: walwriter
+  jinghuihu        82275   0.0  0.0 34307820   2212   ??  Ss   10:51AM   0:00.06 postgres: background writer
+  jinghuihu        82274   0.0  0.0 34307820   2788   ??  Ss   10:51AM   0:00.01 postgres: checkpointer
+  jinghuihu        80299   0.0  0.1 34309108  14920   ??  Ss   10:41AM   0:00.13 /opt/local/pgsql/bin/postgres -D /opt/local/pgsql/data
 #+END_SRC
 
-#+RESULTS:
-: jinghuihu        83419   0.0  0.0 34130524    652   ??  S    11:07AM   0:00.00 grep postgres
-: jinghuihu        82329   0.0  0.2 34313316  36692   ??  Ss   10:51AM   0:00.16 postgres: jinghuihu test01 [local] idle
-: jinghuihu        82278   0.0  0.0 34309036   1792   ??  Ss   10:51AM   0:00.00 postgres: logical replication launcher
-: jinghuihu        82277   0.0  0.0 34310060   2136   ??  Ss   10:51AM   0:00.01 postgres: autovacuum launcher
-: jinghuihu        82276   0.0  0.0 34307820   5152   ??  Ss   10:51AM   0:00.02 postgres: walwriter
-: jinghuihu        82275   0.0  0.0 34307820   2212   ??  Ss   10:51AM   0:00.04 postgres: background writer
-: jinghuihu        82274   0.0  0.0 34307820   2788   ??  Ss   10:51AM   0:00.01 postgres: checkpointer
-: jinghuihu        80299   0.0  0.1 34309108  14920   ??  Ss   10:41AM   0:00.07 /opt/local/pgsql/bin/postgres -D /opt/local/pgsql/data
-
+找到对应的进程，然后使用 lldb attach 上，打断点
 #+BEGIN_SRC text
   (lldb) attach -p 82329
   Process 82329 stopped
