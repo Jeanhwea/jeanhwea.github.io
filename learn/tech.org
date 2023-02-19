@@ -398,7 +398,7 @@ Slave_SQL_Running: Yes
 ** 编译调试 & 初始化数据
 #+BEGIN_SRC sh
   # 配置调试环境
-  ./configure --prefix=/opt/local/pgsql --enable-debug CFLAGS='-O0'
+  ./configure --prefix=/opt/local/pgsql --enable-cassert --enable-debug CFLAGS="-ggdb -O0 -fno-omit-frame-pointer"
   # 编译, 安装
   make -j8
   make install
@@ -413,6 +413,62 @@ Slave_SQL_Running: Yes
   createdb test01
   # 链接库
   psql test01
+#+END_SRC
+** 调试命令
+找到对应的进程，然后使用 lldb attach 上
+#+BEGIN_SRC sh :results output
+  ps aux | grep postgres
+#+END_SRC
+
+#+RESULTS:
+: jinghuihu        83419   0.0  0.0 34130524    652   ??  S    11:07AM   0:00.00 grep postgres
+: jinghuihu        82329   0.0  0.2 34313316  36692   ??  Ss   10:51AM   0:00.16 postgres: jinghuihu test01 [local] idle
+: jinghuihu        82278   0.0  0.0 34309036   1792   ??  Ss   10:51AM   0:00.00 postgres: logical replication launcher
+: jinghuihu        82277   0.0  0.0 34310060   2136   ??  Ss   10:51AM   0:00.01 postgres: autovacuum launcher
+: jinghuihu        82276   0.0  0.0 34307820   5152   ??  Ss   10:51AM   0:00.02 postgres: walwriter
+: jinghuihu        82275   0.0  0.0 34307820   2212   ??  Ss   10:51AM   0:00.04 postgres: background writer
+: jinghuihu        82274   0.0  0.0 34307820   2788   ??  Ss   10:51AM   0:00.01 postgres: checkpointer
+: jinghuihu        80299   0.0  0.1 34309108  14920   ??  Ss   10:41AM   0:00.07 /opt/local/pgsql/bin/postgres -D /opt/local/pgsql/data
+
+#+BEGIN_SRC text
+  (lldb) attach -p 82329
+  Process 82329 stopped
+  ,* thread #1, queue = 'com.apple.main-thread', stop reason = signal SIGSTOP
+      frame #0: 0x00007ff810e892fe libsystem_kernel.dylib`kevent + 10
+  libsystem_kernel.dylib`kevent:
+  ->  0x7ff810e892fe <+10>: jae    0x7ff810e89308            ; <+20>
+      0x7ff810e89300 <+12>: movq   %rax, %rdi
+      0x7ff810e89303 <+15>: jmp    0x7ff810e84dc2            ; cerror_nocancel
+      0x7ff810e89308 <+20>: retq
+  Target 0: (postgres) stopped.
+  Executable module set to "/opt/local/pgsql/bin/postgres".
+  Architecture set to: x86_64h-apple-macosx-.
+  (lldb) b exec_simple_query
+  Breakpoint 1: where = postgres`exec_simple_query + 29 at postgres.c:994:21, address = 0x000000010f17af6d
+  (lldb) c
+  Process 82329 resuming
+  Process 82329 stopped
+  ,* thread #1, queue = 'com.apple.main-thread', stop reason = breakpoint 1.1
+      frame #0: 0x000000010f17af6d postgres`exec_simple_query + 29 at /Users/jinghuihu/code/jeanhwea/postgres/src/backend/tcop/postgres.c:994
+     991  static void
+     992  exec_simple_query(const char *query_string)
+     993  {
+  -> 994      CommandDest dest = whereToSendOutput;
+                                 ^
+     995      MemoryContext oldcontext;
+     996      List	   *parsetree_list;
+     997      ListCell   *parsetree_item;
+  Target 0: (postgres) stopped.
+  (lldb)  bt
+  ,* thread #1, queue = 'com.apple.main-thread', stop reason = breakpoint 1.1
+    ,* frame #0: 0x000000010f17af6d postgres`exec_simple_query + 29 at /Users/jinghuihu/code/jeanhwea/postgres/src/backend/tcop/postgres.c:994
+      frame #1: 0x000000010f17a633 postgres`PostgresMain + 2243 at /Users/jinghuihu/code/jeanhwea/postgres/src/backend/tcop/postgres.c:4593
+      frame #2: 0x000000010f08d0d2 postgres`BackendRun + 50 at /Users/jinghuihu/code/jeanhwea/postgres/src/backend/postmaster/postmaster.c:4511
+      frame #3: 0x000000010f08c6bc postgres`BackendStartup + 524 at /Users/jinghuihu/code/jeanhwea/postgres/src/backend/postmaster/postmaster.c:4239
+      frame #4: 0x000000010f08b4ec postgres`ServerLoop + 716 at /Users/jinghuihu/code/jeanhwea/postgres/src/backend/postmaster/postmaster.c:1806
+      frame #5: 0x000000010f088dc7 postgres`PostmasterMain + 6471 at /Users/jinghuihu/code/jeanhwea/postgres/src/backend/postmaster/postmaster.c:1478
+      frame #6: 0x000000010ef6eda0 postgres`main + 816 at /Users/jinghuihu/code/jeanhwea/postgres/src/backend/main/main.c:202
+      frame #7: 0x00007ff810b92310 dyld`start + 2432
 #+END_SRC
 
 * 🐳 Docker & kubernetes
