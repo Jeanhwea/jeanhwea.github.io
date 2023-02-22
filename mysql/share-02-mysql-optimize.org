@@ -5,6 +5,54 @@
 #+HTML_LINK_UP: ../readme.html
 #+HTML_LINK_HOME: ../index.html
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+PROPERTY: header-args:sql :dbhost 127.0.0.1 :database employees :engine mysql :dbuser root :exports both
 
 
-* starting here
+* SQL 执行流程
+参考 [[https://dev.mysql.com/doc/dev/mysql-server/8.0.30/PAGE_SQL_EXECUTION.html][执行流程]]
+
+[[file:../static/image/2023/0222/193853.png]]
+
+* Explain
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json select emp_no from employees where emp_no < 11111\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "224.08" // => cost值
+    },
+    "table": {
+      "table_name": "employees",
+      "access_type": "range", // 范围扫描
+      "possible_keys": [
+        "PRIMARY"
+      ],
+      "key": "PRIMARY", // 命中主键
+      "used_key_parts": [
+        "emp_no"
+      ],
+      "key_length": "4",
+      "rows_examined_per_scan": 1110,
+      "rows_produced_per_join": 1110,
+      "filtered": "100.00",
+      "using_index": true,
+      "cost_info": {
+        "read_cost": "113.08",
+        "eval_cost": "111.00",
+        "prefix_cost": "224.08",
+        "data_read_per_join": "147K"
+      },
+      "used_columns": [
+        "emp_no"
+      ],
+      "attached_condition": "(`employees`.`employees`.`emp_no` < 11111)"
+    }
+  }
+}
+#+end_example
