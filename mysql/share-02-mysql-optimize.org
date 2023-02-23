@@ -874,3 +874,116 @@ MySQL 8.0 的 cose 配置常量如下所示
 相关统计信息如下：
 
 [[file:../static/image/2023/0223/201742.png]]
+
+*** cost 常量配置实验
+默认执行 SQL 的花费
+#+BEGIN_SRC sql :results output
+  explain format=json select * from country where continent='asia' and population > 5000000\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "25.65" // 总体 cost 值
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "ALL",
+      "rows_examined_per_scan": 239,
+      "rows_produced_per_join": 11,
+      "filtered": "4.76",
+      "cost_info": {
+        "read_cost": "24.51",
+        "eval_cost": "1.14",
+        "prefix_cost": "25.65",
+        "data_read_per_join": "10K"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ],
+      "attached_condition": "((`world`.`country`.`Continent` = 'asia') and (`world`.`country`.`Population` > 5000000))"
+    }
+  }
+}
+#+end_example
+
+将 row_evaluate_cost 从默认值 0.1 修改成 1
+#+BEGIN_SRC sql :results none
+  update mysql.server_cost set cost_value=1 where cost_name='row_evaluate_cost';
+  flush optimizer_costs;
+#+END_SRC
+
+#+BEGIN_SRC sql :results output
+  explain format=json select * from country where continent='asia' and population > 5000000\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "240.75" // 总体 cost 提升了 10 倍
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "ALL",
+      "rows_examined_per_scan": 239,
+      "rows_produced_per_join": 11,
+      "filtered": "4.76",
+      "cost_info": {
+        "read_cost": "229.37",
+        "eval_cost": "11.38",
+        "prefix_cost": "240.75",
+        "data_read_per_join": "10K"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ],
+      "attached_condition": "((`world`.`country`.`Continent` = 'asia') and (`world`.`country`.`Population` > 5000000))"
+    }
+  }
+}
+#+end_example
+
+恢复默认值, 防止影响后续实验
+#+BEGIN_SRC sql
+  update mysql.server_cost set cost_value=null where cost_name='row_evaluate_cost';
+  flush optimizer_costs;
+#+END_SRC
+
+#+RESULTS:
+|---|
