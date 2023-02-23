@@ -1740,5 +1740,121 @@ EXPLAIN: {
 }
 #+end_example
 
+下面总结了一些常见的索引优化原则
+1. Left most rule. An index on (First Name, Last Name) can be used to also
+   satisfy queries that need an index on (First Name), but not on queries that
+   require an index on (Last Name). Try and design composite indexes in such a
+   way that they can be reused by the greatest number of queries possible.
+2. Ranges to the right. An index on (Age, First Name) can not be used to satisfy
+   a query in the form of WHERE age BETWEEN x and y AND first_name = 'John'. Or
+   to state more specifically: the rest of the composite index will not be used
+   after the first range condition.
+3. Most selective columns to the left. Think about how you can eliminate work in
+   the index as fast as possible. This usually has the effect of improving
+   memory fit because fewer index pages need to be accessed.
+4. Be careful changing index order. Mixing ASC or DESC may affect how much of a
+   composite index can be used.
 
 *** Covering Indexes
+添加 (洲, 人口数, 名称) 联合索引
+#+BEGIN_SRC sql
+  alter table country add index c_p_n(continent, population, name);
+#+END_SRC
+
+添加索引前
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select name from country where population > 5000000 and continent='Asia'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "14.66"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "range",
+      "possible_keys": [
+        "c_p",
+        "p_c"
+      ],
+      "key": "c_p",
+      "used_key_parts": [
+        "Continent",
+        "Population"
+      ],
+      "key_length": "5",
+      "rows_examined_per_scan": 32,
+      "rows_produced_per_join": 32,
+      "filtered": "100.00",
+      "index_condition": "((`world`.`country`.`Continent` = 'Asia') and (`world`.`country`.`Population` > 5000000))",
+      "cost_info": {
+        "read_cost": "11.46",
+        "eval_cost": "3.20",
+        "prefix_cost": "14.66",
+        "data_read_per_join": "30K"
+      },
+      "used_columns": [
+        "Name",
+        "Continent",
+        "Population"
+      ]
+    }
+  }
+}
+#+end_example
+
+添加 c_p_n 索引后
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select name from country where population > 5000000 and continent='Asia'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "6.87"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "range",
+      "possible_keys": [
+        "c_p",
+        "p_c",
+        "c_p_n"
+      ],
+      "key": "c_p_n",
+      "used_key_parts": [
+        "Continent",
+        "Population"
+      ],
+      "key_length": "5",
+      "rows_examined_per_scan": 32,
+      "rows_produced_per_join": 32,
+      "filtered": "100.00",
+      "using_index": true, // => 表示使用覆盖索引
+      "cost_info": {
+        "read_cost": "3.67",
+        "eval_cost": "3.20",
+        "prefix_cost": "6.87",
+        "data_read_per_join": "30K"
+      },
+      "used_columns": [
+        "Name",
+        "Continent",
+        "Population"
+      ],
+      "attached_condition": "((`world`.`country`.`Continent` = 'Asia') and (`world`.`country`.`Population` > 5000000))"
+    }
+  }
+}
+#+end_example
