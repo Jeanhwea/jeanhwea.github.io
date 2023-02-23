@@ -1607,4 +1607,138 @@ EXPLAIN: {
 #+END_SRC
 
 *** Composite Indexes
+添加两个联合索引
+#+BEGIN_SRC sql
+  alter table country add index c_p(continent, population);
+  alter table country add index p_c(population, continent);
+#+END_SRC
+
+#+BEGIN_SRC sql
+  alter table country drop index c;
+  alter table country drop index p;
+#+END_SRC
+
+Cost 值对比
+| Index |  Cost |
+|-------+-------|
+| p_c   | 48.86 |
+| c_p   | 14.66 |
+
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from country force index(p_c) where population > 5000000 and continent='Asia'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "48.86"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "range",
+      "possible_keys": [
+        "p_c"
+      ],
+      "key": "p_c",
+      "used_key_parts": [
+        "Population"
+      ],
+      "key_length": "4",
+      "rows_examined_per_scan": 108,
+      "rows_produced_per_join": 15,
+      "filtered": "14.29",
+      "index_condition": "((`world`.`country`.`Continent` = 'Asia') and (`world`.`country`.`Population` > 5000000))",
+      "cost_info": {
+        "read_cost": "47.32",
+        "eval_cost": "1.54",
+        "prefix_cost": "48.86",
+        "data_read_per_join": "14K"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ]
+    }
+  }
+}
+#+end_example
+
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from country where population > 5000000 and continent='Asia'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "14.66"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "range",
+      "possible_keys": [
+        "c_p",
+        "p_c"
+      ],
+      "key": "c_p",
+      "used_key_parts": [
+        "Continent",
+        "Population"
+      ],
+      "key_length": "5",
+      "rows_examined_per_scan": 32,
+      "rows_produced_per_join": 32,
+      "filtered": "100.00",
+      "index_condition": "((`world`.`country`.`Continent` = 'Asia') and (`world`.`country`.`Population` > 5000000))",
+      "cost_info": {
+        "read_cost": "11.46",
+        "eval_cost": "3.20",
+        "prefix_cost": "14.66",
+        "data_read_per_join": "30K"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ]
+    }
+  }
+}
+#+end_example
+
+
 *** Covering Indexes
