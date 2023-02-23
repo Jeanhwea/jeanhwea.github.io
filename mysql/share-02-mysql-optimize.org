@@ -6,6 +6,7 @@
 #+HTML_LINK_HOME: ../index.html
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
 #+PROPERTY: header-args:sql :dbhost 127.0.0.1 :database world :engine mysql :dbuser root :exports both
+#+STARTUP: indent cache num inlineimages
 
 
 * 引言 MySQL Architecture
@@ -572,4 +573,22 @@ Transformation 过后生成的结果 expanded_query 如下
     `country`
   where ((`country`.`Population` > 5000000)
     and (`country`.`Continent` = 'Asia'))
+#+END_SRC
+
+*** 主键相关
+#+BEGIN_SRC sql
+  -- 命中主键
+  select * from country where code = 'CAN';
+  -- 未命中主键
+  select * from country where code = 'XYZ';
+#+END_SRC
+[[file:../static/image/2023/0223/111928.png]]
+
+*** 其它
+#+BEGIN_SRC sql
+  select * from country where code = 'CAN' and 1 = 0;
+
+  select city.* from city, (select * from country where continent = 'Asia') as country where country.code = City.countryCode and country.population > 5000000;
+
+  create view countries_in_asia as select * from country where continent = 'asia'; select * from countries_in_asia where population > 5000000;
 #+END_SRC
