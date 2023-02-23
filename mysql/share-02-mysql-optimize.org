@@ -387,7 +387,7 @@ Optimize Trace 工具使用步骤
   1 row in set (0.01 sec)
 #+END_EXAMPLE
 
-* 主题 Topic
+* 主题 Topics
 ** Logical Transformations
 *** 前置说明
 Transformation 可以理解对输入的 Query 字符串进行转化，我们以例子进行分析
@@ -1867,5 +1867,963 @@ EXPLAIN: {
 [[file:../static/image/2023/0223/235710.png]]
 
 同事即使固定一个值，不同索引执行的 Cost 也可能是不一样的
-
 [[file:../static/image/2023/0224/000023.png]]
+** Subqueries
+*** Scalar Subquery
+Scalar Subquery 指只返回一条数据的子查询，这种查询通常可以被优化成缓存
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from country where code = (select countrycode from city where name='Toronto')\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "1.00"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "const",
+      "possible_keys": [
+        "PRIMARY"
+      ],
+      "key": "PRIMARY",
+      "used_key_parts": [
+        "Code"
+      ],
+      "key_length": "12",
+      "ref": [
+        "const"
+      ],
+      "rows_examined_per_scan": 1,
+      "rows_produced_per_join": 1,
+      "filtered": "100.00",
+      "cost_info": {
+        "read_cost": "0.00",
+        "eval_cost": "0.10",
+        "prefix_cost": "0.00",
+        "data_read_per_join": "968"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ]
+    },
+    "optimized_away_subqueries": [
+      {
+        "dependent": false,
+        "cacheable": true,
+        "query_block": {
+          "select_id": 2,
+          "cost_info": {
+            "query_cost": "410.85"
+          },
+          "table": {
+            "table_name": "city",
+            "access_type": "ALL", // => city 全表扫描
+            "rows_examined_per_scan": 4046,
+            "rows_produced_per_join": 404,
+            "filtered": "10.00",
+            "cost_info": {
+              "read_cost": "370.39",
+              "eval_cost": "40.46",
+              "prefix_cost": "410.85",
+              "data_read_per_join": "97K"
+            },
+            "used_columns": [
+              "Name",
+              "CountryCode"
+            ],
+            "attached_condition": "(`world`.`city`.`Name` = 'Toronto')"
+          }
+        }
+      }
+    ]
+  }
+}
+#+end_example
+
+添加一个索引来改善标量查询
+#+BEGIN_SRC sql
+  alter table city add index n(name);
+#+END_SRC
+
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from country where code = (select countrycode from city where name='Toronto')\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "1.00"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "const",
+      "possible_keys": [
+        "PRIMARY"
+      ],
+      "key": "PRIMARY",
+      "used_key_parts": [
+        "Code"
+      ],
+      "key_length": "12",
+      "ref": [
+        "const"
+      ],
+      "rows_examined_per_scan": 1,
+      "rows_produced_per_join": 1,
+      "filtered": "100.00",
+      "cost_info": {
+        "read_cost": "0.00",
+        "eval_cost": "0.10",
+        "prefix_cost": "0.00",
+        "data_read_per_join": "968"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ]
+    },
+    "optimized_away_subqueries": [
+      {
+        "dependent": false,
+        "cacheable": true,
+        "query_block": {
+          "select_id": 2,
+          "cost_info": {
+            "query_cost": "0.35"
+          },
+          "table": {
+            "table_name": "city",
+            "access_type": "ref", // 添加索引后，全表扫描优化成了走索引
+            "possible_keys": [
+              "n"
+            ],
+            "key": "n",
+            "used_key_parts": [
+              "Name"
+            ],
+            "key_length": "140",
+            "ref": [
+              "const"
+            ],
+            "rows_examined_per_scan": 1,
+            "rows_produced_per_join": 1,
+            "filtered": "100.00",
+            "index_condition": "(`world`.`city`.`Name` = 'Toronto')",
+            "cost_info": {
+              "read_cost": "0.25",
+              "eval_cost": "0.10",
+              "prefix_cost": "0.35",
+              "data_read_per_join": "248"
+            },
+            "used_columns": [
+              "Name",
+              "CountryCode"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+#+end_example
+*** IN Subquery (Unique)
+code 是 country 表的唯一索引
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from city where countrycode in (select code from country where continent = 'Asia')\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "316.67"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "country",
+          "access_type": "ref",
+          "possible_keys": [
+            "PRIMARY",
+            "c"
+          ],
+          "key": "c", // => 走 c 索引
+          "used_key_parts": [
+            "Continent"
+          ],
+          "key_length": "1",
+          "ref": [
+            "const"
+          ],
+          "rows_examined_per_scan": 51,
+          "rows_produced_per_join": 51,
+          "filtered": "100.00",
+          "using_index": true, // => 索引覆盖
+          "cost_info": {
+            "read_cost": "0.27",
+            "eval_cost": "5.10",
+            "prefix_cost": "5.37",
+            "data_read_per_join": "48K"
+          },
+          "used_columns": [
+            "Code",
+            "Continent"
+          ],
+          "attached_condition": "(`world`.`country`.`Continent` = 'Asia')"
+        }
+      },
+      {
+        "table": {
+          "table_name": "city",
+          "access_type": "ref",
+          "possible_keys": [
+            "CountryCode"
+          ],
+          "key": "CountryCode",
+          "used_key_parts": [
+            "CountryCode"
+          ],
+          "key_length": "12",
+          "ref": [
+            "world.country.Code"
+          ],
+          "rows_examined_per_scan": 17,
+          "rows_produced_per_join": 889,
+          "filtered": "100.00",
+          "cost_info": {
+            "read_cost": "222.36",
+            "eval_cost": "88.94",
+            "prefix_cost": "316.67",
+            "data_read_per_join": "215K"
+          },
+          "used_columns": [
+            "ID",
+            "Name",
+            "CountryCode",
+            "District",
+            "Population"
+          ]
+        }
+      }
+    ]
+  }
+}
+#+end_example
+
+上述的子查询会有如下几步的转化
+#+BEGIN_SRC json
+  "join_preparation": {
+    "select#": 1,
+    "steps": [
+      {
+        "join_preparation": {
+          "select#": 2,
+          "steps": [
+            {
+              "expanded_query": "/* select#2 */ select `country`.`Code` from `country` where (`country`.`Continent` = 'Asia')"
+            }
+          ]
+        }
+      },
+      {
+        "expanded_query": "/* select#1 */ select `city`.`ID` AS `ID`,`city`.`Name` AS `Name`,`city`.`CountryCode` AS `CountryCode`,`city`.`District` AS `District`,`city`.`Population` AS `Population` from `city` where `city`.`CountryCode` in (/* select#2 */ select `country`.`Code` from `country` where (`country`.`Continent` = 'Asia'))"
+      },
+      {
+        "transformation": {
+          "select#": 2,
+          "from": "IN (SELECT)",
+          "to": "semijoin",
+          "chosen": true,
+          "transformation_to_semi_join": {
+            "subquery_predicate": "`city`.`CountryCode` in (/* select#2 */ select `country`.`Code` from `country` where (`country`.`Continent` = 'Asia'))",
+            "embedded in": "WHERE",
+            "evaluating_constant_semijoin_conditions": [
+            ],
+            "semi-join condition": "((`country`.`Continent` = 'Asia') and (`city`.`CountryCode` = `country`.`Code`))",
+            "decorrelated_predicates": [
+              {
+                "outer": "`city`.`CountryCode`",
+                "inner": "`country`.`Code`"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "transformations_to_nested_joins": {
+          "transformations": [
+            "semijoin"
+          ],
+          "expanded_query": "/* select#1 */ select `city`.`ID` AS `ID`,`city`.`Name` AS `Name`,`city`.`CountryCode` AS `CountryCode`,`city`.`District` AS `District`,`city`.`Population` AS `Population` from `city` semi join (`country`) where ((`country`.`Continent` = 'Asia') and (`city`.`CountryCode` = `country`.`Code`))"
+        }
+      }
+    ]
+  }
+#+END_SRC
+
+最终转化成 ~semi-join~
+#+BEGIN_SRC sql
+  /* select#1 */
+  select
+    `city`.`ID` as `ID`,
+    `city`.`Name` as `Name`,
+    `city`.`CountryCode` as `CountryCode`,
+    `city`.`District` as `District`,
+    `city`.`Population` as `Population`
+  from
+    `city` semi join (`country`)
+  where ((`country`.`Continent` = 'Asia')
+    and (`city`.`CountryCode` = `country`.`Code`));
+#+END_SRC
+
+*** IN Subquery (Non-Unique)
+国家的官方语言可能不止一种
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from country where code in (select countrycode from countrylanguage where isofficial=1)\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "186.54"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "country",
+          "access_type": "ALL",
+          "possible_keys": [
+            "PRIMARY"
+          ],
+          "rows_examined_per_scan": 239,
+          "rows_produced_per_join": 239,
+          "filtered": "100.00",
+          "cost_info": {
+            "read_cost": "1.75",
+            "eval_cost": "23.90",
+            "prefix_cost": "25.65",
+            "data_read_per_join": "225K"
+          },
+          "used_columns": [
+            "Code",
+            "Name",
+            "Continent",
+            "Region",
+            "SurfaceArea",
+            "IndepYear",
+            "Population",
+            "LifeExpectancy",
+            "GNP",
+            "GNPOld",
+            "LocalName",
+            "GovernmentForm",
+            "HeadOfState",
+            "Capital",
+            "Code2"
+          ]
+        }
+      },
+      {
+        "table": {
+          "table_name": "countrylanguage",
+          "access_type": "ref",
+          "possible_keys": [
+            "PRIMARY",
+            "CountryCode"
+          ],
+          "key": "PRIMARY",
+          "used_key_parts": [
+            "CountryCode"
+          ],
+          "key_length": "12",
+          "ref": [
+            "world.country.Code"
+          ],
+          "rows_examined_per_scan": 4,
+          "rows_produced_per_join": 239,
+          "filtered": "50.00",
+          "first_match": "country",
+          "cost_info": {
+            "read_cost": "59.96",
+            "eval_cost": "23.90",
+            "prefix_cost": "186.54",
+            "data_read_per_join": "33K"
+          },
+          "used_columns": [
+            "CountryCode",
+            "IsOfficial"
+          ],
+          "attached_condition": "(`world`.`countrylanguage`.`IsOfficial` = 1)"
+        }
+      }
+    ]
+  }
+}
+#+end_example
+
+查看一下 Trace 日志
+#+BEGIN_SRC json
+  {
+    "steps": [
+      {
+        "join_preparation": {
+          "select#": 1,
+          "steps": [
+            {
+              "join_preparation": {
+                "select#": 2,
+                "steps": [
+                  {
+                    "expanded_query": "/* select#2 */ select `countrylanguage`.`CountryCode` from `countrylanguage` where (`countrylanguage`.`IsOfficial` = 1)"
+                  }
+                ]
+              }
+            },
+            {
+              "expanded_query": "/* select#1 */ select `country`.`Code` AS `Code`,`country`.`Name` AS `Name`,`country`.`Continent` AS `Continent`,`country`.`Region` AS `Region`,`country`.`SurfaceArea` AS `SurfaceArea`,`country`.`IndepYear` AS `IndepYear`,`country`.`Population` AS `Population`,`country`.`LifeExpectancy` AS `LifeExpectancy`,`country`.`GNP` AS `GNP`,`country`.`GNPOld` AS `GNPOld`,`country`.`LocalName` AS `LocalName`,`country`.`GovernmentForm` AS `GovernmentForm`,`country`.`HeadOfState` AS `HeadOfState`,`country`.`Capital` AS `Capital`,`country`.`Code2` AS `Code2` from `country` where `country`.`Code` in (/* select#2 */ select `countrylanguage`.`CountryCode` from `countrylanguage` where (`countrylanguage`.`IsOfficial` = 1))"
+            },
+            {
+              "transformation": {
+                "select#": 2,
+                "from": "IN (SELECT)",
+                "to": "semijoin",
+                "chosen": true,
+                "transformation_to_semi_join": {
+                  "subquery_predicate": "`country`.`Code` in (/* select#2 */ select `countrylanguage`.`CountryCode` from `countrylanguage` where (`countrylanguage`.`IsOfficial` = 1))",
+                  "embedded in": "WHERE",
+                  "evaluating_constant_semijoin_conditions": [],
+                  "semi-join condition": "((`countrylanguage`.`IsOfficial` = 1) and (`country`.`Code` = `countrylanguage`.`CountryCode`))",
+                  "decorrelated_predicates": [
+                    {
+                      "outer": "`country`.`Code`",
+                      "inner": "`countrylanguage`.`CountryCode`"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "transformations_to_nested_joins": {
+                "transformations": [
+                  "semijoin"
+                ],
+                "expanded_query": "/* select#1 */ select `country`.`Code` AS `Code`,`country`.`Name` AS `Name`,`country`.`Continent` AS `Continent`,`country`.`Region` AS `Region`,`country`.`SurfaceArea` AS `SurfaceArea`,`country`.`IndepYear` AS `IndepYear`,`country`.`Population` AS `Population`,`country`.`LifeExpectancy` AS `LifeExpectancy`,`country`.`GNP` AS `GNP`,`country`.`GNPOld` AS `GNPOld`,`country`.`LocalName` AS `LocalName`,`country`.`GovernmentForm` AS `GovernmentForm`,`country`.`HeadOfState` AS `HeadOfState`,`country`.`Capital` AS `Capital`,`country`.`Code2` AS `Code2` from `country` semi join (`countrylanguage`) where ((`countrylanguage`.`IsOfficial` = 1) and (`country`.`Code` = `countrylanguage`.`CountryCode`))"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "join_optimization": {
+          "select#": 1,
+          "steps": [
+            {
+              "condition_processing": {
+                "condition": "WHERE",
+                "original_condition": "((`countrylanguage`.`IsOfficial` = 1) and (`country`.`Code` = `countrylanguage`.`CountryCode`))",
+                "steps": [
+                  {
+                    "transformation": "equality_propagation",
+                    "resulting_condition": "((`countrylanguage`.`IsOfficial` = 1) and multiple equal(`country`.`Code`, `countrylanguage`.`CountryCode`))"
+                  },
+                  {
+                    "transformation": "constant_propagation",
+                    "resulting_condition": "((`countrylanguage`.`IsOfficial` = 1) and multiple equal(`country`.`Code`, `countrylanguage`.`CountryCode`))"
+                  },
+                  {
+                    "transformation": "trivial_condition_removal",
+                    "resulting_condition": "((`countrylanguage`.`IsOfficial` = 1) and multiple equal(`country`.`Code`, `countrylanguage`.`CountryCode`))"
+                  }
+                ]
+              }
+            },
+            {
+              "substitute_generated_columns": {}
+            },
+            {
+              "table_dependencies": [
+                {
+                  "table": "`country`",
+                  "row_may_be_null": false,
+                  "map_bit": 0,
+                  "depends_on_map_bits": []
+                },
+                {
+                  "table": "`countrylanguage`",
+                  "row_may_be_null": false,
+                  "map_bit": 1,
+                  "depends_on_map_bits": []
+                }
+              ]
+            },
+            {
+              "ref_optimizer_key_uses": [
+                {
+                  "table": "`country`",
+                  "field": "Code",
+                  "equals": "`countrylanguage`.`CountryCode`",
+                  "null_rejecting": true
+                },
+                {
+                  "table": "`countrylanguage`",
+                  "field": "CountryCode",
+                  "equals": "`country`.`Code`",
+                  "null_rejecting": true
+                },
+                {
+                  "table": "`countrylanguage`",
+                  "field": "CountryCode",
+                  "equals": "`country`.`Code`",
+                  "null_rejecting": true
+                }
+              ]
+            },
+            {
+              "pulled_out_semijoin_tables": []
+            },
+            {
+              "rows_estimation": [
+                {
+                  "table": "`country`",
+                  "table_scan": {
+                    "rows": 239,
+                    "cost": 1.75
+                  }
+                },
+                {
+                  "table": "`countrylanguage`",
+                  "table_scan": {
+                    "rows": 984,
+                    "cost": 1.5
+                  }
+                }
+              ]
+            },
+            {
+              "execution_plan_for_potential_materialization": {
+                "steps": [
+                  {
+                    "considered_execution_plans": [
+                      {
+                        "plan_prefix": [],
+                        "table": "`countrylanguage`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "CountryCode",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 984,
+                              "filtering_effect": [],
+                              "final_filtering_effect": 0.5,
+                              "access_type": "scan",
+                              "resulting_rows": 492,
+                              "cost": 99.9,
+                              "chosen": true
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 492,
+                        "cost_for_plan": 99.9,
+                        "chosen": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "considered_execution_plans": [
+                {
+                  "plan_prefix": [],
+                  "table": "`country`",
+                  "best_access_path": {
+                    "considered_access_paths": [
+                      {
+                        "access_type": "ref",
+                        "index": "PRIMARY",
+                        "usable": false,
+                        "chosen": false
+                      },
+                      {
+                        "rows_to_scan": 239,
+                        "filtering_effect": [],
+                        "final_filtering_effect": 1,
+                        "access_type": "scan",
+                        "resulting_rows": 239,
+                        "cost": 25.65,
+                        "chosen": true
+                      }
+                    ]
+                  },
+                  "condition_filtering_pct": 100,
+                  "rows_for_plan": 239,
+                  "cost_for_plan": 25.65,
+                  "semijoin_strategy_choice": [],
+                  "rest_of_plan": [
+                    {
+                      "plan_prefix": [
+                        "`country`"
+                      ],
+                      "table": "`countrylanguage`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "access_type": "ref",
+                            "index": "PRIMARY",
+                            "rows": 4.22318,
+                            "cost": 160.894,
+                            "chosen": true
+                          },
+                          {
+                            "access_type": "ref",
+                            "index": "CountryCode",
+                            "rows": 4.22318,
+                            "cost": 353.269,
+                            "chosen": false
+                          },
+                          {
+                            "rows_to_scan": 984,
+                            "filtering_effect": [],
+                            "final_filtering_effect": 0.5,
+                            "access_type": "scan",
+                            "using_join_cache": true,
+                            "buffers_needed": 1,
+                            "resulting_rows": 492,
+                            "cost": 11853.9,
+                            "chosen": false
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 50,
+                      "rows_for_plan": 504.67,
+                      "cost_for_plan": 186.544,
+                      "semijoin_strategy_choice": [
+                        {
+                          "strategy": "FirstMatch",
+                          "recalculate_access_paths_and_cost": {
+                            "tables": []
+                          },
+                          "cost": 186.544,
+                          "rows": 239,
+                          "chosen": true
+                        },
+                        {
+                          "strategy": "MaterializeLookup",
+                          "cost": 199.65,
+                          "rows": 239,
+                          "duplicate_tables_left": false,
+                          "chosen": false
+                        },
+                        {
+                          "strategy": "DuplicatesWeedout",
+                          "cost": 261.911,
+                          "rows": 239,
+                          "duplicate_tables_left": false,
+                          "chosen": false
+                        }
+                      ],
+                      "chosen": true
+                    }
+                  ]
+                },
+                {
+                  "plan_prefix": [],
+                  "table": "`countrylanguage`",
+                  "best_access_path": {
+                    "considered_access_paths": [
+                      {
+                        "access_type": "ref",
+                        "index": "PRIMARY",
+                        "usable": false,
+                        "chosen": false
+                      },
+                      {
+                        "access_type": "ref",
+                        "index": "CountryCode",
+                        "usable": false,
+                        "chosen": false
+                      },
+                      {
+                        "rows_to_scan": 984,
+                        "filtering_effect": [],
+                        "final_filtering_effect": 0.5,
+                        "access_type": "scan",
+                        "resulting_rows": 492,
+                        "cost": 99.9,
+                        "chosen": true
+                      }
+                    ]
+                  },
+                  "condition_filtering_pct": 100,
+                  "rows_for_plan": 492,
+                  "cost_for_plan": 99.9,
+                  "semijoin_strategy_choice": [
+                    {
+                      "strategy": "MaterializeScan",
+                      "choice": "deferred"
+                    }
+                  ],
+                  "rest_of_plan": [
+                    {
+                      "plan_prefix": [
+                        "`countrylanguage`"
+                      ],
+                      "table": "`country`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "access_type": "eq_ref",
+                            "index": "PRIMARY",
+                            "rows": 1,
+                            "cost": 172.2,
+                            "chosen": true,
+                            "cause": "clustered_pk_chosen_by_heuristics"
+                          },
+                          {
+                            "rows_to_scan": 239,
+                            "filtering_effect": [],
+                            "final_filtering_effect": 1,
+                            "access_type": "scan",
+                            "using_join_cache": true,
+                            "buffers_needed": 1,
+                            "resulting_rows": 239,
+                            "cost": 11760.6,
+                            "chosen": false
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 492,
+                      "cost_for_plan": 272.1,
+                      "semijoin_strategy_choice": [
+                        {
+                          "strategy": "LooseScan",
+                          "recalculate_access_paths_and_cost": {
+                            "tables": [
+                              {
+                                "table": "`countrylanguage`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "PRIMARY",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "CountryCode",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "rows_to_scan": 984,
+                                      "filtering_effect": [],
+                                      "final_filtering_effect": 0.5,
+                                      "access_type": "scan",
+                                      "resulting_rows": 492,
+                                      "cost": 99.9,
+                                      "chosen": true
+                                    }
+                                  ]
+                                },
+                                "unknown_key_1": {
+                                  "searching_loose_scan_index": {
+                                    "indexes": [
+                                      {
+                                        "index": "PRIMARY",
+                                        "ref_possible": false,
+                                        "covering_scan_possible": false
+                                      },
+                                      {
+                                        "index": "CountryCode",
+                                        "ref_possible": false,
+                                        "covering_scan_possible": false
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          "chosen": false
+                        },
+                        {
+                          "strategy": "MaterializeScan",
+                          "recalculate_access_paths_and_cost": {
+                            "tables": [
+                              {
+                                "table": "`country`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "eq_ref",
+                                      "index": "PRIMARY",
+                                      "rows": 1,
+                                      "cost": 172.2,
+                                      "chosen": true,
+                                      "cause": "clustered_pk_chosen_by_heuristics"
+                                    },
+                                    {
+                                      "rows_to_scan": 239,
+                                      "filtering_effect": [],
+                                      "final_filtering_effect": 1,
+                                      "access_type": "scan",
+                                      "using_join_cache": true,
+                                      "buffers_needed": 1,
+                                      "resulting_rows": 239,
+                                      "cost": 11760.6,
+                                      "chosen": false
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "cost": 371.5,
+                          "rows": 1,
+                          "duplicate_tables_left": true,
+                          "chosen": true
+                        },
+                        {
+                          "strategy": "DuplicatesWeedout",
+                          "cost": 346.2,
+                          "rows": 239,
+                          "duplicate_tables_left": false,
+                          "chosen": true
+                        }
+                      ],
+                      "pruned_by_cost": true
+                    }
+                  ]
+                },
+                {
+                  "final_semijoin_strategy": "FirstMatch", // => 最终 semi-join 策略
+                  "recalculate_access_paths_and_cost": {
+                    "tables": []
+                  }
+                }
+              ]
+            },
+            {
+              "attaching_conditions_to_tables": {
+                "original_condition": "((`countrylanguage`.`CountryCode` = `country`.`Code`) and (`countrylanguage`.`IsOfficial` = 1))",
+                "attached_conditions_computation": [],
+                "attached_conditions_summary": [
+                  {
+                    "table": "`country`",
+                    "attached": null
+                  },
+                  {
+                    "table": "`countrylanguage`",
+                    "attached": "((`countrylanguage`.`CountryCode` = `country`.`Code`) and (`countrylanguage`.`IsOfficial` = 1))"
+                  }
+                ]
+              }
+            },
+            {
+              "finalizing_table_conditions": [
+                {
+                  "table": "`countrylanguage`",
+                  "original_table_condition": "((`countrylanguage`.`CountryCode` = `country`.`Code`) and (`countrylanguage`.`IsOfficial` = 1))",
+                  "final_table_condition   ": "(`countrylanguage`.`IsOfficial` = 1)"
+                }
+              ]
+            },
+            {
+              "refine_plan": [
+                {
+                  "table": "`country`"
+                },
+                {
+                  "table": "`countrylanguage`"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "join_execution": {
+          "select#": 1,
+          "steps": []
+        }
+      }
+    ]
+  }
+#+END_SRC
+
+Semi-join 的执行概括来看就是想办法把内层的查询进行去重。在写我们自己的 Semi-join
+执行前，我们先学习一下 MySQL 中执行的方式，主要有 4 种，分别是：
+
+1. DuplicateWeedout，使用临时表针对 join 序列中，join 内表产生的重复部分，做消除
+   处理；内层子查询的表通过在外层表的 rowid 上建立唯一索引来对重复生成的 country
+   行数据做去重。
+2. FirstMatch，比较好理解，在选中内部表的第 1 条与外表匹配的记录后，就跳过后续的
+   匹配过程，从外层表的下一条记录重新开始，从而也达到了去重的目的。
+3. LooseScan，把 inner-tables 中的第一个表，其数据基于索引进行分组，取每组第一条
+   数据向后做匹配。
+4. Materialize，这个是想法上最直观的，通过将 inner-table 去重，并固化成临时表，
+   遍历 outer-table，然后在固化表上去寻找匹配。
+
+*** NOT IN Subquery
+
+*** Derived Table
