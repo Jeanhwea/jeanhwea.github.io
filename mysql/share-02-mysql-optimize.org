@@ -154,10 +154,27 @@ EXPLAIN: {
 #+end_example
 
 ** Optimize Trace
-通过 optimizer_trace 开启
-#+BEGIN_SRC sql :results output :exports both
+Optimize Trace 工具使用步骤
+#+BEGIN_SRC sql :results output
+  # 开启 trace
   set optimizer_trace="enabled=on";
+
+  # 执行 Query
   select emp_no from employees where emp_no < 11111;
+
+  # Trace 日志表结构
+  mysql> desc information_schema.optimizer_trace;
+  +-----------------------------------+----------------+------+-----+---------+-------+
+  | Field                             | Type           | Null | Key | Default | Extra |
+  +-----------------------------------+----------------+------+-----+---------+-------+
+  | QUERY                             | varchar(65535) | NO   |     |         |       |
+  | TRACE                             | varchar(65535) | NO   |     |         |       |
+  | MISSING_BYTES_BEYOND_MAX_MEM_SIZE | int            | NO   |     |         |       |
+  | INSUFFICIENT_PRIVILEGES           | tinyint(1)     | NO   |     |         |       |
+  +-----------------------------------+----------------+------+-----+---------+-------+
+  4 rows in set (0.03 sec)
+
+  # 查看结果
   select * from information_schema.optimizer_trace\G
 #+END_SRC
 
