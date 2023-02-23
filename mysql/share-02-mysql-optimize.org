@@ -819,6 +819,7 @@ Transformation 过后生成的结果 expanded_query 如下
   }
 #+END_SRC
 ** Cost-based Optimization
+*** 计算流程
 CBO 是 MySQL 优化器的计算模型，其简要的流程如下：
 1. 为每个操作分配一个成本 (cost)
 2. 评估每个可能的计划需要多少次操作
@@ -831,13 +832,13 @@ CBO 是 MySQL 优化器的计算模型，其简要的流程如下：
 $5! * 5! = 14400$ 种可能的执行计划，如果优化器都逐个分析，很有可能分析所耗费的时
 间都比 sql 语句执行的时间长，这样的分析就失去了它的价值。
 
-MySQL 的 optimizer_search_depth 参数可以控制优化器搜索的深度, 通常默认是不限制优
-化搜索深度
+MySQL 的 optimizer_search_depth 参数可以控制优化器搜索的深度
 
 正因为如此，优化器选择的计划不是每次都是最优的，如果你能明确知道某种计划是最优的，
 那么你可以强制执行那个计划，比如：明确知道用索引 index_a 是最快的，那么你可以使
 用 ~force index('index_a')~ 强制优化器执行
 
+*** cost 常量
 MySQL 8.0 的 cose 配置常量如下所示
 服务端的 cost
 #+BEGIN_SRC sql :exports both
@@ -864,3 +865,12 @@ MySQL 8.0 的 cose 配置常量如下所示
 |-------------+-------------+------------------------+------------+---------------------+---------+---------------|
 | default     |           0 | io_block_read_cost     | NULL       | 2023-02-20 14:39:39 | NULL    |             1 |
 | default     |           0 | memory_block_read_cost | NULL       | 2023-02-20 14:39:39 | NULL    |          0.25 |
+
+*** 元数据 & 统计数据
+常见使用的元数据如下：
+
+[[file:../static/image/2023/0223/201652.png]]
+
+相关统计信息如下：
+
+[[file:../static/image/2023/0223/201742.png]]
