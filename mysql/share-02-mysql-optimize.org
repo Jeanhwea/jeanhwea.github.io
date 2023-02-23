@@ -584,11 +584,236 @@ Transformation 过后生成的结果 expanded_query 如下
 #+END_SRC
 [[file:../static/image/2023/0223/111928.png]]
 
-*** 其它
+*** 其它类型
+永假式优化
 #+BEGIN_SRC sql
   select * from country where code = 'CAN' and 1 = 0;
+#+END_SRC
 
-  select city.* from city, (select * from country where continent = 'Asia') as country where country.code = City.countryCode and country.population > 5000000;
+#+BEGIN_SRC sql
+  /* select#1 */
+  select
+    `country`.`Code` as `Code`,
+    `country`.`Name` as `Name`,
+    `country`.`Continent` as `Continent`,
+    `country`.`Region` as `Region`,
+    `country`.`SurfaceArea` as `SurfaceArea`,
+    `country`.`IndepYear` as `IndepYear`,
+    `country`.`Population` as `Population`,
+    `country`.`LifeExpectancy` as `LifeExpectancy`,
+    `country`.`GNP` as `GNP`,
+    `country`.`GNPOld` as `GNPOld`,
+    `country`.`LocalName` as `LocalName`,
+    `country`.`GovernmentForm` as `GovernmentForm`,
+    `country`.`HeadOfState` as `HeadOfState`,
+    `country`.`Capital` as `Capital`,
+    `country`.`Code2` as `Code2`
+  from
+    `country`
+  where
+    false
+#+END_SRC
 
-  create view countries_in_asia as select * from country where continent = 'asia'; select * from countries_in_asia where population > 5000000;
+嵌入式 join 的转化
+#+BEGIN_SRC sql
+  select
+    city.*
+  from
+    city,
+    (
+      select
+        ,*
+      from
+        country
+      where
+        continent = 'Asia') as country
+  where
+    country.code = City.countryCode
+    and country.population > 5000000;
+#+END_SRC
+
+#+BEGIN_SRC json
+  {
+    "join_preparation": {
+      "select#": 1,
+      "steps": [
+        {
+          "join_preparation": {
+            "select#": 2,
+            "steps": [
+              {
+                "expanded_query": "/* select#2 */ select `country`.`Code` AS `Code`,`country`.`Name` AS `Name`,`country`.`Continent` AS `Continent`,`country`.`Region` AS `Region`,`country`.`SurfaceArea` AS `SurfaceArea`,`country`.`IndepYear` AS `IndepYear`,`country`.`Population` AS `Population`,`country`.`LifeExpectancy` AS `LifeExpectancy`,`country`.`GNP` AS `GNP`,`country`.`GNPOld` AS `GNPOld`,`country`.`LocalName` AS `LocalName`,`country`.`GovernmentForm` AS `GovernmentForm`,`country`.`HeadOfState` AS `HeadOfState`,`country`.`Capital` AS `Capital`,`country`.`Code2` AS `Code2` from `country` where (`country`.`Continent` = 'Asia')"
+                // select
+                //   `country`.`Code` as `Code`,
+                //   `country`.`Name` as `Name`,
+                //   `country`.`Continent` as `Continent`,
+                //   `country`.`Region` as `Region`,
+                //   `country`.`SurfaceArea` as `SurfaceArea`,
+                //   `country`.`IndepYear` as `IndepYear`,
+                //   `country`.`Population` as `Population`,
+                //   `country`.`LifeExpectancy` as `LifeExpectancy`,
+                //   `country`.`GNP` as `GNP`,
+                //   `country`.`GNPOld` as `GNPOld`,
+                //   `country`.`LocalName` as `LocalName`,
+                //   `country`.`GovernmentForm` as `GovernmentForm`,
+                //   `country`.`HeadOfState` as `HeadOfState`,
+                //   `country`.`Capital` as `Capital`,
+                //   `country`.`Code2` as `Code2`
+                // from
+                //   `country`
+                // where (`country`.`Continent` = 'Asia')
+              }
+            ]
+          }
+        },
+        {
+          "derived": {
+            "table": "`` `country`",
+            "select#": 2,
+            "merged": true
+          }
+        },
+        {
+          "expanded_query": "/* select#1 */ select `city`.`ID` AS `ID`,`city`.`Name` AS `Name`,`city`.`CountryCode` AS `CountryCode`,`city`.`District` AS `District`,`city`.`Population` AS `Population` from `city` join (`country`) on((`country`.`Continent` = 'Asia')) where ((`country`.`Code` = `city`.`CountryCode`) and (`country`.`Population` > 5000000))"
+          // select
+          //   `city`.`ID` as `ID`,
+          //   `city`.`Name` as `Name`,
+          //   `city`.`CountryCode` as `CountryCode`,
+          //   `city`.`District` as `District`,
+          //   `city`.`Population` as `Population`
+          // from
+          //   `city`
+          //   join (`country`) on (`country`.`Continent` = 'Asia')
+          // where ((`country`.`Code` = `city`.`CountryCode`)
+          //   and (`country`.`Population` > 5000000))
+        },
+        {
+          "transformations_to_nested_joins": {
+            "transformations": [
+              "JOIN_condition_to_WHERE",
+              "parenthesis_removal"
+            ],
+            "expanded_query": "/* select#1 */ select `city`.`ID` AS `ID`,`city`.`Name` AS `Name`,`city`.`CountryCode` AS `CountryCode`,`city`.`District` AS `District`,`city`.`Population` AS `Population` from `city` join `country` where ((`country`.`Code` = `city`.`CountryCode`) and (`country`.`Population` > 5000000) and (`country`.`Continent` = 'Asia'))"
+            // select
+            //   `city`.`ID` as `ID`,
+            //   `city`.`Name` as `Name`,
+            //   `city`.`CountryCode` as `CountryCode`,
+            //   `city`.`District` as `District`,
+            //   `city`.`Population` as `Population`
+            // from
+            //   `city`
+            //   join `country`
+            // where ((`country`.`Code` = `city`.`CountryCode`)
+            //   and (`country`.`Population` > 5000000)
+            //   and (`country`.`Continent` = 'Asia'))
+          }
+        }
+      ]
+    }
+  }
+#+END_SRC
+
+基于视图优化
+#+BEGIN_SRC sql
+  create view countries_in_asia as select * from country where continent = 'Asia';
+
+  select * from countries_in_asia where population > 5000000;
+#+END_SRC
+
+#+BEGIN_SRC json
+  {
+    "join_preparation": {
+      "select#": 1,
+      "steps": [
+        {
+          "join_preparation": {
+            "select#": 2,
+            "steps": [
+              {
+                "expanded_query": "/* select#2 */ select `country`.`Code` AS `Code`,`country`.`Name` AS `Name`,`country`.`Continent` AS `Continent`,`country`.`Region` AS `Region`,`country`.`SurfaceArea` AS `SurfaceArea`,`country`.`IndepYear` AS `IndepYear`,`country`.`Population` AS `Population`,`country`.`LifeExpectancy` AS `LifeExpectancy`,`country`.`GNP` AS `GNP`,`country`.`GNPOld` AS `GNPOld`,`country`.`LocalName` AS `LocalName`,`country`.`GovernmentForm` AS `GovernmentForm`,`country`.`HeadOfState` AS `HeadOfState`,`country`.`Capital` AS `Capital`,`country`.`Code2` AS `Code2` from `country` where (`country`.`Continent` = 'Asia')"
+                // select
+                //   `country`.`Code` as `Code`,
+                //   `country`.`Name` as `Name`,
+                //   `country`.`Continent` as `Continent`,
+                //   `country`.`Region` as `Region`,
+                //   `country`.`SurfaceArea` as `SurfaceArea`,
+                //   `country`.`IndepYear` as `IndepYear`,
+                //   `country`.`Population` as `Population`,
+                //   `country`.`LifeExpectancy` as `LifeExpectancy`,
+                //   `country`.`GNP` as `GNP`,
+                //   `country`.`GNPOld` as `GNPOld`,
+                //   `country`.`LocalName` as `LocalName`,
+                //   `country`.`GovernmentForm` as `GovernmentForm`,
+                //   `country`.`HeadOfState` as `HeadOfState`,
+                //   `country`.`Capital` as `Capital`,
+                //   `country`.`Code2` as `Code2`
+                // from
+                //   `country`
+                // where (`country`.`Continent` = 'Asia')
+              }
+            ]
+          }
+        },
+        {
+          "view": {
+            "table": "`countries_in_asia`",
+            "select#": 2,
+            "merged": true
+          }
+        },
+        {
+          "expanded_query": "/* select#1 */ select `country`.`Code` AS `Code`,`country`.`Name` AS `Name`,`country`.`Continent` AS `Continent`,`country`.`Region` AS `Region`,`country`.`SurfaceArea` AS `SurfaceArea`,`country`.`IndepYear` AS `IndepYear`,`country`.`Population` AS `Population`,`country`.`LifeExpectancy` AS `LifeExpectancy`,`country`.`GNP` AS `GNP`,`country`.`GNPOld` AS `GNPOld`,`country`.`LocalName` AS `LocalName`,`country`.`GovernmentForm` AS `GovernmentForm`,`country`.`HeadOfState` AS `HeadOfState`,`country`.`Capital` AS `Capital`,`country`.`Code2` AS `Code2` from <constant table> join (`country`) on((`country`.`Continent` = 'Asia')) where (`country`.`Population` > 5000000)"
+          // select
+          //   `country`.`Code` as `Code`,
+          //   `country`.`Name` as `Name`,
+          //   `country`.`Continent` as `Continent`,
+          //   `country`.`Region` as `Region`,
+          //   `country`.`SurfaceArea` as `SurfaceArea`,
+          //   `country`.`IndepYear` as `IndepYear`,
+          //   `country`.`Population` as `Population`,
+          //   `country`.`LifeExpectancy` as `LifeExpectancy`,
+          //   `country`.`GNP` as `GNP`,
+          //   `country`.`GNPOld` as `GNPOld`,
+          //   `country`.`LocalName` as `LocalName`,
+          //   `country`.`GovernmentForm` as `GovernmentForm`,
+          //   `country`.`HeadOfState` as `HeadOfState`,
+          //   `country`.`Capital` as `Capital`,
+          //   `country`.`Code2` as `Code2`
+          // from
+          //   < constant table >
+          //   join (`country`) on (`country`.`Continent` = 'Asia')
+          // where (`country`.`Population` > 5000000)
+        },
+        {
+          "transformations_to_nested_joins": {
+            "transformations": [
+              "JOIN_condition_to_WHERE",
+              "parenthesis_removal"
+            ],
+            "expanded_query": "/* select#1 */ select `country`.`Code` AS `Code`,`country`.`Name` AS `Name`,`country`.`Continent` AS `Continent`,`country`.`Region` AS `Region`,`country`.`SurfaceArea` AS `SurfaceArea`,`country`.`IndepYear` AS `IndepYear`,`country`.`Population` AS `Population`,`country`.`LifeExpectancy` AS `LifeExpectancy`,`country`.`GNP` AS `GNP`,`country`.`GNPOld` AS `GNPOld`,`country`.`LocalName` AS `LocalName`,`country`.`GovernmentForm` AS `GovernmentForm`,`country`.`HeadOfState` AS `HeadOfState`,`country`.`Capital` AS `Capital`,`country`.`Code2` AS `Code2` from `country` where ((`country`.`Population` > 5000000) and (`country`.`Continent` = 'Asia'))"
+            // select
+            //   `country`.`Code` as `Code`,
+            //   `country`.`Name` as `Name`,
+            //   `country`.`Continent` as `Continent`,
+            //   `country`.`Region` as `Region`,
+            //   `country`.`SurfaceArea` as `SurfaceArea`,
+            //   `country`.`IndepYear` as `IndepYear`,
+            //   `country`.`Population` as `Population`,
+            //   `country`.`LifeExpectancy` as `LifeExpectancy`,
+            //   `country`.`GNP` as `GNP`,
+            //   `country`.`GNPOld` as `GNPOld`,
+            //   `country`.`LocalName` as `LocalName`,
+            //   `country`.`GovernmentForm` as `GovernmentForm`,
+            //   `country`.`HeadOfState` as `HeadOfState`,
+            //   `country`.`Capital` as `Capital`,
+            //   `country`.`Code2` as `Code2`
+            // from
+            //   `country`
+            // where ((`country`.`Population` > 5000000)
+            //   and (`country`.`Continent` = 'Asia'))
+          }
+        }
+      ]
+    }
+  }
 #+END_SRC
