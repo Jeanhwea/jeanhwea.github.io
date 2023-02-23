@@ -1304,7 +1304,7 @@ EXPLAIN: {
 }
 #+end_example
 
-亚洲 5 亿人口
+亚洲 5 亿人口的国家
 #+BEGIN_SRC sql :results output
   explain format=json
   select * from country where population > 500000000 and continent='Asia'\G
@@ -1363,6 +1363,248 @@ EXPLAIN: {
   }
 }
 #+end_example
+
+查看 Optimization Trace, 可以探测出走什么执行计划
+#+BEGIN_SRC json
+  {
+    "steps": [
+      {
+        "join_preparation": {
+          "select#": 1,
+          "steps": [
+            {
+              "expanded_query": "/* select#1 */ select `country`.`Code` AS `Code`,`country`.`Name` AS `Name`,`country`.`Continent` AS `Continent`,`country`.`Region` AS `Region`,`country`.`SurfaceArea` AS `SurfaceArea`,`country`.`IndepYear` AS `IndepYear`,`country`.`Population` AS `Population`,`country`.`LifeExpectancy` AS `LifeExpectancy`,`country`.`GNP` AS `GNP`,`country`.`GNPOld` AS `GNPOld`,`country`.`LocalName` AS `LocalName`,`country`.`GovernmentForm` AS `GovernmentForm`,`country`.`HeadOfState` AS `HeadOfState`,`country`.`Capital` AS `Capital`,`country`.`Code2` AS `Code2` from `country` where ((`country`.`Population` > 500000000) and (`country`.`Continent` = 'Asia'))"
+            }
+          ]
+        }
+      },
+      {
+        "join_optimization": {
+          "select#": 1,
+          "steps": [
+            {
+              "condition_processing": {
+                "condition": "WHERE",
+                "original_condition": "((`country`.`Population` > 500000000) and (`country`.`Continent` = 'Asia'))",
+                "steps": [
+                  {
+                    "transformation": "equality_propagation",
+                    "resulting_condition": "((`country`.`Population` > 500000000) and multiple equal('Asia', `country`.`Continent`))"
+                  },
+                  {
+                    "transformation": "constant_propagation",
+                    "resulting_condition": "((`country`.`Population` > 500000000) and multiple equal('Asia', `country`.`Continent`))"
+                  },
+                  {
+                    "transformation": "trivial_condition_removal",
+                    "resulting_condition": "((`country`.`Population` > 500000000) and multiple equal('Asia', `country`.`Continent`))"
+                  }
+                ]
+              }
+            },
+            {
+              "substitute_generated_columns": {}
+            },
+            {
+              "table_dependencies": [
+                {
+                  "table": "`country`",
+                  "row_may_be_null": false,
+                  "map_bit": 0,
+                  "depends_on_map_bits": []
+                }
+              ]
+            },
+            {
+              "ref_optimizer_key_uses": [
+                {
+                  "table": "`country`",
+                  "field": "Continent",
+                  "equals": "'Asia'",
+                  "null_rejecting": true
+                }
+              ]
+            },
+            {
+              "rows_estimation": [
+                {
+                  "table": "`country`",
+                  "range_analysis": {
+                    "table_scan": {
+                      "rows": 239,
+                      "cost": 27.75
+                    },
+                    "potential_range_indexes": [
+                      {
+                        "index": "PRIMARY",
+                        "usable": false,
+                        "cause": "not_applicable"
+                      },
+                      {
+                        "index": "p",
+                        "usable": true,
+                        "key_parts": [
+                          "Population",
+                          "Code"
+                        ]
+                      },
+                      {
+                        "index": "c",
+                        "usable": true,
+                        "key_parts": [
+                          "Continent",
+                          "Code"
+                        ]
+                      }
+                    ],
+                    "setup_range_conditions": [],
+                    "group_index_range": {
+                      "chosen": false,
+                      "cause": "not_group_by_or_distinct"
+                    },
+                    "skip_scan_range": {
+                      "potential_skip_scan_indexes": [
+                        {
+                          "index": "p",
+                          "usable": false,
+                          "cause": "query_references_nonkey_column"
+                        },
+                        {
+                          "index": "c",
+                          "usable": false,
+                          "cause": "query_references_nonkey_column"
+                        }
+                      ]
+                    },
+                    "analyzing_range_alternatives": {
+                      "range_scan_alternatives": [
+                        {
+                          "index": "p", // => 使用索引 p 的代价 0.96
+                          "ranges": [
+                            "500000000 < Population"
+                          ],
+                          "index_dives_for_eq_ranges": true,
+                          "rowid_ordered": false,
+                          "using_mrr": false,
+                          "index_only": false,
+                          "in_memory": 1,
+                          "rows": 2,
+                          "cost": 0.96,
+                          "chosen": true
+                        },
+                        {
+                          "index": "c", // => 使用索引 c 的代价 18.11
+                          "ranges": [
+                            "Continent = 'Asia'"
+                          ],
+                          "index_dives_for_eq_ranges": true,
+                          "rowid_ordered": true,
+                          "using_mrr": false,
+                          "index_only": false,
+                          "in_memory": 1,
+                          "rows": 51,
+                          "cost": 18.11,
+                          "chosen": false,
+                          "cause": "cost"
+                        }
+                      ],
+                      "analyzing_roworder_intersect": {
+                        "usable": false,
+                        "cause": "too_few_roworder_scans"
+                      }
+                    },
+                    "chosen_range_access_summary": {
+                      "range_access_plan": {
+                        "type": "range_scan",
+                        "index": "p",
+                        "rows": 2,
+                        "ranges": [
+                          "500000000 < Population"
+                        ]
+                      },
+                      "rows_for_plan": 2,
+                      "cost_for_plan": 0.96,
+                      "chosen": true
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "considered_execution_plans": [
+                {
+                  "plan_prefix": [],
+                  "table": "`country`",
+                  "best_access_path": {
+                    "considered_access_paths": [
+                      {
+                        "access_type": "ref",
+                        "index": "c",
+                        "rows": 51,
+                        "cost": 10.35,
+                        "chosen": true
+                      },
+                      {
+                        "rows_to_scan": 2,
+                        "access_type": "range",
+                        "range_details": {
+                          "used_index": "p"
+                        },
+                        "resulting_rows": 2,
+                        "cost": 1.16,
+                        "chosen": true
+                      }
+                    ]
+                  },
+                  "condition_filtering_pct": 100,
+                  "rows_for_plan": 2,
+                  "cost_for_plan": 1.16,
+                  "chosen": true
+                }
+              ]
+            },
+            {
+              "attaching_conditions_to_tables": {
+                "original_condition": "((`country`.`Continent` = 'Asia') and (`country`.`Population` > 500000000))",
+                "attached_conditions_computation": [],
+                "attached_conditions_summary": [
+                  {
+                    "table": "`country`",
+                    "attached": "((`country`.`Continent` = 'Asia') and (`country`.`Population` > 500000000))"
+                  }
+                ]
+              }
+            },
+            {
+              "finalizing_table_conditions": [
+                {
+                  "table": "`country`",
+                  "original_table_condition": "((`country`.`Continent` = 'Asia') and (`country`.`Population` > 500000000))",
+                  "final_table_condition   ": "((`country`.`Continent` = 'Asia') and (`country`.`Population` > 500000000))"
+                }
+              ]
+            },
+            {
+              "refine_plan": [
+                {
+                  "table": "`country`",
+                  "pushed_index_condition": "(`country`.`Population` > 500000000)",
+                  "table_condition_attached": "(`country`.`Continent` = 'Asia')"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "join_execution": {
+          "select#": 1,
+          "steps": []
+        }
+      }
+    ]
+  }
+#+END_SRC
 
 *** Composite Indexes
 *** Covering Indexes
