@@ -839,7 +839,7 @@ MySQL 的 optimizer_search_depth 参数可以控制优化器搜索的深度
 用 ~force index('index_a')~ 强制优化器执行
 
 *** cost 常量
-MySQL 8.0 的 cose 配置常量如下所示
+MySQL 8.0 的 cose 配置常量如下所示, 详见 [[https://dev.mysql.com/doc/refman/8.0/en/cost-model.html][Cost Model]]
 服务端的 cost
 #+BEGIN_SRC sql :exports both
   select * from mysql.server_cost;
@@ -1233,3 +1233,27 @@ EXPLAIN: {
   }
 }
 #+end_example
+** Index Optimization
+*** Comparing Plans
+添加两个索引: c 洲, p 人口数
+#+BEGIN_SRC sql
+  alter table country add index c(continent);
+  alter table country add index p(population);
+#+END_SRC
+
+亚洲 500 万人口的国家
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from country where population > 5000000 continent='Asia'\G
+#+END_SRC
+
+#+RESULTS:
+
+亚洲 5 亿人口
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from country where population > 500000000 continent='Asia';
+#+END_SRC
+
+*** Composite Indexes
+*** Covering Indexes
