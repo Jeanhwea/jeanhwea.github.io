@@ -984,3 +984,136 @@ EXPLAIN: {
   update mysql.server_cost set cost_value=null where cost_name='row_evaluate_cost';
   flush optimizer_costs;
 #+END_SRC
+** Hints
+*** Old Style Hints
+老版本的 Hints 是直接写在 SQL 语句中的，目前 Hints 的写法在 MySQL 8.0 依然支持，
+下面有一些示例
+#+BEGIN_SRC sql
+  -- Join tables in the order specified
+  select straight_join country.name as countryname, city.name as city
+  from country inner join city on city.countrycode=country.code;
+
+  -- Force usage of an index
+  select * from country force index (p)
+  where continent='Asia' and population > 5000000;
+
+  -- Ignore an index
+  select * from country ignore index (p)
+  where continent='Asia' and population > 5000000;
+
+  -- Suggest an index over other indexes
+  select * from country use index (p)
+  where continent='Asia' and population > 5000000;
+#+END_SRC
+
+如果直接写 SQL, 全表扫描的 query_cost = 25.65
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from country where continent='Asia' and population > 5000000\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "25.65"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "ALL",
+      "possible_keys": [
+        "p"
+      ],
+      "rows_examined_per_scan": 239,
+      "rows_produced_per_join": 15,
+      "filtered": "6.46",
+      "cost_info": {
+        "read_cost": "24.11",
+        "eval_cost": "1.54",
+        "prefix_cost": "25.65",
+        "data_read_per_join": "14K"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ],
+      "attached_condition": "((`world`.`country`.`Continent` = 'Asia') and (`world`.`country`.`Population` > 5000000))"
+    }
+  }
+}
+#+end_example
+
+强制走索引 p, query_cost = 48.86
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from country force index (p) where continent='Asia' and population > 5000000\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "48.86"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "range",
+      "possible_keys": [
+        "p"
+      ],
+      "key": "p",
+      "used_key_parts": [
+        "Population"
+      ],
+      "key_length": "4",
+      "rows_examined_per_scan": 108,
+      "rows_produced_per_join": 15,
+      "filtered": "14.29",
+      "index_condition": "(`world`.`country`.`Population` > 5000000)",
+      "cost_info": {
+        "read_cost": "47.32",
+        "eval_cost": "1.54",
+        "prefix_cost": "48.86",
+        "data_read_per_join": "14K"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ],
+      "attached_condition": "(`world`.`country`.`Continent` = 'Asia')"
+    }
+  }
+}
+#+end_example
