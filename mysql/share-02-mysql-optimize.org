@@ -5,10 +5,10 @@
 #+HTML_LINK_UP: ../readme.html
 #+HTML_LINK_HOME: ../index.html
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
-#+PROPERTY: header-args:sql :dbhost 127.0.0.1 :database employees :engine mysql :dbuser root :exports both
+#+PROPERTY: header-args:sql :dbhost 127.0.0.1 :database world :engine mysql :dbuser root :exports both
 
 
-* SQL 执行流程
+* 引言 MySQL Architecture
 参考 [[https://dev.mysql.com/doc/dev/mysql-server/8.0.30/PAGE_SQL_EXECUTION.html][执行流程]]
 
 [[file:../static/image/2023/0222/193853.png]]
@@ -107,7 +107,7 @@
   T@8: | | | | | <vio_is_blocking
 #+END_EXAMPLE
 
-* 工具介绍 Explain vs Optimize Trace
+* 工具 Explain vs Optimize Trace
 ** Explain
 Explain 可以看出简要的执行计划
 
@@ -176,6 +176,7 @@ Optimize Trace 工具使用步骤
 
   # 查看结果
   select * from information_schema.optimizer_trace\G
+  select trace from information_schema.optimizer_trace\G
 #+END_SRC
 
 #+BEGIN_EXAMPLE
@@ -384,3 +385,191 @@ Optimize Trace 工具使用步骤
             INSUFFICIENT_PRIVILEGES: 0
   1 row in set (0.01 sec)
 #+END_EXAMPLE
+
+* 主题 Topic
+** Logical Transformations
+Transformation 可以理解对输入的 Query 字符串进行转化，我们以例子进行分析
+#+BEGIN_SRC sql
+  select * from country where population > 5000000 and continent = 'Asia' and 1 = 1;
+#+END_SRC
+
+Trace 的日志的结果
+#+BEGIN_SRC json
+  {
+    "steps": [
+      {
+        "join_preparation": {
+          "select#": 1,
+          "steps": [
+            {
+              "expanded_query": "/* select#1 */ select `country`.`Code` AS `Code`,`country`.`Name` AS `Name`,`country`.`Continent` AS `Continent`,`country`.`Region` AS `Region`,`country`.`SurfaceArea` AS `SurfaceArea`,`country`.`IndepYear` AS `IndepYear`,`country`.`Population` AS `Population`,`country`.`LifeExpectancy` AS `LifeExpectancy`,`country`.`GNP` AS `GNP`,`country`.`GNPOld` AS `GNPOld`,`country`.`LocalName` AS `LocalName`,`country`.`GovernmentForm` AS `GovernmentForm`,`country`.`HeadOfState` AS `HeadOfState`,`country`.`Capital` AS `Capital`,`country`.`Code2` AS `Code2` from `country` where ((`country`.`Population` > 5000000) and (`country`.`Continent` = 'Asia'))"
+            }
+          ]
+        }
+      },
+      {
+        "join_optimization": {
+          "select#": 1,
+          "steps": [
+            {
+              "condition_processing": {
+                "condition": "WHERE",
+                "original_condition": "((`country`.`Population` > 5000000) and (`country`.`Continent` = 'Asia'))",
+                "steps": [
+                  {
+                    "transformation": "equality_propagation",
+                    "resulting_condition": "((`country`.`Population` > 5000000) and multiple equal('Asia', `country`.`Continent`))"
+                  },
+                  {
+                    "transformation": "constant_propagation",
+                    "resulting_condition": "((`country`.`Population` > 5000000) and multiple equal('Asia', `country`.`Continent`))"
+                  },
+                  {
+                    "transformation": "trivial_condition_removal",
+                    "resulting_condition": "((`country`.`Population` > 5000000) and multiple equal('Asia', `country`.`Continent`))"
+                  }
+                ]
+              }
+            },
+            {
+              "substitute_generated_columns": {
+              }
+            },
+            {
+              "table_dependencies": [
+                {
+                  "table": "`country`",
+                  "row_may_be_null": false,
+                  "map_bit": 0,
+                  "depends_on_map_bits": [
+                  ]
+                }
+              ]
+            },
+            {
+              "ref_optimizer_key_uses": [
+              ]
+            },
+            {
+              "rows_estimation": [
+                {
+                  "table": "`country`",
+                  "table_scan": {
+                    "rows": 239,
+                    "cost": 1.75
+                  }
+                }
+              ]
+            },
+            {
+              "considered_execution_plans": [
+                {
+                  "plan_prefix": [
+                  ],
+                  "table": "`country`",
+                  "best_access_path": {
+                    "considered_access_paths": [
+                      {
+                        "rows_to_scan": 239,
+                        "access_type": "scan",
+                        "resulting_rows": 239,
+                        "cost": 25.65,
+                        "chosen": true
+                      }
+                    ]
+                  },
+                  "condition_filtering_pct": 100,
+                  "rows_for_plan": 239,
+                  "cost_for_plan": 25.65,
+                  "chosen": true
+                }
+              ]
+            },
+            {
+              "attaching_conditions_to_tables": {
+                "original_condition": "((`country`.`Continent` = 'Asia') and (`country`.`Population` > 5000000))",
+                "attached_conditions_computation": [
+                ],
+                "attached_conditions_summary": [
+                  {
+                    "table": "`country`",
+                    "attached": "((`country`.`Continent` = 'Asia') and (`country`.`Population` > 5000000))"
+                  }
+                ]
+              }
+            },
+            {
+              "finalizing_table_conditions": [
+                {
+                  "table": "`country`",
+                  "original_table_condition": "((`country`.`Continent` = 'Asia') and (`country`.`Population` > 5000000))",
+                  "final_table_condition   ": "((`country`.`Continent` = 'Asia') and (`country`.`Population` > 5000000))"
+                }
+              ]
+            },
+            {
+              "refine_plan": [
+                {
+                  "table": "`country`"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "join_execution": {
+          "select#": 1,
+          "steps": [
+          ]
+        }
+      }
+    ]
+  }
+#+END_SRC
+
+这三次的转换分别是
+  - equality_propagation 等值条件句转换
+  - constant_propagation 常量条件句转换
+  - trivial_condition_removal 无效条件移除的转换，该例子将 ~1 = 1~ 永真表达式剔除了
+#+BEGIN_SRC json
+  "steps": [
+    {
+      "transformation": "equality_propagation",
+      "resulting_condition": "((`country`.`Population` > 5000000) and multiple equal('Asia', `country`.`Continent`))"
+    },
+    {
+      "transformation": "constant_propagation",
+      "resulting_condition": "((`country`.`Population` > 5000000) and multiple equal('Asia', `country`.`Continent`))"
+    },
+    {
+      "transformation": "trivial_condition_removal",
+      "resulting_condition": "((`country`.`Population` > 5000000) and multiple equal('Asia', `country`.`Continent`))"
+    }
+  ]
+#+END_SRC
+
+Transformation 过后生成的结果 expanded_query 如下
+#+BEGIN_SRC sql
+  /* select#1 */
+  select
+    `country`.`Code` as `Code`,
+    `country`.`Name` as `Name`,
+    `country`.`Continent` as `Continent`,
+    `country`.`Region` as `Region`,
+    `country`.`SurfaceArea` as `SurfaceArea`,
+    `country`.`IndepYear` as `IndepYear`,
+    `country`.`Population` as `Population`,
+    `country`.`LifeExpectancy` as `LifeExpectancy`,
+    `country`.`GNP` as `GNP`,
+    `country`.`GNPOld` as `GNPOld`,
+    `country`.`LocalName` as `LocalName`,
+    `country`.`GovernmentForm` as `GovernmentForm`,
+    `country`.`HeadOfState` as `HeadOfState`,
+    `country`.`Capital` as `Capital`,
+    `country`.`Code2` as `Code2`
+  from
+    `country`
+  where ((`country`.`Population` > 5000000)
+    and (`country`.`Continent` = 'Asia'))
+#+END_SRC
