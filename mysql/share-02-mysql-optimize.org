@@ -1117,3 +1117,119 @@ EXPLAIN: {
   }
 }
 #+end_example
+
+*** New Comment-Style Hints
+注释类型的 Hints 如下：
+
+[[file:../static/image/2023/0223/205348.png]]
+
+#+BEGIN_SRC sql :results output
+  explain format=json
+    select  * from country where population > 1000000000 and continent='Asia'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "1.16"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "range",
+      "possible_keys": [
+        "p"
+      ],
+      "key": "p",
+      "used_key_parts": [
+        "Population"
+      ],
+      "key_length": "4",
+      "rows_examined_per_scan": 2,
+      "rows_produced_per_join": 0,
+      "filtered": "14.29",
+      "index_condition": "(`world`.`country`.`Population` > 1000000000)",
+      "cost_info": {
+        "read_cost": "1.13",
+        "eval_cost": "0.03",
+        "prefix_cost": "1.16",
+        "data_read_per_join": "276"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ],
+      "attached_condition": "(`world`.`country`.`Continent` = 'Asia')"
+    }
+  }
+}
+#+end_example
+
+#+BEGIN_SRC sql :results output
+  explain format=json
+    select /*+NO_RANGE_OPTIMIZATION(Country) */  * from country
+    where population > 1000000000 and continent='Asia'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "25.65"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "ALL",
+      "possible_keys": [
+        "p"
+      ],
+      "rows_examined_per_scan": 239,
+      "rows_produced_per_join": 11,
+      "filtered": "4.76",
+      "cost_info": {
+        "read_cost": "24.51",
+        "eval_cost": "1.14",
+        "prefix_cost": "25.65",
+        "data_read_per_join": "10K"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ],
+      "attached_condition": "((`world`.`country`.`Continent` = 'Asia') and (`world`.`country`.`Population` > 1000000000))"
+    }
+  }
+}
+#+end_example
