@@ -837,3 +837,30 @@ MySQL 的 optimizer_search_depth 参数可以控制优化器搜索的深度, 通
 正因为如此，优化器选择的计划不是每次都是最优的，如果你能明确知道某种计划是最优的，
 那么你可以强制执行那个计划，比如：明确知道用索引 index_a 是最快的，那么你可以使
 用 ~force index('index_a')~ 强制优化器执行
+
+MySQL 8.0 的 cose 配置常量如下所示
+服务端的 cost
+#+BEGIN_SRC sql :exports both
+  select * from mysql.server_cost;
+#+END_SRC
+
+#+RESULTS:
+| cost_name                    | cost_value | last_update         | comment | default_value |
+|------------------------------+------------+---------------------+---------+---------------|
+| disk_temptable_create_cost   | NULL       | 2023-02-20 14:39:39 | NULL    |            20 |
+| disk_temptable_row_cost      | NULL       | 2023-02-20 14:39:39 | NULL    |           0.5 |
+| key_compare_cost             | NULL       | 2023-02-20 14:39:39 | NULL    |          0.05 |
+| memory_temptable_create_cost | NULL       | 2023-02-20 14:39:39 | NULL    |             1 |
+| memory_temptable_row_cost    | NULL       | 2023-02-20 14:39:39 | NULL    |           0.1 |
+| row_evaluate_cost            | NULL       | 2023-02-20 14:39:39 | NULL    |           0.1 |
+
+引擎 cost 列表
+#+BEGIN_SRC sql :exports both
+  select * from mysql.engine_cost;
+#+END_SRC
+
+#+RESULTS:
+| engine_name | device_type | cost_name              | cost_value | last_update         | comment | default_value |
+|-------------+-------------+------------------------+------------+---------------------+---------+---------------|
+| default     |           0 | io_block_read_cost     | NULL       | 2023-02-20 14:39:39 | NULL    |             1 |
+| default     |           0 | memory_block_read_cost | NULL       | 2023-02-20 14:39:39 | NULL    |          0.25 |
