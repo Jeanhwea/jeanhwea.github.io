@@ -2826,5 +2826,263 @@ Semi-join 的执行概括来看就是想办法把内层的查询进行去重。�
    遍历 outer-table，然后在固化表上去寻找匹配。
 
 *** NOT IN Subquery
+这里 code 是 country 的主键
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from city where countrycode not in (select code from country)\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "887.80"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "city",
+          "access_type": "ALL",
+          "rows_examined_per_scan": 4035,
+          "rows_produced_per_join": 4035,
+          "filtered": "100.00",
+          "cost_info": {
+            "read_cost": "25.00",
+            "eval_cost": "403.50",
+            "prefix_cost": "428.50",
+            "data_read_per_join": "977K"
+          },
+          "used_columns": [
+            "ID",
+            "Name",
+            "CountryCode",
+            "District",
+            "Population"
+          ]
+        }
+      },
+      {
+        "table": {
+          "table_name": "<subquery2>",
+          "access_type": "eq_ref",
+          "key": "<auto_distinct_key>",
+          "key_length": "13",
+          "ref": [
+            "world.city.CountryCode"
+          ],
+          "rows_examined_per_scan": 1,
+          "not_exists": true,
+          "attached_condition": "<if>(is_not_null_compl(<subquery2>), <if>(found_match(<subquery2>), false, true), true)",
+          "materialized_from_subquery": {
+            "using_temporary_table": true,
+            "query_block": {
+              "table": {
+                "table_name": "country",
+                "access_type": "index",
+                "possible_keys": [
+                  "PRIMARY"
+                ],
+                "key": "c_p",
+                "used_key_parts": [
+                  "Continent",
+                  "Population"
+                ],
+                "key_length": "5",
+                "rows_examined_per_scan": 239,
+                "rows_produced_per_join": 239,
+                "filtered": "100.00",
+                "using_index": true,
+                "cost_info": {
+                  "read_cost": "7.00",
+                  "eval_cost": "23.90",
+                  "prefix_cost": "30.90",
+                  "data_read_per_join": "225K"
+                },
+                "used_columns": [
+                  "Code"
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+#+end_example
+
+采用 materialization 策略
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from city where countrycode not in (select /*+ SUBQUERY(INTOEXISTS) */ code from country)\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "428.50"
+    },
+    "table": {
+      "table_name": "city",
+      "access_type": "ALL",
+      "rows_examined_per_scan": 4035,
+      "rows_produced_per_join": 4035,
+      "filtered": "100.00",
+      "cost_info": {
+        "read_cost": "25.00",
+        "eval_cost": "403.50",
+        "prefix_cost": "428.50",
+        "data_read_per_join": "977K"
+      },
+      "used_columns": [
+        "ID",
+        "Name",
+        "CountryCode",
+        "District",
+        "Population"
+      ],
+      "attached_condition": "<in_optimizer>(`world`.`city`.`CountryCode`,<exists>(<primary_index_lookup>(<cache>(`world`.`city`.`CountryCode`) in country on PRIMARY)) is false)",
+      "attached_subqueries": [
+        {
+          "dependent": true,
+          "cacheable": false,
+          "query_block": {
+            "select_id": 2,
+            "cost_info": {
+              "query_cost": "1.10"
+            },
+            "table": {
+              "table_name": "country",
+              "access_type": "unique_subquery",
+              "possible_keys": [
+                "PRIMARY"
+              ],
+              "key": "PRIMARY",
+              "used_key_parts": [
+                "Code"
+              ],
+              "key_length": "12",
+              "ref": [
+                "func"
+              ],
+              "rows_examined_per_scan": 1,
+              "rows_produced_per_join": 1,
+              "filtered": "100.00",
+              "using_index": true,
+              "cost_info": {
+                "read_cost": "1.00",
+                "eval_cost": "0.10",
+                "prefix_cost": "1.10",
+                "data_read_per_join": "968"
+              },
+              "used_columns": [
+                "Code"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+#+end_example
+
+
+#+BEGIN_SRC sql :results output
+  explain format=json
+  select * from city where countrycode not in (select code from country where continent in ('Asia', 'Europe', 'North America'))\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "887.80"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "city",
+          "access_type": "ALL",
+          "rows_examined_per_scan": 4035,
+          "rows_produced_per_join": 4035,
+          "filtered": "100.00",
+          "cost_info": {
+            "read_cost": "25.00",
+            "eval_cost": "403.50",
+            "prefix_cost": "428.50",
+            "data_read_per_join": "977K"
+          },
+          "used_columns": [
+            "ID",
+            "Name",
+            "CountryCode",
+            "District",
+            "Population"
+          ]
+        }
+      },
+      {
+        "table": {
+          "table_name": "<subquery2>",
+          "access_type": "eq_ref",
+          "key": "<auto_distinct_key>",
+          "key_length": "13",
+          "ref": [
+            "world.city.CountryCode"
+          ],
+          "rows_examined_per_scan": 1,
+          "not_exists": true,
+          "attached_condition": "<if>(is_not_null_compl(<subquery2>), <if>(found_match(<subquery2>), false, true), true)",
+          "materialized_from_subquery": {
+            "using_temporary_table": true,
+            "query_block": {
+              "table": {
+                "table_name": "country",
+                "access_type": "index",
+                "possible_keys": [
+                  "PRIMARY",
+                  "c_p"
+                ],
+                "key": "c_p",
+                "used_key_parts": [
+                  "Continent",
+                  "Population"
+                ],
+                "key_length": "5",
+                "rows_examined_per_scan": 239,
+                "rows_produced_per_join": 239,
+                "filtered": "100.00",
+                "using_index": true,
+                "cost_info": {
+                  "read_cost": "7.00",
+                  "eval_cost": "23.90",
+                  "prefix_cost": "30.90",
+                  "data_read_per_join": "225K"
+                },
+                "used_columns": [
+                  "Code",
+                  "Continent"
+                ],
+                "attached_condition": "(`world`.`country`.`Continent` in ('Asia','Europe','North America'))"
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+#+end_example
 
 *** Derived Table
