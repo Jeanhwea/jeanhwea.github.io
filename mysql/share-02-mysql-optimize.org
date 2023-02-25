@@ -3093,3 +3093,244 @@ EXPLAIN: {
 #+end_example
 
 *** Derived Table
+子查询一般不需要 materialization, MySQL 通常是采用 merge 的策略，和视图合并的策
+略有点类似
+
+#+BEGIN_SRC sql :exports both :results output
+  explain format=json
+    select * from
+    country, (select * from city where countrycode ='CAN' ) as citytmp
+    where country.code=citytmp.countrycode and citytmp.name ='Toronto'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "0.35"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "country",
+          "access_type": "const",
+          "possible_keys": [
+            "PRIMARY"
+          ],
+          "key": "PRIMARY",
+          "used_key_parts": [
+            "Code"
+          ],
+          "key_length": "12",
+          "ref": [
+            "const"
+          ],
+          "rows_examined_per_scan": 1,
+          "rows_produced_per_join": 1,
+          "filtered": "100.00",
+          "cost_info": {
+            "read_cost": "0.00",
+            "eval_cost": "0.10",
+            "prefix_cost": "0.00",
+            "data_read_per_join": "968"
+          },
+          "used_columns": [
+            "Code",
+            "Name",
+            "Continent",
+            "Region",
+            "SurfaceArea",
+            "IndepYear",
+            "Population",
+            "LifeExpectancy",
+            "GNP",
+            "GNPOld",
+            "LocalName",
+            "GovernmentForm",
+            "HeadOfState",
+            "Capital",
+            "Code2"
+          ]
+        }
+      },
+      {
+        "table": {
+          "table_name": "city", //
+          "access_type": "ref", // => 从这里可以看出使用了 merge 策略
+          "possible_keys": [
+            "CountryCode",
+            "n"
+          ],
+          "key": "n",
+          "used_key_parts": [
+            "Name"
+          ],
+          "key_length": "140",
+          "ref": [
+            "const"
+          ],
+          "rows_examined_per_scan": 1,
+          "rows_produced_per_join": 0,
+          "filtered": "5.00",
+          "index_condition": "(`world`.`city`.`Name` = 'Toronto')",
+          "cost_info": {
+            "read_cost": "0.25",
+            "eval_cost": "0.01",
+            "prefix_cost": "0.35",
+            "data_read_per_join": "12"
+          },
+          "used_columns": [
+            "ID",
+            "Name",
+            "CountryCode",
+            "District",
+            "Population"
+          ],
+          "attached_condition": "(`world`.`city`.`CountryCode` = 'CAN')"
+        }
+      }
+    ]
+  }
+}
+#+end_example
+
+通过下面的配置可以关闭 merge 策略
+#+BEGIN_SRC sql
+  set optimizer_switch='derived_merge=off';
+#+END_SRC
+
+#+BEGIN_SRC sql :exports both :results output
+  set optimizer_switch='derived_merge=off';
+  explain format=json
+    select * from
+    country, (select * from city where countrycode ='CAN' ) as citytmp
+    where country.code=citytmp.countrycode and citytmp.name ='Toronto'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "4.67"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "citytmp",
+          "access_type": "ALL",
+          "rows_examined_per_scan": 2,
+          "rows_produced_per_join": 2,
+          "filtered": "100.00",
+          "cost_info": {
+            "read_cost": "2.52",
+            "eval_cost": "0.20",
+            "prefix_cost": "2.73",
+            "data_read_per_join": "496"
+          },
+          "used_columns": [
+            "ID",
+            "Name",
+            "CountryCode",
+            "District",
+            "Population"
+          ],
+          "materialized_from_subquery": { // => 这里没有使用 merge 策略，而是使用了 materialized
+            "using_temporary_table": true,
+            "dependent": false,
+            "cacheable": true,
+            "query_block": {
+              "select_id": 2,
+              "cost_info": {
+                "query_cost": "0.35"
+              },
+              "table": {
+                "table_name": "city",
+                "access_type": "ref",
+                "possible_keys": [
+                  "CountryCode",
+                  "n"
+                ],
+                "key": "n",
+                "used_key_parts": [
+                  "Name"
+                ],
+                "key_length": "140",
+                "ref": [
+                  "const"
+                ],
+                "rows_examined_per_scan": 1,
+                "rows_produced_per_join": 0,
+                "filtered": "5.00",
+                "index_condition": "(`world`.`city`.`Name` = 'Toronto')",
+                "cost_info": {
+                  "read_cost": "0.25",
+                  "eval_cost": "0.01",
+                  "prefix_cost": "0.35",
+                  "data_read_per_join": "12"
+                },
+                "used_columns": [
+                  "ID",
+                  "Name",
+                  "CountryCode",
+                  "District",
+                  "Population"
+                ],
+                "attached_condition": "(`world`.`city`.`CountryCode` = 'CAN')"
+              }
+            }
+          }
+        }
+      },
+      {
+        "table": {
+          "table_name": "country",
+          "access_type": "eq_ref",
+          "possible_keys": [
+            "PRIMARY"
+          ],
+          "key": "PRIMARY",
+          "used_key_parts": [
+            "Code"
+          ],
+          "key_length": "12",
+          "ref": [
+            "citytmp.CountryCode"
+          ],
+          "rows_examined_per_scan": 1,
+          "rows_produced_per_join": 2,
+          "filtered": "100.00",
+          "cost_info": {
+            "read_cost": "1.75",
+            "eval_cost": "0.20",
+            "prefix_cost": "4.67",
+            "data_read_per_join": "1K"
+          },
+          "used_columns": [
+            "Code",
+            "Name",
+            "Continent",
+            "Region",
+            "SurfaceArea",
+            "IndepYear",
+            "Population",
+            "LifeExpectancy",
+            "GNP",
+            "GNPOld",
+            "LocalName",
+            "GovernmentForm",
+            "HeadOfState",
+            "Capital",
+            "Code2"
+          ]
+        }
+      }
+    ]
+  }
+}
+#+end_example
