@@ -2826,8 +2826,12 @@ Semi-join 的执行概括来看就是想办法把内层的查询进行去重。�
    遍历 outer-table，然后在固化表上去寻找匹配。
 
 *** NOT IN Subquery
+NOT IN 子查询通常有两种优化策略：
+1. materialization
+2. exits
+
 这里 code 是 country 的主键
-#+BEGIN_SRC sql :results output
+#+BEGIN_SRC sql :results output :exports both
   explain format=json
   select * from city where countrycode not in (select code from country)\G
 #+END_SRC
@@ -2876,7 +2880,7 @@ EXPLAIN: {
           "rows_examined_per_scan": 1,
           "not_exists": true,
           "attached_condition": "<if>(is_not_null_compl(<subquery2>), <if>(found_match(<subquery2>), false, true), true)",
-          "materialized_from_subquery": {
+          "materialized_from_subquery": { // => 采用 materialized 策略
             "using_temporary_table": true,
             "query_block": {
               "table": {
@@ -2914,8 +2918,10 @@ EXPLAIN: {
 }
 #+end_example
 
-采用 materialization 策略
-#+BEGIN_SRC sql :results output
+我们可以通过 hints 来强制使用 Exits 策略, 通过查看执行计划
+  - exists_cost[428.50] < materialize_cost[887.80]
+  - 这里是执行的优化器选取策略有问题的场景
+#+BEGIN_SRC sql :results output :exports both
   explain format=json
   select * from city where countrycode not in (select /*+ SUBQUERY(INTOEXISTS) */ code from country)\G
 #+END_SRC
@@ -2994,8 +3000,9 @@ EXPLAIN: {
 }
 #+end_example
 
-
-#+BEGIN_SRC sql :results output
+如果添加 continent 限制条件, 这种子查询会使用二级索引，通常的策略就是
+materialize
+#+BEGIN_SRC sql :results output :exports both
   explain format=json
   select * from city where countrycode not in (select code from country where continent in ('Asia', 'Europe', 'North America'))\G
 #+END_SRC
