@@ -3518,3 +3518,143 @@ explain 结果
   Message: /* select#1 */ select 'Asia' AS `continent`,'51' AS `count` from dual
   1 row in set (0.00 sec)
 #+END_SRC
+
+** Join
+MySQL 的 Join 使用 [[https://dev.mysql.com/doc/refman/8.0/en/nested-loop-joins.html][nested-loop]] 策略, 以下面 3 个表 Join 的例子
+1. 先选定驱动表, 这里是 country
+2. 通过过滤条件 ~`world`.`country`.`Continent` = 'Asia'~ 选出待查询的数据，接着
+   再处理被驱动表 city
+3. city 中匹配出的结果集再处理 countrylanguage 表, 最后还会应用过滤条件
+   ~`world`.`countrylanguage`.`IsOfficial` = 'T'~
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+  select
+    country.name as country,
+    city.name as capital,
+    language
+  from
+    city
+    inner join country on country.capital = city.id
+    inner join countrylanguage on countrylanguage.countrycode = country.code
+  where
+    country.continent = 'Asia'
+    and countrylanguage.isofficial = 'T'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "75.66"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "country",
+          "access_type": "ref",
+          "possible_keys": [
+            "PRIMARY",
+            "c_p"
+          ],
+          "key": "c_p",
+          "used_key_parts": [
+            "Continent"
+          ],
+          "key_length": "1",
+          "ref": [
+            "const"
+          ],
+          "rows_examined_per_scan": 51,
+          "rows_produced_per_join": 51,
+          "filtered": "100.00",
+          "index_condition": "(`world`.`country`.`Continent` = 'Asia')",
+          "cost_info": {
+            "read_cost": "18.38",
+            "eval_cost": "5.10",
+            "prefix_cost": "23.48",
+            "data_read_per_join": "48K"
+          },
+          "used_columns": [
+            "Code",
+            "Name",
+            "Continent",
+            "Capital"
+          ],
+          "attached_condition": "(`world`.`country`.`Capital` is not null)"
+        }
+      },
+      {
+        "table": {
+          "table_name": "city",
+          "access_type": "eq_ref",
+          "possible_keys": [
+            "PRIMARY"
+          ],
+          "key": "PRIMARY",
+          "used_key_parts": [
+            "ID"
+          ],
+          "key_length": "4",
+          "ref": [
+            "world.country.Capital"
+          ],
+          "rows_examined_per_scan": 1,
+          "rows_produced_per_join": 51,
+          "filtered": "100.00",
+          "cost_info": {
+            "read_cost": "12.75",
+            "eval_cost": "5.10",
+            "prefix_cost": "41.33",
+            "data_read_per_join": "12K"
+          },
+          "used_columns": [
+            "ID",
+            "Name"
+          ]
+        }
+      },
+      {
+        "table": {
+          "table_name": "countrylanguage",
+          "access_type": "ref",
+          "possible_keys": [
+            "PRIMARY",
+            "CountryCode"
+          ],
+          "key": "PRIMARY",
+          "used_key_parts": [
+            "CountryCode"
+          ],
+          "key_length": "12",
+          "ref": [
+            "world.country.Code"
+          ],
+          "rows_examined_per_scan": 4,
+          "rows_produced_per_join": 107,
+          "filtered": "50.00",
+          "cost_info": {
+            "read_cost": "12.79",
+            "eval_cost": "10.77",
+            "prefix_cost": "75.66",
+            "data_read_per_join": "15K"
+          },
+          "used_columns": [
+            "CountryCode",
+            "Language",
+            "IsOfficial"
+          ],
+          "attached_condition": "(`world`.`countrylanguage`.`IsOfficial` = 'T')"
+        }
+      }
+    ]
+  }
+}
+#+end_example
+
+MySQL 支持以下三种 [[https://dev.mysql.com/doc/refman/8.0/en/join.html][Join]] 类型
+- INNER JOIN
+- LEFT JOIN
+- RIGHT JOIN
