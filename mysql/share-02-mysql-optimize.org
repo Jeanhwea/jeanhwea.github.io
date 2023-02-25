@@ -3342,3 +3342,179 @@ EXPLAIN: {
    - merge, 将定义视图的表转化到其它查询中，这里有一个技巧，可以在 ~explain~ 过后
      通过 ~show warnings~ 查看转化的 SQL
    - materialize, 将查询的结果集存入一个临时表，以供后续的查询使用
+
+#+BEGIN_SRC sql :results output :exports both
+  create view v_country_asia as select * from country where continent='Asia';
+
+  explain format=json
+  select * from v_country_asia where name='China';
+#+END_SRC
+
+#+BEGIN_SRC json
+  {
+    "query_block": {
+      "select_id": 1,
+      "cost_info": {
+        "query_cost": "23.47"
+      },
+      "table": {
+        "table_name": "country",
+        "access_type": "ref",
+        "possible_keys": [
+          "c_p"
+        ],
+        "key": "c_p",
+        "used_key_parts": [
+          "Continent"
+        ],
+        "key_length": "1",
+        "ref": [
+          "const"
+        ],
+        "rows_examined_per_scan": 51,
+        "rows_produced_per_join": 5,
+        "filtered": "10.00",
+        "index_condition": "(`world`.`country`.`Continent` = 'Asia')",
+        "cost_info": {
+          "read_cost": "18.38",
+          "eval_cost": "0.51",
+          "prefix_cost": "23.48",
+          "data_read_per_join": "4K"
+        },
+        "used_columns": [
+          "Code",
+          "Name",
+          "Continent",
+          "Region",
+          "SurfaceArea",
+          "IndepYear",
+          "Population",
+          "LifeExpectancy",
+          "GNP",
+          "GNPOld",
+          "LocalName",
+          "GovernmentForm",
+          "HeadOfState",
+          "Capital",
+          "Code2"
+        ],
+        "attached_condition": "(`world`.`country`.`Name` = 'China')"
+      }
+    }
+  }
+#+END_SRC
+
+通过 ~show warnings~ 查询转化后的 SQL 可以看出 View 在查询中被 merge 了
+#+BEGIN_SRC sql
+  select
+    `world`.`country`.`Code` as `Code`,
+    `world`.`country`.`Name` as `Name`,
+    `world`.`country`.`Continent` as `Continent`,
+    `world`.`country`.`Region` as `Region`,
+    `world`.`country`.`SurfaceArea` as `SurfaceArea`,
+    `world`.`country`.`IndepYear` as `IndepYear`,
+    `world`.`country`.`Population` as `Population`,
+    `world`.`country`.`LifeExpectancy` as `LifeExpectancy`,
+    `world`.`country`.`GNP` as `GNP`,
+    `world`.`country`.`GNPOld` as `GNPOld`,
+    `world`.`country`.`LocalName` as `LocalName`,
+    `world`.`country`.`GovernmentForm` as `GovernmentForm`,
+    `world`.`country`.`HeadOfState` as `HeadOfState`,
+    `world`.`country`.`Capital` as `Capital`,
+    `world`.`country`.`Code2` as `Code2`
+  from
+    `world`.`country`
+  where ((`world`.`country`.`Continent` = 'Asia')
+    and (`world`.`country`.`Name` = 'China'))
+#+END_SRC
+
+这里也举例说明一种不能被 merge 的场景
+#+BEGIN_SRC sql
+  create view v_countrys_per_continent as select continent, count(*) as count from country group by continent;
+
+  explain format=json
+  select * from v_countrys_per_continent where continent='Asia';
+#+END_SRC
+
+explain 结果
+#+BEGIN_SRC json
+  {
+    "query_block": {
+      "select_id": 1,
+      "cost_info": {
+        "query_cost": "1.00"
+      },
+      "table": {
+        "table_name": "v_countrys_per_continent",
+        "access_type": "system",
+        "rows_examined_per_scan": 1,
+        "rows_produced_per_join": 1,
+        "filtered": "100.00",
+        "cost_info": {
+          "read_cost": "0.00",
+          "eval_cost": "0.10",
+          "prefix_cost": "0.00",
+          "data_read_per_join": "16"
+        },
+        "used_columns": [
+          "continent",
+          "count"
+        ],
+        "materialized_from_subquery": {
+          "using_temporary_table": true,
+          "dependent": false,
+          "cacheable": true,
+          "query_block": {
+            "select_id": 2,
+            "cost_info": {
+              "query_cost": "5.37"
+            },
+            "grouping_operation": {
+              "using_filesort": false,
+              "table": {
+                "table_name": "country",
+                "access_type": "ref",
+                "possible_keys": [
+                  "c_p",
+                  "p_c"
+                ],
+                "key": "c_p",
+                "used_key_parts": [
+                  "Continent"
+                ],
+                "key_length": "1",
+                "ref": [
+                  "const"
+                ],
+                "rows_examined_per_scan": 51,
+                "rows_produced_per_join": 51,
+                "filtered": "100.00",
+                "using_index": true,
+                "cost_info": {
+                  "read_cost": "0.28",
+                  "eval_cost": "5.10",
+                  "prefix_cost": "5.38",
+                  "data_read_per_join": "48K"
+                },
+                "used_columns": [
+                  "Continent"
+                ],
+                "attached_condition": "(`world`.`country`.`Continent` = 'Asia')"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+#+END_SRC
+
+可以看出这里使用了 materialize 策略, 直接固化结果
+#+BEGIN_SRC text
+  mysql> show warnings\G
+  ,*************************** 1. row ***************************
+    Level: Note
+     Code: 1003
+  Message: /* select#1 */ select 'Asia' AS `continent`,'51' AS `count` from dual
+  1 row in set (0.00 sec)
+#+END_SRC
