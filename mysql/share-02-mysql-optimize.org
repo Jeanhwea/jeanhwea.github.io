@@ -4596,7 +4596,6 @@ mysql> SHOW GLOBAL VARIABLES LIKE 'rewriter_enabled';
   source /opt/local/mysql/share/uninstall_rewriter.sql
 #+END_SRC
 
-** TODO Profiling Queries
 ** Misc
 *** Invisible Indexes
 [[https://dev.mysql.com/doc/refman/8.0/en/invisible-indexes.html][Invisible Indexes]] 是一直不被优化器使用的索引
@@ -4827,5 +4826,136 @@ EXPLAIN: {
 #+END_EXAMPLE
 
 *** JSON and Generated Columns
+[[https://dev.mysql.com/doc/refman/8.0/en/generated-column-index-optimizations.html][Generated Column Indexes]]
 
-*** Character Sets
+[[file:../static/image/2023/0227/193836.png]]
+
+#+BEGIN_SRC sql :database test_json
+  create table users (
+    id int not null auto_increment,
+    username varchar(32) not null,
+    preferences json not null,
+    primary key (id),
+    unique (username)
+  );
+
+  insert into users
+   (id,username,preferences)
+  values
+   (null, 'morgan', '{"layout": "horizontal", "warn_before_delete": false, "notify_on_updates": true}'),
+   (null, 'wes', '{"layout": "horizontal", "warn_before_delete": false, "notify_on_updates": false}'),
+   (null, 'jasper', '{"layout": "horizontal", "warn_before_delete": false, "notify_on_updates": false}'),
+   (null, 'gus', '{"layout": "horizontal", "warn_before_delete": false, "notify_on_updates": false}'),
+   (null, 'olive', '{"layout": "horizontal", "warn_before_delete": false, "notify_on_updates": false}');
+#+END_SRC
+
+
+#+BEGIN_SRC sql :database test_json :results output :exports both
+  explain format=json
+    select * from users where preferences->"$.notify_on_updates" = true\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "0.75"
+    },
+    "table": {
+      "table_name": "users", // => 未添加索引前全表扫描
+      "access_type": "ALL",
+      "rows_examined_per_scan": 5,
+      "rows_produced_per_join": 5,
+      "filtered": "100.00",
+      "cost_info": {
+        "read_cost": "0.25",
+        "eval_cost": "0.50",
+        "prefix_cost": "0.75",
+        "data_read_per_join": "760"
+      },
+      "used_columns": [
+        "id",
+        "username",
+        "preferences"
+      ],
+      "attached_condition": "(json_extract(`test_json`.`users`.`preferences`,'$.notify_on_updates') = true)"
+    }
+  }
+}
+#+end_example
+
+添加 generated column index
+#+BEGIN_SRC sql :database test_json :results output
+  alter table users add notify_on_updates tinyint as (preferences->"$.notify_on_updates"),
+   add index(notify_on_updates);
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  mysql> show create table users \G
+  ,*************************** 1. row ***************************
+         Table: users
+  Create Table: CREATE TABLE `users` (
+    `id` int NOT NULL AUTO_INCREMENT,
+    `username` varchar(32) NOT NULL,
+    `preferences` json NOT NULL,
+    `notify_on_updates` tinyint GENERATED ALWAYS AS (json_extract(`preferences`,_utf8mb4'$.notify_on_updates')) VIRTUAL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `username` (`username`),
+    KEY `notify_on_updates` (`notify_on_updates`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+  1 row in set (0.00 sec)
+
+#+END_EXAMPLE
+
+#+BEGIN_SRC sql :database test_json :results output
+  explain format=json
+    select * from users where preferences->"$.notify_on_updates" = true\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "0.35"
+    },
+    "table": {
+      "table_name": "users",
+      "access_type": "ref", // => 可以看出 JSON 字段使用了新增的索引
+      "possible_keys": [
+        "notify_on_updates"
+      ],
+      "key": "notify_on_updates",
+      "used_key_parts": [
+        "notify_on_updates"
+      ],
+      "key_length": "2",
+      "ref": [
+        "const"
+      ],
+      "rows_examined_per_scan": 1,
+      "rows_produced_per_join": 1,
+      "filtered": "100.00",
+      "cost_info": {
+        "read_cost": "0.25",
+        "eval_cost": "0.10",
+        "prefix_cost": "0.35",
+        "data_read_per_join": "152"
+      },
+      "used_columns": [
+        "id",
+        "username",
+        "preferences",
+        "notify_on_updates"
+      ]
+    }
+  }
+}
+#+end_example
+
+* TODO Profiling Queries
