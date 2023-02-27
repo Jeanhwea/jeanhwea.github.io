@@ -2961,15 +2961,13 @@ EXPLAIN: {
 
 #+BEGIN_SRC sql :results output :exports both
   explain format=json
-    select code, name from country
+    select /*+ SEMIJOIN(@subq1 LOOSESCAN) */ code, name from country
     where
       country.code in (
-        select /*+ SEMIJOIN(LOOSESCAN) */
-          city.countrycode
+        select /*+ QB_NAME(subq1) */
+          countrylanguage.countrycode
         from
-          city
-        where
-          city.population > 1 * 1000 * 1000)
+          countrylanguage)
       and country.continent = 'Europe'\G
 #+END_SRC
 
@@ -2980,74 +2978,69 @@ EXPLAIN: {
   "query_block": {
     "select_id": 1,
     "cost_info": {
-      "query_cost": "322.97"
+      "query_cost": "297.16"
     },
     "nested_loop": [
       {
         "table": {
+          "table_name": "countrylanguage",
+          "access_type": "index",
+          "possible_keys": [
+            "PRIMARY",
+            "CountryCode"
+          ],
+          "key": "CountryCode",
+          "used_key_parts": [
+            "CountryCode"
+          ],
+          "key_length": "12",
+          "rows_examined_per_scan": 984,
+          "rows_produced_per_join": 232,
+          "filtered": "23.68",
+          "using_index": true,
+          "loosescan": true,
+          "cost_info": {
+            "read_cost": "4.56",
+            "eval_cost": "23.30",
+            "prefix_cost": "27.86",
+            "data_read_per_join": "32K"
+          },
+          "used_columns": [
+            "CountryCode"
+          ]
+        }
+      },
+      {
+        "table": {
           "table_name": "country",
-          "access_type": "ref",
+          "access_type": "eq_ref",
           "possible_keys": [
             "PRIMARY",
             "c"
           ],
-          "key": "c",
+          "key": "PRIMARY",
           "used_key_parts": [
-            "Continent"
+            "Code"
           ],
-          "key_length": "1",
+          "key_length": "12",
           "ref": [
-            "const"
+            "world.countrylanguage.CountryCode"
           ],
-          "rows_examined_per_scan": 46,
-          "rows_produced_per_join": 46,
-          "filtered": "100.00",
-          "index_condition": "(`world`.`country`.`Continent` = 'Europe')",
+          "rows_examined_per_scan": 1,
+          "rows_produced_per_join": 0,
+          "filtered": "19.25",
           "cost_info": {
-            "read_cost": "5.25",
-            "eval_cost": "4.60",
-            "prefix_cost": "9.85",
-            "data_read_per_join": "43K"
+            "read_cost": "246.00",
+            "eval_cost": "0.02",
+            "prefix_cost": "297.16",
+            "data_read_per_join": "186"
           },
           "used_columns": [
             "Code",
             "Name",
             "Continent"
-          ]
-        }
-      },
-      {
-        "duplicates_removal": {
-          "using_temporary_table": true,
-          "table": {
-            "table_name": "city",
-            "access_type": "ref",
-            "possible_keys": [
-              "CountryCode"
-            ],
-            "key": "CountryCode",
-            "used_key_parts": [
-              "CountryCode"
-            ],
-            "key_length": "12",
-            "ref": [
-              "world.country.Code"
-            ],
-            "rows_examined_per_scan": 17,
-            "rows_produced_per_join": 46,
-            "filtered": "33.33",
-            "cost_info": {
-              "read_cost": "200.56",
-              "eval_cost": "4.60",
-              "prefix_cost": "322.97",
-              "data_read_per_join": "11K"
-            },
-            "used_columns": [
-              "CountryCode",
-              "Population"
-            ],
-            "attached_condition": "(`world`.`city`.`Population` > <cache>(((1 * 1000) * 1000)))"
-          }
+          ],
+          "attached_condition": "(`world`.`country`.`Continent` = 'Europe')"
         }
       }
     ]
