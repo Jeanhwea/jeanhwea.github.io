@@ -4154,6 +4154,266 @@ EXPLAIN: {
 #+end_example
 
 ** Sorting
+MySQL 通常有 4 种方法对结果集进行排序, [[https://dev.mysql.com/doc/refman/8.0/en/order-by-optimization.html][order-by]]
+1. Index, 索引是一个 B+ 树，默认遍历即为有序的
+2. Priority Queue, 如果 order by 的结果集比较小，可以存储结果在优先队列，然后返
+   回，例如：
+   #+BEGIN_SRC sql
+     select * from country ignore index (p, p_c)
+      order by population limit 10;
+   #+END_SRC
+3. Alternative Sort Algorithm, 适用于非 TEXT 或者 BLOB
+   - 读取满足 where 条件的 row
+   - 对于满足条件的 row, 记录 tuple => (sort key, sort value, ref fields)
+   - 如果 sort buffer 满了， tuple 会写入磁盘的临时文件
+   - 归并排序完成后，直接对齐有序的 tuple 构建结果集
+4. the Original Sort Algorithm, 适用于 TEXT 或者 BLOB
+   - 通过索引或者全表扫描数据，跳过不满足 where 条件的行
+   - 对于满足条件的 row, 记录 tuple => (sort key, sort value, row_id)
+   - 如果 sort_buffer 够用，则无需临时文件。否则，现在内存 qsort, 然后记录结果到
+     临时文件，记录文件存储块的指针
+   - 重复上一步骤，直到所有需要的数据都读取完毕
+   - 每 MERGEBUFF(7) 个 block 抽取一批数据进行排序，归并排序到另外一个临时文件中，
+     直到所有的数据都排序好到新的临时文件中 [[file:../../mysql-server/sql/filesort.cc::static int merge_buffers(THD *thd, Sort_param *param, IO_CACHE *from_file,][merge_buffers]]
+   - 重复以上归并排序过程，直到剩下不到 MERGEBUFF2(15) 个 block. [[file:../../mysql-server/sql/merge_many_buff.h::IO_CACHE t_file2;][merge_many_buff]]
+   - 最后一轮循环，仅将 row_id 写入到结果文件中
+   - 根据结果文件中的 row_id 按序读取用户需要返回的数据。为了进一步优化性能，MySQL
+     会读一批 row_id，并将读到的数据按排序字段要求插入缓存区中 (内存大小
+     read_rnd_buffer_size)
+
+使用索引排序的例子
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+  select * from country where continent='Asia' order by population\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "10.35"
+    },
+    "ordering_operation": {
+      "using_filesort": false, // => 未使用文件排序
+      "table": {
+        "table_name": "country",
+        "access_type": "ref",
+        "possible_keys": [
+          "c",
+          "c_p"
+        ],
+        "key": "c_p", // => 使用索引排序
+        "used_key_parts": [
+          "Continent"
+        ],
+        "key_length": "1",
+        "ref": [
+          "const"
+        ],
+        "rows_examined_per_scan": 51,
+        "rows_produced_per_join": 51,
+        "filtered": "100.00",
+        "index_condition": "(`world`.`country`.`Continent` = 'Asia')",
+        "cost_info": {
+          "read_cost": "5.25",
+          "eval_cost": "5.10",
+          "prefix_cost": "10.35",
+          "data_read_per_join": "48K"
+        },
+        "used_columns": [
+          "Code",
+          "Name",
+          "Continent",
+          "Region",
+          "SurfaceArea",
+          "IndepYear",
+          "Population",
+          "LifeExpectancy",
+          "GNP",
+          "GNPOld",
+          "LocalName",
+          "GovernmentForm",
+          "HeadOfState",
+          "Capital",
+          "Code2"
+        ]
+      }
+    }
+  }
+}
+#+end_example
+
+使用优先队列的例子
+#+BEGIN_SRC sql
+  set optimizer_trace="enabled=on";
+  select * from country ignore index (p) order by population limit 10;
+  select trace from information_schema.optimizer_trace\G
+#+END_SRC
+
+通过 filesort_priority_queue_optimization 部分验证使用了优先队列
+#+BEGIN_SRC json
+  {
+    "steps": [
+      {
+        "join_preparation": {
+          "select#": 1,
+          "steps": [
+            {
+              "expanded_query": "/* select#1 */ select `country`.`Code` AS `Code`,`country`.`Name` AS `Name`,`country`.`Continent` AS `Continent`,`country`.`Region` AS `Region`,`country`.`SurfaceArea` AS `SurfaceArea`,`country`.`IndepYear` AS `IndepYear`,`country`.`Population` AS `Population`,`country`.`LifeExpectancy` AS `LifeExpectancy`,`country`.`GNP` AS `GNP`,`country`.`GNPOld` AS `GNPOld`,`country`.`LocalName` AS `LocalName`,`country`.`GovernmentForm` AS `GovernmentForm`,`country`.`HeadOfState` AS `HeadOfState`,`country`.`Capital` AS `Capital`,`country`.`Code2` AS `Code2` from `country` IGNORE INDEX (`p`) order by `country`.`Population` limit 10"
+            }
+          ]
+        }
+      },
+      {
+        "join_optimization": {
+          "select#": 1,
+          "steps": [
+            {
+              "substitute_generated_columns": {}
+            },
+            {
+              "table_dependencies": [
+                {
+                  "table": "`country` IGNORE INDEX (`p`)",
+                  "row_may_be_null": false,
+                  "map_bit": 0,
+                  "depends_on_map_bits": []
+                }
+              ]
+            },
+            {
+              "rows_estimation": [
+                {
+                  "table": "`country` IGNORE INDEX (`p`)",
+                  "table_scan": {
+                    "rows": 239,
+                    "cost": 1.75
+                  }
+                }
+              ]
+            },
+            {
+              "considered_execution_plans": [
+                {
+                  "plan_prefix": [],
+                  "table": "`country` IGNORE INDEX (`p`)",
+                  "best_access_path": {
+                    "considered_access_paths": [
+                      {
+                        "rows_to_scan": 239,
+                        "access_type": "scan",
+                        "resulting_rows": 239,
+                        "cost": 25.65,
+                        "chosen": true
+                      }
+                    ]
+                  },
+                  "condition_filtering_pct": 100,
+                  "rows_for_plan": 239,
+                  "cost_for_plan": 25.65,
+                  "chosen": true
+                }
+              ]
+            },
+            {
+              "attaching_conditions_to_tables": {
+                "original_condition": null,
+                "attached_conditions_computation": [],
+                "attached_conditions_summary": [
+                  {
+                    "table": "`country` IGNORE INDEX (`p`)",
+                    "attached": null
+                  }
+                ]
+              }
+            },
+            {
+              "optimizing_distinct_group_by_order_by": {
+                "simplifying_order_by": {
+                  "original_clause": "`country`.`Population`",
+                  "items": [
+                    {
+                      "item": "`country`.`Population`"
+                    }
+                  ],
+                  "resulting_clause_is_simple": true,
+                  "resulting_clause": "`country`.`Population`"
+                }
+              }
+            },
+            {
+              "reconsidering_access_paths_for_index_ordering": {
+                "clause": "ORDER BY",
+                "steps": [],
+                "index_order_summary": {
+                  "table": "`country` IGNORE INDEX (`p`)",
+                  "index_provides_order": false,
+                  "order_direction": "undefined",
+                  "index": "unknown",
+                  "plan_changed": false
+                }
+              }
+            },
+            {
+              "finalizing_table_conditions": []
+            },
+            {
+              "refine_plan": [
+                {
+                  "table": "`country` IGNORE INDEX (`p`)"
+                }
+              ]
+            },
+            {
+              "considering_tmp_tables": [
+                {
+                  "adding_sort_to_table": "country"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "join_execution": {
+          "select#": 1,
+          "steps": [
+            {
+              "sorting_table": "country",
+              "filesort_information": [
+                {
+                  "direction": "asc",
+                  "expression": "`country`.`Population`"
+                }
+              ],
+              "filesort_priority_queue_optimization": { // => 使用了优先队列排序
+                "limit": 10,
+                "chosen": true
+              },
+              "filesort_execution": [],
+              "filesort_summary": {
+                "memory_available": 262144,
+                "key_size": 8,
+                "row_size": 976,
+                "max_rows_per_buffer": 11,
+                "num_rows_estimate": 239,
+                "num_rows_found": 239,
+                "num_initial_chunks_spilled_to_disk": 0,
+                "peak_memory_used": 10824,
+                "sort_algorithm": "std::sort",
+                "unpacked_addon_fields": "using_priority_queue",
+                "sort_mode": "<fixed_sort_key, additional_fields>"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+#+END_SRC
 
 ** Partitioning
 
