@@ -4788,6 +4788,43 @@ EXPLAIN: {
 }
 #+end_example
 
+可以在 ~information_schema.statistics~ 中查询到 invisible 的信息
+#+BEGIN_SRC sql :results none
+  select * from information_schema.statistics where is_visible = 'NO'\G
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  mysql> select * from information_schema.statistics where is_visible = 'NO'\G
+  ,*************************** 1. row ***************************
+  TABLE_CATALOG: def
+   TABLE_SCHEMA: world
+     TABLE_NAME: country
+     NON_UNIQUE: 1
+   INDEX_SCHEMA: world
+     INDEX_NAME: c
+   SEQ_IN_INDEX: 1
+    COLUMN_NAME: Continent
+      COLLATION: A
+    CARDINALITY: 7
+       SUB_PART: NULL
+         PACKED: NULL
+       NULLABLE:
+     INDEX_TYPE: BTREE
+        COMMENT:
+  INDEX_COMMENT:
+     IS_VISIBLE: NO
+     EXPRESSION: NULL
+  1 row in set (0.05 sec)
+
+  mysql> alter table country alter index c visible;
+  Query OK, 0 rows affected (0.15 sec)
+  Records: 0  Duplicates: 0  Warnings: 0
+
+  mysql> select * from information_schema.statistics where is_visible = 'NO'\G
+  Empty set (0.05 sec)
+
+  mysql>
+#+END_EXAMPLE
 
 *** JSON and Generated Columns
 
