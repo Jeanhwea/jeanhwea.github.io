@@ -4596,9 +4596,198 @@ mysql> SHOW GLOBAL VARIABLES LIKE 'rewriter_enabled';
   source /opt/local/mysql/share/uninstall_rewriter.sql
 #+END_SRC
 
-** Profiling Queries
+** TODO Profiling Queries
 ** Misc
 *** Invisible Indexes
+[[https://dev.mysql.com/doc/refman/8.0/en/invisible-indexes.html][Invisible Indexes]] 是一直不被优化器使用的索引
+#+BEGIN_SRC sql :results output :exports both
+  show create table country\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+       Table: country
+Create Table: CREATE TABLE `country` (
+  `Code` char(3) NOT NULL DEFAULT '',
+  `Name` char(52) NOT NULL DEFAULT '',
+  `Continent` enum('Asia','Europe','North America','Africa','Oceania','Antarctica','South America') NOT NULL DEFAULT 'Asia',
+  `Region` char(26) NOT NULL DEFAULT '',
+  `SurfaceArea` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `IndepYear` smallint DEFAULT NULL,
+  `Population` int NOT NULL DEFAULT '0',
+  `LifeExpectancy` decimal(3,1) DEFAULT NULL,
+  `GNP` decimal(10,2) DEFAULT NULL,
+  `GNPOld` decimal(10,2) DEFAULT NULL,
+  `LocalName` char(45) NOT NULL DEFAULT '',
+  `GovernmentForm` char(45) NOT NULL DEFAULT '',
+  `HeadOfState` char(60) DEFAULT NULL,
+  `Capital` int DEFAULT NULL,
+  `Code2` char(2) NOT NULL DEFAULT '',
+  PRIMARY KEY (`Code`),
+  KEY `c` (`Continent`),
+  KEY `c_p` (`Continent`,`Population`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+#+end_example
+
+默认下一条语句会使用 c 索引
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select * from country where continent = 'Aisa'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "0.47"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "ref",
+      "possible_keys": [
+        "c",
+        "c_p"
+      ],
+      "key": "c",
+      "used_key_parts": [
+        "Continent"
+      ],
+      "key_length": "1",
+      "ref": [
+        "const"
+      ],
+      "rows_examined_per_scan": 1,
+      "rows_produced_per_join": 1,
+      "filtered": "100.00",
+      "index_condition": "(`world`.`country`.`Continent` = 'Aisa')",
+      "cost_info": {
+        "read_cost": "0.38",
+        "eval_cost": "0.10",
+        "prefix_cost": "0.47",
+        "data_read_per_join": "968"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ]
+    }
+  }
+}
+#+end_example
+
+将索引 c 修改成 invisible
+#+BEGIN_SRC sql :results none
+  alter table country alter index c invisible;
+#+END_SRC
+
+#+BEGIN_SRC sql :results output :exports both
+  show create table country\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+       Table: country
+Create Table: CREATE TABLE `country` (
+  `Code` char(3) NOT NULL DEFAULT '',
+  `Name` char(52) NOT NULL DEFAULT '',
+  `Continent` enum('Asia','Europe','North America','Africa','Oceania','Antarctica','South America') NOT NULL DEFAULT 'Asia',
+  `Region` char(26) NOT NULL DEFAULT '',
+  `SurfaceArea` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `IndepYear` smallint DEFAULT NULL,
+  `Population` int NOT NULL DEFAULT '0',
+  `LifeExpectancy` decimal(3,1) DEFAULT NULL,
+  `GNP` decimal(10,2) DEFAULT NULL,
+  `GNPOld` decimal(10,2) DEFAULT NULL,
+  `LocalName` char(45) NOT NULL DEFAULT '',
+  `GovernmentForm` char(45) NOT NULL DEFAULT '',
+  `HeadOfState` char(60) DEFAULT NULL,
+  `Capital` int DEFAULT NULL,
+  `Code2` char(2) NOT NULL DEFAULT '',
+  PRIMARY KEY (`Code`),
+  KEY `c` (`Continent`) /*!80000 INVISIBLE */,
+  KEY `c_p` (`Continent`,`Population`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+#+end_example
+
+这里可以看出查询会中 c_p 索引，而忽略掉了 c 索引
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select * from country where continent = 'Aisa'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "0.47"
+    },
+    "table": {
+      "table_name": "country",
+      "access_type": "ref",
+      "possible_keys": [
+        "c_p"
+      ],
+      "key": "c_p",
+      "used_key_parts": [
+        "Continent"
+      ],
+      "key_length": "1",
+      "ref": [
+        "const"
+      ],
+      "rows_examined_per_scan": 1,
+      "rows_produced_per_join": 1,
+      "filtered": "100.00",
+      "index_condition": "(`world`.`country`.`Continent` = 'Aisa')",
+      "cost_info": {
+        "read_cost": "0.38",
+        "eval_cost": "0.10",
+        "prefix_cost": "0.47",
+        "data_read_per_join": "968"
+      },
+      "used_columns": [
+        "Code",
+        "Name",
+        "Continent",
+        "Region",
+        "SurfaceArea",
+        "IndepYear",
+        "Population",
+        "LifeExpectancy",
+        "GNP",
+        "GNPOld",
+        "LocalName",
+        "GovernmentForm",
+        "HeadOfState",
+        "Capital",
+        "Code2"
+      ]
+    }
+  }
+}
+#+end_example
+
 
 *** JSON and Generated Columns
 
