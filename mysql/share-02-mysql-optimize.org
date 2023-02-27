@@ -4416,6 +4416,73 @@ EXPLAIN: {
 #+END_SRC
 
 ** Partitioning
+同分区表有以下使用情景
+[[file:../static/image/2023/0227/125513.png]]
+
+通过下面语句可以将 CountryLanguage 表修改成分区表
+#+BEGIN_SRC sql
+  -- IsOfficial is an ENUM, but can be converted to a CHAR at the same space
+  -- ENUM types only support KEY partitioning
+  -- The partitioning key must be part of the primary and all unique keys
+
+  ALTER TABLE CountryLanguage MODIFY IsOfficial CHAR(1) NOT NULL DEFAULT 'F', DROP PRIMARY KEY, ADD PRIMARY KEY(CountryCode, Language, IsOfficial);
+
+  ALTER TABLE CountryLanguage PARTITION BY LIST COLUMNS (IsOfficial) (
+   PARTITION pUnofficial VALUES IN ('F'),
+   PARTITION pOfficial VALUES IN ('T')
+  );
+#+END_SRC
+[[file:../static/image/2023/0227/125544.png]]
+
+可以查看分区使用情景
+#+BEGIN_SRC text
+  EXPLAIN FORMAT=JSON
+  SELECT * FROM CountryLanguage WHERE isOfficial='T' AND CountryCode='CAN';
+  {
+    "query_block": {
+      "select_id": 1,
+      "cost_info": {
+        "query_cost": "2.40"
+      },
+      "table": {
+        "table_name": "CountryLanguage",
+        "partitions": [                     // => 查询官方沟通语言分区
+          "pOfficial"                       // => pOfficial 是分区键
+        ],
+        "access_type": "ref",
+        "possible_keys": [
+          "PRIMARY",
+          "CountryCode"
+        ],
+        "key": "PRIMARY",
+        "used_key_parts": [
+          "CountryCode"
+        ],
+        "key_length": "3",
+        "ref": [
+          "const"
+        ],
+        "rows_examined_per_scan": 2,
+        "rows_produced_per_join": 0,
+        "filtered": "10.00",
+        "cost_info": {
+          "read_cost": "2.00",
+          "eval_cost": "0.04",
+          "prefix_cost": "2.40",
+          "data_read_per_join": "8"
+        },
+        "used_columns": [
+          "CountryCode",
+          "Language",
+          "IsOfficial",
+          "Percentage"
+        ],
+        "attached_condition": "(`world`.`CountryLanguage`.`IsOfficial` = 'T')"
+      }
+    }
+  }
+#+END_SRC
+
 
 ** Query Rewrite
 
