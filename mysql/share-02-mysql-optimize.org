@@ -3664,6 +3664,162 @@ MySQL 支持以下三种 [[https://dev.mysql.com/doc/refman/8.0/en/join.html][Jo
 - RIGHT JOIN
 
 ** Aggregation
+** GROUP BY
+*** Loose index scan
+松散索引扫描 [[https://dev.mysql.com/doc/refman/8.0/en/group-by-optimization.html#loose-index-scan][loose-index-scan]]
+[[file:../static/image/2023/0227/103516.png]]
+
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select count(*) as c, continent from country group by continent\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "25.65"
+    },
+    "grouping_operation": {
+      "using_filesort": false,
+      "table": {
+        "table_name": "country",
+        "access_type": "index",
+        "possible_keys": [
+          "c_p",
+          "p_c",
+          "c"
+        ],
+        "key": "c",
+        "used_key_parts": [
+          "Continent"
+        ],
+        "key_length": "1",
+        "rows_examined_per_scan": 239,
+        "rows_produced_per_join": 239,
+        "filtered": "100.00",
+        "using_index": true,
+        "cost_info": {
+          "read_cost": "1.75",
+          "eval_cost": "23.90",
+          "prefix_cost": "25.65",
+          "data_read_per_join": "225K"
+        },
+        "used_columns": [
+          "Code",
+          "Continent"
+        ]
+      }
+    }
+  }
+}
+#+end_example
+
+*** Filtering rows
+[[file:../static/image/2023/0227/103523.png]]
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select count(*) as c, continent from country where population > 500000000 group by continent\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "25.65"
+    },
+    "grouping_operation": {
+      "using_filesort": false,
+      "table": {
+        "table_name": "country",
+        "access_type": "index",
+        "possible_keys": [
+          "c"
+        ],
+        "key": "c",
+        "used_key_parts": [
+          "Continent"
+        ],
+        "key_length": "1",
+        "rows_examined_per_scan": 239,
+        "rows_produced_per_join": 79,
+        "filtered": "33.33",
+        "cost_info": {
+          "read_cost": "17.68",
+          "eval_cost": "7.97",
+          "prefix_cost": "25.65",
+          "data_read_per_join": "75K"
+        },
+        "used_columns": [
+          "Code",
+          "Continent",
+          "Population"
+        ],
+        "attached_condition": "(`world`.`country`.`Population` > 500000000)"
+      }
+    }
+  }
+}
+#+end_example
+
+*** Filtering and order
+[[file:../static/image/2023/0227/103715.png]]
+
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select count(*) as c, continent from country where continent = 'Aisa' group by continent\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "0.35"
+    },
+    "grouping_operation": {
+      "using_filesort": false,
+      "table": {
+        "table_name": "country",
+        "access_type": "ref",
+        "possible_keys": [
+          "c"
+        ],
+        "key": "c",
+        "used_key_parts": [
+          "Continent"
+        ],
+        "key_length": "1",
+        "ref": [
+          "const"
+        ],
+        "rows_examined_per_scan": 1,
+        "rows_produced_per_join": 1,
+        "filtered": "100.00",
+        "using_index": true, // => 使用索引过滤
+        "cost_info": {
+          "read_cost": "0.25",
+          "eval_cost": "0.10",
+          "prefix_cost": "0.35",
+          "data_read_per_join": "968"
+        },
+        "used_columns": [
+          "Continent"
+        ],
+        "attached_condition": "(`world`.`country`.`Continent` = 'Aisa')"
+      }
+    }
+  }
+}
+#+end_example
 
 ** Sorting
 
