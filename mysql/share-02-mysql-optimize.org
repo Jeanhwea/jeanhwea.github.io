@@ -2812,29 +2812,438 @@ EXPLAIN: {
   }
 #+END_SRC
 
+*** Semi-Join
+*** Semi-Join Alogrithm
+以下面查询为例
+#+BEGIN_SRC sql
+  select code, name from country
+  where
+    country.code in (
+      select
+        city.countrycode
+      from
+        city
+      where
+        city.population > 1 * 1000 * 1000)
+    and country.continent = 'Europe';
+#+END_SRC
+
+#+RESULTS:
+| code | name               |
+|------+--------------------|
+| GBR  | United Kingdom     |
+| RUS  | Russian Federation |
+
 Semi-join 的执行概括来看就是想办法把内层的查询进行去重。在写我们自己的 Semi-join
 执行前，我们先学习一下 MySQL 中执行的方式，主要有 4 种，分别是：
 
 1. DuplicateWeedout，使用临时表针对 join 序列中，join 内表产生的重复部分，做消除
    处理；内层子查询的表通过在外层表的 rowid 上建立唯一索引来对重复生成的 country
-   行数据做去重。
+   行数据做去重。[[https://mariadb.com/kb/en/duplicateweedout-strategy/][=>]]
 
    [[file:../static/image/2023/0227/225822.png]]
 
 2. FirstMatch，比较好理解，在选中内部表的第 1 条与外表匹配的记录后，就跳过后续的
-   匹配过程，从外层表的下一条记录重新开始，从而也达到了去重的目的。
+   匹配过程，从外层表的下一条记录重新开始，从而也达到了去重的目的。[[https://mariadb.com/kb/en/firstmatch-strategy/][=>]]
 
    [[file:../static/image/2023/0227/230031.png]]
 
 3. LooseScan，把 inner-tables 中的第一个表，其数据基于索引进行分组，取每组第一条
-   数据向后做匹配。
+   数据向后做匹配。[[https://mariadb.com/kb/en/loosescan-strategy/][=>]]
 
    [[file:../static/image/2023/0227/230124.png]]
 
-4. Materialize，这个是想法上最直观的，通过将 inner-table 去重，并固化成临时表，
-   遍历 outer-table，然后在固化表上去寻找匹配。
+4. MaterializeScan，这个是想法上最直观的，通过将 inner-table 去重，并固化成临时
+   表，遍历 outer-table，然后在固化表上去寻找匹配。 [[https://mariadb.com/kb/en/semi-join-materialization-strategy/][=>]]
 
    [[file:../static/image/2023/0227/230157.png]]
+
+*** Semi-Join Examples
+[[https://dev.mysql.com/doc/refman/8.0/en/optimizer-hints.html#optimizer-hints-subquery][SEMIJOIN]] hints 可以控制查询的优化条件:
+- DUPSWEEDOUT
+- FIRSTMATCH
+- LOOSESCAN
+- MATERIALIZATION
+
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select code, name from country
+    where
+      country.code in (
+        select
+          city.countrycode
+        from
+          city
+        where
+          city.population > 1 * 1000 * 1000)
+      and country.continent = 'Europe'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "290.63"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "country",
+          "access_type": "ref",
+          "possible_keys": [
+            "PRIMARY",
+            "c"
+          ],
+          "key": "c",
+          "used_key_parts": [
+            "Continent"
+          ],
+          "key_length": "1",
+          "ref": [
+            "const"
+          ],
+          "rows_examined_per_scan": 46,
+          "rows_produced_per_join": 46,
+          "filtered": "100.00",
+          "index_condition": "(`world`.`country`.`Continent` = 'Europe')",
+          "cost_info": {
+            "read_cost": "5.25",
+            "eval_cost": "4.60",
+            "prefix_cost": "9.85",
+            "data_read_per_join": "43K"
+          },
+          "used_columns": [
+            "Code",
+            "Name",
+            "Continent"
+          ]
+        }
+      },
+      {
+        "table": {
+          "table_name": "city",
+          "access_type": "ref",
+          "possible_keys": [
+            "CountryCode"
+          ],
+          "key": "CountryCode",
+          "used_key_parts": [
+            "CountryCode"
+          ],
+          "key_length": "12",
+          "ref": [
+            "world.country.Code"
+          ],
+          "rows_examined_per_scan": 17,
+          "rows_produced_per_join": 46,
+          "filtered": "33.33",
+          "first_match": "country",
+          "cost_info": {
+            "read_cost": "200.56",
+            "eval_cost": "4.60",
+            "prefix_cost": "290.63",
+            "data_read_per_join": "11K"
+          },
+          "used_columns": [
+            "CountryCode",
+            "Population"
+          ],
+          "attached_condition": "(`world`.`city`.`Population` > <cache>(((1 * 1000) * 1000)))"
+        }
+      }
+    ]
+  }
+}
+#+end_example
+
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select code, name from country
+    where
+      country.code in (
+        select /*+ SEMIJOIN(LOOSESCAN) */
+          city.countrycode
+        from
+          city
+        where
+          city.population > 1 * 1000 * 1000)
+      and country.continent = 'Europe'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "322.97"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "country",
+          "access_type": "ref",
+          "possible_keys": [
+            "PRIMARY",
+            "c"
+          ],
+          "key": "c",
+          "used_key_parts": [
+            "Continent"
+          ],
+          "key_length": "1",
+          "ref": [
+            "const"
+          ],
+          "rows_examined_per_scan": 46,
+          "rows_produced_per_join": 46,
+          "filtered": "100.00",
+          "index_condition": "(`world`.`country`.`Continent` = 'Europe')",
+          "cost_info": {
+            "read_cost": "5.25",
+            "eval_cost": "4.60",
+            "prefix_cost": "9.85",
+            "data_read_per_join": "43K"
+          },
+          "used_columns": [
+            "Code",
+            "Name",
+            "Continent"
+          ]
+        }
+      },
+      {
+        "duplicates_removal": {
+          "using_temporary_table": true,
+          "table": {
+            "table_name": "city",
+            "access_type": "ref",
+            "possible_keys": [
+              "CountryCode"
+            ],
+            "key": "CountryCode",
+            "used_key_parts": [
+              "CountryCode"
+            ],
+            "key_length": "12",
+            "ref": [
+              "world.country.Code"
+            ],
+            "rows_examined_per_scan": 17,
+            "rows_produced_per_join": 46,
+            "filtered": "33.33",
+            "cost_info": {
+              "read_cost": "200.56",
+              "eval_cost": "4.60",
+              "prefix_cost": "322.97",
+              "data_read_per_join": "11K"
+            },
+            "used_columns": [
+              "CountryCode",
+              "Population"
+            ],
+            "attached_condition": "(`world`.`city`.`Population` > <cache>(((1 * 1000) * 1000)))"
+          }
+        }
+      }
+    ]
+  }
+}
+#+end_example
+
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select /*+ SEMIJOIN(@subq1 FIRSTMATCH) */ code, name from country
+    where
+      country.code in (
+        select /*+ QB_NAME(subq1) */
+          city.countrycode
+        from
+          city
+        where
+          city.population > 1 * 1000 * 1000)
+      and country.continent = 'Europe'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "290.63"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "country",
+          "access_type": "ref",
+          "possible_keys": [
+            "PRIMARY",
+            "c"
+          ],
+          "key": "c",
+          "used_key_parts": [
+            "Continent"
+          ],
+          "key_length": "1",
+          "ref": [
+            "const"
+          ],
+          "rows_examined_per_scan": 46,
+          "rows_produced_per_join": 46,
+          "filtered": "100.00",
+          "index_condition": "(`world`.`country`.`Continent` = 'Europe')",
+          "cost_info": {
+            "read_cost": "5.25",
+            "eval_cost": "4.60",
+            "prefix_cost": "9.85",
+            "data_read_per_join": "43K"
+          },
+          "used_columns": [
+            "Code",
+            "Name",
+            "Continent"
+          ]
+        }
+      },
+      {
+        "table": {
+          "table_name": "city",
+          "access_type": "ref",
+          "possible_keys": [
+            "CountryCode"
+          ],
+          "key": "CountryCode",
+          "used_key_parts": [
+            "CountryCode"
+          ],
+          "key_length": "12",
+          "ref": [
+            "world.country.Code"
+          ],
+          "rows_examined_per_scan": 17,
+          "rows_produced_per_join": 46,
+          "filtered": "33.33",
+          "first_match": "country",
+          "cost_info": {
+            "read_cost": "200.56",
+            "eval_cost": "4.60",
+            "prefix_cost": "290.63",
+            "data_read_per_join": "11K"
+          },
+          "used_columns": [
+            "CountryCode",
+            "Population"
+          ],
+          "attached_condition": "(`world`.`city`.`Population` > <cache>(((1 * 1000) * 1000)))"
+        }
+      }
+    ]
+  }
+}
+#+end_example
+
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select /*+ SEMIJOIN(@subq1 DUPSWEEDOUT) */ code, name from country
+    where
+      country.code in (
+        select /*+ QB_NAME(subq1) */
+          city.countrycode
+        from
+          city
+        where
+          city.population > 1 * 1000 * 1000)
+      and country.continent = 'Europe'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "322.97"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "country",
+          "access_type": "ref",
+          "possible_keys": [
+            "PRIMARY",
+            "c"
+          ],
+          "key": "c",
+          "used_key_parts": [
+            "Continent"
+          ],
+          "key_length": "1",
+          "ref": [
+            "const"
+          ],
+          "rows_examined_per_scan": 46,
+          "rows_produced_per_join": 46,
+          "filtered": "100.00",
+          "index_condition": "(`world`.`country`.`Continent` = 'Europe')",
+          "cost_info": {
+            "read_cost": "5.25",
+            "eval_cost": "4.60",
+            "prefix_cost": "9.85",
+            "data_read_per_join": "43K"
+          },
+          "used_columns": [
+            "Code",
+            "Name",
+            "Continent"
+          ]
+        }
+      },
+      {
+        "duplicates_removal": {
+          "using_temporary_table": true,
+          "table": {
+            "table_name": "city",
+            "access_type": "ref",
+            "possible_keys": [
+              "CountryCode"
+            ],
+            "key": "CountryCode",
+            "used_key_parts": [
+              "CountryCode"
+            ],
+            "key_length": "12",
+            "ref": [
+              "world.country.Code"
+            ],
+            "rows_examined_per_scan": 17,
+            "rows_produced_per_join": 46,
+            "filtered": "33.33",
+            "cost_info": {
+              "read_cost": "200.56",
+              "eval_cost": "4.60",
+              "prefix_cost": "322.97",
+              "data_read_per_join": "11K"
+            },
+            "used_columns": [
+              "CountryCode",
+              "Population"
+            ],
+            "attached_condition": "(`world`.`city`.`Population` > <cache>(((1 * 1000) * 1000)))"
+          }
+        }
+      }
+    ]
+  }
+}
+#+end_example
 
 *** NOT IN Subquery
 NOT IN 子查询通常有两种优化策略：
