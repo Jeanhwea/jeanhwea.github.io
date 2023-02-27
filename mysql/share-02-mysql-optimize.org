@@ -4959,4 +4959,72 @@ EXPLAIN: {
 #+end_example
 
 * TODO Profiling Queries
-1. [[https://dev.mysql.com/doc/refman/8.0/en/performance-schema-query-profiling.html][Profiling]]
+MySQL 自带 [[https://dev.mysql.com/doc/refman/8.0/en/performance-schema-query-profiling.html][Profiling]] 的功能，可以参考上面的说明文档开启。
+
+使用生产中也可以通过开启会话级别的 Profile 功能
+#+BEGIN_SRC text
+  mysql> SET SESSION profiling = 1;
+  Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+  mysql> use world;
+  Reading table information for completion of table and column names
+  You can turn off this feature to get a quicker startup with -A
+
+  Database changed
+  mysql> select count(*) as c, continent from country group by continent;
+  +----+---------------+
+  | c  | continent     |
+  +----+---------------+
+  | 51 | Asia          |
+  | 46 | Europe        |
+  | 37 | North America |
+  | 58 | Africa        |
+  | 28 | Oceania       |
+  |  5 | Antarctica    |
+  | 14 | South America |
+  +----+---------------+
+  7 rows in set (0.02 sec)
+
+  mysql> show profiles;
+  +----------+------------+-----------------------------------------------------------------+
+  | Query_ID | Duration   | Query                                                           |
+  +----------+------------+-----------------------------------------------------------------+
+  |        1 | 0.00220800 | SELECT DATABASE()                                               |
+  |        2 | 0.02518400 | show databases                                                  |
+  |        3 | 0.01233900 | show tables                                                     |
+  |        4 | 0.02130500 | select count(*) as c, continent from country group by continent |
+  +----------+------------+-----------------------------------------------------------------+
+  4 rows in set, 1 warning (0.00 sec)
+#+END_SRC
+
+查询执行耗时
+#+BEGIN_SRC sql
+  select query_id, seq, state, duration, source_file, source_line from information_schema.profiling where query_id = 4;
+#+END_SRC
+
+得到耗时结果
+#+BEGIN_EXAMPLE
+  mysql> select query_id, seq, state, duration, source_file, source_line from information_schema.profiling where query_id = 4;
+  +----------+-----+--------------------------------+----------+----------------------+-------------+
+  | query_id | seq | state                          | duration | source_file          | source_line |
+  +----------+-----+--------------------------------+----------+----------------------+-------------+
+  |        4 |   2 | starting                       | 0.000427 | NULL                 |        NULL |
+  |        4 |   3 | Executing hook on transaction  | 0.000014 | rpl_handler.cc       |        1472 |
+  |        4 |   4 | starting                       | 0.000109 | rpl_handler.cc       |        1474 |
+  |        4 |   5 | checking permissions           | 0.000060 | sql_authorization.cc |        2147 |
+  |        4 |   6 | Opening tables                 | 0.000366 | sql_base.cc          |        5796 |
+  |        4 |   7 | init                           | 0.000041 | sql_select.cc        |         564 |
+  |        4 |   8 | System lock                    | 0.000191 | lock.cc              |         331 |
+  |        4 |   9 | optimizing                     | 0.000057 | sql_optimizer.cc     |         296 |
+  |        4 |  10 | statistics                     | 0.000489 | sql_optimizer.cc     |         624 |
+  |        4 |  11 | preparing                      | 0.000469 | sql_optimizer.cc     |         708 |
+  |        4 |  12 | executing                      | 0.017777 | sql_union.cc         |        1186 |
+  |        4 |  13 | end                            | 0.000065 | sql_select.cc        |         597 |
+  |        4 |  14 | query end                      | 0.000034 | sql_parse.cc         |        4763 |
+  |        4 |  15 | waiting for handler commit     | 0.000257 | handler.cc           |        1489 |
+  |        4 |  16 | closing tables                 | 0.000613 | sql_parse.cc         |        4826 |
+  |        4 |  17 | freeing items                  | 0.000220 | sql_parse.cc         |        5282 |
+  |        4 |  18 | cleaning up                    | 0.000116 | sql_parse.cc         |        2381 |
+  +----------+-----+--------------------------------+----------+----------------------+-------------+
+  17 rows in set, 1 warning (0.02 sec)
+#+END_EXAMPLE
