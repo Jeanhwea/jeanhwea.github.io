@@ -4503,8 +4503,97 @@ MySQL Server 支持查询重写插件，可以在服务器执行之前检查并�
 还可以去编写符合用户要求的插件。
 
 安装 [[https://dev.mysql.com/doc/refman/8.0/en/rewriter-query-rewrite-plugin.html][rewriter]] 插件
-#+BEGIN_SRC sh
-  mysql < ./share/install_rewriter.sql
+#+BEGIN_SRC sql :results none :exports both
+  source /opt/local/mysql/share/install_rewriter.sql
+#+END_SRC
+
+查看是否开启
+#+BEGIN_EXAMPLE
+mysql> SHOW GLOBAL VARIABLES LIKE 'rewriter_enabled';
++------------------+-------+
+| Variable_name    | Value |
++------------------+-------+
+| rewriter_enabled | ON    |
++------------------+-------+
+1 row in set (0.03 sec)
+#+END_EXAMPLE
+
+插入规则
+#+BEGIN_SRC sql
+  insert into query_rewrite.rewrite_rules (pattern_database, pattern, replacement)
+  values (
+    "world",
+    "SELECT * FROM Country WHERE population > ? AND continent=?",
+    "SELECT * FROM Country WHERE population > ? AND continent=? LIMIT 1"
+  );
+
+  CALL query_rewrite.flush_rewrite_rules();
+#+END_SRC
+
+测试的 Query
+#+BEGIN_SRC sql
+  SELECT * FROM Country WHERE population > 5000000 AND continent='Asia';
+#+END_SRC
+
+这里的 SQL 会被重写插件添加 ~LIMIT 1~
+#+BEGIN_EXAMPLE
+  mysql> SELECT * FROM Country WHERE population > 5000000 AND continent='Asia'\G
+  ,*************************** 1. row ***************************
+            Code: AFG
+            Name: Afghanistan
+       Continent: Asia
+          Region: Southern and Central Asia
+     SurfaceArea: 652090.00
+       IndepYear: 1919
+      Population: 22720000
+  LifeExpectancy: 45.9
+             GNP: 5976.00
+          GNPOld: NULL
+       LocalName: Afganistan/Afqanestan
+  GovernmentForm: Islamic Emirate
+     HeadOfState: Mohammad Omar
+         Capital: 1
+           Code2: AF
+  1 row in set, 1 warning (0.02 sec)
+
+  mysql> show warnings\G
+  ,*************************** 1. row ***************************
+    Level: Note
+     Code: 1105
+  Message: Query 'SELECT * FROM Country WHERE population > 5000000 AND continent='Asia'' rewritten to 'SELECT * FROM Country WHERE population > 5000000 AND continent='Asia' LIMIT 1' by a query rewrite plugin
+  1 row in set (0.00 sec)
+#+END_EXAMPLE
+
+可以查看当前的重写规则
+#+BEGIN_SRC sql :results output
+  SELECT * FROM query_rewrite.rewrite_rules\G
+#+END_SRC
+
+#+RESULTS:
+: *************************** 1. row ***************************
+:                 id: 1
+:            pattern: SELECT * FROM Country WHERE population > ? AND continent=?
+:   pattern_database: world
+:        replacement: SELECT * FROM Country WHERE population > ? AND continent=? LIMIT 1
+:            enabled: YES
+:            message: NULL
+:     pattern_digest: 15c4d4bba597defc66e11b15e0c344170258af386d38c7b8c8eb9b1b663bbf33
+: normalized_pattern: select `*` from `world`.`country` where ((`population` > ?) and (`continent` = ?))
+
+开启或关闭单个规则
+#+BEGIN_SRC sql
+  -- 关闭规则
+  update query_rewrite.rewrite_rules set enabled = 'NO' where id = 1;
+  call query_rewrite.flush_rewrite_rules();
+
+  -- 开启规则
+  update query_rewrite.rewrite_rules set enabled = 'YES' where id = 1;
+  call query_rewrite.flush_rewrite_rules();
+#+END_SRC
+
+卸载 rewriter => [[https://dev.mysql.com/doc/refman/8.0/en/rewriter-query-rewrite-plugin-installation.html][install-and-uninstall-rewriter-plugin]]
+#+BEGIN_SRC sql :results none
+  source /opt/local/mysql/share/uninstall_rewriter.sql
 #+END_SRC
 
 ** Profiling Queries
