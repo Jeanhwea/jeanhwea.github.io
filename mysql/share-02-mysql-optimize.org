@@ -2818,12 +2818,23 @@ Semi-join 的执行概括来看就是想办法把内层的查询进行去重。�
 1. DuplicateWeedout，使用临时表针对 join 序列中，join 内表产生的重复部分，做消除
    处理；内层子查询的表通过在外层表的 rowid 上建立唯一索引来对重复生成的 country
    行数据做去重。
+
+   [[file:../static/image/2023/0227/225822.png]]
+
 2. FirstMatch，比较好理解，在选中内部表的第 1 条与外表匹配的记录后，就跳过后续的
    匹配过程，从外层表的下一条记录重新开始，从而也达到了去重的目的。
+
+   [[file:../static/image/2023/0227/230031.png]]
+
 3. LooseScan，把 inner-tables 中的第一个表，其数据基于索引进行分组，取每组第一条
    数据向后做匹配。
+
+   [[file:../static/image/2023/0227/230124.png]]
+
 4. Materialize，这个是想法上最直观的，通过将 inner-table 去重，并固化成临时表，
    遍历 outer-table，然后在固化表上去寻找匹配。
+
+   [[file:../static/image/2023/0227/230157.png]]
 
 *** NOT IN Subquery
 NOT IN 子查询通常有两种优化策略：
