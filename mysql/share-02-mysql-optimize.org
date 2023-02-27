@@ -3821,7 +3821,337 @@ EXPLAIN: {
 }
 #+end_example
 *** UNION
+UNION 的语义是合并多个结果集合，并且去重
+
+下面是一个简单合并的例子
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select * from city where countrycode = 'CAN'
+    union
+    select * from city where countrycode = 'USA'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "union_result": {
+      "using_temporary_table": true, // => 使用临时表
+      "table_name": "<union1,2>", // => 合并两个结果集
+      "access_type": "ALL",
+      "query_specifications": [
+        {
+          "dependent": false,
+          "cacheable": true,
+          "query_block": {
+            "select_id": 1,
+            "cost_info": {
+              "query_cost": "17.15"
+            },
+            "table": {
+              "table_name": "city",
+              "access_type": "ref",
+              "possible_keys": [
+                "CountryCode"
+              ],
+              "key": "CountryCode",
+              "used_key_parts": [
+                "CountryCode"
+              ],
+              "key_length": "12",
+              "ref": [
+                "const"
+              ],
+              "rows_examined_per_scan": 49,
+              "rows_produced_per_join": 49,
+              "filtered": "100.00",
+              "index_condition": "(`world`.`city`.`CountryCode` = 'CAN')",
+              "cost_info": {
+                "read_cost": "12.25",
+                "eval_cost": "4.90",
+                "prefix_cost": "17.15",
+                "data_read_per_join": "11K"
+              },
+              "used_columns": [
+                "ID",
+                "Name",
+                "CountryCode",
+                "District",
+                "Population"
+              ]
+            }
+          }
+        },
+        {
+          "dependent": false,
+          "cacheable": true,
+          "query_block": {
+            "select_id": 2,
+            "cost_info": {
+              "query_cost": "46.15"
+            },
+            "table": {
+              "table_name": "city",
+              "access_type": "ref",
+              "possible_keys": [
+                "CountryCode"
+              ],
+              "key": "CountryCode",
+              "used_key_parts": [
+                "CountryCode"
+              ],
+              "key_length": "12",
+              "ref": [
+                "const"
+              ],
+              "rows_examined_per_scan": 274,
+              "rows_produced_per_join": 274,
+              "filtered": "100.00",
+              "index_condition": "(`world`.`city`.`CountryCode` = 'USA')",
+              "cost_info": {
+                "read_cost": "18.75",
+                "eval_cost": "27.40",
+                "prefix_cost": "46.15",
+                "data_read_per_join": "66K"
+              },
+              "used_columns": [
+                "ID",
+                "Name",
+                "CountryCode",
+                "District",
+                "Population"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+#+end_example
+
+注意：之前介绍 view 和 subqueries 时，对于上述类似的查询会使用 merge 策略合并成
+语句，但是 union 却不会 merge 策略。
+#+BEGIN_SRC sql :results none
+  select * from city where countrycode in ('CAN', 'USA');
+#+END_SRC
+
 *** UNION ALL
+union all 和 union 类似，但是 union all 不会给结果集去重
+
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select * from city where countrycode = 'CAN'
+    union all
+    select * from city where countrycode = 'USA'\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "union_result": {
+      "using_temporary_table": false, // => 这里不需要临时表，因为 union all 不需要去重
+      "query_specifications": [
+        {
+          "dependent": false,
+          "cacheable": true,
+          "query_block": {
+            "select_id": 1,
+            "cost_info": {
+              "query_cost": "17.15"
+            },
+            "table": {
+              "table_name": "city",
+              "access_type": "ref",
+              "possible_keys": [
+                "CountryCode"
+              ],
+              "key": "CountryCode",
+              "used_key_parts": [
+                "CountryCode"
+              ],
+              "key_length": "12",
+              "ref": [
+                "const"
+              ],
+              "rows_examined_per_scan": 49,
+              "rows_produced_per_join": 49,
+              "filtered": "100.00",
+              "index_condition": "(`world`.`city`.`CountryCode` = 'CAN')",
+              "cost_info": {
+                "read_cost": "12.25",
+                "eval_cost": "4.90",
+                "prefix_cost": "17.15",
+                "data_read_per_join": "11K"
+              },
+              "used_columns": [
+                "ID",
+                "Name",
+                "CountryCode",
+                "District",
+                "Population"
+              ]
+            }
+          }
+        },
+        {
+          "dependent": false,
+          "cacheable": true,
+          "query_block": {
+            "select_id": 2,
+            "cost_info": {
+              "query_cost": "46.15"
+            },
+            "table": {
+              "table_name": "city",
+              "access_type": "ref",
+              "possible_keys": [
+                "CountryCode"
+              ],
+              "key": "CountryCode",
+              "used_key_parts": [
+                "CountryCode"
+              ],
+              "key_length": "12",
+              "ref": [
+                "const"
+              ],
+              "rows_examined_per_scan": 274,
+              "rows_produced_per_join": 274,
+              "filtered": "100.00",
+              "index_condition": "(`world`.`city`.`CountryCode` = 'USA')",
+              "cost_info": {
+                "read_cost": "18.75",
+                "eval_cost": "27.40",
+                "prefix_cost": "46.15",
+                "data_read_per_join": "66K"
+              },
+              "used_columns": [
+                "ID",
+                "Name",
+                "CountryCode",
+                "District",
+                "Population"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+#+end_example
+
+union all 和 union 不同的是需要临时表，但是添加 order by 语句时就需要临时表
+#+BEGIN_SRC sql :results output :exports both
+  explain format=json
+    select * from city where countrycode = 'CAN'
+    union all
+    select * from city where countrycode = 'USA' order by name\G
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+EXPLAIN: {
+  "query_block": {
+    "union_result": {
+      "using_temporary_table": true, // => 临时表提供排序功能
+      "table_name": "<union1,2>",
+      "access_type": "ALL",
+      "query_specifications": [
+        {
+          "dependent": false,
+          "cacheable": true,
+          "query_block": {
+            "select_id": 1,
+            "cost_info": {
+              "query_cost": "17.15"
+            },
+            "table": {
+              "table_name": "city",
+              "access_type": "ref",
+              "possible_keys": [
+                "CountryCode"
+              ],
+              "key": "CountryCode",
+              "used_key_parts": [
+                "CountryCode"
+              ],
+              "key_length": "12",
+              "ref": [
+                "const"
+              ],
+              "rows_examined_per_scan": 49,
+              "rows_produced_per_join": 49,
+              "filtered": "100.00",
+              "index_condition": "(`world`.`city`.`CountryCode` = 'CAN')",
+              "cost_info": {
+                "read_cost": "12.25",
+                "eval_cost": "4.90",
+                "prefix_cost": "17.15",
+                "data_read_per_join": "11K"
+              },
+              "used_columns": [
+                "ID",
+                "Name",
+                "CountryCode",
+                "District",
+                "Population"
+              ]
+            }
+          }
+        },
+        {
+          "dependent": false,
+          "cacheable": true,
+          "query_block": {
+            "select_id": 2,
+            "cost_info": {
+              "query_cost": "46.15"
+            },
+            "table": {
+              "table_name": "city",
+              "access_type": "ref",
+              "possible_keys": [
+                "CountryCode"
+              ],
+              "key": "CountryCode",
+              "used_key_parts": [
+                "CountryCode"
+              ],
+              "key_length": "12",
+              "ref": [
+                "const"
+              ],
+              "rows_examined_per_scan": 274,
+              "rows_produced_per_join": 274,
+              "filtered": "100.00",
+              "index_condition": "(`world`.`city`.`CountryCode` = 'USA')",
+              "cost_info": {
+                "read_cost": "18.75",
+                "eval_cost": "27.40",
+                "prefix_cost": "46.15",
+                "data_read_per_join": "66K"
+              },
+              "used_columns": [
+                "ID",
+                "Name",
+                "CountryCode",
+                "District",
+                "Population"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+#+end_example
 
 ** Sorting
 
