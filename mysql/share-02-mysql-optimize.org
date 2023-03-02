@@ -389,7 +389,16 @@ Optimize Trace 工具使用步骤
 
 * 主题 Topics
 ** Logical Transformations
-*** 前置说明
+*** 逻辑变换
+1. 否定消除：对于多个表达式的和取或析取范式前面有否定的情况，应将关系条件分解成
+   一个一个的，将外面的 NOT 消除；
+2. 等值常量传递：利用了等值关系的传递特性，为了能够尽早执行下推运算
+3. 常量表达式计算：对于能够立刻计算出结果的表达式，直接计算结果，并将结果与其他
+   条件尽量提前化简
+
+[[file:../static/image/2023/0302/113149.png]]
+
+*** 实验案例
 Transformation 可以理解对输入的 Query 字符串进行转化，我们以例子进行分析
 #+BEGIN_SRC sql
   select * from country where population > 5000000 and continent = 'Asia' and 1 = 1;
@@ -3283,7 +3292,7 @@ EXPLAIN: {
       },
       {
         "table": {
-          "table_name": "<subquery2>",
+        "table_name": "<subquery2>",
           "access_type": "eq_ref",
           "key": "<auto_distinct_key>",
           "key_length": "13",
