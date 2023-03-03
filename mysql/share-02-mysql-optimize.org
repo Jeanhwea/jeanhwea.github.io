@@ -7,6 +7,13 @@
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
 #+PROPERTY: header-args:sql :dbhost 127.0.0.1 :database world :engine mysql :dbuser root :exports both
 #+STARTUP: indent cache num inlineimages
+#+LATEX_COMPILER: xelatex
+#+LATEX_CLASS: beamer
+#+LATEX_CLASS_OPTIONS: [presentation]
+#+LATEX_HEADER: \usepackage[scheme=plain]{ctex}
+#+BEAMER_THEME: Madrid
+#+OPTIONS: H:2 toc:t
+#+OPTIONS: ^:nil
 
 
 * 引言 MySQL Architecture
@@ -888,7 +895,7 @@ MySQL 优化器的计算模型依赖系统的元数据和统计信息，见 [[ht
 *** cost 常量配置实验
 默认执行 SQL 的花费
 #+BEGIN_SRC sql :results output
-  explain format=json select * from country where continent='asia' and population > 5000000\G
+  explain format=json select * from country where continent='Asia' and population > 5000000\G
 #+END_SRC
 
 #+RESULTS:
@@ -942,7 +949,7 @@ EXPLAIN: {
 #+END_SRC
 
 #+BEGIN_SRC sql :results output
-  explain format=json select * from country where continent='asia' and population > 5000000\G
+  explain format=json select * from country where continent='Asia' and population > 5000000\G
 #+END_SRC
 
 #+RESULTS:
@@ -1193,7 +1200,7 @@ EXPLAIN: {
 
 #+BEGIN_SRC sql :results output
   explain format=json
-    select /*+NO_RANGE_OPTIMIZATION(Country) */  * from country
+    select /*+ NO_RANGE_OPTIMIZATION(Country) */  * from country
     where population > 1000000000 and continent='Asia'\G
 #+END_SRC
 
@@ -2821,7 +2828,6 @@ EXPLAIN: {
   }
 #+END_SRC
 
-*** Semi-Join
 *** Semi-Join Alogrithm
 以下面查询为例
 #+BEGIN_SRC sql
@@ -2895,7 +2901,7 @@ EXPLAIN: {
   "query_block": {
     "select_id": 1,
     "cost_info": {
-      "query_cost": "290.63"
+      "query_cost": "576.09"
     },
     "nested_loop": [
       {
@@ -2904,7 +2910,8 @@ EXPLAIN: {
           "access_type": "ref",
           "possible_keys": [
             "PRIMARY",
-            "c"
+            "c",
+            "c_p"
           ],
           "key": "c",
           "used_key_parts": [
@@ -2933,34 +2940,40 @@ EXPLAIN: {
       },
       {
         "table": {
-          "table_name": "city",
-          "access_type": "ref",
-          "possible_keys": [
-            "CountryCode"
-          ],
-          "key": "CountryCode",
-          "used_key_parts": [
-            "CountryCode"
-          ],
+          "table_name": "<subquery2>",
+          "access_type": "eq_ref",
+          "key": "<auto_distinct_key>",
           "key_length": "12",
           "ref": [
             "world.country.Code"
           ],
-          "rows_examined_per_scan": 17,
-          "rows_produced_per_join": 46,
-          "filtered": "33.33",
-          "first_match": "country",
-          "cost_info": {
-            "read_cost": "200.56",
-            "eval_cost": "4.60",
-            "prefix_cost": "290.63",
-            "data_read_per_join": "11K"
-          },
-          "used_columns": [
-            "CountryCode",
-            "Population"
-          ],
-          "attached_condition": "(`world`.`city`.`Population` > <cache>(((1 * 1000) * 1000)))"
+          "rows_examined_per_scan": 1,
+          "materialized_from_subquery": {
+            "using_temporary_table": true,
+            "query_block": {
+              "table": {
+                "table_name": "city",
+                "access_type": "ALL",
+                "possible_keys": [
+                  "CountryCode"
+                ],
+                "rows_examined_per_scan": 4035,
+                "rows_produced_per_join": 1344,
+                "filtered": "33.33",
+                "cost_info": {
+                  "read_cost": "291.67",
+                  "eval_cost": "134.49",
+                  "prefix_cost": "426.16",
+                  "data_read_per_join": "325K"
+                },
+                "used_columns": [
+                  "CountryCode",
+                  "Population"
+                ],
+                "attached_condition": "(`world`.`city`.`Population` > <cache>(((1 * 1000) * 1000)))"
+              }
+            }
+          }
         }
       }
     ]
