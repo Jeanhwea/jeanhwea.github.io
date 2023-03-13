@@ -5,6 +5,46 @@
 #+HTML_LINK_UP: ../readme.html
 #+HTML_LINK_HOME: ../index.html
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+PROPERTY: header-args:sql :dbhost 127.0.0.1 :database world :engine mysql :dbuser root :exports both
+#+STARTUP: indent cache num inlineimages
 
+* 测试表
+#+BEGIN_SRC sql :results output
+  show create table country\G
+#+END_SRC
 
-* starting here
+#+RESULTS:
+#+begin_example
+,*************************** 1. row ***************************
+       Table: country
+Create Table: CREATE TABLE `country` (
+  `Code` char(3) NOT NULL DEFAULT '',
+  `Name` char(52) NOT NULL DEFAULT '',
+  `Continent` enum('Asia','Europe','North America','Africa','Oceania','Antarctica','South America') NOT NULL DEFAULT 'Asia',
+  `Region` char(26) NOT NULL DEFAULT '',
+  `SurfaceArea` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `IndepYear` smallint DEFAULT NULL,
+  `Population` int NOT NULL DEFAULT '0',
+  `LifeExpectancy` decimal(3,1) DEFAULT NULL,
+  `GNP` decimal(10,2) DEFAULT NULL,
+  `GNPOld` decimal(10,2) DEFAULT NULL,
+  `LocalName` char(45) NOT NULL DEFAULT '',
+  `GovernmentForm` char(45) NOT NULL DEFAULT '',
+  `HeadOfState` char(60) DEFAULT NULL,
+  `Capital` int DEFAULT NULL,
+  `Code2` char(2) NOT NULL DEFAULT '',
+  PRIMARY KEY (`Code`),
+  KEY `c` (`Continent`),
+  KEY `c_p` (`Continent`,`Population`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+#+end_example
+
+* 查询语句
+#+BEGIN_SRC sql
+  select count(*) from country where continent = 'Asia';
+#+END_SRC
+
+#+RESULTS:
+| count(*) |
+|----------|
+|       51 |
