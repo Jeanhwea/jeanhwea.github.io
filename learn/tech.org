@@ -749,10 +749,8 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
 *** Minix
 **** 配置环境
 [[https://wiki.minix3.org/doku.php?id=developersguide:crosscompiling][交叉编译文档]]
-#+BEGIN_SRC sql
-  sudo apt-get install build-essential curl git zlibc zlib1g zlib1g-dev g++
-#+END_SRC
 
+下载代码
 #+BEGIN_SRC sh
   mkdir minix
   cd minix
@@ -760,9 +758,30 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
   cd src
 #+END_SRC
 
+安装依赖
+#+BEGIN_SRC sql
+  sudo apt-get install build-essential curl git zlibc zlib1g zlib1g-dev g++
+#+END_SRC
+
+编译内存镜像
 #+BEGIN_SRC sh
   JOBS=8 ./releasetools/x86_hdimage.sh
 #+END_SRC
+
+启动镜像
+#+BEGIN_SRC sh
+  cd ../obj.i386/destdir.i386/boot/minix/.temp
+
+  qemu-system-i386 -display none \
+                   -serial stdio \
+                   -kernel kernel \
+                   -append "console=tty00 rootdevname=c0d0p1" \
+                   -initrd "mod01_ds,mod02_rs,mod03_pm,mod04_sched,mod05_vfs,mod06_memory,mod07_tty,mod08_mfs,mod09_vm,mod10_pfs,mod11_init" \
+                   -hda /opt/local/hack/minix/src/minix_x86.img --enable-kvm
+#+END_SRC
+
+[[file:../static/image/2023/0315/112736.png]]
+
 
 ** 极客时光
 *** 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/22%20%E8%AE%B2%E9%80%9A%E5%85%B3%20Go%20%E8%AF%AD%E8%A8%80-%E5%AE%8C][22 讲通关 Go 语言]]
