@@ -683,30 +683,54 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
    #+END_SRC
 ** kafka
 *** 环境配置
+**** 官网快速使用手册
 1. [[https://kafka.apache.org/quickstart][quickstart]]
-#+BEGIN_SRC text
-  ➜  kafka git:(jh/3.4.0) ./gradlew build
+#+BEGIN_SRC sh
+  # 启动 zk
+  ./bin/zookeeper-server-start.sh config/zookeeper.properties
+  # 启动 kafka
+  ./bin/kafka-server-start.sh config/server.properties
 
-  Welcome to Gradle 7.6!
+  # 创建 topic
+  ./bin/kafka-topics.sh --create --topic quickstart-events --bootstrap-server localhost:9092
+  # 显示 topic 列表
+  ./bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+  # 查看指定 topic 状态
+  ./bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic quickstart-events
 
-  Here are the highlights of this release:
-   - Added support for Java 19.
-   - Introduced `--rerun` flag for individual task rerun.
-   - Improved dependency block for test suites to be strongly typed.
-   - Added a pluggable system for Java toolchains provisioning.
-
-  For more details see https://docs.gradle.org/7.6/release-notes.html
-
-  Starting a Gradle Daemon, 1 busy Daemon could not be reused, use --status for details
-
-  > Configure project :
-  Starting build with version 3.4.0 (commit id 2e1947d2) using Gradle 7.6, Java 1.8 and Scala 2.13.10
-  Build properties: maxParallelForks=4, maxScalacThreads=4, maxTestRetries=0
+  # 生产者 & 消费者
+  ./bin/kafka-console-consumer.sh --topic quickstart-events --from-beginning --bootstrap-server localhost:9092
+  ./bin/kafka-console-producer.sh --topic quickstart-events --bootstrap-server localhost:9092
 #+END_SRC
 
 跳过测试编译
 #+BEGIN_SRC sh
   ./gradlew build -x test
+#+END_SRC
+
+**** docker 版本配置
+1. [[https://hub.docker.com/r/bitnami/kafka/][docker hub]]
+#+BEGIN_SRC yaml
+  version: "3"
+  services:
+    zookeeper:
+      image: 'bitnami/zookeeper:latest'
+      ports:
+        - '2181:2181'
+      environment:
+        - ALLOW_ANONYMOUS_LOGIN=yes
+    kafka:
+      image: 'bitnami/kafka:latest'
+      ports:
+        - '9092:9092'
+      environment:
+        - KAFKA_BROKER_ID=1
+        - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+        - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+        - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+        - ALLOW_PLAINTEXT_LISTENER=yes
+      depends_on:
+        - zookeeper
 #+END_SRC
 
 * 🏄 脚本语言
