@@ -703,9 +703,9 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
   ./bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic quickstart-events
 #+END_SRC
 
-跳过测试编译
+配置相关
 #+BEGIN_SRC sh
-  ./gradlew build -x test
+  ./bin/kafka-configs.sh --zookeeper localhost:2181 --all
 #+END_SRC
 
 **** docker 版本配置
@@ -714,6 +714,73 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
    #+BEGIN_SRC sh
      docker-compose up -d
    #+END_SRC
+
+**** 源代码
+跳过测试编译
+#+BEGIN_SRC sh
+  ./gradlew build -x test
+#+END_SRC
+** hive
+配置 hadoop
+#+BEGIN_SRC sh
+  export HADOOP_HOME=/opt/local/hack/hadoop-2.6.0
+  export PATH="$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH"
+  export HIVE_HOME=/opt/local/hack/apache-hive-1.2.2-bin
+  export PATH="$HIVE_HOME/bin:$PATH"
+#+END_SRC
+
+配置 core-site.xml
+#+BEGIN_SRC xml
+  <configuration>
+     <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9000</value>
+     </property>
+  </configuration>
+#+END_SRC
+
+配置 hdfs-site.xml
+#+BEGIN_SRC xml
+  <configuration>
+    <property>
+      <name>dfs.replication</name>
+      <value>1</value>
+    </property>
+
+    <property>
+      <name>dfs.namenode.name.dir</name>
+      <value>/opt/local/hdfs/namenode</value>
+    </property>
+
+    <property>
+      <name>dfs.datanode.data.dir</name>
+      <value>/opt/local/hdfs/datanode</value>
+    </property>
+  </configuration>
+#+END_SRC
+
+初始化命令
+#+BEGIN_SRC sh
+  # 格式化 namenode
+  hdfs namenode -format
+  # 启动/关闭 dfs
+  start-dfs.sh
+  stop-dfs.sh
+#+END_SRC
+
+hive 需要有 /tmp, /user/hive/warehouse 目录, 并且配置 g+w 权限
+- 配置元数据存放目录 hive.metastore.warehouse.dir
+#+BEGIN_SRC sh
+  hadoop fs -mkdir       /tmp
+  hadoop fs -mkdir -p    /user/hive/warehouse
+  hadoop fs -chmod g+w   /tmp
+  hadoop fs -chmod g+w   /user/hive/warehouse
+#+END_SRC
+
+解决 [ERROR] Terminal initialization failed; falling back to unsupported 问题
+#+BEGIN_SRC sh
+  export HADOOP_USER_CLASSPATH_FIRST=true
+#+END_SRC
 
 * 🏄 脚本语言
 ** Perl
