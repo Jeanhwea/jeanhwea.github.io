@@ -1,0 +1,74 @@
+#+TITLE: Golang 并发编程
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2023-03-22 Wed 23:29:01>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+STARTUP: indent cache num inlineimages
+
+
+* 并发概念
+** 并发 vs. 并行
+并发 (conrurrent) 和并行 (parallel) 是两个不同的概念，并发强调是“发”（出发），并
+行则着重“行”（执行）。并发对应的是顺序，并行对应的是串行。
+
+并发重在避免阻塞，使程序不会因为阻塞而停止执行；并行则是依赖硬件和操作系统的资源。
+
+[[file:../static/image/2023/0322/232950.png]]
+
+** 常见并发模型
+*** 共享内存
+多线程共享内存。其实就是 Java 或者 C++等语言中的多线程开发。常见访问共享变量，线
+程安全的数据结构等
+*** Actor 和 CSP 模型
+#+BEGIN_EXAMPLE
+Don’t communicate by sharing memory, share memory by communicating
+不要通过共享内存来通信，而应该通过通信来共享内存
+#+END_EXAMPLE
+
+Actor 和 CSP 就是两种基于这种思想的并发编程模型。
+**** Actor 模型
+在 Actor 模型中，主角是 Actor，类似一种 worker，Actor 彼此之间直接发送消息，不需
+要经过什么中介，消息是异步发送和处理的：
+
+[[file:../static/image/2023/0322/233116.png]]
+
+Actor 模型描述了一组为了避免并发编程的常见问题的公理:
+1. 所有 Actor 状态是 Actor 本地的，外部无法访问。
+2. Actor 必须只有通过消息传递进行通信。
+3. 一个 Actor 可以响应消息:推出新 Actor,改变其内部状态,或将消息发送到一个或多个其他参与者。
+4. Actor 可能会堵塞自己,但 Actor 不应该堵塞它运行的线程。
+
+Map-Reduce 就是 actor 模型的一个典型应用。
+**** CSP (communicating sequential processes，通讯顺序进程)
+Channel 模型中，worker 之间不直接彼此联系，而是通过不同 channel 进行消息发布和侦
+听。消息的发送者和接收者之间通过 Channel 松耦合，发送者不知道自己消息被哪个接收
+者消费了，接收者也不知道是哪个发送者发送的消息。
+
+[[file:../static/image/2023/0322/233224.png]]
+
+Go 语言的 CSP 模型是由协程 Goroutine 与通道 Channel 实现：
+1. Go 协程 goroutine: 是一种轻量线程，它不是操作系统的线程，而是将一个操作系统线程
+   分段使用，通过调度器实现协作式调度。是一种绿色线程，微线程，它与 Coroutine 协程
+   也有区别，能够在发现堵塞后启动新的微线程。
+2. 通道 channel: 类似 Unix 的 Pipe，用于协程之间通讯和同步。协程之间虽然解耦，但是
+   它们和 Channel 有着耦合。
+*** 常见语言的并发模型
+- Golang 主要就是实现 CSP 模型里的 process 和 channel 概念，核心是不需要用户来执
+  行调度，使用了 N:M 方案，简化了开发过程
+- Scala 采用的是 Actor 的实现
+- Node.js 是单线程通过事件循环来实现并发（并不是并行）
+
+** 调度模式
+- **非剥夺调度方式** 又称非抢占方式。是指当一个进程正在处理器上执行时 ，即使有某
+  个更为重要或紧迫的进程进入就绪队列，仍然让正在执行的进程继续执行，直到该进程完
+  成或发生某种事件而进入阻塞状态时，才把处理器分配给更为重要或紧迫的进程。
+- **剥夺调度方式** 又称抢占方式。是指当一个进程正在处理器上执行时，若有某个更为
+  重要或紧迫的进程需要使用处理器，则立即暂停正在执行的进程，将处理器分配给这个更
+  为重要或紧迫的进程。
+
+* Golang
+[[https://golang.design/under-the-hood/zh-cn/part2runtime/ch06sched/preemption/][协作与抢占]]
+
+[[file:../static/image/2023/0322/233821.png]]
