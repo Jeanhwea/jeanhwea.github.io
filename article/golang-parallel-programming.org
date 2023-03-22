@@ -68,7 +68,152 @@ Go 语言的 CSP 模型是由协程 Goroutine 与通道 Channel 实现：
   重要或紧迫的进程需要使用处理器，则立即暂停正在执行的进程，将处理器分配给这个更
   为重要或紧迫的进程。
 
-* Golang
+* Golang 并发
 [[https://golang.design/under-the-hood/zh-cn/part2runtime/ch06sched/preemption/][协作与抢占]]
 
 [[file:../static/image/2023/0322/233821.png]]
+
+* 常见实践
+** Channel
+Channel 是 CSP 派生的同步原语之一，是 Golang 推崇的 “使用通信来共享内存，而不是
+通过共享内存来通信” 理念的最有利的工具。Channel 大家都比较熟悉，就不过多赘述了。
+
+** Cond
+sync.Cond 条件变量用来协调想要访问共享资源的那些 goroutine，当共享资源的状态发生
+变化的时候，它可以用来通知被互斥锁阻塞的 goroutine。
+
+条件变量和互斥锁的区别在于互斥锁 sync.Mutex 通常用来保护临界区和共享资源，条件变
+量 sync.Cond 用来协调想要访问共享资源的 goroutine。如果用 chan 或者 mutex 来做控
+制，最多只能有一个协程等待并获得数据，或者为每个协程建立一个 channel，而 cond 可
+以简化这个操作。
+
+每个 Cond 实例都会关联一个锁 L（互斥锁 *Mutex，或读写锁 *RWMutex），当修改条件或
+者调用 Wait 方法时，必须加锁。
+
+Cond 用法较复杂，如果想详细了解参考 这一次，彻底搞懂 Go Cond。
+
+Cond 的几个常用方法：
+**** NewCond
+创建实例，需要关联一个锁。
+**** Broadcast
+广播唤醒所有协程，无需锁保护。
+**** Signal
+唤醒随机一个协程，无需锁保护。
+**** Wait 等待
+调用 Wait 会自动释放锁 c.L，并挂起调用者所在的 goroutine，因此当前协程会阻塞在
+Wait 方法调用的地方。如果其他协程调用了 Signal 或 Broadcast 唤醒了该协程，那么
+Wait 方法在结束阻塞时，会重新给 c.L 加锁，并且继续执行 Wait 后面的代码。
+
+对条件的检查，使用了 for !condition() 而非 if，是因为当前协程被唤醒时，条件不一
+定符合要求，需要再次 Wait 等待下次被唤醒。为了保险起见，使用 for 能够确保条件符
+合要求后，再执行后续的代码。什么是 spurious wakeups(虚假唤醒)_Tornado1102 的博
+客-CSDN 博客_spurious wakeup
+
+** Sync 包
+*** WaitGroup
+WaitGroup 包是最常见等待多组并发完成的操作。
+
+*** Mutex & RWMutex
+互斥锁和读写锁是用于保护临界区和共享资源的一个方式。读写锁一般应用于读多写少的情
+况下。锁的要点在于尽可能减少临界区大小，同时注意正确获取释放的方式（防止死锁）。
+需要注意的是，在 goroutine 里用 defer 来调用 Unlock 是个常见的习惯用法，确保了即
+使出现了 panic，调用也总是执行，防止出现死锁。
+
+*** Once
+sync.Once 是 Go 标准库提供的使函数只执行一次的实现，常应用于单例模式，例如初始化
+配置、保持数据库连接等。作用与 init 函数类似，但有区别。
+- init 函数是当所在的 package 首次被加载时执行，若迟迟未被使用，则既浪费了内存，
+  又延长了程序加载时间。
+- sync.Once 可以在代码的任意位置初始化和调用，因此可以延迟到使用时再执行，并发场
+  景下是线程安全的。
+
+*** Map
+sync.Map 是一个并发版本的 Go 语言的 map，我们可以：
+- 使用 Store(interface {}，interface {}) 添加元素。
+- 使用 Load(interface {}) interface {}) 检索元素。
+- 使用 Delete(interface {}) 删除元素。
+- 使用 LoadOrStore(interface {}，interface {}) (interface {}，bool) 检索或添加之
+  前不存在的元素。如果键之前在 map 中存在，则返回的布尔值为 true。
+- 使用 Range 遍历元素。
+
+** Context 包
+Context 包是专门用来简化对于处理单个请求的多个 goroutine 之间与请求域的数据、取
+消信号、截止时间等相关操作。
+
+Context 包内置的两个方法来创建上下文的实例：
+#+BEGIN_SRC go
+  func Background() Context
+  func TODO() Context
+#+END_SRC
+
+Background 主要用于 main 函数、初始化以及测试代码中，作为 Context 这个树结构的最
+顶层的 Context，不能被取消；TODO，如果我们不知道该使用什么 Context 的时候，可以
+使用这个，实际上两者效果相同。
+
+然后以此作为最顶层的父 Context，衍生出子 Context 启动调用链。而这些 Context 对象
+形成了一棵树，当父 Context 对象被取消时，它的所有子 Context 都会被取消。context
+包还提供了一系列函数用以产生子 Context：
+#+BEGIN_SRC go
+  func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
+  func WithDeadline(parent Context, deadline time.Time) (Context, CancelFunc)
+  func WithTimeout(parent Context, timeout time.Duration) (Context, CancelFunc)
+  func WithValue(parent Context, key, val interface{}) Context
+#+END_SRC
+
+** 高性能并发
+*** 锁
+加锁的目的就是保证共享资源在任意时间里，只有一个线程访问，这样就可以避免多线程导
+致共享数据错乱的问题。
+
+锁有很多种分类，常见的有自旋锁和互斥锁，区别在于互斥锁加锁失败后，线程会释放 CPU
+，给其他线程；自旋锁加锁失败后，线程会忙等待，直到它拿到锁。自旋锁可以简单看成在
+while 中判断是否可以获得锁，消耗 CPU 资源。可以看出如果没有特殊需求，应采用互斥
+锁来保护资源节省 CPU。同时还要注意应尽可能的减少锁保护的范围，从而增加利用率。
+Golang 并没有提供自旋锁，可通过如下来简单实现。
+
+#+BEGIN_SRC go
+  type spinLock uint32
+
+  func (sl *spinLock) Lock() {
+      for !atomic.CompareAndSwapUint32((*uint32)(sl), 0, 1) {
+          runtime.Gosched()
+      }
+  }
+
+  func (sl *spinLock) Unlock() {
+      atomic.StoreUint32((*uint32)(sl), 0)
+  }
+
+  func NewSpinLock() sync.Locker {
+      var lock spinLock
+      return &lock
+  }
+#+END_SRC
+
+Go 标准库里提供了两种锁，互斥锁和读写锁，关于两者的性能，根据读写操作时间的不同，
+有大致这样的对比。
+
+在读写操作耗时约 1 μs 时：
+- 读写比为 9:1 时，读写锁的性能约为互斥锁的 8 倍
+- 读写比为 1:9 时，读写锁性能相当
+- 读写比为 5:5 时，读写锁的性能约为互斥锁的 2 倍
+
+而当读写操作耗时 0.1 μs 时，读写锁性能优势降低三分之一；当读写操作增加后，性能对
+比和 1 μs 时差不多。
+
+*** 原子操作
+原子操作通常可以取得比锁更高的性能，下面是 atomic.Value 对比 mutex 的 benchmark：
+
+[[file:../static/image/2023/0322/235617.png]]
+
+*** Channel
+Golang 现有的 channel 是由有锁队列实现的，所以性能并不占优势，在大量数据流转的情
+况下可以考虑用其他数据结构。 [[https://stackoverflow.com/questions/57562606/why-does-sync-mutex-largely-drop-performance-when-goroutine-contention-is-more-t][so]]
+
+[[file:../static/image/2023/0322/235813.png]]
+
+
+可以看出在低并发下，单纯的锁性能要优于使用 channel，而原子操作是最优的。之前针对
+多生产者 append 的性能做过测试，有锁情况下的 append 花费时间大概是用 channel 版
+本的 1/5。简而言之如果队列成为性能瓶颈时可以考虑用锁来实现或者用其他如循环队列等
+无锁结构来优化性能。
