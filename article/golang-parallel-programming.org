@@ -217,3 +217,16 @@ Golang 现有的 channel 是由有锁队列实现的，所以性能并不占优�
 多生产者 append 的性能做过测试，有锁情况下的 append 花费时间大概是用 channel 版
 本的 1/5。简而言之如果队列成为性能瓶颈时可以考虑用锁来实现或者用其他如循环队列等
 无锁结构来优化性能。
+
+*** sync.Map
+sync.Map 的主要使用场景是“读多写少”，针对读多写少的情况下，具体性能测试指标。测
+试方法为对于一个给定的 sync.Map，并发场景下存在 1 个 goroutine 对某个 key 进行并
+发写，并同时存在 n-1 个 goroutine 对同一个 key 产生并发读。
+
+对比使用互斥锁和读写锁的开销时间如下： [[https://golang.design/under-the-hood/zh-cn/part1basic/ch05sync/map/][link]]
+
+[[file:../static/image/2023/0322/235935.png]]
+
+可以看到通过 sync.Map 储存读取的开销远小于用锁的示例，并且随着并发数的增加而扩大
+优势，这是由于 golang 做了特殊的优化，使得 sync.Map 花销时间比有锁情况下大大减少。
+更多测试内容和优化原理详见
