@@ -507,6 +507,21 @@ Slave_SQL_Running: Yes
 : kube-system   kube-scheduler-minikube            1/1     Running   0             57s
 : kube-system   storage-provisioner                1/1     Running   1 (18s ago)   54s
 
+* 🐂 GNU
+** ssh
+*** forward
+本地转发
+#+BEGIN_SRC sh
+  # -N 不执行命令, -L local 转发 <remote-port>:<local-host>:<local-port>
+  ssh -N -L 9092:127.0.0.1:9092 user@host
+#+END_SRC
+
+远端转发
+#+BEGIN_SRC sh
+  # -N 不执行命令, -R remote 转发 <local-port>:<remote-host>:<remote-port>
+  ssh -N -R 9092:127.0.0.1:9092 user@host
+#+END_SRC
+
 * 🐢 GDB & LLDB
 ** 📚 参考资料
 1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
@@ -719,6 +734,15 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
 跳过测试编译
 #+BEGIN_SRC sh
   ./gradlew build -x test
+#+END_SRC
+
+编译发布包
+#+BEGIN_SRC sh
+  # 编译包
+  ./gradlew clean releaseTarGz
+
+  # 编译产物
+  ls ./core/build/distributions/
 #+END_SRC
 ** hive
 配置 [[https://hadoop.apache.org/docs/r2.6.2/hadoop-project-dist/hadoop-common/SingleCluster.html#Standalone_Operation][hadoop]]
