@@ -278,10 +278,21 @@ Slave_SQL_Running: Yes
 #+END_SRC
 
 ** 运维主题
-*** 配置用户权限
+*** 创建用户 & 授权访问数据库
 #+BEGIN_SRC sql
   create user 'jeffrey'@'%' identified by 'hello';
   grant all privileges on employees.* to 'jeffrey'@'%';
+  flush privileges;
+#+END_SRC
+*** 查看当前用户权限
+#+BEGIN_SRC sql
+  select user, host from mysql.user;
+#+END_SRC
+*** 修改用户密码
+#+BEGIN_SRC sql
+  use mysql;
+  set password for 'jeffrey'@'%' = password('root');
+  update user set host = '%' where user = 'root';
   flush privileges;
 #+END_SRC
 
