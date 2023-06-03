@@ -284,6 +284,7 @@ Slave_SQL_Running: Yes
   grant all privileges on employees.* to 'jeffrey'@'%';
   flush privileges;
 #+END_SRC
+
 *** 查看当前用户权限
 #+BEGIN_SRC sql
   select user, host from mysql.user;
@@ -295,6 +296,8 @@ Slave_SQL_Running: Yes
   update user set password = password('new.password') where user = 'jeffrey' and host = '%';
   update user set host = '%' where user = 'root';
   flush privileges;
+
+  alter user 'jeffrey'@'%' identitied by 'mypass';
 #+END_SRC
 
 ** 源码研究
@@ -548,7 +551,25 @@ Slave_SQL_Running: Yes
   # -N 不执行命令, -R remote 转发 <local-port>:<remote-host>:<remote-port>
   ssh -N -R 9092:127.0.0.1:9092 user@host
 #+END_SRC
+** centos7 & gcc 11
+*** SCL (Software Collection)
+SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources/Repositories/SCL][link]]
+#+BEGIN_SRC sql
+  yum install centos-release-scl
 
+  yum makecache
+  yum repolist
+#+END_SRC
+
+*** Red Hat Developer Toolset
+1. 使用手册 [[https://access.redhat.com/documentation/en-us/red_hat_developer_toolset/11/html-single/user_guide/index#doc-wrapper][User Guide]]
+   #+BEGIN_SRC sh
+     yum install scl-utils centos-release-scl
+
+     yum list all --enablerepo='centos-sclo-rh' | grep "devtoolset"
+     yum install devtoolset-11-toolchain
+   #+END_SRC
+2. 配置
 * 🐢 GDB & LLDB
 ** 📚 参考资料
 1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
