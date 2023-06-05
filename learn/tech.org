@@ -12,11 +12,12 @@
 #+LATEX_HEADER: \usepackage[scheme=plain]{ctex}
 #+BEAMER_THEME: boxes
 
-* 🍎 Oracle
-** 📚 参考资料
+* 🧑‍💻 后端研发
+** 🍎 Oracle
+*** 📚 参考资料
 1. Oracle 关系数据库 [[file:../database/oracle.org::*参考链接][参考链接]]
-** 开发环境配置
-*** CentOS 7 镜像启动
+*** 开发环境配置
+**** CentOS 7 镜像启动
 1. [[https://hub.docker.com/_/centos/][docker container]]
 2. 启动 centos7 镜像
    #+BEGIN_SRC sh
@@ -32,7 +33,7 @@
    #+BEGIN_SRC sh
      docker rm -f pence
    #+END_SRC
-*** 配置主机开发环境
+**** 配置主机开发环境
 安装一波系统依赖库
 #+BEGIN_SRC sh
   yum update
@@ -61,24 +62,24 @@
 
 #+END_SRC
 
-*** 设置时区
+**** 设置时区
 #+BEGIN_SRC sh
   cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 #+END_SRC
 
-*** TODO 安装数据库的前置准备
+**** TODO 安装数据库的前置准备
 1. [[file:../article/install-oracle-11g-on-linux.org][安装Oracle 11g]]
 2. 配置系统内存以及 swap
 
-* 🐬 MySQL
-** 📚 参考资料
+** 🐬 MySQL
+*** 📚 参考资料
 1. MySQL 开发文档 8.0.30  [[https://dev.mysql.com/doc/dev/mysql-server/8.0.30/PAGE_GET_STARTED.html#start_source][Source Code Documents]]
 2. MySQL 使用文档 [[https://dev.mysql.com/doc/refman/8.0/en/innodb-storage-engine.html][InnoDB Storage Engine]]
 3. 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2][MySQL 实战 45 讲]]
 4. 三方库 [[https://gorm.io/docs/index.html][GORM]] | [[https://docs.spring.io/spring-data/jpa/docs/2.7.7/reference/html/][JPA]] | [[https://github.com/mybatis/mybatis-3][mybatis-3]]
 
-** 主从架构实验环境
-*** 配置 Docker 环境
+*** 主从架构实验环境
+**** 配置 Docker 环境
 1. 安装 Docker Server
 2. 参考文档 [[https://docs.docker.com/compose/install/other][Install the Compose standalone]] 安装 docker-compose
 3. 编写启动配置文件 [[file:env-mysql/][MySQL 主备配置]]
@@ -88,8 +89,8 @@
   docker-compose up -d
 #+END_SRC
 
-*** 配置主备环境
-**** 查看主备网络配置
+**** 配置主备环境
+***** 查看主备网络配置
 #+BEGIN_SRC sh :results output
   docker inspect mysql-master | jq '.[0].NetworkSettings.Networks.dbnet.IPAddress'
   docker inspect mysql-slave  | jq '.[0].NetworkSettings.Networks.dbnet.IPAddress'
@@ -109,7 +110,7 @@
 | e09faf7e7340 | dbnet    | bridge | local  |       |
 | c21a61df1551 | none     | null   | local  |       |
 
-**** 主库配置备库用户的访问权限
+***** 主库配置备库用户的访问权限
 :properties:
 :header-args:sql: :engine mysql :dbhost 127.0.0.1 :dbport 9001 :database test01 :dbuser root :dbpassword p111
 :end:
@@ -131,7 +132,7 @@
 |------------------+----------+--------------+------------------+-------------------|
 | mysql-bin.000003 |      841 | test01       |                  |                   |
 
-**** 备库同步配置
+***** 备库同步配置
 :properties:
 :header-args:sql: :engine mysql :dbhost 127.0.0.1 :dbport 9002 :database test01 :dbuser root :dbpassword p222
 :end:
@@ -232,7 +233,7 @@ Slave_SQL_Running: Yes
   reset slave;
 #+END_SRC
 
-**** 主库建表
+***** 主库建表
 :properties:
 :header-args:sql: :engine mysql :dbhost 127.0.0.1 :dbport 9001 :database test01 :dbuser root :dbpassword p111
 :end:
@@ -258,7 +259,7 @@ Slave_SQL_Running: Yes
 
 #+RESULTS:
 
-**** 备库查询
+***** 备库查询
 :properties:
 :header-args:sql: :engine mysql :dbhost 127.0.0.1 :dbport 9002 :database test01 :dbuser root :dbpassword p222
 :end:
@@ -267,7 +268,7 @@ Slave_SQL_Running: Yes
   select * from t;
 #+END_SRC
 
-*** 设置登录别名
+**** 设置登录别名
 #+BEGIN_SRC sh
   alias my1="MYSQL_PWD=p111   mysql -h127.0.0.1 -uroot -P9001"
   alias my2="MYSQL_PWD=p222   mysql -h127.0.0.1 -uroot -P9002"
@@ -277,19 +278,19 @@ Slave_SQL_Running: Yes
   alias m101='docker exec -it mysql-slave /bin/bash'
 #+END_SRC
 
-** 运维主题
-*** 创建用户 & 授权访问数据库
+*** 运维主题
+**** 创建用户 & 授权访问数据库
 #+BEGIN_SRC sql
   create user 'jeffrey'@'%' identified by 'hello';
   grant all privileges on employees.* to 'jeffrey'@'%';
   flush privileges;
 #+END_SRC
 
-*** 查看当前用户权限
+**** 查看当前用户权限
 #+BEGIN_SRC sql
   select user, host from mysql.user;
 #+END_SRC
-*** 修改用户密码
+**** 修改用户密码
 #+BEGIN_SRC sql
   use mysql;
   set password for 'jeffrey'@'%' = password('root');
@@ -300,14 +301,14 @@ Slave_SQL_Running: Yes
   alter user 'jeffrey'@'%' identitied by 'mypass';
 #+END_SRC
 
-** 源码研究
+*** 源码研究
 1. 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2][MySQL45]] | [[https://blog.jcole.us/innodb/][Data Structure]] | [[http://www.unofficialmysqlguide.com/introduction.html][Unofficial Optimizer Guide]]
 2. [[file:mysql-source-code.org][MySQL 源码笔记]]
 3. 示例数据库 [[https://dev.mysql.com/doc/employee/en/employees-installation.html][Employees Sample Database]] | [[https://github.com/datacharmer/test_db][Github]] | [[https://dev.mysql.com/doc/index-other.html][Example DB: world, sakila]]
 4. 代码阅读分享
    - [[file:../mysql/share-01-mysql-group-by-analysis.org][GroupBy 语句实现原理探索]]
    - [[file:../mysql/share-02-mysql-optimize.org][MySQL 优化器实现原理探索]]
-*** 安装编译调试环境
+**** 安装编译调试环境
 1. 系统依赖安装
    #+BEGIN_SRC sh
      # 安装依赖包
@@ -361,7 +362,7 @@ Slave_SQL_Running: Yes
    #+BEGIN_SRC sh
      export PATH=/usr/local/cmake/bin:$PATH
    #+END_SRC
-*** 编译代码及初始数据库
+**** 编译代码及初始数据库
 1. 参考资料 [[https://dev.mysql.com/doc/refman/8.0/en/source-installation.html][源代码安装文档]] | [[https://dev.mysql.com/doc/refman/8.0/en/making-trace-files.html][TRACE 文件]] | [[https://dev.mysql.com/doc/refman/8.0/en/using-gdb-on-mysqld.html][--gdb]] | [[https://dev.mysql.com/doc/dev/mysql-server/8.0.30/PAGE_OPT_TRACE.html][The Optimizer Trace]]
 2. 配置文件 ~/etc/my.cnf~
    #+BEGIN_SRC conf
@@ -412,18 +413,18 @@ Slave_SQL_Running: Yes
      # 关闭数据库
      mysqladmin shutdown
    #+END_SRC
-*** 代码阅读配置
+**** 代码阅读配置
 #+BEGIN_SRC sh
   # 生成跳转的 TAG
   ctags -e -R --languages=c,c++ .
 #+END_SRC
 
-* 🐘 Postgres
-** 前置环境变量
+** 🐘 Postgres
+*** 前置环境变量
 #+BEGIN_SRC sh
   export PGDATA=/opt/local/pgsql/data
 #+END_SRC
-** 编译调试 & 初始化数据
+*** 编译调试 & 初始化数据
 #+BEGIN_SRC sh
   # 配置调试环境
   ./configure --prefix=/opt/local/pgsql --enable-cassert --enable-debug CFLAGS="-ggdb -O0 -fno-omit-frame-pointer"
@@ -442,7 +443,7 @@ Slave_SQL_Running: Yes
   # 链接库
   psql test01
 #+END_SRC
-** 调试命令
+*** 调试命令
 找到对应的进程
 #+BEGIN_SRC sh :results output :exports both
   $ ps aux | grep postgres
@@ -503,240 +504,15 @@ Slave_SQL_Running: Yes
   (lldb)
 #+END_SRC
 
-* 🏡 ClickHouse
-** 安装步骤
+** 🏡 ClickHouse
+*** 安装步骤
 1. 官方文档 [[https://clickhouse.com/docs/en/install][doc]]
 #+BEGIN_SRC sh
   # https://clickhouse.com/docs/en/development/build-osx
   cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -S . -B build
 #+END_SRC
-* 🐳 Docker & kubernetes
-** minikube
-1. [[https://minikube.sigs.k8s.io/docs/][文档中心]]
-** 环境配置
-   #+BEGIN_SRC sh
-     # 安装
-     brew install minikube
-
-     # 启动
-     minikube start
-   #+END_SRC
-** Pod
-*** 查看 Pod
-#+BEGIN_SRC sh :results output
-  kubectl get pods -A
-#+END_SRC
-
-#+RESULTS:
-: NAMESPACE     NAME                               READY   STATUS    RESTARTS      AGE
-: kube-system   coredns-787d4945fb-g688w           1/1     Running   0             50s
-: kube-system   etcd-minikube                      1/1     Running   0             65s
-: kube-system   kube-apiserver-minikube            1/1     Running   0             57s
-: kube-system   kube-controller-manager-minikube   1/1     Running   0             56s
-: kube-system   kube-proxy-4ph9m                   1/1     Running   0             50s
-: kube-system   kube-scheduler-minikube            1/1     Running   0             57s
-: kube-system   storage-provisioner                1/1     Running   1 (18s ago)   54s
-
-* 🐂 GNU
-** ssh
-*** forward
-本地转发
-#+BEGIN_SRC sh
-  # -N 不执行命令, -L local 转发 <remote-port>:<local-host>:<local-port>
-  ssh -N -L 9092:127.0.0.1:9092 user@host
-#+END_SRC
-
-远端转发
-#+BEGIN_SRC sh
-  # -N 不执行命令, -R remote 转发 <local-port>:<remote-host>:<remote-port>
-  ssh -N -R 9092:127.0.0.1:9092 user@host
-#+END_SRC
-** CentOS 7 & gcc 11
-*** SCL (Software Collection)
-SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources/Repositories/SCL][link]]
-#+BEGIN_SRC sql
-  yum install centos-release-scl
-
-  yum makecache
-  yum repolist
-#+END_SRC
-
-*** Red Hat Developer Toolset
-1. 使用手册 [[https://access.redhat.com/documentation/en-us/red_hat_developer_toolset/11/html-single/user_guide/index#doc-wrapper][User Guide]]
-   #+BEGIN_SRC sh
-     yum install scl-utils centos-release-scl
-
-     yum list all --enablerepo='centos-sclo-rh' | grep "devtoolset"
-     yum install devtoolset-11-toolchain
-   #+END_SRC
-2. 配置
-** CentOS 时钟
-*** 硬件时钟 hwclock
-#+BEGIN_SRC sh
-  # Display hwclock
-  hwclock --show
-
-  # Sync hwclock to system
-  hwclock --hctosys
-
-  # Save clock, for reboot
-  clock -w
-  hwclock -w
-#+END_SRC
-* 🐢 GDB & LLDB
-** 📚 参考资料
-1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
-2. [[https://github.com/hellogcc/100-gdb-tips][GDB 小技巧]] | [[https://sourceware.org/gdb/onlinedocs/gdb/][GDB 在线手册]]
-3. 视频 [[https://www.youtube.com/watch?v=svG6OPyKsrw][GDB Tutorial]]
-** 📒 使用笔记
-*** 进程启动: run & attach
-方法一：使用 attach 模式调试。首先正常启动重新，然后使用 attach 命令附属到进程上
-#+BEGIN_SRC sh
-  (lldb) attach -p 18616
-  (gdb) attach 18616
-#+END_SRC
-
-方法二：直接 run 启动进程
-#+BEGIN_SRC sh
-  # 指定启动文件
-  (lldb/gdb) file <binary>
-
-  # 直接 run 启动进程
-  (lldb/gdb) r
-  # 添加启动参数
-  (lldb/gdb) r args1 args2 ...
-  # 查看参数
-  (gdb) show args
-  (lldb) settings show target.run-args
-#+END_SRC
-[[file:../static/image/2023/0205/131917.png]]
-
-*** 调试流程控制
-**** 设置断点 breakpoint
-#+BEGIN_SRC sh
-  # 普通断点
-  b main
-  b main.cc:12
-  b 12
-  # 条件断点
-  (gdb) b 34 if i = 10
-  (gdb) break foo if strcmp(y,"hello") == 0
-  (lldb) breakpoint set --name foo --condition '(int)strcmp(y,"hello") == 0'
-  (lldb) br s -n foo -c '(int)strcmp(y,"hello") == 0'
-  (lldb) br s -n read_page -c 'm_page_id.space()==56'
-  # 临时断点: 临时断点执行一次后自动销毁
-  tb main
-#+END_SRC
-
-**** 流程控制 step & next & continue
-1. step 单步调试，不进入函数
-2. next 单步调试，进入函数
-3. continue 继续执行
-   #+BEGIN_SRC sh
-     s # step
-     n # next
-     c # continue
-
-     # until 直接执行到行数
-     (gdb) until 12
-     (lldb) thread until 12
-   #+END_SRC
-4. 跳转到指定行
-   - 条件断点 ~tb~ temp breakpoint
-   - until ~until <line>~
-5. 返回当前值
-   #+BEGIN_SRC sh
-     (gdb) return <return expression>
-     (lldb) thread return <return expression>
-   #+END_SRC
-
-*** 保持断点 & 现场恢复
-GDB 保存断点的方式比较方便，直接保持成一个文本文件后，再应用代码
-#+BEGIN_SRC sh
-  # 保持断点到文件中
-  (gdb) save breakpoint mybreak.txt
-  # 重新加载保存的断点
-  (gdb) source mybreak.txt
-#+END_SRC
-
-LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
-#+BEGIN_SRC sh
-  # 保存断点到 json 格式文件
-  (lldb) breakpoint write -f dbg001
-  # 读取断点到 json 格式文件
-  (lldb) breakpoint read -f dbg001
-#+END_SRC
-
-也可以参考这个答案优化流程 [[https://stackoverflow.com/questions/24638515/save-breakpoints-in-lldb][SO]]
-
-[[file:../static/image/2023/0205/100837.png]]
-
-*** 查看/修改变量和内存数据
-1. 打印变量 print
-   #+BEGIN_SRC sh
-     (lldb) p thd->m_thread_id
-     (my_thread_id) $1 = 10
-     (lldb) x/w &$1
-     0x7fbdc1240188: 0x0000000a
-     (lldb)
-   #+END_SRC
-2. 查看内存地址中的数据
-   #+BEGIN_SRC sh
-     (lldb) x/8w $0 => 打印地址的数据, 打印 8 条数据, [w, b] 表示不同的打印方式
-     0x7fbdc123dc00: 0x0916f4d8 0x00000001 0x0916f548 0x00000001
-     0x7fbdc123dc10: 0x00000000 0x00000000 0xc1240440 0x00007fbd
-     (lldb) x/8b $0
-     0x7fbdc123dc00: 0xd8 0xf4 0x16 0x09 0x01 0x00 0x00 0x00
-     (lldb) x/8x $0
-     0x7fbdc123dc00: 0xd8 0xf4 0x16 0x09 0x01 0x00 0x00 0x00
-   #+END_SRC
-3. 查看 frame 中变量
-   #+BEGIN_SRC sh
-     # 查看局部变量
-     (lldb) frame variable
-     (lldb) fr v
-     # 查看全局变量
-     (lldb) target variable
-     (lldb) ta v
-     # 查看调用栈 thread backtrace
-     (lldb/gdb) bt
-   #+END_SRC
-
-** 🐛 问题修复
-*** MacOS: 证书错误问题 [[https://timnash.co.uk/getting-gdb-to-semi-reliably-work-on-mojave-macos/][(^-^)]]
-#+BEGIN_QUOTE
-  please check gdb is codesigned - see taskgated(8)
-#+END_QUOTE
-手工编写 gdb.xml
-#+BEGIN_SRC xml
-  <?xml version="1.0" encoding="UTF-8"?>
-  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-  <plist version="1.0">
-  <dict>
-      <key>com.apple.security.cs.allow-jit</key>
-      <true/>
-      <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
-      <true/>
-      <key>com.apple.security.cs.allow-dyld-environment-variables</key>
-      <true/>
-      <key>com.apple.security.cs.disable-library-validation</key>
-      <true/>
-      <key>com.apple.security.cs.disable-executable-page-protection</key>
-      <true/>
-      <key>com.apple.security.cs.debugger</key>
-      <true/>
-      <key>com.apple.security.get-task-allow</key>
-      <true/>
-  </dict>
-  </plist>
-#+END_SRC
-使用命令给 gdb 添加证书
-#+BEGIN_SRC sh
-  codesign --entitlements gdb.xml -fs gdb-cert /usr/local/bin/gdb
-#+END_SRC
-* ☕️ Java
-** 🍃 Spring Framework
+** ☕️ Java
+*** 🍃 Spring Framework
 1. 代码 [[https://github.com/spring-projects/spring-framework][Source]] | [[https://github.com/Jeanhwea/spring-framework/tree/jh/5.3.25][jh/5.3.25]]
 2. 编译 [[https://github.com/spring-projects/spring-framework/wiki/Build-from-Source][BUILD]] => Java8 切到 5.3 分支
    #+BEGIN_SRC sh
@@ -758,13 +534,13 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
      # 生成跳转的 TAG
      ctags -e -R --languages=c,c++ .
    #+END_SRC
-** 📪 Kafka
+*** 📪 Kafka
 CLOSED: [2023-06-03 Sat 23:39]
 1. [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/JVM%20%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%2032%20%E8%AE%B2%EF%BC%88%E5%AE%8C%EF%BC%89][JVM 系列]]
-*** 资源链接
+**** 资源链接
 1. 说明文档 [[https://kafka.apache.org/documentation/][link]]
-*** 环境配置
-**** 官网快速使用手册
+**** 环境配置
+***** 官网快速使用手册
 1. [[https://kafka.apache.org/quickstart][quickstart]]
 #+BEGIN_SRC sh
   # 启动 zk
@@ -789,14 +565,14 @@ CLOSED: [2023-06-03 Sat 23:39]
   ./bin/kafka-configs.sh --zookeeper localhost:2181 --all
 #+END_SRC
 
-**** docker 版本配置
+***** docker 版本配置
 1. [[https://hub.docker.com/r/bitnami/kafka/][docker hub]]
 2. 配置文件 [[file:env-kafka/docker-compose.yaml][docker-compose.yaml]]
    #+BEGIN_SRC sh
      docker-compose up -d
    #+END_SRC
 
-**** 源代码
+***** 源代码
 跳过测试编译
 #+BEGIN_SRC sh
   ./gradlew build -x test
@@ -810,11 +586,11 @@ CLOSED: [2023-06-03 Sat 23:39]
   # 编译产物
   ls ./core/build/distributions/
 #+END_SRC
-** RocketMQ
-*** 资源链接
+*** RocketMQ
+**** 资源链接
 1. 官网文档 [[https://rocketmq.apache.org/docs/4.x/introduction/02quickstart][link]]
-** JVM
-** Hive
+*** JVM
+*** Hive
 配置 [[https://hadoop.apache.org/docs/r2.6.2/hadoop-project-dist/hadoop-common/SingleCluster.html#Standalone_Operation][hadoop]]
 #+BEGIN_SRC sh
   export HADOOP_HOME=/opt/local/hack/hadoop-2.6.0
@@ -875,7 +651,7 @@ CLOSED: [2023-06-03 Sat 23:39]
 #+BEGIN_SRC sh
   export HADOOP_USER_CLASSPATH_FIRST=true
 #+END_SRC
-** SDK Man
+*** SDK Man
 1. 官网 [[https://sdkman.io/][link]]
 #+BEGIN_SRC sh
   # 安装 SDK Man
@@ -914,6 +690,232 @@ CLOSED: [2023-06-03 Sat 23:39]
 
   # 强制更新 SDK Man
   sdk selfupdate force
+#+END_SRC
+* 🐳 系统运维
+** Docker & Kubernetes
+*** minikube
+1. [[https://minikube.sigs.k8s.io/docs/][文档中心]]
+*** 环境配置
+   #+BEGIN_SRC sh
+     # 安装
+     brew install minikube
+
+     # 启动
+     minikube start
+   #+END_SRC
+*** Pod
+**** 查看 Pod
+#+BEGIN_SRC sh :results output
+  kubectl get pods -A
+#+END_SRC
+
+#+RESULTS:
+: NAMESPACE     NAME                               READY   STATUS    RESTARTS      AGE
+: kube-system   coredns-787d4945fb-g688w           1/1     Running   0             50s
+: kube-system   etcd-minikube                      1/1     Running   0             65s
+: kube-system   kube-apiserver-minikube            1/1     Running   0             57s
+: kube-system   kube-controller-manager-minikube   1/1     Running   0             56s
+: kube-system   kube-proxy-4ph9m                   1/1     Running   0             50s
+: kube-system   kube-scheduler-minikube            1/1     Running   0             57s
+: kube-system   storage-provisioner                1/1     Running   1 (18s ago)   54s
+
+* 🐂 GNU
+** 🐢 GDB & LLDB
+*** 📚 参考资料
+1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
+2. [[https://github.com/hellogcc/100-gdb-tips][GDB 小技巧]] | [[https://sourceware.org/gdb/onlinedocs/gdb/][GDB 在线手册]]
+3. 视频 [[https://www.youtube.com/watch?v=svG6OPyKsrw][GDB Tutorial]]
+*** 📒 使用笔记
+**** 进程启动: run & attach
+方法一：使用 attach 模式调试。首先正常启动重新，然后使用 attach 命令附属到进程上
+#+BEGIN_SRC sh
+  (lldb) attach -p 18616
+  (gdb) attach 18616
+#+END_SRC
+
+方法二：直接 run 启动进程
+#+BEGIN_SRC sh
+  # 指定启动文件
+  (lldb/gdb) file <binary>
+
+  # 直接 run 启动进程
+  (lldb/gdb) r
+  # 添加启动参数
+  (lldb/gdb) r args1 args2 ...
+  # 查看参数
+  (gdb) show args
+  (lldb) settings show target.run-args
+#+END_SRC
+[[file:../static/image/2023/0205/131917.png]]
+
+**** 调试流程控制
+***** 设置断点 breakpoint
+#+BEGIN_SRC sh
+  # 普通断点
+  b main
+  b main.cc:12
+  b 12
+  # 条件断点
+  (gdb) b 34 if i = 10
+  (gdb) break foo if strcmp(y,"hello") == 0
+  (lldb) breakpoint set --name foo --condition '(int)strcmp(y,"hello") == 0'
+  (lldb) br s -n foo -c '(int)strcmp(y,"hello") == 0'
+  (lldb) br s -n read_page -c 'm_page_id.space()==56'
+  # 临时断点: 临时断点执行一次后自动销毁
+  tb main
+#+END_SRC
+
+***** 流程控制 step & next & continue
+1. step 单步调试，不进入函数
+2. next 单步调试，进入函数
+3. continue 继续执行
+   #+BEGIN_SRC sh
+     s # step
+     n # next
+     c # continue
+
+     # until 直接执行到行数
+     (gdb) until 12
+     (lldb) thread until 12
+   #+END_SRC
+4. 跳转到指定行
+   - 条件断点 ~tb~ temp breakpoint
+   - until ~until <line>~
+5. 返回当前值
+   #+BEGIN_SRC sh
+     (gdb) return <return expression>
+     (lldb) thread return <return expression>
+   #+END_SRC
+
+**** 保持断点 & 现场恢复
+GDB 保存断点的方式比较方便，直接保持成一个文本文件后，再应用代码
+#+BEGIN_SRC sh
+  # 保持断点到文件中
+  (gdb) save breakpoint mybreak.txt
+  # 重新加载保存的断点
+  (gdb) source mybreak.txt
+#+END_SRC
+
+LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
+#+BEGIN_SRC sh
+  # 保存断点到 json 格式文件
+  (lldb) breakpoint write -f dbg001
+  # 读取断点到 json 格式文件
+  (lldb) breakpoint read -f dbg001
+#+END_SRC
+
+也可以参考这个答案优化流程 [[https://stackoverflow.com/questions/24638515/save-breakpoints-in-lldb][SO]]
+
+[[file:../static/image/2023/0205/100837.png]]
+
+**** 查看/修改变量和内存数据
+1. 打印变量 print
+   #+BEGIN_SRC sh
+     (lldb) p thd->m_thread_id
+     (my_thread_id) $1 = 10
+     (lldb) x/w &$1
+     0x7fbdc1240188: 0x0000000a
+     (lldb)
+   #+END_SRC
+2. 查看内存地址中的数据
+   #+BEGIN_SRC sh
+     (lldb) x/8w $0 => 打印地址的数据, 打印 8 条数据, [w, b] 表示不同的打印方式
+     0x7fbdc123dc00: 0x0916f4d8 0x00000001 0x0916f548 0x00000001
+     0x7fbdc123dc10: 0x00000000 0x00000000 0xc1240440 0x00007fbd
+     (lldb) x/8b $0
+     0x7fbdc123dc00: 0xd8 0xf4 0x16 0x09 0x01 0x00 0x00 0x00
+     (lldb) x/8x $0
+     0x7fbdc123dc00: 0xd8 0xf4 0x16 0x09 0x01 0x00 0x00 0x00
+   #+END_SRC
+3. 查看 frame 中变量
+   #+BEGIN_SRC sh
+     # 查看局部变量
+     (lldb) frame variable
+     (lldb) fr v
+     # 查看全局变量
+     (lldb) target variable
+     (lldb) ta v
+     # 查看调用栈 thread backtrace
+     (lldb/gdb) bt
+   #+END_SRC
+
+*** 🐛 问题修复
+**** MacOS: 证书错误问题 [[https://timnash.co.uk/getting-gdb-to-semi-reliably-work-on-mojave-macos/][(^-^)]]
+#+BEGIN_QUOTE
+  please check gdb is codesigned - see taskgated(8)
+#+END_QUOTE
+手工编写 gdb.xml
+#+BEGIN_SRC xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  <plist version="1.0">
+  <dict>
+      <key>com.apple.security.cs.allow-jit</key>
+      <true/>
+      <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+      <true/>
+      <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+      <true/>
+      <key>com.apple.security.cs.disable-library-validation</key>
+      <true/>
+      <key>com.apple.security.cs.disable-executable-page-protection</key>
+      <true/>
+      <key>com.apple.security.cs.debugger</key>
+      <true/>
+      <key>com.apple.security.get-task-allow</key>
+      <true/>
+  </dict>
+  </plist>
+#+END_SRC
+使用命令给 gdb 添加证书
+#+BEGIN_SRC sh
+  codesign --entitlements gdb.xml -fs gdb-cert /usr/local/bin/gdb
+#+END_SRC
+** SSH 配置
+*** forward 端口转发
+本地转发
+#+BEGIN_SRC sh
+  # -N 不执行命令, -L local 转发 <remote-port>:<local-host>:<local-port>
+  ssh -N -L 9092:127.0.0.1:9092 user@host
+#+END_SRC
+
+远端转发
+#+BEGIN_SRC sh
+  # -N 不执行命令, -R remote 转发 <local-port>:<remote-host>:<remote-port>
+  ssh -N -R 9092:127.0.0.1:9092 user@host
+#+END_SRC
+** 研发工具链
+*** SCL (Software Collection)
+SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources/Repositories/SCL][link]]
+#+BEGIN_SRC sql
+  yum install centos-release-scl
+
+  yum makecache
+  yum repolist
+#+END_SRC
+
+*** Red Hat Developer Toolset
+1. 使用手册 [[https://access.redhat.com/documentation/en-us/red_hat_developer_toolset/11/html-single/user_guide/index#doc-wrapper][User Guide]]
+   #+BEGIN_SRC sh
+     yum install scl-utils centos-release-scl
+
+     yum list all --enablerepo='centos-sclo-rh' | grep "devtoolset"
+     yum install devtoolset-11-toolchain
+   #+END_SRC
+2. 配置
+** CentOS 时钟
+*** 硬件时钟 hwclock
+#+BEGIN_SRC sh
+  # Display hwclock
+  hwclock --show
+
+  # Sync hwclock to system
+  hwclock --hctosys
+
+  # Save clock, for reboot
+  clock -w
+  hwclock -w
 #+END_SRC
 * 🤔 问题排查
 ** 科学上网
