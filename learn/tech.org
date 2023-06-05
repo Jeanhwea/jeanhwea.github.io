@@ -692,9 +692,36 @@ CLOSED: [2023-06-03 Sat 23:39]
   sdk selfupdate force
 #+END_SRC
 * 🐳 系统运维
-** Docker & Kubernetes
+** Docker
+
+** Kubernetes
 *** minikube
 1. [[https://minikube.sigs.k8s.io/docs/][文档中心]]
+*** kubeadm
+系统安装
+#+BEGIN_SRC sh
+  # 创建 master 集群
+  kubeadm init --apiserver-advertise-address=192.168.0.210 \
+          --pod-network-cidr=10.244.0.0/16 \
+          --kubernetes-version 1.27.2 \
+          --image-repository registry.aliyuncs.com/google_containers
+
+  # 遇到错误重置
+  kubeadm reset
+#+END_SRC
+
+查看使用到的镜像
+#+BEGIN_SRC sh
+  kubeadm config images list
+  kubeadm config images pull --image-repository registry.cn-hangzhou.aliyuncs.com/google_containers
+  kubeadm config images pull --image-repository registry.aliyuncs.com/google_containers
+#+END_SRC
+
+新增 node 节点
+#+BEGIN_SRC sh
+  kubeadm token create --print-join-command
+#+END_SRC
+
 *** 环境配置
    #+BEGIN_SRC sh
      # 安装
