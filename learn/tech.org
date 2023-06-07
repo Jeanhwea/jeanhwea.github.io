@@ -736,6 +736,7 @@ CLOSED: [2023-06-03 Sat 23:39]
 #+BEGIN_SRC sh
   kubectl create deployment web-gateway --image=nginx
   kubectl expose deployment web-gateway --port=80 --type=NodePort
+  kubectl scale deployment/web-gateway --replicas=4
 #+END_SRC
 
 获取启动的 Service
@@ -753,6 +754,16 @@ CLOSED: [2023-06-03 Sat 23:39]
   minikube ssh
   # 在 NameNode 中获取页面
   curl http://0.0.0.0:31151
+#+END_SRC
+**** 配置 DashBoard
+#+BEGIN_SRC sh
+  wget https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+  # 安装 dashboard
+  kubectl apply -f recommended.yaml
+  # 卸载 dashboard
+  kubectl delete -f recommended.yaml
+  kubectl get pods -n kubernetes-dashboard
+  kubectl get svc -n kubernetes-dashboard
 #+END_SRC
 
 **** 查看 Pod
