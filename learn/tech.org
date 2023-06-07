@@ -697,6 +697,15 @@ CLOSED: [2023-06-03 Sat 23:39]
 ** Kubernetes
 *** minikube
 1. [[https://minikube.sigs.k8s.io/docs/][文档中心]]
+配置
+#+BEGIN_SRC sh
+  brew install minikube
+  minikube start
+#+END_SRC
+
+#+BEGIN_SRC sh
+  minikube dashboard
+#+END_SRC
 *** kubeadm
 系统安装
 #+BEGIN_SRC sh
@@ -722,15 +731,28 @@ CLOSED: [2023-06-03 Sat 23:39]
   kubeadm token create --print-join-command
 #+END_SRC
 
-*** 环境配置
-   #+BEGIN_SRC sh
-     # 安装
-     brew install minikube
+*** 基础命令
+**** 快速开始
+#+BEGIN_SRC sh
+  kubectl create deployment web-gateway --image=nginx
+  kubectl expose deployment web-gateway --port=80 --type=NodePort
+#+END_SRC
 
-     # 启动
-     minikube start
-   #+END_SRC
-*** Pod
+获取启动的 Service
+#+BEGIN_SRC sh :results output
+  kubectl get svc
+#+END_SRC
+
+#+RESULTS:
+: NAME          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+: kubernetes    ClusterIP   10.96.0.1       <none>        443/TCP        122d
+: web-gateway   NodePort    10.98.232.246   <none>        80:31151/TCP   8m1s
+
+#+BEGIN_SRC sh
+  minikube ssh
+  curl http://10.98.232.246:31151
+#+END_SRC
+
 **** 查看 Pod
 #+BEGIN_SRC sh :results output
   kubectl get pods -A
