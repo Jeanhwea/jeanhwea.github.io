@@ -1147,6 +1147,26 @@ tmux
 
 [[file:../static/image/2023/0315/112736.png]]
 *** Linux
+**** 编译内核
+#+BEGIN_SRC sh
+  # 下载源码
+  wget -c https://mirrors.tuna.tsinghua.edu.cn/kernel/v5.x/linux-5.15.115.tar.gz
+  tar xvzf linux-5.15.115.tar.gz
+  cd linux-5.15.115
+
+  # 准备配置文件
+  cp /boot/config-`uname -r` .config
+  # 开启或关闭配置选项
+  make menuconfig
+
+  # 确保 CONFIG_SYSTEM_TRUSTED_KEYS 为空
+  # cat .config | grep CONFIG_SYSTEM_TRUSTED_KEYS
+  # CONFIG_SYSTEM_TRUSTED_KEYS=""
+
+  # 编译内核
+  make -j12
+#+END_SRC
+**** LFS
 1. Linux From Scratch [[https://www.linuxfromscratch.org/][LFS]]
 
 ** 极客时光
