@@ -855,6 +855,68 @@ daemon.json 配置
   kubectl get cm
   kubectl describe cm config01
 #+END_SRC
+
+** 磁盘管理
+*** Ubuntu 磁盘分区扩容
+使用 parted, resize2fs 命令行工具进行操作
+#+BEGIN_SRC sh
+  root@ubuntu201:/home/ubuntu# parted
+  GNU Parted 3.4
+  Using /dev/sda
+  Welcome to GNU Parted! Type 'help' to view a list of commands.
+  (parted) print                 # ==> 查看当前磁盘分区信息
+  Model: VMware Virtual disk (scsi)
+  Disk /dev/sda: 215GB
+  Sector size (logical/physical): 512B/512B
+  Partition Table: gpt
+  Disk Flags:
+
+  Number  Start   End     Size    File system  Name  Flags
+   1      1049kB  2097kB  1049kB                     bios_grub
+   2      2097kB  53.7GB  53.7GB  ext4
+
+  (parted) resizepart            # ==> 扩容分区 2
+  Partition number? 2
+  Warning: Partition /dev/sda2 is being used. Are you sure you want to continue?
+  Yes/No? Yes
+  End?  [53.7GB]? 215GB          # ==> 这里扩容到最大可见分区
+  (parted) print                 # ==> 扩容后的分区 2 变成 215G
+  Model: VMware Virtual disk (scsi)
+  Disk /dev/sda: 215GB
+  Sector size (logical/physical): 512B/512B
+  Partition Table: gpt
+  Disk Flags:
+
+  Number  Start   End     Size    File system  Name  Flags
+   1      1049kB  2097kB  1049kB                     bios_grub
+   2      2097kB  215GB   215GB   ext4
+
+  (parted)
+
+  Information: You may need to update /etc/fstab.
+
+  root@ubuntu201:/home/ubuntu# df -h # ==> 文件系统并未扩容
+  Filesystem      Size  Used Avail Use% Mounted on
+  tmpfs           1.6G  1.2M  1.6G   1% /run
+  /dev/sda2        49G   44G  3.1G  94% /
+  tmpfs           7.8G     0  7.8G   0% /dev/shm
+  tmpfs           5.0M     0  5.0M   0% /run/lock
+  tmpfs           1.6G  4.0K  1.6G   1% /run/user/1000
+  root@ubuntu201:/home/ubuntu# resize2fs /dev/sda2 # ==> 调整文件系统大小
+  resize2fs 1.46.5 (30-Dec-2021)
+  Filesystem at /dev/sda2 is mounted on /; on-line resizing required
+  old_desc_blocks = 7, new_desc_blocks = 25
+  The filesystem on /dev/sda2 is now 52428283 (4k) blocks long.
+
+  root@ubuntu201:/home/ubuntu# df -h
+  Filesystem      Size  Used Avail Use% Mounted on
+  tmpfs           1.6G  1.2M  1.6G   1% /run
+  /dev/sda2       197G   44G  145G  24% /
+  tmpfs           7.8G     0  7.8G   0% /dev/shm
+  tmpfs           5.0M     0  5.0M   0% /run/lock
+  tmpfs           1.6G  4.0K  1.6G   1% /run/user/1000
+  root@ubuntu201:/home/ubuntu# reboot
+#+END_SRC
 * 🐂 研发效率
 ** GDB & LLDB
 *** 📚 参考资料
