@@ -1136,6 +1136,7 @@ SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources
      scl enable devtoolset-11 bash
    #+END_SRC
 ** WSL
+*** Ubuntu 安装并迁移到其他盘
 1. 安装说明 [[https://learn.microsoft.com/zh-cn/windows/wsl/install-manual][link]]
 2. 移动数据文件到非系统盘
    #+BEGIN_SRC sh
@@ -1148,6 +1149,25 @@ SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources
      mkdir data
      wsl --import Ubuntu-22.04 data ubuntu2204.tar
    #+END_SRC
+*** Docker 无法启动
+/usr/sbin/iptables-nft 网络管理 WSL2 不支持，需要修改一下
+#+BEGIN_SRC sh
+  $ sudo update-alternatives --config iptables
+  There are 2 choices for the alternative iptables (providing /usr/sbin/iptables).
+
+    Selection    Path                       Priority   Status
+  ------------------------------------------------------------
+  ,* 0            /usr/sbin/iptables-nft      20        auto mode
+    1            /usr/sbin/iptables-legacy   10        manual mode
+    2            /usr/sbin/iptables-nft      20        manual mode
+
+  Press <enter> to keep the current choice[*], or type selection number: 1
+  update-alternatives: using /usr/sbin/iptables-legacy to provide /usr/sbin/iptables (iptables) in manual mode
+  $ sudo service docker start
+   ,* Starting Docker: docker                                                                                                                                            [ OK ]
+  $ docker ps
+  CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+#+END_SRC
 * 🐢 效率工具
 ** Perl
 *** 环境配置
