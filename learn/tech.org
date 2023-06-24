@@ -1105,6 +1105,35 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
 #+BEGIN_SRC sh
   codesign --entitlements gdb.xml -fs gdb-cert /usr/local/bin/gdb
 #+END_SRC
+
+*** 交叉编译
+#+BEGIN_SRC sh
+  export PREFIX="/opt/i386-elf-toolchain"
+  export TARGET=i386-elf
+  export PATH="$PREFIX/bin:$PATH"
+
+  tar xzvf ~/down/binutils-2.40.tar.gz
+  tar xzvf ~/down/gcc-11.4.0.tar.gz
+  cd gcc-11.4.0
+  ./contrib/download_prerequisites
+
+  DIR=$PWD
+
+  mkdir -p $DIR/build-binutils
+  cd $DIR/build-binutils
+  ../binutils-2.40/configure --target=$TARGET --prefix=$PREFIX --enable-interwork --enable-multilib --disable-nls --disable-werror 2>&1 | tee configure.log
+  make all -j4 2>&1 | tee make.log
+  sudo make install 2>&1 | tee install.log
+
+  rm -rf $DIR/build-gcc
+  mkdir -p $DIR/build-gcc
+  cd $DIR/build-gcc
+  ../gcc-11.4.0/configure --target=$TARGET --prefix=$PREFIX --disable-nls --disable-libssp --enable-languages=c --without-headers 2>&1 | tee configure.log
+  make all-gcc -j4 2>&1 | tee make-all-gcc.log
+  make all-target-libgcc -j4 2>&1 | tee make-all-target-libgcc.log
+  sudo make install-gcc 2>&1 | tee make-install-gcc.log
+  sudo make install-target-libgcc 2>&1 | tee make-install-target-libgcc.log
+#+END_SRC
 ** SSH 配置
 *** forward 端口转发
 本地转发
