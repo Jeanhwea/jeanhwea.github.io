@@ -1481,8 +1481,16 @@ tmux
      # install package
      sudo pacman -U i386-elf-binutils-2.40-1-x86_64.pkg.tar.zst
    #+END_SRC
-2. 汇编语言
+2. 交叉编译
    #+BEGIN_SRC sh
-     nasm -f bin -o hello.s vm.bin
-     ndisasm -d 32 vm.bin
+     # 交叉编译, -ffreestanding 不需要标准库支持，生成目标是一个独立环境
+     i386-elf-gcc -ffreestanding -c function.c -o function.o
+     # 反汇编
+     i386-elf-objdump -d function.o
+
+     # 链接, -Ttext 0x0 表示代码段的起始地址
+     i386-elf-ld -o function.bin -Ttext 0x0 --oformat binary function.o
+
+     # 反汇编测试生成的二进制文件
+     ndisasm -b 32 function.bin
    #+END_SRC
