@@ -1562,3 +1562,12 @@ tmux
      # 反汇编测试生成的二进制文件
      ndisasm -b 32 function.bin
    #+END_SRC
+3. gdb 调试内核
+   #+BEGIN_SRC sh
+     # -s 让 qemu 停止并监听 1234 端口等待调试
+     qemu-system-i386 -s -fda os-image.bin &
+     # 创建连接符号文件
+     i386-elf-ld -o kernel.elf -Ttext 0x1000 kernel.o obj1.o obj2.o
+     # gdb 执行命令进行调试
+     i386-elf-gdb -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
+   #+END_SRC
