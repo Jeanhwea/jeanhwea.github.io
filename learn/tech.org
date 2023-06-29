@@ -739,6 +739,14 @@ CLOSED: [2023-06-03 Sat 23:39]
 Kitex 微服务架构工具 [[https://www.cloudwego.io/zh/docs/kitex/][kitex]]
 * 系统运维
 ** Docker
+*** Docker 安装过程
+安装参考链接 [[https://docs.docker.com/engine/install/centos/#install-using-the-repository][link]]
+#+BEGIN_SRC sh
+  yum install -y yum-utils
+  yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+  yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+#+END_SRC
 *** Engine 配置
 安装文档 [[https://docs.docker.com/engine/install/ubuntu/][link]]
 #+BEGIN_SRC sh
@@ -754,6 +762,7 @@ daemon.json 配置
     ]
   }
 #+END_SRC
+
 *** 国内镜像
 daemon.json 配置
 #+BEGIN_SRC json
@@ -897,7 +906,7 @@ daemon.json 配置
   kubectl describe cm config01
 #+END_SRC
 
-*** 管理工具
+*** 包管理工具 helm
 1. k8s 包管理器: helm [[https://helm.sh/][link]]
    #+BEGIN_SRC sh
      helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -1167,7 +1176,7 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
   make -j4 2>&1 | tee make.log
   sudo make install 2>&1 | tee install.log
 #+END_SRC
-** SSH 配置
+** SSH
 *** forward 端口转发
 本地转发
 #+BEGIN_SRC sh
@@ -1180,21 +1189,31 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
   # -N 不执行命令, -R remote 转发 <local-port>:<remote-host>:<remote-port>
   ssh -N -R 9092:127.0.0.1:9092 user@host
 #+END_SRC
+
+*** ssh 双跳登录
+#+BEGIN_SRC sh
+  ssh -p9998 -i ~/.ssh/id_s1 user1@175.0.0.20 -t ssh -p9999 -i ~/.ssh/id_s2 user2@213.0.0.30
+#+END_SRC
+
+*** scp 双跳传输
+#+BEGIN_SRC sh
+  scp -o ProxyCommand="ssh -p9998 user1@175.0.0.20 nc 213.0.0.30 9999" \
+      -o IdentityFile="~/.ssh/id_s2" /opt/file user2@213.0.0.30:/tmp/file
+#+END_SRC
+
 ** Git
 *** 配置用户信息
 #+BEGIN_SRC sh
   git config --global user.email "hujinghui@buaa.edu.cn"
   git config --global user.name "Jinghui Hu"
 #+END_SRC
-** Docker 环境
-安装参考链接 [[https://docs.docker.com/engine/install/centos/#install-using-the-repository][link]]
-#+BEGIN_SRC sh
-  yum install -y yum-utils
-  yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
-  yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+*** 递归克隆子模块
+#+BEGIN_SRC sh
+  git clone --recurse-submodules url
 #+END_SRC
-** CentOS 工具链
+
+** CentOS
 *** SCL (Software Collection)
 SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources/Repositories/SCL][link]]
 #+BEGIN_SRC sql
@@ -1271,11 +1290,14 @@ Java LSP 服务
 
 Python LSP 服务
 #+BEGIN_SRC sh
-  pip install --user pandas
-  pip install --user sqlalchemy
-  pip install --user pymysql
   pip install --user yapf
   pip install --user "python-lsp-server[yapf]"
+#+END_SRC
+** Tmux
+#+BEGIN_SRC sh
+  set -g mouse on
+  set -g default-terminal "xterm-256color"
+  set -g escape-time 0
 #+END_SRC
 * 效率工具
 ** Perl
@@ -1331,9 +1353,22 @@ Python LSP 服务
 [[file:/tmp/mysqld-thd-8.txt]]
 
 ** Python
+安装 python 的开发包
+#+BEGIN_SRC sh
+  pip install --user pandas
+  pip install --user sqlalchemy
+  pip install --user pymysql
+#+END_SRC
 
 ** Ruby
 1. 配置国内 GEM 镜像 [[https://gems.ruby-china.com/][Ruby China]]
+** Rust
+*** 安装配置
+1. 安装页面 [[https://www.rust-lang.org/tools/install][link]]
+   #+BEGIN_SRC sh
+     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   #+END_SRC
+2. 入门材料 [[https://rust-book.cs.brown.edu/][rust book]]
 * 问题排查
 ** 科学上网
 *** githubusercontent 链接失败
@@ -1342,7 +1377,7 @@ Python LSP 服务
   185.199.108.133 raw.githubusercontent.com
 #+END_SRC
 ** 使用体验
-*** Esc 键有延迟
+**** Esc 键有延迟
 问题说明 [[https://www.johnhawthorn.com/2012/09/vi-escape-delays/][Eliminating delays on ESC in vim and zsh]]
 尝试按照以下思路解决这个问题
 vim
