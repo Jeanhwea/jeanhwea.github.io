@@ -533,9 +533,10 @@ Slave_SQL_Running: Yes
 #+END_SRC
 ** Java
 *** Maven
-添加项目包
+**** 添加本地 JAR 包
+在 pom.xml 文件中直接添加引用
 #+BEGIN_SRC xml
-  <!--添加数据库驱动安装包-->
+  <!-- 添加数据库驱动安装包 -->
   <dependency>
     <groupId>com.oracle</groupId>
     <artifactId>ojdbc6</artifactId>
@@ -543,6 +544,26 @@ Slave_SQL_Running: Yes
     <scope>system</scope>
     <systemPath>${project.basedir}/src/main/resources/lib/ojdbc6.jar</systemPath>
   </dependency>
+#+END_SRC
+
+**** 添加项目过滤
+在 pom.xml 文件中开启编译过滤
+#+BEGIN_SRC xml
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+  </build>
+#+END_SRC
+
+引用 pom.xml 文件中的配置
+#+BEGIN_SRC yaml
+  spring:
+    application:
+      version: @project.version@
 #+END_SRC
 *** Spring Framework
 1. 代码 [[https://github.com/spring-projects/spring-framework][Source]] | [[https://github.com/Jeanhwea/spring-framework/tree/jh/5.3.25][jh/5.3.25]]
