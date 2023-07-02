@@ -2031,6 +2031,7 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
 
 ** Linux 0.11
 *** 安装 minix
+操作系统安装 [[https://wiki.minix3.org/doku.php?id=usersguide:runningonqemu][link]]
 #+BEGIN_SRC sh
   # 解压
   bzip2 -d minix_R3.3.0-588a35b.iso.bz2
@@ -2040,4 +2041,15 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
   qemu-system-x86_64 -net user -net nic -m 256 -cdrom minix_R3.3.0-588a35b.iso -hda minix.img -boot d
   # 启动
   qemu-system-x86_64 -net user -net nic -m 256 -hda minix.img
+#+END_SRC
+
+安装后设置 [[https://wiki.minix3.org/doku.php?id=usersguide:postinstallation][link]]
+#+BEGIN_SRC sh
+  hostname minix3
+
+  pkgin update
+  pkgin install openssh
+  cp /usr/pkg/etc/rc.d/sshd /etc/rc.d/
+  printf 'sshd=YES\n' >> /etc/rc.conf
+  /etc/rc.d/sshd start
 #+END_SRC
