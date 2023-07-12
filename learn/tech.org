@@ -1060,7 +1060,6 @@ daemon.json 配置
 2. 开启寄存器窗口 layout regs
 3. 布局循环 layout next/prev
 4. 打印 32 个汇编指令 x/32i $pc
-5. 打印 32 个字节地址数据 x/32b addr
 *** 进程启动: run & attach
 方法一：使用 attach 模式调试。首先正常启动重新，然后使用 attach 命令附属到进程上
 #+BEGIN_SRC sh
@@ -1144,14 +1143,28 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
 [[file:../static/image/2023/0205/100837.png]]
 
 *** 查看/修改变量和内存数据
-1. 打印变量 print
-   #+BEGIN_SRC sh
+1. 打印变量 print / [[https://visualgdb.com/gdbreference/commands/x ][x-command]]
+   #+BEGIN_SRC text
      (lldb) p thd->m_thread_id
      (my_thread_id) $1 = 10
      (lldb) x/w &$1
      0x7fbdc1240188: 0x0000000a
      (lldb)
    #+END_SRC
+   - o octal
+   - x hexadecimal
+   - d decimal
+   - u unsigned decimal
+   - t binary
+   - f floating point
+   - a address
+   - c char
+   - s string
+   - i instruction
+   - b byte
+   - h halfword (16-bit value)
+   - w word (32-bit value)
+   - g giant word (64-bit value)
 2. 查看内存地址中的数据
    #+BEGIN_SRC sh
      (lldb) x/8w $0 => 打印地址的数据, 打印 8 条数据, [w, b] 表示不同的打印方式
