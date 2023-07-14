@@ -1373,6 +1373,8 @@ SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources
   sudo ln -s /mnt/c/Windows/Fonts /usr/share/fonts/host
   fc-cache -fv
 #+END_SRC
+
+
 *** 解决提示符错误
 Windows Terminal 在安装 zsh-autosuggestions 时会显示的有问题，这里修改一下 ~PS1~
 #+BEGIN_SRC sh
@@ -1482,6 +1484,13 @@ Python LSP 服务
      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
    #+END_SRC
 2. 入门材料 [[https://rust-book.cs.brown.edu/][rust book]]
+** Golang
+*** 初始化项目
+#+BEGIN_SRC sh
+  mkdir genco
+  cd genco
+  go mod init genco
+#+END_SRC
 * 问题排查
 ** 前端
 *** digital envelope routines::unsupported
@@ -1527,6 +1536,41 @@ tmux
   echo 'set -s escape-time 0' >> ~/.tmux.conf
 #+END_SRC
 ** CentOS
+*** 安装中文字体
+修改配置文件
+#+BEGIN_SRC sh
+  vim /etc/fonts/fonts.conf
+#+END_SRC
+
+添加字体文件目录配置
+#+BEGIN_SRC xml
+  <!-- Font directory list -->
+
+          <dir>/usr/share/fonts</dir>
+          <dir>/usr/share/fonts/Fonts/</dir>
+          <dir>/usr/share/X11/fonts/Type1</dir>
+          <dir>/usr/share/X11/fonts/TTF</dir>
+          <dir>/usr/local/share/fonts</dir>
+          <dir prefix="xdg">fonts</dir>
+          <!-- the following element will be removed in the future -->
+          <dir>~/.fonts</dir>
+#+END_SRC
+
+使用命令刷新字体缓存
+#+BEGIN_SRC sh
+  cd /usr/share/fonts
+  tar xzvf fonts.tar.gz
+  fc-cache -fv
+  # 查看中文字体
+  fc-list :lang=zh
+#+END_SRC
+
+如果发现找不到字体配置文件，需要手工添加环境变量
+Fontconfig error: Cannot load default config file
+#+BEGIN_SRC sh
+  export FONTCONFIG_PATH=/etc/fonts
+#+END_SRC
+
 *** 硬件时钟 hwclock
 #+BEGIN_SRC sh
   # Display hwclock
@@ -1539,6 +1583,7 @@ tmux
   clock -w
   hwclock -w
 #+END_SRC
+
 ** MySQL
 *** Public Key Retrieval is not allowed
 在设置数据库添加如下的链接选项
