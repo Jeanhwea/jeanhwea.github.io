@@ -1320,79 +1320,6 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
   make -j4 2>&1 | tee make.log
   sudo make install 2>&1 | tee install.log
 #+END_SRC
-** CentOS
-*** SCL (Software Collection)
-SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources/Repositories/SCL][link]]
-#+BEGIN_SRC sql
-  yum install centos-release-scl
-
-  yum makecache
-  yum repolist
-#+END_SRC
-
-*** Red Hat Developer Toolset
-1. 使用手册 [[https://access.redhat.com/documentation/en-us/red_hat_developer_toolset/11/html-single/user_guide/index#doc-wrapper][User Guide]]
-   #+BEGIN_SRC sh
-     yum install scl-utils centos-release-scl
-
-     yum list all --enablerepo='centos-sclo-rh' | grep "devtoolset"
-     yum install devtoolset-11-toolchain
-   #+END_SRC
-2. 配置并启用 scl 工具集
-   #+BEGIN_SRC sh
-     scl --list
-     scl enable devtoolset-11 bash
-   #+END_SRC
-** WSL
-*** Ubuntu 安装并迁移到其他盘
-1. 安装说明 [[https://learn.microsoft.com/zh-cn/windows/wsl/install-manual][link]]
-2. 移动数据文件到非系统盘
-   #+BEGIN_SRC sh
-     # 查看当前的 wsl 容器
-     wsl -l -v
-
-     wsl --export Ubuntu ubuntu2204.tar
-     wsl --unregister Ubuntu
-
-     mkdir data
-     wsl --import Ubuntu-22.04 data ubuntu2204.tar
-   #+END_SRC
-*** Docker 无法启动
-/usr/sbin/iptables-nft 网络管理 WSL2 不支持，需要修改一下
-#+BEGIN_SRC sh
-  $ sudo update-alternatives --config iptables
-  There are 2 choices for the alternative iptables (providing /usr/sbin/iptables).
-
-    Selection    Path                       Priority   Status
-  ------------------------------------------------------------
-  ,* 0            /usr/sbin/iptables-nft      20        auto mode
-    1            /usr/sbin/iptables-legacy   10        manual mode
-    2            /usr/sbin/iptables-nft      20        manual mode
-
-  Press <enter> to keep the current choice[*], or type selection number: 1
-  update-alternatives: using /usr/sbin/iptables-legacy to provide /usr/sbin/iptables (iptables) in manual mode
-  $ sudo service docker start
-   ,* Starting Docker: docker                                                                                                                                            [ OK ]
-  $ docker ps
-  CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
-#+END_SRC
-*** 缺失字体
-默认添加 Windows 自带的字体来显示缺失字体
-#+BEGIN_SRC sh
-  sudo ln -s /mnt/c/Windows/Fonts /usr/share/fonts/host
-  fc-cache -fv
-#+END_SRC
-
-*** 挂载共享服务器
-#+BEGIN_SRC sh
- sudo mount -t drvfs '\\192.168.0.201\开发服务器共享' /mnt/share
-#+END_SRC
-*** 解决提示符错误
-Windows Terminal 在安装 zsh-autosuggestions 时会显示的有问题，这里修改一下 ~PS1~
-#+BEGIN_SRC sh
-  ZSH_THEME="none"
-  export PS1='WSL(%3~)%# '
-#+END_SRC
 ** LSP
 Java LSP 服务
 #+BEGIN_SRC sh
@@ -1508,6 +1435,81 @@ Python LSP 服务
   cd genco
   go mod init genco
 #+END_SRC
+* 操作系统
+** WSL
+*** Ubuntu 安装并迁移到其他盘
+1. 安装说明 [[https://learn.microsoft.com/zh-cn/windows/wsl/install-manual][link]]
+2. 移动数据文件到非系统盘
+   #+BEGIN_SRC sh
+     # 查看当前的 wsl 容器
+     wsl -l -v
+
+     wsl --export Ubuntu ubuntu2204.tar
+     wsl --unregister Ubuntu
+
+     mkdir data
+     wsl --import Ubuntu-22.04 data ubuntu2204.tar
+   #+END_SRC
+*** Docker 无法启动
+/usr/sbin/iptables-nft 网络管理 WSL2 不支持，需要修改一下
+#+BEGIN_SRC sh
+  $ sudo update-alternatives --config iptables
+  There are 2 choices for the alternative iptables (providing /usr/sbin/iptables).
+
+    Selection    Path                       Priority   Status
+  ------------------------------------------------------------
+  ,* 0            /usr/sbin/iptables-nft      20        auto mode
+    1            /usr/sbin/iptables-legacy   10        manual mode
+    2            /usr/sbin/iptables-nft      20        manual mode
+
+  Press <enter> to keep the current choice[*], or type selection number: 1
+  update-alternatives: using /usr/sbin/iptables-legacy to provide /usr/sbin/iptables (iptables) in manual mode
+  $ sudo service docker start
+   ,* Starting Docker: docker                                                                                                                                            [ OK ]
+  $ docker ps
+  CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+#+END_SRC
+*** 缺失字体
+默认添加 Windows 自带的字体来显示缺失字体
+#+BEGIN_SRC sh
+  sudo ln -s /mnt/c/Windows/Fonts /usr/share/fonts/host
+  fc-cache -fv
+#+END_SRC
+
+*** 挂载共享服务器
+#+BEGIN_SRC sh
+ sudo mount -t drvfs '\\192.168.0.201\开发服务器共享' /mnt/share
+#+END_SRC
+*** 解决提示符错误
+Windows Terminal 在安装 zsh-autosuggestions 时会显示的有问题，这里修改一下 ~PS1~
+#+BEGIN_SRC sh
+  ZSH_THEME="none"
+  export PS1='WSL(%3~)%# '
+#+END_SRC
+** CentOS
+*** SCL (Software Collection)
+SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources/Repositories/SCL][link]]
+#+BEGIN_SRC sql
+  yum install centos-release-scl
+
+  yum makecache
+  yum repolist
+#+END_SRC
+
+*** Red Hat Developer Toolset
+1. 使用手册 [[https://access.redhat.com/documentation/en-us/red_hat_developer_toolset/11/html-single/user_guide/index#doc-wrapper][User Guide]]
+   #+BEGIN_SRC sh
+     yum install scl-utils centos-release-scl
+
+     yum list all --enablerepo='centos-sclo-rh' | grep "devtoolset"
+     yum install devtoolset-11-toolchain
+   #+END_SRC
+2. 配置并启用 scl 工具集
+   #+BEGIN_SRC sh
+     scl --list
+     scl enable devtoolset-11 bash
+   #+END_SRC
+** Manjaro
 * 问题排查
 ** 前端
 *** digital envelope routines::unsupported
