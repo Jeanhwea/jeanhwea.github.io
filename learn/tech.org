@@ -1358,6 +1358,45 @@ Python LSP 服务
 #+BEGIN_SRC sh
   cat a.json | jq '.str | fromjson | .[0] | tojson'
 #+END_SRC
+** Bochs
+源码编译安装 [[https://wiki.osdev.org/Bochs][OSDev link]] | [[https://github.com/bochs-emu/Bochs][Github]] | [[https://sourceforge.net/projects/bochs/files/bochs/2.7/][bochs 2.7]]
+官方编译手册 [[https://bochs.sourceforge.io/doc/docbook/user/compiling.html][Compiling Bochs]]
+
+#+BEGIN_SRC sh
+  wget -c https://jaist.dl.sourceforge.net/project/bochs/bochs/2.7/bochs-2.7.tar.gz
+
+  sudo apt-get install libgtk2.0-dev libsdl2-dev
+
+  ./configure --enable-smp \
+              --enable-cpu-level=6 \
+              --enable-all-optimizations \
+              --enable-x86-64 \
+              --enable-pci \
+              --enable-vmx \
+              --enable-debugger \
+              --enable-debugger-gui \
+              --enable-logging \
+              --enable-fpu \
+              --enable-3dnow \
+              --enable-sb16=dummy \
+              --enable-cdrom \
+              --enable-x86-debugger \
+              --enable-iodebug \
+              --disable-plugins \
+              --disable-docbook \
+              --with-x --with-x11 --with-term --with-sdl2
+
+  make
+
+  sudo make install
+#+END_SRC
+
+bochsrc 配置文件, 设置启动未 1.44 存软盘, 启动镜像名称为 Image
+#+BEGIN_SRC text
+  boot: floppy
+  floppy_bootsig_check: disabled=0
+  floppya: 1_44=Image, status=inserted
+#+END_SRC
 * 编程语言
 ** Perl
 *** 环境配置
@@ -2171,43 +2210,4 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
   cp /usr/pkg/etc/rc.d/sshd /etc/rc.d/
   printf 'sshd=YES\n' >> /etc/rc.conf
   /etc/rc.d/sshd start
-#+END_SRC
-*** 安装 Bochs
-源码编译安装 [[https://wiki.osdev.org/Bochs][OSDev link]] | [[https://github.com/bochs-emu/Bochs][Github]] | [[https://sourceforge.net/projects/bochs/files/bochs/2.7/][bochs 2.7]]
-官方编译手册 [[https://bochs.sourceforge.io/doc/docbook/user/compiling.html][Compiling Bochs]]
-
-#+BEGIN_SRC sh
-  wget -c https://jaist.dl.sourceforge.net/project/bochs/bochs/2.7/bochs-2.7.tar.gz
-
-  sudo apt-get install libgtk2.0-dev libsdl2-dev
-
-  ./configure --enable-smp \
-              --enable-cpu-level=6 \
-              --enable-all-optimizations \
-              --enable-x86-64 \
-              --enable-pci \
-              --enable-vmx \
-              --enable-debugger \
-              --enable-debugger-gui \
-              --enable-logging \
-              --enable-fpu \
-              --enable-3dnow \
-              --enable-sb16=dummy \
-              --enable-cdrom \
-              --enable-x86-debugger \
-              --enable-iodebug \
-              --disable-plugins \
-              --disable-docbook \
-              --with-x --with-x11 --with-term --with-sdl2
-
-  make
-
-  sudo make install
-#+END_SRC
-
-bochsrc 配置文件, 设置启动未 1.44 存软盘, 启动镜像名称为 Image
-#+BEGIN_SRC text
-  boot: floppy
-  floppy_bootsig_check: disabled=0
-  floppya: 1_44=Image, status=inserted
 #+END_SRC
