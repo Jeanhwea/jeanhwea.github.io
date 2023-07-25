@@ -898,13 +898,67 @@ Kitex 微服务架构工具 [[https://www.cloudwego.io/zh/docs/kitex/][kitex]]
 #+END_SRC
 
 ** SSH
+*** ~/.ssh/config
+创建配置文件
+#+BEGIN_SRC sh
+  touch ~/.ssh/config
+  chmod 600 ~/.ssh/config
+#+END_SRC
+
+查看配置文件
+#+BEGIN_SRC sh
+  man ssh_config 5
+#+End_SRC
+
+基本配置
+- ServerAliveInterval 心跳时间
+#+BEGIN_SRC conf
+  Host *
+      ServerAliveInterval 0
+#+END_SRC
+
 *** 配置 host 别名
 在配置文件 ~/.ssh/config 方便后续直接在 ssh 命令中使用
-#+BEGIN_SRC text
+#+BEGIN_SRC conf
   Host gitana
       Hostname gitana.jeanhwea.io
       Port 2222
       User admin
+#+END_SRC
+
+*** 直接转发远端流量
+通过 ssh_config 的配置来转发远端 5432
+#+BEGIN_SRC text
+  Host db
+      HostName db.example.com
+      LocalForward 5433 localhost:5432
+#+END_SRC
+
+登录到远端, 然后就可以在本地连接
+#+BEGIN_SRC sh
+  ssh db
+  psql -h localhost -p 5433 orders
+#+END_SRC
+
+*** 代理登录
+添加代理登录的配置, 需要通过 ProxyCommand 来设置代理命令
+#+BEGIN_SRC conf
+  Host gateway
+      HostName proxy.example.com
+      User root
+  Host db
+      HostName db.internal.example.com                  # 目标服务器地址
+      User root                                         # 用户名
+      # IdentityFile ~/.ssh/id_ecdsa                    # 认证文件
+      ProxyCommand ssh gateway netcat -q 600 %h %p      # 代理命令
+#+END_SRC
+
+*** 连接 socket 重用
+#+BEGIN_SRC conf
+  Host example.org
+    ControlMaster    auto
+    ControlPath      ~/.ssh/cp-%r@%h:%p.sock
+    ControlPersist   yes
 #+END_SRC
 
 *** forward 端口转发
@@ -2290,7 +2344,6 @@ Fontconfig error: Cannot load default config file
 #+BEGIN_EXAMPLE
   M-x replace-string RET C-q C-m RET RET
 #+END_EXAMPLE
-
 *** tramp ssh 到远程
 配置远端 ~/.ssh/config, 添加别名
 #+BEGIN_SRC text
@@ -2304,7 +2357,6 @@ Fontconfig error: Cannot load default config file
 #+BEGIN_EXAMPLE
   M-x find-file /sshx:user@host#port:/path
 #+END_EXAMPLE
-
 
 *** 设置文件类型
 #+BEGIN_SRC text
