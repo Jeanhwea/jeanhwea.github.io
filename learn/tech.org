@@ -1254,12 +1254,13 @@ ubuntu 下编译
               --enable-fpu \
               --enable-3dnow \
               --enable-sb16=dummy \
+              --enable-ne2000 \
               --enable-cdrom \
               --enable-x86-debugger \
               --enable-iodebug \
               --disable-plugins \
               --disable-docbook \
-              --with-x --with-x11 --with-term --with-sdl2
+              --with-x --with-x11 --with-term
 
   make
 
@@ -1313,6 +1314,15 @@ bochsrc 配置文件, 设置启动未 1.44 存软盘, 启动镜像名称为 Imag
   vim /opt/bochs/share/doc/bochs/bochsrc-sample.txt
 #+END_SRC
 
+*** 开启图形调试器
+修改配置文件 bochsrc.bxrc
+#+BEGIN_SRC sh
+  # Linux
+  display_library: x, options="gui_debug"
+  # Windows
+  display_library: win32, options="gui_debug"
+#+END_SRC
+
 *** 提取系统文件
 #+BEGIN_SRC text
   [/root]# mdir b:
@@ -1335,13 +1345,6 @@ bochsrc 配置文件, 设置启动未 1.44 存软盘, 启动镜像名称为 Imag
 #+BEGIN_SRC sh
   sudo mount -t msdos -o loop diskb.img /mnt
   sudo mount -t minix -o loop rootimage-hd.img /mnt
-#+END_SRC
-
-*** 开启图形调试器
-修改配置文件 bochsrc.bxrc
-#+BEGIN_SRC sh
-  display_library: x, options="gui_debug"
-  display_library: win32, options="gui_debug"
 #+END_SRC
 
 * 后端研发
