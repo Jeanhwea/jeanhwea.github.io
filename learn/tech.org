@@ -1241,15 +1241,35 @@ Python LSP 服务
 使用 ~Ctrl-b :~ 可以进入命令模式执行命令
 使用 ~Ctrl-b ?~ 可以进入查看快捷键绑定
 
-** JSON
+** json
 *** jq
 - fromjson 字符串 => 对象
 - tojson 对象 => 字符串
 #+BEGIN_SRC sh
   cat a.json | jq '.str | fromjson | .[0] | tojson'
 #+END_SRC
-** Bochs
-*** Bochs 安装及配置
+** qemu
+- qemu 使用示例教程 [[https://www.poftut.com/qemu-tutorial/][link]]
+
+安装 qemu
+#+BEGIN_SRC sh
+  apt install -y qemu-system
+#+END_SRC
+
+创建硬盘镜像文件
+#+BEGIN_SRC sh
+  qemu-img create myvm.qcow2 16G
+#+END_SRC
+
+安装 minix 系统
+#+BEGIN_SRC sh
+  qemu-system-x86_64 -boot d -cdrom minix_R3.3.0-588a35b.iso -m 1024 -hda myvm.qcow2
+  # Ctrl-A x 退出 QEMU 界面
+  qemu-system-x86_64 -nographic -boot d -cdrom minix_R3.3.0-588a35b.iso -m 1024 -hda myvm.qcow2
+#+END_SRC
+
+** bochs
+*** bochs 安装及配置
 源码编译安装 [[https://wiki.osdev.org/Bochs][OSDev link]] | [[https://github.com/bochs-emu/Bochs][Github]] | [[https://sourceforge.net/projects/bochs/files/bochs/2.7/][bochs 2.7]]
 官方编译手册 [[https://bochs.sourceforge.io/doc/docbook/user/compiling.html][Compiling Bochs]] | [[https://rayanfam.com/topics/bochs-config-and-build-on-windows-and-os-x/][build on macosx]]
 
@@ -2376,6 +2396,96 @@ Fontconfig error: Cannot load default config file
 #+END_SRC
 
 ** Emacs
+*** 参考资料
+1. 精选插件列表 [[https://github.com/emacs-tw/awesome-emacs][Awesome Emcas]]
+*** 任务管理
+1. 表格 [[info:org#The Spreadsheet][org#The Spreadsheet]]
+   - 单元格公式: 输入 ~:=~ 后在单元格中直接编辑公式，或者 ~C-u C-c =~
+   - 列公式: 输入 ~=~ 后在单元格中直接编辑公式，或者 ~C-c =~
+   - 显示坐标: ~C-c }~
+2. 绘图 [[info:org#Org Plot][org#Org Plot]]
+3. 待办实现管理 [[info:org#TODO dependencies][org#TODO dependencies]]
+4. 标签系统 [[info:org#Tags][org#Tags]]
+5. 代码管理 [[info:org#Working with Source Code][org#Working with Source Code]]
+6. buffer 设置 [[info:org#In-buffer Settings][org#In-buffer Settings]]
+   - #+STARTUP: 启动设置
+     #+BEGIN_QUOTE
+       #+STARTUP: indent cache num inlineimages
+     #+END_QUOTE
+*** 绘图
+**** graphviz
+***** 参考连接
+1. 图库 [[http://graphviz.org/gallery/][Gallery]]
+2. [[file:../article/drawing-graphs-with-dot.org::+TITLE: 使用 dot 画图工具][文章]] | 快速入门 [[https://www.graphviz.org/pdf/dotguide.pdf][Drawing graphs with dot]]
+3. 属性参考文档 [[http://www.graphviz.org/doc/info/attrs.html][Attrs]]
+***** 无向图
+#+BEGIN_SRC dot :exports results :file ../static/image/2023/0201/000024.png
+  graph {
+    A -- B -- C -- D;
+    A -- C;
+  }
+#+END_SRC
+
+#+RESULTS:
+[[file:../static/image/2023/0201/000024.png]]
+
+***** 有向图
+#+BEGIN_SRC dot :exports results :file ../static/image/2023/0201/000219.png
+  digraph {
+    A -> B;
+    A -> C;
+    A -> D;
+    B -> D;
+  }
+#+END_SRC
+
+#+RESULTS:
+[[file:../static/image/2023/0201/000219.png]]
+
+***** 支持中文
+#+BEGIN_SRC dot :exports results :file ../static/image/2023/0201/001233.png
+  digraph {
+    node [fontname="Microsoft Yahei"];
+    outsys [label="外部系统"];
+    innersys [label="内部系统"];
+    outsys -> innersys;
+  }
+#+END_SRC
+
+#+RESULTS:
+[[file:../static/image/2023/0201/001233.png]]
+
+***** 系统交互图
+#+BEGIN_SRC dot :exports results :file ../static/image/2023/0201/001954.png
+    digraph {
+      size="8,8";
+      node [fontname="Microsoft Yahei"];
+
+      subgraph cluster_metadata {
+        label = "元数据管理模块"; color = "lightgray"; style = "filled";
+        module_meta_data [shape=record label="治理数据 | {Servie | Module | Field}"];
+        module_meta_status [label="治理状态"];
+        module_work_order [label="工单管理"];
+      }
+
+      subgraph cluster_detector {
+        label = "劣化探测模块"; color = "lightgray"; style = "filled";
+        module_data_preload [label="数据准备"];
+        module_intern_checker [label="内置检测器"];
+        module_extern_checker [label="外置检测器"];
+      }
+
+      module_data_preload -> module_intern_checker;
+      module_data_preload -> module_extern_checker;
+
+      module_data_preload -> module_meta_data [label="取"];
+    }
+#+END_SRC
+
+#+RESULTS:
+[[file:../static/image/2023/0201/001954.png]]
+**** plantuml
+1. [[http://eschulte.github.io/babel-dev/DONE-integrate-plantuml-support.html][Tutor]] | [[https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-plantuml.html][Official]]
 *** 批量删除 ^M 方法
 #+BEGIN_EXAMPLE
   M-x replace-string RET C-q C-m RET RET
@@ -2408,6 +2518,10 @@ Fontconfig error: Cannot load default config file
 #+BEGIN_EXAMPLE
   M-x hexl-mode
 #+END_EXAMPLE
+
+*** elisp 函数增强
+1. 增强 defadvice [[info:elisp#Advising Functions][elisp#Advising Functions]]
+2. 闭包 [[info:elisp#Closures][elisp#Closures]]
 
 ** GDB
 *** MacOS: 证书错误问题 [[https://timnash.co.uk/getting-gdb-to-semi-reliably-work-on-mojave-macos/][(^-^)]]
