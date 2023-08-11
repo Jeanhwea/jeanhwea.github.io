@@ -1252,6 +1252,19 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
   fi
 #+END_SRC
 
+*** 检测当前是否 root 用户
+#+BEGIN_SRC sh
+  if [ $UID -ne 0 ]; then
+      echo "permission deny, sudo ..."
+      exit 13 # EACCES
+  fi
+#+END_SRC
+
+*** 临时提权设置目录权限
+#+BEGIN_SRC sh
+  echo 'password' | sudo -S chmod -R a+rX dist
+#+END_SRC
+
 * 研发效率
 ** 交叉编译环境配置
 安装前置依赖项目
