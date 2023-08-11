@@ -485,7 +485,9 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
 #+END_SRC
 
 ** Rust
+*** 资源链接
 1. The Rust Programming Language | [[https://www.bilibili.com/video/BV1K34y1x7F9][BTV]]
+
 ** 极客时光
 *** 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/22%20%E8%AE%B2%E9%80%9A%E5%85%B3%20Go%20%E8%AF%AD%E8%A8%80-%E5%AE%8C][22 讲通关 Go 语言]]
 *** 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/24%E8%AE%B2%E5%90%83%E9%80%8F%E5%88%86%E5%B8%83%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93-%E5%AE%8C][24 讲吃透分布式数据库]]
@@ -881,6 +883,55 @@ Kitex 微服务架构工具 [[https://www.cloudwego.io/zh/docs/kitex/][kitex]]
      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
    #+END_SRC
 2. 入门材料 [[https://rust-book.cs.brown.edu/][rust book]]
+
+*** 使用笔记
+#+BEGIN_SRC rust
+  #![allow(dead_code)]
+  #![allow(unused_variables)]
+#+END_SRC
+
+结构体
+#+BEGIN_SRC rust
+  struct Point {
+      x: f64,
+      y: f64,
+  }
+
+  struct Line {
+      beg: Point,
+      end: Point,
+  }
+
+  impl Line {
+      // 方法
+      fn len(&self) -> f64 {
+          let dx = self.end.x - self.beg.x;
+          let dy = self.end.y - self.beg.y;
+          (dx * dx + dy * dy).sqrt()
+      }
+  }
+#+END_SRC
+
+匿名函数及闭包
+#+BEGIN_SRC rust
+  fn use_closure() {
+      let plus_one = |x| -> i32 { x + 1 };
+      let x = 1;
+      println!("{} + 1 = {}", x, plus_one(x));
+  }
+#+END_SRC
+
+match 关键字
+#+BEGIN_SRC rust
+  fn match_statement(x: i32) -> &'static str {
+      return match x {
+          8 => "China",
+          1..=10 => "VALID",
+          _ => "INVALID",
+      };
+  }
+#+END_SRC
+
 * 研发效率
 ** Git
 1. taobao git 下载 [[https://registry.npmmirror.com/binary.html?path=git-for-windows/][git-for-windows]]
