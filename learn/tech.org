@@ -13,9 +13,6 @@
 #+BEAMER_THEME: boxes
 
 * 学习计划
-** 数据结构
-1. Leetcode 刷题 [[https://github.com/jeanhwea/golang_tutor][golang]] | [[https://github.com/jeanhwea/annotry][java]]
-2. 红黑树 [[https://www.cs.usfca.edu/~galles/visualization/RedBlack.html][rbtree]]
 ** 操作系统
 *** 制作操作系统资源
 1. os-tutorial 编写操作系统的入门代码 os-dev.pdf | [[https://github.com/cfenollosa/os-tutorial][link]]
@@ -425,6 +422,41 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
   printf 'sshd=YES\n' >> /etc/rc.conf
   /etc/rc.d/sshd start
 #+END_SRC
+*** 实验环境准备
+1. AUR 编译说明文档 [[https://wiki.manjaro.org/index.php/Arch_User_Repository/zh-cn][link]]
+   #+BEGIN_SRC sh
+     # clone build repository
+     git clone https://aur.archlinux.org/i386-elf-binutils.git
+     # make binary package
+     makepkg -s
+     # install package
+     sudo pacman -U i386-elf-binutils-2.40-1-x86_64.pkg.tar.zst
+   #+END_SRC
+
+2. c 语言交叉编译
+   #+BEGIN_SRC sh
+     # 交叉编译, -ffreestanding 不需要标准库支持，生成目标是一个独立环境
+     i386-elf-gcc -ffreestanding -c function.c -o function.o
+     # 反汇编
+     i386-elf-objdump -d function.o
+
+     # 链接, -Ttext 0x0 表示代码段的起始地址
+     i386-elf-ld -o function.bin -Ttext 0x0 --oformat binary function.o
+
+     # 反汇编测试生成的二进制文件
+     ndisasm -b 32 function.bin
+   #+END_SRC
+
+3. gdb 调试内核
+   #+BEGIN_SRC sh
+     # -s 让 qemu 停止并监听 1234 端口等待调试
+     qemu-system-i386 -s -fda os-image.bin &
+     # 创建连接符号文件
+     i386-elf-ld -o kernel.elf -Ttext 0x1000 kernel.o obj1.o obj2.o
+     # gdb 执行命令进行调试
+     i386-elf-gdb -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
+   #+END_SRC
+
 ** Linux
 *** Linux 资源链接
 1. Linux 源码在线导读 bootlin [[https://elixir.bootlin.com/linux/0.12/source/kernel/fork.c][link]]
@@ -534,41 +566,9 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
 2. 对于系统发生消息积压的情况，需要先解决积压，再分析原因
    - 快速解决积压的方法就是通过水平扩容增加 Consumer 的实例数量
 
-** 操作系统实验
-1. AUR 编译说明文档 [[https://wiki.manjaro.org/index.php/Arch_User_Repository/zh-cn][link]]
-   #+BEGIN_SRC sh
-     # clone build repository
-     git clone https://aur.archlinux.org/i386-elf-binutils.git
-     # make binary package
-     makepkg -s
-     # install package
-     sudo pacman -U i386-elf-binutils-2.40-1-x86_64.pkg.tar.zst
-   #+END_SRC
-
-2. c 语言交叉编译
-   #+BEGIN_SRC sh
-     # 交叉编译, -ffreestanding 不需要标准库支持，生成目标是一个独立环境
-     i386-elf-gcc -ffreestanding -c function.c -o function.o
-     # 反汇编
-     i386-elf-objdump -d function.o
-
-     # 链接, -Ttext 0x0 表示代码段的起始地址
-     i386-elf-ld -o function.bin -Ttext 0x0 --oformat binary function.o
-
-     # 反汇编测试生成的二进制文件
-     ndisasm -b 32 function.bin
-   #+END_SRC
-
-3. gdb 调试内核
-   #+BEGIN_SRC sh
-     # -s 让 qemu 停止并监听 1234 端口等待调试
-     qemu-system-i386 -s -fda os-image.bin &
-     # 创建连接符号文件
-     i386-elf-ld -o kernel.elf -Ttext 0x1000 kernel.o obj1.o obj2.o
-     # gdb 执行命令进行调试
-     i386-elf-gdb -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
-   #+END_SRC
-
+** 数据结构
+1. Leetcode 刷题 [[https://github.com/jeanhwea/golang_tutor][golang]] | [[https://github.com/jeanhwea/annotry][java]]
+2. 红黑树 [[https://www.cs.usfca.edu/~galles/visualization/RedBlack.html][rbtree]]
 * 编程语言
 ** Java
 *** Maven
