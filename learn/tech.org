@@ -569,7 +569,7 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
 ** 数据结构
 1. Leetcode 刷题 [[https://github.com/jeanhwea/golang_tutor][golang]] | [[https://github.com/jeanhwea/annotry][java]]
 2. 红黑树 [[https://www.cs.usfca.edu/~galles/visualization/RedBlack.html][rbtree]]
-* 编程语言
+* 编程工具
 ** Java
 *** Maven
 **** 添加本地 JAR 包
@@ -933,190 +933,6 @@ match 关键字
   }
 #+END_SRC
 
-* 研发效率
-** Git
-1. taobao git 下载 [[https://registry.npmmirror.com/binary.html?path=git-for-windows/][git-for-windows]]
-2. taobao 二进制下载 [[https://registry.npmmirror.com/binary.html][taobao binary]]
-*** 配置用户信息
-#+BEGIN_SRC sh
-  git config --global user.email "hujinghui@buaa.edu.cn"
-  git config --global user.name "Jinghui Hu"
-#+END_SRC
-
-*** 递归克隆子模块
-#+BEGIN_SRC sh
-  git clone --recurse-submodules url
-#+END_SRC
-
-*** 忽略换行符 ^M
-#+BEGIN_SRC sh
-   git config core.autocrlf true
-#+END_SRC
-
-*** 代码发布相关
-#+BEGIN_SRC sh
-  # 动态生成标签
-  git describe --tags --always --dirty='-dev'
-  # 创建代码包
-  git archive -o output.tgz HEAD
-#+END_SRC
-
-** SSH
-*** ~/.ssh/config
-创建配置文件
-#+BEGIN_SRC sh
-  touch ~/.ssh/config
-  chmod 600 ~/.ssh/config
-#+END_SRC
-
-查看配置文件
-#+BEGIN_SRC sh
-  man ssh_config 5
-#+End_SRC
-
-基本配置
-- ServerAliveInterval 心跳时间
-#+BEGIN_SRC conf
-  Host *
-      ServerAliveInterval 0
-#+END_SRC
-
-*** 配置 host 别名
-在配置文件 ~/.ssh/config 方便后续直接在 ssh 命令中使用
-#+BEGIN_SRC conf
-  Host gitana
-      Hostname gitana.jeanhwea.io
-      Port 2222
-      User admin
-
-  # match 123, 212 etc
-  Host 1?? 2??
-      Hostname 192.168.0.%h
-      Port 22
-      User admin
-
-  # match all
-  Host *
-      Hostname 192.168.0.%h
-      Port 22
-      User admin
-#+END_SRC
-
-*** 直接转发远端流量
-通过 ssh_config 的配置来转发远端 5432
-#+BEGIN_SRC text
-  Host db
-      HostName db.example.com
-      LocalForward 5433 localhost:5432
-#+END_SRC
-
-登录到远端, 然后就可以在本地连接
-#+BEGIN_SRC sh
-  ssh db
-  psql -h localhost -p 5433 orders
-#+END_SRC
-
-*** 代理登录
-添加代理登录的配置, 需要通过 ProxyCommand 来设置代理命令
-#+BEGIN_SRC conf
-  Host gateway
-      HostName proxy.example.com
-      User root
-  Host db
-      HostName db.internal.example.com                  # 目标服务器地址
-      User root                                         # 用户名
-      # IdentityFile ~/.ssh/id_ecdsa                    # 认证文件
-      ProxyCommand ssh gateway netcat -q 600 %h %p      # 代理命令
-#+END_SRC
-
-*** 连接 socket 重用
-#+BEGIN_SRC conf
-  Host example.org
-    ControlMaster    auto
-    ControlPath      ~/.ssh/cp-%r@%h:%p.sock
-    ControlPersist   yes
-#+END_SRC
-
-*** forward 端口转发
-本地转发
-#+BEGIN_SRC sh
-  # -N 不执行命令, -L local 转发 <remote-port>:<local-host>:<local-port>
-  ssh -N -L 9092:127.0.0.1:9092 user@host
-#+END_SRC
-
-远端转发
-#+BEGIN_SRC sh
-  # -N 不执行命令, -R remote 转发 <local-port>:<remote-host>:<remote-port>
-  ssh -N -R 9092:127.0.0.1:9092 user@host
-#+END_SRC
-
-*** ssh 双跳登录
-#+BEGIN_SRC sh
-  ssh -p9998 -i ~/.ssh/id_s1 user1@175.0.0.20 -t ssh -p9999 -i ~/.ssh/id_s2 user2@213.0.0.30
-#+END_SRC
-
-*** scp 双跳传输
-#+BEGIN_SRC sh
-  scp -o ProxyCommand="ssh -p9998 user1@175.0.0.20 nc 213.0.0.30 9999" \
-      -o IdentityFile="~/.ssh/id_s2" /opt/file user2@213.0.0.30:/tmp/file
-#+END_SRC
-
-** 交叉编译
-安装前置依赖项目
-#+BEGIN_SRC sh
-  yum install -y texinfo
-#+END_SRC
-
-下载所需的依赖
-#+BEGIN_SRC sh
-  # 下载所需的安装包
-  wget -c https://mirrors.tuna.tsinghua.edu.cn/gnu/gcc/gcc-11.4.0/gcc-11.4.0.tar.gz
-  wget -c https://mirrors.tuna.tsinghua.edu.cn/gnu/binutils/binutils-2.40.tar.gz
-  wget -c https://mirrors.tuna.tsinghua.edu.cn/gnu/gdb/gdb-11.2.tar.gz
-
-  tar xzvf binutils-2.40.tar.gz
-  tar xzvf gcc-11.4.0.tar.gz
-  tar xzvf gdb-11.2.tar.gz
-
-  # gcc 需要依赖 gmp mpfr libmpc 库, 可以直接使用 gcc 里面的辅助脚本下载
-  cd gcc-11.4.0
-  ./contrib/download_prerequisites
-#+END_SRC
-
-保存脚本开始编译
-#+BEGIN_SRC sh
-  export PREFIX="/opt/i386-elf-toolchain"
-  export TARGET=i386-elf
-  export PATH="$PREFIX/bin:$PATH"
-
-  DIR=$PWD
-
-  # rm -rf $DIR/build-binutils
-  mkdir -p $DIR/build-binutils
-  cd $DIR/build-binutils
-  ../binutils-2.40/configure --target=$TARGET --prefix=$PREFIX --enable-interwork --enable-multilib --disable-nls --disable-werror 2>&1 | tee configure.log
-  make all -j4 2>&1 | tee make.log
-  sudo make install 2>&1 | tee install.log
-
-
-  # rm -rf $DIR/build-gcc
-  mkdir -p $DIR/build-gcc
-  cd $DIR/build-gcc
-  ../gcc-11.4.0/configure --target=$TARGET --prefix=$PREFIX --disable-nls --disable-libssp --enable-languages=c --without-headers 2>&1 | tee configure.log
-  make all-gcc -j4 2>&1 | tee make-all-gcc.log
-  make all-target-libgcc -j4 2>&1 | tee make-all-target-libgcc.log
-  sudo make install-gcc 2>&1 | tee make-install-gcc.log
-  sudo make install-target-libgcc 2>&1 | tee make-install-target-libgcc.log
-
-
-  # rm -rf $DIR/build-gdb
-  mkdir -p $DIR/build-gdb
-  cd $DIR/build-gdb
-  ../gdb-11.2/configure --target=$TARGET --prefix=$PREFIX --program-prefix=i386-elf-
-  make -j4 2>&1 | tee make.log
-  sudo make install 2>&1 | tee install.log
-#+END_SRC
-
 ** GDB & LLDB
 *** 参考资料及链接
 1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
@@ -1270,7 +1086,197 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
   gdb -ex "target remote :1234" -ex "b *0x7c00" -ex "c"
 #+END_SRC
 
-** LSP
+** Git
+1. taobao git 下载 [[https://registry.npmmirror.com/binary.html?path=git-for-windows/][git-for-windows]]
+2. taobao 二进制下载 [[https://registry.npmmirror.com/binary.html][taobao binary]]
+*** 配置用户信息
+#+BEGIN_SRC sh
+  git config --global user.email "hujinghui@buaa.edu.cn"
+  git config --global user.name "Jinghui Hu"
+#+END_SRC
+
+*** 递归克隆子模块
+#+BEGIN_SRC sh
+  git clone --recurse-submodules url
+#+END_SRC
+
+*** 忽略换行符 ^M
+#+BEGIN_SRC sh
+   git config core.autocrlf true
+#+END_SRC
+
+*** 代码发布相关
+#+BEGIN_SRC sh
+  # 动态生成标签
+  git describe --tags --always --dirty='-dev'
+  # 创建代码包
+  git archive -o output.tgz HEAD
+#+END_SRC
+
+** SSH
+*** ~/.ssh/config
+创建配置文件
+#+BEGIN_SRC sh
+  touch ~/.ssh/config
+  chmod 600 ~/.ssh/config
+#+END_SRC
+
+查看配置文件
+#+BEGIN_SRC sh
+  man ssh_config 5
+#+End_SRC
+
+基本配置
+- ServerAliveInterval 心跳时间
+#+BEGIN_SRC conf
+  Host *
+      ServerAliveInterval 0
+#+END_SRC
+
+*** 配置 host 别名
+在配置文件 ~/.ssh/config 方便后续直接在 ssh 命令中使用
+#+BEGIN_SRC conf
+  Host gitana
+      Hostname gitana.jeanhwea.io
+      Port 2222
+      User admin
+
+  # match 123, 212 etc
+  Host 1?? 2??
+      Hostname 192.168.0.%h
+      Port 22
+      User admin
+
+  # match all
+  Host *
+      Hostname 192.168.0.%h
+      Port 22
+      User admin
+#+END_SRC
+
+*** 直接转发远端流量
+通过 ssh_config 的配置来转发远端 5432
+#+BEGIN_SRC text
+  Host db
+      HostName db.example.com
+      LocalForward 5433 localhost:5432
+#+END_SRC
+
+登录到远端, 然后就可以在本地连接
+#+BEGIN_SRC sh
+  ssh db
+  psql -h localhost -p 5433 orders
+#+END_SRC
+
+*** 代理登录
+添加代理登录的配置, 需要通过 ProxyCommand 来设置代理命令
+#+BEGIN_SRC conf
+  Host gateway
+      HostName proxy.example.com
+      User root
+  Host db
+      HostName db.internal.example.com                  # 目标服务器地址
+      User root                                         # 用户名
+      # IdentityFile ~/.ssh/id_ecdsa                    # 认证文件
+      ProxyCommand ssh gateway netcat -q 600 %h %p      # 代理命令
+#+END_SRC
+
+*** 连接 socket 重用
+#+BEGIN_SRC conf
+  Host example.org
+    ControlMaster    auto
+    ControlPath      ~/.ssh/cp-%r@%h:%p.sock
+    ControlPersist   yes
+#+END_SRC
+
+*** forward 端口转发
+本地转发
+#+BEGIN_SRC sh
+  # -N 不执行命令, -L local 转发 <remote-port>:<local-host>:<local-port>
+  ssh -N -L 9092:127.0.0.1:9092 user@host
+#+END_SRC
+
+远端转发
+#+BEGIN_SRC sh
+  # -N 不执行命令, -R remote 转发 <local-port>:<remote-host>:<remote-port>
+  ssh -N -R 9092:127.0.0.1:9092 user@host
+#+END_SRC
+
+*** ssh 双跳登录
+#+BEGIN_SRC sh
+  ssh -p9998 -i ~/.ssh/id_s1 user1@175.0.0.20 -t ssh -p9999 -i ~/.ssh/id_s2 user2@213.0.0.30
+#+END_SRC
+
+*** scp 双跳传输
+#+BEGIN_SRC sh
+  scp -o ProxyCommand="ssh -p9998 user1@175.0.0.20 nc 213.0.0.30 9999" \
+      -o IdentityFile="~/.ssh/id_s2" /opt/file user2@213.0.0.30:/tmp/file
+#+END_SRC
+
+** Shell
+*** 后台运行
+#+BEGIN_SRC sh
+
+#+END_SRC
+
+* 研发效率
+** 交叉编译环境配置
+安装前置依赖项目
+#+BEGIN_SRC sh
+  yum install -y texinfo
+#+END_SRC
+
+下载所需的依赖
+#+BEGIN_SRC sh
+  # 下载所需的安装包
+  wget -c https://mirrors.tuna.tsinghua.edu.cn/gnu/gcc/gcc-11.4.0/gcc-11.4.0.tar.gz
+  wget -c https://mirrors.tuna.tsinghua.edu.cn/gnu/binutils/binutils-2.40.tar.gz
+  wget -c https://mirrors.tuna.tsinghua.edu.cn/gnu/gdb/gdb-11.2.tar.gz
+
+  tar xzvf binutils-2.40.tar.gz
+  tar xzvf gcc-11.4.0.tar.gz
+  tar xzvf gdb-11.2.tar.gz
+
+  # gcc 需要依赖 gmp mpfr libmpc 库, 可以直接使用 gcc 里面的辅助脚本下载
+  cd gcc-11.4.0
+  ./contrib/download_prerequisites
+#+END_SRC
+
+保存脚本开始编译
+#+BEGIN_SRC sh
+  export PREFIX="/opt/i386-elf-toolchain"
+  export TARGET=i386-elf
+  export PATH="$PREFIX/bin:$PATH"
+
+  DIR=$PWD
+
+  # rm -rf $DIR/build-binutils
+  mkdir -p $DIR/build-binutils
+  cd $DIR/build-binutils
+  ../binutils-2.40/configure --target=$TARGET --prefix=$PREFIX --enable-interwork --enable-multilib --disable-nls --disable-werror 2>&1 | tee configure.log
+  make all -j4 2>&1 | tee make.log
+  sudo make install 2>&1 | tee install.log
+
+
+  # rm -rf $DIR/build-gcc
+  mkdir -p $DIR/build-gcc
+  cd $DIR/build-gcc
+  ../gcc-11.4.0/configure --target=$TARGET --prefix=$PREFIX --disable-nls --disable-libssp --enable-languages=c --without-headers 2>&1 | tee configure.log
+  make all-gcc -j4 2>&1 | tee make-all-gcc.log
+  make all-target-libgcc -j4 2>&1 | tee make-all-target-libgcc.log
+  sudo make install-gcc 2>&1 | tee make-install-gcc.log
+  sudo make install-target-libgcc 2>&1 | tee make-install-target-libgcc.log
+
+
+  # rm -rf $DIR/build-gdb
+  mkdir -p $DIR/build-gdb
+  cd $DIR/build-gdb
+  ../gdb-11.2/configure --target=$TARGET --prefix=$PREFIX --program-prefix=i386-elf-
+  make -j4 2>&1 | tee make.log
+  sudo make install 2>&1 | tee install.log
+#+END_SRC
+
+** LSP 代码提示
 Java LSP 服务
 #+BEGIN_SRC sh
   # 安装 jdtls
@@ -1290,7 +1296,8 @@ Python LSP 服务
   pip install --user yapf
   pip install --user "python-lsp-server[yapf]"
 #+END_SRC
-** Tmux
+
+** Tmux 管理终端会话
 基本配置 ~/.tmux.conf
 #+BEGIN_SRC sh
   set -g mouse on
@@ -1301,13 +1308,13 @@ Python LSP 服务
 使用 ~Ctrl-b :~ 可以进入命令模式执行命令
 使用 ~Ctrl-b ?~ 可以进入查看快捷键绑定
 
-** json
-*** jq
+** 处理 json 字符串
 - fromjson 字符串 => 对象
 - tojson 对象 => 字符串
 #+BEGIN_SRC sh
   cat a.json | jq '.str | fromjson | .[0] | tojson'
 #+END_SRC
+
 ** qemu
 - qemu 使用示例教程 [[https://www.poftut.com/qemu-tutorial/][link]]
 
@@ -1445,6 +1452,17 @@ bochsrc 配置文件, 设置启动未 1.44 存软盘, 启动镜像名称为 Imag
   sudo mount -t minix -o loop rootimage-hd.img /mnt
 #+END_SRC
 
+** pandoc 文档格式转换
+#+BEGIN_SRC sh
+  pandoc --pdf-engine=xelatex \
+         --toc --number-sections \
+         -V date="$(date +'%Y-%m-%d %H:%M:%S')" \
+         -V author="Jinghui Hu" \
+         -V mainfont="SimSun" \
+         -V documentclass=ctexart \
+         -V geometry:margin='1in' \
+         -o tech.pdf tech.org
+#+END_SRC
 * 后端研发
 ** Oracle
 *** 参考资料
