@@ -544,6 +544,7 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
      # install package
      sudo pacman -U i386-elf-binutils-2.40-1-x86_64.pkg.tar.zst
    #+END_SRC
+
 2. c 语言交叉编译
    #+BEGIN_SRC sh
      # 交叉编译, -ffreestanding 不需要标准库支持，生成目标是一个独立环境
@@ -557,6 +558,7 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
      # 反汇编测试生成的二进制文件
      ndisasm -b 32 function.bin
    #+END_SRC
+
 3. gdb 调试内核
    #+BEGIN_SRC sh
      # -s 让 qemu 停止并监听 1234 端口等待调试
@@ -566,7 +568,6 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
      # gdb 执行命令进行调试
      i386-elf-gdb -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
    #+END_SRC
-
 
 * 编程语言
 ** Java
@@ -1061,15 +1062,14 @@ match 关键字
 #+END_SRC
 
 ** 交叉编译
+安装前置依赖项目
 #+BEGIN_SRC sh
   yum install -y texinfo
 #+END_SRC
 
+下载所需的依赖
 #+BEGIN_SRC sh
-  export PREFIX="/opt/i386-elf-toolchain"
-  export TARGET=i386-elf
-  export PATH="$PREFIX/bin:$PATH"
-
+  # 下载所需的安装包
   wget -c https://mirrors.tuna.tsinghua.edu.cn/gnu/gcc/gcc-11.4.0/gcc-11.4.0.tar.gz
   wget -c https://mirrors.tuna.tsinghua.edu.cn/gnu/binutils/binutils-2.40.tar.gz
   wget -c https://mirrors.tuna.tsinghua.edu.cn/gnu/gdb/gdb-11.2.tar.gz
@@ -1078,9 +1078,16 @@ match 关键字
   tar xzvf gcc-11.4.0.tar.gz
   tar xzvf gdb-11.2.tar.gz
 
+  # gcc 需要依赖 gmp mpfr libmpc 库, 可以直接使用 gcc 里面的辅助脚本下载
   cd gcc-11.4.0
   ./contrib/download_prerequisites
+#+END_SRC
 
+保存脚本开始编译
+#+BEGIN_SRC sh
+  export PREFIX="/opt/i386-elf-toolchain"
+  export TARGET=i386-elf
+  export PATH="$PREFIX/bin:$PATH"
 
   DIR=$PWD
 
@@ -1109,6 +1116,7 @@ match 关键字
   make -j4 2>&1 | tee make.log
   sudo make install 2>&1 | tee install.log
 #+END_SRC
+
 ** GDB & LLDB
 *** 参考资料及链接
 1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
