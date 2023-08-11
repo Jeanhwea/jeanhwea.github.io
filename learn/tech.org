@@ -16,6 +16,15 @@
 ** 数据结构
 1. 红黑树 [[https://www.cs.usfca.edu/~galles/visualization/RedBlack.html][rbtree]]
 ** 操作系统
+*** 制作操作系统
+1. os-tutorial 编写操作系统的入门代码 os-dev.pdf | [[https://github.com/cfenollosa/os-tutorial][link]]
+2. linux inside [[https://0xax.gitbooks.io/linux-insides/content/Booting/linux-bootstrap-1.html][link]]
+3. c/c++ 编写一个操作系统 [[https://samypesse.gitbook.io/how-to-create-an-operating-system/chapter-2][link]]
+4. Linux 内核完全注释 [[http://www.oldlinux.org/download/CLK-5.0-WithCover.pdf][book]]
+5. James kernel development tutorial [[http://www.jamesmolloy.co.uk/tutorial_html/index.html][link]]
+6. Linux 源码在线导读 bootlin [[https://elixir.bootlin.com/linux/0.12/source/kernel/fork.c][link]]
+7. Linux Documentation Project Guides [[https://tldp.org/guides.html][TLDP]] | [[https://tldp.org/LDP/khg/HyperNews/get/khg.html][Linux Kernel Hackers' Guide]]
+8. rust 操作系统 [[https://rcore.gitbook.io/rust-os-docs/kai-fa-huan-jing-pei-zhi][rust os]] | [[https://github.com/rcore-os/rCore][rCore]]
 *** 课程 [[https://pdos.csail.mit.edu/6.828/2019/index.html][MIT 6.828]]
 **** 环境准备
 1. [[https://pdos.csail.mit.edu/6.828/2019/tools.html][工具链]] risc-v
@@ -56,6 +65,30 @@
 #+END_SRC
 
 [[file:../static/image/2023/0315/112736.png]]
+
+**** 安装 Minix 操作系统
+操作系统安装 [[https://wiki.minix3.org/doku.php?id=usersguide:runningonqemu][link]]
+#+BEGIN_SRC sh
+  # 解压
+  bzip2 -d minix_R3.3.0-588a35b.iso.bz2
+  # 新建硬盘镜像
+  qemu-img create minix.img 8G
+  # 安装启动
+  qemu-system-x86_64 -net user -net nic -m 256 -cdrom minix_R3.3.0-588a35b.iso -hda minix.img -boot d
+  # 启动
+  qemu-system-x86_64 -net user -net nic -m 256 -hda minix.img
+#+END_SRC
+
+安装后设置 [[https://wiki.minix3.org/doku.php?id=usersguide:postinstallation][link]]
+#+BEGIN_SRC sh
+  hostname minix3
+
+  pkgin update
+  pkgin install openssh
+  cp /usr/pkg/etc/rc.d/sshd /etc/rc.d/
+  printf 'sshd=YES\n' >> /etc/rc.conf
+  /etc/rc.d/sshd start
+#+END_SRC
 *** Linux
 **** 编译内核
 1. 一些依赖安装
@@ -162,15 +195,6 @@
 2. 对于系统发生消息积压的情况，需要先解决积压，再分析原因
    - 快速解决积压的方法就是通过水平扩容增加 Consumer 的实例数量
 
-** 制作操作系统
-1. os-tutorial
-2. linux inside [[https://0xax.gitbooks.io/linux-insides/content/Booting/linux-bootstrap-1.html][link]]
-3. c/c++ 编写一个操作系统 [[https://samypesse.gitbook.io/how-to-create-an-operating-system/chapter-2][link]]
-4. Linux 内核完全注释 [[http://www.oldlinux.org/download/CLK-5.0-WithCover.pdf][book]]
-5. James kernel development tutorial [[http://www.jamesmolloy.co.uk/tutorial_html/index.html][link]]
-6. Linux 源码在线导读 bootlin [[https://elixir.bootlin.com/linux/0.12/source/kernel/fork.c][link]]
-7. Linux Documentation Project Guides [[https://tldp.org/guides.html][TLDP]] | [[https://tldp.org/LDP/khg/HyperNews/get/khg.html][Linux Kernel Hackers' Guide]]
-8. rust 操作系统 [[https://rcore.gitbook.io/rust-os-docs/kai-fa-huan-jing-pei-zhi][rust os]] | [[https://github.com/rcore-os/rCore][rCore]]
 ** 操作系统实验
 1. AUR 编译说明文档 [[https://wiki.manjaro.org/index.php/Arch_User_Repository/zh-cn][link]]
    #+BEGIN_SRC sh
@@ -543,30 +567,6 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
 *** 书籍及配套教材
 1. 《x86 汇编语言：从实模式到保护模式》 [[http://www.lizhongc.com/index.php/archives/10/][book]] | [[https://www.bilibili.com/video/BV1xE411N74T/?spm_id_from=333.337.search-card.all.click&vd_source=3a56932406d5df288a20eff532848982][video]] | [[http://www.lizhongc.com/][李忠]]
 
-** Linux 0.11
-*** 安装 minix
-操作系统安装 [[https://wiki.minix3.org/doku.php?id=usersguide:runningonqemu][link]]
-#+BEGIN_SRC sh
-  # 解压
-  bzip2 -d minix_R3.3.0-588a35b.iso.bz2
-  # 新建硬盘镜像
-  qemu-img create minix.img 8G
-  # 安装启动
-  qemu-system-x86_64 -net user -net nic -m 256 -cdrom minix_R3.3.0-588a35b.iso -hda minix.img -boot d
-  # 启动
-  qemu-system-x86_64 -net user -net nic -m 256 -hda minix.img
-#+END_SRC
-
-安装后设置 [[https://wiki.minix3.org/doku.php?id=usersguide:postinstallation][link]]
-#+BEGIN_SRC sh
-  hostname minix3
-
-  pkgin update
-  pkgin install openssh
-  cp /usr/pkg/etc/rc.d/sshd /etc/rc.d/
-  printf 'sshd=YES\n' >> /etc/rc.conf
-  /etc/rc.d/sshd start
-#+END_SRC
 * 编程语言
 ** Java
 *** Maven
