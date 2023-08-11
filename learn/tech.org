@@ -936,6 +936,49 @@ match 关键字
   }
 #+END_SRC
 
+使用 trait
+#+BEGIN_SRC rust
+  trait Animal {
+      fn name(&self) -> &'static str;
+
+      fn talk(&self) {
+          println!("{} cannot talk!", self.name());
+      }
+  }
+
+  struct Cat {
+      name: &'static str,
+  }
+
+  struct Human {
+      name: &'static str,
+  }
+
+  impl Animal for Cat {
+      fn name(&self) -> &'static str {
+          self.name
+      }
+  }
+
+  impl Animal for Human {
+      fn name(&self) -> &'static str {
+          self.name
+      }
+
+      fn talk(&self) {
+          println!("{} says hello.", self.name());
+      }
+  }
+
+  fn use_trait() {
+      let john = Human { name: "John" };
+      john.talk();
+
+      let pet = Cat { name: "MiMi" };
+      pet.talk();
+  }
+#+END_SRC
+
 ** GDB & LLDB
 *** 参考资料及链接
 1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
@@ -1119,7 +1162,7 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
 *** 添加添加生成 TAGS 的 git-hooks
 #+BEGIN_SRC sh
   cp .git/hooks/pre-commit.sample .git/hooks/pre-commit
-  echo 'ctags -e -R .' > .git/hooks/pre-commit
+  echo 'ctags -e -R . >/dev/null 2>&1 &' > .git/hooks/pre-commit
 #+END_SRC
 
 ** SSH
