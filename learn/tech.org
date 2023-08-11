@@ -1214,9 +1214,34 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
 #+END_SRC
 
 ** Shell
-*** 后台运行
+*** 后台运行命令 cmd
 #+BEGIN_SRC sh
+  nohup cmd >/dev/null 2>&1 &
+#+END_SRC
 
+*** 比较 semver 版本号
+#+BEGIN_SRC sh
+  vge() {
+      local v1=$1
+      local v2=$2
+      local small=$(printf "%s\n", $1, $2 | sort -V | head -n 1)
+      if [ "$v1" == "$small" ]; then
+          echo "true"
+      else
+          echo "false"
+      fi
+  }
+#+END_SRC
+
+*** heredoc 定义变量
+#+BEGIN_SRC sh
+  read -d '' TEXT <<EOF
+  this is a
+  multiple line
+  text
+  EOF
+
+  echo $TEXT
 #+END_SRC
 
 * 研发效率
@@ -2251,6 +2276,7 @@ daemon.json 配置
   tar czvf pack.tar.gz pack
   gzip app.log.2023-07-07.0
 #+END_SRC
+
 * 前端研发
 ** Node
 #+BEGIN_SRC sh
