@@ -21,6 +21,7 @@
 4. c/c++ 编写一个操作系统 [[https://samypesse.gitbook.io/how-to-create-an-operating-system/chapter-2][link]]
 5. James kernel development tutorial [[http://www.jamesmolloy.co.uk/tutorial_html/index.html][link]]
 6. 《x86 汇编语言：从实模式到保护模式》 [[http://www.lizhongc.com/index.php/archives/10/][BOOK]] | [[https://www.bilibili.com/video/BV1xE411N74T/?spm_id_from=333.337.search-card.all.click&vd_source=3a56932406d5df288a20eff532848982][BTV]] | [[http://www.lizhongc.com/][李忠]]
+7. BUAA OS 2022 [[https://github.com/MaxLong2001/BUAA_OS_2022.git][link]]
 *** 课程 [[https://pdos.csail.mit.edu/6.828/2019/index.html][MIT 6.828]]
 1. riscv [[https://pdos.csail.mit.edu/6.828/2019/tools.html][工具链]]
 2. 课程视频 [[https://www.bilibili.com/video/BV19k4y1C7kA][BTV]]
@@ -519,6 +520,8 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
   sudo apt install bin86
 #+END_SRC
 
+*** TODO 内存检测工具 valgrind
+
 ** Rust
 *** 资源链接
 1. [X] The Rust Programming Language | [[https://www.bilibili.com/video/BV1K34y1x7F9][BTV]]
@@ -910,7 +913,6 @@ Kitex 微服务架构工具 [[https://www.cloudwego.io/zh/docs/kitex/][kitex]]
      # 安装工具链
      rustup component add rust-src
    #+END_SRC
-
 
 *** 使用笔记
 #+BEGIN_SRC rust
@@ -2493,115 +2495,6 @@ SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources
    #+END_SRC
 ** Manjaro
 * 日常使用
-** 前端
-*** digital envelope routines::unsupported
-OpenSSL3.0 对允许算法和密钥大小增加了严格的限制，可能会对生态系统造成一些影响
-#+BEGIN_SRC text
-node:internal/crypto/hash:67
-  this[kHandle] = new _Hash(algorithm, xofLen);
-                  ^
-
-Error: error:0308010C:digital envelope routines::unsupported
-    at new Hash (node:internal/crypto/hash:67:19)
-    at Object.createHash (node:crypto:130:10)
-#+END_SRC
-
-解决方法
-#+BEGIN_SRC sh
-  export NODE_OPTIONS=--openssl-legacy-provider
-#+END_SRC
-
-** 科学上网
-*** githubusercontent 链接失败
-/etc/hosts
-#+BEGIN_SRC sh
-  185.199.108.133 raw.githubusercontent.com
-#+END_SRC
-** 使用体验
-**** Esc 键有延迟
-问题说明 [[https://www.johnhawthorn.com/2012/09/vi-escape-delays/][Eliminating delays on ESC in vim and zsh]]
-尝试按照以下思路解决这个问题
-vim
-#+BEGIN_SRC text
-  set timeoutlen=1000 ttimeoutlen=0
-#+END_SRC
-zsh
-#+BEGIN_SRC sh
-  # 10ms for key sequences
-  KEYTIMEOUT=1
-#+END_SRC
-tmux
-#+BEGIN_SRC sh
-  # .tmux.conf
-  set -s escape-time 0
-  echo 'set -s escape-time 0' >> ~/.tmux.conf
-#+END_SRC
-** CentOS
-*** 安装中文字体
-修改配置文件
-#+BEGIN_SRC sh
-  vim /etc/fonts/fonts.conf
-#+END_SRC
-
-添加字体文件目录配置
-#+BEGIN_SRC xml
-  <!-- Font directory list -->
-
-          <dir>/usr/share/fonts</dir>
-          <dir>/usr/share/fonts/Fonts/</dir>
-          <dir>/usr/share/X11/fonts/Type1</dir>
-          <dir>/usr/share/X11/fonts/TTF</dir>
-          <dir>/usr/local/share/fonts</dir>
-          <dir prefix="xdg">fonts</dir>
-          <!-- the following element will be removed in the future -->
-          <dir>~/.fonts</dir>
-#+END_SRC
-
-使用命令刷新字体缓存
-#+BEGIN_SRC sh
-  cd /usr/share/fonts
-  tar xzvf fonts.tar.gz
-  fc-cache -fv
-  # 查看中文字体
-  fc-list :lang=zh
-#+END_SRC
-
-如果发现找不到字体配置文件，需要手工添加环境变量
-Fontconfig error: Cannot load default config file
-#+BEGIN_SRC sh
-  export FONTCONFIG_PATH=/etc/fonts
-#+END_SRC
-
-*** 硬件时钟 hwclock
-#+BEGIN_SRC sh
-  # Display hwclock
-  hwclock --show
-
-  # Sync hwclock to system
-  hwclock --hctosys
-
-  # Save clock, for reboot
-  clock -w
-  hwclock -w
-#+END_SRC
-
-** MySQL
-*** Public Key Retrieval is not allowed
-在设置数据库添加如下的链接选项
-#+BEGIN_SRC text
-  allowPublicKeyRetrieval=true
-#+END_SRC
-** Docker
-*** 文件夹递归复制
-#+BEGIN_SRC dockerfile
-  # 正确地递归复制文件夹方案
-  COPY src/  target/
-
-  # 以下两种不和递归复制
-  COPY src/* target
-  COPY src   target
-#+END_SRC
-
 ** Emacs
 *** 参考资料
 1. 精选插件列表 [[https://github.com/emacs-tw/awesome-emacs][Awesome Emcas]]
@@ -2729,6 +2622,133 @@ Fontconfig error: Cannot load default config file
 *** elisp 函数增强
 1. 增强 defadvice [[info:elisp#Advising Functions][elisp#Advising Functions]]
 2. 闭包 [[info:elisp#Closures][elisp#Closures]]
+
+*** 设置文件显示自动换行
+#+BEGIN_EXAMPLE
+  M-x toggle-truncate-lines
+#+END_EXAMPLE
+
+** Linux
+*** tar: time stamp XXX in the future
+如果解压时发现待解压的机器的时间戳较慢，会出现如下报错
+#+BEGIN_EXAMPLE
+  tar: ./app.jar: time stamp 2023-08-21 08:17:50 is 223.674040911 s in the future
+  tar: ./version: time stamp 2023-08-21 08:17:50 is 223.673692569 s in the future
+#+END_EXAMPLE
+
+可以在 tar 命令中添加 -m 来忽略时间戳问题
+#+BEGIN_SRC sh
+  tar xzmf file.tar.gz
+#+END_SRC
+
+** 前端
+*** digital envelope routines::unsupported
+OpenSSL3.0 对允许算法和密钥大小增加了严格的限制，可能会对生态系统造成一些影响
+#+BEGIN_SRC text
+node:internal/crypto/hash:67
+  this[kHandle] = new _Hash(algorithm, xofLen);
+                  ^
+
+Error: error:0308010C:digital envelope routines::unsupported
+    at new Hash (node:internal/crypto/hash:67:19)
+    at Object.createHash (node:crypto:130:10)
+#+END_SRC
+
+解决方法
+#+BEGIN_SRC sh
+  export NODE_OPTIONS=--openssl-legacy-provider
+#+END_SRC
+
+** 科学上网
+*** githubusercontent 链接失败
+/etc/hosts
+#+BEGIN_SRC sh
+  185.199.108.133 raw.githubusercontent.com
+#+END_SRC
+** 使用体验
+*** Esc 键有延迟
+问题说明 [[https://www.johnhawthorn.com/2012/09/vi-escape-delays/][Eliminating delays on ESC in vim and zsh]]
+尝试按照以下思路解决这个问题
+vim
+#+BEGIN_SRC text
+  set timeoutlen=1000 ttimeoutlen=0
+#+END_SRC
+zsh
+#+BEGIN_SRC sh
+  # 10ms for key sequences
+  KEYTIMEOUT=1
+#+END_SRC
+tmux
+#+BEGIN_SRC sh
+  # .tmux.conf
+  set -s escape-time 0
+  echo 'set -s escape-time 0' >> ~/.tmux.conf
+#+END_SRC
+** CentOS
+*** 安装中文字体
+修改配置文件
+#+BEGIN_SRC sh
+  vim /etc/fonts/fonts.conf
+#+END_SRC
+
+添加字体文件目录配置
+#+BEGIN_SRC xml
+  <!-- Font directory list -->
+
+          <dir>/usr/share/fonts</dir>
+          <dir>/usr/share/fonts/Fonts/</dir>
+          <dir>/usr/share/X11/fonts/Type1</dir>
+          <dir>/usr/share/X11/fonts/TTF</dir>
+          <dir>/usr/local/share/fonts</dir>
+          <dir prefix="xdg">fonts</dir>
+          <!-- the following element will be removed in the future -->
+          <dir>~/.fonts</dir>
+#+END_SRC
+
+使用命令刷新字体缓存
+#+BEGIN_SRC sh
+  cd /usr/share/fonts
+  tar xzvf fonts.tar.gz
+  fc-cache -fv
+  # 查看中文字体
+  fc-list :lang=zh
+#+END_SRC
+
+如果发现找不到字体配置文件，需要手工添加环境变量
+Fontconfig error: Cannot load default config file
+#+BEGIN_SRC sh
+  export FONTCONFIG_PATH=/etc/fonts
+#+END_SRC
+
+*** 硬件时钟 hwclock
+#+BEGIN_SRC sh
+  # Display hwclock
+  hwclock --show
+
+  # Sync hwclock to system
+  hwclock --hctosys
+
+  # Save clock, for reboot
+  clock -w
+  hwclock -w
+#+END_SRC
+
+** MySQL
+*** Public Key Retrieval is not allowed
+在设置数据库添加如下的链接选项
+#+BEGIN_SRC text
+  allowPublicKeyRetrieval=true
+#+END_SRC
+** Docker
+*** 文件夹递归复制
+#+BEGIN_SRC dockerfile
+  # 正确地递归复制文件夹方案
+  COPY src/  target/
+
+  # 以下两种不和递归复制
+  COPY src/* target
+  COPY src   target
+#+END_SRC
 
 ** GDB
 *** MacOS: 证书错误问题 [[https://timnash.co.uk/getting-gdb-to-semi-reliably-work-on-mojave-macos/][(^-^)]]
