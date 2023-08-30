@@ -843,6 +843,99 @@ CLOSED: [2023-06-03 Sat 23:39]
 
 *** kitex
 Kitex 微服务架构工具 [[https://www.cloudwego.io/zh/docs/kitex/][kitex]]
+*** profile 性能分析
+通过如下命令生成分析文件，官网工具介绍 [[https://go.dev/doc/diagnostics][diagnostics]]
+#+BEGIN_SRC sh
+  # cpu 性能分析
+  go test -cpuprofile ./output/cpu.prof -run TestSched01 ./app/sched
+  # 内存 性能分析
+  go test -memprofile ./output/mem.prof -run TestSched01 ./app/sched
+  # cpu 内存性能分析
+  go test -cpuprofile ./output/cpu.prof -memprofile ./output/mem.prof -run TestSched01 ./app/sched
+#+END_SRC
+
+使用 go tool 查看文件
+#+BEGIN_SRC sh
+  go tool pprof ./output/cpu.prof
+#+END_SRC
+
+查看 cpu 性能分析结果
+#+BEGIN_EXAMPLE
+  $ go tool pprof ./output/cpu.prof
+  File: sched.test
+  Type: cpu
+  Time: Aug 30, 2023 at 8:51am (CST)
+  Duration: 201.60ms, Total samples = 70ms (34.72%)
+  Entering interactive mode (type "help" for commands, "o" for options)
+  (pprof) top 5
+  Showing nodes accounting for 70ms, 100% of 70ms total
+  Showing top 5 nodes out of 32
+        flat  flat%   sum%        cum   cum%
+        40ms 57.14% 57.14%       40ms 57.14%  runtime/internal/syscall.Syscall6
+        10ms 14.29% 71.43%       10ms 14.29%  github.com/sirupsen/logrus.(*TextFormatter).Format
+        10ms 14.29% 85.71%       10ms 14.29%  runtime.heapBitsSetType
+        10ms 14.29%   100%       10ms 14.29%  time.Now
+           0     0%   100%       60ms 85.71%  github.com/sirupsen/logrus.(*Entry).Info
+  (pprof) top 5 -cum
+  Showing nodes accounting for 0, 0% of 70ms total
+  Showing top 5 nodes out of 32
+        flat  flat%   sum%        cum   cum%
+           0     0%     0%       70ms   100%  mtiisl.cn/gitlab/xifei/patok/app/sched.(*Sched).StartSched
+           0     0%     0%       70ms   100%  mtiisl.cn/gitlab/xifei/patok/app/sched.TestSched01
+           0     0%     0%       70ms   100%  testing.tRunner
+           0     0%     0%       60ms 85.71%  github.com/sirupsen/logrus.(*Entry).Info (inline)
+           0     0%     0%       60ms 85.71%  github.com/sirupsen/logrus.(*Entry).Log
+  (pprof)
+#+END_EXAMPLE
+
+查看内存性能分析结果
+#+BEGIN_EXAMPLE
+  $ go tool pprof ./output/mem.prof
+  File: sched.test
+  Type: alloc_space
+  Time: Aug 30, 2023 at 8:47am (CST)
+  Entering interactive mode (type "help" for commands, "o" for options)
+  (pprof) top
+  Showing nodes accounting for 3693.94kB, 100% of 3693.94kB total
+  Showing top 10 nodes out of 29
+        flat  flat%   sum%        cum   cum%
+   1184.27kB 32.06% 32.06%  1184.27kB 32.06%  runtime/pprof.StartCPUProfile
+    902.59kB 24.43% 56.49%  1485.59kB 40.22%  compress/flate.NewWriter (inline)
+    583.01kB 15.78% 72.28%   583.01kB 15.78%  compress/flate.newDeflateFast (inline)
+    512.07kB 13.86% 86.14%   512.07kB 13.86%  fmt.Sprintf
+    512.01kB 13.86%   100%   512.01kB 13.86%  fmt.Sprint
+           0     0%   100%   583.01kB 15.78%  compress/flate.(*compressor).init
+           0     0%   100%  1485.59kB 40.22%  compress/gzip.(*Writer).Write
+           0     0%   100%  1024.08kB 27.72%  github.com/sirupsen/logrus.(*Entry).Info
+           0     0%   100%  1024.08kB 27.72%  github.com/sirupsen/logrus.(*Entry).Log
+           0     0%   100%   512.07kB 13.86%  github.com/sirupsen/logrus.(*Entry).log
+  (pprof) top -cum
+  Showing nodes accounting for 2086.86kB, 56.49% of 3693.94kB total
+  Showing top 10 nodes out of 29
+        flat  flat%   sum%        cum   cum%
+    902.59kB 24.43% 24.43%  1485.59kB 40.22%  compress/flate.NewWriter (inline)
+           0     0% 24.43%  1485.59kB 40.22%  compress/gzip.(*Writer).Write
+           0     0% 24.43%  1485.59kB 40.22%  runtime/pprof.(*profileBuilder).build
+           0     0% 24.43%  1485.59kB 40.22%  runtime/pprof.profileWriter
+           0     0% 24.43%  1184.27kB 32.06%  main.main
+           0     0% 24.43%  1184.27kB 32.06%  runtime.main
+   1184.27kB 32.06% 56.49%  1184.27kB 32.06%  runtime/pprof.StartCPUProfile
+           0     0% 56.49%  1184.27kB 32.06%  testing.(*M).Run
+           0     0% 56.49%  1184.27kB 32.06%  testing.(*M).before
+           0     0% 56.49%  1184.27kB 32.06%  testing/internal/testdeps.TestDeps.StartCPUProfile
+  (pprof)
+#+END_EXAMPLE
+
+产出 PDF 性能分析报告
+#+BEGIN_SRC sh
+  # 安装图像生成工具
+  sudo apt install graphviz
+  sudo brew install graphviz
+  # 生成 PDF 报告
+  go tool pprof --pdf ./output/cpu.prof > cpu.pdf
+  go tool pprof --pdf ./output/mem.prof > mem.pdf
+#+END_SRC
+
 ** Perl
 *** 环境配置
 **** 包管理工具配置 CPAN
@@ -1461,6 +1554,21 @@ Python LSP 服务
 #+BEGIN_SRC sh
   cat a.json | jq '.str | fromjson | .[0] | tojson'
 #+END_SRC
+
+unqoute string, jq 使用 =-r= 选项可以去掉字符串中的双引号, [[https://github.com/jqlang/jq/issues/1735][link]]
+#+BEGIN_SRC sh :results output
+  echo '{"a": "val01", "b": 1}' | jq '.a'
+#+END_SRC
+
+#+RESULTS:
+: "val01"
+
+#+BEGIN_SRC sh :results output
+  echo '{"a": "val01", "b": 1}' | jq -r '.a'
+#+END_SRC
+
+#+RESULTS:
+: val01
 
 ** qemu
 - qemu 使用示例教程 [[https://www.poftut.com/qemu-tutorial/][link]]
@@ -2521,6 +2629,7 @@ SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources
 ** Emacs
 *** 参考资料
 1. 精选插件列表 [[https://github.com/emacs-tw/awesome-emacs][Awesome Emcas]]
+2. Emacs Windows Binary [[http://mirrors.ustc.edu.cn/gnu/emacs/windows/][emacs-windows]]
 *** 任务管理
 1. 表格 [[info:org#The Spreadsheet][org#The Spreadsheet]]
    - 单元格公式: 输入 ~:=~ 后在单元格中直接编辑公式，或者 ~C-u C-c =~
@@ -2650,6 +2759,24 @@ SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources
 #+BEGIN_EXAMPLE
   M-x toggle-truncate-lines
 #+END_EXAMPLE
+
+*** libvterm 编译失败
+#+BEGIN_EXAMPLE
+  -- System libvterm not found: libvterm will be downloaded and compiled as part of the build process
+  CMake Error at CMakeLists.txt:71 (message):
+    libtool not found.  Please install libtool
+
+
+  -- Configuring incomplete, errors occurred!
+  See also "/home/jeffrey/.emacs.d/elpa/vterm-20230417.424/build/CMakeFiles/CMakeOutput.log".
+  make: *** No targets specified and no makefile found.  Stop.
+  /home/jeffrey/.emacs.d/elpa/vterm-20230417.424
+#+END_EXAMPLE
+
+解决方法，安装对应库
+#+BEGIN_SRC sh
+  sudo apt install cmake libtool libtool-bin
+#+END_SRC
 
 ** Linux
 *** tar: time stamp XXX in the future
