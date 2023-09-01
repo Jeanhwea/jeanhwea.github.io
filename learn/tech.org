@@ -602,6 +602,54 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
    #+BEGIN_SRC sh
      export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
    #+END_SRC
+*** LSP
+Java LSP 服务
+#+BEGIN_SRC sh
+  # 安装 jdtls
+  git clone https://github.com/eruizc-dev/jdtls-launcher.git
+  ./install.sh
+
+  # 更新 jdtls
+  jdtls --update
+  jdtls --version
+
+  # 清理 jdtls 缓存目录
+  rm -rvf ~/.cache/jdtls-workspace
+#+END_SRC
+
+Python LSP 服务
+#+BEGIN_SRC sh
+  pip install --user yapf
+  pip install --user "python-lsp-server[yapf]"
+  # 一次安装所有的 LSP 依赖
+  pip install --user "python-lsp-server[all]"
+#+END_SRC
+
+MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是 brew install python3
+时对应的 bin 文件夹在一个奇怪的位置
+#+BEGIN_SRC sh
+  $ pylsp
+  zsh: command not found: pylsp
+  $ pip uninstall  "python-lsp-server[all]"
+
+  Found existing installation: python-lsp-server 1.7.4
+  Uninstalling python-lsp-server-1.7.4:
+    Would remove:
+      /Users/hujinghui/Library/Python/3.11/bin/pylsp
+      /Users/hujinghui/Library/Python/3.11/lib/python/site-packages/pylsp/*
+      /Users/hujinghui/Library/Python/3.11/lib/python/site-packages/python_lsp_server-1.7.4.dist-info/*
+  Proceed (Y/n)? n
+  $ ls /Users/hujinghui/Library/Python/3.11/bin/
+  autopep8  flake8     get_objgraph  isort-identify-imports  pydocstyle  pylint         pylsp      symilar  yapf
+  epylint   get_gprof  isort         pycodestyle             pyflakes    pylint-config  pyreverse  undill   yapf-diff
+  $
+#+END_SRC
+
+修改 PATH 解决
+#+BEGIN_SRC sh
+  export PATH=~/Library/Python/3.11/bin:$PATH
+#+END_SRC
+
 ** Java
 *** Maven
 **** 添加本地 JAR 包
@@ -1549,29 +1597,6 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
   ../gdb-11.2/configure --target=$TARGET --prefix=$PREFIX --program-prefix=i386-elf-
   make -j4 |& tee make.log
   sudo make install |& tee install.log
-#+END_SRC
-
-** LSP 代码提示
-Java LSP 服务
-#+BEGIN_SRC sh
-  # 安装 jdtls
-  git clone https://github.com/eruizc-dev/jdtls-launcher.git
-  ./install.sh
-
-  # 更新 jdtls
-  jdtls --update
-  jdtls --version
-
-  # 清理 jdtls 缓存目录
-  rm -rvf ~/.cache/jdtls-workspace
-#+END_SRC
-
-Python LSP 服务
-#+BEGIN_SRC sh
-  pip install --user yapf
-  pip install --user "python-lsp-server[yapf]"
-  # 一次安装所有的 LSP 依赖
-  pip install --user "python-lsp-server[all]"
 #+END_SRC
 
 ** Tmux 管理终端会话
