@@ -2102,6 +2102,38 @@ Slave_SQL_Running: Yes
 
   alter user 'jeffrey'@'%' identified by 'mypass';
 #+END_SRC
+**** 重建表
+InnoDB 不支持直接优化表
+#+BEGIN_EXAMPLE
+  mysql> optimize table price_daily;
+  +-----------------------------+----------+----------+-------------------------------------------------------------------+
+  | Table                       | Op       | Msg_type | Msg_text                                                          |
+  +-----------------------------+----------+----------+-------------------------------------------------------------------+
+  | prod_alpen_dict.price_daily | optimize | note     | Table does not support optimize, doing recreate + analyze instead |
+  | prod_alpen_dict.price_daily | optimize | status   | OK                                                                |
+  +-----------------------------+----------+----------+-------------------------------------------------------------------+
+#+END_EXAMPLE
+
+InnoDB 需要重建后分析来优化表，对应 SQL 如下
+#+BEGIN_SRC sql
+  -- recreate
+  alter table price_daily engine=innodb;
+  -- analyze
+  analyze table price_daily;
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  mysql> alter table prod_alpen_dict.price_daily engine=innodb;
+  Query OK, 0 rows affected (3 min 2.06 sec)
+  Records: 0  Duplicates: 0  Warnings: 0
+  mysql> analyze table price_daily;
+  +-----------------------------+---------+----------+----------+
+  | Table                       | Op      | Msg_type | Msg_text |
+  +-----------------------------+---------+----------+----------+
+  | prod_alpen_dict.price_daily | analyze | status   | OK       |
+  +-----------------------------+---------+----------+----------+
+  1 row in set (0.04 sec)
+#+END_EXAMPLE
 
 *** 源码研究
 1. 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2][MySQL45]] | [[https://blog.jcole.us/innodb/][Data Structure]] | [[http://www.unofficialmysqlguide.com/introduction.html][Unofficial Optimizer Guide]]
