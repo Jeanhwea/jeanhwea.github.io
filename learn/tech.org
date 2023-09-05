@@ -1022,6 +1022,24 @@ Kitex 微服务架构工具 [[https://www.cloudwego.io/zh/docs/kitex/][kitex]]
   go tool pprof --pdf ./output/mem.prof > mem.pdf
 #+END_SRC
 
+*** 泛型写法
+#+BEGIN_SRC go
+  import (
+          "sort"
+  )
+
+  // ~string 表示底层时 string 类型的集合
+  func IterMap[K ~string, V any](m map[K]V, fn func(k K, v V)) {
+          keys := make([]string, 0, len(m))
+          for k := range m {
+                  keys = append(keys, string(k))
+          }
+          sort.Strings(keys)
+          for _, k := range keys {
+                  fn(K(k), m[K(k)])
+          }
+  }
+#+END_SRC
 ** Perl
 *** 环境配置
 **** 包管理工具配置 CPAN
