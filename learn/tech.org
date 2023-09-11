@@ -1099,7 +1099,7 @@ Kitex 微服务架构工具 [[https://www.cloudwego.io/zh/docs/kitex/][kitex]]
 [[file:/tmp/mysqld-thd-8.txt]]
 
 ** Python
-安装 python 的开发包
+*** 安装 python 的开发包
 #+BEGIN_SRC sh
   pip install --user pandas
   pip install --user sqlalchemy
@@ -1117,6 +1117,36 @@ Kitex 微服务架构工具 [[https://www.cloudwego.io/zh/docs/kitex/][kitex]]
   ./configure prefix=/opt/python3
   make
   sudo make install
+#+END_SRC
+
+配置国内下载源地址 [[https://mirrors.tuna.tsinghua.edu.cn/help/pypi/][tuna]]
+#+BEGIN_SRC sh
+  pip install pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
+  pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+  pip config set install.trusted-host pypi.tuna.tsinghua.edu.cn
+#+END_SRC
+
+*** pyenv 管理 python 版本
+安装如下
+#+BEGIN_SRC sh
+  git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+#+END_SRC
+
+配置环境变量
+#+BEGIN_SRC sh
+  export PYTHON_BUILD_MIRROR_URL="https://registry.npmmirror.com/-/binary/python"
+  export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
+
+  export PYENV_ROOT="$HOME/.pyenv"
+  command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init -)"
+#+END_SRC
+
+centos7 指定 openssl 安装路径后编译安装 [[https://github.com/pyenv/pyenv/wiki/Common-build-problems#error-the-python-ssl-extension-was-not-compiled-missing-the-openssl-lib][link]]
+#+BEGIN_SRC sh
+  CPPFLAGS="$(pkg-config --cflags openssl11)" \
+  LDFLAGS="$(pkg-config --libs openssl11)" \
+  pyenv install -v 3.10
 #+END_SRC
 
 ** Ruby
@@ -1532,7 +1562,6 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
       ProxyCommand ssh gateway netcat -q 600 %h %p      # 代理命令
 #+END_SRC
 
-
 *** 连接 socket 重用
 #+BEGIN_SRC conf
   Host example.org
@@ -1563,6 +1592,28 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
 #+BEGIN_SRC sh
   scp -o ProxyCommand="ssh -p9998 user1@175.0.0.20 nc 213.0.0.30 9999" \
       -o IdentityFile="~/.ssh/id_s2" /opt/file user2@213.0.0.30:/tmp/file
+#+END_SRC
+
+** squid
+http proxy server
+其配置文件 /etc/squid/squid.conf
+#+BEGIN_SRC conf
+  # Squid normally listens to port 3128
+  http_port 3128
+
+  # Example rule allowing access from your local networks.
+  # Adapt to list your (internal) IP networks from where browsing
+  # should be allowed
+  acl localnet src 10.0.0.0/8		# RFC 1918 local private network (LAN)
+  acl localnet src 100.64.0.0/10		# RFC 6598 shared address space (CGN)
+  acl localnet src 192.168.0.0/16		# RFC 1918 local private network (LAN)
+#+END_SRC
+
+在宿主机进行代理设置
+#+BEGIN_SRC sh
+  export proxy=http://0.0.0.0:3128
+  export http_proxy=http://0.0.0.0:3128
+  export https_proxy=http://0.0.0.0:3128
 #+END_SRC
 
 ** Shell
