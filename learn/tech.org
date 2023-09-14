@@ -2875,6 +2875,26 @@ SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources
   proxy=http://192.168.0.100:3128
 #+END_SRC
 
+*** 编译安装 openssl
+#+BEGIN_SRC sh
+  # 编译安装
+  wget -c https://www.openssl.org/source/openssl-1.1.1w.tar.gz
+  tar xzvf ~/down/openssl-1.1.1w.tar.gz
+  cd openssl-1.1.1w/
+  ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl
+  make
+  sudo make install
+
+  # 配置 ldconfig
+  sudo echo "/usr/local/openssl/lib" > /etc/ld.so.conf.d/openssl.conf
+  sudo ldconfig
+#+END_SRC
+
+配置环境变量
+#+BEGIN_SRC sh
+  export PATH=/usr/local/openssl/bin:$PATH
+#+END_SRC
+
 ** Manjaro
 * 日常使用
 ** Emacs
