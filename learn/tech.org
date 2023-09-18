@@ -662,6 +662,56 @@ MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是
 2. tldr
 ** Java
 *** Maven
+**** 配置下载源
+~/.m2/settings.xml | [[https://developer.aliyun.com/mvn/guide][link]]
+#+BEGIN_SRC xml
+  <servers>
+    <server>
+      <id>nexus</id>
+      <username>user01</username>
+      <password>passwd</password>
+    </server>
+  </servers>
+
+  <mirrors>
+    <mirror>
+      <id>aliyun</id>
+      <mirrorOf>*</mirrorOf>
+      <name>Aliyun Public Repository</name>
+      <url>https://maven.aliyun.com/repository/public</url>
+    </mirror>
+  </mirrors>
+#+END_SRC
+
+**** Nexus 依赖包上传
+  新建一个 ~mavenimport.sh~ 脚本放到 repository 文件夹下
+  #+BEGIN_SRC sh
+    #!/bin/bash
+    while getopts ":r:u:p:" opt; do
+      case $opt in
+        r) REPO_URL="$OPTARG"
+           ;;
+        u) USERNAME="$OPTARG"
+           ;;
+        p) PASSWORD="$OPTARG"
+           ;;
+      esac
+    done
+
+    find . -type f \
+         -not -path '*/\.*' \
+         -not -path '*/\^archetype\-catalog\.xml*' \
+         -not -path '*/\maven\-metadata\-local**\.xml' \
+         -not -path '*/\^maven\-metadata\-deployment*\.xml' \
+         -exec curl -u $USERNAME:$PASSWORD -X PUT -v -T {} $REPO_URL{} \;
+
+  #+END_SRC
+
+  一般需要上传 release 和 snapshot 两个仓库
+  #+BEGIN_SRC sh
+    sh mavenimport.sh -u user -p pass123 -r http://192.168.0.123:8081/repository/maven-releases/
+    sh mavenimport.sh -u user -p pass123 -r http://192.168.0.123:8081/repository/maven-snapshots/
+  #+END_SRC
 **** 添加本地 JAR 包
 在 pom.xml 文件中直接添加引用
 #+BEGIN_SRC xml
@@ -2736,6 +2786,8 @@ docker proxy [[https://docs.docker.com/network/proxy/][link]]
   tar czvf pack.tar.gz pack
   gzip app.log.2023-07-07.0
 #+END_SRC
+** Prometheus
+[[https://prometheus.io/docs/introduction/overview/][link]]
 
 * 前端研发
 ** Node
@@ -2750,6 +2802,8 @@ docker proxy [[https://docs.docker.com/network/proxy/][link]]
   export PATH=$HOME/.local/node_modules/bin:$PATH
   npm i -g nvm
   nvm install node
+  # -s 源码编译
+  nvm install -s node
 #+END_SRC
 
 ** Node Windows 配置
