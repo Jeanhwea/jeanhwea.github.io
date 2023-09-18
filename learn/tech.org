@@ -2897,6 +2897,31 @@ Windows Terminal 在安装 zsh-autosuggestions 时会显示的有问题，这里
   ZSH_THEME="none"
   export PS1='WSL(%3~)%# '
 #+END_SRC
+*** 下载 firefox
+删除 snap 组件
+#+BEGIN_SRC sh
+  sudo snap remove firefox
+  sudo apt remove firefox
+  sudo add-apt-repository ppa:mozillateam/ppa
+#+END_SRC
+
+配置下载 firefox 的配置
+#+BEGIN_SRC sh
+  # Create a new file, it should be empty as it opens:
+  sudo vi /etc/apt/preferences.d/mozillateamppa
+
+  # Insert these lines, then save and exit
+  Package: firefox*
+  Pin: release o=LP-PPA-mozillateam
+  Pin-Priority: 501
+#+END_SRC
+
+下载 firefox
+#+BEGIN_SRC sh
+  sudo apt update
+  sudo apt install firefox # or firefox-esr
+#+END_SRC
+
 ** CentOS
 *** SCL (Software Collection)
 SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources/Repositories/SCL][link]]
