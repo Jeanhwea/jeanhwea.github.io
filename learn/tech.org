@@ -2846,7 +2846,26 @@ docker proxy [[https://docs.docker.com/network/proxy/][link]]
      pro create myapp
    #+END_SRC
 
-* 操作系统
+* 日常使用
+** 使用体验
+*** Esc 键有延迟
+问题说明 [[https://www.johnhawthorn.com/2012/09/vi-escape-delays/][Eliminating delays on ESC in vim and zsh]]
+尝试按照以下思路解决这个问题
+vim
+#+BEGIN_SRC text
+  set timeoutlen=1000 ttimeoutlen=0
+#+END_SRC
+zsh
+#+BEGIN_SRC sh
+  # 10ms for key sequences
+  KEYTIMEOUT=1
+#+END_SRC
+tmux
+#+BEGIN_SRC sh
+  # .tmux.conf
+  set -s escape-time 0
+  echo 'set -s escape-time 0' >> ~/.tmux.conf
+#+END_SRC
 ** WSL
 *** Ubuntu 安装并迁移到其他盘
 1. 安装说明 [[https://learn.microsoft.com/zh-cn/windows/wsl/install-manual][link]]
@@ -3025,6 +3044,7 @@ http proxy server
 #+END_SRC
 
 *** NTP 时间服务器设置
+配置自动同步时间
 #+BEGIN_SRC sh
   timedatectl set-timezone 'Asia/Shanghai'
   timedatectl set-ntp yes
@@ -3033,8 +3053,62 @@ http proxy server
   # ntpq -p
 #+END_SRC
 
+离线手工同步时间
+#+BEGIN_SRC sh
+  timedatectl set-ntp no
+  timedatectl set-time '08:12:21'
+
+  hwclock -w
+#+END_SRC
+
+*** 硬件时钟 hwclock
+#+BEGIN_SRC sh
+  # Display hwclock
+  hwclock --show
+
+  # Sync hwclock to system
+  hwclock --hctosys
+
+  # Save clock, for reboot
+  clock -w
+  hwclock -w
+#+END_SRC
+*** 安装中文字体
+修改配置文件
+#+BEGIN_SRC sh
+  vim /etc/fonts/fonts.conf
+#+END_SRC
+
+添加字体文件目录配置
+#+BEGIN_SRC xml
+  <!-- Font directory list -->
+
+          <dir>/usr/share/fonts</dir>
+          <dir>/usr/share/fonts/Fonts/</dir>
+          <dir>/usr/share/X11/fonts/Type1</dir>
+          <dir>/usr/share/X11/fonts/TTF</dir>
+          <dir>/usr/local/share/fonts</dir>
+          <dir prefix="xdg">fonts</dir>
+          <!-- the following element will be removed in the future -->
+          <dir>~/.fonts</dir>
+#+END_SRC
+
+使用命令刷新字体缓存
+#+BEGIN_SRC sh
+  cd /usr/share/fonts
+  tar xzvf fonts.tar.gz
+  fc-cache -fv
+  # 查看中文字体
+  fc-list :lang=zh
+#+END_SRC
+
+如果发现找不到字体配置文件，需要手工添加环境变量
+Fontconfig error: Cannot load default config file
+#+BEGIN_SRC sh
+  export FONTCONFIG_PATH=/etc/fonts
+#+END_SRC
+
 ** Manjaro
-* 日常使用
 ** Emacs
 *** 参考资料
 1. 精选插件列表 [[https://github.com/emacs-tw/awesome-emacs][Awesome Emcas]]
@@ -3246,80 +3320,13 @@ Error: error:0308010C:digital envelope routines::unsupported
 #+BEGIN_SRC sh
   185.199.108.133 raw.githubusercontent.com
 #+END_SRC
-** 使用体验
-*** Esc 键有延迟
-问题说明 [[https://www.johnhawthorn.com/2012/09/vi-escape-delays/][Eliminating delays on ESC in vim and zsh]]
-尝试按照以下思路解决这个问题
-vim
-#+BEGIN_SRC text
-  set timeoutlen=1000 ttimeoutlen=0
-#+END_SRC
-zsh
-#+BEGIN_SRC sh
-  # 10ms for key sequences
-  KEYTIMEOUT=1
-#+END_SRC
-tmux
-#+BEGIN_SRC sh
-  # .tmux.conf
-  set -s escape-time 0
-  echo 'set -s escape-time 0' >> ~/.tmux.conf
-#+END_SRC
-** CentOS
-*** 安装中文字体
-修改配置文件
-#+BEGIN_SRC sh
-  vim /etc/fonts/fonts.conf
-#+END_SRC
-
-添加字体文件目录配置
-#+BEGIN_SRC xml
-  <!-- Font directory list -->
-
-          <dir>/usr/share/fonts</dir>
-          <dir>/usr/share/fonts/Fonts/</dir>
-          <dir>/usr/share/X11/fonts/Type1</dir>
-          <dir>/usr/share/X11/fonts/TTF</dir>
-          <dir>/usr/local/share/fonts</dir>
-          <dir prefix="xdg">fonts</dir>
-          <!-- the following element will be removed in the future -->
-          <dir>~/.fonts</dir>
-#+END_SRC
-
-使用命令刷新字体缓存
-#+BEGIN_SRC sh
-  cd /usr/share/fonts
-  tar xzvf fonts.tar.gz
-  fc-cache -fv
-  # 查看中文字体
-  fc-list :lang=zh
-#+END_SRC
-
-如果发现找不到字体配置文件，需要手工添加环境变量
-Fontconfig error: Cannot load default config file
-#+BEGIN_SRC sh
-  export FONTCONFIG_PATH=/etc/fonts
-#+END_SRC
-
-*** 硬件时钟 hwclock
-#+BEGIN_SRC sh
-  # Display hwclock
-  hwclock --show
-
-  # Sync hwclock to system
-  hwclock --hctosys
-
-  # Save clock, for reboot
-  clock -w
-  hwclock -w
-#+END_SRC
-
 ** MySQL
 *** Public Key Retrieval is not allowed
 在设置数据库添加如下的链接选项
 #+BEGIN_SRC text
   allowPublicKeyRetrieval=true
 #+END_SRC
+
 ** Docker
 *** 文件夹递归复制
 #+BEGIN_SRC dockerfile
