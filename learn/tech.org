@@ -833,6 +833,23 @@ CLOSED: [2023-06-03 Sat 23:39]
   MAKE=/usr/bin/make ./configure
   JOBS=12 /usr/bin/make all
 #+END_SRC
+**** 垃圾回收
+控制堆内存
+#+BEGIN_SRC sh
+  java -Xss256M -Xms4G -Xmx4G -jar app.jar
+#+END_SRC
+
+使用 G1 垃圾收集器 (Garbage-First)
+- MaxGCPauseMillis 回收暂停时间 300 毫秒
+#+BEGIN_SRC sh
+  java -XX:+UseG1GC -XX:MaxGCPauseMillis=300 -jar app.jar
+#+END_SRC
+
+打印 GC 日志，方便调试
+#+BEGIN_SRC sh
+  java -Xloggc:/app/log/gc.log -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -jar app.jar
+#+END_SRC
+
 *** Hive
 配置 [[https://hadoop.apache.org/docs/r2.6.2/hadoop-project-dist/hadoop-common/SingleCluster.html#Standalone_Operation][hadoop]]
 #+BEGIN_SRC sh
