@@ -662,7 +662,7 @@ MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是
 2. tldr
 ** Java
 *** Maven
-**** 配置下载源
+**** 配置国内下载镜像源
 ~/.m2/settings.xml | [[https://developer.aliyun.com/mvn/guide][link]]
 #+BEGIN_SRC xml
   <servers>
@@ -744,6 +744,7 @@ MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是
     application:
       version: @project.version@
 #+END_SRC
+
 *** Spring Framework
 1. 代码 [[https://github.com/spring-projects/spring-framework][Source]] | [[https://github.com/Jeanhwea/spring-framework/tree/jh/5.3.25][jh/5.3.25]]
 2. 编译 [[https://github.com/spring-projects/spring-framework/wiki/Build-from-Source][BUILD]] => Java8 切到 5.3 分支
@@ -1363,6 +1364,11 @@ match 关键字
 3. 布局循环 layout next/prev
 4. 打印 32 个汇编指令 x/32i $pc
 *** 进程启动: run & attach
+直接在命令行参数 attach 进程
+#+BEGIN_SRC sh
+  gdb -p pid
+#+END_SRC
+
 方法一：使用 attach 模式调试。首先正常启动重新，然后使用 attach 命令附属到进程上
 #+BEGIN_SRC sh
   (lldb) attach -p 18616
@@ -1400,6 +1406,21 @@ match 关键字
   # 临时断点: 临时断点执行一次后自动销毁
   tb main
 #+END_SRC
+
+启用/禁用断点 disable/enable
+#+BEGIN_EXAMPLE
+  (gdb) info b
+  Num     Type           Disp Enb Address            What
+  1       breakpoint     keep y   0x000000000331276b in dispatch_command(THD*, COM_DATA const*, enum_server_command)
+  (gdb) dis 1 # 禁用断点
+  (gdb) info b
+  Num     Type           Disp Enb Address            What
+  1       breakpoint     keep n   0x000000000331276b in dispatch_command(THD*, COM_DATA const*, enum_server_command)
+  (gdb) ena 1 # 启用断点
+  (gdb) i b
+  Num     Type           Disp Enb Address            What
+  1       breakpoint     keep y   0x000000000331276b in dispatch_command(THD*, COM_DATA const*, enum_server_command)
+#+END_EXAMPLE
 
 **** 流程控制 step & next & continue
 1. step 单步调试，不进入函数
