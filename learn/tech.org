@@ -766,6 +766,12 @@ MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是
      # 生成跳转的 TAG
      ctags -e -R --languages=c,c++ .
    #+END_SRC
+*** Spring Boot
+**** 启动传参
+#+BEGIN_SRC sh
+  mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Dfile.encoding=UTF-8"
+#+END_SRC
+
 *** Kafka
 CLOSED: [2023-06-03 Sat 23:39]
 1. [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/JVM%20%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%2032%20%E8%AE%B2%EF%BC%88%E5%AE%8C%EF%BC%89][JVM 系列]]
@@ -833,6 +839,23 @@ CLOSED: [2023-06-03 Sat 23:39]
   MAKE=/usr/bin/make ./configure
   JOBS=12 /usr/bin/make all
 #+END_SRC
+**** 垃圾回收
+控制堆内存
+#+BEGIN_SRC sh
+  java -Xss256M -Xms4G -Xmx4G -jar app.jar
+#+END_SRC
+
+使用 G1 垃圾收集器 (Garbage-First)
+- MaxGCPauseMillis 回收暂停时间 300 毫秒
+#+BEGIN_SRC sh
+  java -XX:+UseG1GC -XX:MaxGCPauseMillis=300 -jar app.jar
+#+END_SRC
+
+打印 GC 日志，方便调试
+#+BEGIN_SRC sh
+  java -Xloggc:/app/log/gc.log -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -jar app.jar
+#+END_SRC
+
 *** Hive
 配置 [[https://hadoop.apache.org/docs/r2.6.2/hadoop-project-dist/hadoop-common/SingleCluster.html#Standalone_Operation][hadoop]]
 #+BEGIN_SRC sh
@@ -2285,6 +2308,15 @@ InnoDB 需要重建后分析来优化表，对应 SQL 如下
   +-----------------------------+---------+----------+----------+
   1 row in set (0.04 sec)
 #+END_EXAMPLE
+
+**** 高可用部署方案
+1. 全同步复制 5.7.17 后版本
+   - GTID 模式下运行
+   - 日志为 row 格式
+2. MGR
+   - 基于 raft 算法自动选主
+   - 保证 N/2 + 1 节点可用
+   - 基于 MySQL 插件实现，部分方便
 
 *** 源码研究
 1. 专栏 [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2][MySQL45]] | [[https://blog.jcole.us/innodb/][Data Structure]] | [[http://www.unofficialmysqlguide.com/introduction.html][Unofficial Optimizer Guide]]
