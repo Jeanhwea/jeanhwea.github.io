@@ -802,6 +802,46 @@ MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是
   java -Xloggc:/app/log/gc.log -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -jar app.jar
 #+END_SRC
 
+G1 打印的日志举例
+#+BEGIN_EXAMPLE
+  OpenJDK 64-Bit Server VM (25.342-b07) for linux-amd64 JRE (1.8.0_342-b07), built on Jul 16 2022 09:19:19 by "openjdk" with gcc 4.4.7 20120313 (Red Hat 4.4.7-23)
+  Memory: 4k page, physical 32945904k(5742728k free), swap 8257532k(8213756k free)
+  CommandLine flags: -XX:InitialHeapSize=2147483648 -XX:MaxGCPauseMillis=300 -XX:MaxHeapSize=2147483648 -XX:+PrintGC -XX:+PrintGCDateStamps -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:ThreadStackSize=131072 -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseG1GC
+  2023-09-22T11:52:27.442+0800: 0.703: [GC pause (G1 Evacuation Pause) (young), 0.0108449 secs]
+  ....
+  2023-09-22T11:52:31.179+0800: 4.440: [GC remark 2023-09-22T11:52:31.179+0800: 4.440: [Finalize Marking, 0.0026141 secs] 2023-09-22T11:52:31.182+0800: 4.443: [GC ref-proc, 0.0011447 secs] 2023-09-22T11:52:31.183+0800: 4.444: [Unloading, 0.0061893 secs], 0.0105824 secs]
+   [Times: user=0.04 sys=0.00, real=0.01 secs]
+  2023-09-22T11:52:31.190+0800: 4.451: [GC cleanup 16895K->16895K(2048M), 0.0028270 secs]
+   [Times: user=0.01 sys=0.01, real=0.00 secs]
+  2023-09-22T11:52:34.081+0800: 7.342: [GC pause (Metadata GC Threshold) (young) (initial-mark), 0.0320499 secs]
+     [Parallel Time: 26.9 ms, GC Workers: 8]
+        [GC Worker Start (ms): Min: 7342.4, Avg: 7343.4, Max: 7346.0, Diff: 3.6]
+        [Ext Root Scanning (ms): Min: 5.4, Avg: 7.6, Max: 9.4, Diff: 4.0, Sum: 60.7]
+        [Update RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+           [Processed Buffers: Min: 0, Avg: 0.0, Max: 0, Diff: 0, Sum: 0]
+        [Scan RS (ms): Min: 0.1, Avg: 0.1, Max: 0.3, Diff: 0.2, Sum: 1.1]
+        [Code Root Scanning (ms): Min: 0.0, Avg: 3.7, Max: 14.8, Diff: 14.8, Sum: 29.5]
+        [Object Copy (ms): Min: 1.8, Avg: 13.9, Max: 17.8, Diff: 16.1, Sum: 111.1]
+        [Termination (ms): Min: 0.0, Avg: 0.1, Max: 0.2, Diff: 0.2, Sum: 1.1]
+           [Termination Attempts: Min: 1, Avg: 129.5, Max: 186, Diff: 185, Sum: 1036]
+        [GC Worker Other (ms): Min: 0.0, Avg: 0.0, Max: 0.1, Diff: 0.0, Sum: 0.2]
+        [GC Worker Total (ms): Min: 22.8, Avg: 25.5, Max: 26.4, Diff: 3.6, Sum: 203.8]
+        [GC Worker End (ms): Min: 7368.8, Avg: 7368.8, Max: 7368.9, Diff: 0.0]
+     [Code Root Fixup: 0.3 ms]
+     [Code Root Purge: 0.0 ms]
+     [Clear CT: 0.4 ms]
+     [Other: 4.5 ms]
+        [Choose CSet: 0.0 ms]
+        [Ref Proc: 2.8 ms]
+        [Ref Enq: 0.1 ms]
+        [Redirty Cards: 0.3 ms]
+        [Humongous Register: 0.1 ms]
+        [Humongous Reclaim: 0.0 ms]
+        [Free CSet: 0.7 ms]
+     [Eden: 643.0M(1212.0M)->0.0B(1200.0M) Survivors: 16384.0K->28672.0K Heap: 658.0M(2048.0M)->28160.0K(2048.0M)]
+   [Times: user=0.14 sys=0.01, real=0.03 secs]
+#+END_EXAMPLE
+
 *** SDK Man
 1. 官网 [[https://sdkman.io/][link]]
 #+BEGIN_SRC sh
