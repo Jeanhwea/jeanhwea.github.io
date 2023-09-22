@@ -3112,6 +3112,52 @@ Windows Terminal 在安装 zsh-autosuggestions 时会显示的有问题，这里
 #+END_SRC
 
 ** CentOS
+*** 配置网络
+/etc/sysconfig/network-scripts
+#+BEGIN_SRC conf
+  TYPE=Ethernet
+  PROXY_METHOD=none
+  BROWSER_ONLY=no
+  BOOTPROTO=none
+  DEFROUTE=yes
+  IPV4_FAILURE_FATAL=no
+  IPV6INIT=yes
+  IPV6_AUTOCONF=yes
+  IPV6_DEFROUTE=yes
+  IPV6_FAILURE_FATAL=no
+  IPV6_ADDR_GEN_MODE=stable-privacy
+  NAME=eno1
+  DEVICE=eno1
+  ONBOOT=yes
+  IPADDR=192.168.0.123
+  PREFIX=24
+  GATEWAY=192.168.0.1
+  IPV6_PRIVACY=no
+  DNS1=192.168.0.1
+  DNS2=114.114.114.114
+#+END_SRC
+
+配置网络工具
+#+BEGIN_SRC sh
+  # TUI 工具
+  nmtui
+  # 命令行工具
+  nmcli
+#+END_SRC
+
+*** 设置防火墙 firewall
+#+BEGIN_SRC sh
+  # 获取 zone
+  firewall-cmd --get-active-zones
+  # 查看规则
+  firewall-cmd --list-all
+  # 添加网络接口白名单
+  firewall-cmd --permanent --zone=block --change-interface=enp1s0
+  # 添加 tcp 端口白名单
+  firewall-cmd --permanent --zone=public --add-port=3306/tcp
+  # 应用配置
+  firewall-cmd --reload
+#+END_SRC
 *** SCL (Software Collection)
 SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources/Repositories/SCL][link]]
 #+BEGIN_SRC sql
@@ -3284,6 +3330,7 @@ Fontconfig error: Cannot load default config file
 #+BEGIN_SRC conf
   /dev/sdb1       /data ext4      defaults        0       0
 #+END_SRC
+
 ** Manjaro
 ** Emacs
 *** 参考资料
