@@ -1176,6 +1176,24 @@ centos7 指定 openssl 安装路径后编译安装 [[https://github.com/pyenv/py
   pyenv global 3.10.6
 #+END_SRC
 
+无法找到系统 ssl 库，解决方法使用源码方式安装
+#+BEGIN_EXAMPLE
+  File "/home/admin/.pyenv/versions/3.10.6/lib/python3.10/ssl.py", line 99, in <module>
+    import _ssl             # if we can't import it, let the error propagate ModuleNotFoundError: No module named '_ssl'
+#+END_EXAMPLE
+
+#+BEGIN_SRC sh
+  tar xvf Python-3.10.13.tar.xz
+
+  ./configure --prefix=/usr/local/python3 \
+              --with-openssl=/usr/local/openssl \
+              --with-openssl-rpath=auto \
+              --enable-optimizations
+
+  make -j4
+  sudo make altinstall
+#+END_SRC
+
 ** Ruby
 1. 配置国内 GEM 镜像 [[https://gems.ruby-china.com/][Ruby China]]
 ** Rust
