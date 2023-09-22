@@ -773,61 +773,6 @@ MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是
   mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Dfile.encoding=UTF-8"
 #+END_SRC
 
-*** Kafka
-CLOSED: [2023-06-03 Sat 23:39]
-1. [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/JVM%20%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%2032%20%E8%AE%B2%EF%BC%88%E5%AE%8C%EF%BC%89][JVM 系列]]
-**** 资源链接
-1. 说明文档 [[https://kafka.apache.org/documentation/][link]]
-**** 环境配置
-***** 官网快速使用手册
-1. [[https://kafka.apache.org/quickstart][quickstart]]
-#+BEGIN_SRC sh
-  # 启动 zk
-  ./bin/zookeeper-server-start.sh config/zookeeper.properties
-  # 启动 kafka
-  ./bin/kafka-server-start.sh config/server.properties
-
-  # 创建 topic
-  ./bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic quickstart-events
-  # 显示 topic 列表
-  ./bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
-  # 查看指定 topic 状态
-  ./bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic quickstart-events
-
-  # 生产者 & 消费者
-  ./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --from-beginning --topic quickstart-events
-  ./bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic quickstart-events
-#+END_SRC
-
-配置相关
-#+BEGIN_SRC sh
-  ./bin/kafka-configs.sh --zookeeper localhost:2181 --all
-#+END_SRC
-
-***** docker 版本配置
-1. [[https://hub.docker.com/r/bitnami/kafka/][docker hub]]
-2. 配置文件 [[file:env-kafka/docker-compose.yaml][docker-compose.yaml]]
-   #+BEGIN_SRC sh
-     docker-compose up -d
-   #+END_SRC
-
-***** 源代码
-跳过测试编译
-#+BEGIN_SRC sh
-  ./gradlew build -x test
-#+END_SRC
-
-编译发布包
-#+BEGIN_SRC sh
-  # 编译包
-  ./gradlew clean releaseTarGz
-
-  # 编译产物
-  ls ./core/build/distributions/
-#+END_SRC
-*** RocketMQ
-**** 资源链接
-1. 官网文档 [[https://rocketmq.apache.org/docs/4.x/introduction/02quickstart][link]]
 *** JVM
 **** 编译 JDK
 1. OpenJDK 编译说明 [[https://openjdk.org/groups/build/][link]]
@@ -857,67 +802,6 @@ CLOSED: [2023-06-03 Sat 23:39]
   java -Xloggc:/app/log/gc.log -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -jar app.jar
 #+END_SRC
 
-*** Hive
-配置 [[https://hadoop.apache.org/docs/r2.6.2/hadoop-project-dist/hadoop-common/SingleCluster.html#Standalone_Operation][hadoop]]
-#+BEGIN_SRC sh
-  export HADOOP_HOME=/opt/local/hack/hadoop-2.6.0
-  export PATH="$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH"
-  export HIVE_HOME=/opt/local/hack/apache-hive-1.2.2-bin
-  export PATH="$HIVE_HOME/bin:$PATH"
-#+END_SRC
-
-配置 core-site.xml
-#+BEGIN_SRC xml
-  <configuration>
-     <property>
-        <name>fs.defaultFS</name>
-        <value>hdfs://localhost:9000</value>
-     </property>
-  </configuration>
-#+END_SRC
-
-配置 hdfs-site.xml
-#+BEGIN_SRC xml
-  <configuration>
-    <property>
-      <name>dfs.replication</name>
-      <value>1</value>
-    </property>
-
-    <property>
-      <name>dfs.namenode.name.dir</name>
-      <value>/opt/local/hdfs/namenode</value>
-    </property>
-
-    <property>
-      <name>dfs.datanode.data.dir</name>
-      <value>/opt/local/hdfs/datanode</value>
-    </property>
-  </configuration>
-#+END_SRC
-
-初始化命令
-#+BEGIN_SRC sh
-  # 格式化 namenode
-  hdfs namenode -format
-  # 启动/关闭 dfs
-  start-dfs.sh
-  stop-dfs.sh
-#+END_SRC
-
-[[https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-InstallationandConfiguration][hive]] 需要有 /tmp, /user/hive/warehouse 目录, 并且配置 g+w 权限
-- 配置元数据存放目录 hive.metastore.warehouse.dir
-#+BEGIN_SRC sh
-  hadoop fs -mkdir       /tmp
-  hadoop fs -mkdir -p    /user/hive/warehouse
-  hadoop fs -chmod g+w   /tmp
-  hadoop fs -chmod g+w   /user/hive/warehouse
-#+END_SRC
-
-解决 [ERROR] Terminal initialization failed; falling back to unsupported 问题
-#+BEGIN_SRC sh
-  export HADOOP_USER_CLASSPATH_FIRST=true
-#+END_SRC
 *** SDK Man
 1. 官网 [[https://sdkman.io/][link]]
 #+BEGIN_SRC sh
@@ -2017,8 +1901,8 @@ bochsrc 配置文件, 设置启动未 1.44 存软盘, 启动镜像名称为 Imag
          -V geometry:margin='1in' \
          -o tech.pdf tech.org
 #+END_SRC
-* 后端研发
-** Oracle
+* 中间件
+** ORACLE
 *** 参考资料
 1. Oracle 关系数据库 [[file:../database/oracle.org::*参考链接][参考链接]]
 *** 开发环境配置
@@ -2485,7 +2369,64 @@ InnoDB 需要重建后分析来优化表，对应 SQL 如下
   ctags -e -R --languages=c,c++ .
 #+END_SRC
 
-** Postgres
+** Redis
+*** 系统监控
+查看内存
+#+BEGIN_EXAMPLE
+  0.0.0.0:6379> info memory
+  # Memory
+  used_memory:96005008
+  used_memory_rss:101408768 # Redis 占用操作系统的内存
+  used_memory_peak:96270784
+  used_memory_peak_perc:99.72%
+  used_memory_overhead:61210584
+  used_memory_startup:812096
+  used_memory_dataset:34794424
+  used_memory_dataset_perc:36.55%
+  allocator_allocated:96049840
+  allocator_active:96358400
+  allocator_resident:100630528
+  total_system_memory:67385872384
+  used_memory_lua:30720
+  used_memory_scripts:0
+  number_of_cached_scripts:0
+  maxmemory:0 # 设置的最大内存
+  maxmemory_policy:noeviction
+  allocator_frag_ratio:1.00
+  allocator_frag_bytes:308560
+  allocator_rss_ratio:1.04
+  allocator_rss_bytes:4272128
+  rss_overhead_ratio:1.01
+  rss_overhead_bytes:778240
+  mem_fragmentation_ratio:1.06 # 内存碎片比例 = used_memory_rss/used_memory
+  mem_fragmentation_bytes:5444784
+  mem_not_counted_for_evict:0
+  mem_replication_backlog:0
+  mem_clients_slaves:0
+  mem_clients_normal:184592
+  mem_aof_buffer:0
+  mem_allocator:jemalloc-5.1.0
+  active_defrag_running:0
+  lazyfree_pending_objects:0
+  lazyfreed_objects:0
+#+END_EXAMPLE
+
+查看容量
+#+BEGIN_EXAMPLE
+  0.0.0.0:6379> info keyspace
+  # Keyspace
+  db0:keys=25,expires=0,avg_ttl=0
+  db2:keys=1085884,expires=0,avg_ttl=0
+  0.0.0.0:6379>
+#+END_EXAMPLE
+
+观测当前的执行命令
+#+BEGIN_EXAMPLE
+  0.0.0.0:6379> monitor
+  OK
+#+END_EXAMPLE
+
+** PostgreSQL
 *** 前置环境变量
 #+BEGIN_SRC sh
   export PGDATA=/opt/local/pgsql/data
@@ -2588,6 +2529,121 @@ InnoDB 需要重建后分析来优化表，对应 SQL 如下
   }
 #+END_SRC
 
+** Kafka
+1. [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/JVM%20%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%2032%20%E8%AE%B2%EF%BC%88%E5%AE%8C%EF%BC%89][JVM 系列]]
+*** 资源链接
+1. 说明文档 [[https://kafka.apache.org/documentation/][link]]
+*** 环境配置
+**** 官网快速使用手册
+1. [[https://kafka.apache.org/quickstart][quickstart]]
+#+BEGIN_SRC sh
+  # 启动 zk
+  ./bin/zookeeper-server-start.sh config/zookeeper.properties
+  # 启动 kafka
+  ./bin/kafka-server-start.sh config/server.properties
+
+  # 创建 topic
+  ./bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic quickstart-events
+  # 显示 topic 列表
+  ./bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+  # 查看指定 topic 状态
+  ./bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic quickstart-events
+
+  # 生产者 & 消费者
+  ./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --from-beginning --topic quickstart-events
+  ./bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic quickstart-events
+#+END_SRC
+
+配置相关
+#+BEGIN_SRC sh
+  ./bin/kafka-configs.sh --zookeeper localhost:2181 --all
+#+END_SRC
+
+**** docker 版本配置
+1. [[https://hub.docker.com/r/bitnami/kafka/][docker hub]]
+2. 配置文件 [[file:env-kafka/docker-compose.yaml][docker-compose.yaml]]
+   #+BEGIN_SRC sh
+     docker-compose up -d
+   #+END_SRC
+
+**** 源代码
+跳过测试编译
+#+BEGIN_SRC sh
+  ./gradlew build -x test
+#+END_SRC
+
+编译发布包
+#+BEGIN_SRC sh
+  # 编译包
+  ./gradlew clean releaseTarGz
+
+  # 编译产物
+  ls ./core/build/distributions/
+#+END_SRC
+** RocketMQ
+*** 资源链接
+1. 官网文档 [[https://rocketmq.apache.org/docs/4.x/introduction/02quickstart][link]]
+** Hive
+配置 [[https://hadoop.apache.org/docs/r2.6.2/hadoop-project-dist/hadoop-common/SingleCluster.html#Standalone_Operation][hadoop]]
+#+BEGIN_SRC sh
+  export HADOOP_HOME=/opt/local/hack/hadoop-2.6.0
+  export PATH="$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH"
+  export HIVE_HOME=/opt/local/hack/apache-hive-1.2.2-bin
+  export PATH="$HIVE_HOME/bin:$PATH"
+#+END_SRC
+
+配置 core-site.xml
+#+BEGIN_SRC xml
+  <configuration>
+     <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9000</value>
+     </property>
+  </configuration>
+#+END_SRC
+
+配置 hdfs-site.xml
+#+BEGIN_SRC xml
+  <configuration>
+    <property>
+      <name>dfs.replication</name>
+      <value>1</value>
+    </property>
+
+    <property>
+      <name>dfs.namenode.name.dir</name>
+      <value>/opt/local/hdfs/namenode</value>
+    </property>
+
+    <property>
+      <name>dfs.datanode.data.dir</name>
+      <value>/opt/local/hdfs/datanode</value>
+    </property>
+  </configuration>
+#+END_SRC
+
+初始化命令
+#+BEGIN_SRC sh
+  # 格式化 namenode
+  hdfs namenode -format
+  # 启动/关闭 dfs
+  start-dfs.sh
+  stop-dfs.sh
+#+END_SRC
+
+[[https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-InstallationandConfiguration][hive]] 需要有 /tmp, /user/hive/warehouse 目录, 并且配置 g+w 权限
+- 配置元数据存放目录 hive.metastore.warehouse.dir
+#+BEGIN_SRC sh
+  hadoop fs -mkdir       /tmp
+  hadoop fs -mkdir -p    /user/hive/warehouse
+  hadoop fs -chmod g+w   /tmp
+  hadoop fs -chmod g+w   /user/hive/warehouse
+#+END_SRC
+
+解决 [ERROR] Terminal initialization failed; falling back to unsupported 问题
+#+BEGIN_SRC sh
+  export HADOOP_USER_CLASSPATH_FIRST=true
+#+END_SRC
 * 系统运维
 ** Docker
 *** Docker 安装过程
