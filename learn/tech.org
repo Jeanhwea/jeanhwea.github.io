@@ -3025,6 +3025,44 @@ docker proxy [[https://docs.docker.com/network/proxy/][link]]
 ** Prometheus
 [[https://prometheus.io/docs/introduction/overview/][link]]
 
+** 问题排查
+*** Java 系统 CPU 飙高排查
+查看线程信息
+#+BEGIN_SRC sh
+  ps -mp 352 -o THREAD,tid,time
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  $ ps -mp 352 -o THREAD,tid,time
+  USER     %CPU PRI SCNT WCHAN  USER SYSTEM   TID     TIME
+  admin     1.2   -    - -         -      -     - 00:33:48
+  admin     0.0  19    - futex_    -      -   352 00:00:00
+  admin     0.0  19    - futex_    -      -   355 00:00:09
+  admin     0.0  19    - futex_    -      -   360 00:00:02
+  admin     0.0  19    - futex_    -      -   361 00:00:02
+  admin     0.1  19    - futex_    -      -   362 00:04:09
+  admin     0.0  19    - futex_    -      -   364 00:00:00
+  admin     0.0  19    - futex_    -      -   365 00:00:00
+#+END_EXAMPLE
+
+取 tid=360 转 16 进制数
+#+BEGIN_EXAMPLE
+  $ printf '%x' 360
+  168
+#+END_EXAMPLE
+
+打印 java 线程执行堆栈
+#+BEGIN_EXAMPLE
+  $ jstack 352 | grep 168 -A100
+  "Gang worker#0 (Parallel GC Threads)" os_prio=0 tid=0x00007fbfa4020800 nid=0x168 runnable
+
+  "Gang worker#1 (Parallel GC Threads)" os_prio=0 tid=0x00007fbfa4022000 nid=0x169 runnable
+
+  "G1 Main Concurrent Mark GC Thread" os_prio=0 tid=0x00007fbfa4046800 nid=0x16e runnable
+
+  "Gang worker#0 (G1 Parallel Marking Threads)" os_prio=0 tid=0x00007fbfa4048000 nid=0x172 runnable
+#+END_EXAMPLE
+
 * 前端研发
 ** Node
 #+BEGIN_SRC sh
@@ -3083,7 +3121,7 @@ docker proxy [[https://docs.docker.com/network/proxy/][link]]
    #+END_SRC
 
 * 日常使用
-** 使用体验
+** 体验优化
 *** Esc 键有延迟
 问题说明 [[https://www.johnhawthorn.com/2012/09/vi-escape-delays/][Eliminating delays on ESC in vim and zsh]]
 尝试按照以下思路解决这个问题
