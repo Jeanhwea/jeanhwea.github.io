@@ -1413,6 +1413,7 @@ Kitex 微服务架构工具 [[https://www.cloudwego.io/zh/docs/kitex/][kitex]]
 #+END_SRC
 
 centos7 指定 openssl 安装路径后编译安装 [[https://github.com/pyenv/pyenv/wiki/Common-build-problems#error-the-python-ssl-extension-was-not-compiled-missing-the-openssl-lib][link]]
+
 #+BEGIN_SRC sh
   CPPFLAGS="$(pkg-config --cflags openssl11)" \
   LDFLAGS="$(pkg-config --libs openssl11)" \
@@ -2878,6 +2879,33 @@ docker proxy [[https://docs.docker.com/network/proxy/][link]]
   # 以下两种不和递归复制
   COPY src/* target
   COPY src   target
+#+END_SRC
+
+** Harbor
+*** 安装教程
+安装参考教程 [[https://goharbor.io/docs/2.9.0/install-config/][doc]]
+#+BEGIN_SRC sh
+  wget -c https://github.com/goharbor/harbor/releases/download/v2.9.0/harbor-offline-installer-v2.9.0.tgz
+#+END_SRC
+
+解压安装文件
+#+BEGIN_SRC sh
+  tar xzvf ~/down/harbor-offline-installer-v2.9.0.tar.gz
+  cd harbor
+  cp harbor.yml.tmpl harbor.yml
+#+END_SRC
+
+配置 yaml 文件
+#+BEGIN_SRC yaml
+  # harbor.yml
+  hostname: 192.168.0.123
+  http:
+    port: 8000
+#+END_SRC
+
+启动服务
+#+BEGIN_SRC sh
+  ./install.sh
 #+END_SRC
 
 ** Kubernetes
