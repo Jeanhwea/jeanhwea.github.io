@@ -724,91 +724,6 @@ Fontconfig error: Cannot load default config file
   /dev/sdb1       /data ext4      defaults        0       0
 #+END_SRC
 
-** Manjaro
-** GDB
-*** MacOS: 证书错误问题 [[https://timnash.co.uk/getting-gdb-to-semi-reliably-work-on-mojave-macos/][(^-^)]]
-#+BEGIN_QUOTE
-  please check gdb is codesigned - see taskgated(8)
-#+END_QUOTE
-手工编写 gdb.xml
-#+BEGIN_SRC xml
-  <?xml version="1.0" encoding="UTF-8"?>
-  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-  <plist version="1.0">
-  <dict>
-      <key>com.apple.security.cs.allow-jit</key>
-      <true/>
-      <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
-      <true/>
-      <key>com.apple.security.cs.allow-dyld-environment-variables</key>
-      <true/>
-      <key>com.apple.security.cs.disable-library-validation</key>
-      <true/>
-      <key>com.apple.security.cs.disable-executable-page-protection</key>
-      <true/>
-      <key>com.apple.security.cs.debugger</key>
-      <true/>
-      <key>com.apple.security.get-task-allow</key>
-      <true/>
-  </dict>
-  </plist>
-#+END_SRC
-使用命令给 gdb 添加证书
-#+BEGIN_SRC sh
-  codesign --entitlements gdb.xml -fs gdb-cert /usr/local/bin/gdb
-#+END_SRC
-
-官网说明 [[https://sourceware.org/gdb/wiki/PermissionsDarwin][gdb permission]]
-
-*** Remote 'g' packet reply is too long
-解决方法参考 [[https://wiki.osdev.org/QEMU_and_GDB_in_long_mode#:~:text=When%20the%20break%20point%20is%20hit%20and%20the,architecture%20names%20in%20those%20two%20%22set%20arch%22%20commands.][link]]
-
-方案一，启动时配置
-#+BEGIN_SRC sh
-  $ gdb
-  (gdb) set arch i386:x86-64:intel
-  (gdb) target remote localhost:1234
-  (gdb) symbol-file YOUR_KERNEL_FILE
-  (gdb) break SOME_FUNCTION_IN_LONG_MODE
-  (gdb) continue
-#+END_SRC
-
-方案二，修补源码, 修改 gdb/remote.c 的代码后重新编译
-#+BEGIN_SRC text
-  --- gdb/remote.c        2016-04-14 11:13:49.962628700 +0300
-  +++ gdb/remote.c	2016-04-14 11:15:38.257783400 +0300
-  @@ -7181,8 +7181,28 @@
-     buf_len = strlen (rs->buf);
-
-     /* Further sanity checks, with knowledge of the architecture.  */
-  +// HACKFIX for changing architectures for qemu. It's ugly. Don't use, unless you have to.
-  +  // Just a tiny modification of the patch of Matias Vara (http://forum.osdev.org/viewtopic.php?f=13&p=177644)
-     if (buf_len > 2 * rsa->sizeof_g_packet)
-  -    error (_("Remote 'g' packet reply is too long: %s"), rs->buf);
-  +    {
-  +      warning (_("Assuming long-mode change. [Remote 'g' packet reply is too long: %s]"), rs->buf);
-  +      rsa->sizeof_g_packet = buf_len ;
-  +
-  +      for (i = 0; i < gdbarch_num_regs (gdbarch); i++)
-  +        {
-  +          if (rsa->regs[i].pnum == -1)
-  +            continue;
-  +
-  +          if (rsa->regs[i].offset >= rsa->sizeof_g_packet)
-  +            rsa->regs[i].in_g_packet = 0;
-  +          else
-  +            rsa->regs[i].in_g_packet = 1;
-  +        }
-  +
-  +      // HACKFIX: Make sure at least the lower half of EIP is set correctly, so the proper
-  +      // breakpoint is recognized (and triggered).
-  +      rsa->regs[8].offset = 16*8;
-  +    }
-
-     /* Save the size of the packet sent to us by the target.  It is used
-        as a heuristic when determining the max size of packets that the
-#+END_SRC
 ** 工具链
 *** ohmyzsh
 1. 源码安装 [[https://ohmyz.sh][ohmyz.sh]]
@@ -904,6 +819,279 @@ MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是
   autossh_DEBUG=1 AUTOSSH_LOGFILE=path/to/autossh_log_file.log autossh -f -M monitor_port -v -E path/to/ssh_log_file.log ssh_command
 #+END_SRC
 
+*** ctags & cscope
+**** ctags
+使用命令生成 TAGS 文件
+#+BEGIN_SRC sh
+  ctags -e -R --languages=c,c++ .
+#+END_SRC
+**** cscope
+生成数据库文件 | [[https://cscope.sourceforge.net/][link]]
+#+BEGIN_SRC sh
+  find . -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" > cscope.files
+  cscope -q -R -b -i cscope.files
+#+END_SRC
+
+查询相关的数据
+#+BEGIN_SRC sh
+  cscope -d
+#+END_SRC
+
+*** gdb & lldb
+**** 参考资料及链接
+1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
+2. [[https://github.com/hellogcc/100-gdb-tips][GDB 小技巧]] | [[https://sourceware.org/gdb/onlinedocs/gdb/][GDB 在线手册]]
+3. 视频 [[https://www.youtube.com/watch?v=svG6OPyKsrw][GDB Tutorial]]
+**** gdb 开启 TUI
+1. 开启汇编窗口 layout asm
+2. 开启寄存器窗口 layout regs
+3. 布局循环 layout next/prev
+4. 打印 32 个汇编指令 x/32i $pc
+**** 进程启动: run & attach
+直接在命令行参数 attach 进程
+#+BEGIN_SRC sh
+  gdb -p pid
+#+END_SRC
+
+方法一：使用 attach 模式调试。首先正常启动重新，然后使用 attach 命令附属到进程上
+#+BEGIN_SRC sh
+  (lldb) attach -p 18616
+  (gdb) attach 18616
+#+END_SRC
+
+方法二：直接 run 启动进程
+#+BEGIN_SRC sh
+  # 指定启动文件
+  (lldb/gdb) file <binary>
+
+  # 直接 run 启动进程
+  (lldb/gdb) r
+  # 添加启动参数
+  (lldb/gdb) r args1 args2 ...
+  # 查看参数
+  (gdb) show args
+  (lldb) settings show target.run-args
+#+END_SRC
+[[file:../static/image/2023/0205/131917.png]]
+
+**** 设置断点 breakpoint
+#+BEGIN_SRC sh
+  # 普通断点
+  b main
+  b main.cc:12
+  b 12
+  # 条件断点
+  (gdb) b 34 if i = 10
+  (gdb) break foo if strcmp(y,"hello") == 0
+  (lldb) breakpoint set --name foo --condition '(int)strcmp(y,"hello") == 0'
+  (lldb) br s -n foo -c '(int)strcmp(y,"hello") == 0'
+  (lldb) br s -n read_page -c 'm_page_id.space()==56'
+  # 临时断点: 临时断点执行一次后自动销毁
+  tb main
+#+END_SRC
+
+启用/禁用断点 disable/enable
+#+BEGIN_EXAMPLE
+  (gdb) info b
+  Num     Type           Disp Enb Address            What
+  1       breakpoint     keep y   0x000000000331276b in dispatch_command(THD*, COM_DATA const*, enum_server_command)
+  (gdb) dis 1 # 禁用断点
+  (gdb) info b
+  Num     Type           Disp Enb Address            What
+  1       breakpoint     keep n   0x000000000331276b in dispatch_command(THD*, COM_DATA const*, enum_server_command)
+  (gdb) ena 1 # 启用断点
+  (gdb) i b
+  Num     Type           Disp Enb Address            What
+  1       breakpoint     keep y   0x000000000331276b in dispatch_command(THD*, COM_DATA const*, enum_server_command)
+#+END_EXAMPLE
+
+**** 流程控制 step & next & continue
+1. step 单步调试，不进入函数
+2. next 单步调试，进入函数
+3. continue 继续执行
+   #+BEGIN_SRC sh
+     s # step
+     n # next
+     c # continue
+
+     # until 直接执行到行数
+     (gdb) until 12
+     (lldb) thread until 12
+   #+END_SRC
+4. 跳转到指定行
+   - 条件断点 ~tb~ temp breakpoint
+   - until ~until <line>~
+5. 返回当前值
+   #+BEGIN_SRC sh
+     (gdb) return <return expression>
+     (lldb) thread return <return expression>
+   #+END_SRC
+
+**** 保持断点 & 现场恢复
+GDB 保存断点的方式比较方便，直接保持成一个文本文件后，再应用代码
+#+BEGIN_SRC sh
+  # 保持断点到文件中
+  (gdb) save breakpoint mybreak.txt
+  # 重新加载保存的断点
+  (gdb) source mybreak.txt
+#+END_SRC
+
+LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
+#+BEGIN_SRC sh
+  # 保存断点到 json 格式文件
+  (lldb) breakpoint write -f dbg001
+  # 读取断点到 json 格式文件
+  (lldb) breakpoint read -f dbg001
+#+END_SRC
+
+也可以参考这个答案优化流程 [[https://stackoverflow.com/questions/24638515/save-breakpoints-in-lldb][SO]]
+
+[[file:../static/image/2023/0205/100837.png]]
+
+**** 查看/修改变量和内存数据
+1. 打印变量 print / [[https://visualgdb.com/gdbreference/commands/x ][x-command]]
+   #+BEGIN_SRC text
+     (lldb) p thd->m_thread_id
+     (my_thread_id) $1 = 10
+     (lldb) x/w &$1
+     0x7fbdc1240188: 0x0000000a
+     (lldb)
+   #+END_SRC
+   - o octal
+   - x hexadecimal
+   - d decimal
+   - u unsigned decimal
+   - t binary
+   - f floating point
+   - a address
+   - c char
+   - s string
+   - i instruction
+   - b byte
+   - h halfword (16-bit value)
+   - w word (32-bit value)
+   - g giant word (64-bit value)
+2. 查看内存地址中的数据
+   #+BEGIN_SRC sh
+     (lldb) x/8w $0 => 打印地址的数据, 打印 8 条数据, [w, b] 表示不同的打印方式
+     0x7fbdc123dc00: 0x0916f4d8 0x00000001 0x0916f548 0x00000001
+     0x7fbdc123dc10: 0x00000000 0x00000000 0xc1240440 0x00007fbd
+     (lldb) x/8b $0
+     0x7fbdc123dc00: 0xd8 0xf4 0x16 0x09 0x01 0x00 0x00 0x00
+     (lldb) x/8x $0
+     0x7fbdc123dc00: 0xd8 0xf4 0x16 0x09 0x01 0x00 0x00 0x00
+   #+END_SRC
+3. 查看 frame 中变量
+   #+BEGIN_SRC sh
+     # 查看局部变量
+     (lldb) frame variable
+     (lldb) fr v
+     # 查看全局变量
+     (lldb) target variable
+     (lldb) ta v
+     # 查看调用栈 thread backtrace
+     (lldb/gdb) bt
+   #+END_SRC
+
+**** 调试时显示下一条汇编
+开启显示下一条汇编
+#+BEGIN_EXAMPLE
+  set disassemble-next-line on
+#+END_EXAMPLE
+
+查看是否开启成功
+#+BEGIN_EXAMPLE
+  show disassemble-next-line
+#+END_EXAMPLE
+
+**** 命令行启动时执行命令 -ex
+#+BEGIN_SRC sh
+  gdb -ex "target remote :1234" -ex "b *0x7c00" -ex "c"
+#+END_SRC
+
+**** MacOS: 证书错误问题 [[https://timnash.co.uk/getting-gdb-to-semi-reliably-work-on-mojave-macos/][(^-^)]]
+#+BEGIN_QUOTE
+  please check gdb is codesigned - see taskgated(8)
+#+END_QUOTE
+手工编写 gdb.xml
+#+BEGIN_SRC xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  <plist version="1.0">
+  <dict>
+      <key>com.apple.security.cs.allow-jit</key>
+      <true/>
+      <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+      <true/>
+      <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+      <true/>
+      <key>com.apple.security.cs.disable-library-validation</key>
+      <true/>
+      <key>com.apple.security.cs.disable-executable-page-protection</key>
+      <true/>
+      <key>com.apple.security.cs.debugger</key>
+      <true/>
+      <key>com.apple.security.get-task-allow</key>
+      <true/>
+  </dict>
+  </plist>
+#+END_SRC
+使用命令给 gdb 添加证书
+#+BEGIN_SRC sh
+  codesign --entitlements gdb.xml -fs gdb-cert /usr/local/bin/gdb
+#+END_SRC
+
+官网说明 [[https://sourceware.org/gdb/wiki/PermissionsDarwin][gdb permission]]
+
+**** Remote 'g' packet reply is too long
+解决方法参考 [[https://wiki.osdev.org/QEMU_and_GDB_in_long_mode#:~:text=When%20the%20break%20point%20is%20hit%20and%20the,architecture%20names%20in%20those%20two%20%22set%20arch%22%20commands.][link]]
+
+方案一，启动时配置
+#+BEGIN_SRC sh
+  $ gdb
+  (gdb) set arch i386:x86-64:intel
+  (gdb) target remote localhost:1234
+  (gdb) symbol-file YOUR_KERNEL_FILE
+  (gdb) break SOME_FUNCTION_IN_LONG_MODE
+  (gdb) continue
+#+END_SRC
+
+方案二，修补源码, 修改 gdb/remote.c 的代码后重新编译
+#+BEGIN_SRC text
+  --- gdb/remote.c        2016-04-14 11:13:49.962628700 +0300
+  +++ gdb/remote.c	2016-04-14 11:15:38.257783400 +0300
+  @@ -7181,8 +7181,28 @@
+     buf_len = strlen (rs->buf);
+
+     /* Further sanity checks, with knowledge of the architecture.  */
+  +// HACKFIX for changing architectures for qemu. It's ugly. Don't use, unless you have to.
+  +  // Just a tiny modification of the patch of Matias Vara (http://forum.osdev.org/viewtopic.php?f=13&p=177644)
+     if (buf_len > 2 * rsa->sizeof_g_packet)
+  -    error (_("Remote 'g' packet reply is too long: %s"), rs->buf);
+  +    {
+  +      warning (_("Assuming long-mode change. [Remote 'g' packet reply is too long: %s]"), rs->buf);
+  +      rsa->sizeof_g_packet = buf_len ;
+  +
+  +      for (i = 0; i < gdbarch_num_regs (gdbarch); i++)
+  +        {
+  +          if (rsa->regs[i].pnum == -1)
+  +            continue;
+  +
+  +          if (rsa->regs[i].offset >= rsa->sizeof_g_packet)
+  +            rsa->regs[i].in_g_packet = 0;
+  +          else
+  +            rsa->regs[i].in_g_packet = 1;
+  +        }
+  +
+  +      // HACKFIX: Make sure at least the lower half of EIP is set correctly, so the proper
+  +      // breakpoint is recognized (and triggered).
+  +      rsa->regs[8].offset = 16*8;
+  +    }
+
+     /* Save the size of the packet sent to us by the target.  It is used
+        as a heuristic when determining the max size of packets that the
+#+END_SRC
 ** Java
 *** Maven
 **** 配置国内下载镜像源
@@ -1009,8 +1197,9 @@ MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是
 5. 生成代码流量跳转 TAGS
    #+BEGIN_SRC sh
      # 生成跳转的 TAG
-     ctags -e -R --languages=c,c++ .
+     ctags -e -R --languages=java .
    #+END_SRC
+
 *** Spring Boot
 **** 启动传参
 #+BEGIN_SRC sh
@@ -1752,179 +1941,6 @@ match 关键字
 #+BEGIN_SRC sh
   scp -o ProxyCommand="ssh -p9998 user1@175.0.0.20 nc 213.0.0.30 9999" \
       -o IdentityFile="~/.ssh/id_s2" /opt/file user2@213.0.0.30:/tmp/file
-#+END_SRC
-
-** 调试器
-*** 参考资料及链接
-1. [[https://lldb.llvm.org/use/map.html][LLDB <-> GDB]]
-2. [[https://github.com/hellogcc/100-gdb-tips][GDB 小技巧]] | [[https://sourceware.org/gdb/onlinedocs/gdb/][GDB 在线手册]]
-3. 视频 [[https://www.youtube.com/watch?v=svG6OPyKsrw][GDB Tutorial]]
-*** TUI
-1. 开启汇编窗口 layout asm
-2. 开启寄存器窗口 layout regs
-3. 布局循环 layout next/prev
-4. 打印 32 个汇编指令 x/32i $pc
-*** 进程启动: run & attach
-直接在命令行参数 attach 进程
-#+BEGIN_SRC sh
-  gdb -p pid
-#+END_SRC
-
-方法一：使用 attach 模式调试。首先正常启动重新，然后使用 attach 命令附属到进程上
-#+BEGIN_SRC sh
-  (lldb) attach -p 18616
-  (gdb) attach 18616
-#+END_SRC
-
-方法二：直接 run 启动进程
-#+BEGIN_SRC sh
-  # 指定启动文件
-  (lldb/gdb) file <binary>
-
-  # 直接 run 启动进程
-  (lldb/gdb) r
-  # 添加启动参数
-  (lldb/gdb) r args1 args2 ...
-  # 查看参数
-  (gdb) show args
-  (lldb) settings show target.run-args
-#+END_SRC
-[[file:../static/image/2023/0205/131917.png]]
-
-*** 调试流程控制
-**** 设置断点 breakpoint
-#+BEGIN_SRC sh
-  # 普通断点
-  b main
-  b main.cc:12
-  b 12
-  # 条件断点
-  (gdb) b 34 if i = 10
-  (gdb) break foo if strcmp(y,"hello") == 0
-  (lldb) breakpoint set --name foo --condition '(int)strcmp(y,"hello") == 0'
-  (lldb) br s -n foo -c '(int)strcmp(y,"hello") == 0'
-  (lldb) br s -n read_page -c 'm_page_id.space()==56'
-  # 临时断点: 临时断点执行一次后自动销毁
-  tb main
-#+END_SRC
-
-启用/禁用断点 disable/enable
-#+BEGIN_EXAMPLE
-  (gdb) info b
-  Num     Type           Disp Enb Address            What
-  1       breakpoint     keep y   0x000000000331276b in dispatch_command(THD*, COM_DATA const*, enum_server_command)
-  (gdb) dis 1 # 禁用断点
-  (gdb) info b
-  Num     Type           Disp Enb Address            What
-  1       breakpoint     keep n   0x000000000331276b in dispatch_command(THD*, COM_DATA const*, enum_server_command)
-  (gdb) ena 1 # 启用断点
-  (gdb) i b
-  Num     Type           Disp Enb Address            What
-  1       breakpoint     keep y   0x000000000331276b in dispatch_command(THD*, COM_DATA const*, enum_server_command)
-#+END_EXAMPLE
-
-**** 流程控制 step & next & continue
-1. step 单步调试，不进入函数
-2. next 单步调试，进入函数
-3. continue 继续执行
-   #+BEGIN_SRC sh
-     s # step
-     n # next
-     c # continue
-
-     # until 直接执行到行数
-     (gdb) until 12
-     (lldb) thread until 12
-   #+END_SRC
-4. 跳转到指定行
-   - 条件断点 ~tb~ temp breakpoint
-   - until ~until <line>~
-5. 返回当前值
-   #+BEGIN_SRC sh
-     (gdb) return <return expression>
-     (lldb) thread return <return expression>
-   #+END_SRC
-
-*** 保持断点 & 现场恢复
-GDB 保存断点的方式比较方便，直接保持成一个文本文件后，再应用代码
-#+BEGIN_SRC sh
-  # 保持断点到文件中
-  (gdb) save breakpoint mybreak.txt
-  # 重新加载保存的断点
-  (gdb) source mybreak.txt
-#+END_SRC
-
-LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
-#+BEGIN_SRC sh
-  # 保存断点到 json 格式文件
-  (lldb) breakpoint write -f dbg001
-  # 读取断点到 json 格式文件
-  (lldb) breakpoint read -f dbg001
-#+END_SRC
-
-也可以参考这个答案优化流程 [[https://stackoverflow.com/questions/24638515/save-breakpoints-in-lldb][SO]]
-
-[[file:../static/image/2023/0205/100837.png]]
-
-*** 查看/修改变量和内存数据
-1. 打印变量 print / [[https://visualgdb.com/gdbreference/commands/x ][x-command]]
-   #+BEGIN_SRC text
-     (lldb) p thd->m_thread_id
-     (my_thread_id) $1 = 10
-     (lldb) x/w &$1
-     0x7fbdc1240188: 0x0000000a
-     (lldb)
-   #+END_SRC
-   - o octal
-   - x hexadecimal
-   - d decimal
-   - u unsigned decimal
-   - t binary
-   - f floating point
-   - a address
-   - c char
-   - s string
-   - i instruction
-   - b byte
-   - h halfword (16-bit value)
-   - w word (32-bit value)
-   - g giant word (64-bit value)
-2. 查看内存地址中的数据
-   #+BEGIN_SRC sh
-     (lldb) x/8w $0 => 打印地址的数据, 打印 8 条数据, [w, b] 表示不同的打印方式
-     0x7fbdc123dc00: 0x0916f4d8 0x00000001 0x0916f548 0x00000001
-     0x7fbdc123dc10: 0x00000000 0x00000000 0xc1240440 0x00007fbd
-     (lldb) x/8b $0
-     0x7fbdc123dc00: 0xd8 0xf4 0x16 0x09 0x01 0x00 0x00 0x00
-     (lldb) x/8x $0
-     0x7fbdc123dc00: 0xd8 0xf4 0x16 0x09 0x01 0x00 0x00 0x00
-   #+END_SRC
-3. 查看 frame 中变量
-   #+BEGIN_SRC sh
-     # 查看局部变量
-     (lldb) frame variable
-     (lldb) fr v
-     # 查看全局变量
-     (lldb) target variable
-     (lldb) ta v
-     # 查看调用栈 thread backtrace
-     (lldb/gdb) bt
-   #+END_SRC
-
-*** 调试时显示下一条汇编
-开启显示下一条汇编
-#+BEGIN_EXAMPLE
-  set disassemble-next-line on
-#+END_EXAMPLE
-
-查看是否开启成功
-#+BEGIN_EXAMPLE
-  show disassemble-next-line
-#+END_EXAMPLE
-
-*** 命令行启动时执行命令 -ex
-#+BEGIN_SRC sh
-  gdb -ex "target remote :1234" -ex "b *0x7c00" -ex "c"
 #+END_SRC
 
 ** Git
