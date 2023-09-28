@@ -26,8 +26,18 @@ Debezium 最初设计成一个 Kafka Connect 的 Source Plugin，目前开发者
 Kafka Connect 解耦，但当前的代码实现还未变动。下图引自 Debeizum 官方文档，可以看到
 一个 Debezium 在一个完整 CDC 系统中的位置。
 
-对于 Debezium 来说，基本沿用了官方搭建从库的这一思路，让我们看下官方文档描述的详细
-步骤。
+
+Debezium 是一组用于 Apache Kafka Connect 的 Source Connector。每个 Connector 都
+通过使用该数据库的变更数据捕获 (CDC) 功能从不同的数据库中获取变更。与其他方法
+（例如轮询或双重写入）不同，Debezium 的实现基于日志的 CDC：
+
+1. 确保捕获所有的数据变更。
+2. 以极低的延迟生成变更事件，同时避免因为频繁轮询导致 CPU 使用率增加。例如，对于
+   MySQL 或 PostgreSQL，延迟在毫秒范围内。
+3. 不需要更改您的数据模型，例如 =Last Updated= 列。
+4. 可以捕获删除操作。
+5. 可以捕获旧记录状态以及其他元数据，例如，事务 ID，具体取决于数据库的功能和配置。
+
 
 MySQL 连接器每次获取快照的时候会执行以下的步骤：
 
