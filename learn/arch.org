@@ -12,7 +12,45 @@
 * 系统架构
 
 * CDC 中间件
+数据准实时复制（CDC）是目前行内实时数据需求大量使用的技术，随着国产化的需求，我
+们也逐步考虑基于开源产品进行准实时数据同步工具的相关开发，逐步实现对商业产品的替
+代。
+
 ** Debezium
-[[https://debezium.io/documentation/][link]]
+[[https://debezium.io/documentation/][link]] | [[https://debezium.io/documentation/reference/2.4/tutorial.html][tutorial]]
+
+Debezium 是一种 CDC（Change Data Capture）工具，工作原理类似大家所熟知的 Canal,
+DataBus, Maxwell 等，是通过抽取数据库日志来获取变更。
+
+Debezium 最初设计成一个 Kafka Connect 的 Source Plugin，目前开发者虽致力于将其与
+Kafka Connect 解耦，但当前的代码实现还未变动。下图引自 Debeizum 官方文档，可以看到
+一个 Debezium 在一个完整 CDC 系统中的位置。
+
+对于 Debezium 来说，基本沿用了官方搭建从库的这一思路，让我们看下官方文档描述的详细
+步骤。
+
+MySQL 连接器每次获取快照的时候会执行以下的步骤：
+
+- 获取一个全局读锁，从而阻塞住其他数据库客户端的写操作。
+- 开启一个可重复读语义的事务，来保证后续的在同一个事务内读操作都是在一个一致性快
+  照中完成的。
+- 读取 binlog 的当前位置。
+- 读取连接器中配置的数据库和表的模式（schema）信息。
+- 释放全局读锁，允许其他的数据库客户端对数据库进行写操作。
+- （可选）把 DDL 改变事件写入模式改变 topic（schema change topic），包括所有的必要
+  的 DROP 和 CREATEDDL 语句。
+- 扫描所有数据库的表，并且为每一个表产生一个和特定表相关的 kafka topic 创建事件
+  （即为每一个表创建一个 kafka topic）。
+- 提交事务。
+- 记录连接器成功完成快照任务时的连接器偏移量。
 
 ** Flink CDC
+Flink CDC 底层封装了 Debezium， Debezium 同步一张表分为两个阶段：
+
+- 全量阶段：查询当前表中所有记录
+- 增量阶段：从 binlog 消费变更数据
+
+大部分用户使用的场景都是 =全量+增量同步= ，加锁是发生在全量阶段，目的是为了确定
+全量阶段的初始位点，保证 =增量+全量实现= 一条不多，一条不少，从而保证数据一致性。
+从下图中我们可以分析全局锁和表锁的一些加锁流程，左边红色线条是锁的生命周期，右边
+是 MySQL 开启可重复读事务的生命周期。
