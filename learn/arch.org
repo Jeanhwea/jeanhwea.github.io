@@ -64,3 +64,10 @@ Flink CDC 底层封装了 Debezium， Debezium 同步一张表分为两个阶段
 全量阶段的初始位点，保证 =增量+全量实现= 一条不多，一条不少，从而保证数据一致性。
 从下图中我们可以分析全局锁和表锁的一些加锁流程，左边红色线条是锁的生命周期，右边
 是 MySQL 开启可重复读事务的生命周期。
+
+** canal [维护暂缓]
+- canal 模拟 MySQL slave 的交互协议，伪装自己为 MySQL slave, 向 MySQL master 发
+  送 dump 协议
+- MySQL master 收到 dump 请求，开始推送 binary log 给 slave (即 canal )
+- canal 解析 binary log 对象(原始为 byte 流)
+- Binlog 获取详解
