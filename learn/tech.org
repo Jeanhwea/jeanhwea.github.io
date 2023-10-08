@@ -2691,6 +2691,40 @@ InnoDB 需要重建后分析来优化表，对应 SQL 如下
   OK
 #+END_EXAMPLE
 
+*** SLOWLOG
+slowlog 主要查看下面两个参数
+#+BEGIN_EXAMPLE
+  0.0.0.0:6379> CONFIG GET slowlog-*
+  1) "slowlog-max-len"
+  2) "128"
+  3) "slowlog-log-slower-than"
+  4) "10000"
+  0.0.0.0:6379>
+#+END_EXAMPLE
+
+可以通过下面命令来设置
+#+BEGIN_SRC redis
+  CONFIG SET slowlog-log-slower-than 1000
+  CONFIG SET slowlog-max-len 100
+#+END_SRC
+
+查看 slowlog 命令
+#+BEGIN_SRC sh
+  0.0.0.0:6379> SLOWLOG GET 5
+  1) 1) (integer) 1
+     2) (integer) 1696742925        // 时间戳
+     3) (integer) 505777            // 耗时，单位微秒
+     4) 1) "save"                   // 查询命令
+     5) "172.18.0.1:46536"
+     6) ""
+  2) 1) (integer) 0
+     2) (integer) 1695355395
+     3) (integer) 546200
+     4) 1) "save"
+     5) "172.18.0.1:45142"
+     6) ""
+#+END_SRC
+
 ** PostgreSQL
 *** 源代码
 pg 的源代码托管在 [[https://git.postgresql.org/gitweb/?p=postgresql.git;a=summary][git]] , 也可以使用 github, 下载的链接 [[https://www.postgresql.org/download/][download]]
