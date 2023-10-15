@@ -3765,6 +3765,23 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
   sudo apt install bin86
 #+END_SRC
 
+*** 编译 Linux 内核并使用 qemu 启动
+qemu 启动命令
+#+BEGIN_SRC sh
+  sudo qemu-system-x86_64 \
+    -kernel linux-v.x.y/arch/x86_64/boot/bzImage \
+    -nographic \
+    -drive format=raw,file=buildroot/output/images/rootfs.ext4,if=virtio \
+    -append "root=/dev/vda console=ttyS0 nokaslr other-paras-here-if-needed" \
+    -m 4G \
+    -enable-kvm \
+    -cpu host \
+    -smp $(nproc) \
+    -net nic,model=virtio \
+    -net user,hostfwd=tcp::10022-:22 \
+    -s -S
+#+END_SRC
+
 *** TODO 内存检测工具 valgrind
 
 ** Rust
