@@ -3783,17 +3783,16 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
 qemu 启动命令, 参考 buildroot/board/qemu/x86_64/readme.txt
 #+BEGIN_SRC sh
   sudo qemu-system-x86_64 \
-    -kernel linux-v.x.y/arch/x86_64/boot/bzImage \
+    -kernel linux/arch/x86_64/boot/bzImage \
     -nographic \
     -drive format=raw,file=buildroot/output/images/rootfs.ext4,if=virtio \
-    -append "root=/dev/vda console=ttyS0 nokaslr other-paras-here-if-needed" \
-    -m 4G \
+    -append "rootwait root=/dev/vda console=tty1 console=ttyS0" \
     -enable-kvm \
+    -serial stdio \
     -cpu host \
     -smp $(nproc) \
     -net nic,model=virtio \
-    -net user,hostfwd=tcp::10022-:22 \
-    -s -S
+    -net user
 #+END_SRC
 
 *** TODO 内存检测工具 valgrind
