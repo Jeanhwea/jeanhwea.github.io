@@ -3298,7 +3298,7 @@ WARNING: no logs are available with the 'syslog' log driver
      helm uninstall mysql-1686374196
    #+END_SRC
 
-** Prometheus
+*** Prometheus
 [[https://prometheus.io/docs/introduction/overview/][link]]
 
 * 学习计划
@@ -3827,17 +3827,16 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
 
 qemu 启动命令, 参考 buildroot/board/qemu/x86_64/readme.txt
 #+BEGIN_SRC sh
-  sudo qemu-system-x86_64 \
-    -kernel linux/arch/x86_64/boot/bzImage \
-    -nographic \
-    -drive format=raw,file=buildroot/output/images/rootfs.ext4,if=virtio \
-    -append "rootwait root=/dev/vda console=tty1 console=ttyS0" \
-    -enable-kvm \
-    -serial stdio \
-    -cpu host \
-    -smp $(nproc) \
-    -net nic,model=virtio \
-    -net user
+  # kaslr(kernel address space layout randomize), 目的是为了提高内核安全性
+  # 需要开启 nokaslr 选项，否则无法打断点
+  qemu-system-x86_64 \
+      -kernel linux-5.15.18/arch/x86_64/boot/bzImage \
+      -drive file=buildroot-2023.02.5/output/images/rootfs.ext2,if=virtio,format=raw \
+      -append "rootwait root=/dev/vda console=tty1 console=ttyS0 nokaslr" \
+      -net user -M pc -nographic \
+      -net nic,model=virtio \
+      -smp $(nproc) \
+      -s -S
 #+END_SRC
 
 *** TODO 内存检测工具 valgrind
