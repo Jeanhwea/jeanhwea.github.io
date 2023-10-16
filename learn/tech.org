@@ -529,234 +529,6 @@ esxi 6.7 修改配置文件来全局开启虚拟化
   egrep '(vmx|svm)' /proc/cpuinfo
 #+END_SRC
 
-** CentOS
-*** 配置网络
-/etc/sysconfig/network-scripts
-#+BEGIN_SRC conf
-  TYPE=Ethernet
-  PROXY_METHOD=none
-  BROWSER_ONLY=no
-  BOOTPROTO=none
-  DEFROUTE=yes
-  IPV4_FAILURE_FATAL=no
-  IPV6INIT=yes
-  IPV6_AUTOCONF=yes
-  IPV6_DEFROUTE=yes
-  IPV6_FAILURE_FATAL=no
-  IPV6_ADDR_GEN_MODE=stable-privacy
-  NAME=eno1
-  DEVICE=eno1
-  ONBOOT=yes
-  IPADDR=192.168.0.123
-  PREFIX=24
-  GATEWAY=192.168.0.1
-  IPV6_PRIVACY=no
-  DNS1=192.168.0.1
-  DNS2=114.114.114.114
-#+END_SRC
-
-配置网络工具
-#+BEGIN_SRC sh
-  # TUI 工具
-  nmtui
-  # 命令行工具
-  nmcli
-#+END_SRC
-
-*** 设置防火墙 firewall
-#+BEGIN_SRC sh
-  # 获取 zone
-  firewall-cmd --get-active-zones
-  # 查看规则
-  firewall-cmd --list-all
-  # 添加网络接口白名单
-  firewall-cmd --permanent --zone=block --change-interface=enp1s0
-  # 添加 tcp 端口白名单
-  firewall-cmd --permanent --zone=public --add-port=3306/tcp
-  # 应用配置
-  firewall-cmd --reload
-#+END_SRC
-
-*** YUM 包管理工具
-更新软件
-#+BEGIN_SRC sh
-  sudo yum makecache
-  sudo yum update
-#+END_SRC
-
-*** SCL (Software Collection)
-SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources/Repositories/SCL][link]]
-#+BEGIN_SRC sql
-  yum install centos-release-scl
-
-  yum makecache
-  yum repolist
-#+END_SRC
-
-*** Red Hat Developer Toolset
-1. 使用手册 [[https://access.redhat.com/documentation/en-us/red_hat_developer_toolset/11/html-single/user_guide/index#doc-wrapper][User Guide]]
-   #+BEGIN_SRC sh
-     yum install scl-utils centos-release-scl
-
-     yum list all --enablerepo='centos-sclo-rh' | grep "devtoolset"
-     yum install devtoolset-11-toolchain
-   #+END_SRC
-2. 配置并启用 scl 工具集
-   #+BEGIN_SRC sh
-     scl --list
-     scl enable devtoolset-11 bash
-   #+END_SRC
-
-*** yum 代理
-在配置文件中直接添加代理到对应发服务器中
-#+BEGIN_SRC conf
-  # /etc/yum.conf
-  [main]
-  proxy=http://192.168.0.100:3128
-#+END_SRC
-
-*** nodejs
-centos 7 中编译安装 nodejs
-#+BEGIN_SRC sh
-  wget -c https://registry.npmmirror.com/-/binary/node/v18.17.1/node-v18.17.1.tar.gz
-
-  tar xzvf ~/down/node-v18.17.1.tar.gz
-
-  scl enable devtoolset-11 bash
-
-  cd node-v18.17.1
-  PREFIX=/opt/node ./configure
-  make -j4
-  sudo make install
-#+END_SRC
-
-*** 编译安装 openssl
-#+BEGIN_SRC sh
-  # 编译安装
-  wget -c https://www.openssl.org/source/openssl-1.1.1w.tar.gz
-  tar xzvf ~/down/openssl-1.1.1w.tar.gz
-  cd openssl-1.1.1w/
-  ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl
-  make
-  sudo make install
-
-  # 配置 ldconfig
-  sudo echo "/usr/local/openssl/lib" > /etc/ld.so.conf.d/openssl.conf
-  sudo ldconfig
-#+END_SRC
-
-配置环境变量
-#+BEGIN_SRC sh
-  export PATH=/usr/local/openssl/bin:$PATH
-#+END_SRC
-
-*** 代理服务器 squid
-http proxy server
-其配置文件 /etc/squid/squid.conf
-#+BEGIN_SRC conf
-  # Squid normally listens to port 3128
-  http_port 3128
-
-  # Example rule allowing access from your local networks.
-  # Adapt to list your (internal) IP networks from where browsing
-  # should be allowed
-  acl localnet src 10.0.0.0/8		# RFC 1918 local private network (LAN)
-  acl localnet src 100.64.0.0/10		# RFC 6598 shared address space (CGN)
-  acl localnet src 192.168.0.0/16		# RFC 1918 local private network (LAN)
-#+END_SRC
-
-在宿主机进行代理设置
-#+BEGIN_SRC sh
-  export proxy=http://0.0.0.0:3128
-  export http_proxy=http://0.0.0.0:3128
-  export https_proxy=http://0.0.0.0:3128
-#+END_SRC
-
-*** DNS Server 配置 dnsmasq
-配置上游的 DNS 服务器
-#+BEGIN_SRC conf
-  # /etc/dnsmasq.conf
-  server=/localnet/192.168.1.1
-#+END_SRC
-
-开启服务
-#+BEGIN_SRC sh
-  systemctl enable dnsmasq
-  systemctl restart dnsmasq
-#+END_SRC
-
-*** NTP 时间服务器设置
-配置自动同步时间
-#+BEGIN_SRC sh
-  timedatectl set-timezone 'Asia/Shanghai'
-  timedatectl set-ntp yes
-
-  timedatectl
-  # ntpq -p
-#+END_SRC
-
-离线手工同步时间
-#+BEGIN_SRC sh
-  timedatectl set-ntp no
-  timedatectl set-time '08:12:21'
-
-  hwclock -w
-#+END_SRC
-
-*** 硬件时钟 hwclock
-#+BEGIN_SRC sh
-  # Display hwclock
-  hwclock --show
-
-  # Sync hwclock to system
-  hwclock --hctosys
-
-  # Save clock, for reboot
-  clock -w
-  hwclock -w
-#+END_SRC
-
-*** 安装中文字体
-修改配置文件
-#+BEGIN_SRC sh
-  vim /etc/fonts/fonts.conf
-#+END_SRC
-
-添加字体文件目录配置
-#+BEGIN_SRC xml
-  <!-- Font directory list -->
-
-          <dir>/usr/share/fonts</dir>
-          <dir>/usr/share/fonts/Fonts/</dir>
-          <dir>/usr/share/X11/fonts/Type1</dir>
-          <dir>/usr/share/X11/fonts/TTF</dir>
-          <dir>/usr/local/share/fonts</dir>
-          <dir prefix="xdg">fonts</dir>
-          <!-- the following element will be removed in the future -->
-          <dir>~/.fonts</dir>
-#+END_SRC
-
-使用命令刷新字体缓存
-#+BEGIN_SRC sh
-  cd /usr/share/fonts
-  tar xzvf fonts.tar.gz
-  fc-cache -fv
-  # 查看中文字体
-  fc-list :lang=zh
-#+END_SRC
-
-如果发现找不到字体配置文件，需要手工添加环境变量
-Fontconfig error: Cannot load default config file
-#+BEGIN_SRC sh
-  export FONTCONFIG_PATH=/etc/fonts
-#+END_SRC
-
-*** 文件挂载
-编辑 /etc/fstab 配置系统启动挂载文件配置
-#+BEGIN_SRC conf
-  /dev/sdb1       /data ext4      defaults        0       0
-#+END_SRC
-
 ** 工具链
 *** ohmyzsh
 1. 源码安装 [[https://ohmyz.sh][ohmyz.sh]]
@@ -2077,6 +1849,234 @@ match 关键字
   echo 'ctags -e -R . >/dev/null 2>&1 &' > .git/hooks/pre-commit
 #+END_SRC
 
+** CentOS
+*** 配置网络
+/etc/sysconfig/network-scripts
+#+BEGIN_SRC conf
+  TYPE=Ethernet
+  PROXY_METHOD=none
+  BROWSER_ONLY=no
+  BOOTPROTO=none
+  DEFROUTE=yes
+  IPV4_FAILURE_FATAL=no
+  IPV6INIT=yes
+  IPV6_AUTOCONF=yes
+  IPV6_DEFROUTE=yes
+  IPV6_FAILURE_FATAL=no
+  IPV6_ADDR_GEN_MODE=stable-privacy
+  NAME=eno1
+  DEVICE=eno1
+  ONBOOT=yes
+  IPADDR=192.168.0.123
+  PREFIX=24
+  GATEWAY=192.168.0.1
+  IPV6_PRIVACY=no
+  DNS1=192.168.0.1
+  DNS2=114.114.114.114
+#+END_SRC
+
+配置网络工具
+#+BEGIN_SRC sh
+  # TUI 工具
+  nmtui
+  # 命令行工具
+  nmcli
+#+END_SRC
+
+*** 设置防火墙 firewall
+#+BEGIN_SRC sh
+  # 获取 zone
+  firewall-cmd --get-active-zones
+  # 查看规则
+  firewall-cmd --list-all
+  # 添加网络接口白名单
+  firewall-cmd --permanent --zone=block --change-interface=enp1s0
+  # 添加 tcp 端口白名单
+  firewall-cmd --permanent --zone=public --add-port=3306/tcp
+  # 应用配置
+  firewall-cmd --reload
+#+END_SRC
+
+*** YUM 包管理工具
+更新软件
+#+BEGIN_SRC sh
+  sudo yum makecache
+  sudo yum update
+#+END_SRC
+
+*** SCL (Software Collection)
+SCL 提供一下较新的工具集 [[https://wiki.centos.org/AdditionalResources/Repositories/SCL][link]]
+#+BEGIN_SRC sql
+  yum install centos-release-scl
+
+  yum makecache
+  yum repolist
+#+END_SRC
+
+*** Red Hat Developer Toolset
+1. 使用手册 [[https://access.redhat.com/documentation/en-us/red_hat_developer_toolset/11/html-single/user_guide/index#doc-wrapper][User Guide]]
+   #+BEGIN_SRC sh
+     yum install scl-utils centos-release-scl
+
+     yum list all --enablerepo='centos-sclo-rh' | grep "devtoolset"
+     yum install devtoolset-11-toolchain
+   #+END_SRC
+2. 配置并启用 scl 工具集
+   #+BEGIN_SRC sh
+     scl --list
+     scl enable devtoolset-11 bash
+   #+END_SRC
+
+*** yum 代理
+在配置文件中直接添加代理到对应发服务器中
+#+BEGIN_SRC conf
+  # /etc/yum.conf
+  [main]
+  proxy=http://192.168.0.100:3128
+#+END_SRC
+
+*** nodejs
+centos 7 中编译安装 nodejs
+#+BEGIN_SRC sh
+  wget -c https://registry.npmmirror.com/-/binary/node/v18.17.1/node-v18.17.1.tar.gz
+
+  tar xzvf ~/down/node-v18.17.1.tar.gz
+
+  scl enable devtoolset-11 bash
+
+  cd node-v18.17.1
+  PREFIX=/opt/node ./configure
+  make -j4
+  sudo make install
+#+END_SRC
+
+*** 编译安装 openssl
+#+BEGIN_SRC sh
+  # 编译安装
+  wget -c https://www.openssl.org/source/openssl-1.1.1w.tar.gz
+  tar xzvf ~/down/openssl-1.1.1w.tar.gz
+  cd openssl-1.1.1w/
+  ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl
+  make
+  sudo make install
+
+  # 配置 ldconfig
+  sudo echo "/usr/local/openssl/lib" > /etc/ld.so.conf.d/openssl.conf
+  sudo ldconfig
+#+END_SRC
+
+配置环境变量
+#+BEGIN_SRC sh
+  export PATH=/usr/local/openssl/bin:$PATH
+#+END_SRC
+
+*** 代理服务器 squid
+http proxy server
+其配置文件 /etc/squid/squid.conf
+#+BEGIN_SRC conf
+  # Squid normally listens to port 3128
+  http_port 3128
+
+  # Example rule allowing access from your local networks.
+  # Adapt to list your (internal) IP networks from where browsing
+  # should be allowed
+  acl localnet src 10.0.0.0/8		# RFC 1918 local private network (LAN)
+  acl localnet src 100.64.0.0/10		# RFC 6598 shared address space (CGN)
+  acl localnet src 192.168.0.0/16		# RFC 1918 local private network (LAN)
+#+END_SRC
+
+在宿主机进行代理设置
+#+BEGIN_SRC sh
+  export proxy=http://0.0.0.0:3128
+  export http_proxy=http://0.0.0.0:3128
+  export https_proxy=http://0.0.0.0:3128
+#+END_SRC
+
+*** DNS Server 配置 dnsmasq
+配置上游的 DNS 服务器
+#+BEGIN_SRC conf
+  # /etc/dnsmasq.conf
+  server=/localnet/192.168.1.1
+#+END_SRC
+
+开启服务
+#+BEGIN_SRC sh
+  systemctl enable dnsmasq
+  systemctl restart dnsmasq
+#+END_SRC
+
+*** NTP 时间服务器设置
+配置自动同步时间
+#+BEGIN_SRC sh
+  timedatectl set-timezone 'Asia/Shanghai'
+  timedatectl set-ntp yes
+
+  timedatectl
+  # ntpq -p
+#+END_SRC
+
+离线手工同步时间
+#+BEGIN_SRC sh
+  timedatectl set-ntp no
+  timedatectl set-time '08:12:21'
+
+  hwclock -w
+#+END_SRC
+
+*** 硬件时钟 hwclock
+#+BEGIN_SRC sh
+  # Display hwclock
+  hwclock --show
+
+  # Sync hwclock to system
+  hwclock --hctosys
+
+  # Save clock, for reboot
+  clock -w
+  hwclock -w
+#+END_SRC
+
+*** 安装中文字体
+修改配置文件
+#+BEGIN_SRC sh
+  vim /etc/fonts/fonts.conf
+#+END_SRC
+
+添加字体文件目录配置
+#+BEGIN_SRC xml
+  <!-- Font directory list -->
+
+          <dir>/usr/share/fonts</dir>
+          <dir>/usr/share/fonts/Fonts/</dir>
+          <dir>/usr/share/X11/fonts/Type1</dir>
+          <dir>/usr/share/X11/fonts/TTF</dir>
+          <dir>/usr/local/share/fonts</dir>
+          <dir prefix="xdg">fonts</dir>
+          <!-- the following element will be removed in the future -->
+          <dir>~/.fonts</dir>
+#+END_SRC
+
+使用命令刷新字体缓存
+#+BEGIN_SRC sh
+  cd /usr/share/fonts
+  tar xzvf fonts.tar.gz
+  fc-cache -fv
+  # 查看中文字体
+  fc-list :lang=zh
+#+END_SRC
+
+如果发现找不到字体配置文件，需要手工添加环境变量
+Fontconfig error: Cannot load default config file
+#+BEGIN_SRC sh
+  export FONTCONFIG_PATH=/etc/fonts
+#+END_SRC
+
+*** 文件挂载
+编辑 /etc/fstab 配置系统启动挂载文件配置
+#+BEGIN_SRC conf
+  /dev/sdb1       /data ext4      defaults        0       0
+#+END_SRC
+
 ** Linux & Shell
 *** 后台运行命令 cmd
 #+BEGIN_SRC sh
@@ -2219,6 +2219,20 @@ bash 4.0 版本可以使用变量替换的方式
   tmpfs           1.6G  4.0K  1.6G   1% /run/user/1000
   root@ubuntu201:/home/ubuntu# reboot
 #+END_SRC
+*** Ubuntu 20.22 apt 添加代理
+编辑配置文件
+#+BEGIN_SRC sh
+  vi /etc/apt/apt.conf.d/proxy.confg
+#+END_SRC
+
+添加 http 代理配置
+#+BEGIN_SRC conf
+  Acquire {
+    HTTP::proxy "http://127.0.0.1:3128";
+    HTTPS::proxy "http://127.0.0.1:3128";
+  }
+#+END_SRC
+
 ** ORACLE
 *** 参考资料
 1. Oracle 关系数据库 [[file:../database/oracle.org::*参考链接][参考链接]]
