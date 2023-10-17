@@ -1386,6 +1386,7 @@ MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是
 #+BEGIN_SRC sh
   ctags -e -R --languages=c,c++ .
 #+END_SRC
+
 **** cscope
 生成数据库文件 | [[https://cscope.sourceforge.net/][link]]
 #+BEGIN_SRC sh
@@ -1396,6 +1397,29 @@ MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是
 查询相关的数据
 #+BEGIN_SRC sh
   cscope -d
+#+END_SRC
+
+**** linux kernel 代码浏览
+参考 cscope 代码仓库文件浏览 [[https://cscope.sourceforge.net/large_projects.html][large project]]
+#+BEGIN_SRC sh
+  LNX=/opt/linux-5.15.18
+
+  cd $LNX
+  rm cscope.*
+
+  find  $LNX                                                                  \
+        -path "$LNX/arch/*" ! -path "$LNX/arch/i386*" -prune -o               \
+        -path "$LNX/include/asm-*" ! -path "$LNX/include/asm-i386*" -prune -o \
+        -path "$LNX/tmp*" -prune -o                                           \
+        -path "$LNX/Documentation*" -prune -o                                 \
+        -path "$LNX/scripts*" -prune -o                                       \
+        -path "$LNX/drivers*" -prune -o                                       \
+        -path "$LNX/tools/testing/*" -prune -o                                \
+        -name "*.[chxsS]" -print > cscope.files
+
+  cscope -b -q -k
+
+  ctags -e -L cscope.files
 #+END_SRC
 
 *** gdb & lldb
