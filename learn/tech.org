@@ -1399,6 +1399,23 @@ MacOS 上安装过后出现一些诡异问题, pylsp 命令找不到，发现是
   export PATH=~/Library/Python/3.11/bin:$PATH
 #+END_SRC
 
+clangd 编译安装
+#+BEGIN_SRC sh
+  git clone https://mirrors.tuna.tsinghua.edu.cn/git/llvm-project.git
+
+  cd llvm-project
+  mkdir build
+
+  cd build
+  cmake ../llvm  \
+        -DCMAKE_INSTALL_PREFIX /opt/llvm \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra"
+
+  make -j$(nproc)
+  sudo make install
+#+END_SRC
+
 *** autossh
 下载源码编译安装 | [[https://github.com/Autossh/autossh.git][github]]
 #+BEGIN_SRC sh
