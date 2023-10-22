@@ -61,27 +61,45 @@ tmux
   # rm -rf $DIR/build-binutils
   mkdir -p $DIR/build-binutils
   cd $DIR/build-binutils
-  ../binutils-2.40/configure --target=$TARGET --prefix=$PREFIX --enable-interwork --enable-multilib --disable-nls --disable-werror |& tee configure.log
-  make all -j4 |& tee make.log
-  sudo make install |& tee install.log
+  ../binutils-2.40/configure \
+      --target=$TARGET \
+      --prefix=$PREFIX \
+      --enable-interwork \
+      --enable-multilib \
+      --disable-nls \
+      --disable-werror
+
+  make all -j$(nproc)
+  sudo make install
 
 
   # rm -rf $DIR/build-gcc
   mkdir -p $DIR/build-gcc
   cd $DIR/build-gcc
-  ../gcc-11.4.0/configure --target=$TARGET --prefix=$PREFIX --disable-nls --disable-libssp --enable-languages=c --without-headers |& tee configure.log
-  make all-gcc -j4 |& tee make-all-gcc.log
-  make all-target-libgcc -j4 |& tee make-all-target-libgcc.log
-  sudo make install-gcc |& tee make-install-gcc.log
-  sudo make install-target-libgcc |& tee make-install-target-libgcc.log
+  ../gcc-11.4.0/configure \
+      --target=$TARGET \
+      --prefix=$PREFIX \
+      --disable-nls \
+      --disable-libssp \
+      --enable-languages=c \
+      --without-headers
+
+  make all-gcc -j$(nproc)
+  make all-target-libgcc -j$(nproc)
+  sudo make install-gcc
+  sudo make install-target-libgcc
 
 
   # rm -rf $DIR/build-gdb
   mkdir -p $DIR/build-gdb
   cd $DIR/build-gdb
-  ../gdb-11.2/configure --target=$TARGET --prefix=$PREFIX --program-prefix=i386-elf-
-  make -j4 |& tee make.log
-  sudo make install |& tee install.log
+  ../gdb-11.2/configure \
+      --target=$TARGET \
+      --prefix=$PREFIX \
+      --program-prefix=$TARGET
+
+  make  -j$(nproc)
+  sudo make install
 #+END_SRC
 
 *** Tmux 管理终端会话
