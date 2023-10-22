@@ -2483,6 +2483,21 @@ Fontconfig error: Cannot load default config file
   /dev/sdb1       /data ext4      defaults        0       0
 #+END_SRC
 
+*** samba 网络系统挂载
+临时挂载，思路是安装 cifs 工具，然后使用命令挂载
+#+BEGIN_SRC sh
+  yum install -y cifs-utils
+  mkdir -p /mnt/data
+  mount -t cifs -o username="guest",password="" //192.168.100.10/share/ /mnt/data
+  # 添加一些权限
+  mount -t cifs -o username="guest",password="",rw,file_mode=0777,dir_mode=0777,uid=0,gid=0,vers=2.0 //192.168.100.10/share/ /mnt/data
+#+END_SRC
+
+永久挂载，需要将配置写入 /etc/fstab
+#+BEGIN_SRC conf
+  //192.168.100.10/share/ /mnt/data       cifs     defaults,username="guest",password="",rw,file_mode=0777,dir_mode=0777,uid=0,gid=0,vers=2.0     0       0
+#+END_SRC
+
 ** Linux & Shell
 *** 后台运行命令 cmd
 #+BEGIN_SRC sh
