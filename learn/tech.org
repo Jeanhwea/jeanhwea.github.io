@@ -1270,8 +1270,8 @@ InnoDB 需要重建后分析来优化表，对应 SQL 如下
      # -*- mode: conf; -*-
 
      [mysqld]
-     basedir=/opt/local/mysql
-     datadir=/opt/local/mysql/data
+     basedir=/opt/mysql
+     datadir=/opt/mysql/data
      log-error=/tmp/mysql-error.log
      pid-file=/tmp/mysql.pid
      # debug=d,info,error,query,general,where:O,/tmp/mysqld.trace
@@ -1293,7 +1293,7 @@ InnoDB 需要重建后分析来优化表，对应 SQL 如下
      # 准备代码编译目录, 输出目录为 out
      mkdir out
      cd out
-     cmake -DCMAKE_INSTALL_PREFIX=/opt/local/mysql -DWITH_BOOST=../../boost/boost_1_77_0 -DWITH_DEBUG=1 -DWITH_UNIT_TESTS=0 ..
+     cmake -DCMAKE_INSTALL_PREFIX=/opt/mysql -DWITH_BOOST=/opt/boost/boost_1_77_0 -DWITH_DEBUG=1 -DWITH_UNIT_TESTS=0 ..
      # 编译代码
      cd out
      make -j8
@@ -3036,12 +3036,12 @@ pg 的源代码托管在 [[https://git.postgresql.org/gitweb/?p=postgresql.git;a
 
 *** 前置环境变量
 #+BEGIN_SRC sh
-  export PGDATA=/opt/local/pgsql/data
+  export PGDATA=/opt/pgsql/data
 #+END_SRC
 *** 编译调试 & 初始化数据
 #+BEGIN_SRC sh
   # 配置调试环境
-  ./configure --prefix=/opt/local/pgsql --enable-cassert --enable-debug CFLAGS="-ggdb -O0 -fno-omit-frame-pointer"
+  ./configure --prefix=/opt/pgsql --enable-cassert --enable-debug CFLAGS="-ggdb -O0 -fno-omit-frame-pointer"
   # 编译, 安装
   make -j8
   make install
@@ -3049,9 +3049,9 @@ pg 的源代码托管在 [[https://git.postgresql.org/gitweb/?p=postgresql.git;a
 
 #+BEGIN_SRC sh
   # 初始化数据库
-  initdb -D /opt/local/pgsql/data
+  initdb -D /opt/pgsql/data
   # 启动数据库
-  pg_ctl -D /opt/local/pgsql/data -l logfile start
+  pg_ctl -D /opt/pgsql/data -l logfile start
   # 创建库
   createdb test01
   # 链接库
@@ -3068,7 +3068,7 @@ pg 的源代码托管在 [[https://git.postgresql.org/gitweb/?p=postgresql.git;a
   jinghuihu        82276   0.0  0.0 34307820   5152   ??  Ss   10:51AM   0:00.04 postgres: walwriter
   jinghuihu        82275   0.0  0.0 34307820   2212   ??  Ss   10:51AM   0:00.06 postgres: background writer
   jinghuihu        82274   0.0  0.0 34307820   2788   ??  Ss   10:51AM   0:00.01 postgres: checkpointer
-  jinghuihu        80299   0.0  0.1 34309108  14920   ??  Ss   10:41AM   0:00.13 /opt/local/pgsql/bin/postgres -D /opt/local/pgsql/data
+  jinghuihu        80299   0.0  0.1 34309108  14920   ??  Ss   10:41AM   0:00.13 /opt/pgsql/bin/postgres -D /opt/pgsql/data
 #+END_SRC
 
 找到对应的进程，然后使用 lldb attach 上，打断点
@@ -3083,7 +3083,7 @@ pg 的源代码托管在 [[https://git.postgresql.org/gitweb/?p=postgresql.git;a
       0x7ff810e89303 <+15>: jmp    0x7ff810e84dc2            ; cerror_nocancel
       0x7ff810e89308 <+20>: retq
   Target 0: (postgres) stopped.
-  Executable module set to "/opt/local/pgsql/bin/postgres".
+  Executable module set to "/opt/pgsql/bin/postgres".
   Architecture set to: x86_64h-apple-macosx-.
   (lldb) b exec_simple_query
   Breakpoint 1: where = postgres`exec_simple_query + 29 at postgres.c:994:21, address = 0x000000010f17af6d
