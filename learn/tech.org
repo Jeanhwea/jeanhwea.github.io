@@ -3160,6 +3160,45 @@ pg 的源代码托管在 [[https://git.postgresql.org/gitweb/?p=postgresql.git;a
   }
 #+END_SRC
 
+** Tex
+*** texlive 2023 安装
+参考文档 [[https://mirrors.tuna.tsinghua.edu.cn/CTAN/info/install-latex-guide-zh-cn/install-latex-guide-zh-cn.pdf][link]]
+
+安装字体依赖
+#+BEGIN_SRC sh
+  sudo apt install fontconfig
+#+END_SRC
+
+下载 iso 安装镜像
+#+BEGIN_SRC sh
+  wget -c https://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/Images/texlive2023-20230313.iso
+#+END_SRC
+
+挂着镜像
+#+BEGIN_SRC sh
+  mkdir /mnt/texlive
+  mount -o loop texlive2023-20230313.iso /mnt/texlive
+#+END_SRC
+
+执行安装脚本
+#+BEGIN_SRC sh
+  sudo /mnt/texlive/install-tl
+#+END_SRC
+
+配置字体
+#+BEGIN_SRC sh
+  sudo cp /usr/local/texlive/2023/texmf-var/fonts/conf/texlive-fontconfig.conf /etc/fonts/conf.d/09-texlive.conf
+  sudo fc-cache -fsv
+#+END_SRC
+
+安装好后配置环境变量
+#+BEGIN_SRC sh
+  # texlive
+  export PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+  export MANPATH=/usr/local/texlive/2023/texmf-dist/doc/man:$MANPATH
+  export INFOPATH=/usr/local/texlive/2023/texmf-dist/doc/info:$INFOPATH
+#+END_SRC
+
 ** Kafka
 1. [[https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/JVM%20%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%2032%20%E8%AE%B2%EF%BC%88%E5%AE%8C%EF%BC%89][JVM 系列]]
 *** 资源链接
