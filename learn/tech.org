@@ -1749,13 +1749,15 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
 #+BEGIN_QUOTE
   please check gdb is codesigned - see taskgated(8)
 #+END_QUOTE
+参考官网说明 [[https://sourceware.org/gdb/wiki/PermissionsDarwin][gdb PermissionsDarwin]]
+
 手工编写 gdb.xml
 #+BEGIN_SRC xml
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+   "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
   <plist version="1.0">
-  <dict>
+    <dict>
       <key>com.apple.security.cs.allow-jit</key>
       <true/>
       <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
@@ -1770,15 +1772,13 @@ LLDB 保存断点也有类似的命令，但是保存结果是一个 JSON
       <true/>
       <key>com.apple.security.get-task-allow</key>
       <true/>
-  </dict>
+    </dict>
   </plist>
 #+END_SRC
 使用命令给 gdb 添加证书
 #+BEGIN_SRC sh
   codesign --entitlements gdb.xml -fs gdb-cert /usr/local/bin/gdb
 #+END_SRC
-
-官网说明 [[https://sourceware.org/gdb/wiki/PermissionsDarwin][gdb permission]]
 
 **** Remote 'g' packet reply is too long
 解决方法参考 [[https://wiki.osdev.org/QEMU_and_GDB_in_long_mode#:~:text=When%20the%20break%20point%20is%20hit%20and%20the,architecture%20names%20in%20those%20two%20%22set%20arch%22%20commands.][link]]
