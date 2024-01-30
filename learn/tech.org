@@ -3170,6 +3170,53 @@ pg 的源代码托管在 [[https://git.postgresql.org/gitweb/?p=postgresql.git;a
   }
 #+END_SRC
 
+*** Host Mapping Reverse Proxy Example
+1. token from https://help.sonatype.com/en/docker-repository-reverse-proxy-strategies.html
+#+BEGIN_SRC conf
+  http {
+
+    proxy_send_timeout 120;
+    proxy_read_timeout 300;
+    proxy_buffering    off;
+    proxy_request_buffering off;
+    keepalive_timeout  5 5;
+    tcp_nodelay        on;
+
+    server {
+     listen 443 ssl;
+     server_name project.example.com
+
+     ssl on;
+     ssl_certificate /path/to/ssl/server.crt;
+     ssl_certificate_key /path/to/ssl/server.key;
+
+     # Docker /v2 and /v1 (for search) requests
+     location /v2 {
+       proxy_set_header Host $host:$server_port;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       proxy_set_header X-Forwarded-Proto "https";
+       proxy_pass http://nexus.example.com:8081/repository/docker-repo/$request_uri;
+     }
+     location /v1 {
+       proxy_set_header Host $host:$server_port;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       proxy_set_header X-Forwarded-Proto "https";
+       proxy_pass http://nexus.example.com:8081/repository/docker-repo/$request_uri;
+    }
+
+     # Regular Nexus requests
+     location / {
+       proxy_set_header Host $host:$server_port;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       proxy_set_header X-Forwarded-Proto "https";
+       proxy_pass http://nexus.example.com:8081;
+     }
+   }}
+#+END_SRC
+
 ** Tex
 *** texlive 2023 安装
 参考一个简短的说明文档 [[https://mirrors.tuna.tsinghua.edu.cn/CTAN/info/install-latex-guide-zh-cn/install-latex-guide-zh-cn.pdf][link]]
