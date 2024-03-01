@@ -4146,24 +4146,47 @@ lldb in macOS | [[https://lldb.llvm.org/resources/build.html#common-configuratio
 #+END_SRC
 
 **** llvm 工具链
-#+BEGIN_SRC sh
-  # 生成可执行文件
-  $ clang main.c -o main
-  # 查看编译的过程
-  $ clang -ccc-print-phases main.c
+1. clang 是 llvm 的 c/c++ 编译前端
+  #+BEGIN_SRC sh
+    # 生成可执行文件
+    clang main.c -o main
+    # 查看编译的过程
+    clang -ccc-print-phases main.c
 
-  # 生成 tokens
-  $ clang -E -Xclang -dump-tokens main.c
-  # 生成语法树
-  $ clang -fsyntax-only -Xclang -ast-dump main.c
-  # 生成 llvm ir（不开优化）
-  $ clang -S -emit-llvm main.c -o main.ll -O0
+    # 生成 tokens
+    clang -E -Xclang -dump-tokens main.c
+    # 生成语法树
+    clang -fsyntax-only -Xclang -ast-dump main.c
+    # 生成 llvm ir（不开优化）
+    clang -S -emit-llvm main.c -o main.ll -O0
 
-  # 生成汇编
-  $ clang -S main.c -o main.s
-  # 生成目标文件
-  $ clang -c main.c -o main.o
-#+END_SRC
+    # 生成汇编
+    clang -S main.c -o main.s
+    # 生成目标文件
+    clang -c main.c -o main.o
+  #+END_SRC
+2. lli 会解释或以 JIT 的形式运行 .bc 和 .ll 程序。
+   - .bc 是 LLVM IR 的二进制格式
+   - .ll 是 LLVM IR 的可读代码格式
+   #+BEGIN_SRC sh
+     # 1. 生成 main.c 对应的 .ll 格式的文件
+     clang -S -emit-llvm main.c -o main.ll -O0
+     # 2. 用 lli 解释执行生成的 .ll 文件
+     lli main.ll
+   #+END_SRC
+3. llvm-link 用于链接其它库的 .ll 和 .bc 文件，最终输出单个可执行的 main.ll
+   #+BEGIN_SRC sh
+     # 1. 分别导出 mylib.c 和 main.c 对应的的 .ll 文件
+     clang -emit-llvm -S mylib.c -o mylib.ll
+     clang -emit-llvm -S main.c -o main.ll
+     # 2. 使用 llvm-link 将两个文件链接，生成新的 IR 文件
+     llvm-link main.ll mylib.ll -S -o out.ll
+     # 3. 用 lli 解释运行
+     lli out.ll
+   #+END_SRC
+4. llc 可以将 .ll 形式的 IR 编译成指定体系结构的汇编
+5. opt 是 LLVM 模块化的优化器和分析器
+
 ** Linux
 *** Linux 资源链接
 1. Linux 源码在线导读 bootlin [[https://elixir.bootlin.com/linux/0.12/source/kernel/fork.c][link]]
