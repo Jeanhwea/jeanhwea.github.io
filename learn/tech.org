@@ -1454,15 +1454,6 @@ clangd 编译安装
   sudo make install
 #+END_SRC
 
-lldb in macOS | [[https://lldb.llvm.org/resources/build.html#common-configurations-on-macos][link]]
-#+BEGIN_SRC sh
-  cmake -DCMAKE_INSTALL_PREFIX=/opt/llvm \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lldb" \
-        -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" \
-        ../llvm
-#+END_SRC
-
 *** autossh
 下载源码编译安装 | [[https://github.com/Autossh/autossh.git][github]]
 #+BEGIN_SRC sh
@@ -4123,8 +4114,56 @@ BIOS 通过中断提供一下操作硬件的基本程序，具体中断参考手
 *** 自制操作系统
 1. nasm 手册 [[https://www.nasm.us/doc/nasmdoc2.html][link]]
 ** 编译原理
+*** 编译原理课程
 1. 南大 [[https://cs.nju.edu.cn/tiantan/courses/compiler-2023/index.html][编译原理]]
 2. 北航 [[https://buaa-se-compiling.github.io/miniSysY-tutorial/][miniSysY 编译实验]] llvm 相关知识
+*** llvm
+**** llvm 安装
+下载代码后编译安装
+#+BEGIN_SRC sh
+  git clone --depth 1 https://mirrors.tuna.tsinghua.edu.cn/git/llvm-project.git
+
+  cd llvm-project
+  mkdir build
+
+  cd build
+  cmake -DCMAKE_INSTALL_PREFIX=/opt/llvm \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lldb" \
+        ../llvm
+
+  make -j$(nproc)
+  sudo make install
+#+END_SRC
+
+lldb in macOS | [[https://lldb.llvm.org/resources/build.html#common-configurations-on-macos][link]]
+#+BEGIN_SRC sh
+  cmake -DCMAKE_INSTALL_PREFIX=/opt/llvm \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lldb" \
+        -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" \
+        ../llvm
+#+END_SRC
+
+**** llvm 工具链
+#+BEGIN_SRC sh
+  # 生成可执行文件
+  $ clang main.c -o main
+  # 查看编译的过程
+  $ clang -ccc-print-phases main.c
+
+  # 生成 tokens
+  $ clang -E -Xclang -dump-tokens main.c
+  # 生成语法树
+  $ clang -fsyntax-only -Xclang -ast-dump main.c
+  # 生成 llvm ir（不开优化）
+  $ clang -S -emit-llvm main.c -o main.ll -O0
+
+  # 生成汇编
+  $ clang -S main.c -o main.s
+  # 生成目标文件
+  $ clang -c main.c -o main.o
+#+END_SRC
 ** Linux
 *** Linux 资源链接
 1. Linux 源码在线导读 bootlin [[https://elixir.bootlin.com/linux/0.12/source/kernel/fork.c][link]]
