@@ -285,6 +285,27 @@ bochsrc 配置文件, 设置启动未 1.44 存软盘, 启动镜像名称为 Imag
 #+END_SRC
 
 ** Emacs
+*** emacs 源码编译
+准备一些包
+#+BEGIN_SRC sh
+  sudo apt-get update && apt-get upgrade
+  sudo apt-get install build-essential libncurses-dev autoconf make gcc \
+       texinfo libgtk-3-dev libxpm-dev libjpeg-dev libgif-dev libtiff5-dev \
+       libncurses5-dev libxml2-dev libgnutls28-dev libtree-sitter-dev
+#+END_SRC
+
+编译安装，emacs 29 以后才支持 tree-sitter
+#+BEGIN_SRC sh
+  cd emacs
+  ./autogen.sh
+  ./configure --prefix=/opt/emacs --with-tree-sitter
+
+  make -j 4
+  make docs
+
+  sudo make install && make install-doc
+#+END_SRC
+
 *** macOS 上编译
 #+BEGIN_SRC sh
   brew install autoconf automake texinfo gnutls pkg-config libxml2

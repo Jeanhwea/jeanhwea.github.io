@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2023-07-08 Sat 23:03 -->
+<!-- 2024-03-06 Wed 13:18 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>在 Ubuntu 18.04 系统下安装 Emacs 26.3</title>
@@ -191,7 +191,7 @@
     { font-size: 10px; font-weight: bold; white-space: nowrap; }
   .org-info-js_search-highlight
     { background-color: #ffff00; color: #000000; font-weight: bold; }
-  .org-svg { width: 90%; }
+  .org-svg { }
 </style>
 <link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
 <link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
@@ -211,20 +211,21 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgee13654">1. 下载 Emacs 26 的源代码</a></li>
-<li><a href="#org2c438c5">2. 更新系统包管理器并下载依赖项</a></li>
-<li><a href="#org3153bca">3. 编译及安装</a></li>
-<li><a href="#org928a0b2">4. 启动 Emacs</a></li>
+<li><a href="#org267f012">1. 下载 Emacs 26 的源代码</a></li>
+<li><a href="#orgf8b6436">2. 更新系统包管理器并下载依赖项</a></li>
+<li><a href="#org79dcb46">3. 编译及安装</a></li>
+<li><a href="#org214e447">4. 启动 Emacs</a></li>
+<li><a href="#org99dcfa3">5. tree-sitter 支持</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgee13654" class="outline-2">
-<h2 id="orgee13654"><span class="section-number-2">1.</span> 下载 Emacs 26 的源代码</h2>
+<div id="outline-container-org267f012" class="outline-2">
+<h2 id="org267f012"><span class="section-number-2">1.</span> 下载 Emacs 26 的源代码</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
-<pre class="src src-shell">mkdir ~/.local/ &amp;&amp; <span style="color: #c397d8;">cd</span> ~/.local/
+<pre class="src src-shell">mkdir ~/.local/ &amp;&amp; <span style="color: #5fafff;">cd</span> ~/.local/
 wget http://mirrors.ustc.edu.cn/gnu/emacs/emacs-28.2.tar.gz
 tar xzvf emacs-28.2.tar.gz
 </pre>
@@ -232,16 +233,16 @@ tar xzvf emacs-28.2.tar.gz
 </div>
 </div>
 
-<div id="outline-container-org2c438c5" class="outline-2">
-<h2 id="org2c438c5"><span class="section-number-2">2.</span> 更新系统包管理器并下载依赖项</h2>
+<div id="outline-container-orgf8b6436" class="outline-2">
+<h2 id="orgf8b6436"><span class="section-number-2">2.</span> 更新系统包管理器并下载依赖项</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 ubuntu
 </p>
 <div class="org-src-container">
 <pre class="src src-shell">sudo apt-get update &amp;&amp; apt-get upgrade
-sudo apt-get install build-essential libncurses-dev autoconf make gcc <span style="color: #70c0b1;">\</span>
-     texinfo libgtk-3-dev libxpm-dev libjpeg-dev libgif-dev libtiff5-dev <span style="color: #70c0b1;">\</span>
+sudo apt-get install build-essential libncurses-dev autoconf make gcc <span style="color: #afff00;">\</span>
+     texinfo libgtk-3-dev libxpm-dev libjpeg-dev libgif-dev libtiff5-dev <span style="color: #afff00;">\</span>
      libncurses5-dev libxml2-dev libgnutls28-dev
 </pre>
 </div>
@@ -250,18 +251,18 @@ sudo apt-get install build-essential libncurses-dev autoconf make gcc <span styl
 centos
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">yum install -y libXpm-devel libtiff-devel gnutls-devel giflib-devel <span style="color: #70c0b1;">\</span>
-    libjpeg-turbo-devel ncurses-devel libpng-devel libXaw-devel
+<pre class="src src-sh">yum install -y libXpm-devel libtiff-devel gnutls-devel giflib-devel <span style="color: #afff00;">\</span>
+    libjpeg-turbo-devel ncurses-devel libpng-devel libXaw-devel texinfo
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org3153bca" class="outline-2">
-<h2 id="org3153bca"><span class="section-number-2">3.</span> 编译及安装</h2>
+<div id="outline-container-org79dcb46" class="outline-2">
+<h2 id="org79dcb46"><span class="section-number-2">3.</span> 编译及安装</h2>
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #c397d8;">cd</span> emacs-26.3
+<pre class="src src-shell"><span style="color: #5fafff;">cd</span> emacs-26.3
 ./autogen.sh
 ./configure
 
@@ -274,20 +275,35 @@ sudo make install &amp;&amp; make install-doc
 </div>
 </div>
 
-<div id="outline-container-org928a0b2" class="outline-2">
-<h2 id="org928a0b2"><span class="section-number-2">4.</span> 启动 Emacs</h2>
+<div id="outline-container-org214e447" class="outline-2">
+<h2 id="org214e447"><span class="section-number-2">4.</span> 启动 Emacs</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-shell">emacs
-<span style="color: #969896; font-style: italic;"># </span><span style="color: #969896; font-style: italic;">-nw &#34920;&#31034;&#26080;&#31383;&#21475;&#26041;&#24335;&#21551;&#21160;</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">-nw &#34920;&#31034;&#26080;&#31383;&#21475;&#26041;&#24335;&#21551;&#21160;</span>
 emacs -nw
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org99dcfa3" class="outline-2">
+<h2 id="org99dcfa3"><span class="section-number-2">5.</span> tree-sitter 支持</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+<pre class="src src-sh">sudo apt-get -y install libtree-sitter-dev
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-sh">./configure --with-tree-sitter
 </pre>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2023-07-08 Sat 23:03. Created by Jinghui Hu at 2020-02-18 Tue 11:19.</p>
+<p class="author">Last Updated 2024-03-06 Wed 13:18. Created by Jinghui Hu at 2020-02-18 Tue 11:19.</p>
 </div>
 </body>
 </html>
