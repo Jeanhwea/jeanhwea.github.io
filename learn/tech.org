@@ -2048,38 +2048,38 @@ centos7 指定 openssl 安装路径后编译安装 [[https://github.com/pyenv/py
 
 ** Rust
 *** 安装配置及更新
-安装页面 [[https://www.rust-lang.org/tools/install][link]]
+1. 设置 rustup 国内镜像 | [[http://rsproxy.cn/#getStarted][link]]
+   #+BEGIN_SRC sh
+     export RUSTUP_DIST_SERVER="https://rsproxy.cn"
+     export RUSTUP_UPDATE_ROOT="https://rsproxy.cn/rustup"
+   #+END_SRC
+2. 安装 rust
+   #+BEGIN_SRC sh
+     curl --proto '=https' --tlsv1.2 -sSf https://rsproxy.cn/rustup-init.sh | sh
+   #+END_SRC
+3. 配置 crates 的镜像源代码 ~/.cargo/config
+   #+BEGIN_SRC conf
+     # ~/.cargo/config
+
+     [source.crates-io]
+     replace-with = 'rsproxy'
+     [source.rsproxy]
+     registry = "https://rsproxy.cn/crates.io-index"
+     [source.rsproxy-sparse]
+     registry = "sparse+https://rsproxy.cn/index/"
+     [registries.rsproxy]
+     index = "https://rsproxy.cn/crates.io-index"
+     [net]
+     git-fetch-with-cli = true
+   #+END_SRC
+
+附：原始安装指令 [[https://www.rust-lang.org/tools/install][link]]
 #+BEGIN_SRC sh
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
   # 安装工具链
   rustup component add rust-src
-  # 更新
+  # 更新 rustup 相关工具
   rustup update
-#+END_SRC
-
-设置国内镜像 | [[http://rsproxy.cn/#getStarted][link]]
-#+BEGIN_SRC sh
-  export RUSTUP_DIST_SERVER="https://rsproxy.cn"
-  export RUSTUP_UPDATE_ROOT="https://rsproxy.cn/rustup"
-#+END_SRC
-
-安装 rust
-#+BEGIN_SRC sh
-  curl --proto '=https' --tlsv1.2 -sSf https://rsproxy.cn/rustup-init.sh | sh
-#+END_SRC
-
-~/.cargo/config
-#+BEGIN_SRC conf
-  [source.crates-io]
-  replace-with = 'rsproxy'
-  [source.rsproxy]
-  registry = "https://rsproxy.cn/crates.io-index"
-  [source.rsproxy-sparse]
-  registry = "sparse+https://rsproxy.cn/index/"
-  [registries.rsproxy]
-  index = "https://rsproxy.cn/crates.io-index"
-  [net]
-  git-fetch-with-cli = true
 #+END_SRC
 
 *** 使用笔记
