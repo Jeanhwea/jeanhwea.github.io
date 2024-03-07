@@ -2929,6 +2929,60 @@ Windows Terminal 在安装 zsh-autosuggestions 时会显示的有问题，这里
 ** freebsd
 *** 参考链接
 1. HandBook [[https://docs.freebsd.org/en/books/handbook][en]] | [[https://docs.freebsd.org/zh-cn/books/handbook][zh]]
+*** 创建 /data 盘
+1. 磁盘分区格式化
+   #+BEGIN_EXAMPLE
+     # gpart create -s GPT /dev/da1
+     gpart: geom 'da1': File exists
+     # gpart destroy /dev/da1
+     da1 destroyed
+     # gpart create -s GPT /dev/da1
+     da1 created
+     # gpart show /dev/da1
+     =>       40  419430320  da1  GPT  (200G)
+              40  419430320       - free -  (200G)
+
+     # ls /dev/da1*
+     /dev/da1
+     #  gpart add -t freebsd-ufs -a 1M /dev/da1
+     da1p1 added
+     # ls /dev/da1*
+     /dev/da1        /dev/da1p1
+     # gpart show /dev/da1
+     =>       40  419430320  da1  GPT  (200G)
+              40       2008       - free -  (1.0M)
+            2048  419426304    1  freebsd-ufs  (200G)
+       419428352       2008       - free -  (1.0M)
+
+     #
+   #+END_EXAMPLE
+2. 创建文件系统
+   #+BEGIN_EXAMPLE
+     # newfs -U /dev/da1p1
+     /dev/da1p1: 204798.0MB (419426304 sectors) block size 32768, fragment size 4096
+             using 328 cylinder groups of 625.22MB, 20007 blks, 80128 inodes.
+             with soft updates
+     super-block backups (for fsck_ffs -b #) at:
+      192, 1280640, 2561088, 3841536, 5121984, 6402432, 7682880, 8963328, 10243776,
+      11524224, 12804672, 14085120, 15365568, 16646016, 17926464, 19206912, 20487360,
+      ...
+      416145792, 417426240, 418706688
+     # mkdir /data
+     # mount /dev/da0p1 /data
+     # df
+      Filesystem         1K-blocks    Used     Avail Capacity  Mounted on
+     zroot/ROOT/default  60852520 2060144  58792376     3%    /
+     devfs                      1       0         1     0%    /dev
+     ...
+     /dev/da1p1         203121560       8 186871828     0%    /data
+     #
+   #+END_EXAMPLE
+3. 配置开机挂载 /etc/fstab
+   - nosuid 禁止设置 uid
+   #+BEGIN_EXAMPLE
+     /dev/da0p1	/data		ufs	rw,nosuid	2	2
+   #+END_EXAMPLE
+
 ** ORACLE
 *** 参考资料
 1. Oracle 关系数据库 [[file:../database/oracle.org::*参考链接][参考链接]]
