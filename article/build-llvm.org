@@ -1,0 +1,46 @@
+#+TITLE: 源码编译 llvm 编译器
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2024-03-20 Wed>
+#+STARTUP: overview num indent
+#+OPTIONS: ^:nil
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+
+
+* 下载代码后编译安装
+#+BEGIN_SRC sh
+  git clone https://mirrors.tuna.tsinghua.edu.cn/git/llvm-project.git
+  git clone https://github.com/llvm/llvm-project.git
+#+END_SRC
+
+* cmake 编译准备
+#+BEGIN_SRC sh
+  cd llvm-project
+  mkdir build
+  cd build
+
+  cmake -DCMAKE_INSTALL_PREFIX=/opt/llvm \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=on \
+        -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lldb" \
+        ../llvm
+#+END_SRC
+
+* 编译代码
+#+BEGIN_SRC sh
+  make -j4
+  sudo make install
+#+END_SRC
+
+* macOS 配置选项
+lldb in macOS | [[https://lldb.llvm.org/resources/build.html#common-configurations-on-macos][link]]
+#+BEGIN_SRC sh
+  cmake -DCMAKE_INSTALL_PREFIX=/opt/llvm \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=on \
+        -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lldb" \
+        -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" \
+        ../llvm
+#+END_SRC
