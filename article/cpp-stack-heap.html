@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-03-31 Sun 16:48 -->
+<!-- 2024-03-31 Sun 16:56 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>C++ 对象的栈(stack)和堆(heap)</title>
@@ -211,15 +211,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgc381032">1. new 关键字</a></li>
-<li><a href="#org004d173">2. delete 关键字</a></li>
+<li><a href="#org527813d">1. new 关键字</a></li>
+<li><a href="#orgda09b9f">2. delete 关键字</a></li>
+<li><a href="#org96a050d">3. array new 一定要搭配 array delete</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgc381032" class="outline-2">
-<h2 id="orgc381032"><span class="section-number-2">1.</span> new 关键字</h2>
+<div id="outline-container-org527813d" class="outline-2">
+<h2 id="org527813d"><span class="section-number-2">1.</span> new 关键字</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 假设我们实现了一个描述复数的 <code>Complex</code> 类
@@ -260,8 +261,8 @@ pc-&gt;<span style="color: #6c71c4; font-weight: bold;">Complex</span>::Complex<
 </div>
 </div>
 
-<div id="outline-container-org004d173" class="outline-2">
-<h2 id="org004d173"><span class="section-number-2">2.</span> delete 关键字</h2>
+<div id="outline-container-orgda09b9f" class="outline-2">
+<h2 id="orgda09b9f"><span class="section-number-2">2.</span> delete 关键字</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 一个 <code>delete</code> 释放对象内存会被编译器拆分成 2 个步骤：
@@ -286,9 +287,35 @@ pc-&gt;<span style="color: #6c71c4; font-weight: bold;">Complex</span>::Complex<
 </p>
 </div>
 </div>
+
+<div id="outline-container-org96a050d" class="outline-2">
+<h2 id="org96a050d"><span class="section-number-2">3.</span> array new 一定要搭配 array delete</h2>
+<div class="outline-text-2" id="text-3">
+<ol class="org-ol">
+<li><p>
+array delete 会有唤醒次数
+</p>
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #b58900; font-style: italic;">String</span> *<span style="color: #268bd2;">p</span> = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">String</span><span style="color: #8d5649;">[</span>3<span style="color: #8d5649;">]</span>;
+<span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">...</span>
+<span style="color: #859900; font-weight: bold;">delete</span><span style="color: #8d5649;">[]</span> p; <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">&#21796;&#37266; 3 &#27425; dtor</span>
+</pre>
+</div></li>
+<li><p>
+delete 只会唤醒 1 次析构函数
+</p>
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #b58900; font-style: italic;">String</span> *<span style="color: #268bd2;">p</span> = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">String</span><span style="color: #8d5649;">[</span>3<span style="color: #8d5649;">]</span>;
+<span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">...</span>
+<span style="color: #859900; font-weight: bold;">delete</span> p; <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">&#21796;&#37266; 1 &#27425; dtor</span>
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2024-03-31 Sun 16:48. Created by Jinghui Hu at 2024-03-31 Sun 00:00.</p>
+<p class="author">Last Updated 2024-03-31 Sun 16:56. Created by Jinghui Hu at 2024-03-31 Sun 00:00.</p>
 </div>
 </body>
 </html>

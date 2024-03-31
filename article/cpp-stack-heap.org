@@ -54,3 +54,17 @@
 #+END_SRC
 
 注意： ~delete~ 调用析构函数的时机和 ~new~ 申请次序是相反的
+
+* array new 一定要搭配 array delete
+1. array delete 会有唤醒次数
+   #+BEGIN_SRC C++ :includes '(<iostream> <cstring>) :results output
+     String *p = new String[3];
+     // ...
+     delete[] p; // 唤醒 3 次 dtor
+   #+END_SRC
+2. delete 只会唤醒 1 次析构函数
+   #+BEGIN_SRC C++ :includes '(<iostream> <cstring>) :results output
+     String *p = new String[3];
+     // ...
+     delete p; // 唤醒 1 次 dtor
+   #+END_SRC
