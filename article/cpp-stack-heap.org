@@ -1,0 +1,56 @@
+#+TITLE: C++ 对象的栈(stack)和堆(heap)
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2024-03-31 Sun>
+#+STARTUP: overview num indent
+#+OPTIONS: ^:nil
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+
+
+* new 关键字
+假设我们实现了一个描述复数的 ~Complex~ 类
+#+BEGIN_SRC C++ :includes '(<iostream> <cstring>) :results output
+  class Complex
+  {
+  public:
+      Complex(...) {...}
+      ~Complex(...) {...}
+  private:
+      double m_real;
+      double m_imag;
+  };
+#+END_SRC
+
+一个 ~new~ 申请对象内存会被编译器拆分成 3 个步骤
+1. 分配内存
+2. 静态转型
+3. 调用构造函数
+#+BEGIN_SRC C++ :includes '(<iostream> <cstring>) :results output
+  // new 分配内存会被拆分以下 3 个过程
+  Complex * pc = new Complex(1, 2);
+
+  // 1. 分配内存
+  void * mem = operator new(sizeof(Complex)); // 编译器内部调用 malloc(...)
+  // 2. 静态转型
+  pc = static_cast<Complex*>(mem);
+  // 3. 调用构造函数
+  pc->Complex::Complex(1, 2);
+#+END_SRC
+
+* delete 关键字
+一个 ~delete~ 释放对象内存会被编译器拆分成 2 个步骤：
+1. 析构函数
+2. 释放内存
+
+#+BEGIN_SRC C++ :includes '(<iostream> <cstring>) :results output
+  Complex * pc = new Complex(1, 2);
+
+  // 1. 析构函数
+  Complex::~Complex(pc);
+  // 2. 释放内存
+  operator delete(pc);
+#+END_SRC
+
+注意： ~delete~ 调用析构函数的时机和 ~new~ 申请次序是相反的
