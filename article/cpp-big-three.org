@@ -6,9 +6,10 @@
 #+OPTIONS: ^:nil
 
 
-* C++ 中的类的引入
+* C++ 中的类
 1. c++ 不同于 c 是它引入了类的机制
 2. 类通过 ~class~ 关键字进行定义
+3. 我们可以定义一个自己的 ~MyString~ 类
 #+BEGIN_SRC C++ :includes '(<iostream> <vector>) :results output
   // 定义一个类
   class MyString {
@@ -26,27 +27,101 @@
 #+RESULTS:
 : s1 = 0x7ff7bcf4a30f
 
-* 类有其对于的生命周期函数
+* 类的生命周期函数
 1. 类可以作为模版来创建实例
 2. 如何创建和销毁就形成了以下几种方法：（只就是 big three）
    1) 构造函数
-      - 无参构造函数 (ctr)
-      - 拷贝构造函数 (copy ctr)
+      - 无参构造函数 (ctor)
+      - 拷贝构造函数 (copy ctor)
    2) 拷贝赋值函数 (copy op=)
-   3) 析构函数 (dctr)
+   3) 析构函数 (dtor)
 
 我们使用之前的例子来定义它，依次定义的结果如下：
 #+BEGIN_SRC C++ :includes '(<iostream> <vector>) :results output
   class MyString {
   public:
-          MyString(const char *cstr = 0);
-          MyString(const MyString &str);
-          MyString& operator=(const MyString &str);
-          ~MyString();
-          char *get_cstr() const { return m_data; }
+      MyString(const char *cstr = 0);
+      MyString(const MyString &str);
+      MyString& operator=(const MyString &str);
+      ~MyString();
+      char *get_cstr() const { return m_data; }
   private:
-          char *m_data;
+      char *m_data;
   };
+#+END_SRC
+
+#+RESULTS:
+
+* 实现类
+#+BEGIN_SRC C++ :includes '(<iostream> <cstring>) :results output
+  class MyString {
+  public:
+      MyString(const char *cstr = 0);
+      MyString(const MyString &str);
+      MyString& operator=(const MyString &str);
+      ~MyString();
+      char *get_cstr() const { return m_data; }
+  private:
+      char *m_data;
+  };
+
+  // ctor
+  inline
+  MyString::MyString(const char *cstr)
+  {
+      if(cstr) {
+          m_data = new char[strlen(cstr)+1];
+          strcpy(m_data, cstr);
+      } else {
+          m_data = new char[1];
+          ,*m_data = '\0';
+      }
+  }
+
+  // copy ctor
+  inline
+  MyString::MyString(const MyString &str)
+  {
+      m_data = new char[strlen(str.m_data)+1];
+      strcpy(m_data, str.m_data);
+  }
+
+  // copy op=
+  inline
+  MyString& operator=(const MyString &str)
+  {
+      // 1. 防止 &str 和 this 指向同一个堆空间造成赋值错误
+      // 2. 提高执行效率
+      if (this == &str) {
+          return *this;
+      }
+
+      // step1: 删除旧数据
+      delete[] m_data;
+      // step2: 申请新数据
+      m_data = new char[strlen(str.m_data)+1];
+      // step3: 拷贝数据
+      strcpy(m_data, str.m_data);
+
+      return *this;
+  }
+
+  // dtor
+  inline
+  MyString::~MyString()
+  {
+      delete[] m_data;
+  }
+
+
+  int main (int argc, char *argv[])
+  {
+      MyString s1;
+      MyString s2("hello");
+      MyString s3(s2);
+      // std::cout << s2.get_cstr() << std::endl;
+      return 0;
+  }
 #+END_SRC
 
 #+RESULTS:
