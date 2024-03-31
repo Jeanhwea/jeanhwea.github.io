@@ -15,8 +15,13 @@
   class Complex
   {
   public:
-      Complex(...) {...}
-      ~Complex(...) {...}
+      Complex(double real, double imag) {
+          this->m_real = real;
+          this->m_imag = imag;
+      }
+      ~Complex() {
+          // do nothing
+      }
   private:
       double m_real;
       double m_imag;
@@ -29,14 +34,14 @@
 3. 调用构造函数
 #+BEGIN_SRC C++ :includes '(<iostream> <cstring>) :results output
   // new 分配内存会被拆分以下 3 个过程
-  Complex * pc = new Complex(1, 2);
+  Complex *c1 = new Complex(1, 2);
 
   // 1. 分配内存
   void * mem = operator new(sizeof(Complex)); // 编译器内部调用 malloc(...)
   // 2. 静态转型
-  pc = static_cast<Complex*>(mem);
+  c1 = static_cast<Complex*>(mem);
   // 3. 调用构造函数
-  pc->Complex::Complex(1, 2);
+  c1->Complex::Complex(1, 2);
 #+END_SRC
 
 * delete 关键字
@@ -45,12 +50,12 @@
 2. 释放内存
 
 #+BEGIN_SRC C++ :includes '(<iostream> <cstring>) :results output
-  Complex * pc = new Complex(1, 2);
+  Complex *c1 = new Complex(1, 2);
 
   // 1. 析构函数
-  Complex::~Complex(pc);
+  Complex::~Complex(c1);
   // 2. 释放内存
-  operator delete(pc);
+  operator delete(c1);
 #+END_SRC
 
 注意： ~delete~ 调用析构函数的时机和 ~new~ 申请次序是相反的
@@ -58,13 +63,13 @@
 * array new 一定要搭配 array delete
 1. array delete 会有唤醒次数
    #+BEGIN_SRC C++ :includes '(<iostream> <cstring>) :results output
-     String *p = new String[3];
+     String *s1 = new String[3];
      // ...
-     delete[] p; // 唤醒 3 次 dtor
+     delete[] s1; // 唤醒 3 次 dtor
    #+END_SRC
 2. delete 只会唤醒 1 次析构函数
    #+BEGIN_SRC C++ :includes '(<iostream> <cstring>) :results output
-     String *p = new String[3];
+     String *s1 = new String[3];
      // ...
-     delete p; // 唤醒 1 次 dtor
+     delete s1; // 唤醒 1 次 dtor
    #+END_SRC

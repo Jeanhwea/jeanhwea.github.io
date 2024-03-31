@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-03-31 Sun 16:56 -->
+<!-- 2024-03-31 Sun 19:48 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>C++ 对象的栈(stack)和堆(heap)</title>
@@ -211,16 +211,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org527813d">1. new 关键字</a></li>
-<li><a href="#orgda09b9f">2. delete 关键字</a></li>
-<li><a href="#org96a050d">3. array new 一定要搭配 array delete</a></li>
+<li><a href="#org905f826">1. new 关键字</a></li>
+<li><a href="#org0e44ee6">2. delete 关键字</a></li>
+<li><a href="#orga8b282c">3. array new 一定要搭配 array delete</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org527813d" class="outline-2">
-<h2 id="org527813d"><span class="section-number-2">1.</span> new 关键字</h2>
+<div id="outline-container-org905f826" class="outline-2">
+<h2 id="org905f826"><span class="section-number-2">1.</span> new 关键字</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 假设我们实现了一个描述复数的 <code>Complex</code> 类
@@ -229,8 +229,13 @@
 <pre class="src src-C++"><span style="color: #859900; font-weight: bold;">class</span> <span style="color: #b58900; font-style: italic;">Complex</span>
 <span style="color: #8d5649;">{</span>
 <span style="color: #859900; font-weight: bold;">public</span>:
-    <span style="color: #b58900; font-style: italic;">Complex</span><span style="color: #d8241f;">(</span>...<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>...<span style="color: #d8241f;">}</span>
-    ~<span style="color: #b58900; font-style: italic;">Complex</span><span style="color: #d8241f;">(</span>...<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>...<span style="color: #d8241f;">}</span>
+    <span style="color: #b58900;">Complex</span><span style="color: #d8241f;">(</span><span style="color: #b58900; font-style: italic;">double</span> <span style="color: #268bd2;">real</span>, <span style="color: #b58900; font-style: italic;">double</span> <span style="color: #268bd2;">imag</span><span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900; font-weight: bold;">this</span>-&gt;m_real = real;
+        <span style="color: #859900; font-weight: bold;">this</span>-&gt;m_imag = imag;
+    <span style="color: #d8241f;">}</span>
+    ~<span style="color: #b58900;">Complex</span><span style="color: #d8241f;">()</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">do nothing</span>
+    <span style="color: #d8241f;">}</span>
 <span style="color: #859900; font-weight: bold;">private</span>:
     <span style="color: #b58900; font-style: italic;">double</span> <span style="color: #268bd2;">m_real</span>;
     <span style="color: #b58900; font-style: italic;">double</span> <span style="color: #268bd2;">m_imag</span>;
@@ -248,21 +253,21 @@
 </ol>
 <div class="org-src-container">
 <pre class="src src-C++"><span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">new &#20998;&#37197;&#20869;&#23384;&#20250;&#34987;&#25286;&#20998;&#20197;&#19979; 3 &#20010;&#36807;&#31243;</span>
-<span style="color: #b58900; font-style: italic;">Complex</span> * <span style="color: #268bd2;">pc</span> = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">Complex</span><span style="color: #8d5649;">(</span>1, 2<span style="color: #8d5649;">)</span>;
+<span style="color: #b58900; font-style: italic;">Complex</span> *<span style="color: #268bd2;">c1</span> = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">Complex</span><span style="color: #8d5649;">(</span>1, 2<span style="color: #8d5649;">)</span>;
 
 <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">1. &#20998;&#37197;&#20869;&#23384;</span>
 <span style="color: #b58900; font-style: italic;">void</span> * <span style="color: #268bd2;">mem</span> = <span style="color: #859900; font-weight: bold;">operator</span> <span style="color: #859900; font-weight: bold;">new</span><span style="color: #8d5649;">(</span><span style="color: #859900; font-weight: bold;">sizeof</span><span style="color: #d8241f;">(</span>Complex<span style="color: #d8241f;">)</span><span style="color: #8d5649;">)</span>; <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">&#32534;&#35793;&#22120;&#20869;&#37096;&#35843;&#29992; malloc(...)</span>
 <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">2. &#38745;&#24577;&#36716;&#22411;</span>
-pc = <span style="color: #859900; font-weight: bold;">static_cast</span><span style="color: #8d5649;">&lt;</span><span style="color: #b58900; font-style: italic;">Complex</span>*<span style="color: #8d5649;">&gt;(</span>mem<span style="color: #8d5649;">)</span>;
+c1 = <span style="color: #859900; font-weight: bold;">static_cast</span><span style="color: #8d5649;">&lt;</span><span style="color: #b58900; font-style: italic;">Complex</span>*<span style="color: #8d5649;">&gt;(</span>mem<span style="color: #8d5649;">)</span>;
 <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">3. &#35843;&#29992;&#26500;&#36896;&#20989;&#25968;</span>
-pc-&gt;<span style="color: #6c71c4; font-weight: bold;">Complex</span>::Complex<span style="color: #8d5649;">(</span>1, 2<span style="color: #8d5649;">)</span>;
+c1-&gt;<span style="color: #6c71c4; font-weight: bold;">Complex</span>::Complex<span style="color: #8d5649;">(</span>1, 2<span style="color: #8d5649;">)</span>;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgda09b9f" class="outline-2">
-<h2 id="orgda09b9f"><span class="section-number-2">2.</span> delete 关键字</h2>
+<div id="outline-container-org0e44ee6" class="outline-2">
+<h2 id="org0e44ee6"><span class="section-number-2">2.</span> delete 关键字</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 一个 <code>delete</code> 释放对象内存会被编译器拆分成 2 个步骤：
@@ -273,12 +278,12 @@ pc-&gt;<span style="color: #6c71c4; font-weight: bold;">Complex</span>::Complex<
 </ol>
 
 <div class="org-src-container">
-<pre class="src src-C++"><span style="color: #b58900; font-style: italic;">Complex</span> * <span style="color: #268bd2;">pc</span> = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">Complex</span><span style="color: #8d5649;">(</span>1, 2<span style="color: #8d5649;">)</span>;
+<pre class="src src-C++"><span style="color: #b58900; font-style: italic;">Complex</span> *<span style="color: #268bd2;">c1</span> = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">Complex</span><span style="color: #8d5649;">(</span>1, 2<span style="color: #8d5649;">)</span>;
 
 <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">1. &#26512;&#26500;&#20989;&#25968;</span>
-<span style="color: #6c71c4; font-weight: bold;">Complex</span>::~Complex<span style="color: #8d5649;">(</span>pc<span style="color: #8d5649;">)</span>;
+<span style="color: #6c71c4; font-weight: bold;">Complex</span>::~Complex<span style="color: #8d5649;">(</span>c1<span style="color: #8d5649;">)</span>;
 <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">2. &#37322;&#25918;&#20869;&#23384;</span>
-<span style="color: #859900; font-weight: bold;">operator</span> <span style="color: #859900; font-weight: bold;">delete</span><span style="color: #8d5649;">(</span>pc<span style="color: #8d5649;">)</span>;
+<span style="color: #859900; font-weight: bold;">operator</span> <span style="color: #859900; font-weight: bold;">delete</span><span style="color: #8d5649;">(</span>c1<span style="color: #8d5649;">)</span>;
 </pre>
 </div>
 
@@ -288,26 +293,26 @@ pc-&gt;<span style="color: #6c71c4; font-weight: bold;">Complex</span>::Complex<
 </div>
 </div>
 
-<div id="outline-container-org96a050d" class="outline-2">
-<h2 id="org96a050d"><span class="section-number-2">3.</span> array new 一定要搭配 array delete</h2>
+<div id="outline-container-orga8b282c" class="outline-2">
+<h2 id="orga8b282c"><span class="section-number-2">3.</span> array new 一定要搭配 array delete</h2>
 <div class="outline-text-2" id="text-3">
 <ol class="org-ol">
 <li><p>
 array delete 会有唤醒次数
 </p>
 <div class="org-src-container">
-<pre class="src src-C++"><span style="color: #b58900; font-style: italic;">String</span> *<span style="color: #268bd2;">p</span> = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">String</span><span style="color: #8d5649;">[</span>3<span style="color: #8d5649;">]</span>;
+<pre class="src src-C++"><span style="color: #b58900; font-style: italic;">String</span> *<span style="color: #268bd2;">s1</span> = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">String</span><span style="color: #8d5649;">[</span>3<span style="color: #8d5649;">]</span>;
 <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">...</span>
-<span style="color: #859900; font-weight: bold;">delete</span><span style="color: #8d5649;">[]</span> p; <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">&#21796;&#37266; 3 &#27425; dtor</span>
+<span style="color: #859900; font-weight: bold;">delete</span><span style="color: #8d5649;">[]</span> s1; <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">&#21796;&#37266; 3 &#27425; dtor</span>
 </pre>
 </div></li>
 <li><p>
 delete 只会唤醒 1 次析构函数
 </p>
 <div class="org-src-container">
-<pre class="src src-C++"><span style="color: #b58900; font-style: italic;">String</span> *<span style="color: #268bd2;">p</span> = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">String</span><span style="color: #8d5649;">[</span>3<span style="color: #8d5649;">]</span>;
+<pre class="src src-C++"><span style="color: #b58900; font-style: italic;">String</span> *<span style="color: #268bd2;">s1</span> = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">String</span><span style="color: #8d5649;">[</span>3<span style="color: #8d5649;">]</span>;
 <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">...</span>
-<span style="color: #859900; font-weight: bold;">delete</span> p; <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">&#21796;&#37266; 1 &#27425; dtor</span>
+<span style="color: #859900; font-weight: bold;">delete</span> s1; <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">&#21796;&#37266; 1 &#27425; dtor</span>
 </pre>
 </div></li>
 </ol>
@@ -315,7 +320,7 @@ delete 只会唤醒 1 次析构函数
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2024-03-31 Sun 16:56. Created by Jinghui Hu at 2024-03-31 Sun 00:00.</p>
+<p class="author">Last Updated 2024-03-31 Sun 19:48. Created by Jinghui Hu at 2024-03-31 Sun 00:00.</p>
 </div>
 </body>
 </html>
