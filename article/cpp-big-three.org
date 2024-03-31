@@ -87,8 +87,7 @@
   }
 
   // copy op=
-  inline
-  MyString& operator=(const MyString &str)
+  MyString& MyString::operator=(const MyString &str)
   {
       // 1. 防止 &str 和 this 指向同一个堆空间造成赋值错误
       // 2. 提高执行效率
@@ -113,15 +112,100 @@
       delete[] m_data;
   }
 
+  int main (int argc, char *argv[])
+  {
+      MyString s1;
+      MyString s2("hello");
+      MyString s3(s2);
+
+      printf("s3 = %s\n", s3.get_cstr());
+      return 0;
+  }
+#+END_SRC
+
+#+RESULTS:
+: s3 = hello
+
+* 重载输出函数 cout
+1. ~operator<<~ 必须写成全局函数，因为 ostream 需要访问
+2. ~operator=~ 则必需写成成员函数
+#+BEGIN_SRC C++ :includes '(<iostream> <cstring>) :results output
+  class MyString {
+  public:
+      MyString(const char *cstr = 0);
+      MyString(const MyString &str);
+      MyString& operator=(const MyString &str);
+      ~MyString();
+      char *get_cstr() const { return m_data; }
+  private:
+      char *m_data;
+  };
+
+  // ctor
+  inline
+  MyString::MyString(const char *cstr)
+  {
+      if(cstr) {
+          m_data = new char[strlen(cstr)+1];
+          strcpy(m_data, cstr);
+      } else {
+          m_data = new char[1];
+          ,*m_data = '\0';
+      }
+  }
+
+  // copy ctor
+  inline
+  MyString::MyString(const MyString &str)
+  {
+      m_data = new char[strlen(str.m_data)+1];
+      strcpy(m_data, str.m_data);
+  }
+
+  // copy op=
+  MyString& MyString::operator=(const MyString &str)
+  {
+      // 1. 防止 &str 和 this 指向同一个堆空间造成赋值错误
+      // 2. 提高执行效率
+      if (this == &str) {
+          return *this;
+      }
+
+      // step1: 删除旧数据
+      delete[] m_data;
+      // step2: 申请新数据
+      m_data = new char[strlen(str.m_data)+1];
+      // step3: 拷贝数据
+      strcpy(m_data, str.m_data);
+
+      return *this;
+  }
+
+  // dtor
+  inline
+  MyString::~MyString()
+  {
+      delete[] m_data;
+  }
+
+  // 重载输出流函数
+  std::ostream& operator<<(std::ostream& os, const MyString &str)
+  {
+      std::cout << str.get_cstr();
+      return os;
+  }
 
   int main (int argc, char *argv[])
   {
       MyString s1;
       MyString s2("hello");
       MyString s3(s2);
-      // std::cout << s2.get_cstr() << std::endl;
+
+      // printf("s3 = %s\n", s3.get_cstr());
+      std::cout << s3 << std::endl;
       return 0;
   }
 #+END_SRC
 
 #+RESULTS:
+: hello

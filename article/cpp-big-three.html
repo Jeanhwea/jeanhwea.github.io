@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-03-31 Sun 11:56 -->
+<!-- 2024-03-31 Sun 12:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>C++ 中的三巨头</title>
@@ -201,16 +201,17 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org86bcc81">1. C++ 中的类</a></li>
-<li><a href="#org7768a8e">2. 类的生命周期函数</a></li>
-<li><a href="#org3728cbb">3. 实现类</a></li>
+<li><a href="#org2eda0a1">1. C++ 中的类</a></li>
+<li><a href="#org246d1cf">2. 类的生命周期函数</a></li>
+<li><a href="#orge2fcc05">3. 实现类</a></li>
+<li><a href="#orge69f8c4">4. 重载输出函数 cout</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org86bcc81" class="outline-2">
-<h2 id="org86bcc81"><span class="section-number-2">1.</span> C++ 中的类</h2>
+<div id="outline-container-org2eda0a1" class="outline-2">
+<h2 id="org2eda0a1"><span class="section-number-2">1.</span> C++ 中的类</h2>
 <div class="outline-text-2" id="text-1">
 <ol class="org-ol">
 <li>c++ 不同于 c 是它引入了类的机制</li>
@@ -234,8 +235,8 @@ printf<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"s1 = 
 </div>
 </div>
 
-<div id="outline-container-org7768a8e" class="outline-2">
-<h2 id="org7768a8e"><span class="section-number-2">2.</span> 类的生命周期函数</h2>
+<div id="outline-container-org246d1cf" class="outline-2">
+<h2 id="org246d1cf"><span class="section-number-2">2.</span> 类的生命周期函数</h2>
 <div class="outline-text-2" id="text-2">
 <ol class="org-ol">
 <li>类可以作为模版来创建实例</li>
@@ -270,8 +271,8 @@ printf<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"s1 = 
 </div>
 </div>
 
-<div id="outline-container-org3728cbb" class="outline-2">
-<h2 id="org3728cbb"><span class="section-number-2">3.</span> 实现类</h2>
+<div id="outline-container-orge2fcc05" class="outline-2">
+<h2 id="orge2fcc05"><span class="section-number-2">3.</span> 实现类</h2>
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
 <pre class="src src-C++"><span style="color: #859900; font-weight: bold;">class</span> <span style="color: #b58900; font-style: italic;">MyString</span> <span style="color: #8d5649;">{</span>
@@ -307,8 +308,7 @@ printf<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"s1 = 
 <span style="color: #8d5649;">}</span>
 
 <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">copy op=</span>
-<span style="color: #859900; font-weight: bold;">inline</span>
-<span style="color: #b58900; font-style: italic;">MyString</span>&amp; <span style="color: #859900; font-weight: bold;">operator</span><span style="color: #b58900;">=</span><span style="color: #8d5649;">(</span><span style="color: #859900; font-weight: bold;">const</span> <span style="color: #b58900; font-style: italic;">MyString</span> &amp;<span style="color: #268bd2;">str</span><span style="color: #8d5649;">)</span>
+<span style="color: #b58900; font-style: italic;">MyString</span>&amp; <span style="color: #6c71c4; font-weight: bold;">MyString</span>::<span style="color: #859900; font-weight: bold;">operator</span>=<span style="color: #8d5649;">(</span><span style="color: #859900; font-weight: bold;">const</span> <span style="color: #b58900; font-style: italic;">MyString</span> &amp;<span style="color: #268bd2;">str</span><span style="color: #8d5649;">)</span>
 <span style="color: #8d5649;">{</span>
     <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">1. &#38450;&#27490; &amp;str &#21644; this &#25351;&#21521;&#21516;&#19968;&#20010;&#22534;&#31354;&#38388;&#36896;&#25104;&#36171;&#20540;&#38169;&#35823;</span>
     <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">2. &#25552;&#39640;&#25191;&#34892;&#25928;&#29575;</span>
@@ -333,13 +333,101 @@ printf<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"s1 = 
     <span style="color: #859900; font-weight: bold;">delete</span><span style="color: #d8241f;">[]</span> m_data;
 <span style="color: #8d5649;">}</span>
 
+<span style="color: #b58900; font-style: italic;">int</span> <span style="color: #b58900;">main</span> <span style="color: #8d5649;">(</span><span style="color: #b58900; font-style: italic;">int</span> <span style="color: #268bd2;">argc</span>, <span style="color: #b58900; font-style: italic;">char</span> *<span style="color: #268bd2;">argv</span><span style="color: #d8241f;">[]</span><span style="color: #8d5649;">)</span>
+<span style="color: #8d5649;">{</span>
+    <span style="color: #b58900; font-style: italic;">MyString</span> <span style="color: #268bd2;">s1</span>;
+    <span style="color: #b58900; font-style: italic;">MyString</span> <span style="color: #268bd2;">s2</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"hello"</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #b58900; font-style: italic;">MyString</span> <span style="color: #268bd2;">s3</span><span style="color: #d8241f;">(</span>s2<span style="color: #d8241f;">)</span>;
+
+    printf<span style="color: #d8241f;">(</span><span style="color: #2aa198;">"s3 = %s\n"</span>, s3.get_cstr<span style="color: #9564bf;">()</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #859900; font-weight: bold;">return</span> 0;
+<span style="color: #8d5649;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orge69f8c4" class="outline-2">
+<h2 id="orge69f8c4"><span class="section-number-2">4.</span> 重载输出函数 cout</h2>
+<div class="outline-text-2" id="text-4">
+<ol class="org-ol">
+<li><code>operator&lt;&lt;</code> 必须写成全局函数，因为 ostream 需要访问</li>
+<li><code>operator=</code> 则必需写成成员函数</li>
+</ol>
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #859900; font-weight: bold;">class</span> <span style="color: #b58900; font-style: italic;">MyString</span> <span style="color: #8d5649;">{</span>
+<span style="color: #859900; font-weight: bold;">public</span>:
+    <span style="color: #b58900;">MyString</span><span style="color: #d8241f;">(</span><span style="color: #859900; font-weight: bold;">const</span> <span style="color: #b58900; font-style: italic;">char</span> *<span style="color: #268bd2;">cstr</span> = 0<span style="color: #d8241f;">)</span>;
+    <span style="color: #b58900;">MyString</span><span style="color: #d8241f;">(</span><span style="color: #859900; font-weight: bold;">const</span> <span style="color: #b58900; font-style: italic;">MyString</span> &amp;<span style="color: #268bd2;">str</span><span style="color: #d8241f;">)</span>;
+    <span style="color: #b58900; font-style: italic;">MyString</span>&amp; <span style="color: #859900; font-weight: bold;">operator</span><span style="color: #b58900;">=</span><span style="color: #d8241f;">(</span><span style="color: #859900; font-weight: bold;">const</span> <span style="color: #b58900; font-style: italic;">MyString</span> &amp;<span style="color: #268bd2;">str</span><span style="color: #d8241f;">)</span>;
+    ~<span style="color: #b58900;">MyString</span><span style="color: #d8241f;">()</span>;
+    <span style="color: #b58900; font-style: italic;">char</span> *<span style="color: #b58900;">get_cstr</span><span style="color: #d8241f;">()</span> <span style="color: #859900; font-weight: bold;">const</span> <span style="color: #d8241f;">{</span> <span style="color: #859900; font-weight: bold;">return</span> m_data; <span style="color: #d8241f;">}</span>
+<span style="color: #859900; font-weight: bold;">private</span>:
+    <span style="color: #b58900; font-style: italic;">char</span> *<span style="color: #268bd2;">m_data</span>;
+<span style="color: #8d5649;">}</span>;
+
+<span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">ctor</span>
+<span style="color: #859900; font-weight: bold;">inline</span>
+<span style="color: #6c71c4; font-weight: bold;">MyString</span>::<span style="color: #b58900;">MyString</span><span style="color: #8d5649;">(</span><span style="color: #859900; font-weight: bold;">const</span> <span style="color: #b58900; font-style: italic;">char</span> *<span style="color: #268bd2;">cstr</span><span style="color: #8d5649;">)</span>
+<span style="color: #8d5649;">{</span>
+    <span style="color: #859900; font-weight: bold;">if</span><span style="color: #d8241f;">(</span>cstr<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        m_data = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">char</span><span style="color: #9564bf;">[</span>strlen<span style="color: #24a222;">(</span>cstr<span style="color: #24a222;">)</span>+1<span style="color: #9564bf;">]</span>;
+        strcpy<span style="color: #9564bf;">(</span>m_data, cstr<span style="color: #9564bf;">)</span>;
+    <span style="color: #d8241f;">}</span> <span style="color: #859900; font-weight: bold;">else</span> <span style="color: #d8241f;">{</span>
+        m_data = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">char</span><span style="color: #9564bf;">[</span>1<span style="color: #9564bf;">]</span>;
+        *m_data = <span style="color: #2aa198;">'\0'</span>;
+    <span style="color: #d8241f;">}</span>
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">copy ctor</span>
+<span style="color: #859900; font-weight: bold;">inline</span>
+<span style="color: #6c71c4; font-weight: bold;">MyString</span>::<span style="color: #b58900;">MyString</span><span style="color: #8d5649;">(</span><span style="color: #859900; font-weight: bold;">const</span> <span style="color: #b58900; font-style: italic;">MyString</span> &amp;<span style="color: #268bd2;">str</span><span style="color: #8d5649;">)</span>
+<span style="color: #8d5649;">{</span>
+    m_data = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">char</span><span style="color: #d8241f;">[</span>strlen<span style="color: #9564bf;">(</span>str.m_data<span style="color: #9564bf;">)</span>+1<span style="color: #d8241f;">]</span>;
+    strcpy<span style="color: #d8241f;">(</span>m_data, str.m_data<span style="color: #d8241f;">)</span>;
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">copy op=</span>
+<span style="color: #b58900; font-style: italic;">MyString</span>&amp; <span style="color: #6c71c4; font-weight: bold;">MyString</span>::<span style="color: #859900; font-weight: bold;">operator</span>=<span style="color: #8d5649;">(</span><span style="color: #859900; font-weight: bold;">const</span> <span style="color: #b58900; font-style: italic;">MyString</span> &amp;<span style="color: #268bd2;">str</span><span style="color: #8d5649;">)</span>
+<span style="color: #8d5649;">{</span>
+    <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">1. &#38450;&#27490; &amp;str &#21644; this &#25351;&#21521;&#21516;&#19968;&#20010;&#22534;&#31354;&#38388;&#36896;&#25104;&#36171;&#20540;&#38169;&#35823;</span>
+    <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">2. &#25552;&#39640;&#25191;&#34892;&#25928;&#29575;</span>
+    <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #d8241f;">(</span><span style="color: #859900; font-weight: bold;">this</span> == &amp;str<span style="color: #d8241f;">)</span> <span style="color: #d8241f;">{</span>
+        <span style="color: #859900; font-weight: bold;">return</span> *<span style="color: #859900; font-weight: bold;">this</span>;
+    <span style="color: #d8241f;">}</span>
+
+    <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">step1: &#21024;&#38500;&#26087;&#25968;&#25454;</span>
+    <span style="color: #859900; font-weight: bold;">delete</span><span style="color: #d8241f;">[]</span> m_data;
+    <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">step2: &#30003;&#35831;&#26032;&#25968;&#25454;</span>
+    m_data = <span style="color: #859900; font-weight: bold;">new</span> <span style="color: #b58900; font-style: italic;">char</span><span style="color: #d8241f;">[</span>strlen<span style="color: #9564bf;">(</span>str.m_data<span style="color: #9564bf;">)</span>+1<span style="color: #d8241f;">]</span>;
+    <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">step3: &#25335;&#36125;&#25968;&#25454;</span>
+    strcpy<span style="color: #d8241f;">(</span>m_data, str.m_data<span style="color: #d8241f;">)</span>;
+
+    <span style="color: #859900; font-weight: bold;">return</span> *<span style="color: #859900; font-weight: bold;">this</span>;
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">dtor</span>
+<span style="color: #859900; font-weight: bold;">inline</span>
+<span style="color: #6c71c4; font-weight: bold;">MyString</span>::~<span style="color: #b58900;">MyString</span><span style="color: #8d5649;">()</span>
+<span style="color: #8d5649;">{</span>
+    <span style="color: #859900; font-weight: bold;">delete</span><span style="color: #d8241f;">[]</span> m_data;
+<span style="color: #8d5649;">}</span>
+
+<span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">&#37325;&#36733;&#36755;&#20986;&#27969;&#20989;&#25968;</span>
+<span style="color: #6c71c4; font-weight: bold;">std</span>::<span style="color: #b58900; font-style: italic;">ostream</span>&amp; <span style="color: #859900; font-weight: bold;">operator</span><span style="color: #b58900;">&lt;&lt;</span><span style="color: #8d5649;">(</span><span style="color: #6c71c4; font-weight: bold;">std</span>::<span style="color: #b58900; font-style: italic;">ostream</span>&amp; <span style="color: #268bd2;">os</span>, <span style="color: #859900; font-weight: bold;">const</span> <span style="color: #b58900; font-style: italic;">MyString</span> &amp;<span style="color: #268bd2;">str</span><span style="color: #8d5649;">)</span>
+<span style="color: #8d5649;">{</span>
+    <span style="color: #6c71c4; font-weight: bold;">std</span>::cout &lt;&lt; str.get_cstr<span style="color: #d8241f;">()</span>;
+    <span style="color: #859900; font-weight: bold;">return</span> os;
+<span style="color: #8d5649;">}</span>
 
 <span style="color: #b58900; font-style: italic;">int</span> <span style="color: #b58900;">main</span> <span style="color: #8d5649;">(</span><span style="color: #b58900; font-style: italic;">int</span> <span style="color: #268bd2;">argc</span>, <span style="color: #b58900; font-style: italic;">char</span> *<span style="color: #268bd2;">argv</span><span style="color: #d8241f;">[]</span><span style="color: #8d5649;">)</span>
 <span style="color: #8d5649;">{</span>
     <span style="color: #b58900; font-style: italic;">MyString</span> <span style="color: #268bd2;">s1</span>;
     <span style="color: #b58900; font-style: italic;">MyString</span> <span style="color: #268bd2;">s2</span><span style="color: #d8241f;">(</span><span style="color: #2aa198;">"hello"</span><span style="color: #d8241f;">)</span>;
     <span style="color: #b58900; font-style: italic;">MyString</span> <span style="color: #268bd2;">s3</span><span style="color: #d8241f;">(</span>s2<span style="color: #d8241f;">)</span>;
-    <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">std::cout &lt;&lt; s2.get_cstr() &lt;&lt; std::endl;</span>
+
+    <span style="color: #96A7A9; font-style: italic;">// </span><span style="color: #96A7A9; font-style: italic;">printf("s3 = %s\n", s3.get_cstr());</span>
+    <span style="color: #6c71c4; font-weight: bold;">std</span>::cout &lt;&lt; s3 &lt;&lt; <span style="color: #6c71c4; font-weight: bold;">std</span>::endl;
     <span style="color: #859900; font-weight: bold;">return</span> 0;
 <span style="color: #8d5649;">}</span>
 </pre>
@@ -348,7 +436,7 @@ printf<span style="color: #8d5649;">(</span><span style="color: #2aa198;">"s1 = 
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2024-03-31 Sun 11:56. Created by Jinghui Hu at 2024-03-31 Sun 00:00.</p>
+<p class="author">Last Updated 2024-03-31 Sun 12:22. Created by Jinghui Hu at 2024-03-31 Sun 00:00.</p>
 </div>
 </body>
 </html>
