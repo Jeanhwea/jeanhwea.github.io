@@ -1,0 +1,52 @@
+#+TITLE: C++ 中的三巨头
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2024-03-31 Sun>
+#+STARTUP: overview num indent
+#+OPTIONS: ^:nil
+
+
+* C++ 中的类的引入
+1. c++ 不同于 c 是它引入了类的机制
+2. 类通过 ~class~ 关键字进行定义
+#+BEGIN_SRC C++ :includes '(<iostream> <vector>) :results output
+  // 定义一个类
+  class MyString {
+
+  };
+
+  // 无参数构造器，后面的括号可以省略，否则 g++ 会给出一些警告
+  // MyString s1();
+  MyString s1;
+
+  // 检查申请的地址
+  printf("s1 = %p\n", &s1);
+#+END_SRC
+
+#+RESULTS:
+: s1 = 0x7ff7bcf4a30f
+
+* 类有其对于的生命周期函数
+1. 类可以作为模版来创建实例
+2. 如何创建和销毁就形成了以下几种方法：（只就是 big three）
+   1) 构造函数
+      - 无参构造函数 (ctr)
+      - 拷贝构造函数 (copy ctr)
+   2) 拷贝赋值函数 (copy op=)
+   3) 析构函数 (dctr)
+
+我们使用之前的例子来定义它，依次定义的结果如下：
+#+BEGIN_SRC C++ :includes '(<iostream> <vector>) :results output
+  class MyString {
+  public:
+          MyString(const char *cstr = 0);
+          MyString(const MyString &str);
+          MyString& operator=(const MyString &str);
+          ~MyString();
+          char *get_cstr() const { return m_data; }
+  private:
+          char *m_data;
+  };
+#+END_SRC
+
+#+RESULTS:
