@@ -1,0 +1,58 @@
+#+TITLE: 构建 Arm64 汇编
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2024-06-25 Tue>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: API RESTful web
+
+
+* 安装交叉编译的工具链
+#+BEGIN_SRC sh
+  # 交叉编译器
+  sudo apt install gcc-aarch64-linux-gnu
+  # Qemu 用户态模拟器
+  sudo apt install qemu-user
+#+END_SRC
+
+* 编写 hello world 代码
+新建 ~hello.S~ 并写入以下代码
+#+BEGIN_SRC asm
+  .data
+
+  /* Data segment: define our message string and calculate its length. */
+  msg:
+      .ascii        "Hello, ARM64!\n"
+  len = . - msg
+
+  .text
+
+  /* Our application's entry point. */
+  .globl _start
+  _start:
+      /* syscall write(int fd, const void *buf, size_t count) */
+      mov     x0, #1      /* fd := STDOUT_FILENO */
+      ldr     x1, =msg    /* buf := msg */
+      ldr     x2, =len    /* count := len */
+      mov     w8, #64     /* write is syscall #64 */
+      svc     #0          /* invoke syscall */
+
+      /* syscall exit(int status) */
+      mov     x0, #0      /* status := 0 */
+      mov     w8, #93     /* exit is syscall #93 */
+      svc     #0          /* invoke syscall */
+#+END_SRC
+
+* 编译代码
+#+BEGIN_SRC sh
+  aarch64-linux-gnu-as -o hello.o hello.S
+  aarch64-linux-gnu-ld -s -o hello hello.o
+#+END_SRC
+
+* 运行代码
+#+BEGIN_EXAMPLE
+$ qemu-aarch64 ./hello
+Hello, ARM64!
+$
+#+END_EXAMPLE
