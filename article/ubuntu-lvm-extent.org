@@ -1,0 +1,51 @@
+#+TITLE: Ubuntu LVM 扩容记录
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2024-08-30 Fri>
+#+HTML_LINK_UP: ../readme.html
+#+HTML_LINK_HOME: ../index.html
+#+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
+#+TAGS: font
+
+* 初始现象
+~df~ 默认显示 ~/~ 目录下只有 ~98G~ 可以，但是 ~lsblk~ 查看发现有 ~1022G~ 未分配
+#+BEGIN_EXAMPLE
+   root@machine:~# df -h
+   Filesystem                         Size  Used Avail Use% Mounted on
+   tmpfs                              3.2G  1.1M  3.2G   1% /run
+   /dev/mapper/ubuntu--vg-ubuntu--lv   98G   21G   73G  23% /
+   tmpfs                               16G     0   16G   0% /dev/shm
+   tmpfs                              5.0M     0  5.0M   0% /run/lock
+   /dev/sda2                          2.0G  254M  1.6G  14% /boot
+   tmpfs                              3.2G  4.0K  3.2G   1% /run/user/1000
+   root@machine:~# lsblk
+   NAME                      MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+   sda                         8:0    0    1T  0 disk
+   ├─sda1                      8:1    0    1M  0 part
+   ├─sda2                      8:2    0    2G  0 part /boot
+   └─sda3                      8:3    0 1022G  0 part
+     └─ubuntu--vg-ubuntu--lv 253:0    0 1022G  0 lvm  /
+   sr0                        11:0    1 1024M  0 rom
+  /dev/sda2                          2.0G  254M  1.6G  14% /boot
+#+END_EXAMPLE
+
+* 扩容记录
+通过 ~lvextend~ 扩容后再调用， ~resize2fs~ 扩充实际磁盘容量
+#+BEGIN_EXAMPLE
+  root@machine:~# lvextend  -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+    Size of logical volume ubuntu-vg/ubuntu-lv changed from 100.00 GiB (25600 extents) to <1022.00 GiB (261631 extents).
+    Logical volume ubuntu-vg/ubuntu-lv successfully resized.
+  root@machine:~# resize2fs /dev/ubuntu-vg/ubuntu-lv
+  resize2fs 1.46.5 (30-Dec-2021)
+  Filesystem at /dev/ubuntu-vg/ubuntu-lv is mounted on /; on-line resizing required
+  old_desc_blocks = 13, new_desc_blocks = 128
+  The filesystem on /dev/ubuntu-vg/ubuntu-lv is now 267910144 (4k) blocks long.
+
+  root@machine:~# df -h
+  Filesystem                         Size  Used Avail Use% Mounted on
+  tmpfs                              3.2G  1.1M  3.2G   1% /run
+  /dev/mapper/ubuntu--vg-ubuntu--lv 1006G   21G  943G   3% /
+  tmpfs                               16G     0   16G   0% /dev/shm
+  tmpfs                              5.0M     0  5.0M   0% /run/lock
+  /dev/sda2                          2.0G  254M  1.6G  14% /boot
+#+END_EXAMPLE
