@@ -3,14 +3,14 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-03-07 Sat 04:38 -->
+<!-- 2024-09-30 Mon 10:54 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Git 项目管理工具</title>
-<meta name="generator" content="Org mode" />
 <meta name="author" content="Jinghui Hu" />
-<style type="text/css">
- <!--/*--><![CDATA[/*><!--*/
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
   .title  { text-align: center;
              margin-bottom: .2em; }
   .subtitle { text-align: center;
@@ -31,8 +31,9 @@
   #postamble p, #preamble p { font-size: 90%; margin: .2em; }
   p.verse { margin-left: 3%; }
   pre {
-    border: 1px solid #ccc;
-    box-shadow: 3px 3px 3px #eee;
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
     padding: 8pt;
     font-family: monospace;
     overflow: auto;
@@ -40,22 +41,22 @@
   }
   pre.src {
     position: relative;
-    overflow: visible;
-    padding-top: 1.2em;
+    overflow: auto;
   }
   pre.src:before {
     display: none;
     position: absolute;
-    background-color: white;
-    top: -10px;
-    right: 10px;
+    top: -8px;
+    right: 12px;
     padding: 3px;
-    border: 1px solid black;
+    color: #555;
+    background-color: #f2f2f299;
   }
-  pre.src:hover:before { display: inline;}
+  pre.src:hover:before { display: inline; margin-top: 14px;}
   /* Languages per Org manual */
   pre.src-asymptote:before { content: 'Asymptote'; }
   pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
   pre.src-C:before { content: 'C'; }
   /* pre.src-C++ doesn't work in CSS */
   pre.src-clojure:before { content: 'Clojure'; }
@@ -161,6 +162,19 @@
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
   .inlinetask {
     padding: 10px;
     border: 2px solid gray;
@@ -177,8 +191,7 @@
     { font-size: 10px; font-weight: bold; white-space: nowrap; }
   .org-info-js_search-highlight
     { background-color: #ffff00; color: #000000; font-weight: bold; }
-  .org-svg { width: 90%; }
-  /*]]>*/-->
+  .org-svg { }
 </style>
 <link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
 <link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
@@ -186,146 +199,100 @@
 <script type="text/javascript" src="styles/lib/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
 <script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
-<script type="text/javascript">
-/*
-@licstart  The following is the entire license notice for the
-JavaScript code in this tag.
-
-Copyright (C) 2012-2019 Free Software Foundation, Inc.
-
-The JavaScript code in this tag is free software: you can
-redistribute it and/or modify it under the terms of the GNU
-General Public License (GNU GPL) as published by the Free Software
-Foundation, either version 3 of the License, or (at your option)
-any later version.  The code is distributed WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
-
-As additional permission under GNU GPL version 3 section 7, you
-may distribute non-source (e.g., minimized or compacted) forms of
-that code without the copy of the GNU GPL normally required by
-section 4, provided you include this license notice and a URL
-through which recipients can access the Corresponding Source.
-
-
-@licend  The above is the entire license notice
-for the JavaScript code in this tag.
-*/
-<!--/*--><![CDATA[/*><!--*/
- function CodeHighlightOn(elem, id)
- {
-   var target = document.getElementById(id);
-   if(null != target) {
-     elem.cacheClassElem = elem.className;
-     elem.cacheClassTarget = target.className;
-     target.className = "code-highlighted";
-     elem.className   = "code-highlighted";
-   }
- }
- function CodeHighlightOff(elem, id)
- {
-   var target = document.getElementById(id);
-   if(elem.cacheClassElem)
-     elem.className = elem.cacheClassElem;
-   if(elem.cacheClassTarget)
-     target.className = elem.cacheClassTarget;
- }
-/*]]>*///-->
-</script>
 </head>
 <body>
 <div id="org-div-home-and-up">
  <a accesskey="h" href="../readme.html"> UP </a>
  |
  <a accesskey="H" href="../index.html"> HOME </a>
-</div><div id="content">
+</div><div id="content" class="content">
 <h1 class="title">Git 项目管理工具</h1>
-<div id="table-of-contents">
+<div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
-<div id="text-table-of-contents">
+<div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgfaf0916">1. 高层(porcelain)命令</a>
+<li><a href="#org062d3da">1. 高层(porcelain)命令</a>
 <ul>
-<li><a href="#orgfb69685">1.1. 工作目录、INDEX 和代码仓库</a></li>
-<li><a href="#orgf22b45c">1.2. 基础指令</a></li>
-<li><a href="#orgd5659cc">1.3. 修改操作</a>
+<li><a href="#orgddc990d">1.1. 工作目录、INDEX 和代码仓库</a></li>
+<li><a href="#org0b13a5f">1.2. 基础指令</a></li>
+<li><a href="#orgedc68a9">1.3. 修改操作</a>
 <ul>
-<li><a href="#org503e8be">1.3.1. 撤销修改</a></li>
-<li><a href="#org5fe0ea0">1.3.2. 重写历史</a></li>
-<li><a href="#org36e9e41">1.3.3. 重置文件</a></li>
-<li><a href="#org3c5b03f">1.3.4. 删除文件</a></li>
-<li><a href="#orgcf14db5">1.3.5. 暂存修改</a></li>
+<li><a href="#org6c07ccf">1.3.1. 撤销修改</a></li>
+<li><a href="#org9fc468e">1.3.2. 重写历史</a></li>
+<li><a href="#orgff6bec4">1.3.3. 重置文件</a></li>
+<li><a href="#org62053cc">1.3.4. 删除文件</a></li>
+<li><a href="#org111ead9">1.3.5. 暂存修改</a></li>
 </ul>
 </li>
-<li><a href="#orgd1a4f74">1.4. 分支管理</a>
+<li><a href="#org5c09633">1.4. 分支管理</a>
 <ul>
-<li><a href="#org7175d55">1.4.1. 分支操作</a></li>
-<li><a href="#orgb04fb1c">1.4.2. 修改分支</a></li>
-<li><a href="#org3de64a4">1.4.3. 重建基</a></li>
+<li><a href="#orgf3e98ca">1.4.1. 分支操作</a></li>
+<li><a href="#org1b3f7ba">1.4.2. 修改分支</a></li>
+<li><a href="#org8dbf920">1.4.3. 重建基</a></li>
 </ul>
 </li>
-<li><a href="#orga759d7c">1.5. 远程操作</a>
+<li><a href="#org96dd8ef">1.5. 远程操作</a>
 <ul>
-<li><a href="#orgd6d51ab">1.5.1. 远端仓库</a></li>
-<li><a href="#orgb4fed80">1.5.2. 远端拉取</a></li>
-<li><a href="#org2efbce6">1.5.3. 推送远端</a></li>
+<li><a href="#orge91025a">1.5.1. 远端仓库</a></li>
+<li><a href="#orgd0674ea">1.5.2. 远端拉取</a></li>
+<li><a href="#org14acbaa">1.5.3. 推送远端</a></li>
 </ul>
 </li>
-<li><a href="#org75ac9da">1.6. 查看追踪</a>
+<li><a href="#orga442429">1.6. 查看追踪</a>
 <ul>
-<li><a href="#org05a7989">1.6.1. 查看历史</a></li>
-<li><a href="#orgf6a4e68">1.6.2. 查看差异</a></li>
-<li><a href="#org640217e">1.6.3. 忽略文件</a></li>
+<li><a href="#orga2c99eb">1.6.1. 查看历史</a></li>
+<li><a href="#org04be668">1.6.2. 查看差异</a></li>
+<li><a href="#org4f8ccb2">1.6.3. 忽略文件</a></li>
 </ul>
 </li>
-<li><a href="#org1272c3d">1.7. 配置参数</a></li>
+<li><a href="#orgce252fe">1.7. 配置参数</a></li>
 </ul>
 </li>
-<li><a href="#org807c0c6">2. 底层(plumbing)命令</a></li>
-<li><a href="#org8a270bf">3. Git 工具</a>
+<li><a href="#org21197e6">2. 底层(plumbing)命令</a></li>
+<li><a href="#orgb8cf5bf">3. Git 工具</a>
 <ul>
-<li><a href="#org821198c">3.1. 子模块</a>
+<li><a href="#orgf52e65a">3.1. 子模块</a>
 <ul>
-<li><a href="#org4f99109">3.1.1. 使用子模块</a></li>
-<li><a href="#org04a129b">3.1.2. 克隆含有子模块的项目</a></li>
-<li><a href="#orgc88f6c9">3.1.3. 在包含子模块项目中工作</a></li>
-<li><a href="#orgb05beaa">3.1.4. 在子模块中工作</a></li>
-<li><a href="#org9b60748">3.1.5. 发布子模块的改动</a></li>
-<li><a href="#org21271e7">3.1.6. 遍历子模块</a></li>
+<li><a href="#orge91818d">3.1.1. 使用子模块</a></li>
+<li><a href="#org34cce34">3.1.2. 克隆含有子模块的项目</a></li>
+<li><a href="#org90c25b0">3.1.3. 在包含子模块项目中工作</a></li>
+<li><a href="#orgd3b6753">3.1.4. 在子模块中工作</a></li>
+<li><a href="#org4398b85">3.1.5. 发布子模块的改动</a></li>
+<li><a href="#orgafd3d62">3.1.6. 遍历子模块</a></li>
 </ul>
 </li>
-<li><a href="#orgcf9ceb1">3.2. Git LFS</a>
+<li><a href="#org8e1348f">3.2. Git LFS</a>
 <ul>
-<li><a href="#orgd10584e">3.2.1. 安装</a></li>
-<li><a href="#org93184ec">3.2.2. 使用</a></li>
+<li><a href="#orgf1d495c">3.2.1. 安装</a></li>
+<li><a href="#org623b5a2">3.2.2. 使用</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org1b4fe9b">4. 常见工作流</a>
+<li><a href="#orgeb77189">4. 常见工作流</a>
 <ul>
-<li><a href="#org0ee066d">4.1. 批量更新当前文件夹下代码仓库</a></li>
-<li><a href="#org7f3fd5c">4.2. 初次添加远端并且上传代码</a></li>
-<li><a href="#org708de35">4.3. Git Rebase 工作流</a></li>
-<li><a href="#org600042e">4.4. Git Open， 在浏览器中打开 git 代码仓链接</a>
+<li><a href="#org7948e00">4.1. 批量更新当前文件夹下代码仓库</a></li>
+<li><a href="#org2ab1edc">4.2. 初次添加远端并且上传代码</a></li>
+<li><a href="#orge031a9f">4.3. Git Rebase 工作流</a></li>
+<li><a href="#org8eac661">4.4. Git Open， 在浏览器中打开 git 代码仓链接</a>
 <ul>
-<li><a href="#orge44f953">4.4.1. 安装</a></li>
-<li><a href="#org602f682">4.4.2. 使用方法</a></li>
+<li><a href="#orgf043812">4.4.1. 安装</a></li>
+<li><a href="#org437bc59">4.4.2. 使用方法</a></li>
 </ul>
 </li>
-<li><a href="#orgc1987dc">4.5. 显示分页</a></li>
-<li><a href="#org6483f0f">4.6. 清除当前项目，丢弃项目中的修改</a></li>
-<li><a href="#org86da6df">4.7. 将代码导出 zip 包</a></li>
+<li><a href="#orgc572da7">4.5. 显示分页</a></li>
+<li><a href="#org255958c">4.6. 清除当前项目，丢弃项目中的修改</a></li>
+<li><a href="#orga97c74d">4.7. 将代码导出 zip 包</a></li>
 </ul>
 </li>
-<li><a href="#org5633e0a">5. 参考链接</a></li>
+<li><a href="#org6a8de1d">5. 参考链接</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgfaf0916" class="outline-2">
-<h2 id="orgfaf0916"><span class="section-number-2">1</span> 高层(porcelain)命令</h2>
+<div id="outline-container-org062d3da" class="outline-2">
+<h2 id="org062d3da"><span class="section-number-2">1.</span> 高层(porcelain)命令</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 由于 Git 最初是一套面向版本控制系统的工具集，而不是一个完整的、用户友好的版本控
@@ -335,8 +302,8 @@ for the JavaScript code in this tag.
 </p>
 </div>
 
-<div id="outline-container-orgfb69685" class="outline-3">
-<h3 id="orgfb69685"><span class="section-number-3">1.1</span> 工作目录、INDEX 和代码仓库</h3>
+<div id="outline-container-orgddc990d" class="outline-3">
+<h3 id="orgddc990d"><span class="section-number-3">1.1.</span> 工作目录、INDEX 和代码仓库</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 git 代码管理的主要包括以下三个状态，即：工作目录（working directory）、暂存区
@@ -344,15 +311,15 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </p>
 
 
-<div class="figure">
+<div id="org804aac8" class="figure">
 <p><img src="../static/image/2018/10/git-WD-index-head.png" alt="git-WD-index-head.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgf22b45c" class="outline-3">
-<h3 id="orgf22b45c"><span class="section-number-3">1.2</span> 基础指令</h3>
+<div id="outline-container-org0b13a5f" class="outline-3">
+<h3 id="org0b13a5f"><span class="section-number-3">1.2.</span> 基础指令</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 常见的基本命令如下：
@@ -373,12 +340,12 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-orgd5659cc" class="outline-3">
-<h3 id="orgd5659cc"><span class="section-number-3">1.3</span> 修改操作</h3>
+<div id="outline-container-orgedc68a9" class="outline-3">
+<h3 id="orgedc68a9"><span class="section-number-3">1.3.</span> 修改操作</h3>
 <div class="outline-text-3" id="text-1-3">
 </div>
-<div id="outline-container-org503e8be" class="outline-4">
-<h4 id="org503e8be"><span class="section-number-4">1.3.1</span> 撤销修改</h4>
+<div id="outline-container-org6c07ccf" class="outline-4">
+<h4 id="org6c07ccf"><span class="section-number-4">1.3.1.</span> 撤销修改</h4>
 <div class="outline-text-4" id="text-1-3-1">
 <ul class="org-ul">
 <li><code>git revert &lt;commit&gt;</code> : 创建一个提交，用来撤销 &lt;commit&gt; 里的修改，并将它运
@@ -390,8 +357,8 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-org5fe0ea0" class="outline-4">
-<h4 id="org5fe0ea0"><span class="section-number-4">1.3.2</span> 重写历史</h4>
+<div id="outline-container-org9fc468e" class="outline-4">
+<h4 id="org9fc468e"><span class="section-number-4">1.3.2.</span> 重写历史</h4>
 <div class="outline-text-4" id="text-1-3-2">
 <ul class="org-ul">
 <li><code>git commit --amend</code> : 将 Index 中的修改和最近一次的提交合并。并且修改提交
@@ -403,8 +370,8 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-org36e9e41" class="outline-4">
-<h4 id="org36e9e41"><span class="section-number-4">1.3.3</span> 重置文件</h4>
+<div id="outline-container-orgff6bec4" class="outline-4">
+<h4 id="orgff6bec4"><span class="section-number-4">1.3.3.</span> 重置文件</h4>
 <div class="outline-text-4" id="text-1-3-3">
 <ul class="org-ul">
 <li><code>git reset</code> : 重置 Index 中的修改到最近一次提交，不修改工作目录</li>
@@ -418,8 +385,8 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-org3c5b03f" class="outline-4">
-<h4 id="org3c5b03f"><span class="section-number-4">1.3.4</span> 删除文件</h4>
+<div id="outline-container-org62053cc" class="outline-4">
+<h4 id="org62053cc"><span class="section-number-4">1.3.4.</span> 删除文件</h4>
 <div class="outline-text-4" id="text-1-3-4">
 <ul class="org-ul">
 <li><code>git rm &lt;file&gt;</code> : 从工作目录和 Index 中将 &lt;file&gt; 移除</li>
@@ -429,8 +396,8 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-orgcf14db5" class="outline-4">
-<h4 id="orgcf14db5"><span class="section-number-4">1.3.5</span> 暂存修改</h4>
+<div id="outline-container-org111ead9" class="outline-4">
+<h4 id="org111ead9"><span class="section-number-4">1.3.5.</span> 暂存修改</h4>
 <div class="outline-text-4" id="text-1-3-5">
 <ul class="org-ul">
 <li><code>git stash</code> : 将工作目录中的修改暂存</li>
@@ -442,18 +409,18 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-orgd1a4f74" class="outline-3">
-<h3 id="orgd1a4f74"><span class="section-number-3">1.4</span> 分支管理</h3>
+<div id="outline-container-org5c09633" class="outline-3">
+<h3 id="org5c09633"><span class="section-number-3">1.4.</span> 分支管理</h3>
 <div class="outline-text-3" id="text-1-4">
 
-<div class="figure">
+<div id="orgae91c78" class="figure">
 <p><img src="../static/image/2018/10/git-branch.png" alt="git-branch.png" />
 </p>
 </div>
 </div>
 
-<div id="outline-container-org7175d55" class="outline-4">
-<h4 id="org7175d55"><span class="section-number-4">1.4.1</span> 分支操作</h4>
+<div id="outline-container-orgf3e98ca" class="outline-4">
+<h4 id="orgf3e98ca"><span class="section-number-4">1.4.1.</span> 分支操作</h4>
 <div class="outline-text-4" id="text-1-4-1">
 <ul class="org-ul">
 <li><code>git branch</code> : 显示本地分支。如果添加 &lt;branch&gt; 则基于当前分支新建一个分支</li>
@@ -465,8 +432,8 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-orgb04fb1c" class="outline-4">
-<h4 id="orgb04fb1c"><span class="section-number-4">1.4.2</span> 修改分支</h4>
+<div id="outline-container-org1b3f7ba" class="outline-4">
+<h4 id="org1b3f7ba"><span class="section-number-4">1.4.2.</span> 修改分支</h4>
 <div class="outline-text-4" id="text-1-4-2">
 <ul class="org-ul">
 <li><code>git branch -d &lt;branch&gt;</code> : 删除 &lt;branch&gt; 分支</li>
@@ -475,8 +442,8 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-org3de64a4" class="outline-4">
-<h4 id="org3de64a4"><span class="section-number-4">1.4.3</span> 重建基</h4>
+<div id="outline-container-org8dbf920" class="outline-4">
+<h4 id="org8dbf920"><span class="section-number-4">1.4.3.</span> 重建基</h4>
 <div class="outline-text-4" id="text-1-4-3">
 <ul class="org-ul">
 <li><code>git rebase -i &lt;base&gt;</code> : 交互式基于 &lt;base&gt; 重建当前分支的基，中间会启动编
@@ -486,12 +453,12 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-orga759d7c" class="outline-3">
-<h3 id="orga759d7c"><span class="section-number-3">1.5</span> 远程操作</h3>
+<div id="outline-container-org96dd8ef" class="outline-3">
+<h3 id="org96dd8ef"><span class="section-number-3">1.5.</span> 远程操作</h3>
 <div class="outline-text-3" id="text-1-5">
 </div>
-<div id="outline-container-orgd6d51ab" class="outline-4">
-<h4 id="orgd6d51ab"><span class="section-number-4">1.5.1</span> 远端仓库</h4>
+<div id="outline-container-orge91025a" class="outline-4">
+<h4 id="orge91025a"><span class="section-number-4">1.5.1.</span> 远端仓库</h4>
 <div class="outline-text-4" id="text-1-5-1">
 <ul class="org-ul">
 <li><code>git remote add &lt;name&gt; &lt;url&gt;</code> : 添加一个 &lt;name&gt; 的远端仓库，并指向 &lt;url&gt;</li>
@@ -501,8 +468,8 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-orgb4fed80" class="outline-4">
-<h4 id="orgb4fed80"><span class="section-number-4">1.5.2</span> 远端拉取</h4>
+<div id="outline-container-orgd0674ea" class="outline-4">
+<h4 id="orgd0674ea"><span class="section-number-4">1.5.2.</span> 远端拉取</h4>
 <div class="outline-text-4" id="text-1-5-2">
 <ul class="org-ul">
 <li><code>git fetch &lt;remote&gt; &lt;branch&gt;</code> : 拉取特定的 &lt;branch&gt;。将拉下来的数据放到远
@@ -514,8 +481,8 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-org2efbce6" class="outline-4">
-<h4 id="org2efbce6"><span class="section-number-4">1.5.3</span> 推送远端</h4>
+<div id="outline-container-org14acbaa" class="outline-4">
+<h4 id="org14acbaa"><span class="section-number-4">1.5.3.</span> 推送远端</h4>
 <div class="outline-text-4" id="text-1-5-3">
 <ul class="org-ul">
 <li><code>git push &lt;remote&gt; &lt;branch&gt;</code> : 将 &lt;branch&gt; 分支推到 &lt;remote&gt; 远端中。如果
@@ -531,12 +498,12 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-org75ac9da" class="outline-3">
-<h3 id="org75ac9da"><span class="section-number-3">1.6</span> 查看追踪</h3>
+<div id="outline-container-orga442429" class="outline-3">
+<h3 id="orga442429"><span class="section-number-3">1.6.</span> 查看追踪</h3>
 <div class="outline-text-3" id="text-1-6">
 </div>
-<div id="outline-container-org05a7989" class="outline-4">
-<h4 id="org05a7989"><span class="section-number-4">1.6.1</span> 查看历史</h4>
+<div id="outline-container-orga2c99eb" class="outline-4">
+<h4 id="orga2c99eb"><span class="section-number-4">1.6.1.</span> 查看历史</h4>
 <div class="outline-text-4" id="text-1-6-1">
 <ul class="org-ul">
 <li><code>git log -&lt;limit&gt;</code> : 查看不超过 &lt;limit&gt; 数量的提交历史</li>
@@ -553,8 +520,8 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-orgf6a4e68" class="outline-4">
-<h4 id="orgf6a4e68"><span class="section-number-4">1.6.2</span> 查看差异</h4>
+<div id="outline-container-org04be668" class="outline-4">
+<h4 id="org04be668"><span class="section-number-4">1.6.2.</span> 查看差异</h4>
 <div class="outline-text-4" id="text-1-6-2">
 <ul class="org-ul">
 <li><code>git diff HEAD</code> : 查看工作目录和最近一次提交的差异</li>
@@ -563,8 +530,8 @@ git 代码管理的主要包括以下三个状态，即：工作目录（working
 </div>
 </div>
 
-<div id="outline-container-org640217e" class="outline-4">
-<h4 id="org640217e"><span class="section-number-4">1.6.3</span> 忽略文件</h4>
+<div id="outline-container-org4f8ccb2" class="outline-4">
+<h4 id="org4f8ccb2"><span class="section-number-4">1.6.3.</span> 忽略文件</h4>
 <div class="outline-text-4" id="text-1-6-3">
 <p>
 <b>.gitignore</b> 可以使用在线工具来生成所需要忽略的文件，详见 <a href="https://www.gitignore.io/">gitignore.io</a> ，下
@@ -583,8 +550,8 @@ temp-*
 </div>
 </div>
 
-<div id="outline-container-org1272c3d" class="outline-3">
-<h3 id="org1272c3d"><span class="section-number-3">1.7</span> 配置参数</h3>
+<div id="outline-container-orgce252fe" class="outline-3">
+<h3 id="orgce252fe"><span class="section-number-3">1.7.</span> 配置参数</h3>
 <div class="outline-text-3" id="text-1-7">
 <ul class="org-ul">
 <li><code>git config --global user.name &lt;name&gt;</code> : 配置用户名</li>
@@ -597,8 +564,8 @@ temp-*
 </div>
 </div>
 
-<div id="outline-container-org807c0c6" class="outline-2">
-<h2 id="org807c0c6"><span class="section-number-2">2</span> 底层(plumbing)命令</h2>
+<div id="outline-container-org21197e6" class="outline-2">
+<h2 id="org21197e6"><span class="section-number-2">2.</span> 底层(plumbing)命令</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 早期的 Git（主要是 1.5 之前的版本）的用户界面要比现在复杂的多，因为它更侧重于
@@ -608,23 +575,23 @@ temp-*
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sh">git hash-object -w --stdin
+<pre class="src src-shell">git hash-object -w --stdin
 git cat-file -p &lt;sha&gt;
 git update-index --add --cacheinfo 100644 &lt;sha-blob&gt; filename.txt
 git write-tree
-git commit-tree &lt;sha-tree&gt; -m <span style="color: #2aa198;">'message'</span>
+git commit-tree &lt;sha-tree&gt; -m <span style="color: #afff00;">'message'</span>
 git update-ref refs/heads/master &lt;sha-commit&gt;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org8a270bf" class="outline-2">
-<h2 id="org8a270bf"><span class="section-number-2">3</span> Git 工具</h2>
+<div id="outline-container-orgb8cf5bf" class="outline-2">
+<h2 id="orgb8cf5bf"><span class="section-number-2">3.</span> Git 工具</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org821198c" class="outline-3">
-<h3 id="org821198c"><span class="section-number-3">3.1</span> 子模块</h3>
+<div id="outline-container-orgf52e65a" class="outline-3">
+<h3 id="orgf52e65a"><span class="section-number-3">3.1.</span> 子模块</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 子模块允许你将一个 Git 仓库作为另一个 Git 仓库的子目录。 它能让你将另一个仓库
@@ -632,45 +599,45 @@ git update-ref refs/heads/master &lt;sha-commit&gt;
 </p>
 </div>
 
-<div id="outline-container-org4f99109" class="outline-4">
-<h4 id="org4f99109"><span class="section-number-4">3.1.1</span> 使用子模块</h4>
+<div id="outline-container-orge91818d" class="outline-4">
+<h4 id="orge91818d"><span class="section-number-4">3.1.1.</span> 使用子模块</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <p>
 添加子模块后会在同名目录下创建 <code>.gitmodules</code> 文件，该文件保存子项目的 URL 和
 当前仓库目录的映射关系
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#20026;&#24403;&#21069;&#20179;&#24211;&#28155;&#21152;&#23376;&#27169;&#22359;</span>
+<pre class="src src-shell"><span style="color: #626262;"># </span><span style="color: #626262;">&#20026;&#24403;&#21069;&#20179;&#24211;&#28155;&#21152;&#23376;&#27169;&#22359;</span>
 git submodule add &lt;url&gt;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org04a129b" class="outline-4">
-<h4 id="org04a129b"><span class="section-number-4">3.1.2</span> 克隆含有子模块的项目</h4>
+<div id="outline-container-org34cce34" class="outline-4">
+<h4 id="org34cce34"><span class="section-number-4">3.1.2.</span> 克隆含有子模块的项目</h4>
 <div class="outline-text-4" id="text-3-1-2">
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21021;&#22987;&#21270;&#26412;&#22320;&#37197;&#32622;&#25991;&#20214;</span>
+<pre class="src src-shell"><span style="color: #626262;"># </span><span style="color: #626262;">&#21021;&#22987;&#21270;&#26412;&#22320;&#37197;&#32622;&#25991;&#20214;</span>
 git submodule init
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25235;&#21462;&#25152;&#26377;&#25968;&#25454;&#24182;&#26816;&#20986;&#29238;&#39033;&#30446;&#20013;&#21015;&#20986;&#30340;&#21512;&#36866;&#30340;&#25552;&#20132;</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">&#25235;&#21462;&#25152;&#26377;&#25968;&#25454;&#24182;&#26816;&#20986;&#29238;&#39033;&#30446;&#20013;&#21015;&#20986;&#30340;&#21512;&#36866;&#30340;&#25552;&#20132;</span>
 git submodule update
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25110;&#32773;&#30452;&#25509;&#20351;&#29992; --recursive &#36873;&#39033;&#33258;&#21160;&#21021;&#22987;&#21270;&#24182;&#26356;&#26032;&#20179;&#24211;&#20013;&#30340;&#27599;&#19968;&#20010;&#23376;&#27169;&#22359;</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">&#25110;&#32773;&#30452;&#25509;&#20351;&#29992; --recursive &#36873;&#39033;&#33258;&#21160;&#21021;&#22987;&#21270;&#24182;&#26356;&#26032;&#20179;&#24211;&#20013;&#30340;&#27599;&#19968;&#20010;&#23376;&#27169;&#22359;</span>
 git clone --recursive &lt;url&gt;
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgc88f6c9" class="outline-4">
-<h4 id="orgc88f6c9"><span class="section-number-4">3.1.3</span> 在包含子模块项目中工作</h4>
+<div id="outline-container-org90c25b0" class="outline-4">
+<h4 id="org90c25b0"><span class="section-number-4">3.1.3.</span> 在包含子模块项目中工作</h4>
 <div class="outline-text-4" id="text-3-1-3">
 <p>
 更新某个子模块
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#36827;&#20837; SubModuleName &#23376;&#27169;&#22359;&#28982;&#21518;&#25235;&#21462;&#24182;&#26356;&#26032;</span>
+<pre class="src src-shell"><span style="color: #626262;"># </span><span style="color: #626262;">&#36827;&#20837; SubModuleName &#23376;&#27169;&#22359;&#28982;&#21518;&#25235;&#21462;&#24182;&#26356;&#26032;</span>
 git submodule update --remote SubModuleName
 </pre>
 </div>
@@ -679,22 +646,22 @@ git submodule update --remote SubModuleName
 修改子模块的分支
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">git config -f .gitmodules submodule.SubModuleName.branch stable
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#25235;&#21462;&#23376;&#27169;&#22359;&#24182;&#26356;&#26032;</span>
+<pre class="src src-shell">git config -f .gitmodules submodule.SubModuleName.branch stable
+<span style="color: #626262;"># </span><span style="color: #626262;">&#25235;&#21462;&#23376;&#27169;&#22359;&#24182;&#26356;&#26032;</span>
 git submodule update --remote
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgb05beaa" class="outline-4">
-<h4 id="orgb05beaa"><span class="section-number-4">3.1.4</span> 在子模块中工作</h4>
+<div id="outline-container-orgd3b6753" class="outline-4">
+<h4 id="orgd3b6753"><span class="section-number-4">3.1.4.</span> 在子模块中工作</h4>
 <div class="outline-text-4" id="text-3-1-4">
 <p>
 拉去远端子模块的更新并合并
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">git submodule update --remote --merge
+<pre class="src src-shell">git submodule update --remote --merge
 </pre>
 </div>
 
@@ -702,14 +669,14 @@ git submodule update --remote
 使用 rebase
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">git submodule update --remote --rebase
+<pre class="src src-shell">git submodule update --remote --rebase
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org9b60748" class="outline-4">
-<h4 id="org9b60748"><span class="section-number-4">3.1.5</span> 发布子模块的改动</h4>
+<div id="outline-container-org4398b85" class="outline-4">
+<h4 id="org4398b85"><span class="section-number-4">3.1.5.</span> 发布子模块的改动</h4>
 <div class="outline-text-4" id="text-3-1-5">
 <p>
 git push 命令接受可以设置为 <code>check</code> 或 <code>on-demand</code> 的
@@ -717,69 +684,69 @@ git push 命令接受可以设置为 <code>check</code> 或 <code>on-demand</cod
 选项会直接使 push 操作失败
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">git push --recurse-submodules=check
+<pre class="src src-shell">git push --recurse-submodules=check
 </pre>
 </div>
 <p>
 <code>on-demand</code> 选项按需推送
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">git push --recurse-submodules=on-demand
+<pre class="src src-shell">git push --recurse-submodules=on-demand
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org21271e7" class="outline-4">
-<h4 id="org21271e7"><span class="section-number-4">3.1.6</span> 遍历子模块</h4>
+<div id="outline-container-orgafd3d62" class="outline-4">
+<h4 id="orgafd3d62"><span class="section-number-4">3.1.6.</span> 遍历子模块</h4>
 <div class="outline-text-4" id="text-3-1-6">
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">stash &#25152;&#26377;&#23376;&#27169;&#22359;</span>
-git submodule foreach <span style="color: #2aa198;">'git stash'</span>
+<pre class="src src-shell"><span style="color: #626262;"># </span><span style="color: #626262;">stash &#25152;&#26377;&#23376;&#27169;&#22359;</span>
+git submodule foreach <span style="color: #afff00;">'git stash'</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#26816;&#20986;&#25152;&#26377;&#23376;&#27169;&#22359;</span>
-git submodule foreach <span style="color: #2aa198;">'git checkout -b featureA'</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">&#26816;&#20986;&#25152;&#26377;&#23376;&#27169;&#22359;</span>
+git submodule foreach <span style="color: #afff00;">'git checkout -b featureA'</span>
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgcf9ceb1" class="outline-3">
-<h3 id="orgcf9ceb1"><span class="section-number-3">3.2</span> Git LFS</h3>
+<div id="outline-container-org8e1348f" class="outline-3">
+<h3 id="org8e1348f"><span class="section-number-3">3.2.</span> Git LFS</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 <a href="https://git-lfs.github.com/">Git LFS</a> 是 Github 开发的一个 Git 的扩展，用于实现 Git 对大文件的支持
 </p>
 </div>
 
-<div id="outline-container-orgd10584e" class="outline-4">
-<h4 id="orgd10584e"><span class="section-number-4">3.2.1</span> 安装</h4>
+<div id="outline-container-orgf1d495c" class="outline-4">
+<h4 id="orgf1d495c"><span class="section-number-4">3.2.1.</span> 安装</h4>
 <div class="outline-text-4" id="text-3-2-1">
 <p>
 Mac 下安装
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">brew install git-lfs
+<pre class="src src-shell">brew install git-lfs
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org93184ec" class="outline-4">
-<h4 id="org93184ec"><span class="section-number-4">3.2.2</span> 使用</h4>
+<div id="outline-container-org623b5a2" class="outline-4">
+<h4 id="org623b5a2"><span class="section-number-4">3.2.2.</span> 使用</h4>
 <div class="outline-text-4" id="text-3-2-2">
 <p>
 Git LFS 的文档参考 <a href="https://github.com/git-lfs/git-lfs/tree/master/docs">这里</a>
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#22312;&#24403;&#21069; git &#20195;&#30721;&#20179;&#20013;&#23433;&#35013; lfs &#38057;&#23376;</span>
+<pre class="src src-shell"><span style="color: #626262;"># </span><span style="color: #626262;">&#22312;&#24403;&#21069; git &#20195;&#30721;&#20179;&#20013;&#23433;&#35013; lfs &#38057;&#23376;</span>
 git lfs install
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#28155;&#21152; lfs &#31867;&#22411;&#30340;&#25991;&#20214;, &#25110;&#32773;&#30452;&#25509;&#32534;&#36753; .gitattributes</span>
-git lfs track <span style="color: #2aa198;">"*.psd"</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">&#28155;&#21152; lfs &#31867;&#22411;&#30340;&#25991;&#20214;, &#25110;&#32773;&#30452;&#25509;&#32534;&#36753; .gitattributes</span>
+git lfs track <span style="color: #afff00;">"*.psd"</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#21015;&#20986;&#25152;&#26377; lfs &#31649;&#29702;&#30340;&#25991;&#20214;</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">&#21015;&#20986;&#25152;&#26377; lfs &#31649;&#29702;&#30340;&#25991;&#20214;</span>
 git lfs ls-files
 </pre>
 </div>
@@ -788,7 +755,7 @@ git lfs ls-files
 如果安装 lfs 晚于 git clone 仓库，使用下面命令下载文件
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">git lfs pull
+<pre class="src src-shell">git lfs pull
 </pre>
 </div>
 </div>
@@ -796,29 +763,29 @@ git lfs ls-files
 </div>
 </div>
 
-<div id="outline-container-org1b4fe9b" class="outline-2">
-<h2 id="org1b4fe9b"><span class="section-number-2">4</span> 常见工作流</h2>
+<div id="outline-container-orgeb77189" class="outline-2">
+<h2 id="orgeb77189"><span class="section-number-2">4.</span> 常见工作流</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org0ee066d" class="outline-3">
-<h3 id="org0ee066d"><span class="section-number-3">4.1</span> 批量更新当前文件夹下代码仓库</h3>
+<div id="outline-container-org7948e00" class="outline-3">
+<h3 id="org7948e00"><span class="section-number-3">4.1.</span> 批量更新当前文件夹下代码仓库</h3>
 <div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #859900;">for</span> dotgit<span style="color: #859900;"> in</span> <span style="color: #d33682;">`find $(pwd) -type d -name '.git'`</span>; <span style="color: #859900;">do </span><span style="color: #6c71c4;">cd</span> $<span style="color: #6c71c4;">dotgit</span>/.. &amp;&amp; git pull; <span style="color: #859900;">done</span>
+<pre class="src src-shell"><span style="color: #5fd7ff;">for</span> dotgit<span style="color: #5fd7ff;"> in</span> <span style="color: #5fd7ff; font-weight: bold;">`find $(pwd) -type d -name '.git'`</span>; <span style="color: #5fd7ff;">do </span><span style="color: #5fafff;">cd</span> $<span style="color: #ffd700;">dotgit</span>/.. &amp;&amp; git pull; <span style="color: #5fd7ff;">done</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org7f3fd5c" class="outline-3">
-<h3 id="org7f3fd5c"><span class="section-number-3">4.2</span> 初次添加远端并且上传代码</h3>
+<div id="outline-container-org2ab1edc" class="outline-3">
+<h3 id="org2ab1edc"><span class="section-number-3">4.2.</span> 初次添加远端并且上传代码</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 先添加一个远端，然后使用 <code>--all</code> 选项将所有的分支都推送上去，并 <code>--tags</code> 将所
 有的标签一起推送上去。值得注意的是： <b>&#x2013;all 和 &#x2013;tags 不可以同时使用</b> 。
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">git remote add origin git@github.com:Username/Repo.git
+<pre class="src src-shell">git remote add origin git@github.com:Username/Repo.git
 git push -u origin master
 git push -u origin --all
 git push -u origin --tags
@@ -827,8 +794,8 @@ git push -u origin --tags
 </div>
 </div>
 
-<div id="outline-container-org708de35" class="outline-3">
-<h3 id="org708de35"><span class="section-number-3">4.3</span> Git Rebase 工作流</h3>
+<div id="outline-container-orge031a9f" class="outline-3">
+<h3 id="orge031a9f"><span class="section-number-3">4.3.</span> Git Rebase 工作流</h3>
 <div class="outline-text-3" id="text-4-3">
 <p>
 git-rebase 是用来修改本地提交的，目的是为了让提交历史变成线性。下面是一个
@@ -836,7 +803,7 @@ rebase 的例子。
 </p>
 
 
-<div class="figure">
+<div id="orge864354" class="figure">
 <p><img src="../static/image/2018/10/git-rebase1.gif" alt="git-rebase1.gif" />
 </p>
 </div>
@@ -845,76 +812,76 @@ rebase 的例子。
 基本的 rebase 示例如下：
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">git rebase master
+<pre class="src src-shell">git rebase master
 git rebase master topic
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24773;&#20917;&#19968;&#65306;&#22914;&#26524; topic &#21644; master &#27809;&#26377;&#21516;&#26679;&#30340;&#25552;&#20132;</span>
-<span style="color: #93a1a1; font-style: italic;">#</span>
-<span style="color: #93a1a1; font-style: italic;">#      </span><span style="color: #93a1a1; font-style: italic;">A---B---C topic</span>
-<span style="color: #93a1a1; font-style: italic;">#     </span><span style="color: #93a1a1; font-style: italic;">/</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">D---E---F---G master</span>
-<span style="color: #93a1a1; font-style: italic;">#</span>
-<span style="color: #93a1a1; font-style: italic;">#              </span><span style="color: #93a1a1; font-style: italic;">A'--B'--C' topic</span>
-<span style="color: #93a1a1; font-style: italic;">#             </span><span style="color: #93a1a1; font-style: italic;">/</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">D---E---F---G master</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">&#24773;&#20917;&#19968;&#65306;&#22914;&#26524; topic &#21644; master &#27809;&#26377;&#21516;&#26679;&#30340;&#25552;&#20132;</span>
+<span style="color: #626262;">#</span>
+<span style="color: #626262;">#      </span><span style="color: #626262;">A---B---C topic</span>
+<span style="color: #626262;">#     </span><span style="color: #626262;">/</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">D---E---F---G master</span>
+<span style="color: #626262;">#</span>
+<span style="color: #626262;">#              </span><span style="color: #626262;">A'--B'--C' topic</span>
+<span style="color: #626262;">#             </span><span style="color: #626262;">/</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">D---E---F---G master</span>
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24773;&#20917;&#20108;&#65306;&#22914;&#26524; topic &#21644; master &#26377;&#21516;&#26679;&#30340;&#25552;&#20132;&#65292;rebase &#20250;&#21512;&#24182;&#30456;&#21516;&#30340;&#25552;&#20132;</span>
-<span style="color: #93a1a1; font-style: italic;">#</span>
-<span style="color: #93a1a1; font-style: italic;">#       </span><span style="color: #93a1a1; font-style: italic;">A---B---C topic</span>
-<span style="color: #93a1a1; font-style: italic;">#      </span><span style="color: #93a1a1; font-style: italic;">/</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">D---E---A'---F master</span>
-<span style="color: #93a1a1; font-style: italic;">#</span>
-<span style="color: #93a1a1; font-style: italic;">#                </span><span style="color: #93a1a1; font-style: italic;">B'---C' topic</span>
-<span style="color: #93a1a1; font-style: italic;">#               </span><span style="color: #93a1a1; font-style: italic;">/</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">D---E---A'---F master</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">&#24773;&#20917;&#20108;&#65306;&#22914;&#26524; topic &#21644; master &#26377;&#21516;&#26679;&#30340;&#25552;&#20132;&#65292;rebase &#20250;&#21512;&#24182;&#30456;&#21516;&#30340;&#25552;&#20132;</span>
+<span style="color: #626262;">#</span>
+<span style="color: #626262;">#       </span><span style="color: #626262;">A---B---C topic</span>
+<span style="color: #626262;">#      </span><span style="color: #626262;">/</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">D---E---A'---F master</span>
+<span style="color: #626262;">#</span>
+<span style="color: #626262;">#                </span><span style="color: #626262;">B'---C' topic</span>
+<span style="color: #626262;">#               </span><span style="color: #626262;">/</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">D---E---A'---F master</span>
 </pre>
 </div>
 <p>
 git-rebase 的 <b>&#x2013;on-to</b> 选项也是非常重要的，可以跨多个分支来修改本地提交。
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">git rebase --onto master next topic
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24773;&#24418;&#19968;&#65306;&#36830;&#32493;&#32447;&#24615;&#20381;&#36182;</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">o---o---o---o---o  master</span>
-<span style="color: #93a1a1; font-style: italic;">#          </span><span style="color: #93a1a1; font-style: italic;">\</span>
-<span style="color: #93a1a1; font-style: italic;">#           </span><span style="color: #93a1a1; font-style: italic;">o---o---o---o---o  next</span>
-<span style="color: #93a1a1; font-style: italic;">#                            </span><span style="color: #93a1a1; font-style: italic;">\</span>
-<span style="color: #93a1a1; font-style: italic;">#                             </span><span style="color: #93a1a1; font-style: italic;">o---o---o  topic</span>
-<span style="color: #93a1a1; font-style: italic;">#</span>
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">o---o---o---o---o  master</span>
-<span style="color: #93a1a1; font-style: italic;">#         </span><span style="color: #93a1a1; font-style: italic;">|       \</span>
-<span style="color: #93a1a1; font-style: italic;">#         </span><span style="color: #93a1a1; font-style: italic;">|        o'--o'--o'  topic</span>
-<span style="color: #93a1a1; font-style: italic;">#          </span><span style="color: #93a1a1; font-style: italic;">\</span>
-<span style="color: #93a1a1; font-style: italic;">#           </span><span style="color: #93a1a1; font-style: italic;">o---o---o---o---o  next</span>
+<pre class="src src-shell">git rebase --onto master next topic
+<span style="color: #626262;"># </span><span style="color: #626262;">&#24773;&#24418;&#19968;&#65306;&#36830;&#32493;&#32447;&#24615;&#20381;&#36182;</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">o---o---o---o---o  master</span>
+<span style="color: #626262;">#          </span><span style="color: #626262;">\</span>
+<span style="color: #626262;">#           </span><span style="color: #626262;">o---o---o---o---o  next</span>
+<span style="color: #626262;">#                            </span><span style="color: #626262;">\</span>
+<span style="color: #626262;">#                             </span><span style="color: #626262;">o---o---o  topic</span>
+<span style="color: #626262;">#</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">o---o---o---o---o  master</span>
+<span style="color: #626262;">#         </span><span style="color: #626262;">|       \</span>
+<span style="color: #626262;">#         </span><span style="color: #626262;">|        o'--o'--o'  topic</span>
+<span style="color: #626262;">#          </span><span style="color: #626262;">\</span>
+<span style="color: #626262;">#           </span><span style="color: #626262;">o---o---o---o---o  next</span>
 
 git rebase --onto master topicA topicB
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24773;&#24418;&#20108;&#65306;&#31227;&#21160;&#20998;&#25903;&#21040;&#31283;&#23450;&#20998;&#25903; master &#19978;</span>
-<span style="color: #93a1a1; font-style: italic;">#</span>
-<span style="color: #93a1a1; font-style: italic;">#                             </span><span style="color: #93a1a1; font-style: italic;">H---I---J topicB</span>
-<span style="color: #93a1a1; font-style: italic;">#                            </span><span style="color: #93a1a1; font-style: italic;">/</span>
-<span style="color: #93a1a1; font-style: italic;">#                   </span><span style="color: #93a1a1; font-style: italic;">E---F---G  topicA</span>
-<span style="color: #93a1a1; font-style: italic;">#                  </span><span style="color: #93a1a1; font-style: italic;">/</span>
-<span style="color: #93a1a1; font-style: italic;">#     </span><span style="color: #93a1a1; font-style: italic;">A---B---C---D  master</span>
-<span style="color: #93a1a1; font-style: italic;">#</span>
-<span style="color: #93a1a1; font-style: italic;">#</span>
-<span style="color: #93a1a1; font-style: italic;">#                  </span><span style="color: #93a1a1; font-style: italic;">H'--I'--J'  topicB</span>
-<span style="color: #93a1a1; font-style: italic;">#                 </span><span style="color: #93a1a1; font-style: italic;">/</span>
-<span style="color: #93a1a1; font-style: italic;">#                 </span><span style="color: #93a1a1; font-style: italic;">| E---F---G  topicA</span>
-<span style="color: #93a1a1; font-style: italic;">#                 </span><span style="color: #93a1a1; font-style: italic;">|/</span>
-<span style="color: #93a1a1; font-style: italic;">#     </span><span style="color: #93a1a1; font-style: italic;">A---B---C---D  master</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">&#24773;&#24418;&#20108;&#65306;&#31227;&#21160;&#20998;&#25903;&#21040;&#31283;&#23450;&#20998;&#25903; master &#19978;</span>
+<span style="color: #626262;">#</span>
+<span style="color: #626262;">#                             </span><span style="color: #626262;">H---I---J topicB</span>
+<span style="color: #626262;">#                            </span><span style="color: #626262;">/</span>
+<span style="color: #626262;">#                   </span><span style="color: #626262;">E---F---G  topicA</span>
+<span style="color: #626262;">#                  </span><span style="color: #626262;">/</span>
+<span style="color: #626262;">#     </span><span style="color: #626262;">A---B---C---D  master</span>
+<span style="color: #626262;">#</span>
+<span style="color: #626262;">#</span>
+<span style="color: #626262;">#                  </span><span style="color: #626262;">H'--I'--J'  topicB</span>
+<span style="color: #626262;">#                 </span><span style="color: #626262;">/</span>
+<span style="color: #626262;">#                 </span><span style="color: #626262;">| E---F---G  topicA</span>
+<span style="color: #626262;">#                 </span><span style="color: #626262;">|/</span>
+<span style="color: #626262;">#     </span><span style="color: #626262;">A---B---C---D  master</span>
 
 git rebase --onto topicA~5 topicA~3 topicA
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24773;&#24418;&#19977;&#65306;&#21098;&#20999;&#37096;&#20998;&#25552;&#20132;</span>
-<span style="color: #93a1a1; font-style: italic;">#  </span><span style="color: #93a1a1; font-style: italic;">E---F---G---H---I---J  topicA</span>
-<span style="color: #93a1a1; font-style: italic;">#</span>
-<span style="color: #93a1a1; font-style: italic;">#  </span><span style="color: #93a1a1; font-style: italic;">E---H'---I'---J'  topicA</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">&#24773;&#24418;&#19977;&#65306;&#21098;&#20999;&#37096;&#20998;&#25552;&#20132;</span>
+<span style="color: #626262;">#  </span><span style="color: #626262;">E---F---G---H---I---J  topicA</span>
+<span style="color: #626262;">#</span>
+<span style="color: #626262;">#  </span><span style="color: #626262;">E---H'---I'---J'  topicA</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org600042e" class="outline-3">
-<h3 id="org600042e"><span class="section-number-3">4.4</span> Git Open， 在浏览器中打开 git 代码仓链接</h3>
+<div id="outline-container-org8eac661" class="outline-3">
+<h3 id="org8eac661"><span class="section-number-3">4.4.</span> Git Open， 在浏览器中打开 git 代码仓链接</h3>
 <div class="outline-text-3" id="text-4-4">
 <p>
 <a href="https://github.com/paulirish/git-open">git-open</a> 是一个扩展 git 子命令的工具，它添加了 <code>git open</code> 的扩展，使得在命令行
@@ -923,21 +890,21 @@ Bitbucket 这些远端网站。
 </p>
 </div>
 
-<div id="outline-container-orge44f953" class="outline-4">
-<h4 id="orge44f953"><span class="section-number-4">4.4.1</span> 安装</h4>
+<div id="outline-container-orgf043812" class="outline-4">
+<h4 id="orgf043812"><span class="section-number-4">4.4.1.</span> 安装</h4>
 <div class="outline-text-4" id="text-4-4-1">
 <p>
 直接通过 yarn 安装即可。
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">yarn global add git-open
+<pre class="src src-shell">yarn global add git-open
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org602f682" class="outline-4">
-<h4 id="org602f682"><span class="section-number-4">4.4.2</span> 使用方法</h4>
+<div id="outline-container-org437bc59" class="outline-4">
+<h4 id="org437bc59"><span class="section-number-4">4.4.2.</span> 使用方法</h4>
 <div class="outline-text-4" id="text-4-4-2">
 <ul class="org-ul">
 <li><code>git open</code> : 打开当前项目的网站</li>
@@ -948,14 +915,14 @@ Bitbucket 这些远端网站。
 </div>
 </div>
 
-<div id="outline-container-orgc1987dc" class="outline-3">
-<h3 id="orgc1987dc"><span class="section-number-3">4.5</span> 显示分页</h3>
+<div id="outline-container-orgc572da7" class="outline-3">
+<h3 id="orgc572da7"><span class="section-number-3">4.5.</span> 显示分页</h3>
 <div class="outline-text-3" id="text-4-5">
 <p>
 Git 默认是分页显示输出的，如果要关闭分页显示可以使用 <code>--no-pager</code> 选项
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #6c71c4;">alias</span> <span style="color: #6c71c4;">git</span>=<span style="color: #2aa198;">'git --no-pager'</span>
+<pre class="src src-shell"><span style="color: #5fafff;">alias</span> <span style="color: #ffd700;">git</span>=<span style="color: #afff00;">'git --no-pager'</span>
 </pre>
 </div>
 
@@ -963,38 +930,38 @@ Git 默认是分页显示输出的，如果要关闭分页显示可以使用 <co
 当然可以使用环境变量，告诉 less 如输出超过一屏才分页，否则直接输出
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #6c71c4;">export</span> <span style="color: #6c71c4;">LESS</span>=<span style="color: #2aa198;">"-F -X $LESS"</span>
+<pre class="src src-shell"><span style="color: #5fafff;">export</span> <span style="color: #ffd700;">LESS</span>=<span style="color: #afff00;">"-F -X $LESS"</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org6483f0f" class="outline-3">
-<h3 id="org6483f0f"><span class="section-number-3">4.6</span> 清除当前项目，丢弃项目中的修改</h3>
+<div id="outline-container-org255958c" class="outline-3">
+<h3 id="org255958c"><span class="section-number-3">4.6.</span> 清除当前项目，丢弃项目中的修改</h3>
 <div class="outline-text-3" id="text-4-6">
 <p>
 强制清除当前项目如下
 </p>
 
 <div class="org-src-container">
-<pre class="src src-shell"><span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">&#24378;&#21046;&#20002;&#24323;&#24037;&#20316;&#25991;&#20214;&#20013;&#30340;&#20462;&#25913;&#65292;&#23558; HEAD &#35774;&#32622;&#25104; master</span>
+<pre class="src src-shell"><span style="color: #626262;"># </span><span style="color: #626262;">&#24378;&#21046;&#20002;&#24323;&#24037;&#20316;&#25991;&#20214;&#20013;&#30340;&#20462;&#25913;&#65292;&#23558; HEAD &#35774;&#32622;&#25104; master</span>
 git reset --hard
 
-<span style="color: #93a1a1; font-style: italic;"># </span><span style="color: #93a1a1; font-style: italic;">-f &#36873;&#39033;&#24378;&#21046;&#21024;&#38500;&#20026;&#36861;&#36394;&#30340;&#25991;&#20214;&#65292; -d &#21516;&#26102;&#23558;&#31354;&#30340;&#25991;&#20214;&#22841;&#20063;&#21024;&#38500;</span>
+<span style="color: #626262;"># </span><span style="color: #626262;">-f &#36873;&#39033;&#24378;&#21046;&#21024;&#38500;&#20026;&#36861;&#36394;&#30340;&#25991;&#20214;&#65292; -d &#21516;&#26102;&#23558;&#31354;&#30340;&#25991;&#20214;&#22841;&#20063;&#21024;&#38500;</span>
 git clean -fd
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org86da6df" class="outline-3">
-<h3 id="org86da6df"><span class="section-number-3">4.7</span> 将代码导出 zip 包</h3>
+<div id="outline-container-orga97c74d" class="outline-3">
+<h3 id="orga97c74d"><span class="section-number-3">4.7.</span> 将代码导出 zip 包</h3>
 <div class="outline-text-3" id="text-4-7">
 <p>
 使用 git 可以直接将代码的某次提交直接打成 zip 包
 </p>
 <div class="org-src-container">
-<pre class="src src-sh">git archive --format tar.gz --output <span style="color: #2aa198;">"output.tar.gz"</span> master
+<pre class="src src-shell">git archive --format tar.gz --output <span style="color: #afff00;">"output.tar.gz"</span> master
 git archive --format=zip --prefix=emacs/ master &gt; emacs.zip
 </pre>
 </div>
@@ -1002,8 +969,8 @@ git archive --format=zip --prefix=emacs/ master &gt; emacs.zip
 </div>
 </div>
 
-<div id="outline-container-org5633e0a" class="outline-2">
-<h2 id="org5633e0a"><span class="section-number-2">5</span> 参考链接</h2>
+<div id="outline-container-org6a8de1d" class="outline-2">
+<h2 id="org6a8de1d"><span class="section-number-2">5.</span> 参考链接</h2>
 <div class="outline-text-2" id="text-5">
 <ol class="org-ol">
 <li><a href="https://rogerdudler.github.io/git-guide/index.zh.html">Git 简明指南</a></li>
@@ -1012,14 +979,14 @@ git archive --format=zip --prefix=emacs/ master &gt; emacs.zip
 <li><a href="https://git-scm.com/doc">Pro Git</a></li>
 <li><a href="https://www.gitignore.io">online gitignore pattern</a></li>
 <li><a href="https://github.com/jeanhwea/dotfiles/blob/master/.gitconfig">My .gitconfig file</a></li>
-<li><a href="https://npm.taobao.org/mirrors/git-for-windows">淘宝 Git Windows</a></li>
+<li><a href="https://gitforwindows.org/">git-for-windows</a></li>
 <li><a href="https://coding.net/help/doc/git/git-lfs.html">如何使用 Git LFS 提交大文件</a></li>
 </ol>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2020-03-07 Sat 04:38. Created by Jinghui Hu at 2018-10-08 Mon 11:04.</p>
+<p class="author">Last Updated 2024-09-30 Mon 10:54. Created by Jinghui Hu at 2018-10-08 Mon 11:04.</p>
 </div>
 </body>
 </html>
