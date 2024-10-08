@@ -1,5 +1,6 @@
 FROM nginx
-LABEL appname="surui" author="Jinghui Hu"
+
+LABEL author="Jinghui Hu"
 
 COPY . /usr/share/nginx/html
 
