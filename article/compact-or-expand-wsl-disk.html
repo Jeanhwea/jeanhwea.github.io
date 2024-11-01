@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-11-01 Fri 13:09 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WSL 虚拟磁盘压缩和扩缩容</title>
+<meta name="author" content="Jinghui Hu" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">WSL 虚拟磁盘压缩和扩缩容</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org7a02f06">1. 磁盘文件压缩</a></li>
+<li><a href="#org14cb140">2. 磁盘文件扩容</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org7a02f06" class="outline-2">
+<h2 id="org7a02f06"><span class="section-number-2">1.</span> 磁盘文件压缩</h2>
+<div class="outline-text-2" id="text-1">
+<ol class="org-ol">
+<li>思路: 关闭 WSL 后使用 diskpart 直接压缩磁盘文件 <code>ext4.vhdx</code></li>
+<li><p>
+关闭 WSL
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">wsl --shutdown
+</pre>
+</div></li>
+<li><p>
+磁盘压缩
+</p>
+<pre class="example" id="org75eeb05">
+C:&gt;diskpart
+
+Microsoft DiskPart 版本 10.0.22621.1
+
+Copyright (C) Microsoft Corporation.
+在计算机上: P3
+
+DISKPART&gt; select vdisk file="C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx"
+
+DiskPart 已成功选择虚拟磁盘文件。
+
+DISKPART&gt; detail vdisk
+
+设备类型 ID: 0 (未知)
+供应商 ID: {00000000-0000-0000-0000-000000000000} (未知)
+状态: 已添加
+虚拟大小:  256 GB
+物理大小:  237 GB
+文件名: C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx
+为子级: 否
+父文件名:
+找不到关联的磁盘号。
+
+DISKPART&gt; compact vdisk
+
+  100 百分比已完成
+
+DiskPart 已成功压缩虚拟磁盘文件。
+
+DISKPART&gt; detail vdisk
+
+设备类型 ID: 0 (未知)
+供应商 ID: {00000000-0000-0000-0000-000000000000} (未知)
+状态: 已添加
+虚拟大小:  256 GB
+物理大小:  100 GB
+文件名: C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx
+为子级: 否
+父文件名:
+找不到关联的磁盘号。
+
+DISKPART&gt; exit
+
+退出 DiskPart...
+
+C:&gt;
+</pre></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org14cb140" class="outline-2">
+<h2 id="org14cb140"><span class="section-number-2">2.</span> 磁盘文件扩容</h2>
+<div class="outline-text-2" id="text-2">
+<ol class="org-ol">
+<li>思路: 关闭 WSL 后使用 diskpart 设置磁盘的 maximum 参数到 512G</li>
+<li><p>
+关闭 WSL
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">wsl --shutdown
+</pre>
+</div></li>
+<li><p>
+磁盘扩容
+</p>
+<pre class="example" id="orgc04152b">
+C:&gt;diskpart
+
+Microsoft DiskPart 版本 10.0.22621.1
+
+Copyright (C) Microsoft Corporation.
+在计算机上: P3
+
+DISKPART&gt; select vdisk file="C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx"
+
+DiskPart 已成功选择虚拟磁盘文件。
+
+DISKPART&gt; detail vdisk
+
+设备类型 ID: 0 (未知)
+供应商 ID: {00000000-0000-0000-0000-000000000000} (未知)
+状态: 已添加
+虚拟大小:  256 GB
+物理大小:  100 GB
+文件名: C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx
+为子级: 否
+父文件名:
+找不到关联的磁盘号。
+
+
+DISKPART&gt; help expand vdisk
+
+    扩展虚拟磁盘上可用的最大大小。
+
+语法:  EXPAND VDISK MAXIMUM=&lt;N&gt;
+
+    MAXIMUM=&lt;N&gt;    指示磁盘的新虚拟大小(以兆字节(MB)为单位)。
+
+    必须选择一个虚拟磁盘才能成功完成此操作。
+    只能扩展已断开连接的磁盘。
+
+示例:
+
+    EXPAND VDISK MAXIMUM=20000
+
+DISKPART&gt; expand vdisk maximum=524288
+
+  100 百分比已完成
+
+DiskPart 已成功扩展虚拟磁盘文件。
+
+DISKPART&gt; detail vdisk
+
+设备类型 ID: 0 (未知)
+供应商 ID: {00000000-0000-0000-0000-000000000000} (未知)
+状态: 已添加
+虚拟大小:  512 GB
+物理大小:  100 GB
+文件名: C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx
+为子级: 否
+父文件名:
+找不到关联的磁盘号。
+
+
+DISKPART&gt; exit
+
+退出 DiskPart...
+
+C:&gt;
+</pre></li>
+<li><p>
+进入主机后 resize2fs 来添加文件系统容量
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">root@ubuntu:/# resize2fs /dev/sdc <span style="color: #626262;"># </span><span style="color: #626262;">==&gt; &#35843;&#25972;&#25991;&#20214;&#31995;&#32479;&#22823;&#23567;</span>
+resize2fs 1.46.5 (30-Dec-2021)
+Filesystem at /dev/sda2 is mounted on /; on-line resizing required
+<span style="color: #ffd700;">old_desc_blocks</span> = 7, <span style="color: #ffd700;">new_desc_blocks</span> = 25
+The filesystem on /dev/sda2 is now 52428283 (4k) blocks long.
+
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Last Updated 2024-11-01 Fri 13:09. Created by Jinghui Hu at 2024-11-01 Fri 00:00.</p>
+</div>
+</body>
+</html>

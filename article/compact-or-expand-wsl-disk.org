@@ -1,0 +1,145 @@
+#+TITLE: WSL 虚拟磁盘压缩和扩缩容
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2024-11-01 Fri>
+#+STARTUP: overview num indent
+#+OPTIONS: ^:nil
+
+
+* 磁盘文件压缩
+1. 思路: 关闭 WSL 后使用 diskpart 直接压缩磁盘文件 ~ext4.vhdx~
+2. 关闭 WSL
+   #+BEGIN_SRC sh
+     wsl --shutdown
+   #+END_SRC
+3. 磁盘压缩
+   #+BEGIN_EXAMPLE
+     C:>diskpart
+
+     Microsoft DiskPart 版本 10.0.22621.1
+
+     Copyright (C) Microsoft Corporation.
+     在计算机上: P3
+
+     DISKPART> select vdisk file="C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx"
+
+     DiskPart 已成功选择虚拟磁盘文件。
+
+     DISKPART> detail vdisk
+
+     设备类型 ID: 0 (未知)
+     供应商 ID: {00000000-0000-0000-0000-000000000000} (未知)
+     状态: 已添加
+     虚拟大小:  256 GB
+     物理大小:  237 GB
+     文件名: C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx
+     为子级: 否
+     父文件名:
+     找不到关联的磁盘号。
+
+     DISKPART> compact vdisk
+
+       100 百分比已完成
+
+     DiskPart 已成功压缩虚拟磁盘文件。
+
+     DISKPART> detail vdisk
+
+     设备类型 ID: 0 (未知)
+     供应商 ID: {00000000-0000-0000-0000-000000000000} (未知)
+     状态: 已添加
+     虚拟大小:  256 GB
+     物理大小:  100 GB
+     文件名: C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx
+     为子级: 否
+     父文件名:
+     找不到关联的磁盘号。
+
+     DISKPART> exit
+
+     退出 DiskPart...
+
+     C:>
+   #+END_EXAMPLE
+
+* 磁盘文件扩容
+1. 思路: 关闭 WSL 后使用 diskpart 设置磁盘的 maximum 参数到 512G
+2. 关闭 WSL
+   #+BEGIN_SRC sh
+     wsl --shutdown
+   #+END_SRC
+3. 磁盘扩容
+   #+BEGIN_EXAMPLE
+     C:>diskpart
+
+     Microsoft DiskPart 版本 10.0.22621.1
+
+     Copyright (C) Microsoft Corporation.
+     在计算机上: P3
+
+     DISKPART> select vdisk file="C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx"
+
+     DiskPart 已成功选择虚拟磁盘文件。
+
+     DISKPART> detail vdisk
+
+     设备类型 ID: 0 (未知)
+     供应商 ID: {00000000-0000-0000-0000-000000000000} (未知)
+     状态: 已添加
+     虚拟大小:  256 GB
+     物理大小:  100 GB
+     文件名: C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx
+     为子级: 否
+     父文件名:
+     找不到关联的磁盘号。
+
+
+     DISKPART> help expand vdisk
+
+         扩展虚拟磁盘上可用的最大大小。
+
+     语法:  EXPAND VDISK MAXIMUM=<N>
+
+         MAXIMUM=<N>    指示磁盘的新虚拟大小(以兆字节(MB)为单位)。
+
+         必须选择一个虚拟磁盘才能成功完成此操作。
+         只能扩展已断开连接的磁盘。
+
+     示例:
+
+         EXPAND VDISK MAXIMUM=20000
+
+     DISKPART> expand vdisk maximum=524288
+
+       100 百分比已完成
+
+     DiskPart 已成功扩展虚拟磁盘文件。
+
+     DISKPART> detail vdisk
+
+     设备类型 ID: 0 (未知)
+     供应商 ID: {00000000-0000-0000-0000-000000000000} (未知)
+     状态: 已添加
+     虚拟大小:  512 GB
+     物理大小:  100 GB
+     文件名: C:\Users\jeffrey\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx
+     为子级: 否
+     父文件名:
+     找不到关联的磁盘号。
+
+
+     DISKPART> exit
+
+     退出 DiskPart...
+
+     C:>
+   #+END_EXAMPLE
+4. 进入主机后 resize2fs 来添加文件系统容量
+   #+BEGIN_SRC sh
+     root@ubuntu:/# resize2fs /dev/sdc # ==> 调整文件系统大小
+     resize2fs 1.46.5 (30-Dec-2021)
+     Filesystem at /dev/sda2 is mounted on /; on-line resizing required
+     old_desc_blocks = 7, new_desc_blocks = 25
+     The filesystem on /dev/sda2 is now 52428283 (4k) blocks long.
+
+   #+END_SRC
