@@ -2671,6 +2671,82 @@ Fontconfig error: Cannot load default config file
   //192.168.100.10/share/ /mnt/data       cifs     defaults,username="guest",password="",rw,file_mode=0777,dir_mode=0777,uid=0,gid=0,vers=2.0     0       0
 #+END_SRC
 
+** UOS
+*** docker/firewalld
+同网络内，容器间能 ping 但访问监听端口时，提示 'No route to host'
+
+#+BEGIN_SRC sh
+  firewall-cmd --permanent --zone=public --add-rich-rule='rule family=ipv4 source address=172.17.0.0/16 accept' && firewall-cmd --reload
+#+END_SRC
+
+*** 容器间共享网络
+创建子网
+#+BEGIN_SRC sh
+    docker network create --subnet=172.77.0.0/16 hutnet
+#+END_SRC
+
+#+RESULTS:
+: e28c2ce8317a3b12882cf5f1b08aa2b87ebd50305e6bacd9e0957caaa0f9aee9
+
+查看网络
+#+BEGIN_SRC sh
+    docker network ls
+#+END_SRC
+
+#+RESULTS:
+| NETWORK      | ID     | NAME   | DRIVER | SCOPE |
+| 8549bacddc39 | bridge | bridge | local  |       |
+| 8a8a365252ea | host   | host   | local  |       |
+| e28c2ce8317a | hutnet | bridge | local  |       |
+| cf87d5217c45 | none   | null   | local  |       |
+
+删除子网
+#+BEGIN_SRC sh
+    docker network rm hutnet
+#+END_SRC
+
+#+RESULTS:
+: hutnet
+
+*** Gitlab 代理重定向
+#+BEGIN_SRC conf
+  # gitlab
+  location /gitlab/ {
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_pass   http://172.77.0.2:80/gitlab/;
+  }
+#+END_SRC
+
+*** gitlab-ce 14 初始密码无法登录的问题
+gitlab-ce 安装好后，root 用户的初始密码放在
+/etc/gitlab/initial_root_password 文件中，但这个密码仍然登录失败。
+
+用下面的命令可快速重置 root 密码，已验证通过:
+#+BEGIN_EXAMPLE
+  [root@localhost gitlab]# gitlab-rake "gitlab:password:reset[root]"
+  Enter password:
+  Confirm password:
+  Password successfully updated for user with username root.
+#+END_EXAMPLE
+
+两次输入密码搞定！
+
+*** docker 重启自动删除网络配置
+#+BEGIN_EXAMPLE
+  [root@16-0-0-85 ganglia]# cat /etc/sysconfig/docker
+  # /etc/sysconfig/docker
+
+  # Modify these options if you want to change the way the docker daemon runs
+  OPTIONS='--live-restore'
+
+  # avoid after hw restart customer's docker network
+  DISABLE_CRASH_FILES_DELETE=true
+
+  DOCKER_CERT_PATH=/etc/docker
+#+END_EXAMPLE
+
 ** Linux & Shell
 *** 后台运行命令 cmd
 #+BEGIN_SRC sh
