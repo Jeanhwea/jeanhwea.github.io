@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-02-07 Fri 14:41 -->
+<!-- 2025-02-08 Sat 13:29 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>DeepSeek本地化部署笔记</title>
@@ -201,26 +201,31 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org4ef5d15">1. 下载模型</a>
+<li><a href="#org201a09a">1. 下载模型</a>
 <ul>
-<li><a href="#org4b1c849">1.1. huggingface-cli 配置</a></li>
-<li><a href="#orgbd75efb">1.2. hf_transfer 加速下载</a></li>
-<li><a href="#org6502ab6">1.3. 下载 DeepSeek-R1 模型</a></li>
+<li><a href="#orgb8f8b72">1.1. huggingface-cli 配置</a></li>
+<li><a href="#orgf178064">1.2. hf_transfer 加速下载</a></li>
+<li><a href="#org6a86cbb">1.3. 下载 DeepSeek-R1 模型</a></li>
 </ul>
 </li>
-<li><a href="#org0d6e5cc">2. 下载 R1 代码</a></li>
-<li><a href="#orgcb5bc8a">3. 运行测试</a></li>
+<li><a href="#orgf08801f">2. 下载 R1 代码</a></li>
+<li><a href="#org008dd25">3. Ollama 下载</a>
+<ul>
+<li><a href="#orgaebabed">3.1. 安装 ollama 客户端</a></li>
+<li><a href="#org124215f">3.2. 运行 deepseek 模型</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org4ef5d15" class="outline-2">
-<h2 id="org4ef5d15"><span class="section-number-2">1.</span> 下载模型</h2>
+<div id="outline-container-org201a09a" class="outline-2">
+<h2 id="org201a09a"><span class="section-number-2">1.</span> 下载模型</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org4b1c849" class="outline-3">
-<h3 id="org4b1c849"><span class="section-number-3">1.1.</span> huggingface-cli 配置</h3>
+<div id="outline-container-orgb8f8b72" class="outline-3">
+<h3 id="orgb8f8b72"><span class="section-number-3">1.1.</span> huggingface-cli 配置</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 下载 huggingface-cli
@@ -241,8 +246,8 @@
 </div>
 </div>
 
-<div id="outline-container-orgbd75efb" class="outline-3">
-<h3 id="orgbd75efb"><span class="section-number-3">1.2.</span> hf_transfer 加速下载</h3>
+<div id="outline-container-orgf178064" class="outline-3">
+<h3 id="orgf178064"><span class="section-number-3">1.2.</span> hf_transfer 加速下载</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 <a href="https://github.com/huggingface/hf_transfer">hf_transfer</a> 加速 huggingface 文件下载
@@ -256,8 +261,8 @@
 </div>
 </div>
 
-<div id="outline-container-org6502ab6" class="outline-3">
-<h3 id="org6502ab6"><span class="section-number-3">1.3.</span> 下载 DeepSeek-R1 模型</h3>
+<div id="outline-container-org6a86cbb" class="outline-3">
+<h3 id="org6a86cbb"><span class="section-number-3">1.3.</span> 下载 DeepSeek-R1 模型</h3>
 <div class="outline-text-3" id="text-1-3">
 <div class="org-src-container">
 <pre class="src src-sh">huggingface-cli download --resume-download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
@@ -268,8 +273,8 @@ huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
 </div>
 </div>
 
-<div id="outline-container-org0d6e5cc" class="outline-2">
-<h2 id="org0d6e5cc"><span class="section-number-2">2.</span> 下载 R1 代码</h2>
+<div id="outline-container-orgf08801f" class="outline-2">
+<h2 id="orgf08801f"><span class="section-number-2">2.</span> 下载 R1 代码</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
 <pre class="src src-sh">git clone https://github.com/deepseek-ai/DeepSeek-R1.git
@@ -278,12 +283,48 @@ huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
 </div>
 </div>
 
-<div id="outline-container-orgcb5bc8a" class="outline-2">
-<h2 id="orgcb5bc8a"><span class="section-number-2">3.</span> 运行测试</h2>
+<div id="outline-container-org008dd25" class="outline-2">
+<h2 id="org008dd25"><span class="section-number-2">3.</span> Ollama 下载</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgaebabed" class="outline-3">
+<h3 id="orgaebabed"><span class="section-number-3">3.1.</span> 安装 ollama 客户端</h3>
+<div class="outline-text-3" id="text-3-1">
+<ol class="org-ol">
+<li><p>
+下载并安装 <a href="https://ollama.com/">ollama</a>
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">wget -c https://github.com/ollama/ollama/releases/download/v0.5.7/ollama-linux-amd64.tgz
+</pre>
+</div></li>
+<li><p>
+直接解压安装
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">sudo tar -C /usr -xzf ollama-linux-amd64.tgz
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org124215f" class="outline-3">
+<h3 id="org124215f"><span class="section-number-3">3.2.</span> 运行 deepseek 模型</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+运行 deepseek 模型 | <a href="https://ollama.com/library/deepseek-r1">deepseek-r1</a>
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">ollama run deepseek-r1:32b
+</pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2025-02-07 Fri 14:41. Created by Jinghui Hu at 2025-02-07 Fri 00:00.</p>
+<p class="author">Last Updated 2025-02-08 Sat 13:29. Created by Jinghui Hu at 2025-02-07 Fri 00:00.</p>
 </div>
 </body>
 </html>
