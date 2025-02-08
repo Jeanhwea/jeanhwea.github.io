@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-02-08 Sat 13:33 -->
+<!-- 2025-02-08 Sat 15:40 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>DeepSeek本地化部署笔记</title>
@@ -211,18 +211,18 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgd451e2e">1. 下载模型</a>
+<li><a href="#orgff25d02">1. 下载模型</a>
 <ul>
-<li><a href="#org4c3b2d0">1.1. huggingface-cli 配置</a></li>
-<li><a href="#orgbdc023e">1.2. hf_transfer 加速下载</a></li>
-<li><a href="#orgc310112">1.3. 下载 DeepSeek-R1 模型</a></li>
+<li><a href="#org8634503">1.1. huggingface-cli 配置</a></li>
+<li><a href="#org832c163">1.2. hf_transfer 加速下载</a></li>
+<li><a href="#org2279979">1.3. 下载 DeepSeek-R1 模型</a></li>
 </ul>
 </li>
-<li><a href="#org55fc555">2. 下载 R1 代码</a></li>
-<li><a href="#org9b341e8">3. Ollama 下载</a>
+<li><a href="#org20ae59a">2. 下载 R1 代码</a></li>
+<li><a href="#org867ef0a">3. Ollama 下载</a>
 <ul>
-<li><a href="#orgc05e5a5">3.1. 安装 ollama 客户端</a></li>
-<li><a href="#org72ccda4">3.2. 运行 deepseek 模型</a></li>
+<li><a href="#org9b74dbe">3.1. 安装 ollama 客户端</a></li>
+<li><a href="#org4471350">3.2. 运行 deepseek 模型</a></li>
 </ul>
 </li>
 </ul>
@@ -230,12 +230,12 @@
 </div>
 
 
-<div id="outline-container-orgd451e2e" class="outline-2">
-<h2 id="orgd451e2e"><span class="section-number-2">1.</span> 下载模型</h2>
+<div id="outline-container-orgff25d02" class="outline-2">
+<h2 id="orgff25d02"><span class="section-number-2">1.</span> 下载模型</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org4c3b2d0" class="outline-3">
-<h3 id="org4c3b2d0"><span class="section-number-3">1.1.</span> huggingface-cli 配置</h3>
+<div id="outline-container-org8634503" class="outline-3">
+<h3 id="org8634503"><span class="section-number-3">1.1.</span> huggingface-cli 配置</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 下载 huggingface-cli
@@ -249,15 +249,15 @@
 配置国内源 <a href="https://hf-mirror.com">hf-mirror</a>
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #626262;"># </span><span style="color: #626262;">huggingface mirror</span>
-<span style="color: #5fafff;">export</span> <span style="color: #ffd700;">HF_ENDPOINT</span>=https://hf-mirror.com
+<pre class="src src-sh"><span style="color: #525252;"># </span><span style="color: #525252;">huggingface mirror</span>
+<span style="color: #c678dd;">export</span> <span style="color: #dcaeea;">HF_ENDPOINT</span>=https://hf-mirror.com
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgbdc023e" class="outline-3">
-<h3 id="orgbdc023e"><span class="section-number-3">1.2.</span> hf_transfer 加速下载</h3>
+<div id="outline-container-org832c163" class="outline-3">
+<h3 id="org832c163"><span class="section-number-3">1.2.</span> hf_transfer 加速下载</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 <a href="https://github.com/huggingface/hf_transfer">hf_transfer</a> 加速 huggingface 文件下载
@@ -265,14 +265,14 @@
 
 <div class="org-src-container">
 <pre class="src src-sh">pip install -U hf_transfer
-<span style="color: #5fafff;">export</span> <span style="color: #ffd700;">HF_HUB_ENABLE_HF_TRANSFER</span>=1
+<span style="color: #c678dd;">export</span> <span style="color: #dcaeea;">HF_HUB_ENABLE_HF_TRANSFER</span>=1
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgc310112" class="outline-3">
-<h3 id="orgc310112"><span class="section-number-3">1.3.</span> 下载 DeepSeek-R1 模型</h3>
+<div id="outline-container-org2279979" class="outline-3">
+<h3 id="org2279979"><span class="section-number-3">1.3.</span> 下载 DeepSeek-R1 模型</h3>
 <div class="outline-text-3" id="text-1-3">
 <div class="org-src-container">
 <pre class="src src-sh">huggingface-cli download --resume-download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
@@ -283,8 +283,8 @@ huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
 </div>
 </div>
 
-<div id="outline-container-org55fc555" class="outline-2">
-<h2 id="org55fc555"><span class="section-number-2">2.</span> 下载 R1 代码</h2>
+<div id="outline-container-org20ae59a" class="outline-2">
+<h2 id="org20ae59a"><span class="section-number-2">2.</span> 下载 R1 代码</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
 <pre class="src src-sh">git clone https://github.com/deepseek-ai/DeepSeek-R1.git
@@ -293,12 +293,12 @@ huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
 </div>
 </div>
 
-<div id="outline-container-org9b341e8" class="outline-2">
-<h2 id="org9b341e8"><span class="section-number-2">3.</span> Ollama 下载</h2>
+<div id="outline-container-org867ef0a" class="outline-2">
+<h2 id="org867ef0a"><span class="section-number-2">3.</span> Ollama 下载</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgc05e5a5" class="outline-3">
-<h3 id="orgc05e5a5"><span class="section-number-3">3.1.</span> 安装 ollama 客户端</h3>
+<div id="outline-container-org9b74dbe" class="outline-3">
+<h3 id="org9b74dbe"><span class="section-number-3">3.1.</span> 安装 ollama 客户端</h3>
 <div class="outline-text-3" id="text-3-1">
 <ol class="org-ol">
 <li><p>
@@ -319,8 +319,8 @@ huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
 </div>
 </div>
 
-<div id="outline-container-org72ccda4" class="outline-3">
-<h3 id="org72ccda4"><span class="section-number-3">3.2.</span> 运行 deepseek 模型</h3>
+<div id="outline-container-org4471350" class="outline-3">
+<h3 id="org4471350"><span class="section-number-3">3.2.</span> 运行 deepseek 模型</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 运行 deepseek 模型 | <a href="https://ollama.com/library/deepseek-r1">deepseek-r1</a>
@@ -334,7 +334,7 @@ huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2025-02-08 Sat 13:33. Created by Jinghui Hu at 2025-02-07 Fri 00:00.</p>
+<p class="author">Last Updated 2025-02-08 Sat 15:40. Created by Jinghui Hu at 2025-02-07 Fri 00:00.</p>
 </div>
 </body>
 </html>
