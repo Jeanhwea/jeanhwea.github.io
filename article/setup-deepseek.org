@@ -9,39 +9,7 @@
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
 
 
-* 下载模型
-** huggingface-cli 配置
-下载 huggingface-cli
-#+BEGIN_SRC sh
-  pip install -U huggingface_hub
-#+END_SRC
-
-配置国内源 [[https://hf-mirror.com][hf-mirror]]
-#+BEGIN_SRC sh
-  # huggingface mirror
-  export HF_ENDPOINT=https://hf-mirror.com
-#+END_SRC
-
-** hf_transfer 加速下载
-[[https://github.com/huggingface/hf_transfer][hf_transfer]] 加速 huggingface 文件下载
-
-#+BEGIN_SRC sh
-  pip install -U hf_transfer
-  export HF_HUB_ENABLE_HF_TRANSFER=1
-#+END_SRC
-
-** 下载 DeepSeek-R1 模型
-#+BEGIN_SRC sh
-  huggingface-cli download --resume-download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
-  huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
-#+END_SRC
-
-* 下载 R1 代码
-#+BEGIN_SRC sh
-  git clone https://github.com/deepseek-ai/DeepSeek-R1.git
-#+END_SRC
-
-* Ollama 下载
+* Ollama 快速试用
 ** 安装 ollama 客户端
 1. 下载并安装 [[https://ollama.com/][ollama]]
    #+BEGIN_SRC sh
@@ -56,4 +24,37 @@
 运行 deepseek 模型 | [[https://ollama.com/library/deepseek-r1][deepseek-r1]]
    #+BEGIN_SRC sh
      ollama run deepseek-r1:32b
+   #+END_SRC
+* 企业级部署
+** 下载模型
+1. huggingface-cli 配置, 配置国内源 [[https://hf-mirror.com][hf-mirror]]
+   #+BEGIN_SRC sh
+     pip install -U huggingface_hub
+     # huggingface mirror
+     export HF_ENDPOINT=https://hf-mirror.com
+   #+END_SRC
+2. [[https://github.com/huggingface/hf_transfer][hf_transfer]] 加速 huggingface 文件下载
+   #+BEGIN_SRC sh
+     pip install -U hf_transfer
+     export HF_HUB_ENABLE_HF_TRANSFER=1
+   #+END_SRC
+3. 下载 DeepSeek-R1 模型
+   #+BEGIN_SRC sh
+     huggingface-cli download --resume-download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
+     huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
+   #+END_SRC
+
+** 相关工具链
+1. DeepSeek 原始代码
+   #+BEGIN_SRC sh
+     git clone https://github.com/deepseek-ai/DeepSeek-V3.git
+     git clone https://github.com/deepseek-ai/DeepSeek-R1.git
+   #+END_SRC
+2. [[https://docs.vllm.ai/en/latest/][vllm]] 支持 hf 模型直接部署
+   #+BEGIN_SRC sh
+     git clone https://github.com/vllm-project/vllm.git
+   #+END_SRC
+3. open-webui
+   #+BEGIN_SRC sh
+     git clone https://github.com/open-webui/open-webui.git
    #+END_SRC
