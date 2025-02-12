@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-02-08 Sat 15:40 -->
+<!-- 2025-02-11 Tue 21:37 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>DeepSeek本地化部署笔记</title>
@@ -211,18 +211,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgff25d02">1. 下载模型</a>
+<li><a href="#org68eff5e">1. Ollama 快速试用</a>
 <ul>
-<li><a href="#org8634503">1.1. huggingface-cli 配置</a></li>
-<li><a href="#org832c163">1.2. hf_transfer 加速下载</a></li>
-<li><a href="#org2279979">1.3. 下载 DeepSeek-R1 模型</a></li>
+<li><a href="#org2b5750d">1.1. 安装 ollama 客户端</a></li>
+<li><a href="#orgd4bff72">1.2. 运行 deepseek 模型</a></li>
 </ul>
 </li>
-<li><a href="#org20ae59a">2. 下载 R1 代码</a></li>
-<li><a href="#org867ef0a">3. Ollama 下载</a>
+<li><a href="#orgc1bcfe1">2. 企业级部署</a>
 <ul>
-<li><a href="#org9b74dbe">3.1. 安装 ollama 客户端</a></li>
-<li><a href="#org4471350">3.2. 运行 deepseek 模型</a></li>
+<li><a href="#orgda12dfc">2.1. 下载模型</a></li>
+<li><a href="#org3ccd8ea">2.2. 相关工具链</a></li>
 </ul>
 </li>
 </ul>
@@ -230,76 +228,13 @@
 </div>
 
 
-<div id="outline-container-orgff25d02" class="outline-2">
-<h2 id="orgff25d02"><span class="section-number-2">1.</span> 下载模型</h2>
+<div id="outline-container-org68eff5e" class="outline-2">
+<h2 id="org68eff5e"><span class="section-number-2">1.</span> Ollama 快速试用</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org8634503" class="outline-3">
-<h3 id="org8634503"><span class="section-number-3">1.1.</span> huggingface-cli 配置</h3>
+<div id="outline-container-org2b5750d" class="outline-3">
+<h3 id="org2b5750d"><span class="section-number-3">1.1.</span> 安装 ollama 客户端</h3>
 <div class="outline-text-3" id="text-1-1">
-<p>
-下载 huggingface-cli
-</p>
-<div class="org-src-container">
-<pre class="src src-sh">pip install -U huggingface_hub
-</pre>
-</div>
-
-<p>
-配置国内源 <a href="https://hf-mirror.com">hf-mirror</a>
-</p>
-<div class="org-src-container">
-<pre class="src src-sh"><span style="color: #525252;"># </span><span style="color: #525252;">huggingface mirror</span>
-<span style="color: #c678dd;">export</span> <span style="color: #dcaeea;">HF_ENDPOINT</span>=https://hf-mirror.com
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org832c163" class="outline-3">
-<h3 id="org832c163"><span class="section-number-3">1.2.</span> hf_transfer 加速下载</h3>
-<div class="outline-text-3" id="text-1-2">
-<p>
-<a href="https://github.com/huggingface/hf_transfer">hf_transfer</a> 加速 huggingface 文件下载
-</p>
-
-<div class="org-src-container">
-<pre class="src src-sh">pip install -U hf_transfer
-<span style="color: #c678dd;">export</span> <span style="color: #dcaeea;">HF_HUB_ENABLE_HF_TRANSFER</span>=1
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org2279979" class="outline-3">
-<h3 id="org2279979"><span class="section-number-3">1.3.</span> 下载 DeepSeek-R1 模型</h3>
-<div class="outline-text-3" id="text-1-3">
-<div class="org-src-container">
-<pre class="src src-sh">huggingface-cli download --resume-download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
-huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
-</pre>
-</div>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org20ae59a" class="outline-2">
-<h2 id="org20ae59a"><span class="section-number-2">2.</span> 下载 R1 代码</h2>
-<div class="outline-text-2" id="text-2">
-<div class="org-src-container">
-<pre class="src src-sh">git clone https://github.com/deepseek-ai/DeepSeek-R1.git
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org867ef0a" class="outline-2">
-<h2 id="org867ef0a"><span class="section-number-2">3.</span> Ollama 下载</h2>
-<div class="outline-text-2" id="text-3">
-</div>
-<div id="outline-container-org9b74dbe" class="outline-3">
-<h3 id="org9b74dbe"><span class="section-number-3">3.1.</span> 安装 ollama 客户端</h3>
-<div class="outline-text-3" id="text-3-1">
 <ol class="org-ol">
 <li><p>
 下载并安装 <a href="https://ollama.com/">ollama</a>
@@ -319,9 +254,9 @@ huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
 </div>
 </div>
 
-<div id="outline-container-org4471350" class="outline-3">
-<h3 id="org4471350"><span class="section-number-3">3.2.</span> 运行 deepseek 模型</h3>
-<div class="outline-text-3" id="text-3-2">
+<div id="outline-container-orgd4bff72" class="outline-3">
+<h3 id="orgd4bff72"><span class="section-number-3">1.2.</span> 运行 deepseek 模型</h3>
+<div class="outline-text-3" id="text-1-2">
 <p>
 运行 deepseek 模型 | <a href="https://ollama.com/library/deepseek-r1">deepseek-r1</a>
 </p>
@@ -332,9 +267,76 @@ huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
 </div>
 </div>
 </div>
+<div id="outline-container-orgc1bcfe1" class="outline-2">
+<h2 id="orgc1bcfe1"><span class="section-number-2">2.</span> 企业级部署</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgda12dfc" class="outline-3">
+<h3 id="orgda12dfc"><span class="section-number-3">2.1.</span> 下载模型</h3>
+<div class="outline-text-3" id="text-2-1">
+<ol class="org-ol">
+<li><p>
+huggingface-cli 配置, 配置国内源 <a href="https://hf-mirror.com">hf-mirror</a>
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">pip install -U huggingface_hub
+<span style="color: #525252;"># </span><span style="color: #525252;">huggingface mirror</span>
+<span style="color: #c678dd;">export</span> <span style="color: #dcaeea;">HF_ENDPOINT</span>=https://hf-mirror.com
+</pre>
+</div></li>
+<li><p>
+<a href="https://github.com/huggingface/hf_transfer">hf_transfer</a> 加速 huggingface 文件下载
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">pip install -U hf_transfer
+<span style="color: #c678dd;">export</span> <span style="color: #dcaeea;">HF_HUB_ENABLE_HF_TRANSFER</span>=1
+</pre>
+</div></li>
+<li><p>
+下载 DeepSeek-R1 模型
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">huggingface-cli download --resume-download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
+huggingface-cli download deepseek-ai/DeepSeek-R1 --local-dir DeepSeek-R1
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org3ccd8ea" class="outline-3">
+<h3 id="org3ccd8ea"><span class="section-number-3">2.2.</span> 相关工具链</h3>
+<div class="outline-text-3" id="text-2-2">
+<ol class="org-ol">
+<li><p>
+DeepSeek 原始代码
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">git clone https://github.com/deepseek-ai/DeepSeek-V3.git
+git clone https://github.com/deepseek-ai/DeepSeek-R1.git
+</pre>
+</div></li>
+<li><p>
+<a href="https://docs.vllm.ai/en/latest/">vllm</a> 支持 hf 模型直接部署
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">git clone https://github.com/vllm-project/vllm.git
+</pre>
+</div></li>
+<li><p>
+open-webui
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">git clone https://github.com/open-webui/open-webui.git
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2025-02-08 Sat 15:40. Created by Jinghui Hu at 2025-02-07 Fri 00:00.</p>
+<p class="author">Last Updated 2025-02-11 Tue 21:37. Created by Jinghui Hu at 2025-02-07 Fri 00:00.</p>
 </div>
 </body>
 </html>
