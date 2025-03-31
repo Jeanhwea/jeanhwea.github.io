@@ -2981,6 +2981,39 @@ esxi 6.7 修改配置文件来全局开启虚拟化
   ln -s output/compile_commands.json compile_commands.json
 #+END_SRC
 
+*** Ubuntu 22.04 添加开机启动脚本
+1. 在目录/etc/init.d/目录新建脚本
+   #+BEGIN_SRC sh
+     sudo vim /etc/init.d/init.sh
+   #+END_SRC
+2. 脚本内容
+   #+BEGIN_SRC sh
+     #!/bin/bash
+     # Only for test
+     touch /root/1.txt
+   #+END_SRC
+3. 添加执行权限
+   #+BEGIN_SRC sh
+     sudo chmod +x /etc/init.d/init.sh
+   #+END_SRC
+4. 添加启动脚本
+   #+BEGIN_SRC sh
+     sudo update-rc.d init.sh defaults 90
+   #+END_SRC
+5. 查看服务列表
+   #+BEGIN_SRC sh
+     sudo service --status-all
+   #+END_SRC
+6. 测试是否生效#
+   #+BEGIN_SRC sh
+     sudo service init.sh start
+     sudo service init.sh stop
+   #+END_SRC
+7. 删除任务
+   #+BEGIN_SRC sh
+     sudo update-rc.d -f init.sh remove
+   #+END_SRC
+
 ** WSL
 *** Ubuntu 安装并迁移到其他盘
 1. 安装说明 [[https://learn.microsoft.com/zh-cn/windows/wsl/install-manual][link]]
