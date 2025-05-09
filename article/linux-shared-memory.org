@@ -1,0 +1,35 @@
+#+TITLE: Linux 清理共享内存
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2025-05-09 Fri>
+#+STARTUP: overview num indent
+#+OPTIONS: ^:nil
+
+
+* 问题 QSharedMemory
+最近在编写 QT 应用时，发现程序异常退出 QSharedMemory 申请的内存还是会驻留
+
+#+BEGIN_SRC python
+  class TdaApplication(QApplication):
+
+      def __init__(self, *args, **kwargs):
+          super().__init__(*args, **kwargs)
+          self._shared_mem = QSharedMemory(TDA_APPNAME)
+          self._win = QMainWindow(parent=None)
+
+#+END_SRC
+
+* 清理工具
+可以使用 ipcs/ipcrm 工具手工清理对应内存地址，具体示例如下：
+
+#+BEGIN_SRC sh
+  $ ipcs -m
+
+  ------ Shared Memory Segments --------
+  key        shmid      owner      perms      bytes      nattch     status
+  0x00000000 16         jhh        606        11436552   2          dest
+  0x00000000 17         jhh        606        11436552   2          dest
+  0x512034dc 32797      jhh        600        1          0
+
+  $ ipcrm -M 0x512034dc
+#+END_SRC
