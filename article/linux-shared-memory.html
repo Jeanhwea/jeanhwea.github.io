@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-05-31 Sat 10:43 -->
+<!-- 2025-05-12 Mon 21:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>TDA (Thermogravimetry Data Analysis)</title>
+<title>Linux 清理共享内存</title>
 <meta name="author" content="Jinghui Hu" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -206,142 +206,62 @@
  |
  <a accesskey="H" href="../index.html"> HOME </a>
 </div><div id="content" class="content">
-<h1 class="title">TDA (Thermogravimetry Data Analysis)</h1>
+<h1 class="title">Linux 清理共享内存</h1>
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org24ca340">1. 简介</a></li>
-<li><a href="#org1b8f771">2. 软件功能界面</a>
-<ul>
-<li><a href="#org5c8b3e0">2.1. 绘图界面</a></li>
-<li><a href="#orgf4d335b">2.2. 图片缩放</a></li>
-<li><a href="#org4e1c16a">2.3. 编辑信号</a></li>
-<li><a href="#org0288918">2.4. 轴，曲线，网格可见性</a></li>
-<li><a href="#org2884444">2.5. 表格界面</a></li>
-<li><a href="#org669c490">2.6. 局部视图</a></li>
-<li><a href="#org533c72e">2.7. 导出文件</a></li>
-<li><a href="#org8396635">2.8. 操作日志</a></li>
-</ul>
-</li>
-<li><a href="#orgf0eae89">3. 作者</a></li>
+<li><a href="#org40e7b9f">1. 问题 QSharedMemory</a></li>
+<li><a href="#org7362bba">2. 清理工具</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org24ca340" class="outline-2">
-<h2 id="org24ca340"><span class="section-number-2">1.</span> 简介</h2>
+
+<div id="outline-container-org40e7b9f" class="outline-2">
+<h2 id="org40e7b9f"><span class="section-number-2">1.</span> 问题 QSharedMemory</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-TDA 是一款热重曲线分析软件，提供高效的热重作图和分析功能。
+最近在编写 QT 应用时，发现程序异常退出 QSharedMemory 申请的内存还是会驻留
 </p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #51afef;">class</span> <span style="color: #ECBE7B;">TdaApplication</span><span style="color: #8d5649;">(</span>QApplication<span style="color: #8d5649;">)</span>:
+
+    <span style="color: #51afef;">def</span> <span style="color: #c678dd;">__init__</span><span style="color: #8d5649;">(</span><span style="color: #51afef;">self</span>, *args, **kwargs<span style="color: #8d5649;">)</span>:
+        <span style="color: #c678dd;">super</span><span style="color: #8d5649;">()</span>.__init__<span style="color: #8d5649;">(</span>*args, **kwargs<span style="color: #8d5649;">)</span>
+        <span style="color: #51afef;">self</span>.<span style="color: #dcaeea;">_shared_mem</span> = QSharedMemory<span style="color: #8d5649;">(</span>TDA_APPNAME<span style="color: #8d5649;">)</span>
+        <span style="color: #51afef;">self</span>.<span style="color: #dcaeea;">_win</span> = QMainWindow<span style="color: #8d5649;">(</span>parent=<span style="color: #a9a1e1;">None</span><span style="color: #8d5649;">)</span>
+
+</pre>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org1b8f771" class="outline-2">
-<h2 id="org1b8f771"><span class="section-number-2">2.</span> 软件功能界面</h2>
+<div id="outline-container-org7362bba" class="outline-2">
+<h2 id="org7362bba"><span class="section-number-2">2.</span> 清理工具</h2>
 <div class="outline-text-2" id="text-2">
-</div>
-<div id="outline-container-org5c8b3e0" class="outline-3">
-<h3 id="org5c8b3e0"><span class="section-number-3">2.1.</span> 绘图界面</h3>
-<div class="outline-text-3" id="text-2-1">
-
-<div id="orgff0b4c4" class="figure">
-<p><img src="../static/figure/2025/0418/tda-v0.6.4-02.png" alt="tda-v0.6.4-02.png" />
+<p>
+可以使用 ipcs/ipcrm 工具手工清理对应内存地址，具体示例如下：
 </p>
-</div>
-</div>
-</div>
 
-<div id="outline-container-orgf4d335b" class="outline-3">
-<h3 id="orgf4d335b"><span class="section-number-3">2.2.</span> 图片缩放</h3>
-<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-sh">$ ipcs -m
 
-<div id="org6f76c8a" class="figure">
-<p><img src="../static/figure/2025/0418/tda-v0.6.4-01.png" alt="tda-v0.6.4-01.png" />
-</p>
-</div>
-</div>
-</div>
+------ Shared Memory Segments --------
+key        shmid      owner      perms      bytes      nattch     status
+0x00000000 16         jhh        606        11436552   2          dest
+0x00000000 17         jhh        606        11436552   2          dest
+0x512034dc 32797      jhh        600        1          0
 
-<div id="outline-container-org4e1c16a" class="outline-3">
-<h3 id="org4e1c16a"><span class="section-number-3">2.3.</span> 编辑信号</h3>
-<div class="outline-text-3" id="text-2-3">
-
-<div id="org1250162" class="figure">
-<p><img src="../static/figure/2025/0418/tda-v0.6.4-03.png" alt="tda-v0.6.4-03.png" />
-</p>
+$ ipcrm -M 0x512034dc
+</pre>
 </div>
-</div>
-</div>
-
-<div id="outline-container-org0288918" class="outline-3">
-<h3 id="org0288918"><span class="section-number-3">2.4.</span> 轴，曲线，网格可见性</h3>
-<div class="outline-text-3" id="text-2-4">
-
-<div id="orgb84f1e2" class="figure">
-<p><img src="../static/figure/2025/0418/tda-v0.6.4-04.png" alt="tda-v0.6.4-04.png" />
-</p>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org2884444" class="outline-3">
-<h3 id="org2884444"><span class="section-number-3">2.5.</span> 表格界面</h3>
-<div class="outline-text-3" id="text-2-5">
-
-<div id="orgbdd115f" class="figure">
-<p><img src="../static/figure/2025/0418/tda-v0.6.4-05.png" alt="tda-v0.6.4-05.png" />
-</p>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org669c490" class="outline-3">
-<h3 id="org669c490"><span class="section-number-3">2.6.</span> 局部视图</h3>
-<div class="outline-text-3" id="text-2-6">
-
-<div id="orgdd4b3ec" class="figure">
-<p><img src="../static/figure/2025/0418/tda-v0.7.4-08.png" alt="tda-v0.7.4-08.png" />
-</p>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org533c72e" class="outline-3">
-<h3 id="org533c72e"><span class="section-number-3">2.7.</span> 导出文件</h3>
-<div class="outline-text-3" id="text-2-7">
-
-<div id="org76c78b0" class="figure">
-<p><img src="../static/figure/2025/0418/tda-v0.6.4-06.png" alt="tda-v0.6.4-06.png" />
-</p>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org8396635" class="outline-3">
-<h3 id="org8396635"><span class="section-number-3">2.8.</span> 操作日志</h3>
-<div class="outline-text-3" id="text-2-8">
-
-<div id="org1ed88e7" class="figure">
-<p><img src="../static/figure/2025/0418/tda-v0.6.4-07.png" alt="tda-v0.6.4-07.png" />
-</p>
-</div>
-</div>
-</div>
-</div>
-
-<div id="outline-container-orgf0eae89" class="outline-2">
-<h2 id="orgf0eae89"><span class="section-number-2">3.</span> 作者</h2>
-<div class="outline-text-2" id="text-3">
-<ul class="org-ul">
-<li>Email: hujinghui@buaa.edu.cn</li>
-</ul>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2025-05-31 Sat 10:43. Created by Jinghui Hu at 2025-04-06 Sun 00:00.</p>
+<p class="author">Last Updated 2025-05-12 Mon 21:53. Created by Jinghui Hu at 2025-05-09 Fri 00:00.</p>
 </div>
 </body>
 </html>
