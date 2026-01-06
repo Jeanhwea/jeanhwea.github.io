@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-01-06 Tue 10:54 -->
+<!-- 2026-01-06 Tue 10:59 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>QSettings 操作</title>
@@ -211,19 +211,19 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgc6b904d">1. QSettings</a></li>
-<li><a href="#org6a4cda5">2. macOS 操作</a></li>
-<li><a href="#orgfad4edc">3. windows 存注册表</a></li>
+<li><a href="#org3d67c3b">1. QSettings 操作</a></li>
+<li><a href="#orgb7d31c3">2. macOS 操作</a></li>
+<li><a href="#orge29f333">3. Windows 注册表存储</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgc6b904d" class="outline-2">
-<h2 id="orgc6b904d"><span class="section-number-2">1.</span> QSettings</h2>
+<div id="outline-container-org3d67c3b" class="outline-2">
+<h2 id="org3d67c3b"><span class="section-number-2">1.</span> QSettings 操作</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-PySide6 持久化系统级别的配置数据往往会使用 QSettings 这个工具
+在 PySide6 中，系统级别的配置数据持久化通常使用 QSettings 工具
 </p>
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #96A7A9; font-style: italic;"># </span><span style="color: #96A7A9; font-style: italic;">&#21019;&#24314;&#23545;&#35937;
@@ -233,45 +233,65 @@ PySide6 持久化系统级别的配置数据往往会使用 QSettings 这个工�
 </span><span style="color: #268bd2;">data_value</span>: <span style="color: #d33682; font-style: italic;">str</span> = settings.value<span style="color: #8d5649;">(</span>data_key<span style="color: #8d5649;">)</span>
 settings.setValue<span style="color: #8d5649;">(</span>data_key, data_value<span style="color: #8d5649;">)</span>
 
-<span style="color: #96A7A9; font-style: italic;"># </span><span style="color: #96A7A9; font-style: italic;">&#26597;&#30475;&#20445;&#25345;&#25991;&#20214;
+<span style="color: #96A7A9; font-style: italic;"># </span><span style="color: #96A7A9; font-style: italic;">&#26597;&#30475;&#20445;&#23384;&#25991;&#20214;
 </span>settings.fileName<span style="color: #8d5649;">()</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org6a4cda5" class="outline-2">
-<h2 id="org6a4cda5"><span class="section-number-2">2.</span> macOS 操作</h2>
+<div id="outline-container-orgb7d31c3" class="outline-2">
+<h2 id="orgb7d31c3"><span class="section-number-2">2.</span> macOS 操作</h2>
 <div class="outline-text-2" id="text-2">
 <p>
-macOS 文件会持久化到 <code>~/Library/Preferences</code> 目录中，
-通常，用户会天真地以为直接 <code>rm com.company.xxx.plist</code> 就可以清除配置，
-但是 macOS 的配置文件有缓存，需要使用下面命令操作。
+macOS 配置文件会持久化到 <code>~/Library/Preferences</code> 目录中。
+用户可能会直接使用 <code>rm com.company.xxx.plist</code> 命令删除配置文件，
+但 macOS 的配置文件有缓存机制，需要使用专门的命令来操作。
 </p>
 
-<pre class="example" id="orgc99aae3">
+<pre class="example" id="org4a68666">
 # 读取配置
 $ defaults read com.red-infinity.AndroidCrashTraceTool
 {
     "ndk-root" = "/Users/jhh/Library/Android/sdk/ndk/27.3.13750724";
 }
+
 # 删除配置
 $ defaults delete com.red-infinity.AndroidCrashTraceTool
 </pre>
 </div>
 </div>
 
-<div id="outline-container-orgfad4edc" class="outline-2">
-<h2 id="orgfad4edc"><span class="section-number-2">3.</span> windows 存注册表</h2>
+<div id="outline-container-orge29f333" class="outline-2">
+<h2 id="orge29f333"><span class="section-number-2">3.</span> Windows 注册表存储</h2>
 <div class="outline-text-2" id="text-3">
-<pre class="example" id="org266b8a5">
+<p>
+Windows 配置数据通常存储在注册表中。
+用户可以直接在注册表编辑器中操作，
+</p>
+
+<pre class="example" id="orge270388">
 计算机\HKEY_CURRENT_USER\Software\Red Infinity\AndroidCrashTraceTool
+</pre>
+
+<p>
+也可以使用命令行工具 <code>reg</code> 来操作。
+</p>
+
+<pre class="example" id="orgef2a910">
+# 读取配置
+$ reg query "HKCU\Software\Red Infinity\AndroidCrashTraceTool" /v "ndk-root"
+HKEY_CURRENT_USER\Software\Red Infinity\AndroidCrashTraceTool
+    ndk-root    REG_SZ    C:\Users\jhh\AppData\Local\Android\Sdk\ndk\27.3.13750724
+
+# 删除配置
+$ reg delete "HKCU\Software\Red Infinity\AndroidCrashTraceTool" /v "ndk-root"
 </pre>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2026-01-06 Tue 10:54. Created by Jinghui Hu at 2026-01-04 Sun 00:00.</p>
+<p class="author">Last Updated 2026-01-06 Tue 10:59. Created by Jinghui Hu at 2026-01-04 Sun 00:00.</p>
 </div>
 </body>
 </html>

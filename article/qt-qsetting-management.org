@@ -7,8 +7,8 @@
 #+SETUPFILE: ~/.emacs.d/site-lisp/org-html-themes/setup/theme-readtheorg-local.setup
 
 
-* QSettings
-PySide6 持久化系统级别的配置数据往往会使用 QSettings 这个工具
+* QSettings 操作
+在 PySide6 中，系统级别的配置数据持久化通常使用 QSettings 工具
 #+BEGIN_SRC python
   # 创建对象
   settings = QSettings(consts.SYS_COMPANY, consts.SYS_APP_NAME)
@@ -17,14 +17,14 @@ PySide6 持久化系统级别的配置数据往往会使用 QSettings 这个工�
   data_value: str = settings.value(data_key)
   settings.setValue(data_key, data_value)
 
-  # 查看保持文件
+  # 查看保存文件
   settings.fileName()
 #+END_SRC
 
 * macOS 操作
-macOS 文件会持久化到 =~/Library/Preferences= 目录中，
-通常，用户会天真地以为直接 =rm com.company.xxx.plist= 就可以清除配置，
-但是 macOS 的配置文件有缓存，需要使用下面命令操作。
+macOS 配置文件会持久化到 =~/Library/Preferences= 目录中。
+用户可能会直接使用 =rm com.company.xxx.plist= 命令删除配置文件，
+但 macOS 的配置文件有缓存机制，需要使用专门的命令来操作。
 
 #+BEGIN_EXAMPLE
   # 读取配置
@@ -32,11 +32,27 @@ macOS 文件会持久化到 =~/Library/Preferences= 目录中，
   {
       "ndk-root" = "/Users/jhh/Library/Android/sdk/ndk/27.3.13750724";
   }
+
   # 删除配置
   $ defaults delete com.red-infinity.AndroidCrashTraceTool
 #+END_EXAMPLE
 
-* windows 存注册表
+* Windows 注册表存储
+Windows 配置数据通常存储在注册表中。
+用户可以直接在注册表编辑器中操作，
+
 #+BEGIN_EXAMPLE
-计算机\HKEY_CURRENT_USER\Software\Red Infinity\AndroidCrashTraceTool
+  计算机\HKEY_CURRENT_USER\Software\Red Infinity\AndroidCrashTraceTool
+#+END_EXAMPLE
+
+也可以使用命令行工具 =reg= 来操作。
+
+#+BEGIN_EXAMPLE
+  # 读取配置
+  $ reg query "HKCU\Software\Red Infinity\AndroidCrashTraceTool" /v "ndk-root"
+  HKEY_CURRENT_USER\Software\Red Infinity\AndroidCrashTraceTool
+      ndk-root    REG_SZ    C:\Users\jhh\AppData\Local\Android\Sdk\ndk\27.3.13750724
+
+  # 删除配置
+  $ reg delete "HKCU\Software\Red Infinity\AndroidCrashTraceTool" /v "ndk-root"
 #+END_EXAMPLE
