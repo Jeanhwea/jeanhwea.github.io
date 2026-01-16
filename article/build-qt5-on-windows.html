@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-01-16 Fri 09:25 -->
+<!-- 2026-01-16 Fri 10:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Windows 上源码构建 Qt5</title>
@@ -211,23 +211,23 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org08eba70">1. 系统要求</a></li>
-<li><a href="#orgd91fa54">2. 许可证</a></li>
-<li><a href="#orgee828ba">3. Windows</a></li>
-<li><a href="#org7d88db9">4. 构建！</a>
+<li><a href="#org98e23d0">1. 系统要求</a></li>
+<li><a href="#org097fb8d">2. 许可证</a></li>
+<li><a href="#org1c95f13">3. Windows</a></li>
+<li><a href="#org28e23e2">4. 构建！</a>
 <ul>
-<li><a href="#org6a174c4">4.1. 构建示例</a></li>
-<li><a href="#org71a5716">4.2. 开发者版本构建示例</a></li>
-<li><a href="#org69db1a3">4.3. 提示</a></li>
+<li><a href="#org18f83c7">4.1. 构建示例</a></li>
+<li><a href="#org7f5bdc5">4.2. 开发者版本构建示例</a></li>
+<li><a href="#org8025408">4.3. 提示</a></li>
 </ul>
 </li>
-<li><a href="#org505c1b9">5. 从 git 构建 Qt5</a></li>
-<li><a href="#org2a753f2">6. 文档</a></li>
+<li><a href="#orgdb0f0a0">5. 从 git 构建 Qt5</a></li>
+<li><a href="#org9553f7d">6. 文档</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org08eba70" class="outline-2">
-<h2 id="org08eba70"><span class="section-number-2">1.</span> 系统要求</h2>
+<div id="outline-container-org98e23d0" class="outline-2">
+<h2 id="org98e23d0"><span class="section-number-2">1.</span> 系统要求</h2>
 <div class="outline-text-2" id="text-1">
 <ul class="org-ul">
 <li>Perl 5.8 或更高版本，安装 <a href="https://strawberryperl.com/">Strawberry Perl</a></li>
@@ -241,8 +241,8 @@
 </p>
 </div>
 </div>
-<div id="outline-container-orgd91fa54" class="outline-2">
-<h2 id="orgd91fa54"><span class="section-number-2">2.</span> 许可证</h2>
+<div id="outline-container-org097fb8d" class="outline-2">
+<h2 id="org097fb8d"><span class="section-number-2">2.</span> 许可证</h2>
 <div class="outline-text-2" id="text-2">
 <ul class="org-ul">
 <li>开源用户 &lt;license&gt; = -opensource</li>
@@ -250,8 +250,8 @@
 </ul>
 </div>
 </div>
-<div id="outline-container-orgee828ba" class="outline-2">
-<h2 id="orgee828ba"><span class="section-number-2">3.</span> Windows</h2>
+<div id="outline-container-org1c95f13" class="outline-2">
+<h2 id="org1c95f13"><span class="section-number-2">3.</span> Windows</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 打开命令提示符。确保以下工具可以在路径中找到：
@@ -265,9 +265,14 @@ Ruby 1.9.3 或更高版本  <a href="http://rubyinstaller.org/">http://rubyinsta
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #9370db;">cd</span> qt-everywhere-src-5.15.18
-configure -prefix qtbase -opensource -nomake tests
-nmake // jom // mingw32-make
+<pre class="src src-sh">unzip qt-everywhere-opensource-src-5.15.18.zip
+<span style="color: #9370db;">cd</span> qt-everywhere-src-5.15.18
+<span style="color: #9370db;">set</span> <span style="color: #ffffff;">CL</span>=/MP32
+<span style="color: #6c6c6c;"># </span><span style="color: #6c6c6c;">configure -prefix qtbase -opensource -nomake tests</span>
+<span style="color: #6c6c6c;"># </span><span style="color: #6c6c6c;">configure -prefix "C:\Qt\Qt5.15.8" -shared -release -nomake tests -opensource -confirm-license</span>
+configure -prefix <span style="color: #f0e68c;">"C:\Qt\Qt5.15.8"</span> -shared -release -nomake tests -skip qtwebengine -opensource -confirm-license
+nmake
+nmake --install
 </pre>
 </div></li>
 </ul>
@@ -279,8 +284,8 @@ nmake // jom // mingw32-make
 </p>
 </div>
 </div>
-<div id="outline-container-org7d88db9" class="outline-2">
-<h2 id="org7d88db9"><span class="section-number-2">4.</span> 构建！</h2>
+<div id="outline-container-org28e23e2" class="outline-2">
+<h2 id="org28e23e2"><span class="section-number-2">4.</span> 构建！</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 使用典型的 `configure; make` 构建过程。一些相关的 configure 选项（请参阅 configure -help）：
@@ -293,10 +298,10 @@ nmake // jom // mingw32-make
 <li>-confirm-license      自动确认 LGPL 2.1 许可证。</li>
 </ul>
 </div>
-<div id="outline-container-org6a174c4" class="outline-3">
-<h3 id="org6a174c4"><span class="section-number-3">4.1.</span> 构建示例</h3>
+<div id="outline-container-org18f83c7" class="outline-3">
+<h3 id="org18f83c7"><span class="section-number-3">4.1.</span> 构建示例</h3>
 <div class="outline-text-3" id="text-4-1">
-<pre class="example" id="org0950e43">
+<pre class="example" id="orgbb68cde">
 C:\Qt\qt-everywhere-src-5.15.18&gt; configure -prefix %CD%\qtbase -opensource -nomake tests
 + cd qtbase
 + C:\Qt\qt-everywhere-src-5.15.18\qtbase\configure.bat -top-level -prefix C:\Qt\qt-everywhere-src-5.15.18\qtbase -opensource -nomake tests
@@ -641,8 +646,8 @@ Microsoft (R) 程序维护实用工具 14.44.35222.0 版
 </pre>
 </div>
 </div>
-<div id="outline-container-org71a5716" class="outline-3">
-<h3 id="org71a5716"><span class="section-number-3">4.2.</span> 开发者版本构建示例</h3>
+<div id="outline-container-org7f5bdc5" class="outline-3">
+<h3 id="org7f5bdc5"><span class="section-number-3">4.2.</span> 开发者版本构建示例</h3>
 <div class="outline-text-3" id="text-4-2">
 <div class="org-src-container">
 <pre class="src src-sh">./configure -developer-build &lt;license&gt;
@@ -673,8 +678,8 @@ make -j4 module-qtdeclarative
 </p>
 </div>
 </div>
-<div id="outline-container-org69db1a3" class="outline-3">
-<h3 id="org69db1a3"><span class="section-number-3">4.3.</span> 提示</h3>
+<div id="outline-container-org8025408" class="outline-3">
+<h3 id="org8025408"><span class="section-number-3">4.3.</span> 提示</h3>
 <div class="outline-text-3" id="text-4-3">
 <p>
 子模块仓库 qtrepotools 包含对开发人员和发布工程师有用的脚本。考虑将 qtrepotools/bin 添加到您的 PATH 环境变量中以访问它们。
@@ -686,8 +691,8 @@ qtrepotools 中的 qt5<sub>tool</sub> 有一些可能感兴趣的更多功能。
 </div>
 </div>
 </div>
-<div id="outline-container-org505c1b9" class="outline-2">
-<h2 id="org505c1b9"><span class="section-number-2">5.</span> 从 git 构建 Qt5</h2>
+<div id="outline-container-orgdb0f0a0" class="outline-2">
+<h2 id="orgdb0f0a0"><span class="section-number-2">5.</span> 从 git 构建 Qt5</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 有关更多信息，请参阅 <a href="http://wiki.qt.io/Building_Qt_5_from_Git">http://wiki.qt.io/Building<sub>Qt</sub><sub>5</sub><sub>from</sub><sub>Git</sub></a> 和 README.git。
@@ -695,8 +700,8 @@ qtrepotools 中的 qt5<sub>tool</sub> 有一些可能感兴趣的更多功能。
 </p>
 </div>
 </div>
-<div id="outline-container-org2a753f2" class="outline-2">
-<h2 id="org2a753f2"><span class="section-number-2">6.</span> 文档</h2>
+<div id="outline-container-org9553f7d" class="outline-2">
+<h2 id="org9553f7d"><span class="section-number-2">6.</span> 文档</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 配置和编译 Qt 后，可以通过运行 "make docs" 来构建文档。
@@ -726,7 +731,7 @@ qtrepotools 中的 qt5<sub>tool</sub> 有一些可能感兴趣的更多功能。
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="author">Last Updated 2026-01-16 Fri 09:25. Created by Jinghui Hu at 2026-01-16 Fri 00:00.</p>
+<p class="author">Last Updated 2026-01-16 Fri 10:12. Created by Jinghui Hu at 2026-01-16 Fri 00:00.</p>
 </div>
 </body>
 </html>
