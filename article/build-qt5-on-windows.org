@@ -24,12 +24,12 @@
 - Python 2.7 或更高版本  [[http://www.activestate.com/activepython/][http://www.activestate.com/activepython/]]
 - Ruby 1.9.3 或更高版本  [[http://rubyinstaller.org/][http://rubyinstaller.org/]]
 
-  #+BEGIN_SRC sh
+  #+BEGIN_SRC bat
     unzip qt-everywhere-opensource-src-5.15.18.zip
     cd qt-everywhere-src-5.15.18
     set CL=/MP32
-    # configure -prefix qtbase -opensource -nomake tests
-    # configure -prefix "C:\Qt\Qt5.15.8" -shared -release -nomake tests -opensource -confirm-license
+    rem configure -prefix qtbase -opensource -nomake tests
+    rem configure -prefix "C:\Qt\Qt5.15.8" -shared -release -nomake tests -opensource -confirm-license
     configure -prefix "C:\Qt\Qt5.15.8" -shared -release -nomake tests -skip qtwebengine -opensource -confirm-license
     nmake
     nmake --install
@@ -57,15 +57,18 @@
   Microsoft (R) 程序维护实用工具 14.44.35222.0 版
   版权所有 (C) Microsoft Corporation。  保留所有权利。
 
+          cl -c -Fo./ -Fdqmake.pdb  -W2 -nologo -O2  /MP /wd4577   -IC:\Qt\qt-everywhere-src-5.15.18\qtbase\qmake -IC:\Qt\qt-everywhere-src-5.15.18\qtbase\qmake\library -IC:\Qt\qt-everywhere-src-5.15.18\qtbase\qmake\generators -IC:\Qt\qt-everywhere-src-5.15.18\qtbase\qmake\generators\unix -IC:\Qt\qt-everywhere-src-5.15.18\qtbase\qmake\generators\win32 -IC:\Qt\qt-everywhere-src-5.15.18\qtbase\qmake\generators\mac  -IC:\Qt\qt-everywhere-src-5.15.18\qtbase/src/3rdparty/tinycbor/src  -IC:\Qt\qt-everywhere-src-5.15.18\qtbase/include -IC:\Qt\qt-everywhere-src-5.15.18\qtbase/include\QtCore -IC:\Qt\qt-everywhere-src-5.15.18\qtbase/include\QtCore\5.15.18 -IC:\Qt\qt-everywhere-src-5.15.18\qtbase/include\QtCore\5.15.18\QtCore  -I..\src\corelib\global  -IC:\Qt\qt-everywhere-src-5.15.18\qtbase\mkspecs\win32-msvc   -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS  -DQT_VERSION_STR=\"5.15.18\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=15 -DQT_VERSION_PATCH=18  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_FOREACH -DUNICODE -D_ENABLE_EXTENDED_ALIGNED_STORAGE -c -Yc -Fpqmake_pch.pch -TP C:\Qt\qt-everywhere-src-5.15.18\qtbase\qmake\qmake_pch.h
+  qmake_pch.h权所有 (C) Microsoft Corporation。  保留所有权利。
+
   >>>>>>>>>> 此处省略一千万字 <<<<<<<<<<
 
   Configure summary:
 
   Build type: win32-msvc (x86_64, CPU features: sse sse2)
   Compiler: msvc 194435222
-  Configuration: sse2 aesni sse3 ssse3 sse4_1 sse4_2 avx avx2 avx512f avx512bw avx512cd avx512dq avx512er avx512ifma avx512pf avx512vbmi avx512vl compile_examples f16c largefile precompile_header rdrnd rdseed shani x86SimdAlways shared shared debug_and_release release debug build_all c++11 c++14 c++17 c++1z concurrent dbus no-pkg-config release_tools stl
+  Configuration: sse2 aesni sse3 ssse3 sse4_1 sse4_2 avx avx2 avx512f avx512bw avx512cd avx512dq avx512er avx512ifma avx512pf avx512vbmi avx512vl compile_examples f16c largefile precompile_header rdrnd rdseed shani x86SimdAlways shared shared release c++11 c++14 c++17 c++1z concurrent dbus no-pkg-config stl
   Build options:
-    Mode ................................... debug and release; default link: debug; optimized tools
+    Mode ................................... release
     Optimize release build for size ........ no
     Building shared libraries .............. yes
     Using C standard ....................... C89
@@ -198,7 +201,7 @@
   Qt Testlib:
     Tester for item models ................. yes
   Serial Port:
-    ntddmodm ............................... no
+    ntddmodm ............................... yes
   Qt SerialBus:
     Socket CAN ............................. no
     Socket CAN FD .......................... no
@@ -287,8 +290,6 @@
       Mapbox ............................... yes
       MapboxGL ............................. no
       Itemsoverlay ......................... yes
-  QtXmlPatterns:
-    XML schema support ..................... yes
   Qt Multimedia:
     ALSA ................................... no
     GStreamer 1.0 .......................... no
@@ -323,42 +324,6 @@
     WinRT Runner Tool ...................... no
   Qt Tools:
     QDoc ................................... no
-  Qt WebEngine Build Tools:
-    Use System Ninja ....................... no
-    Jumbo Build Merge Limit ................ no
-    Developer build ........................ no
-    Sanitizer .............................. no
-  Qt WebEngineCore:
-    Embedded build ......................... no
-    Full debug information ................. no
-    Pepper Plugins ......................... yes
-    Printing and PDF ....................... yes
-    Proprietary Codecs ..................... no
-    Spellchecker ........................... yes
-    Native Spellchecker .................... no
-    WebRTC ................................. yes
-    PipeWire over GIO ...................... no
-    Geolocation ............................ yes
-    WebChannel support ..................... yes
-    Kerberos Authentication ................ yes
-    Extensions ............................. yes
-  Qt WebEngineQml:
-    Support Qt WebEngine Qml ............... yes
-    UI Delegates ........................... yes
-    Test Support ........................... no
-  Qt WebEngineWidgets:
-    Support Qt WebEngine Widgets ........... yes
-  Qt PDF:
-    Support V8 ............................. no
-    Support XFA ............................ no
-    Support XFA-BMP ........................ no
-    Support XFA-GIF ........................ no
-    Support XFA-PNG ........................ no
-    Support XFA-TIFF ....................... no
-    Bitcode support ........................ no
-    Use static runtime ..................... no
-  Qt PDF Widgets:
-    Support Qt PDF Widgets ................. yes
 
   Note: No wayland-egl support detected. Cross-toolkit compatibility disabled.
 
@@ -370,9 +335,8 @@
   On Windows, you must set LLVM_INSTALL_DIR to the installation path.
 
   Qt is now configured for building. Just run 'nmake'.
-  Once everything is built, Qt is installed.
-  You should NOT run 'nmake install'.
-  Note that this build cannot be deployed to other machines or devices.
+  Once everything is built, you must run 'nmake install'.
+  Qt will be installed into 'C:\Qt\Qt5.15.8'.
 
   Prior to reconfiguration, make sure you remove any leftovers from
   the previous build.
