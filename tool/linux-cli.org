@@ -32,13 +32,13 @@
      w
      users
 
-     # 查看用户指纹，用户 id，名字，登录状态
+     # 查看用户指纹、用户 ID、名字、登录状态
      finger user
-     # 查看用户的各种 id，uid，gid
+     # 查看用户的各种 ID，包括 UID、GID
      id user
-     # 打印 uid
+     # 打印 UID
      id -u user
-     # 打印 gid
+     # 打印 GID
      id -g user
 
      # 查看最近登录用户日志
@@ -53,17 +53,17 @@
    #+BEGIN_SRC shell
      # 添加用户
      useradd user
-     useradd -m user # 创建用户，同时创建家目录；但不设置用户密码
-     # 删除用户 -r 选项删除用户并移除家目录和邮箱
+     useradd -m user # 创建用户，同时创建家目录，但不设置用户密码
+     # 删除用户，-r 选项删除用户并移除家目录和邮箱
      userdel user
      userdel -r user
 
-     # 添加用户，1. 调用 useradd 新建用户; 2. 创建用户的家目录; 3. 为用户设置密码
+     # 添加用户：1. 调用 useradd 新建用户；2. 创建用户的家目录；3. 为用户设置密码
      adduser user
-     # 删除用户，1. 调用 userdel 删除用户；2. 删除用户的家目录
+     # 删除用户：1. 调用 userdel 删除用户；2. 删除用户的家目录
      deluser user
 
-     # 修改密码, 重置密码
+     # 修改密码、重置密码
      passwd
      sudo passwd user
    #+END_SRC
@@ -106,9 +106,9 @@
       cd
       # 返回之前的目录
       cd -
-      # 返回之前第 N 个目录, cd -2 返回倒数第二个目录
+      # 返回之前第 N 个目录，cd -2 返回倒数第二个目录
       cd -N
-      # 返回到 git 根目录
+      # 返回到 Git 根目录
       cd $(git rev-parse --show-toplevel)
 
       # 新建目录
@@ -147,7 +147,7 @@
       # 文件的详细信息
       stat file
 
-      # 分页查看, less is more, less 可以往回翻页， more 不行
+      # 分页查看，less is more，less 可以往回翻页，more 不行
       less file
       more file
 
@@ -164,15 +164,15 @@
       cp -rf src dest
       # 更新模式复制文件，即 src 比 dest 新则复制
       cp -u src dest
-      # 移动文件，重命名文件
+      # 移动文件、重命名文件
       mv src dest
       # 删除文件
       rm file
-      # 递归删除，非常小心地用这个命令
+      # 递归删除，非常小心地使用这个命令
       rm -rf dir
 
-      # 创建软连接, dest 是所指向的文件，link 是软连接
-      # 例如: ln -s /tmp ~/Public/tmp 相当于在 ~/Public 中建了一个 tmp 软链接，指向 /tmp
+      # 创建软链接，dest 是所指向的文件，link 是软链接
+      # 例如：ln -s /tmp ~/Public/tmp 相当于在 ~/Public 中建了一个 tmp 软链接，指向 /tmp
       ln -s dest link
     #+END_SRC
 
@@ -189,7 +189,7 @@
 
 *** 更新文件信息
     #+BEGIN_SRC shell
-      # 更新一下文件
+      # 更新文件时间戳
       touch file
 
       # 更新文件权限为 644，-R 可以递归修改
@@ -197,7 +197,7 @@
       # 更新文件的组/用户，-R 可以递归修改
       chgrp group file
       chown user file
-      # 同时更改文件的组合用户，-R 可以递归修改
+      # 同时更改文件的组和用户，-R 可以递归修改
       chown user:group file
     #+END_SRC
 
@@ -207,10 +207,10 @@
       cmd > file
       # 将 cmd 的 stderr 重定向到 file 中
       cmd 2> file
-      # 将 cmd 的 stdout 和 stderr 重定向到 file 中, 2>&1 的必须放在 > file 后面
+      # 将 cmd 的 stdout 和 stderr 重定向到 file 中，2>&1 必须放在 > file 后面
       cmd > file 2>&1
 
-      # 将 cmd 的 stdout 和 stderr 重定向到 /dev/null 中，并挂载成后台任务
+      # 将 cmd 的 stdout 和 stderr 重定向到 /dev/null 中，并作为后台任务运行
       cmd >/dev/null 2>&1 &
     #+END_SRC
 
@@ -225,7 +225,7 @@
      ps -u user
      # 指定格式查看进程
      ps -eo pid,user,command
-     # 查看父进程 ppid 为 1 的子进程
+     # 查看父进程 PPID 为 1 的子进程
      ps -eo ppid,pid,user,command | awk '$1 ~ /^1$/'
    #+END_SRC
 
@@ -234,11 +234,11 @@
      # 进程监视器
      top
 
-     # 进程监视器, 仅仅监控 user 的进程
+     # 进程监视器，仅监控 user 的进程
      top -u user
      top -u $USER
 
-     # htop 和 top 类似，但是比 top 要好看一点，需要安装
+     # htop 和 top 类似，但是比 top 界面更友好，需要安装
      htop
 
      # 内存监视器
@@ -253,11 +253,11 @@
 
 ** 后台进程
    #+BEGIN_SRC shell
-     # & 符号表示将进程挂在后台运行
+     # & 符号表示将进程在后台运行
      cmd &
      # 查看所有后台进程
      jobs
-     # 查看后台进程，并切换过去
+     # 将后台进程切换到后台继续运行
      bg
      # 切换后台进程到前台
      fg
@@ -268,34 +268,34 @@
      nohup cmd
      # 在后台长期运行程序
      nohup cmd &
-     # 将指定 pid 或者 jid 从后台任务列表移除
+     # 将指定 PID 或者 JID 从后台任务列表移除
      disown pid|jid
      # 等待所有后台进程任务结束
      wait
    #+END_SRC
 
 * 远程交换
-** ssh
+** SSH
    #+BEGIN_SRC shell
      # 远程登录
      ssh user@host
-     # 指定 ssh 端口为 2222 登录到远程机器上
+     # 指定 SSH 端口为 2222 登录到远程机器上
      ssh -p 2222 user@host
 
-     # 生成 ssh 公钥和私钥
+     # 生成 SSH 公钥和私钥
      ssh-keygen -t rsa -b 4096 -C "hujinghui@buaa.edu.cn"
 
-     # 复制 ssh 公钥到远程机器上
+     # 复制 SSH 公钥到远程机器上
      ssh-copy-id user@host
      ssh-copy-id -i ~/.ssh/id_rsa.pub user@host
 
-     # ssh 到远程机器上，并执行 cmd 命令
+     # SSH 到远程机器上，并执行 cmd 命令
      ssh user@host cmd
    #+END_SRC
 
-** scp 和 rsync
+** SCP 和 rsync
    #+BEGIN_SRC shell
-     # 本地到远程复制文件, -r 选项表示递归复制
+     # 本地到远程复制文件，-r 选项表示递归复制
      scp file user@host:path
      scp user@host:path file
      scp -r file user@host:path
@@ -308,20 +308,20 @@
      rsync -av --exclude='*.log' dir user@host:path
      # 增量同步文件，删除远程中多余的文件
      rsync -av --delete dir user@host:path
-     # 增量同步文件，删除远程中多余的文件， *.log 文件会被忽略，不会被删除
+     # 增量同步文件，删除远程中多余的文件，*.log 文件会被忽略，不会被删除
      rsync -av --exclude='*.log' --delete dir user@host:path
    #+END_SRC
 
 * 软件包管理器
-** rpm & yum
+** RPM & YUM
    #+BEGIN_SRC shell
      # 直接安装
      rpm -ivh package-name.bla.rpm
      # 忽略报错，强制安装
      rpm --force -ivh your-package.rpm
-     # 查询 rpm
+     # 查询 RPM
      rpm -ql tree
-     # 卸载 rpm 软件包
+     # 卸载 RPM 软件包
      rpm -e tree
 
      # 返回软件包的全名
@@ -342,7 +342,7 @@
      # 下载包缓存信息
      yum makecache
    #+END_SRC
-** dpkg & apt-get
+** DPKG & APT
    #+BEGIN_SRC shell
      # 安装软件包
      dpkg -i package.bla.deb
@@ -382,12 +382,12 @@
      apt-cache show package
    #+END_SRC
 * 网络管理
-** route
+** Route
    #+BEGIN_SRC shell
      # 打印路由表
      route -n
 
-     # 添加默认网关为 192.168.1.1, 即默认路由
+     # 添加默认网关为 192.168.1.1，即默认路由
      route add default gw 192.168.1.1
      # 添加一条普通路由项
      route add 192.168.1.0/32 gw 192.168.1.1
@@ -451,7 +451,7 @@
      # 路由跳转追踪
      traceroute host
 
-     # 查看暴露的外网 ip
+     # 查看暴露的外网 IP
      curl http://httpbin.org/ip
 
      # DNS 查询
@@ -479,17 +479,17 @@
      nmap -p 9000-9999 192.168.0.110
    #+END_SRC
 
-** ssh 代理
+** SSH 代理
    #+BEGIN_SRC shell
-     # 在本地 9595 端口开启一个 socks5 的代理服务
+     # 在本地 9595 端口开启一个 SOCKS5 的代理服务
      ssh -N -D 9595 user@proxyer
 
-     # 测试连通性: --socks5-hostname 表示使用代理机的 DNS 来解析域名
+     # 测试连通性：--socks5-hostname 表示使用代理机的 DNS 来解析域名
      curl --socks5-hostname 127.0.0.1:9595 http://httpbin.org/ip
 
-     # 优雅地启动 socks5 代理
-     # -f 挂后台, -q 静默, -n 屏蔽 stdin, -T 阻止分配 tty, -C 压缩
-     # -N 不执行 ssh 命令，只作端口转发， -D 指定本地监听端口号
+     # 优雅地启动 SOCKS5 代理
+     # -f 挂后台，-q 静默，-n 屏蔽 stdin，-T 阻止分配 tty，-C 压缩
+     # -N 不执行 ssh 命令，只作端口转发，-D 指定本地监听端口号
      ssh -fqnCTN -D 9595 user@proxyer
 
      # 反向代理：将外网主机（202.115.8.1）端口（8443）转发到内网主机 192.168.1.2:443
@@ -551,7 +551,7 @@
      # 执行多次替换
      sed -e 's/f/r/' -e 's/f/r' file
 
-     # 使用 # 替换 / 来避免 pattern 中有斜杆
+     # 使用 # 替换 / 来避免 pattern 中有斜杠
      sed 's#find#replace#' file
 
      # 删除第 1 行内容
@@ -575,7 +575,7 @@
 ** awk
    awk 一般用于文本预处理，并且支持编程
    #+BEGIN_SRC shell
-     # -F 选项指定分隔符, 默认以空格分隔
+     # -F 选项指定分隔符，默认以空格分隔
      awk -F ':' '{print $1}' file
 
      # 使用正则表达式匹配过滤结果
@@ -637,7 +637,7 @@
      # Object Construction: {}
    #+END_SRC
 
-   去除字符串的双引号，jq 在输出 json 时遇到字符串会添加上双引号，可以使用 -r 选项来去除双引号
+   去除字符串的双引号，jq 在输出 JSON 时遇到字符串会添加上双引号，可以使用 -r 选项来去除双引号
    #+BEGIN_SRC text
      ~ $ echo '["a", "b", "c"]' | jq '.[]'
      "a"
@@ -657,7 +657,7 @@
      sort -r file
      # 使用数字而不是字符串进行比较
      sort -n file
-     # 按 passwd 文件的第三列进行排序, -t 表示分隔符
+     # 按 passwd 文件的第三列进行排序，-t 表示分隔符
      sort -t: -k 3n /etc/passwd
      # 去重排序
      sort -u file
