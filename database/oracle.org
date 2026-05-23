@@ -1103,12 +1103,12 @@
 
 ** 事务开始和结束
    *事务开始* 在 Oracle 数据库中，没有提供开始事务处理语句，所有的事务都是隐式开
-   始的，也就是说在 Oracle 中，用户不可以显示使用命令来开始一个事务。Oracle 任务
+   始的，也就是说在 Oracle 中，用户不可以显式使用命令来开始一个事务。Oracle 任务
    第一条修改数据库的语句， 或者一些要求事务处理的场合都是事务的隐式开始。
 
    *事务结束* 主要发生在以下几种情况下：
    1. 执行 DDL 语句时，系统自动执行 ~commit~ 语句，相当于隐式提交事务
-   2. 显示执行 ~commit~ 和 ~rollback~
+   2. 显式执行 ~commit~ 和 ~rollback~
    3. 退出/断开数据库的连接自动执行 ~commit~ 语句
    4. 进程意外终止，事务自动 ~rollback~
    5. 事务 ~commit~ 时会生成一个唯一的系统变化号保存到事务表，这个系统变化号被称
@@ -1728,7 +1728,7 @@
      export NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'
    #+END_SRC
 
-   方案三：在选取时间日期字段时显示使用 ~to_char~ 函数来格式化时间
+   方案三：在选取时间日期字段时显式使用 ~to_char~ 函数来格式化时间
    #+BEGIN_SRC sql
      select
        to_char(sysdate, 'YYYY-MM-DD HH24:MI:SS') as now
@@ -2279,7 +2279,7 @@
      sqlplus username/password@"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=service_id)))"
    #+END_SRC
 
-   当命令中的密码字段中含义有 @ 字段时需要将 password 字段用双引号包起来，如下：
+   当命令中的密码字段中含有 @ 字段时需要将 password 字段用双引号包起来，如下：
    #+BEGIN_SRC shell
      sqlplus user/\"my@password\"@hostname:port/service_id
    #+END_SRC

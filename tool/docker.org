@@ -10,21 +10,21 @@
 
 * Docker
 
-  Docker 和传统虚拟机有着同样的虚拟化硬件资源的功能，但是 Docker 在完成虚拟化是
+  Docker 和传统虚拟机有着同样的虚拟化硬件资源的功能，但是 Docker 在完成虚拟化时
   使用的是 *容器* 的技术而非实现虚拟主机的资源，这样带来的好处就是更加轻便。
 
   [[file:../static/image/2018/11/container-vs-vm.png]]
 
   Docker 的最低依赖是 3.10.x 的 Linux 内核。并且 Docker 可以安装在 [[https://docs.docker.com/engine/installation/linux/][Linux]]，[[https://docs.docker.com/docker-for-mac/][Mac]] 和
-  [[https://docs.docker.com/docker-for-windows/][Windows]] 操作系统上。如果你使用 Windows 作为开机机，需要另外配置[[https://docs.docker.com/docker-for-windows/#shared-drives][驱动共享]] 。
+  [[https://docs.docker.com/docker-for-windows/][Windows]] 操作系统上。如果你使用 Windows 作为开发机，需要另外配置[[https://docs.docker.com/docker-for-windows/#shared-drives][驱动共享]] 。
 
 * Docker 的系统架构
-  Docker 系统中包含容器（container）、图像（image）等常用概念。概念之间的联系见下图：
+  Docker 系统中包含容器（container）、镜像（image）等常用概念。概念之间的联系见下图：
 
   [[file:../static/image/2018/11/docker-architecture.png]]
 
 * Docker 容器
-  容器是一个运行的实例，他是一个图像的运行实体。如果把图像比喻成数轴上点的话，容
+  容器是一个运行的实例，他是一个镜像的运行实体。如果把镜像比喻成数轴上点的话，容
   器就是一个区间。
 ** 生命周期
    - ~docker create~ : 创建容器
@@ -35,7 +35,7 @@
      + =-d= : 当容器退出后自动进行 detach 操作，该选项是常见的后台启动应用的方法
      + =--volume $HOSTDIR:$DOCKERDIR= : 挂载容器外的磁盘
      + =--publish $HOSTPORT:$DOCKERPORT= : 暴露端口
-     + =--name= : 制定容器名
+     + =--name= : 指定容器名
      + =--restart= : 重启策略，默认是 no ，即不重启。但是有一些后台服务需要跟着
        docker 同时启动。这时需要将重启策略设置成 always
    - ~docker rm~ : 删除容器
@@ -83,7 +83,7 @@
    #+END_SRC
 
 ** 使用容器中 Ubuntu 操作系统
-   下面是使用一些常用命令启动 Ubuntu 图像，并且 attache / detach 终端，具体见如
+   下面是使用一些常用命令启动 Ubuntu 镜像，并且 attache / detach 终端，具体见如
    下：
    #+BEGIN_SRC text
      ➜  ~ docker ps -a
@@ -134,37 +134,37 @@
      ➜  ~
    #+END_SRC
 
-* Docker 图像
-  Docker 图像指的是容器在一个特点时间点的快照，它是一个只读的容器的存储，官网上
-  说图像是容器的一个模板。
+* Docker 镜像
+  Docker 镜像指的是容器在一个特定时间点的快照，它是一个只读的容器的存储，官网上
+  说镜像是容器的一个模板。
 
 ** 生命周期
-   - ~docker images~ : 显示所有图像
-   - ~docker import~ : 通过压缩文档导入图像
-   - ~docker build~ : 通过 Dockerfile 创建图像
-   - ~docker commit~ : 通过一个容器来提交一个图像
-   - ~docker rmi~ : 移除一个图像
-   - ~docker load~ : 通过压缩档案作为 STDIN 来导入图像，图像的标签也会一并导入
-   - ~docker save~ : 将图像压缩成压缩档案输出到 STDOUT，图像的 layer, tags, version 一并输出
+   - ~docker images~ : 显示所有镜像
+   - ~docker import~ : 通过压缩文档导入镜像
+   - ~docker build~ : 通过 Dockerfile 创建镜像
+   - ~docker commit~ : 通过一个容器来提交一个镜像
+   - ~docker rmi~ : 移除一个镜像
+   - ~docker load~ : 通过压缩档案作为 STDIN 来导入镜像，镜像的标签也会一并导入
+   - ~docker save~ : 将镜像压缩成压缩档案输出到 STDOUT，镜像的 layer, tags, version 一并输出
 
 ** 显示状态
-   - ~docker history~ : 显示所有历史图像
-   - ~docker tag~ : 重命名图像，打标签等操作
+   - ~docker history~ : 显示所有历史镜像
+   - ~docker tag~ : 重命名镜像，打标签等操作
 
 ** 常用命令
    #+BEGIN_SRC shell
-     # 删除 tag 为 <none> 的图像
+     # 删除 tag 为 <none> 的镜像
      docker images | awk '$2 == "<none>" {print $3}' | xargs -I {} docker rmi {}
    #+END_SRC
 
 * 工作流
-** load/save 图像
-   加载文件中的图像
+** load/save 镜像
+   加载文件中的镜像
    #+BEGIN_SRC shell
      docker load < filename.tar.gz
    #+END_SRC
 
-   保存图像到文件
+   保存镜像到文件
    #+BEGIN_SRC shell
      docker save imagename:tagname | gzip > filename.tar.gz
    #+END_SRC
@@ -180,8 +180,8 @@
      docker export containername | gzip > filename.tar.gz
    #+END_SRC
 
-   值得一提的是： ~load~ 在新建图像时会带着相关的历史信息，tag 等，而 ~import~
-   只会创建一个图像，所以 ~import~ 的图像的大小会小一点。
+   值得一提的是： ~load~ 在新建镜像时会带着相关的历史信息，tag 等，而 ~import~
+   只会创建一个镜像，所以 ~import~ 的镜像的大小会小一点。
 
 ** 添加当前用户到 docker 组
    1. 添加 docker 的用户组， ~sudo groupadd docker~
@@ -190,16 +190,16 @@
 
 * Registry 和 Repository
   registry 是一个宿主机器，一个 registry 包含多个 repository。repository 是存储
-  图像的仓库，一个 repository 包含多个 image，同时每个 image 又有许多 tag。常见
+  镜像的仓库，一个 repository 包含多个 image，同时每个 image 又有许多 tag。常见
   的操作如下：
   - ~docker login~ : 登入 registry
   - ~docker logout~ : 注销 registry
-  - ~docker search~ : 搜索图像
-  - ~docker pull~ : 拉取 registry 的图像
-  - ~docker push~ : 上传本地图像到 registry
+  - ~docker search~ : 搜索镜像
+  - ~docker pull~ : 拉取 registry 的镜像
+  - ~docker push~ : 上传本地镜像到 registry
 
-** 上传图像到私有仓库
-   在上传或下载私有仓库的图像时，需要提前设置安全性。通常 docker 私有仓库默认采
+** 上传镜像到私有仓库
+   在上传或下载私有仓库的镜像时，需要提前设置安全性。通常 docker 私有仓库默认采
    用 HTTPS，如果不设置安全性则会出现如下错误：
    #+BEGIN_SRC shell
      ➜  ~ docker tag ubuntu:18.04 192.168.1.2:5000/ubuntu:18.04
@@ -241,8 +241,8 @@
      lastest: digest: sha256:9b1b75fa6364b2ec538a5efdb00c3511adee5b6b2f80d5c64b06c4456ad573f6 size: 1571
    #+END_SRC
 
-** 开启私有仓库允许删除图像的接口
-   registry 默认不允许删除已经上传的图像，可以通过以下设置来开启允许删除的配置
+** 开启私有仓库允许删除镜像的接口
+   registry 默认不允许删除已经上传的镜像，可以通过以下设置来开启允许删除的配置
    #+BEGIN_SRC shell
      # 查看默认配置
      docker exec -it registry sh -c 'cat /etc/docker/registry/config.yml'
@@ -312,23 +312,23 @@
    常见的指令如下表:
    | Instruction | 描述                                                          |
    |-------------+---------------------------------------------------------------|
-   | FROM        | 设置基的图像                                                  |
+   | FROM        | 设置基础镜像                                                  |
    | RUN         | 在新的层数执行一条命令，并且提交结果                          |
    | CMD         | 提供默认执行的容器                                            |
    | EXPOSE      | 暴露容器的监听端口， *这条指令只是提供端口，并不会直接暴露*   |
    | ENV         | 设置环境变量                                                  |
    | ADD         | 从容器外复制文件和目录到容器里面，避免使用 ADD，尽量使用 COPY |
    | COPY        | 使用 root 权限来复制文件                                      |
-   | ENTRYPOINT  | 配置容器是入口可执行文件                                      |
+   | ENTRYPOINT  | 配置容器的入口可执行文件                                      |
    | VOLUME      | 配置一个可挂载的点                                            |
    | USER        | 设置 RUN/CMD/ENTRYPOINT 的执行用户                            |
    | WORKDIR     | 设置工作目录                                                  |
    | ARG         | 设置 build 的命令行参数                                       |
-   | ONBUILD     | 添加一个当容器作为别的基容器是的触发命令                      |
+   | ONBUILD     | 添加一个当容器作为别的基础容器时的触发命令                    |
    | STOPSIGNAL  | 设置系统退出的信号                                            |
    | LABEL       | 添加 key/value 属性，如：images, container, daemon            |
 
-** 通过 docker build 创建图像
+** 通过 docker build 创建镜像
    #+BEGIN_SRC dockerfile
      FROM openjdk:8
      LABEL appname="myapp" version="0.0.1" author="Jinghui Hu"
@@ -339,7 +339,7 @@
      CMD java -jar myapp.jar
    #+END_SRC
 
-   使用 ~docker build~ 命令来新建图像
+   使用 ~docker build~ 命令来新建镜像
    #+BEGIN_SRC shell
      docker build -t myapp .
    #+END_SRC
