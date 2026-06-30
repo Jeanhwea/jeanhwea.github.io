@@ -29,7 +29,7 @@
    #+END_SRC
 
 ** null 和 undefined
-   =null= 在 JavaScript 中表示空值， =undefined= 通常是为没有赋值的变量。通常变
+   =null= 在 JavaScript 中表示空值， =undefined= 通常表示没有赋值的变量。通常变
    量为空的时候要使用 =null= ，尽量避免 =undefined=
    #+BEGIN_SRC js
      > null == undefined
@@ -1223,11 +1223,11 @@
    #+END_SRC
 
 ** 原型 ~[[Prototype]]~
-   JavaScript 的对象中都一个隐藏的 ~[[Prototype]]~ 属性，该属性被用来设置对象的原
+   JavaScript 的对象中都有一个隐藏的 ~[[Prototype]]~ 属性，该属性被用来设置对象的原
    型关系和一些面向对象的方法
 
 *** 对象的原型 ~obj.__proto__~
-    可以通过 ~obj.__proto__~ 来访问它 ~[[Prototype]]~ 。JavaScript 的继承关系都是
+    可以通过 ~obj.__proto__~ 来访问它的 ~[[Prototype]]~ 。JavaScript 的继承关系都是
     靠 ~__proto__~ 来实现的
     #+BEGIN_SRC js
       > let animal = { eats: true };
@@ -1349,7 +1349,7 @@
 
 *** 基于原型的类定义
     JavaScript 中的原型被用于定义类，为了保证子类方法在调用时可以共享父类中的方
-    法，类的方法都被定义在 prototype 中，下面是典型是示例
+    法，类的方法都被定义在 prototype 中，下面是典型的示例
     #+BEGIN_SRC js
       function Animal(name) { this.name = name; }
       Animal.prototype.eat = function() { console.log(`${this.name} eats.`); };
@@ -1434,7 +1434,7 @@
       obj instanceof Class
     #+END_SRC
 
-*** Minix
+*** Mixin
     混入 (Mixin) 是一个比较常用的技巧，基本思路是建一个对象，然后将所需混入的对
     象的 prototype 通过 ~Object.assign(...)~ 方法放入 Mixin 的属性。下面是一个例
     子
@@ -1489,7 +1489,7 @@
     | =<tbody>=                         | ~table.tBodies~             |
 
 *** 节点工具函数
-    DOM 提供了一些可以遍历 html 节点的函数，具体入下
+    DOM 提供了一些可以遍历 html 节点的函数，具体如下
     - 针对于所有类型节点方法: parentNode, childNodes, firstChild, lastChild,
       previousSibling, nextSibling.
     - 仅仅针对元素节点: parentElement, children, firstElementChild,
@@ -1592,7 +1592,7 @@
 
 ** 事件
 *** 绑定事件
-    绑定时间主要有 3 种方式：
+    绑定事件主要有 3 种方式：
     1. HTML 标签
        #+BEGIN_SRC html
          <input value="Click me" onclick="alert('Click!')" type="button">
@@ -1628,7 +1628,7 @@
     - ~event.currentTarget~ 指向事件所处理的当前 DOM 元素
     - ~event.clientX~ / ~event.clientY~ 对应鼠标事件，这两个值表示鼠标的坐标
 
-*** 事件冒泡(bubbing)和捕获(capturing)
+*** 事件冒泡(bubbling)和捕获(capturing)
 **** 事件冒泡
      事件冒泡指的是当 HTML 节点嵌套时，子节点的事件依次引发父节点的相应事件。例如：
      在下面的代码中，当点击 =p= 标签时会触发 =div= 和 =form= 的点击事件
@@ -1641,9 +1641,9 @@
      #+END_SRC
      *除了 focus 以外*, 几乎所有的事件都是冒泡的
 
-     - ~event.target~ 指向最先触发事件的 DOM 元素，主要和 ~event.currentTarget~
+     - ~event.target~ 指向最先触发事件的 DOM 元素，注意和 ~event.currentTarget~
        的区别
-     - ~event.eventPhase~ 当前的阶段。 ~capturing=1, bubbing=3~
+     - ~event.eventPhase~ 当前的阶段。 ~capturing=1, bubbling=3~
      - ~event.stopPropagation()~ 可以阻止事件冒泡，注意： *如果不是必要的话，千万
        不要阻止事件冒泡*
      - ~event.preventDefault()~ 阻止浏览器默认的事件，方便改变浏览器的行为。例如：
@@ -1698,7 +1698,7 @@
        + options 选项
          - bubbles 是否冒泡
          - cancelable 如果真，则可以调用 ~event.preventDefault()~ ，否则调用无效
-     - 事件中嵌套事件时同步的，即在事件回调函数中使用 ~addEventListener~ 定义事
+     - 事件中嵌套事件是同步的，即在事件回调函数中使用 ~addEventListener~ 定义事
        件不能达到异步执行的效果
      - 分发事件调用 ~elem.dispatchEvent(event)~
 
@@ -1758,7 +1758,7 @@
 
 ***** 页面生命周期中的事件
       - ~DOMContentLoaded~: 当初始的 HTML 文档被完全加载和解析完成之后触发
-      - ~windows.onload/onbeforeload/onunload~
+      - ~window.onload/onbeforeload/onunload~
         + ~document.readyState~: "loading", "interactive", "complete"
 
       #+BEGIN_SRC js
@@ -1888,7 +1888,7 @@
     - ~then~ 方法返回一个 Promise 对象，可以用来实现链式调用，有一点比较有用的是
       ~then~ 的行为会根据 ~then~ handler 的返回值类型改变
       + 当 handler 返回普通值时， ~then~ 方法会立马返回处理到下一个 handler
-      + 当 handler 抛出异常时， ~then~ 相当发生错误，调用 ~catch~ 方法的 handler
+      + 当 handler 抛出异常时， ~then~ 相当于发生错误，调用 ~catch~ 方法的 handler
         来进行错误处理
       + 当 handler 返回值是 Promise 对象时，直到等待 Promise 的异步调用完毕后
         才返回结果
@@ -2035,7 +2035,7 @@
     #+BEGIN_SRC js
       myObservable.subscribe({
         next(num) { console.log('Next num: ' + num)},
-        error(err) { console.log('Received an errror: ' + err)}
+        error(err) { console.log('Received an error: ' + err)}
       });
     #+END_SRC
 
