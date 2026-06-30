@@ -36,9 +36,9 @@ Actor 和 CSP 就是两种基于这种思想的并发编程模型。
 
 Actor 模型描述了一组为了避免并发编程的常见问题的公理:
 1. 所有 Actor 状态是 Actor 本地的，外部无法访问。
-2. Actor 必须只有通过消息传递进行通信。
+2. Actor 必须只能通过消息传递进行通信。
 3. 一个 Actor 可以响应消息:推出新 Actor,改变其内部状态,或将消息发送到一个或多个其他参与者。
-4. Actor 可能会堵塞自己,但 Actor 不应该堵塞它运行的线程。
+4. Actor 可能会阻塞自己,但 Actor 不应该阻塞它运行的线程。
 
 Map-Reduce 就是 actor 模型的一个典型应用。
 **** CSP (communicating sequential processes，通讯顺序进程)
@@ -51,7 +51,7 @@ Channel 模型中，worker 之间不直接彼此联系，而是通过不同 chan
 Go 语言的 CSP 模型是由协程 Goroutine 与通道 Channel 实现：
 1. Go 协程 goroutine: 是一种轻量线程，它不是操作系统的线程，而是将一个操作系统线程
    分段使用，通过调度器实现协作式调度。是一种绿色线程，微线程，它与 Coroutine 协程
-   也有区别，能够在发现堵塞后启动新的微线程。
+   也有区别，能够在发现阻塞后启动新的微线程。
 2. 通道 channel: 类似 Unix 的 Pipe，用于协程之间通讯和同步。协程之间虽然解耦，但是
    它们和 Channel 有着耦合。
 *** 常见语言的并发模型
