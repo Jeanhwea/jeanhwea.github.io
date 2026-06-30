@@ -21,7 +21,7 @@
       的地方，线程共享
    5. *元空间* 存放已被加载的类信息、常量、静态变量、即时编译器编译后的代码数据
       等。（即永久代），回收目标主要是常量池的回收和类型的卸载，各线程共享
-      - 元空间是 JDK 1.7 之前叫方法区
+      - 元空间在 JDK 1.7 之前叫方法区
 
 ** Java 内存堆和栈区别
    1. 栈内存用来存储基本类型的变量和对象的引用变量，堆内存用来存储 Java 中的对象，
@@ -116,7 +116,7 @@
           和 survivor0，这个过程也称为 *分配担保* （ =Full GC= ）
    3. 大对象、长期存活 (年龄 15 的对象, CMS 收集器默认 6 岁) 的对象则直接进入老
       年代
-   4. 动态对象年龄判定，当进入一批进入 survivor0 对象大小大于等于 survivor0 总内
+   4. 动态对象年龄判定，当一批进入 survivor0 对象大小大于等于 survivor0 总内
       存 50% 时会直接进入老年代 (可通过 ~-XX:TargetSurvivorRatio~ 控制 )
    5. 空间分配担保，Full GC
 
@@ -504,7 +504,7 @@
    Java 在发现 new 出来的对象如果只在当前方法中运行，会直接进入线程栈，而不会放入
    堆空间，这个现象叫做逃逸分析
 
-   实验时可以添加下列 Java 启动参数来显示，为达到演示效果需要现在堆空间为 10M
+   实验时可以添加下列 Java 启动参数来显示，为达到演示效果需要限定堆空间为 10M
    #+BEGIN_SRC shell
      -Xmx10m -Xms10m -XX:+PrintGC -XX:-DoEscapeAnalysis
    #+END_SRC
@@ -596,7 +596,7 @@
         // List of registered JDBC drivers
         private final static CopyOnWriteArrayList<DriverInfo> registeredDrivers = new CopyOnWriteArrayList<>();
       #+END_SRC
-   3. 调用 ~getConnection~ 方法时通过变量所有注册的驱动来获取连接信息
+   3. 调用 ~getConnection~ 方法时通过遍历所有注册的驱动来获取连接信息
       #+BEGIN_SRC java
         //  Worker method called by the public getConnection() methods.
         private static Connection getConnection(
@@ -721,7 +721,7 @@
         JDBC 4.0 之后使用 SPI 机制才会破坏双亲委派机制
       - Bootstrap ClassLoader 和 Extension ClassLoader, 他们只能加载自己指定目录
         下的类，无法加载运行时的，其他目录下的类
-      - JDBC 接口都是由 JDK 提供，具体实现是由第三方数据库产商提供的,所以也只能
+      - JDBC 接口都是由 JDK 提供，具体实现是由第三方数据库厂商提供的,所以也只能
         采用这种方式去加载驱动实现类
 
 * 反射
