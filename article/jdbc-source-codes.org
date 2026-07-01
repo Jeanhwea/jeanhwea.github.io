@@ -100,7 +100,7 @@
         // List of registered JDBC drivers
         private final static CopyOnWriteArrayList<DriverInfo> registeredDrivers = new CopyOnWriteArrayList<>();
       #+END_SRC
-   5. 调用 ~getConnection~ 方法时通过变量所有注册的驱动来获取连接信息
+   5. 调用 ~getConnection~ 方法时通过遍历所有注册的驱动来获取连接信息
       #+BEGIN_SRC java
         //  Worker method called by the public getConnection() methods.
         private static Connection getConnection(
@@ -435,7 +435,7 @@
        }
      }
    #+END_SRC
-   1. ~applyStatementSettings(...)~ 用户设置输入参数
+   1. ~applyStatementSettings(...)~ 用于设置输入参数
       - fectchSize 减少网络交互次数
       - maxRows 获取结果集的最大行数
    2. ~action.doInStatement(...)~ 是调用 ~StatementCallback~ 类型的回调函数
@@ -452,7 +452,7 @@
    4. ~DataSourceUtils.releaseConnection(...)~ 释放连接
 
 ** 数据库更新: ~update(...)~ 方法
-   数据库更新和执行 SQL 类似，这里需要熟悉 ~PreparedStatement~ 接口，它是一预编
+   数据库更新和执行 SQL 类似，这里需要熟悉 ~PreparedStatement~ 接口，它是一个预编
    译的 SQL 语句
    #+BEGIN_SRC java
      PreparedStatement pstmt = con.prepareStatement("UPDATE EMPLOYEES SET SALARY = ? WHERE ID = ?");

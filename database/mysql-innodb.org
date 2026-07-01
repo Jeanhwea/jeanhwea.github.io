@@ -127,7 +127,7 @@
    1. Redo Log 日志文件也需要相应的内存数据结构来进行缓存操作
    2. Log Buffer 就是用于缓存 Redo Log 日志文件的内存空间
    3. 其空间大小可以通过参数 ~innodb_log_buffer_size~ 来设定
-   4. 日志文件的每次更新都应该刷会磁盘，不然就会有数据丢失或不一致的风险,
+   4. 日志文件的每次更新都应该刷回磁盘，不然就会有数据丢失或不一致的风险,
       ~innodb_flush_log_at_trx_commit~ 参数用于设置日志刷回磁盘的频率
       - 默认值为 1， 即每次事务提交时，都会记录日志，并将其刷回到磁盘
       - 参数值为 0 时，日志写入和刷回磁盘的操作为每秒 1 次
@@ -149,7 +149,7 @@
       - 通过下列命令查看 ~show engine innodb status\G~
       - ~innodb_deadlock_detect~ 是检测死锁是否开启，如果死锁检测到立马回滚
       - ~innodb_lock_wait_timeout~ 可以配置等待超时，避免长时间的死锁
-   4. InnoDB 的建表需要满足如下条件来提供性能
+   4. InnoDB 的建表需要满足如下条件来提升性能
       - 建表时添加主键, 用于标识数据
       - 主键的值最好使用 ~CREATE TABLE~ 语句, 而避免使用 ~ALTER TABLE~ 语句
       - 主键类型需要事先选择好，一般使用自增主键是一个比较好的选择
@@ -166,7 +166,7 @@
         1/16 的数据空间预留给将来的扩展
    3. B+ 索引构建方式, 具体描述见[[https://dev.mysql.com/doc/refman/5.7/en/sorted-index-builds.html][文档]]
       - 第一阶段: 扫描 clustered index, 利用 Buffer Pool 缓存数据， 当 Sort
-        Buffer 遍满时使用临时文件中
+        Buffer 填满时使用临时文件中
       - 第二阶段: 将临时文件中的条目归并排序, 这里应该是发生 *磁盘排序*
       - 第三阶段: 将排好序的数据插入 B+ 树
         + 插入需要打开 B+ 树的 cursor 来找到插入位置
