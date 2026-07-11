@@ -1,0 +1,42 @@
+#+TITLE: Agents
+#+AUTHOR: Jinghui Hu
+#+EMAIL: hujinghui@buaa.edu.cn
+#+DATE: <2026-07-11 Sat>
+#+STARTUP: overview num indent
+#+OPTIONS: ^:nil
+
+
+* Coding Agents
+** omp
+- 官网 [[https://omp.sh/][omp.sh]]
+#+BEGIN_SRC sh
+  curl -fsSL https://omp.sh/install | sh
+#+END_SRC
+- 配置模型
+  #+BEGIN_SRC yml
+    providers:
+      myco:
+        baseUrl: http://127.0.0.1:8011/api/v1
+        apiKey: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        api: openai-completions
+        auth: apiKey
+        models:
+          - id: deepseek-v4-flash
+            name: deepseek-v4-flash
+            reasoning: true
+            input: [text]
+            contextWindow: 262144
+            maxTokens: 262144
+            cost: { input: 3, output: 15, cacheRead: 0.3, cacheWrite: 3.75 }
+  #+END_SRC
+** Zed ACP
+- 配置 settings.json
+#+BEGIN_SRC json
+  "agent_servers": {
+    "Oh My Pi": {
+      "type": "custom",
+      "command": "omp",
+      "args": ["acp"]
+    }
+  },
+#+END_SRC
